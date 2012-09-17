@@ -61,34 +61,34 @@ string testApp::setupForTarget(int targ){
     switch(targ){
         case OF_TARGET_OSX:
             project = new xcodeProject;
-            project->setTemplatePath(ofToDataPath("templates/osx/"));
+            if (useDataFolderTemplates) project->setTemplatePath(ofToDataPath("templates/osx/"));
             target = "osx";
             break;
         case OF_TARGET_WINGCC:
             project = new CBWinProject;
-            project->setTemplatePath(ofToDataPath("templates/win_cb/"));
+           if (useDataFolderTemplates)  project->setTemplatePath(ofToDataPath("templates/win_cb/"));
             target = "win_cb";
             break;
         case OF_TARGET_WINVS:
             project = new visualStudioProject;
-            project->setTemplatePath(ofToDataPath("templates/vs2010/"));
+            if (useDataFolderTemplates) project->setTemplatePath(ofToDataPath("templates/vs2010/"));
             target = "vs2010";
             break;
         case OF_TARGET_IPHONE:
             project = new xcodeProject();
-            project->setTemplatePath(ofToDataPath("templates/ios/"));
+            if (useDataFolderTemplates) project->setTemplatePath(ofToDataPath("templates/ios/"));
             target = "ios";
             break;
         case OF_TARGET_ANDROID:
             break;
         case OF_TARGET_LINUX:
             project = new CBLinuxProject;
-            project->setTemplatePath(ofToDataPath("templates/linux/"));
+            if (useDataFolderTemplates) project->setTemplatePath(ofToDataPath("templates/linux/"));
             target = "linux";
             break;
         case OF_TARGET_LINUX64:
             project = new CBLinuxProject;
-            project->setTemplatePath(ofToDataPath("templates/linux64/"));
+            if (useDataFolderTemplates) project->setTemplatePath(ofToDataPath("templates/linux64/"));
             target = "linux64";
             break;
     }
@@ -121,6 +121,7 @@ void testApp::setup(){
     XML.loadFile("projectGeneratorSettings.xml");
     appToRoot = XML.getValue("appToRoot", "../../../../");
     defaultLoc = XML.getValue("defaultNewProjectLocation", "apps/myApps");
+    useDataFolderTemplates = XML.getValue("useDataFolderTemplates", "true") == "true" ? true : false;
     
     //-------------------------------------
     // calculate the bin path (../../../ on osx) and the sketch path (bin -> root - > defaultLoc)

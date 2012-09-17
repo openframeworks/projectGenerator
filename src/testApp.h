@@ -62,6 +62,8 @@ class testApp : public ofBaseApp{
         ofxXmlSettings XML;
         string appToRoot;
         string defaultLoc;
+        bool useDataFolderTemplates;
+    
     
         textButton button;
         textButton addonButton;
@@ -70,6 +72,8 @@ class testApp : public ofBaseApp{
         bool isAddonCore(string addon);
         bool bInited;
         vector < string  > coreAddons;
+    
+        
     
 
 };

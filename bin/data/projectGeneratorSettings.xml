@@ -1,6 +1,9 @@
 
 <!-- the path from this EXE / APP to the root folder -->
-<appToRoot>../../../../</appToRoot>
+<appToRoot>../</appToRoot>
 
 <!-- from the OF root, where should we encourage people to put apps -->
 <defaultNewProjectLocation>apps/myApps</defaultNewProjectLocation>
+
+<!-- use the templates in the data folder, or in the OFROOT/scripts folder -->
+<useDataFolderTemplates>true</useDataFolderTemplates>
