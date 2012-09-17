@@ -402,7 +402,7 @@ void testApp::generateProject(){
             
             addonsToggles = panelOtherAddons.getControlNames();
             for (int i = 0; i < (int) addonsToggles.size(); i++){
-                ofxToggle toggle = panelCoreAddons.getToggle(addonsToggles[i]);
+                ofxToggle toggle = panelOtherAddons.getToggle(addonsToggles[i]);
                 if(toggle){
                     ofAddon addon;
                     addon.pathToOF = getOFRelPath(path);
