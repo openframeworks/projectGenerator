@@ -83,6 +83,12 @@ bool __g2ShowOpenDialog( char * Path, const char* Message, const char* FileExten
     [opanel setCanChooseDirectories:YES];
     [opanel setCanChooseFiles:NO];
     
+    // add a "new folder" button:
+    // http://www.cocoabuilder.com/archive/cocoa/82023-nsopenpanel-and-the-new-folder-button.html
+    
+    [opanel _setIncludeNewFolderButton:YES];
+    
+    
     
     NSString* string = [NSString stringWithFormat:@"%s" , Path];
     

@@ -10,7 +10,9 @@
 
 
 //------------------------------------------------------
-bool testApp::isAddonCore(string addon){    
+bool testApp::isAddonCore(string addon){   
+    
+    
     if (bInited == false){
         coreAddons.push_back("ofx3DModelLoader");
         coreAddons.push_back("ofxAssimpModelLoader");
@@ -22,10 +24,14 @@ bool testApp::isAddonCore(string addon){
         coreAddons.push_back("ofxThreadedImageLoader");
         coreAddons.push_back("ofxVectorGraphics");
         coreAddons.push_back("ofxVectorMath");
-        coreAddons.push_back("ofXmlSettings");
+        coreAddons.push_back("ofxXmlSettings");
         bInited = true;
     }
+    
+    
+    
     for (int i = 0; i < coreAddons.size(); i++){
+        
         if (coreAddons[i] == addon){
             return true;
         }
@@ -61,34 +67,28 @@ string testApp::setupForTarget(int targ){
     switch(targ){
         case OF_TARGET_OSX:
             project = new xcodeProject;
-            if (useDataFolderTemplates) project->setTemplatePath(ofToDataPath("templates/osx/"));
             target = "osx";
             break;
         case OF_TARGET_WINGCC:
             project = new CBWinProject;
-           if (useDataFolderTemplates)  project->setTemplatePath(ofToDataPath("templates/win_cb/"));
             target = "win_cb";
             break;
         case OF_TARGET_WINVS:
             project = new visualStudioProject;
-            if (useDataFolderTemplates) project->setTemplatePath(ofToDataPath("templates/vs2010/"));
             target = "vs2010";
             break;
         case OF_TARGET_IPHONE:
             project = new xcodeProject();
-            if (useDataFolderTemplates) project->setTemplatePath(ofToDataPath("templates/ios/"));
             target = "ios";
             break;
         case OF_TARGET_ANDROID:
             break;
         case OF_TARGET_LINUX:
             project = new CBLinuxProject;
-            if (useDataFolderTemplates) project->setTemplatePath(ofToDataPath("templates/linux/"));
             target = "linux";
             break;
         case OF_TARGET_LINUX64:
             project = new CBLinuxProject;
-            if (useDataFolderTemplates) project->setTemplatePath(ofToDataPath("templates/linux64/"));
             target = "linux64";
             break;
     }
@@ -121,9 +121,7 @@ void testApp::setup(){
     XML.loadFile("projectGeneratorSettings.xml");
     appToRoot = XML.getValue("appToRoot", "../../../../");
     defaultLoc = XML.getValue("defaultNewProjectLocation", "apps/myApps");
-    useDataFolderTemplates = XML.getValue("useDataFolderTemplates", "true") == "true" ? true : false;
-    
-    //-------------------------------------
+       //-------------------------------------
     // calculate the bin path (../../../ on osx) and the sketch path (bin -> root - > defaultLoc)
     //-------------------------------------
     
@@ -590,29 +588,7 @@ void testApp::mousePressed(int x, int y, int button){
     }
     
     if (mode == MODE_PLATFORM){
-        
-        
-        // we don't have platform selection enabled
-        
-        
-//        //if (x < 100){ mode = MODE_NORMAL;
-//        
-//        
-//        string platforms = "";
-//        
-//        for (int i = 0; i < panelPlatforms.getNumControls(); i++){
-//            if (*((ofxToggle *)panelPlatforms.getControl(i))){
-//                if (platforms.length() > 0) platforms+=", ";
-//                platforms += ((ofxToggle *)panelPlatforms.getControl(i))->getName();
-//                
-//            };
-//        }
-//       
-//        buttons[2].setText(platforms);
-//        mode = 0;
-//        }
-        
-        
+
     }
 }
 

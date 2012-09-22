@@ -62,7 +62,6 @@ class testApp : public ofBaseApp{
         ofxXmlSettings XML;
         string appToRoot;
         string defaultLoc;
-        bool useDataFolderTemplates;
     
     
         textButton button;
