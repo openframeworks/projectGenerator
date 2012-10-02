@@ -105,7 +105,8 @@ string testApp::setupForTarget(int targ){
 
 //--------------------------------------------------------------
 void testApp::setup(){
-    
+    ofSetLogLevel(OF_LOG_VERBOSE);
+    ofSetVerticalSync(true);
     
     
     mode = 0;
@@ -130,14 +131,14 @@ void testApp::setup(){
 #ifdef TARGET_OSX
     string binPath = ofFilePath::getAbsolutePath(ofFilePath::join(ofFilePath::getCurrentWorkingDirectory(), "../../../"));
 #else 
-    string binPath = ofFilePath::getCurrentWorkingDirectory();
+    string binPath = ofFilePath::getCurrentExeDir();
 #endif
     
-    setOFRoot(ofFilePath::getAbsolutePath(ofFilePath::join(binPath, appToRoot)));
-    
-    addonsPath = ofFilePath::getAbsolutePath(ofFilePath::join(binPath, ofFilePath::join(appToRoot,"addons")));    
-    sketchPath = ofFilePath::getAbsolutePath(ofFilePath::join(binPath,  ofFilePath::join(appToRoot, defaultLoc)));    
-    
+    string ofRoot = ofFilePath::getAbsolutePath(ofFilePath::join(binPath, appToRoot));
+    setOFRoot(ofRoot);
+
+    addonsPath = ofFilePath::getAbsolutePath(ofFilePath::join(ofRoot,"addons"));
+    sketchPath = ofFilePath::getAbsolutePath(ofFilePath::join(ofRoot, defaultLoc));
     
     
     
@@ -209,6 +210,7 @@ void testApp::setup(){
     addons.listDir();
     for(int i=0;i<(int)addons.size();i++){
     	string addon = addons.getName(i);
+    	cout << "adding addon " << addon << endl;
     	if(addon.find("ofx")==0){
     		
             if (isAddonCore(addon)){
@@ -507,19 +509,15 @@ void testApp::mousePressed(int x, int y, int button){
                 status = "sketch path set to: " + res;
                 
             }
-#elif TARGET_LINUX
+#elif defined(TARGET_LINUX)
             
-            /*ofFileDialogResult results;
-            if(bFolderSelection){
-                
-                .set_current_folder_uri(get_current_folder_uri());
-                results.filePath = gtkFileDialog(GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,windowTitle);
-            }*/
+            ofFileDialogResult results = ofSystemLoadDialog("please select sketch folder",true,buttons[1].myText);
+            if(results.bSuccess){
+				buttons[1].setText(results.filePath);
+				status = "sketch path set to: " + results.filePath;
+            }
             
-            // TODO: implement folder preselection for the choose directory dialog. 
-            // gtk_file_chooser_set_current_folder_uri	
-            
-#elif TARGET_WINDOWS    
+#elif defined(TARGET_WIN32)
             
             // TODO: implement folder preselection for the choose directory dialog. 
 #endif
