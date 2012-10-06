@@ -383,7 +383,7 @@ void testApp::generateProject(){
 
     printf("start with project generation \n");
 
-    string path = buttons[1].myText + "/" + buttons[0].myText;
+    string path = ofFilePath::join(buttons[1].myText, buttons[0].myText);
 
 	for(int i = 0; i < (int)targetsToMake.size(); i++){
 		string target = setupForTarget(targetsToMake[i]);
@@ -393,6 +393,7 @@ void testApp::generateProject(){
                 ofxToggle toggle = panelCoreAddons.getToggle(addonsToggles[i]);
                 if(toggle){
                     ofAddon addon;
+                    cout << getOFRelPath(path) << " " << path << endl;
                     addon.pathToOF = getOFRelPath(path);
                     addon.fromFS(ofFilePath::join(addonsPath, addonsToggles[i]),target);
                     project->addAddon(addon);
@@ -406,7 +407,9 @@ void testApp::generateProject(){
                 ofxToggle toggle = panelOtherAddons.getToggle(addonsToggles[i]);
                 if(toggle){
                     ofAddon addon;
+
                     addon.pathToOF = getOFRelPath(path);
+                    cout << getOFRelPath(path) << " " << path << endl;
                     addon.fromFS(ofFilePath::join(addonsPath, addonsToggles[i]),target);
                     project->addAddon(addon);
 
@@ -478,46 +481,20 @@ void testApp::mousePressed(int x, int y, int button){
 
         if (buttons[1].bMouseOver == true){
 
-             printf("here2? \n");
-
-            string command;
-
+            string command = "";
 
             ofDirectory dir(ofFilePath::join(getOFRoot(),defaultLoc));
-
-            //cout << dir.getAbsolutePath() << endl;
 
             if (!dir.exists()){
                 dir.create();
             }
 
-#ifdef TARGET_OSX
 
-            printf("here? \n");
+            ofFileDialogResult res = ofSystemLoadDialog("please select sketch folder", true,dir.path());
 
-            char * MessageBuffer = "please select sketch folder";
-            char * FileExtension = "";
-            char ResultBuffer[1024];
-            memset(ResultBuffer, 0,1024);
-
-            string defaultStr = ofFilePath::join(getOFRoot(),defaultLoc);
-            cout << defaultStr << endl;
-            if (__g2ShowOpenDialog((char *)defaultStr.c_str(), MessageBuffer, FileExtension, ResultBuffer, 1024)){
-
-                string res = string(ResultBuffer);
-                buttons[1].setText(res);
-                status = "sketch path set to: " + res;
-
+            if (res.bSuccess){
+                buttons[1].setText( res.filePath );
             }
-#else
-
-            ofFileDialogResult results = ofSystemLoadDialog("please select sketch folder",true,buttons[1].myText);
-            if(results.bSuccess){
-				buttons[1].setText(results.filePath);
-				status = "sketch path set to: " + results.filePath;
-            }
-
-#endif
 
 
         }

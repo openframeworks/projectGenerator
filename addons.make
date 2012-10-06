@@ -1,2 +1,2 @@
-ofxXmlSettings
 ofxGui
+ofxXmlSettings
