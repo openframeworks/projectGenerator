@@ -79,11 +79,17 @@ public:
         
         deliminater = "/";
         
-        on.set(50,130,70);
-        //off = on;
-        off.setHsb(on.getHue()* 0.95, on.getSaturation()*1.3, on.getBrightness()*1.2);
-        
+        setColor(ofColor(60,170,100));
     }
+	
+	void setColor( ofColor newOnColor ){
+		on = newOnColor;
+		updateOffColor();
+	}
+	
+	void updateOffColor(){
+        off.setHsb(on.getHue()* 0.95, on.getSaturation()*1.3, on.getBrightness()*1.2);	
+	}
     
     void calculateRect() {
         rect = font->getStringBoundingBox( myDisplayText, topLeftAnchor.x,topLeftAnchor.y);
@@ -106,20 +112,31 @@ public:
     
     void update();
     void draw() {
-        
-        //cout << off<< endl;
-        
-        if (bMouseOver == true) ofSetColor(on);
-        else ofSetColor(off);
-        ofRect(rect);
-        
-        
-        ofSetColor(ofColor::gray);
-        //font->drawString(myText, topLeftAnchor.x+1, topLeftAnchor.y+1);
-        
-        ofSetColor(ofColor::white);
-        font->drawString(myDisplayText, topLeftAnchor.x, topLeftAnchor.y);
-        
+        ofPushStyle();
+			ofFill();
+
+			if( bSelectable ){
+				if (bMouseOver == true) ofSetColor(on);
+				else ofSetColor(off);
+			}else{
+				ofSetColor(160, 160, 160);
+			}
+			ofRect(rect);
+
+			ofColor darkOutline = on;
+			darkOutline *= 0.65;
+
+			ofSetColor(darkOutline);
+			ofNoFill();
+			ofRect(rect);
+
+			ofSetColor(ofColor::gray);
+			//font->drawString(myText, topLeftAnchor.x+1, topLeftAnchor.y+1);
+			
+			ofSetColor(ofColor::white);
+			font->drawString(myDisplayText, topLeftAnchor.x, topLeftAnchor.y);
+		
+		ofPopStyle();
     }
     
     ofRectangle bounds;
