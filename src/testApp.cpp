@@ -8,7 +8,6 @@
 #endif
 
 
-
 //------------------------------------------------------
 bool testApp::isAddonCore(string addon){
 
@@ -25,6 +24,7 @@ bool testApp::isAddonCore(string addon){
         coreAddons.push_back("ofxVectorGraphics");
         coreAddons.push_back("ofxVectorMath");
         coreAddons.push_back("ofxXmlSettings");
+        coreAddons.push_back("ofxSvg");
         bInited = true;
     }
 
@@ -113,7 +113,7 @@ void testApp::setup(){
     bInited = false;
     project = NULL;
     sketchName = "mySketch";
-
+	
 
     //-------------------------------------
     // get settings
@@ -141,8 +141,6 @@ void testApp::setup(){
     sketchPath = ofFilePath::getAbsolutePath(ofFilePath::join(ofRoot, defaultLoc));
 
 
-
-
     //-------------------------------------
     // get settings
     //-------------------------------------
@@ -155,6 +153,7 @@ void testApp::setup(){
     // sketch button
     button.font = &font;
     button.prefix = "name: ";
+	button.topLeftAnchor.set(30, 75); //set top button position - others are set relative to this. 
     button.setText(sketchName);
     buttons.push_back(button);
 
@@ -162,6 +161,7 @@ void testApp::setup(){
     button.deliminater = "/";
     button.prefix = "path: ";
     button.setText(sketchPath);
+	button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.rect.height + 20);
     buttons.push_back(button);
 
     button.deliminater = ", ";
@@ -181,11 +181,12 @@ void testApp::setup(){
     button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.rect.height + 20);
     buttons.push_back(button);
 
+	button.setColor(ofColor(50, 150, 255));
     button.deliminater = ",";
     button.prefix = "generate";
     button.bSelectable = true;
     button.setText("");
-    button.topLeftAnchor.set(50,ofGetHeight()-80);
+    button.topLeftAnchor.set(button.topLeftAnchor.x,ofGetHeight()-80);
     buttons.push_back(button);
 
     addonButton = button;
@@ -249,9 +250,9 @@ void testApp::setup(){
     buttons[2].setText(platforms);
 
 
-    panelPlatforms.setPosition(300,0);
-    panelCoreAddons.setPosition(300,0);
-    panelOtherAddons.setPosition(750,0);
+    panelPlatforms.setPosition(10,40);
+    panelCoreAddons.setPosition(10,40);
+    panelOtherAddons.setPosition(330,40);
 
 
 
@@ -271,7 +272,7 @@ void testApp::update(){
     // if we are in addon mode check
     //-------------------------------------
 
-    if (mode == MODE_ADDON) addonButton.checkMousePressed(ofPoint(mouseX, mouseY));
+    if (mode == MODE_ADDON ) addonButton.checkMousePressed(ofPoint(mouseX, mouseY));
 
 
     //-------------------------------------
@@ -284,11 +285,8 @@ void testApp::update(){
     }
 
     for (int i = 0; i < buttons.size(); i++){
-        if (i == 0){
-            buttons[i].topLeftAnchor.set(200,80);
-        } else {
-            if (i != buttons.size()-1)
-             buttons[i].topLeftAnchor.set(buttons[i-1].topLeftAnchor.x, buttons[i-1].topLeftAnchor.y +buttons[i-1].rect.height + 20);
+        if (i != 0){
+			buttons[i].topLeftAnchor.y = buttons[i-1].topLeftAnchor.y +buttons[i-1].rect.height + 20;
         }
     }
 
@@ -300,13 +298,13 @@ void testApp::update(){
     if (panelCoreAddons.getShape().height > ofGetHeight()){
         float pct = ofMap(ofGetMouseY(), 0,ofGetHeight(), 0,1,true);
         float diff = panelCoreAddons.getShape().height - ofGetHeight();
-        panelCoreAddons.setPosition(300,-diff * pct);
+        panelCoreAddons.setPosition(panelCoreAddons.getPosition().x,-diff * pct);
     }
 
     if (panelOtherAddons.getShape().height > ofGetHeight()){
         float pct = ofMap(ofGetMouseY(), 0,ofGetHeight(), 0,1,true);
         float diff = panelOtherAddons.getShape().height - ofGetHeight();
-        panelOtherAddons.setPosition(750,-diff * pct);
+        panelOtherAddons.setPosition(panelOtherAddons.getPosition().x,-diff * pct);
     }
 
 }
@@ -314,17 +312,22 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
 
-
     ofBackgroundGradient(ofColor(190,190,190), ofColor(130,130,130), OF_GRADIENT_LINEAR);
 
-    if (mode == 0){
+	ofSetColor(50, 50, 50);
+	ofRect(0, 0, ofGetWidth(), 30);
 
-    for (int i = 0; i < buttons.size(); i++){
-        buttons[i].draw();
-    }
+	ofSetColor(190, 190, 190);
+	ofDrawBitmapString("BASIC PROJECT GENERATOR - SET NAME, PATH AND ANY ADDONS TO INCLUDE", ofPoint(button.topLeftAnchor.x-8, 20));
+
+
+	if (mode == 0){
+		
+		for (int i = 0; i < buttons.size(); i++){
+			buttons[i].draw();
+		}
 
     } else if (mode == 1){
-
         panelCoreAddons.draw();
         panelOtherAddons.draw();
     } else if (mode == 2){
@@ -341,7 +344,7 @@ void testApp::draw(){
         ofDrawBitmapString(status, 10,ofGetHeight()-8);
 
     }
-    if (mode == 1){
+    if (mode == 1 ){
         addonButton.draw();
     }
 }
@@ -507,7 +510,7 @@ void testApp::mousePressed(int x, int y, int button){
 
         if (buttons[2].bMouseOver == true){
             // platform is diabled for now
-            // mode = 2;
+             mode = 2;
         }
 
         //-------------------------------------
@@ -524,7 +527,7 @@ void testApp::mousePressed(int x, int y, int button){
     // handle addon mode
     //-------------------------------------
 
-    if (mode == MODE_ADDON){
+    if (mode == MODE_ADDON ){
 
         //-------------------------------------
         // if we hit he back button, collect the addons for display
@@ -539,7 +542,7 @@ void testApp::mousePressed(int x, int y, int button){
                    if (addons.length() > 0) addons+=", ";
                     addons += ((ofxToggle *)panelCoreAddons.getControl(i))->getName();
 
-                };
+                }
 
             }
             for (int i = 0; i < panelOtherAddons.getNumControls(); i++){
@@ -547,7 +550,7 @@ void testApp::mousePressed(int x, int y, int button){
                     if (addons.length() > 0) addons+=", ";
                     addons += ((ofxToggle *)panelOtherAddons.getControl(i))->getName();
 
-                };
+                }
 
             }
             buttons[3].setText(addons);

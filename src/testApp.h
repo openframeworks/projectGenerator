@@ -62,6 +62,8 @@ class testApp : public ofBaseApp{
         ofxXmlSettings XML;
         string appToRoot;
         string defaultLoc;
+		
+		float uiLeftX; 
     
     
         textButton button;
