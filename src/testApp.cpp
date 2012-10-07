@@ -14,6 +14,13 @@ void convertWindowsToUnixPath(string & path){
     }
 }
 
+string windowsFromUnixPath(string path){
+    for (int i = 0; i < path.size(); i++){
+        if (path[i] == '/') path[i] = '\\';
+    }
+	return path;
+}
+
 //------------------------------------------------------
 bool testApp::isAddonCore(string addon){
 
@@ -506,7 +513,13 @@ void testApp::mousePressed(int x, int y, int button){
             }
 
 
-            ofFileDialogResult res = ofSystemLoadDialog("please select sketch folder", true,dir.path());
+			
+#ifdef TARGET_WIN32
+			ofFileDialogResult res = ofSystemLoadDialog("please select sketch folder", true, windowsFromUnixPath(dir.path()));
+#else 
+            ofFileDialogResult res = ofSystemLoadDialog("please select sketch folder", true, dir.path());
+#endif
+            
 
             if (res.bSuccess){
                 string result = res.filePath;
