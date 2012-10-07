@@ -3,10 +3,6 @@
 #include <stdio.h>
 #include "ofConstants.h"
 
-#ifdef TARGET_OSX
-#include "g2AppKit.h"
-#endif
-
 
 void convertWindowsToUnixPath(string & path){
     for (int i = 0; i < path.size(); i++){
@@ -512,13 +508,12 @@ void testApp::mousePressed(int x, int y, int button){
                 dir.create();
             }
 
-
-			
-#ifdef TARGET_WIN32
-			ofFileDialogResult res = ofSystemLoadDialog("please select sketch folder", true, windowsFromUnixPath(dir.path()));
-#else 
-            ofFileDialogResult res = ofSystemLoadDialog("please select sketch folder", true, dir.path());
-#endif
+          	
+        #ifdef TARGET_WIN32
+                    ofFileDialogResult res = ofSystemLoadDialog("please select sketch folder", true, windowsFromUnixPath(dir.path()));
+        #else 
+                    ofFileDialogResult res = ofSystemLoadDialog("please select sketch folder", true, dir.path());
+        #endif
             
 
             if (res.bSuccess){
