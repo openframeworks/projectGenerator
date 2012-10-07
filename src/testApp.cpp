@@ -8,6 +8,12 @@
 #endif
 
 
+void convertWindowsToUnixPath(string & path){
+    for (int i = 0; i < path.size(); i++){
+        if (path[i] == '\\') path[i] = '/';
+    }
+}
+
 //------------------------------------------------------
 bool testApp::isAddonCore(string addon){
 
@@ -135,10 +141,18 @@ void testApp::setup(){
 #endif
 
     string ofRoot = ofFilePath::getAbsolutePath(ofFilePath::join(binPath, appToRoot));
-    setOFRoot(ofRoot);
 
     addonsPath = ofFilePath::getAbsolutePath(ofFilePath::join(ofRoot,"addons"));
     sketchPath = ofFilePath::getAbsolutePath(ofFilePath::join(ofRoot, defaultLoc));
+
+
+    convertWindowsToUnixPath(ofRoot);
+    convertWindowsToUnixPath(addonsPath);
+    convertWindowsToUnixPath(sketchPath);
+
+    // there's some issues internally in OF with non unix paths for OF root
+    setOFRoot(ofRoot);
+
 
 
     //-------------------------------------
@@ -211,7 +225,7 @@ void testApp::setup(){
     addons.listDir();
     for(int i=0;i<(int)addons.size();i++){
     	string addon = addons.getName(i);
-    	cout << "adding addon " << addon << endl;
+
     	if(addon.find("ofx")==0){
 
             if (isAddonCore(addon)){
@@ -396,7 +410,6 @@ void testApp::generateProject(){
                 ofxToggle toggle = panelCoreAddons.getToggle(addonsToggles[i]);
                 if(toggle){
                     ofAddon addon;
-                    cout << getOFRelPath(path) << " " << path << endl;
                     addon.pathToOF = getOFRelPath(path);
                     addon.fromFS(ofFilePath::join(addonsPath, addonsToggles[i]),target);
                     project->addAddon(addon);
@@ -496,7 +509,9 @@ void testApp::mousePressed(int x, int y, int button){
             ofFileDialogResult res = ofSystemLoadDialog("please select sketch folder", true,dir.path());
 
             if (res.bSuccess){
-                buttons[1].setText( res.filePath );
+                string result = res.filePath;
+                convertWindowsToUnixPath(result);
+                buttons[1].setText( result );
             }
 
 
