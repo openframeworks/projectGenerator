@@ -172,17 +172,22 @@ void testApp::setup(){
     button.prefix = "name: ";
 	button.topLeftAnchor.set(30, 75); //set top button position - others are set relative to this. 
     button.setText(sketchName);
+    
+    button.secondaryText = ">> click to change the name";
     buttons.push_back(button);
 
     // path button
     button.deliminater = "/";
     button.prefix = "path: ";
     button.setText(sketchPath);
+    button.secondaryText = ">> click to change the path";
 	button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.rect.height + 20);
     buttons.push_back(button);
 
     button.deliminater = ", ";
     button.prefix = "platforms: ";
+    button.secondaryText = "";
+    button.bDrawLong = false;
     button.bSelectable = false;
     button.setText(platform);
 
@@ -191,7 +196,9 @@ void testApp::setup(){
 
 
     button.deliminater = ", ";
+    button.bDrawLong = true;
     button.prefix = "addons: ";
+    button.secondaryText = ">> click to change addons";
     button.bSelectable = true;
     button.setText(addons);
 
@@ -203,12 +210,15 @@ void testApp::setup(){
     button.prefix = "generate";
     button.bSelectable = true;
     button.setText("");
+    button.bDrawLong = false;
     button.topLeftAnchor.set(button.topLeftAnchor.x,ofGetHeight()-80);
     buttons.push_back(button);
 
     addonButton = button;
     addonButton.prefix = "< back";
     addonButton.setText("");
+    addonButton.bDrawLong = false;
+    
 
      for (int i = 0; i < buttons.size(); i++){
          buttons[i].calculateRect();
@@ -273,6 +283,7 @@ void testApp::setup(){
 
 
 
+    ofBackground(230,230,230);
 
 }
 
@@ -329,14 +340,12 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
 
-    ofBackgroundGradient(ofColor(190,190,190), ofColor(130,130,130), OF_GRADIENT_LINEAR);
+    //ofBackgroundGradient(ofColor(190,190,190), ofColor(130,130,130), OF_GRADIENT_LINEAR);
 
 	ofSetColor(50, 50, 50);
 	ofRect(0, 0, ofGetWidth(), 30);
 
-	ofSetColor(190, 190, 190);
-	ofDrawBitmapString("BASIC PROJECT GENERATOR - SET NAME, PATH AND ANY ADDONS TO INCLUDE", ofPoint(button.topLeftAnchor.x-8, 20));
-
+	
 
 	if (mode == 0){
 		

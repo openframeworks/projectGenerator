@@ -19,6 +19,10 @@ public:
     ofTrueTypeFont * font;
     ofRectangle rect;
     bool bSelectable;
+    bool bDrawLong;
+    
+    string secondaryText;
+    
     
     string deliminater;
     int maxWidth;
@@ -73,22 +77,25 @@ public:
     textButton(){
         bSelectable = true;
         bMouseOver = false;
+        bDrawLong = true;
         //off.set(ofColor::magenta.r, ofColor::magenta.g, ofColor::magenta.b);
         //on.set(ofColor::blue.r, ofColor::blue.g, ofColor::blue.b);
         //cout << ofColor::magenta<< endl;
         
         deliminater = "/";
         
-        setColor(ofColor(60,170,100));
+        //setColor(ofColor(60,170,100));
     }
 	
 	void setColor( ofColor newOnColor ){
 		on = newOnColor;
-		updateOffColor();
+        on.set(0,0,0);
+        off.set(0,0,0);
+		//updateOffColor();
 	}
 	
 	void updateOffColor(){
-        off.setHsb(on.getHue()* 0.95, on.getSaturation()*1.3, on.getBrightness()*1.2);	
+        off.setHsb(0,0,0);	
 	}
     
     void calculateRect() {
@@ -115,9 +122,27 @@ public:
         ofPushStyle();
 			ofFill();
 
+        
+            if (bDrawLong == true){
+                ofSetColor(220,220,220);
+                ofRect(rect.x, rect.y, ofGetWidth() - rect.x*2, rect.height);
+                
+                
+                ofRectangle rectString = font->getStringBoundingBox(secondaryText, 0, 0);
+                float h = rectString.height;
+                float y = (rect.y + rect.height/2) + (rectString.height)/2;
+                float x = (rect.x + ofGetWidth() - rect.x*2) - rectString.width - 10;
+                
+                ofSetColor(0,0,0);
+                font->drawString(secondaryText, x,y);
+                //button.secondaryText;
+                
+            }
+        
+        
 			if( bSelectable ){
-				if (bMouseOver == true) ofSetColor(on);
-				else ofSetColor(off);
+				if (bMouseOver == true) ofSetColor(140,140,140);
+				else ofSetColor(0,0,0);
 			}else{
 				ofSetColor(160, 160, 160);
 			}
@@ -126,16 +151,17 @@ public:
 			ofColor darkOutline = on;
 			darkOutline *= 0.65;
 
-			ofSetColor(darkOutline);
-			ofNoFill();
-			ofRect(rect);
+			//ofSetColor(darkOutline);
+			//ofNoFill();
+			//ofRect(rect);
 
-			ofSetColor(ofColor::gray);
+			//ofSetColor(ofColor::gray);
 			//font->drawString(myText, topLeftAnchor.x+1, topLeftAnchor.y+1);
 			
-			ofSetColor(ofColor::white);
+			ofSetColor(ofColor::cyan);
 			font->drawString(myDisplayText, topLeftAnchor.x, topLeftAnchor.y);
-		
+        
+        
 		ofPopStyle();
     }
     
