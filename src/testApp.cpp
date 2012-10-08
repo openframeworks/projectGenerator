@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include "ofConstants.h"
 
-
 void convertWindowsToUnixPath(string & path){
     for (int i = 0; i < path.size(); i++){
         if (path[i] == '\\') path[i] = '/';
@@ -165,27 +164,32 @@ void testApp::setup(){
 
     //-------------------------------------
     // load font and setup the buttons
-    font.loadFont("frabk.ttf", 12, false, false);
-
-    // sketch button
+    font.loadFont("Inconsolata.otf", 14, true,false,false,0.3,90);
+    titleFont.loadFont("Inconsolata.otf", 28, true,false,false,0.3,90);
+    
+    //  Sketch button
+    //
     button.font = &font;
-    button.prefix = "name: ";
-	button.topLeftAnchor.set(30, 75); //set top button position - others are set relative to this. 
+    button.prefix = "Name: ";
+	button.topLeftAnchor.set(76, 189); //set top button position - others are set relative to this.
     button.setText(sketchName);
     
-    button.secondaryText = ">> click to change the name";
+    button.secondaryText = ">> CLICK TO CHANGE THE NAME";
     buttons.push_back(button);
 
-    // path button
+    //  Path button
+    //
     button.deliminater = "/";
-    button.prefix = "path: ";
+    button.prefix = "Path: ";
     button.setText(sketchPath);
-    button.secondaryText = ">> click to change the path";
+    button.secondaryText = ">> CLICK TO CHANGE THE DIRECTORY";
 	button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.rect.height + 20);
     buttons.push_back(button);
 
+    //  Platform text
+    //
     button.deliminater = ", ";
-    button.prefix = "platforms: ";
+    button.prefix = "Platforms: ";
     button.secondaryText = "";
     button.bDrawLong = false;
     button.bSelectable = false;
@@ -194,20 +198,23 @@ void testApp::setup(){
     button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.rect.height + 20);
     buttons.push_back(button);
 
-
+    //  Addons button
+    //
     button.deliminater = ", ";
     button.bDrawLong = true;
-    button.prefix = "addons: ";
-    button.secondaryText = ">> click to change addons";
+    button.prefix = "Addons: ";
+    button.secondaryText = ">> CLICK TO SELECT ADDONS";
     button.bSelectable = true;
     button.setText(addons);
 
     button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.rect.height + 20);
     buttons.push_back(button);
 
+    //  Generate
+    //
 	button.setColor(ofColor(50, 150, 255));
     button.deliminater = ",";
-    button.prefix = "generate";
+    button.prefix = "GENERATE PROJECT";
     button.bSelectable = true;
     button.setText("");
     button.bDrawLong = false;
@@ -284,7 +291,6 @@ void testApp::setup(){
 
 
     ofBackground(230,230,230);
-
 }
 
 
@@ -340,19 +346,14 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
 
-    //ofBackgroundGradient(ofColor(190,190,190), ofColor(130,130,130), OF_GRADIENT_LINEAR);
-
-	ofSetColor(50, 50, 50);
-	ofRect(0, 0, ofGetWidth(), 30);
-
-	
-
+    ofSetColor(0);
+    titleFont.drawString("PROJECT", 64, 114);
+    titleFont.drawString("GENERATOR", 64, 142);
+    
 	if (mode == 0){
-		
 		for (int i = 0; i < buttons.size(); i++){
 			buttons[i].draw();
 		}
-
     } else if (mode == 1){
         panelCoreAddons.draw();
         panelOtherAddons.draw();

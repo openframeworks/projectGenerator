@@ -55,7 +55,7 @@ public:
             
             cout << text << endl;
             ofRectangle rect = font->getStringBoundingBox(text, pos.x, pos.y);
-            if ((pos.x + rect.width) > 300){
+            if ((pos.x + rect.width) > 600){
                 
                 myDisplayText += "\n";
                 myDisplayText += text;
@@ -99,12 +99,12 @@ public:
 	}
     
     void calculateRect() {
-        rect = font->getStringBoundingBox( myDisplayText, topLeftAnchor.x,topLeftAnchor.y);
+        rect = font->getStringBoundingBox( myDisplayText, topLeftAnchor.x, topLeftAnchor.y);
         
-        rect.x -= 10;
-        rect.y -= 10;
-        rect.width += 20;
-        rect.height += 20;
+        rect.x -= 12;
+        rect.y -= 12;
+        rect.width += 24;
+        rect.height += 24;
         
     }
     
@@ -158,7 +158,7 @@ public:
 			//ofSetColor(ofColor::gray);
 			//font->drawString(myText, topLeftAnchor.x+1, topLeftAnchor.y+1);
 			
-			ofSetColor(ofColor::cyan);
+			ofSetColor(74,255,203);
 			font->drawString(myDisplayText, topLeftAnchor.x, topLeftAnchor.y);
         
         

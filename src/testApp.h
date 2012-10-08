@@ -46,6 +46,7 @@ class testApp : public ofBaseApp{
         ofxToggle osxToggle, iosToggle, wincbToggle, winvsToggle, linuxcbToggle, linux64cbToggle;
 
         ofTrueTypeFont font;
+        ofTrueTypeFont titleFont;
     
         int mode;
         enum { MODE_NORMAL, MODE_ADDON, MODE_PLATFORM };
