@@ -41,6 +41,8 @@ class testApp : public ofBaseApp{
     
         ofxPanel panelCoreAddons;
         ofxPanel panelOtherAddons;
+        bool bHaveNonCoreAddons;
+    
         ofxPanel panelPlatforms;
     
         ofxToggle osxToggle, iosToggle, wincbToggle, winvsToggle, linuxcbToggle, linux64cbToggle;
@@ -78,6 +80,10 @@ class testApp : public ofBaseApp{
         vector < string  > coreAddons;
     
         
+        float statusSetTime;
+        float statusEnergy;
+        void setStatus(string newStatus);
+        
+        ofImage logo;
     
-
 };

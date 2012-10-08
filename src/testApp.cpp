@@ -108,6 +108,11 @@ string testApp::setupForTarget(int targ){
 
 
 
+void testApp::setStatus(string newStatus){
+    statusEnergy = 1;
+    status = newStatus;
+    statusSetTime = ofGetElapsedTimef();
+}
 
 
 
@@ -175,7 +180,7 @@ void testApp::setup(){
     button.font = &font;
     button.secondFont = &secondFont;
     button.prefix = "Name: ";
-	button.topLeftAnchor.set(76, 189); //set top button position - others are set relative to this.
+	button.topLeftAnchor.set(76, 189+40); //set top button position - others are set relative to this.
     button.setText(sketchName);
     
     button.secondaryText = ">> CLICK TO CHANGE THE NAME";
@@ -195,8 +200,8 @@ void testApp::setup(){
     button.deliminater = ", ";
     button.prefix = "Platforms: ";
     button.secondaryText = "";
-    button.bDrawLong = true;
-    button.secondaryText = ">> CLICK TO CHANGE YOUR PLATFORM ";
+    button.bDrawLong = false;
+    button.secondaryText = "";
     button.bSelectable = false;
     button.setText(platform);
 
@@ -227,7 +232,9 @@ void testApp::setup(){
     generateButton.bDrawLong = false;
     
 
+    
     addonButton = button;
+    addonButton.topLeftAnchor.set(906, 535);
     addonButton.prefix = "<< BACK";
     addonButton.setText("");
     addonButton.bDrawLong = false;
@@ -258,6 +265,7 @@ void testApp::setup(){
                 ofxToggle * toggle = new ofxToggle();
                 panelCoreAddons.add(toggle->setup(addon,false,300));
             } else {
+                bHaveNonCoreAddons = true;
                 ofxToggle * toggle = new ofxToggle();
                 panelOtherAddons.add(toggle->setup(addon,false,300));
             }
@@ -293,8 +301,9 @@ void testApp::setup(){
     panelPlatforms.setPosition(10,40);
     panelCoreAddons.setPosition(10,40);
     panelOtherAddons.setPosition(330,40);
+   
 
-
+    logo.loadImage("ofw-logo.png");
 
     ofBackground(230,230,230);
 }
@@ -307,7 +316,10 @@ void testApp::setup(){
 //--------------------------------------------------------------
 void testApp::update(){
 
-
+    float diff = ofGetElapsedTimef()- statusSetTime;
+    if (diff > 3){
+        statusEnergy *= 0.99;;
+    }
     //-------------------------------------
     // if we are in addon mode check
     //-------------------------------------
@@ -324,6 +336,8 @@ void testApp::update(){
         buttons[i].checkMousePressed(ofPoint(mouseX, mouseY));
     }
 
+    
+    generateButton.calculateRect();
     generateButton.checkMousePressed(ofPoint(mouseX, mouseY));
     
     for (int i = 0; i < buttons.size(); i++){
@@ -354,9 +368,17 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
 
-    ofSetColor(10,200);
-    titleFont.drawString("PROJECT", 64, 114);
-    titleFont.drawString("GENERATOR", 64, 142);
+    
+    
+    if (mode != MODE_ADDON ) {
+        
+        ofSetColor(255,255,255,60);
+        logo.draw(64, 62); 
+        
+        ofSetColor(10,60);
+        titleFont.drawString("PROJECT", 64 + logo.getWidth() + 25, 84);
+        titleFont.drawString("GENERATOR",  64 + logo.getWidth() + 25, 122);
+    }
     
 	if (mode == 0){
 		for (int i = 0; i < buttons.size(); i++){
@@ -367,23 +389,33 @@ void testApp::draw(){
         
     } else if (mode == 1){
         panelCoreAddons.draw();
-        panelOtherAddons.draw();
+        if (bHaveNonCoreAddons){
+            panelOtherAddons.draw();
+        }
     } else if (mode == 2){
         panelPlatforms.draw();
     }
     //cout << panelAddons.getShape().height << endl;
 
 
-//    if (mode == 0){
-//        ofFill();
-//        ofSetColor(0,0,0);
-//        ofRect(0,ofGetHeight(), ofGetWidth(), -25);
-//        ofSetColor(255,255,255);
-//        ofDrawBitmapString(status, 10,ofGetHeight()-8);
-//    }
+    
     
     if (mode == 1 ){
         addonButton.draw();
+        
+        ofRectangle rect = secondFont.getStringBoundingBox("select core and non-core addons to add", addonButton.topLeftAnchor.x-200, 60);
+        ofSetColor(220,220,220);
+        ofRect(rect.x-10, rect.y-10, rect.width+20, rect.height+20);
+        ofSetColor(0,0,0);
+        secondFont.drawString("select core and non-core addons to add", addonButton.topLeftAnchor.x-200, 60);
+    }
+    
+    if (mode == 0){
+        ofFill();
+        ofSetColor(0 + 220 * (1-statusEnergy),0 + 220 * (1-statusEnergy),0 + 220 * (1-statusEnergy));
+        ofRect(0,ofGetHeight(), ofGetWidth(), -25);
+        ofSetColor(255,255,255, 255 * statusEnergy);
+        ofDrawBitmapString(status, 10,ofGetHeight()-8);
     }
 }
 
@@ -462,7 +494,7 @@ void testApp::generateProject(){
 
 
     printf("done with project generation \n");
-    status = "generated: " + buttons[1].myText + "/" + buttons[0].myText;
+    setStatus("generated: " + buttons[1].myText + "/" + buttons[0].myText);
 
     // go through the control panels, do stuff
 }
@@ -495,12 +527,14 @@ void testApp::mousePressed(int x, int y, int button){
         for (int i = 0; i < buttons.size(); i++){
             buttons[i].checkMousePressed(ofPoint(x, y));
         }
+        
 
         //-------------------------------------
         // 4 = genearate
         //-------------------------------------
 
-        if (buttons[4].bMouseOver == true){
+        
+        if (generateButton.bMouseOver == true){
             generateProject();
         }
 
@@ -511,7 +545,7 @@ void testApp::mousePressed(int x, int y, int button){
         if (buttons[0].bMouseOver == true){
             string text = ofSystemTextBoxDialog("choose sketch name", buttons[0].myText);
             fixStringCharacters(text);
-            status = "sketch name set to: " + text;
+            setStatus("sketch name set to: " + text);
             buttons[0].setText(text);
         }
 
@@ -542,7 +576,7 @@ void testApp::mousePressed(int x, int y, int button){
                 convertWindowsToUnixPath(result);
                 buttons[1].setText( result );
                 
-                status = "path set to: " + result;
+                setStatus("path set to: " + result);
             }
 
 
@@ -601,7 +635,7 @@ void testApp::mousePressed(int x, int y, int button){
             }
             buttons[3].setText(addons);
 
-            status = "addons set to: " + addons;
+            setStatus("addons set to: " + addons);
 
             addonButton.bMouseOver = false;
             mode = MODE_NORMAL;

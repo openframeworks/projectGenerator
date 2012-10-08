@@ -126,8 +126,8 @@ public:
             if (bDrawLong == true){
 //                ofSetColor(220,220,220);
                 
-                ofSetColor(0,240);
-                ofNoFill();
+                ofSetColor(220,220,220);
+                ofFill();
                 ofRect(rect.x, rect.y, ofGetWidth() - rect.x*2, rect.height);
                 
                 ofRectangle rectString = secondFont->getStringBoundingBox(secondaryText, 0, 0);
