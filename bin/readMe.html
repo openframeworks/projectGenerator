@@ -1,0 +1,202 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote {
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: "Helvetica Neue", Helvetica, "Hiragino Sans GB", Arial, sans-serif;
+    font-size: 13px;
+    line-height: 18px;
+    color: #737373;
+    margin: 10px 13px 10px 13px;
+}
+a {
+    color: #0069d6;
+}
+a:hover {
+    color: #0050a3;
+    text-decoration: none;
+}
+a img {
+    border: none;
+}
+p {
+    margin-bottom: 9px;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #404040;
+    line-height: 36px;
+}
+h1 {
+    margin-bottom: 18px;
+    font-size: 30px;
+}
+h2 {
+    font-size: 24px;
+}
+h3 {
+    font-size: 18px;
+}
+h4 {
+    font-size: 16px;
+}
+h5 {
+    font-size: 14px;
+}
+h6 {
+    font-size: 13px;
+}
+hr {
+    margin: 0 0 19px;
+    border: 0;
+    border-bottom: 1px solid #ccc;
+}
+blockquote {
+    padding: 13px 13px 21px 15px;
+    margin-bottom: 18px;
+    font-family:georgia,serif;
+    font-style: italic;
+}
+blockquote:before {
+    content:"\201C";
+    font-size:40px;
+    margin-left:-10px;
+    font-family:georgia,serif;
+    color:#eee;
+}
+blockquote p {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 18px;
+    margin-bottom: 0;
+    font-style: italic;
+}
+code, pre {
+    font-family: Monaco, Andale Mono, Courier New, monospace;
+}
+code {
+    background-color: #fee9cc;
+    color: rgba(0, 0, 0, 0.75);
+    padding: 1px 3px;
+    font-size: 12px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+pre {
+    display: block;
+    padding: 14px;
+    margin: 0 0 18px;
+    line-height: 16px;
+    font-size: 11px;
+    border: 1px solid #d9d9d9;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+pre code {
+    background-color: #fff;
+    color:#737373;
+    font-size: 11px;
+    padding: 0;
+}
+@media screen and (min-width: 768px) {
+    body {
+        width: 748px;
+        margin:10px auto;
+    }
+}
+</style>
+<title>project generator</title>
+</head>
+<body>
+<h1>project generator</h1>
+
+<p>please note that the project generator is a work in progress / alpha.  We&rsquo;ll be retooling it based on feedback we get.</p>
+
+<h2>about</h2>
+
+<p>this is the simple version of the openframeworks project generator.  This tool has been exiting inside of the develop banch of openframeworks (from github) but not in releases, and with 0072, we are starting to move this tool into releases.   It&rsquo;s very much a work in progress, so here are some points and caveats:</p>
+
+<ul>
+<li>the tool can be used to generate project files for the platform you&rsquo;ve downloaded (osx xcode, windows codeblocks etc)</li>
+<li>the project generator can add addons to your project, but not all addons (especially non core addons) are packaged in the right way for this</li>
+<li>it assumes you will want to put your project in &ldquo;root/apps/myApps&rdquo;, but you can put your projects anywhere relative to OF, and it should work. Putting your apps in non standard paths (ie, not at a height of ../../../) is</li>
+</ul>
+
+
+<h2>how to use the project generator</h2>
+
+<p>It&rsquo;s pretty simple to make an new project, there are 3 things you can adjust:</p>
+
+<p><strong>name of the project</strong></p>
+
+<p>this is where you set the name of the project.  This creates both a folder with this name and a project file, so for example, if your name is &ldquo;myCoolExample&rdquo; it will generate:</p>
+
+<p>myCoolExample/myCoolExample.xcodeproj</p>
+
+<p>where the myCoolExample will have all the src / settings / etc of an exmpty example.</p>
+
+<p><strong>path of the project</strong></p>
+
+<p>this defaults to apps/myApps, but it should allow you to put projects anywhere.  We strongly recommend you to keep them inside this release of OF, so that if the OF release or your project get moved, or if some lower level folder gets renamed, the generated paths don&rsquo;t break.  it&rsquo;s much safer to have paths that are &ldquo;../../../&rdquo; vs paths that have a name in them.  please note that because we also create a folder with this tool with the name of your project, the actuall full path to your project will look like:</p>
+
+<p>chosenPath/projectName/projectName.project</p>
+
+<p>(where chosenPath and projectName are based on your settings, and .project is the xcode, code blocks, visual studio file that&rsquo;s generated)</p>
+
+<p><strong>addons</strong></p>
+
+<p>to use, choose addons in the gui then hit the back button.</p>
+
+<p>here you can select the addons you&rsquo;d like included.  Not all addons work, but all of the core addons should and if the addon doesn&rsquo;t work, you can tell the addon developer to take a look at it.  The project generator is basically searching the file system recursively through the addons, and it&rsquo;s looking for things like folders that say &ldquo;osx&rdquo; on them, etc, so it can make decisions about what to include / exclude, etc.  For most simple addons, this should work fairly well, but we haven&rsquo;t tested with many addons yet.</p>
+
+<p>After this release is out, we&rsquo;ll spend some time to document exactly how our system parses, and some of the more intricate nuances that will help addon developers make PG friendly releases.</p>
+
+<p><strong>generate</strong></p>
+
+<p>when you hit this button, hopefully magic will happen.  Some addons take a very long time to parse (such as opencv) so please be patient.  If you add alot of addons, it can sometimes take several seconds for a project to generate.</p>
+
+<h2>Differences with the version in the openframeworks develop branch</h2>
+
+<ul>
+<li>the version in github can generate projects for mutiple platforms (since you will have all the necessary templates, etc if you&rsquo;ve got the whole OF repo cloned)</li>
+<li>the version in github can generate recursively.  It does this for generating the OF releases project files.</li>
+<li>the version on github can update a project that alraedy exists, useful if you are trying to port existing work on one platform or release of OF to another.</li>
+</ul>
+
+
+<h2>where to find the project generator</h2>
+
+<p>the project generator simple version lives here:</p>
+
+<p>https://github.com/ofZach/projectGeneratorSimple</p>
+
+<p>the more complete one, with the git repo, is here:</p>
+
+<p>https://github.com/openframeworks/openFrameworks/tree/master/apps/devApps/projectGenerator</p>
+
+<p>since there&rsquo;s common code, we&rsquo;ll be moving these two back into one spot, but right now they&rsquo;re at two locations.</p>
+
+<p>If you have issues / questions / suggestions on this, please use projectGeneratorSimple repo.</p>
+
+<h2>thanks</h2>
+
+<p>thanks to Navit Keren and Patricio Gonzalez Vivo for their help on the UX design, and the OF dev team / mailing list for testing.</p>
+</body>
+</html>
