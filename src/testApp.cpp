@@ -183,7 +183,7 @@ void testApp::setup(){
 	button.topLeftAnchor.set(76, 189+40); //set top button position - others are set relative to this.
     button.setText(sketchName);
     
-    button.secondaryText = ">> CLICK TO CHANGE THE NAME";
+    button.secondaryText = "<< CLICK TO CHANGE THE NAME";
     buttons.push_back(button);
 
     //  Path button
@@ -191,7 +191,7 @@ void testApp::setup(){
     button.deliminater = "/";
     button.prefix = "Path: ";
     button.setText(sketchPath);
-    button.secondaryText = ">> CLICK TO CHANGE THE DIRECTORY";
+    button.secondaryText = "<< CLICK TO CHANGE THE DIRECTORY";
 	button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.rect.height + 20);
     buttons.push_back(button);
 
@@ -213,7 +213,7 @@ void testApp::setup(){
     button.deliminater = ", ";
     button.bDrawLong = true;
     button.prefix = "Addons: ";
-    button.secondaryText = ">> CLICK TO SELECT ADDONS";
+    button.secondaryText = "<< CLICK TO SELECT ADDONS";
     button.bSelectable = true;
     button.setText(addons);
 
@@ -372,10 +372,10 @@ void testApp::draw(){
     
     if (mode != MODE_ADDON ) {
         
-        ofSetColor(255,255,255,60);
+        ofSetColor(100);
         logo.draw(64, 62); 
         
-        ofSetColor(10,60);
+        //ofSetColor(74,255,203);
         titleFont.drawString("PROJECT", 64 + logo.getWidth() + 25, 84);
         titleFont.drawString("GENERATOR",  64 + logo.getWidth() + 25, 122);
     }
