@@ -9,7 +9,7 @@ int main(  int argc, char *argv[]  ){
     
     
     ofAppGlutWindow window;
-    ofSetupOpenGL(&window, 660,760, OF_WINDOW);
+    ofSetupOpenGL(&window, 1124, 630, OF_WINDOW);
     testApp * app = new testApp;
     //app->buildAllExamples = false;
     ofRunApp( app );    
