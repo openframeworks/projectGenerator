@@ -134,7 +134,7 @@ void testApp::setup(){
     // get settings
     //-------------------------------------
 
-    XML.loadFile("projectGeneratorSettings.xml");
+    XML.loadFile("settings/projectGeneratorSettings.xml");
     appToRoot = XML.getValue("appToRoot", "../../../../");
     defaultLoc = XML.getValue("defaultNewProjectLocation", "apps/myApps");
        //-------------------------------------
@@ -171,9 +171,9 @@ void testApp::setup(){
 
     //-------------------------------------
     // load font and setup the buttons
-    font.loadFont("Inconsolata.otf", 15, true,false,false,0.3,90);
-    titleFont.loadFont("Inconsolata.otf", 28, true,false,false,0.3,90);
-    secondFont.loadFont("Inconsolata.otf", 11, true,false,false,0.3,90);
+    font.loadFont("fonts/Inconsolata.otf", 15, true,false,false,0.3,90);
+    titleFont.loadFont("fonts/Inconsolata.otf", 28, true,false,false,0.3,90);
+    secondFont.loadFont("fonts/Inconsolata.otf", 11, true,false,false,0.3,90);
     
     //  Sketch button
     //
@@ -303,7 +303,7 @@ void testApp::setup(){
     panelOtherAddons.setPosition(330,40);
    
 
-    logo.loadImage("ofw-logo.png");
+    logo.loadImage("images/ofw-logo.png");
 
     ofBackground(230,230,230);
 }
