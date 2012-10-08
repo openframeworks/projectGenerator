@@ -113,6 +113,8 @@ string testApp::setupForTarget(int targ){
 
 //--------------------------------------------------------------
 void testApp::setup(){
+    ofEnableAlphaBlending();
+    ofEnableSmoothing();
     ofSetLogLevel(OF_LOG_VERBOSE);
     ofSetVerticalSync(true);
 
@@ -164,12 +166,14 @@ void testApp::setup(){
 
     //-------------------------------------
     // load font and setup the buttons
-    font.loadFont("Inconsolata.otf", 14, true,false,false,0.3,90);
+    font.loadFont("Inconsolata.otf", 15, true,false,false,0.3,90);
     titleFont.loadFont("Inconsolata.otf", 28, true,false,false,0.3,90);
+    secondFont.loadFont("Inconsolata.otf", 11, true,false,false,0.3,90);
     
     //  Sketch button
     //
     button.font = &font;
+    button.secondFont = &secondFont;
     button.prefix = "Name: ";
 	button.topLeftAnchor.set(76, 189); //set top button position - others are set relative to this.
     button.setText(sketchName);
@@ -212,6 +216,7 @@ void testApp::setup(){
 
     //  Generate
     //
+    generateButton.
 	button.setColor(ofColor(50, 150, 255));
     button.deliminater = ",";
     button.prefix = "GENERATE PROJECT";
@@ -222,7 +227,7 @@ void testApp::setup(){
     buttons.push_back(button);
 
     addonButton = button;
-    addonButton.prefix = "< back";
+    addonButton.prefix = "<< BACK";
     addonButton.setText("");
     addonButton.bDrawLong = false;
     
@@ -346,7 +351,7 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
 
-    ofSetColor(0);
+    ofSetColor(10,200);
     titleFont.drawString("PROJECT", 64, 114);
     titleFont.drawString("GENERATOR", 64, 142);
     

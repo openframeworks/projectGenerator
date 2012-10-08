@@ -47,6 +47,7 @@ class testApp : public ofBaseApp{
 
         ofTrueTypeFont font;
         ofTrueTypeFont titleFont;
+        ofTrueTypeFont secondFont;
     
         int mode;
         enum { MODE_NORMAL, MODE_ADDON, MODE_PLATFORM };
@@ -67,8 +68,9 @@ class testApp : public ofBaseApp{
 		float uiLeftX; 
     
     
-        textButton button;
-        textButton addonButton;
+        textButton  button;
+        textButton  generateButton;
+        textButton  addonButton;
         vector < textButton > buttons;
 
         bool isAddonCore(string addon);
