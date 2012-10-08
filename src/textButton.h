@@ -17,6 +17,7 @@ public:
     string myText;
     string prefix;
     ofTrueTypeFont * font;
+    ofTrueTypeFont * secondFont;
     ofRectangle rect;
     bool bSelectable;
     bool bDrawLong;
@@ -103,8 +104,8 @@ public:
         
         rect.x -= 12;
         rect.y -= 12;
-        rect.width += 24;
-        rect.height += 24;
+        rect.width += 22;
+        rect.height += 23;
         
     }
     
@@ -121,20 +122,22 @@ public:
     void draw() {
         ofPushStyle();
 			ofFill();
-
         
             if (bDrawLong == true){
-                ofSetColor(220,220,220);
+//                ofSetColor(220,220,220);
+                
+                ofSetColor(0,240);
+                ofNoFill();
                 ofRect(rect.x, rect.y, ofGetWidth() - rect.x*2, rect.height);
                 
-                
-                ofRectangle rectString = font->getStringBoundingBox(secondaryText, 0, 0);
+                ofRectangle rectString = secondFont->getStringBoundingBox(secondaryText, 0, 0);
                 float h = rectString.height;
                 float y = (rect.y + rect.height/2) + (rectString.height)/2;
                 float x = (rect.x + ofGetWidth() - rect.x*2) - rectString.width - 10;
                 
+                ofFill();
                 ofSetColor(0,0,0);
-                font->drawString(secondaryText, x,y);
+                secondFont->drawString(secondaryText, x,y);
                 //button.secondaryText;
                 
             }
