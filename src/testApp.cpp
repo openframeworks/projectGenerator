@@ -283,9 +283,20 @@ void testApp::setup(){
 	panelPlatforms.add(winvsToggle.setup("windows (visualStudio)", ofGetTargetPlatform()==OF_TARGET_WINVS));
 	panelPlatforms.add(linuxcbToggle.setup("linux (codeblocks)",ofGetTargetPlatform()==OF_TARGET_LINUX));
 	panelPlatforms.add(linux64cbToggle.setup("linux64 (codeblocks)",ofGetTargetPlatform()==OF_TARGET_LINUX64));
-	panelPlatforms.add(osxToggle.setup("osx (xcode)",ofGetTargetPlatform()==OF_TARGET_OSX));
-	panelPlatforms.add(iosToggle.setup("ios (xcode)",ofGetTargetPlatform()==OF_TARGET_IPHONE));
 
+//for ios, we need to fake that the target is ios (since we're compiling w/ osx OF)
+
+//#define MAKE_IOS
+    
+#ifdef MAKE_IOS
+	panelPlatforms.add(osxToggle.setup("osx (xcode)",false));
+	panelPlatforms.add(iosToggle.setup("ios (xcode)",true));
+#else
+    panelPlatforms.add(osxToggle.setup("osx (xcode)",ofGetTargetPlatform()==OF_TARGET_OSX));
+	panelPlatforms.add(iosToggle.setup("ios (xcode)",ofGetTargetPlatform()==OF_TARGET_IPHONE));
+#endif
+    
+    
     // update the platforms text in the platform button
     string platforms = "";
     for (int i = 0; i < panelPlatforms.getNumControls(); i++){
