@@ -195,7 +195,8 @@ void testApp::setup(){
     button.deliminater = ", ";
     button.prefix = "Platforms: ";
     button.secondaryText = "";
-    button.bDrawLong = false;
+    button.bDrawLong = true;
+    button.secondaryText = ">> CLICK TO CHANGE YOUR PLATFORM ";
     button.bSelectable = false;
     button.setText(platform);
 
@@ -217,14 +218,14 @@ void testApp::setup(){
     //  Generate
     //
     generateButton = button;
-    generateButton.topLeftAnchor.set(874, 535);
+    generateButton.topLeftAnchor.set(906, 535);
 	//generateButton.setColor(ofColor(50, 150, 255));
     generateButton.deliminater = ",";
     generateButton.prefix = "GENERATE PROJECT";
     generateButton.bSelectable = true;
     generateButton.setText("");
     generateButton.bDrawLong = false;
-    generateButton.topLeftAnchor.set(button.topLeftAnchor.x,ofGetHeight()-80);
+    
 
     addonButton = button;
     addonButton.prefix = "<< BACK";
@@ -235,7 +236,7 @@ void testApp::setup(){
      for (int i = 0; i < buttons.size(); i++){
          buttons[i].calculateRect();
      }
-
+    generateButton.calculateRect();
     addonButton.calculateRect();
 
     //-------------------------------------
@@ -373,14 +374,14 @@ void testApp::draw(){
     //cout << panelAddons.getShape().height << endl;
 
 
-    if (mode == 0){
-        ofFill();
-        ofSetColor(0,0,0);
-        ofRect(0,ofGetHeight(), ofGetWidth(), -25);
-        ofSetColor(255,255,255);
-        ofDrawBitmapString(status, 10,ofGetHeight()-8);
-
-    }
+//    if (mode == 0){
+//        ofFill();
+//        ofSetColor(0,0,0);
+//        ofRect(0,ofGetHeight(), ofGetWidth(), -25);
+//        ofSetColor(255,255,255);
+//        ofDrawBitmapString(status, 10,ofGetHeight()-8);
+//    }
+    
     if (mode == 1 ){
         addonButton.draw();
     }
