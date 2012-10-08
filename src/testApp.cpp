@@ -530,6 +530,8 @@ void testApp::mousePressed(int x, int y, int button){
                 string result = res.filePath;
                 convertWindowsToUnixPath(result);
                 buttons[1].setText( result );
+                
+                status = "path set to: " + result;
             }
 
 
