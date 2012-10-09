@@ -171,7 +171,7 @@ void testApp::setup(){
 
     //-------------------------------------
     // load font and setup the buttons
-    font.loadFont("fonts/Inconsolata.otf", 15, true,false,false,0.3,90);
+    font.loadFont("fonts/Inconsolata.otf", 14, true,false,false,0.3,90);
     titleFont.loadFont("fonts/Inconsolata.otf", 28, true,false,false,0.3,90);
     secondFont.loadFont("fonts/Inconsolata.otf", 11, true,false,false,0.3,90);
     
@@ -180,7 +180,7 @@ void testApp::setup(){
     button.font = &font;
     button.secondFont = &secondFont;
     button.prefix = "Name: ";
-	button.topLeftAnchor.set(76, 189+40); //set top button position - others are set relative to this.
+	button.topLeftAnchor.set(76, 160+40); //set top button position - others are set relative to this.
     button.setText(sketchName);
     
     button.secondaryText = "<< CLICK TO CHANGE THE NAME";
@@ -231,8 +231,6 @@ void testApp::setup(){
     generateButton.setText("");
     generateButton.bDrawLong = false;
     
-
-    
     addonButton = button;
     addonButton.topLeftAnchor.set(906, 535);
     addonButton.prefix = "<< BACK";
@@ -240,11 +238,11 @@ void testApp::setup(){
     addonButton.bDrawLong = false;
     
 
-     for (int i = 0; i < buttons.size(); i++){
-         buttons[i].calculateRect();
-     }
-    generateButton.calculateRect();
+    for (int i = 0; i < buttons.size(); i++){
+        buttons[i].calculateRect();
+    }
     addonButton.calculateRect();
+    generateButton.calculateRect();
 
     //-------------------------------------
     // addons panels:
@@ -347,8 +345,6 @@ void testApp::update(){
         buttons[i].checkMousePressed(ofPoint(mouseX, mouseY));
     }
 
-    
-    generateButton.calculateRect();
     generateButton.checkMousePressed(ofPoint(mouseX, mouseY));
     
     for (int i = 0; i < buttons.size(); i++){
@@ -384,11 +380,11 @@ void testApp::draw(){
     if (mode != MODE_ADDON ) {
         
         ofSetColor(100);
-        logo.draw(64, 62); 
+        logo.draw(64, 61,logo.getWidth()*0.95,logo.getHeight()*0.95);
         
         //ofSetColor(74,255,203);
-        titleFont.drawString("PROJECT", 64 + logo.getWidth() + 25, 84);
-        titleFont.drawString("GENERATOR",  64 + logo.getWidth() + 25, 122);
+        titleFont.drawString("PROJECT", 64 + logo.getWidth() + 25, 85);
+        titleFont.drawString("GENERATOR",  64 + logo.getWidth() + 25, 117);
     }
     
 	if (mode == 0){
@@ -665,7 +661,9 @@ void testApp::mouseReleased(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::windowResized(int w, int h){
-
+    generateButton.topLeftAnchor.set(ofGetWidth() - buttons[0].rect.x - generateButton.rect.width + 10 ,
+                                     ofGetHeight() - generateButton.rect.height - 84);// 535);
+    generateButton.calculateRect();
 }
 
 //--------------------------------------------------------------
