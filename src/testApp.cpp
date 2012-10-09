@@ -380,7 +380,7 @@ void testApp::draw(){
     if (mode != MODE_ADDON ) {
         
         ofSetColor(100);
-        logo.draw(64, 61,logo.getWidth()*0.95,logo.getHeight()*0.95);
+        logo.draw(64, 61,logo.getWidth(),logo.getHeight());
         
         //ofSetColor(74,255,203);
         titleFont.drawString("PROJECT", 64 + logo.getWidth() + 25, 85);
