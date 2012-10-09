@@ -56,7 +56,7 @@ public:
             
             cout << text << endl;
             ofRectangle rect = font->getStringBoundingBox(text, pos.x, pos.y);
-            if ((pos.x + rect.width) > 600){
+            if ((pos.x + rect.width) > 710){
                 
                 myDisplayText += "\n";
                 myDisplayText += text;
