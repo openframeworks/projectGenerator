@@ -231,8 +231,6 @@ void testApp::setup(){
     generateButton.setText("");
     generateButton.bDrawLong = false;
     
-
-    
     addonButton = button;
     addonButton.topLeftAnchor.set(906, 535);
     addonButton.prefix = "<< BACK";
@@ -240,11 +238,11 @@ void testApp::setup(){
     addonButton.bDrawLong = false;
     
 
-     for (int i = 0; i < buttons.size(); i++){
-         buttons[i].calculateRect();
-     }
-    generateButton.calculateRect();
+    for (int i = 0; i < buttons.size(); i++){
+        buttons[i].calculateRect();
+    }
     addonButton.calculateRect();
+    generateButton.calculateRect();
 
     //-------------------------------------
     // addons panels:
@@ -347,8 +345,6 @@ void testApp::update(){
         buttons[i].checkMousePressed(ofPoint(mouseX, mouseY));
     }
 
-    
-    generateButton.calculateRect();
     generateButton.checkMousePressed(ofPoint(mouseX, mouseY));
     
     for (int i = 0; i < buttons.size(); i++){
@@ -665,7 +661,9 @@ void testApp::mouseReleased(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::windowResized(int w, int h){
-
+    generateButton.topLeftAnchor.set(ofGetWidth() - buttons[0].rect.x - generateButton.rect.width + 10 ,
+                                     ofGetHeight() - generateButton.rect.height - 84);// 535);
+    generateButton.calculateRect();
 }
 
 //--------------------------------------------------------------
