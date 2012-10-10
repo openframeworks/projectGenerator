@@ -123,7 +123,9 @@ void testApp::setup(){
     ofSetLogLevel(OF_LOG_VERBOSE);
     ofSetVerticalSync(true);
 
-
+    
+    statusEnergy = 0;
+    
     mode = 0;
     bInited = false;
     project = NULL;
@@ -315,6 +317,16 @@ void testApp::setup(){
     logo.loadImage("images/ofw-logo.png");
 
     ofBackground(230,230,230);
+    
+    
+    generateButton.topLeftAnchor.set(ofGetWidth() - buttons[0].rect.x - generateButton.rect.width + 10 ,
+                                     ofGetHeight() - generateButton.rect.height - 40);// 535);
+    generateButton.calculateRect();
+    
+    addonButton.topLeftAnchor.set(ofGetWidth() - buttons[0].rect.x - addonButton.rect.width + 10 ,
+                                  ofGetHeight() - addonButton.rect.height - 40);// 535);
+    addonButton.calculateRect();
+
 }
 
 
@@ -662,8 +674,13 @@ void testApp::mouseReleased(int x, int y, int button){
 //--------------------------------------------------------------
 void testApp::windowResized(int w, int h){
     generateButton.topLeftAnchor.set(ofGetWidth() - buttons[0].rect.x - generateButton.rect.width + 10 ,
-                                     ofGetHeight() - generateButton.rect.height - 84);// 535);
+                                     ofGetHeight() - generateButton.rect.height - 40);// 535);
     generateButton.calculateRect();
+    
+    addonButton.topLeftAnchor.set(ofGetWidth() - buttons[0].rect.x - addonButton.rect.width + 10 ,
+                                  ofGetHeight() - addonButton.rect.height - 40);// 535);
+    addonButton.calculateRect();
+    
 }
 
 //--------------------------------------------------------------
