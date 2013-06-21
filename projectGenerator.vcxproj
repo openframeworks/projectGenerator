@@ -108,6 +108,7 @@
     <ClInclude Include="src\pugixmlLib\src\pugiconfig.hpp" />
     <ClInclude Include="src\pugixmlLib\src\pugixml.hpp" />
     <ClInclude Include="src\testApp.h" />
+    <ClInclude Include="src\textButton.h" />
     <ClInclude Include="src\utils\ofAppNoWindow.h" />
     <ClInclude Include="src\utils\Utils.h" />
   </ItemGroup>

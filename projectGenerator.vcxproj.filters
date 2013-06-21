@@ -111,6 +111,9 @@
     <ClInclude Include="src\utils\ofAppNoWindow.h">
       <Filter>src\utils</Filter>
     </ClInclude>
+    <ClInclude Include="src\textButton.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxBaseGui.cpp">
