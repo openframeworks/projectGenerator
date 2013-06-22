@@ -83,7 +83,7 @@ string testApp::setupForTarget(int targ){
             break;
         case OF_TARGET_WINVS:
             project = new visualStudioProject;
-            target = "vs2010";
+            target = "vs";
             break;
         case OF_TARGET_IPHONE:
             project = new xcodeProject();
@@ -280,7 +280,7 @@ void testApp::setup(){
 
     panelPlatforms.setup();
     panelPlatforms.add(wincbToggle.setup("windows (codeblocks)",ofGetTargetPlatform()==OF_TARGET_WINGCC));
-	panelPlatforms.add(winvsToggle.setup("windows (visualStudio)", ofGetTargetPlatform()==OF_TARGET_WINVS));
+	panelPlatforms.add(winvsToggle.setup("windows (visual studio)", ofGetTargetPlatform()==OF_TARGET_WINVS));
 	panelPlatforms.add(linuxcbToggle.setup("linux (codeblocks)",ofGetTargetPlatform()==OF_TARGET_LINUX));
 	panelPlatforms.add(linux64cbToggle.setup("linux64 (codeblocks)",ofGetTargetPlatform()==OF_TARGET_LINUX64));
 
