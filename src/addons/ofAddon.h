@@ -65,6 +65,7 @@ private:
     	AndroidARMv5,
     	AndroidARMv7,
     	iOS,
+    	OSX,
     	Unknown
     } currentParseState;
 
