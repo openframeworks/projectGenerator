@@ -91,13 +91,13 @@ string testApp::setupForTarget(int targ){
             break;
         case OF_TARGET_ANDROID:
             break;
-        case OF_TARGET_LINUX:
-            project = new CBLinuxProject;
-            target = "linux";
-            break;
         case OF_TARGET_LINUX64:
             project = new CBLinuxProject;
             target = "linux64";
+            break;
+        case OF_TARGET_LINUX:
+            project = new CBLinuxProject;
+            target = "linux";
             break;
     }
 
@@ -277,7 +277,6 @@ void testApp::setup(){
     //-------------------------------------
     // platform panel (not used, really, but here just in case)
     //-------------------------------------
-
     panelPlatforms.setup();
     panelPlatforms.add(wincbToggle.setup("windows (codeblocks)",ofGetTargetPlatform()==OF_TARGET_WINGCC));
 	panelPlatforms.add(winvsToggle.setup("windows (visual studio)", ofGetTargetPlatform()==OF_TARGET_WINVS));
