@@ -54,7 +54,6 @@ public:
             if (i != breakUp.size() -1) text += deliminater;
             //if (breakUp[i].length() == 0) text += deliminater;
 
-            cout << text << endl;
             ofRectangle rect = font->getStringBoundingBox(text, pos.x, pos.y);
             if ((pos.x + rect.width) > 500){
 
