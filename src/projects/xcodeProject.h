@@ -19,6 +19,7 @@ private:
     bool createProjectFile();
     bool loadProjectFile();
     bool saveProjectFile();
+    void saveMakefile();
 
 public:
 

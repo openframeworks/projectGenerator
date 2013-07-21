@@ -154,6 +154,7 @@ void xcodeProject::saveScheme(){
 	//TODO: do we still need this?
     string xcsettings = projectDir  + projectName + ".xcodeproj" + "/xcshareddata/WorkspaceSettings.xcsettings";
     ofFile::copyFromTo(templatePath + "emptyExample.xcodeproj/xcshareddata/WorkspaceSettings.xcsettings", xcsettings);
+
 }
 
 
@@ -164,6 +165,14 @@ void xcodeProject::saveWorkspaceXML(){
 	string xcodeProjectWorkspace = workspaceFolder + "contents.xcworkspacedata";    
     ofFile::copyFromTo(templatePath + "/emptyExample.xcodeproj/project.xcworkspace/contents.xcworkspacedata", xcodeProjectWorkspace);
     findandreplaceInTexfile(xcodeProjectWorkspace, "PROJECTNAME", projectName);
+}
+
+void xcodeProject::saveMakefile(){
+    string makefile = ofFilePath::join(projectDir,"Makefile");
+    ofFile::copyFromTo(templatePath + "Makefile", makefile);
+
+    string configmake = ofFilePath::join(projectDir,"config.make");
+    ofFile::copyFromTo(templatePath + "config.make", configmake);
 }
 
 
@@ -223,6 +232,7 @@ bool xcodeProject::createProjectFile(){
 
     saveWorkspaceXML();
     saveScheme();
+    saveMakefile();
 
     // make everything relative the right way.
     string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
