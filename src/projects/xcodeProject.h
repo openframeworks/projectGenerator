@@ -26,7 +26,12 @@ public:
     void addSrc(string srcFile, string folder);
     void addInclude(string includeName);
     void addLibrary(string libraryName, LibType libType = RELEASE_LIB);
-
+    
+    // specific to OSX
+    void addFramework(string name, string path);
+    
+        
+    
     void addAddon(ofAddon & addon);
 
     void saveWorkspaceXML();
@@ -37,6 +42,8 @@ public:
 	string addonUUID;
 	string resourcesUUID;
 	string buildPhaseUUID;
+    string frameworksUUID;
+    
 
     pugi::xml_node findOrMakeFolderSet( pugi::xml_node nodeToAddTo, vector < string > & folders, string pathForHash);
 	pugi::xml_node insertPoint;         // where are we inserting items (at the second dict tag,

@@ -72,6 +72,7 @@ STRINGIFY(
 
 );
 
+
 //-----------------------------------------------------------------
 const char PBXBuildFile[] =
 STRINGIFY(
@@ -128,11 +129,13 @@ void xcodeProject::setup(){
 		addonUUID		= "BB4B014C10F69532006C3DED";
 		buildPhaseUUID	= "E4B69E200A3A1BDC003C02F2";
 		resourcesUUID	= "";
+        frameworksUUID  = "BBAB23BE13894E4700AA2426";   //PBXFrameworksBuildPhase
 	}else{
 		srcUUID			= "E4D8936A11527B74007E1F53";
 		addonUUID		= "BB16F26B0F2B646B00518274";
 		buildPhaseUUID	= "E4D8936E11527B74007E1F53";
 		resourcesUUID   = "BB24DD8F10DA77E000E9C588";
+        frameworksUUID  = "BBAB23BE13894E4700AA2426";   //PBXFrameworksBuildPhase  // todo: check this?
 	}
 }
 
@@ -399,6 +402,106 @@ pugi::xml_node xcodeProject::findOrMakeFolderSet(pugi::xml_node nodeToAddTo, vec
     }
 
 }
+
+// todo: frameworks
+//
+void xcodeProject::addFramework(string name, string path){
+    
+    
+    /*
+    //-----------------------------------------------------------------
+    const char PBXFileReference[] =
+    STRINGIFY(
+              
+              <key>FILEUUID</key>
+              <dict>
+              <key>explicitFileType</key>
+              <string>FILETYPE</string>
+              <key>fileEncoding</key>
+              <string>30</string>
+              <key>isa</key>
+              <string>PBXFileReference</string>
+              <key>name</key>
+              <string>FILENAME</string>
+              <key>path</key>
+              <string>FILEPATH</string>
+              <key>sourceTree</key>
+              <string>SOURCE_ROOT</string>
+              </dict>
+              
+              );
+    */
+    
+//    <key>FDA58C7417AD2D5A00BC9CD1</key>
+//    <dict>
+//    <key>isa</key>
+//    <string>PBXFileReference</string>
+//    <key>lastKnownFileType</key>
+//    <string>wrapper.framework</string>
+//    <key>name</key>
+//    <string>AudioToolbox.framework</string>
+//    <key>path</key>
+//    <string>../../../../../../../../System/Library/Frameworks/AudioToolbox.framework</string>
+//    <key>sourceTree</key>
+//    <string>&lt;group&gt;</string>
+//    </dict>
+//    <key>FDA58C7517AD2D5A00BC9CD1</key>
+//    <dict>
+//    <key>fileRef</key>
+//    <string>FDA58C7417AD2D5A00BC9CD1</string>
+//    <key>isa</key>
+//    <string>PBXBuildFile</string>
+//    </dict>
+//     
+    
+    
+    string buildUUID;
+    
+    //-----------------------------------------------------------------
+    // based on the extension make some choices about what to do:
+    //-----------------------------------------------------------------
+    
+    //bool addToResources = true;
+    bool addToBuild = true;
+   
+    //-----------------------------------------------------------------
+    // (A) make a FILE REF
+    //-----------------------------------------------------------------
+    
+    string pbxfileref = string(PBXFileReference);
+    string UUID = generateUUID( name );
+
+    findandreplace( pbxfileref, "FILEUUID", UUID);
+    findandreplace( pbxfileref, "FILENAME", name);
+    findandreplace( pbxfileref, "FILEPATH", path);
+    findandreplace( pbxfileref, "SOURCE_ROOT", "&lt;group&gt;");
+    findandreplace( pbxfileref, "explicitFileType", "lastKnownFileType");
+    findandreplace( pbxfileref, "FILETYPE", "wrapper.framework");
+    
+    pugi::xml_document fileRefDoc;
+    pugi::xml_parse_result result = fileRefDoc.load_buffer(pbxfileref.c_str(), strlen(pbxfileref.c_str()));
+    
+    // insert it at <plist><dict><dict>
+    doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child().next_sibling());   // UUID FIRST
+    doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child());                  // DICT SECOND
+    
+
+    buildUUID = generateUUID(name + "-build");
+    string pbxbuildfile = string(PBXBuildFile);
+    findandreplace( pbxbuildfile, "FILEUUID", UUID);
+    findandreplace( pbxbuildfile, "BUILDUUID", buildUUID);
+    fileRefDoc.load_buffer(pbxbuildfile.c_str(), strlen(pbxbuildfile.c_str()));
+    doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child().next_sibling());   // UUID FIRST
+    doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child());                  // DICT SECOND
+    
+    // add it to the frameworks array.
+    pugi::xml_node array;
+    findArrayForUUID(frameworksUUID, array);    // this is the build array (all build refs get added here)
+    array.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
+
+
+}
+
 
 
 
@@ -687,4 +790,5 @@ void xcodeProject::addAddon(ofAddon & addon){
         ofLogVerbose() << "adding addon srcFiles: " << addon.srcFiles[i];
         addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
     }
+    
 }
