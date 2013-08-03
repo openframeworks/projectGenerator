@@ -534,7 +534,7 @@ void xcodeProject::addFramework(string name, string path){
     // add it to the frameworks array.
     pugi::xml_node array;
     findArrayForUUID(frameworksUUID, array);    // this is the build array (all build refs get added here)
-    array.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
+    array.append_child("string").append_child(pugi::node_pcdata).set_value(UUID.c_str());
 
 
 }
@@ -843,7 +843,15 @@ void xcodeProject::addAddon(ofAddon & addon){
     
     for(int i=0;i<(int)addon.frameworks.size(); i++){
         ofLogVerbose() << "adding addon frameworks: " << addon.frameworks[i];
-        addFramework( addon.frameworks[i] + ".framework", "/System/Library/Frameworks/" + addon.frameworks[i] + ".framework");
+        
+        int found=addon.frameworks[i].find('/');
+        if (found==std::string::npos){
+             addFramework( addon.frameworks[i] + ".framework", "/System/Library/Frameworks/" + addon.frameworks[i] + ".framework");
+        } else {
+            vector < string > pathSplit = ofSplitString(addon.frameworks[i], "/");
+            addFramework(pathSplit[pathSplit.size()-1], addon.frameworks[i]);
+        }
+            
     }
     
 }

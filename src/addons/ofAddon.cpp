@@ -341,6 +341,12 @@ void ofAddon::fromFS(string path, string platform){
 	//ofSetLogLevel(OF_LOG_NOTICE);
     if (ofDirectory::doesDirectoryExist(libsPath)){
         getLibsRecursively(libsPath, libFiles, libs, platform);
+        
+        if (platform == "osx" || platform == "ios"){
+            getFrameworksRecursively(libsPath, frameworks, platform);
+            
+        }
+        
     }
     //ofSetLogLevel(OF_LOG_VERBOSE);
 
@@ -379,6 +385,24 @@ void ofAddon::fromFS(string path, string platform){
         }
 
     }
+    
+    for (int i = 0; i < (int)frameworks.size(); i++){
+        
+        // does libs[] have any path ? let's fix if so.
+#ifdef TARGET_WIN32
+    	int end = frameworks[i].rfind("\\");
+#else
+        int end = frameworks[i].rfind("/");
+#endif
+        if (end > 0){
+            
+            frameworks[i].erase (frameworks[i].begin(), frameworks[i].begin()+ofRootPath.length());
+            frameworks[i] = pathToOF + frameworks[i];
+        }
+        
+    }
+    
+    
 
     // get a unique list of the paths that are needed for the includes.
     list < string > paths;
