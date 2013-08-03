@@ -151,15 +151,14 @@ void xcodeProject::setup(){
 		addonUUID		= "BB4B014C10F69532006C3DED";
 		buildPhaseUUID	= "E4B69E200A3A1BDC003C02F2";
 		resourcesUUID	= "";
-        frameworksUUID  = "BBAB23BE13894E4700AA2426";   //PBXFrameworksBuildPhase
+        frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase
 	}else{
 		srcUUID			= "E4D8936A11527B74007E1F53";
 		addonUUID		= "BB16F26B0F2B646B00518274";
 		buildPhaseUUID	= "E4D8936E11527B74007E1F53";
 		resourcesUUID   = "BB24DD8F10DA77E000E9C588";
         buildPhaseResourcesUUID = "BB24DDCA10DA781C00E9C588";
-        
-        frameworksUUID  = "BBAB23BE13894E4700AA2426";   //PBXFrameworksBuildPhase  // todo: check this?
+        frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase  // todo: check this?
 	}
 }
 
@@ -839,6 +838,12 @@ void xcodeProject::addAddon(ofAddon & addon){
     for(int i=0;i<(int)addon.srcFiles.size(); i++){
         ofLogVerbose() << "adding addon srcFiles: " << addon.srcFiles[i];
         addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
+    }
+    
+    
+    for(int i=0;i<(int)addon.frameworks.size(); i++){
+        ofLogVerbose() << "adding addon frameworks: " << addon.frameworks[i];
+        addFramework( addon.frameworks[i] + ".framework", "/System/Library/Frameworks/" + addon.frameworks[i] + ".framework");
     }
     
 }
