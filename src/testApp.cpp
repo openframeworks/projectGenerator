@@ -688,8 +688,48 @@ void testApp::windowResized(int w, int h){
 void testApp::gotMessage(ofMessage msg){
 
 }
+void testApp::addAddon(string addon) {
+	
+	string addons = "";
+	
+	for (int i = 0; i < panelCoreAddons.getNumControls(); i++){
+		
+		ofxToggle *toggle = ((ofxToggle *)panelCoreAddons.getControl(i));
+		if(toggle->getName()==addon) {
+			(*toggle) = true;
+		}
+		
+		if (*toggle){
+			if (addons.length() > 0) addons+=", ";
+			addons += toggle->getName();
 
+		}
+		
+	}
+	for (int i = 0; i < panelOtherAddons.getNumControls(); i++){
+		ofxToggle *toggle = ((ofxToggle *)panelOtherAddons.getControl(i));
+		
+		if(toggle->getName()==addon) {
+			(*toggle) = true;
+		}
+		
+		if (*toggle){
+			if (addons.length() > 0) addons+=", ";
+			addons += toggle->getName();
+		}
+		
+	}
+	buttons[3].setText(addons);
+}
 //--------------------------------------------------------------
 void testApp::dragEvent(ofDragInfo dragInfo){
-
+	for(int i = 0; i < dragInfo.files.size(); i++) {
+		string path = dragInfo.files[i];
+		ofFile f(path);
+		ofFile parent(f.getEnclosingDirectory());
+		if(parent.getFileName()=="addons") {
+			string addon = f.getFileName();
+			addAddon(addon);
+		}
+	}
 }
