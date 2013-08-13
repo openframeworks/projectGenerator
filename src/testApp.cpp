@@ -33,6 +33,8 @@ bool testApp::isAddonCore(string addon){
         coreAddons.push_back("ofxVectorMath");
         coreAddons.push_back("ofxXmlSettings");
         coreAddons.push_back("ofxSvg");
+        coreAddons.push_back("ofxGui");
+        coreAddons.push_back("ofxKinect");
         bInited = true;
     }
 
