@@ -85,5 +85,6 @@ class testApp : public ofBaseApp{
         void setStatus(string newStatus);
         
         ofImage logo;
+		void addAddon(string addon);
     
 };
