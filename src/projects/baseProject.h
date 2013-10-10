@@ -18,18 +18,9 @@ public:
         RELEASE_LIB
     };
 
-    bool bTemplateSet;
-    
     baseProject(){
         bLoaded = false;
-        bTemplateSet = false;
     };
-    
-    
-    void setTemplatePath(string _path){
-        templatePath = _path;
-        bTemplateSet = true;
-    }
 
     virtual ~baseProject(){};
 
@@ -54,6 +45,8 @@ public:
     virtual void addSrc(string srcFile, string folder) = 0;
     virtual void addInclude(string includeName) = 0;
     virtual void addLibrary(string libraryName, LibType libType = RELEASE_LIB) = 0;
+    virtual void addLDFLAG(string ldflag, LibType libType = RELEASE_LIB){}
+    virtual void addCFLAG(string cflag, LibType libType = RELEASE_LIB){};
 
 	virtual void addAddon(ofAddon & addon);
 

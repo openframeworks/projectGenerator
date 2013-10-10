@@ -130,7 +130,10 @@ void ofAddon::addReplaceStringVector(vector<string> & variable, string value, st
 
 	if(!addToVariable) variable.clear();
 	for(int i=0;i<(int)values.size();i++){
-		if(values[i]!="") variable.push_back(ofFilePath::join(prefix,values[i]));
+		if(values[i]!=""){
+			if(prefix=="" || values[i][0]=='/' || values[i].find(pathToOF)==0) variable.push_back(values[i]);
+			else variable.push_back(ofFilePath::join(prefix,values[i]));
+		}
 	}
 }
 
@@ -316,9 +319,7 @@ void ofAddon::fromFS(string path, string platform){
     ofLogVerbose() << "in fromFS, trying src " << filePath;
 
 
-	ofSetLogLevel(OF_LOG_NOTICE);
     getFilesRecursively(filePath, srcFiles);
-	//ofSetLogLevel(OF_LOG_VERBOSE);
 
     for(int i=0;i<(int)srcFiles.size();i++){
     	srcFiles[i].erase (srcFiles[i].begin(), srcFiles[i].begin()+ofRootPath.length());
@@ -338,7 +339,6 @@ void ofAddon::fromFS(string path, string platform){
     vector < string > libFiles;
 
 
-	//ofSetLogLevel(OF_LOG_NOTICE);
     if (ofDirectory::doesDirectoryExist(libsPath)){
         getLibsRecursively(libsPath, libFiles, libs, platform);
         
@@ -348,7 +348,6 @@ void ofAddon::fromFS(string path, string platform){
         }
         
     }
-    //ofSetLogLevel(OF_LOG_VERBOSE);
 
 
     // I need to add libFiles to srcFiles
@@ -422,11 +421,9 @@ void ofAddon::fromFS(string path, string platform){
     ofLogVerbose() << "trying get folders recursively " << (path + "/libs");
 
 	// the dirList verbosity is crazy, so I'm setting this off for now.
-	//ofSetLogLevel(OF_LOG_NOTICE);
     getFoldersRecursively(path + "/libs", libFolders, platform);
     vector < string > srcFolders;
     getFoldersRecursively(path + "/src", srcFolders, platform);
-	//ofSetLogLevel(OF_LOG_VERBOSE);
 
     for (int i = 0; i < (int)libFolders.size(); i++){
         libFolders[i].erase (libFolders[i].begin(), libFolders[i].begin()+ofRootPath.length());

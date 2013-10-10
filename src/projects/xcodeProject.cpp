@@ -132,6 +132,19 @@ STRINGIFY(
 
 );
 
+//-----------------------------------------------------------------
+const char CPPFlags[] =
+STRINGIFY(
+
+          <key>OTHER_CPLUSPLUSFLAGS</key>
+          <array>
+		  <string>"-D__MACOSX_CORE__"</string>
+		  <string>"-lpthread"</string>
+		  <string>"-mtune=native"</string>
+          </array>
+
+);
+
 const char workspace[] =
 STRINGIFY(
 
@@ -820,7 +833,94 @@ void xcodeProject::addLibrary(string libraryName, LibType libType){
     //saveFile(projectDir + "/" + projectName + ".xcodeproj" + "/project.pbxproj");
 }
 
+void xcodeProject::addLDFLAG(string ldflag, LibType libType){
+
+    char query[255];
+    sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'OTHER_LDFLAGS')]/following-sibling::node()[1]");
+    pugi::xpath_node_set headerArray = doc.select_nodes(query);
+
+
+    if (headerArray.size() > 0){
+        for (pugi::xpath_node_set::const_iterator it = headerArray.begin(); it != headerArray.end(); ++it){
+            pugi::xpath_node node = *it;
+            node.node().append_child("string").append_child(pugi::node_pcdata).set_value(ldflag.c_str());
+        }
+
+    } else {
+
+        //printf("we don't have OTHER_LDFLAGS, so we're adding them... and calling this function again \n");
+        query[255];
+        sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'buildSettings')]/following-sibling::node()[1]");
+
+        pugi::xpath_node_set dictArray = doc.select_nodes(query);
+
+        for (pugi::xpath_node_set::const_iterator it = dictArray.begin(); it != dictArray.end(); ++it){
+            pugi::xpath_node node = *it;
+
+            //node.node().print(std::cout);
+            string ldXML = string(LDFlags);
+            pugi::xml_document ldDoc;
+            pugi::xml_parse_result result = ldDoc.load_buffer(ldXML.c_str(), strlen(ldXML.c_str()));
+
+            // insert it at <plist><dict><dict>
+            node.node().prepend_copy(ldDoc.first_child().next_sibling());   // KEY FIRST
+            node.node().prepend_copy(ldDoc.first_child());                  // ARRAY SECOND
+
+            //node.node().print(std::cout);
+        }
+
+        // now that we have it, try again...
+        addLDFLAG(ldflag);
+    }
+
+    //saveFile(projectDir + "/" + projectName + ".xcodeproj" + "/project.pbxproj");
+}
+
+void xcodeProject::addCFLAG(string cflag, LibType libType){
+
+    char query[255];
+    sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'OTHER_CPLUSPLUSFLAGS')]/following-sibling::node()[1]");
+    pugi::xpath_node_set headerArray = doc.select_nodes(query);
+
+
+    if (headerArray.size() > 0){
+        for (pugi::xpath_node_set::const_iterator it = headerArray.begin(); it != headerArray.end(); ++it){
+            pugi::xpath_node node = *it;
+            node.node().append_child("string").append_child(pugi::node_pcdata).set_value(cflag.c_str());
+        }
+
+    } else {
+
+        //printf("we don't have OTHER_LDFLAGS, so we're adding them... and calling this function again \n");
+        query[255];
+        sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'buildSettings')]/following-sibling::node()[1]");
+
+        pugi::xpath_node_set dictArray = doc.select_nodes(query);
+
+        for (pugi::xpath_node_set::const_iterator it = dictArray.begin(); it != dictArray.end(); ++it){
+            pugi::xpath_node node = *it;
+
+            //node.node().print(std::cout);
+            string ldXML = string(CPPFlags);
+            pugi::xml_document ldDoc;
+            pugi::xml_parse_result result = ldDoc.load_buffer(ldXML.c_str(), strlen(ldXML.c_str()));
+
+            // insert it at <plist><dict><dict>
+            node.node().prepend_copy(ldDoc.first_child().next_sibling());   // KEY FIRST
+            node.node().prepend_copy(ldDoc.first_child());                  // ARRAY SECOND
+
+            //node.node().print(std::cout);
+        }
+
+        // now that we have it, try again...
+        addLDFLAG(cflag);
+    }
+
+    //saveFile(projectDir + "/" + projectName + ".xcodeproj" + "/project.pbxproj");
+}
+
 void xcodeProject::addAddon(ofAddon & addon){
+	ofLogNotice() << "adding addon " << addon.name;
     for(int i=0;i<(int)addons.size();i++){
 		if(addons[i].name==addon.name) return;
 	}
@@ -835,16 +935,24 @@ void xcodeProject::addAddon(ofAddon & addon){
         ofLogVerbose() << "adding addon libs: " << addon.libs[i];
         addLibrary(addon.libs[i]);
     }
+    for(int i=0;i<(int)addon.cflags.size();i++){
+        ofLogVerbose() << "adding addon cflags: " << addon.cflags[i];
+        addCFLAG(addon.cflags[i]);
+    }
+    for(int i=0;i<(int)addon.ldflags.size();i++){
+        ofLogVerbose() << "adding addon ldflags: " << addon.ldflags[i];
+        addLDFLAG(addon.ldflags[i]);
+    }
     for(int i=0;i<(int)addon.srcFiles.size(); i++){
         ofLogVerbose() << "adding addon srcFiles: " << addon.srcFiles[i];
         addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
     }
     
-    
+    ofLogNotice() << "adding " << addon.frameworks.size() << " frameworks";
     for(int i=0;i<(int)addon.frameworks.size(); i++){
-        ofLogVerbose() << "adding addon frameworks: " << addon.frameworks[i];
+        ofLogNotice() << "adding addon frameworks: " << addon.frameworks[i];
         
-        int found=addon.frameworks[i].find('/');
+        unsigned int found=addon.frameworks[i].find('/');
         if (found==std::string::npos){
              addFramework( addon.frameworks[i] + ".framework", "/System/Library/Frameworks/" + addon.frameworks[i] + ".framework");
         } else {

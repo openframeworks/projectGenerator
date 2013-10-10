@@ -24,6 +24,8 @@ public:
     void addSrc(string srcFile, string folder);
     void addInclude(string includeName);
     void addLibrary(string libraryName, LibType libType = RELEASE_LIB);
+    void addLDFLAG(string ldflag, LibType libType = RELEASE_LIB);
+    void addCFLAG(string cflag, LibType libType = RELEASE_LIB);
     
     // specific to OSX
     void addFramework(string name, string path);
