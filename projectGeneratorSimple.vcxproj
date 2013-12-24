@@ -111,7 +111,6 @@
     <ClInclude Include="src\pugixmlLib\src\pugixml.hpp" />
     <ClInclude Include="src\testApp.h" />
     <ClInclude Include="src\textButton.h" />
-    <ClInclude Include="src\utils\ofAppNoWindow.h" />
     <ClInclude Include="src\utils\Utils.h" />
   </ItemGroup>
   <ItemGroup>
@@ -136,7 +135,6 @@
     <ClCompile Include="src\projects\xcodeProject.cpp" />
     <ClCompile Include="src\pugixmlLib\src\pugixml.cpp" />
     <ClCompile Include="src\testApp.cpp" />
-    <ClCompile Include="src\utils\ofAppNoWindow.cpp" />
     <ClCompile Include="src\utils\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
