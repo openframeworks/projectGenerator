@@ -99,9 +99,6 @@
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxLabel.h">
       <Filter>addons\ofxGui\src</Filter>
     </ClInclude>
-    <ClInclude Include="src\utils\ofAppNoWindow.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
     <ClInclude Include="src\textButton.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -166,9 +163,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.cpp">
       <Filter>addons\ofxGui\src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\utils\ofAppNoWindow.cpp">
-      <Filter>src\utils</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxml.cpp">
       <Filter>addons\ofxXmlSettings\libs</Filter>
