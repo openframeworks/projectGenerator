@@ -129,9 +129,21 @@ void ofAddon::addReplaceStringVector(vector<string> & variable, string value, st
 	}
 
 	if(!addToVariable) variable.clear();
+	Poco::RegularExpression regEX("(?<=\\$\\()[^\\)]*");
 	for(int i=0;i<(int)values.size();i++){
 		if(values[i]!=""){
-			if(prefix=="" || values[i][0]=='/' || values[i].find(pathToOF)==0) variable.push_back(values[i]);
+            Poco::RegularExpression::Match match;
+            if(int pos = regEX.match(values[i],match)){
+                string varName = values[i].substr(match.offset,match.length);
+                string varValue;
+                if(getenv(varName.c_str())){
+                    varValue = getenv(varName.c_str());
+                }
+                ofStringReplace(values[i],"$("+varName+")",varValue);
+                cout << varName << endl << values[i] << endl;
+            }
+
+			if(prefix=="" || values[i].find(pathToOF)==0 || ofFilePath::isAbsolute(values[i])) variable.push_back(values[i]);
 			else variable.push_back(ofFilePath::join(prefix,values[i]));
 		}
 	}
@@ -222,12 +234,12 @@ void ofAddon::exclude(vector<string> & variable, vector<string> exclusions){
 	for(int i=0;i<(int)exclusions.size();i++){
 		string exclusion = exclusions[i];
 		//ofStringReplace(exclusion,"/","\\/");
+		ofStringReplace(exclusion,"\\","\\\\");
 		ofStringReplace(exclusion,".","\\.");
 		ofStringReplace(exclusion,"%",".*");
 		exclusion =".*"+ exclusion;
 		Poco::RegularExpression regExp(exclusion);
 		for(int j=0;j<(int)variable.size();j++){
-			cout << "checking " << variable[j] << endl;
 			if(regExp.match(variable[j])){
 				variable.erase(variable.begin()+j);
 				j--;
@@ -238,8 +250,6 @@ void ofAddon::exclude(vector<string> & variable, vector<string> exclusions){
 
 void ofAddon::parseConfig(){
 	ofFile addonConfig(ofFilePath::join(addonPath,"addon_config.mk"));
-
-	cout << "parse config " << addonPath << endl;
 
 	if(!addonConfig.exists()) return;
 
@@ -306,8 +316,8 @@ void ofAddon::parseConfig(){
 
 void ofAddon::fromFS(string path, string platform){
 
-    
-    
+
+
     clear();
     this->platform = platform;
 	name = ofFilePath::getFileName(path);
@@ -341,12 +351,12 @@ void ofAddon::fromFS(string path, string platform){
 
     if (ofDirectory::doesDirectoryExist(libsPath)){
         getLibsRecursively(libsPath, libFiles, libs, platform);
-        
+
         if (platform == "osx" || platform == "ios"){
             getFrameworksRecursively(libsPath, frameworks, platform);
-            
+
         }
-        
+
     }
 
 
@@ -384,9 +394,9 @@ void ofAddon::fromFS(string path, string platform){
         }
 
     }
-    
+
     for (int i = 0; i < (int)frameworks.size(); i++){
-        
+
         // does libs[] have any path ? let's fix if so.
 #ifdef TARGET_WIN32
     	int end = frameworks[i].rfind("\\");
@@ -394,14 +404,14 @@ void ofAddon::fromFS(string path, string platform){
         int end = frameworks[i].rfind("/");
 #endif
         if (end > 0){
-            
+
             frameworks[i].erase (frameworks[i].begin(), frameworks[i].begin()+ofRootPath.length());
             frameworks[i] = pathToOF + frameworks[i];
         }
-        
+
     }
-    
-    
+
+
 
     // get a unique list of the paths that are needed for the includes.
     list < string > paths;
