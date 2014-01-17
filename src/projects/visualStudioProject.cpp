@@ -132,13 +132,22 @@ void visualStudioProject::addSrc(string srcFile, string folder){
 		nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
 
     } else {
-        appendValue(doc, "ClCompile", "Include", srcFile);
+        pugi::xml_node node = appendValue(doc, "ClCompile", "Include", srcFile);
 
-		pugi::xml_node node = filterXmlDoc.select_single_node("//ItemGroup[ClCompile]").node();
-		pugi::xml_node nodeAdded = node.append_child("ClCompile");
+		if(!node.child("CompileAs")){
+			pugi::xml_node compileAs = node.append_child("CompileAs");
+			compileAs.append_attribute("Condition").set_value("'$(Configuration)|$(Platform)'=='Debug|Win32'");
+			compileAs.set_value("Default");
+
+			compileAs = node.append_child("CompileAs");
+			compileAs.append_attribute("Condition").set_value("'$(Configuration)|$(Platform)'=='Release|Win32'");
+			compileAs.set_value("Default");
+		}
+
+		pugi::xml_node nodeFilters = filterXmlDoc.select_single_node("//ItemGroup[ClCompile]").node();
+		pugi::xml_node nodeAdded = nodeFilters.append_child("ClCompile");
 		nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
 		nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
-
     }
 
 
@@ -173,7 +182,7 @@ void visualStudioProject::addInclude(string includeName){
 
 void visualStudioProject::addLibrary(string libraryName, LibType libType){
 
-
+	cout << "adding library " << libType << "  " << libraryName << endl;
     fixSlashOrder(libraryName);
 
     // ok first, split path and library name.
@@ -234,6 +243,28 @@ void visualStudioProject::addLibrary(string libraryName, LibType libType){
 		platformCounter++;
 
     }
+
+}
+
+void visualStudioProject::addCFLAG(string cflag, LibType libType){
+	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
+	for(int i=0;i<items.size();i++){
+		pugi::xml_node additionalOptions;
+		bool found=false;
+		if(libType==RELEASE_LIB && string(items[i].node().attribute("Condition").value())=="'$(Configuration)|$(Platform)'=='Release|Win32'"){
+			additionalOptions = items[i].node().child("ClCompile").child("AdditionalOptions");
+			found = true;
+		}else if(libType==DEBUG_LIB && string(items[i].node().attribute("Condition").value())=="'$(Configuration)|$(Platform)'=='Debug|Win32'"){
+			additionalOptions = items[i].node().child("ClCompile").child("AdditionalOptions");
+			found = true;
+		}
+		if(!found) continue;
+		if(!additionalOptions){
+			items[i].node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(cflag.c_str());
+		}else{
+			additionalOptions.set_value((string(additionalOptions.value()) + " " + cflag).c_str());
+		}
+	}
 
 }
 
@@ -328,6 +359,18 @@ void visualStudioProject::addAddon(ofAddon & addon){
 
     for(int i=0;i<(int)addon.srcFiles.size(); i++){
         ofLogVerbose() << "adding addon srcFiles: " << addon.srcFiles[i];
+		if(addon.filesToFolders[addon.srcFiles[i]]=="") addon.filesToFolders[addon.srcFiles[i]]="other";
         addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
     }
+
+	for(int i=0;i<(int)addon.dllsToCopy.size();i++){
+		ofLogVerbose() << "adding addon dlls to bin: " << addon.dllsToCopy[i];
+		string dll = ofFilePath::join("addons/" + addon.name, addon.dllsToCopy[i]);
+		ofFile(ofFilePath::join(getOFRoot(),dll)).copyTo(ofFilePath::join(projectDir,"bin/"),false,true);
+	}
+
+	for(int i=0;i<(int)addon.cflags.size();i++){
+		addCFLAG(addon.cflags[i],RELEASE_LIB);
+		addCFLAG(addon.cflags[i],DEBUG_LIB);
+	}
 }

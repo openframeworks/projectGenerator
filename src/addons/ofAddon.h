@@ -27,6 +27,7 @@ public:
 
     vector < string > srcFiles;
     vector < string > libs;
+    vector < string > dllsToCopy;
     vector < string > includePaths;
     
     // From addon_config.mk
