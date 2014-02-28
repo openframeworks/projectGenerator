@@ -19,7 +19,7 @@ public:
     bool loadProjectFile();
     bool saveProjectFile();
 
-    void addSrc(string srcFile, string folder, SrcType type=CPP);
+    void addSrc(string srcFile, string folder, SrcType type=DEFAULT);
     void addInclude(string includeName);
     void addLibrary(string libraryName, LibType libType);
     void addCFLAG(string cflag, LibType libType = RELEASE_LIB);
