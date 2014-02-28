@@ -110,7 +110,7 @@ void visualStudioProject::appendFilter(string folderName){
 	 }
 }
 
-void visualStudioProject::addSrc(string srcFile, string folder){
+void visualStudioProject::addSrc(string srcFile, string folder, SrcType type){
 
     fixSlashOrder(folder);
     fixSlashOrder(srcFile);
@@ -123,32 +123,72 @@ void visualStudioProject::addSrc(string srcFile, string folder){
 		appendFilter(folderName);
 	}
 
-    if (ofIsStringInString(srcFile, ".h") || ofIsStringInString(srcFile, ".hpp")){
-        appendValue(doc, "ClInclude", "Include", srcFile);
+	if(type==DEFAULT){
+		if (ofIsStringInString(srcFile, ".h") || ofIsStringInString(srcFile, ".hpp")){
+			appendValue(doc, "ClInclude", "Include", srcFile);
 
-		pugi::xml_node node = filterXmlDoc.select_single_node("//ItemGroup[ClInclude]").node();
-		pugi::xml_node nodeAdded = node.append_child("ClInclude");
-		nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
-		nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
+			pugi::xml_node node = filterXmlDoc.select_single_node("//ItemGroup[ClInclude]").node();
+			pugi::xml_node nodeAdded = node.append_child("ClInclude");
+			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
+			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
 
-    } else {
-        pugi::xml_node node = appendValue(doc, "ClCompile", "Include", srcFile);
+		} else {
+			appendValue(doc, "ClCompile", "Include", srcFile);
 
-		if(!node.child("CompileAs")){
-			pugi::xml_node compileAs = node.append_child("CompileAs");
-			compileAs.append_attribute("Condition").set_value("'$(Configuration)|$(Platform)'=='Debug|Win32'");
-			compileAs.set_value("Default");
-
-			compileAs = node.append_child("CompileAs");
-			compileAs.append_attribute("Condition").set_value("'$(Configuration)|$(Platform)'=='Release|Win32'");
-			compileAs.set_value("Default");
+			pugi::xml_node nodeFilters = filterXmlDoc.select_single_node("//ItemGroup[ClCompile]").node();
+			pugi::xml_node nodeAdded = nodeFilters.append_child("ClCompile");
+			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
+			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
 		}
+	}else{
+    	switch(type){
+    	case CPP:{
+			appendValue(doc, "ClCompile", "Include", srcFile);
 
-		pugi::xml_node nodeFilters = filterXmlDoc.select_single_node("//ItemGroup[ClCompile]").node();
-		pugi::xml_node nodeAdded = nodeFilters.append_child("ClCompile");
-		nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
-		nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
-    }
+			pugi::xml_node nodeFilters = filterXmlDoc.select_single_node("//ItemGroup[ClCompile]").node();
+			pugi::xml_node nodeAdded = nodeFilters.append_child("ClCompile");
+			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
+			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
+			break;
+    	}
+    	case C:{
+			pugi::xml_node node = appendValue(doc, "ClCompile", "Include", srcFile);
+
+			if(!node.child("CompileAs")){
+				pugi::xml_node compileAs = node.append_child("CompileAs");
+				compileAs.append_attribute("Condition").set_value("'$(Configuration)|$(Platform)'=='Debug|Win32'");
+				compileAs.set_value("Default");
+
+				compileAs = node.append_child("CompileAs");
+				compileAs.append_attribute("Condition").set_value("'$(Configuration)|$(Platform)'=='Release|Win32'");
+				compileAs.set_value("Default");
+			}
+
+			pugi::xml_node nodeFilters = filterXmlDoc.select_single_node("//ItemGroup[ClCompile]").node();
+			pugi::xml_node nodeAdded = nodeFilters.append_child("ClCompile");
+			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
+			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
+			break;
+    	}
+    	case HEADER:{
+			appendValue(doc, "ClInclude", "Include", srcFile);
+
+			pugi::xml_node node = filterXmlDoc.select_single_node("//ItemGroup[ClInclude]").node();
+			pugi::xml_node nodeAdded = node.append_child("ClInclude");
+			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
+			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
+			break;
+    	}
+    	case OBJC:{
+    		ofLogError() << "objective c type not supported on vs for " << srcFile;
+			break;
+    	}
+    	default:{
+    		ofLogError() << "explicit source type " << type << " not supported yet on osx for " << srcFile;
+    		break;
+    	}
+    	}
+	}
 
 
 

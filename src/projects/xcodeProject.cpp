@@ -555,7 +555,7 @@ void xcodeProject::addFramework(string name, string path){
 
 
 
-void xcodeProject::addSrc(string srcFile, string folder){
+void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 
     string buildUUID;
 
@@ -576,33 +576,58 @@ void xcodeProject::addSrc(string srcFile, string folder){
     string fileKind = "file";
     bool bAddFolder = true;
 
-    if( ext == "cpp" || ext == "cc"){
-        fileKind = "sourcecode.cpp.cpp";
-        addToResources = false;
+    if(type==DEFAULT){
+		if( ext == "cpp" || ext == "cc"){
+			fileKind = "sourcecode.cpp.cpp";
+			addToResources = false;
+		}
+		else if( ext == "c" ){
+			fileKind = "sourcecode.c.c";
+			addToResources = false;
+		}
+		else if(ext == "h" || ext == "hpp"){
+			fileKind = "sourcecode.c.h";
+			addToBuild = false;
+			addToResources = false;
+		}
+		else if(ext == "mm" || ext == "m"){
+			addToResources = false;
+			fileKind = "sourcecode.cpp.objcpp";
+		}
+		else if(ext == "xib"){
+			fileKind = "file.xib";
+			addToBuild	= false;
+			addToBuildResource = true;
+			addToResources = true;
+		}else if( target == "ios" ){
+			fileKind = "file";
+			addToBuild	= false;
+			addToResources = true;
+		}
+    }else{
+    	switch(type){
+    	case CPP:
+			fileKind = "sourcecode.cpp.cpp";
+			addToResources = false;
+			break;
+    	case C:
+			fileKind = "sourcecode.c.c";
+			addToResources = false;
+			break;
+    	case HEADER:
+			fileKind = "sourcecode.c.h";
+			addToBuild = false;
+			addToResources = false;
+			break;
+    	case OBJC:
+			addToResources = false;
+			fileKind = "sourcecode.cpp.objcpp";
+			break;
+    	default:
+    		ofLogError() << "explicit source type " << type << " not supported yet on osx for " << srcFile;
+    		break;
+    	}
     }
-    else if( ext == "c" ){
-        fileKind = "sourcecode.c.c";
-        addToResources = false;
-    }
-    else if(ext == "h" || ext == "hpp"){
-        fileKind = "sourcecode.c.h";
-        addToBuild = false;
-        addToResources = false;
-    }
-    else if(ext == "mm" || ext == "m"){
-        addToResources = false;
-        fileKind = "sourcecode.cpp.objcpp";
-    }
-    else if(ext == "xib"){
-		fileKind = "file.xib";
-        addToBuild	= false;
-        addToBuildResource = true; 
-        addToResources = true;		
-    }else if( target == "ios" ){
-		fileKind = "file";	
-        addToBuild	= false;
-        addToResources = true;				
-	}
 	
     if (folder == "src"){
         bAddFolder = false;

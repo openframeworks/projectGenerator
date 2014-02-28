@@ -26,6 +26,10 @@ public:
                                                 //sometimes a listing of what folder to put it in, such as "addons/ofxOsc/src"
 
     vector < string > srcFiles;
+    vector < string > csrcFiles;
+    vector < string > cppsrcFiles;
+    vector < string > headersrcFiles;
+    vector < string > objcsrcFiles;
     vector < string > libs;
     vector < string > dllsToCopy;
     vector < string > includePaths;

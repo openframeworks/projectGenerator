@@ -217,6 +217,22 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 		addReplaceStringVector(srcFiles,value,addonRelPath,addToValue);
 	}
 
+	if(variable == "ADDON_C_SOURCES"){
+		addReplaceStringVector(csrcFiles,value,addonRelPath,addToValue);
+	}
+
+	if(variable == "ADDON_CPP_SOURCES"){
+		addReplaceStringVector(cppsrcFiles,value,addonRelPath,addToValue);
+	}
+
+	if(variable == "ADDON_HEADER_SOURCES"){
+		addReplaceStringVector(headersrcFiles,value,addonRelPath,addToValue);
+	}
+
+	if(variable == "ADDON_OBJC_SOURCES"){
+		addReplaceStringVector(objcsrcFiles,value,addonRelPath,addToValue);
+	}
+
 	if(variable == "ADDON_DATA"){
 		addReplaceStringVector(data,value,addonRelPath,addToValue);
 	}
@@ -315,6 +331,10 @@ void ofAddon::parseConfig(){
 
 	exclude(includePaths,excludeIncludes);
 	exclude(srcFiles,excludeSources);
+	exclude(csrcFiles,excludeSources);
+	exclude(cppsrcFiles,excludeSources);
+	exclude(objcsrcFiles,excludeSources);
+	exclude(headersrcFiles,excludeSources);
 	exclude(libs,excludeLibs);
 }
 

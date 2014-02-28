@@ -22,7 +22,7 @@ public:
     bool loadProjectFile();
     bool saveProjectFile();
 
-	void addSrc(string srcName, string folder);
+	void addSrc(string srcName, string folder, SrcType type=DEFAULT);
 	void addInclude(string includeName);
 	void addLibrary(string libraryName, LibType libType = RELEASE_LIB);
 

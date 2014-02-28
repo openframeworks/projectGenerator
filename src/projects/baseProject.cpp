@@ -153,6 +153,22 @@ void baseProject::addAddon(ofAddon & addon){
         ofLogVerbose() << "adding addon srcFiles: " << addon.srcFiles[i];
         addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
     }
+    for(int i=0;i<(int)addon.csrcFiles.size(); i++){
+        ofLogVerbose() << "adding addon c srcFiles: " << addon.srcFiles[i];
+        addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]],C);
+    }
+    for(int i=0;i<(int)addon.cppsrcFiles.size(); i++){
+        ofLogVerbose() << "adding addon c srcFiles: " << addon.srcFiles[i];
+        addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]],CPP);
+    }
+    for(int i=0;i<(int)addon.objcsrcFiles.size(); i++){
+        ofLogVerbose() << "adding addon c srcFiles: " << addon.srcFiles[i];
+        addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]],OBJC);
+    }
+    for(int i=0;i<(int)addon.headersrcFiles.size(); i++){
+        ofLogVerbose() << "adding addon c srcFiles: " << addon.srcFiles[i];
+        addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]],HEADER);
+    }
 }
 
 void baseProject::parseAddons(){
