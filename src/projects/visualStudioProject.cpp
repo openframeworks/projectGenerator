@@ -403,6 +403,30 @@ void visualStudioProject::addAddon(ofAddon & addon){
         addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
     }
 
+    for(int i=0;i<(int)addon.csrcFiles.size(); i++){
+        ofLogVerbose() << "adding addon c srcFiles: " << addon.csrcFiles[i];
+		if(addon.filesToFolders[addon.csrcFiles[i]]=="") addon.filesToFolders[addon.csrcFiles[i]]="other";
+        addSrc(addon.csrcFiles[i],addon.filesToFolders[addon.csrcFiles[i]],C);
+    }
+
+    for(int i=0;i<(int)addon.cppsrcFiles.size(); i++){
+        ofLogVerbose() << "adding addon c srcFiles: " << addon.cppsrcFiles[i];
+		if(addon.filesToFolders[addon.cppsrcFiles[i]]=="") addon.filesToFolders[addon.cppsrcFiles[i]]="other";
+        addSrc(addon.cppsrcFiles[i],addon.filesToFolders[addon.cppsrcFiles[i]],C);
+    }
+
+    for(int i=0;i<(int)addon.headersrcFiles.size(); i++){
+        ofLogVerbose() << "adding addon c srcFiles: " << addon.headersrcFiles[i];
+		if(addon.filesToFolders[addon.headersrcFiles[i]]=="") addon.filesToFolders[addon.headersrcFiles[i]]="other";
+        addSrc(addon.headersrcFiles[i],addon.filesToFolders[addon.headersrcFiles[i]],C);
+    }
+
+    for(int i=0;i<(int)addon.objcsrcFiles.size(); i++){
+        ofLogVerbose() << "adding addon c srcFiles: " << addon.objcsrcFiles[i];
+		if(addon.filesToFolders[addon.objcsrcFiles[i]]=="") addon.filesToFolders[addon.objcsrcFiles[i]]="other";
+        addSrc(addon.objcsrcFiles[i],addon.filesToFolders[addon.objcsrcFiles[i]],C);
+    }
+
 	for(int i=0;i<(int)addon.dllsToCopy.size();i++){
 		ofLogVerbose() << "adding addon dlls to bin: " << addon.dllsToCopy[i];
 		string dll = ofFilePath::join("addons/" + addon.name, addon.dllsToCopy[i]);
