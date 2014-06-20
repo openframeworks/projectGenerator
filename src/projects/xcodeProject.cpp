@@ -171,8 +171,9 @@ void xcodeProject::setup(){
 		addonUUID		= "BB16F26B0F2B646B00518274";
 		buildPhaseUUID	= "E4D8936E11527B74007E1F53";
 		resourcesUUID   = "BB24DD8F10DA77E000E9C588";
-        buildPhaseResourcesUUID = "BB24DDCA10DA781C00E9C588";
-        frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase  // todo: check this?
+       
+        frameworksUUID  =  "5326AEA710A23A0500278DE6";   //system frameworks folder
+        buildPhaseResourcesUUID = "5326AEA810A23A0500278DE6";  //PBXFrameworksBuildPhase
 	}
 }
 
