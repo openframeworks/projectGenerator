@@ -44,6 +44,8 @@ public:
 	string buildPhaseUUID;
     string frameworksUUID;
     string buildPhaseResourcesUUID;
+    string frameworksBuildPhaseUUID;
+    
 
     pugi::xml_node findOrMakeFolderSet( pugi::xml_node nodeToAddTo, vector < string > & folders, string pathForHash);
 	pugi::xml_node insertPoint;         // where are we inserting items (at the second dict tag,

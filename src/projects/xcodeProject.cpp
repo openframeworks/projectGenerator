@@ -164,7 +164,8 @@ void xcodeProject::setup(){
 		addonUUID		= "BB4B014C10F69532006C3DED";
 		buildPhaseUUID	= "E4B69E200A3A1BDC003C02F2";
 		resourcesUUID	= "";
-        frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase
+        frameworksUUID              = "E45BE97A0E8CC7DD009D7055";   //system frameworks folder
+        frameworksBuildPhaseUUID    = "E7E077E515D3B63C0020DFD4";   //PBXFrameworksBuildPhase
 	}else{
 		srcUUID			= "E4D8936A11527B74007E1F53";
 		addonUUID		= "BB16F26B0F2B646B00518274";
@@ -290,7 +291,7 @@ bool xcodeProject::createProjectFile(){
         string relPath2 = relRoot;
         relPath2.erase(relPath2.end()-1);
         findandreplaceInTexfile(projectDir + projectName + ".xcodeproj/project.pbxproj", "../../..", relPath2);
-        findandreplaceInTexfile(projectDir + "Project.xcconfig", "../../../", relRoot);
+        //findandreplaceInTexfile(projectDir + "Project.xcconfig", "../../../", relRoot);       // fix via https://github.com/ofZach/projectGeneratorSimple/issues/49
         findandreplaceInTexfile(projectDir + "Project.xcconfig", "../../..", relPath2);
     }
 
@@ -544,10 +545,16 @@ void xcodeProject::addFramework(string name, string path){
     doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child().next_sibling());   // UUID FIRST
     doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child());                  // DICT SECOND
     
-    // add it to the frameworks array.
+    
+    // add it to the system frameworks array....
     pugi::xml_node array;
     findArrayForUUID(frameworksUUID, array);    // this is the build array (all build refs get added here)
     array.append_child("string").append_child(pugi::node_pcdata).set_value(UUID.c_str());
+
+    // add it to the build phases...
+    pugi::xml_node arrayBuild;
+    findArrayForUUID(frameworksBuildPhaseUUID, arrayBuild);    // this is the build array (all build refs get added here)
+    arrayBuild.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
 
 
 }
