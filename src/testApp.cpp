@@ -123,7 +123,7 @@ void testApp::setup(){
     ofEnableAlphaBlending();
     ofSetLogLevel(OF_LOG_VERBOSE);
     ofSetVerticalSync(true);
-    ofSetFramerate(60);
+    ofSetFrameRate(60);
     
     statusEnergy = 0;
     
