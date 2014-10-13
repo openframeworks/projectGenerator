@@ -121,10 +121,9 @@ void testApp::setStatus(string newStatus){
 //--------------------------------------------------------------
 void testApp::setup(){
     ofEnableAlphaBlending();
-    ofEnableSmoothing();
     ofSetLogLevel(OF_LOG_VERBOSE);
     ofSetVerticalSync(true);
-
+    ofSetFrameRate(60);
     
     statusEnergy = 0;
     

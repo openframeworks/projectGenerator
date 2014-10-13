@@ -176,11 +176,13 @@ void baseProject::parseAddons(){
 	ofBuffer addonsMakeMem;
 	addonsMake >> addonsMakeMem;
 	while(!addonsMakeMem.isLastLine()){
+	    string line = addonsMakeMem.getNextLine();
+	    if(line[0] == '#') continue;
 		ofAddon addon;
 		cout << projectDir << endl;
 		addon.pathToOF = getOFRelPath(projectDir);
 		cout << addon.pathToOF << endl;
-		addon.fromFS(ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), addonsMakeMem.getNextLine()),target);
+		addon.fromFS(ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), line),target);
 		addAddon(addon);
 	}
 }
