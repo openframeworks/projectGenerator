@@ -26,7 +26,7 @@ public:
     void addLibrary(string libraryName, LibType libType = RELEASE_LIB);
     void addLDFLAG(string ldflag, LibType libType = RELEASE_LIB);
     void addCFLAG(string cflag, LibType libType = RELEASE_LIB); // Other C++ Flags
-	void addPureCFLAG(string purecflag, LibType libType = RELEASE_LIB); // Other C Flags
+    void addPureCFLAG(string purecflag, LibType libType = RELEASE_LIB); // Other C Flags
     
     // specific to OSX
     void addFramework(string name, string path);
