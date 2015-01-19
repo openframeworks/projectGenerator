@@ -22,7 +22,8 @@ public:
     void addSrc(string srcFile, string folder, SrcType type=DEFAULT);
     void addInclude(string includeName);
     void addLibrary(string libraryName, LibType libType);
-    void addCFLAG(string cflag, LibType libType = RELEASE_LIB);
+    void addCFLAG(string cflag, LibType libType = RELEASE_LIB); // C++
+	void addPureCFLAG(string purecflag, LibType libType = RELEASE_LIB); // C
 
     void addAddon(ofAddon & addon);
 

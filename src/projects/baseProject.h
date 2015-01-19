@@ -54,7 +54,8 @@ public:
     virtual void addInclude(string includeName) = 0;
     virtual void addLibrary(string libraryName, LibType libType = RELEASE_LIB) = 0;
     virtual void addLDFLAG(string ldflag, LibType libType = RELEASE_LIB){}
-    virtual void addCFLAG(string cflag, LibType libType = RELEASE_LIB){};
+    virtual void addCFLAG(string cflag, LibType libType = RELEASE_LIB){}; // CXX_FLAGS
+	virtual void addPureCFLAG(string purecflag, LibType libType = RELEASE_LIB){}; // C_FLAGS
 
 	virtual void addAddon(ofAddon & addon);
 

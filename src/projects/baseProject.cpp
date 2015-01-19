@@ -145,6 +145,10 @@ void baseProject::addAddon(ofAddon & addon){
         ofLogVerbose() << "adding addon cflags: " << addon.cflags[i];
         addCFLAG(addon.cflags[i]);
     }
+	for(int i=0;i<(int)addon.purecflags.size();i++){
+        ofLogVerbose() << "adding addon pure cflags: " << addon.purecflags[i];
+        addPureCFLAG(addon.purecflags[i]);
+    }
     for(int i=0;i<(int)addon.ldflags.size();i++){
         ofLogVerbose() << "adding addon ldflags: " << addon.ldflags[i];
         addLDFLAG(addon.ldflags[i]);
@@ -154,20 +158,20 @@ void baseProject::addAddon(ofAddon & addon){
         addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
     }
     for(int i=0;i<(int)addon.csrcFiles.size(); i++){
-        ofLogVerbose() << "adding addon c srcFiles: " << addon.srcFiles[i];
-        addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]],C);
+        ofLogVerbose() << "adding addon c srcFiles: " << addon.csrcFiles[i];
+        addSrc(addon.csrcFiles[i],addon.filesToFolders[addon.csrcFiles[i]],C);
     }
     for(int i=0;i<(int)addon.cppsrcFiles.size(); i++){
-        ofLogVerbose() << "adding addon c srcFiles: " << addon.srcFiles[i];
-        addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]],CPP);
+        ofLogVerbose() << "adding addon cpp srcFiles: " << addon.cppsrcFiles[i];
+        addSrc(addon.cppsrcFiles[i],addon.filesToFolders[addon.cppsrcFiles[i]],CPP);
     }
     for(int i=0;i<(int)addon.objcsrcFiles.size(); i++){
-        ofLogVerbose() << "adding addon c srcFiles: " << addon.srcFiles[i];
-        addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]],OBJC);
+        ofLogVerbose() << "adding addon objc srcFiles: " << addon.objcsrcFiles[i];
+        addSrc(addon.objcsrcFiles[i],addon.filesToFolders[addon.objcsrcFiles[i]],OBJC);
     }
     for(int i=0;i<(int)addon.headersrcFiles.size(); i++){
-        ofLogVerbose() << "adding addon c srcFiles: " << addon.srcFiles[i];
-        addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]],HEADER);
+        ofLogVerbose() << "adding addon header srcFiles: " << addon.headersrcFiles[i];
+        addSrc(addon.headersrcFiles[i],addon.filesToFolders[addon.headersrcFiles[i]],HEADER);
     }
 }
 
