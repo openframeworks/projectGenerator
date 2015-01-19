@@ -146,7 +146,7 @@ STRINGIFY(
 );
 
 //-----------------------------------------------------------------
-const char PureCFlags[] =
+const char CFlags[] =
 STRINGIFY(
 
           <key>OTHER_CFLAGS</key>
@@ -595,7 +595,7 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
     bool bAddFolder = true;
 
     if(type==DEFAULT){
-		if( ext == "cpp" || ext == "cc"){
+		if( ext == "cpp" || ext == "cc" || ext =="cxx" ){
 			fileKind = "sourcecode.cpp.cpp";
 			addToResources = false;
 		}
@@ -919,7 +919,7 @@ void xcodeProject::addLDFLAG(string ldflag, LibType libType){
 void xcodeProject::addCFLAG(string cflag, LibType libType){
 
     char query[255];
-    sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'OTHER_CPLUSPLUSFLAGS')]/following-sibling::node()[1]");
+    sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'OTHER_CFLAGS')]/following-sibling::node()[1]");
     pugi::xpath_node_set headerArray = doc.select_nodes(query);
 
 
@@ -927,6 +927,48 @@ void xcodeProject::addCFLAG(string cflag, LibType libType){
         for (pugi::xpath_node_set::const_iterator it = headerArray.begin(); it != headerArray.end(); ++it){
             pugi::xpath_node node = *it;
             node.node().append_child("string").append_child(pugi::node_pcdata).set_value(cflag.c_str());
+        }
+
+    } else {
+
+        //printf("we don't have OTHER_CFLAGS, so we're adding them... and calling this function again \n");
+        sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'buildSettings')]/following-sibling::node()[1]");
+
+        pugi::xpath_node_set dictArray = doc.select_nodes(query);
+
+        for (pugi::xpath_node_set::const_iterator it = dictArray.begin(); it != dictArray.end(); ++it){
+            pugi::xpath_node node = *it;
+
+            //node.node().print(std::cout);
+            string ldXML = string(CFlags);
+            pugi::xml_document ldDoc;
+            pugi::xml_parse_result result = ldDoc.load_buffer(ldXML.c_str(), strlen(ldXML.c_str()));
+
+            // insert it at <plist><dict><dict>
+            node.node().prepend_copy(ldDoc.first_child().next_sibling());   // KEY FIRST
+            node.node().prepend_copy(ldDoc.first_child());                  // ARRAY SECOND
+
+            //node.node().print(std::cout);
+        }
+
+        // now that we have it, try again...
+        addCFLAG(cflag);
+    }
+
+    //saveFile(projectDir + "/" + projectName + ".xcodeproj" + "/project.pbxproj");
+}
+
+void xcodeProject::addCPPFLAG(string cppflag, LibType libType){
+
+    char query[255];
+    sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'OTHER_CPLUSPLUSFLAGS')]/following-sibling::node()[1]");
+    pugi::xpath_node_set headerArray = doc.select_nodes(query);
+
+
+    if (headerArray.size() > 0){
+        for (pugi::xpath_node_set::const_iterator it = headerArray.begin(); it != headerArray.end(); ++it){
+            pugi::xpath_node node = *it;
+            node.node().append_child("string").append_child(pugi::node_pcdata).set_value(cppflag.c_str());
         }
 
     } else {
@@ -952,49 +994,7 @@ void xcodeProject::addCFLAG(string cflag, LibType libType){
         }
 
         // now that we have it, try again...
-        addCFLAG(cflag);
-    }
-
-    //saveFile(projectDir + "/" + projectName + ".xcodeproj" + "/project.pbxproj");
-}
-
-void xcodeProject::addPureCFLAG(string purecflag, LibType libType){
-
-    char query[255];
-    sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'OTHER_CFLAGS')]/following-sibling::node()[1]");
-    pugi::xpath_node_set headerArray = doc.select_nodes(query);
-
-
-    if (headerArray.size() > 0){
-        for (pugi::xpath_node_set::const_iterator it = headerArray.begin(); it != headerArray.end(); ++it){
-            pugi::xpath_node node = *it;
-            node.node().append_child("string").append_child(pugi::node_pcdata).set_value(purecflag.c_str());
-        }
-
-    } else {
-
-        //printf("we don't have OTHER_CFLAGS, so we're adding them... and calling this function again \n");
-        sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'buildSettings')]/following-sibling::node()[1]");
-
-        pugi::xpath_node_set dictArray = doc.select_nodes(query);
-
-        for (pugi::xpath_node_set::const_iterator it = dictArray.begin(); it != dictArray.end(); ++it){
-            pugi::xpath_node node = *it;
-
-            //node.node().print(std::cout);
-            string ldXML = string(PureCFlags);
-            pugi::xml_document ldDoc;
-            pugi::xml_parse_result result = ldDoc.load_buffer(ldXML.c_str(), strlen(ldXML.c_str()));
-
-            // insert it at <plist><dict><dict>
-            node.node().prepend_copy(ldDoc.first_child().next_sibling());   // KEY FIRST
-            node.node().prepend_copy(ldDoc.first_child());                  // ARRAY SECOND
-
-            //node.node().print(std::cout);
-        }
-
-        // now that we have it, try again...
-        addPureCFLAG(purecflag);
+        addCPPFLAG(cppflag);
     }
 
     //saveFile(projectDir + "/" + projectName + ".xcodeproj" + "/project.pbxproj");
@@ -1020,9 +1020,9 @@ void xcodeProject::addAddon(ofAddon & addon){
         ofLogVerbose() << "adding addon cflags: " << addon.cflags[i];
         addCFLAG(addon.cflags[i]);
     }
-	for(int i=0;i<(int)addon.purecflags.size();i++){
-        ofLogVerbose() << "adding addon pure cflags: " << addon.purecflags[i];
-        addPureCFLAG(addon.purecflags[i]);
+	for(int i=0;i<(int)addon.cppflags.size();i++){
+        ofLogVerbose() << "adding addon cppflags: " << addon.cppflags[i];
+        addCPPFLAG(addon.cppflags[i]);
     }
     for(int i=0;i<(int)addon.ldflags.size();i++){
         ofLogVerbose() << "adding addon ldflags: " << addon.ldflags[i];

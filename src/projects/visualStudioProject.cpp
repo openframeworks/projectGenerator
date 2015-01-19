@@ -308,7 +308,7 @@ void visualStudioProject::addCFLAG(string cflag, LibType libType){
 
 }
 
-void visualStudioProject::addPureCFLAG(string purecflag, LibType libType){
+void visualStudioProject::addCPPFLAG(string cppflag, LibType libType){
 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
 	for(int i=0;i<items.size();i++){
 		pugi::xml_node additionalOptions;
@@ -322,9 +322,9 @@ void visualStudioProject::addPureCFLAG(string purecflag, LibType libType){
 		}
 		if(!found) continue;
 		if(!additionalOptions){
-			items[i].node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(purecflag.c_str());
+			items[i].node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(cppflag.c_str());
 		}else{
-			additionalOptions.set_value((string(additionalOptions.value()) + " " + purecflag).c_str());
+			additionalOptions.set_value((string(additionalOptions.value()) + " " + cppflag).c_str());
 		}
 	}
 
@@ -461,9 +461,9 @@ void visualStudioProject::addAddon(ofAddon & addon){
 		addCFLAG(addon.cflags[i],DEBUG_LIB);
 	}
 	
-	for(int i=0;i<(int)addon.purecflags.size();i++){
-		ofLogVerbose() << "adding addon pure cflags: " << addon.purecflags[i];
-		addPureCFLAG(addon.purecflags[i],RELEASE_LIB);
-		addPureCFLAG(addon.purecflags[i],DEBUG_LIB);
+	for(int i=0;i<(int)addon.cppflags.size();i++){
+		ofLogVerbose() << "adding addon cppflags: " << addon.cppflags[i];
+		addCPPFLAG(addon.cppflags[i],RELEASE_LIB);
+		addCPPFLAG(addon.cppflags[i],DEBUG_LIB);
 	}
 }

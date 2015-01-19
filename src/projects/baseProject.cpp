@@ -145,9 +145,9 @@ void baseProject::addAddon(ofAddon & addon){
         ofLogVerbose() << "adding addon cflags: " << addon.cflags[i];
         addCFLAG(addon.cflags[i]);
     }
-	for(int i=0;i<(int)addon.purecflags.size();i++){
-        ofLogVerbose() << "adding addon pure cflags: " << addon.purecflags[i];
-        addPureCFLAG(addon.purecflags[i]);
+	for(int i=0;i<(int)addon.cppflags.size();i++){
+        ofLogVerbose() << "adding addon cppflags: " << addon.cppflags[i];
+        addCPPFLAG(addon.cppflags[i]);
     }
     for(int i=0;i<(int)addon.ldflags.size();i++){
         ofLogVerbose() << "adding addon ldflags: " << addon.ldflags[i];
