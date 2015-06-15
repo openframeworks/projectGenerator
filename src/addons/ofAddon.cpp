@@ -5,7 +5,6 @@
  *      Author: arturo
  */
 
-#include "pugixml.hpp"
 #include "ofAddon.h"
 #include "ofUtils.h"
 #include "ofFileUtils.h"
