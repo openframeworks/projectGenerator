@@ -5,6 +5,18 @@
  *      Author: arturo
  */
 
+
+#include "Poco/String.h"
+
+#include "Poco/HMACEngine.h"
+#include "Poco/MD5Engine.h"
+using Poco::DigestEngine;
+using Poco::HMACEngine;
+using Poco::MD5Engine;
+
+#include "ofFileUtils.h"
+#include "ofUtils.h"
+#include "ofSystemUtils.h"
 #include "Utils.h"
 
 #include <algorithm>
@@ -18,14 +30,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-
-#include "Poco/String.h"
-
-#include "Poco/HMACEngine.h"
-#include "Poco/MD5Engine.h"
-using Poco::DigestEngine;
-using Poco::HMACEngine;
-using Poco::MD5Engine;
 
 
 
@@ -42,8 +46,6 @@ using Poco::MD5Engine;
 
 
 using namespace Poco;
-
-#include "ofUtils.h"
 
 
 string StringToUpper(string strToConvert)

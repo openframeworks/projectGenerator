@@ -6,6 +6,8 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
+#include "ofFileUtils.h"
+#include "ofLog.h"
 #include "baseProject.h"
 
 void baseProject::setup(string _target){
@@ -34,10 +36,16 @@ bool baseProject::create(string path){
     // if overwrite then ask for permission...
 
     bool ret = createProjectFile();
-    if(!ret) return false;
+    if(!ret){
+        ofLogWarning() << "couldn't create project file";
+        return false;
+    }
 
     ret = loadProjectFile();
-    if(!ret) return false;
+    if(!ret){
+        ofLogWarning() << "couldn't load project file";
+        return false;
+    }
 
     if (bDoesDirExist){
         vector < string > fileNames;

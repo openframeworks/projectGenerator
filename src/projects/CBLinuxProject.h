@@ -8,10 +8,9 @@
 #ifndef CBLINUXPROJECT_H_
 #define CBLINUXPROJECT_H_
 
-#include "ofConstants.h"
-#include "pugixml.hpp"
-#include "ofAddon.h"
 #include "CBWinProject.h"
+#include "ofConstants.h"
+#include "ofAddon.h"
 
 class CBLinuxProject: public CBWinProject {
 public:

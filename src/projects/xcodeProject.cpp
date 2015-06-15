@@ -1,5 +1,8 @@
-#include "xcodeProject.h"
+
 #include <iostream>
+#include "ofFileUtils.h"
+#include "ofUtils.h"
+#include "xcodeProject.h"
 
 
 
@@ -564,7 +567,8 @@ void xcodeProject::addFramework(string name, string path){
 
 
 void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
-
+    cout << "addSrc: " << folder << "/" << srcFile << endl;
+    
     string buildUUID;
 
     //-----------------------------------------------------------------

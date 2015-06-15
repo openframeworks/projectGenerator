@@ -2,10 +2,9 @@
 #ifndef VSWINPROJECT_H_
 #define VSWINPROJECT_H_
 
-#include "ofConstants.h"
-#include "pugixml.hpp"
-#include "ofAddon.h"
 #include "baseProject.h"
+#include "ofConstants.h"
+#include "ofAddon.h"
 
 class visualStudioProject : public baseProject {
 

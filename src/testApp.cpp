@@ -2,6 +2,7 @@
 #include "Utils.h"
 #include <stdio.h>
 #include "ofConstants.h"
+#include "GLFW/glfw3.h"
 
 void convertWindowsToUnixPath(string & path){
     for (int i = 0; i < path.size(); i++){
@@ -436,6 +437,8 @@ void testApp::draw(){
         ofSetColor(255,255,255, 255 * statusEnergy);
         ofDrawBitmapString(status, 10,ofGetHeight()-8);
     }
+    
+    glfwWaitEvents();
 }
 
 //--------------------------------------------------------------
@@ -478,12 +481,18 @@ void testApp::generateProject(){
     string path = ofFilePath::join(buttons[1].myText, buttons[0].myText);
 
 	for(int i = 0; i < (int)targetsToMake.size(); i++){
+        cout << "setup for target" << endl;
 		string target = setupForTarget(targetsToMake[i]);
+        cout << "project create" << endl;
         if(project->create(path)){
+            cout << "control names" << endl;
             vector<string> addonsToggles = panelCoreAddons.getControlNames();
+            cout << addonsToggles.size() << " names" << endl;
             for (int i = 0; i < (int) addonsToggles.size(); i++){
                 ofxToggle toggle = panelCoreAddons.getToggle(addonsToggles[i]);
+                cout << addonsToggles[i] << endl;
                 if(toggle){
+                    cout << "activated" << endl;
                     ofAddon addon;
                     addon.pathToOF = getOFRelPath(path);
                     addon.fromFS(ofFilePath::join(addonsPath, addonsToggles[i]),target);
@@ -496,7 +505,9 @@ void testApp::generateProject(){
             addonsToggles = panelOtherAddons.getControlNames();
             for (int i = 0; i < (int) addonsToggles.size(); i++){
                 ofxToggle toggle = panelOtherAddons.getToggle(addonsToggles[i]);
+                cout << addonsToggles[i] << endl;
                 if(toggle){
+                    cout << "activated" << endl;
                     ofAddon addon;
 
                     addon.pathToOF = getOFRelPath(path);

@@ -3,9 +3,8 @@
 #pragma once
 
 #include <set>
-
-#include "ofMain.h"
 #include "pugixml.hpp"
+
 #include "ofAddon.h"
 #include "Utils.h"
 

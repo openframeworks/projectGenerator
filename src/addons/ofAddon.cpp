@@ -5,8 +5,8 @@
  *      Author: arturo
  */
 
-#include "ofAddon.h"
 #include "pugixml.hpp"
+#include "ofAddon.h"
 #include "ofUtils.h"
 #include "ofFileUtils.h"
 #include "Utils.h"
@@ -121,6 +121,7 @@ void ofAddon::addReplaceString(string & variable, string value, bool addToVariab
 }
 
 void ofAddon::addReplaceStringVector(vector<string> & variable, string value, string prefix, bool addToVariable){
+    cout << "adding " << prefix << " " << value << endl;
 	vector<string> values;
 	if(value.find("\"")!=string::npos){
 		values = ofSplitString(value,"\"",true,true);
@@ -132,6 +133,8 @@ void ofAddon::addReplaceStringVector(vector<string> & variable, string value, st
 	Poco::RegularExpression regEX("(?<=\\$\\()[^\\)]*");
 	for(int i=0;i<(int)values.size();i++){
 		if(values[i]!=""){
+            ofStringReplace(values[i],"$(OF_ROOT)/",pathToOF);
+            ofStringReplace(values[i],"$(OF_ROOT)",pathToOF);
             Poco::RegularExpression::Match match;
             if(int pos = regEX.match(values[i],match)){
                 string varName = values[i].substr(match.offset,match.length);
@@ -140,7 +143,6 @@ void ofAddon::addReplaceStringVector(vector<string> & variable, string value, st
                     varValue = getenv(varName.c_str());
                 }
                 ofStringReplace(values[i],"$("+varName+")",varValue);
-                cout << varName << endl << values[i] << endl;
             }
 
 			if(prefix=="" || values[i].find(pathToOF)==0 || ofFilePath::isAbsolute(values[i])) variable.push_back(values[i]);
@@ -271,7 +273,10 @@ void ofAddon::exclude(vector<string> & variable, vector<string> exclusions){
 void ofAddon::parseConfig(){
 	ofFile addonConfig(ofFilePath::join(addonPath,"addon_config.mk"));
 
-	if(!addonConfig.exists()) return;
+	if(!addonConfig.exists()){
+        ofLogWarning() << "no config for addon " + addonPath;
+        return;
+    }
 
 	string line, originalLine;
 	int lineNum = 0;
