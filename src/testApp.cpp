@@ -371,13 +371,13 @@ void testApp::update(){
     // addons panels can be really long, so use the mouse pos to move them if we need to
     //-------------------------------------
 
-    if (panelCoreAddons.getShape().height > ofGetHeight()){
+    if (ofGetHeight() > 0 && panelCoreAddons.getShape().height > ofGetHeight()){
         float pct = ofMap(ofGetMouseY(), 0,ofGetHeight(), 0,1,true);
         float diff = panelCoreAddons.getShape().height - ofGetHeight();
         panelCoreAddons.setPosition(panelCoreAddons.getPosition().x,-diff * pct);
     }
 
-    if (panelOtherAddons.getShape().height > ofGetHeight()){
+    if (ofGetHeight() > 0 && panelOtherAddons.getShape().height > ofGetHeight()){
         float pct = ofMap(ofGetMouseY(), 0,ofGetHeight(), 0,1,true);
         float diff = panelOtherAddons.getShape().height - ofGetHeight();
         panelOtherAddons.setPosition(panelOtherAddons.getPosition().x,-diff * pct);

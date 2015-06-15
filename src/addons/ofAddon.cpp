@@ -107,7 +107,7 @@ bool ofAddon::checkCorrectVariable(string variable, ConfigParseState state){
 	case AndroidARMv7:
 	case iOS:
 	case OSX:
-		return (variable == "ADDON_DEPENDENCIES" || variable == "ADDON_INCLUDES" || variable == "ADDON_CFLAGS" || variable == "ADDON_LDFLAGS"  || variable == "ADDON_LIBS" || variable == "ADDON_PKG_CONFIG_LIBRARIES" ||
+		return (variable == "ADDON_DEPENDENCIES" || variable == "ADDON_INCLUDES" || variable == "ADDON_CFLAGS" || variable == "ADDON_CPPFLAGS" || variable == "ADDON_LDFLAGS"  || variable == "ADDON_LIBS" || variable == "ADDON_PKG_CONFIG_LIBRARIES" ||
 				variable == "ADDON_FRAMEWORKS" || variable == "ADDON_SOURCES" || variable == "ADDON_DATA" || variable == "ADDON_LIBS_EXCLUDE" || variable == "ADDON_SOURCES_EXCLUDE" || variable == "ADDON_INCLUDES_EXCLUDE" || variable == "ADDON_DLLS_TO_COPY");
 	case Unknown:
 	default:
@@ -133,8 +133,6 @@ void ofAddon::addReplaceStringVector(vector<string> & variable, string value, st
 	Poco::RegularExpression regEX("(?<=\\$\\()[^\\)]*");
 	for(int i=0;i<(int)values.size();i++){
 		if(values[i]!=""){
-            ofStringReplace(values[i],"$(OF_ROOT)/",pathToOF);
-            ofStringReplace(values[i],"$(OF_ROOT)",pathToOF);
             Poco::RegularExpression::Match match;
             if(int pos = regEX.match(values[i],match)){
                 string varName = values[i].substr(match.offset,match.length);
@@ -143,6 +141,7 @@ void ofAddon::addReplaceStringVector(vector<string> & variable, string value, st
                     varValue = getenv(varName.c_str());
                 }
                 ofStringReplace(values[i],"$("+varName+")",varValue);
+                cout << varName << endl << values[i] << endl;
             }
 
 			if(prefix=="" || values[i].find(pathToOF)==0 || ofFilePath::isAbsolute(values[i])) variable.push_back(values[i]);
@@ -193,6 +192,10 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 
 	if(variable == "ADDON_CFLAGS"){
 		addReplaceStringVector(cflags,value,"",addToValue);
+	}
+
+	if(variable == "ADDON_CPPFLAGS"){
+		addReplaceStringVector(cppflags,value,"",addToValue);
 	}
 
 	if(variable == "ADDON_LDFLAGS"){
