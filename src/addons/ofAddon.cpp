@@ -120,7 +120,6 @@ void ofAddon::addReplaceString(string & variable, string value, bool addToVariab
 }
 
 void ofAddon::addReplaceStringVector(vector<string> & variable, string value, string prefix, bool addToVariable){
-    cout << "adding " << prefix << " " << value << endl;
 	vector<string> values;
 	if(value.find("\"")!=string::npos){
 		values = ofSplitString(value,"\"",true,true);
@@ -275,10 +274,7 @@ void ofAddon::exclude(vector<string> & variable, vector<string> exclusions){
 void ofAddon::parseConfig(){
 	ofFile addonConfig(ofFilePath::join(addonPath,"addon_config.mk"));
 
-	if(!addonConfig.exists()){
-        ofLogWarning() << "no config for addon " + addonPath;
-        return;
-    }
+	if(!addonConfig.exists()) return;
 
 	string line, originalLine;
 	int lineNum = 0;

@@ -438,7 +438,9 @@ void testApp::draw(){
         ofDrawBitmapString(status, 10,ofGetHeight()-8);
     }
     
-    glfwWaitEvents();
+    if(statusEnergy<0.001 && ofGetFrameNum()>100){
+        glfwWaitEvents();
+    }
 }
 
 //--------------------------------------------------------------

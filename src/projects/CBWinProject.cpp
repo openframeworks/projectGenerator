@@ -5,10 +5,10 @@
  *      Author: arturo
  */
 
+#include "CBWinProject.h"
 #include "ofFileUtils.h"
 #include "ofLog.h"
 #include "Utils.h"
-#include "CBWinProject.h"
 
 string CBWinProject::LOG_NAME = "CBWinProject";
 
@@ -58,7 +58,7 @@ bool CBWinProject::loadProjectFile(){
 		ofLogError(LOG_NAME) << "error loading" << project.path() << "doesn't exist";
 		return false;
 	}
-	pugi::xml_parse_result result = doc.load(project.path().c_str());
+	pugi::xml_parse_result result = doc.load(project);
 	bLoaded =result.status==pugi::status_ok;
 	return bLoaded;
 }

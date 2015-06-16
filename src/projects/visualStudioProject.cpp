@@ -1,11 +1,8 @@
 
 
 
-#include "Utils.h"
-#include "ofFileUtils.h"
-#include "ofLog.h"
-#include "ofUtils.h"
 #include "visualStudioProject.h"
+#include "Utils.h"
 
 string visualStudioProject::LOG_NAME = "visualStudioProjectFile";
 
@@ -65,7 +62,7 @@ bool visualStudioProject::loadProjectFile(){
 		ofLogError(LOG_NAME) << "error loading " << project.path() << " doesn't exist";
 		return false;
 	}
-	pugi::xml_parse_result result = doc.load(project.path().c_str());
+	pugi::xml_parse_result result = doc.load(project);
     bLoaded = result.status==pugi::status_ok;
     return bLoaded;
 }

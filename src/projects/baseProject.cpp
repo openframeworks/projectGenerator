@@ -6,9 +6,9 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
+#include "baseProject.h"
 #include "ofFileUtils.h"
 #include "ofLog.h"
-#include "baseProject.h"
 
 void baseProject::setup(string _target){
     target = _target;
@@ -29,23 +29,17 @@ bool baseProject::create(string path){
         bDoesDirExist = true;
     }else{
         ofDirectory project(projectDir);
-        ofFile::copyFromTo(ofFilePath::join(templatePath,"src"),ofFilePath::join(projectDir,"src"));
-        ofFile::copyFromTo(ofFilePath::join(templatePath,"bin"),ofFilePath::join(projectDir,"bin"));
+        ofDirectory(ofFilePath::join(templatePath,"src")).copyTo(ofFilePath::join(projectDir,"src"));
+        ofDirectory(ofFilePath::join(templatePath,"bin")).copyTo(ofFilePath::join(projectDir,"bin"));
     }
 
     // if overwrite then ask for permission...
 
     bool ret = createProjectFile();
-    if(!ret){
-        ofLogWarning() << "couldn't create project file";
-        return false;
-    }
+    if(!ret) return false;
 
     ret = loadProjectFile();
-    if(!ret){
-        ofLogWarning() << "couldn't load project file";
-        return false;
-    }
+    if(!ret) return false;
 
     if (bDoesDirExist){
         vector < string > fileNames;

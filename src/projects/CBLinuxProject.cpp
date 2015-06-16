@@ -5,10 +5,10 @@
  *      Author: arturo
  */
 
+#include "CBLinuxProject.h"
+#include "ofFileUtils.h"
 #include "ofLog.h"
 #include "Utils.h"
-#include "ofFileUtils.h"
-#include "CBLinuxProject.h"
 
 string CBLinuxProject::LOG_NAME = "CBLinuxProject";
 

@@ -8,9 +8,9 @@
 #ifndef CBWINPROJECT_H_
 #define CBWINPROJECT_H_
 
-#include "baseProject.h"
 #include "ofConstants.h"
 #include "ofAddon.h"
+#include "baseProject.h"
 
 class CBWinProject: virtual public baseProject  {
 public:

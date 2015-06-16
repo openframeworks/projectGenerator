@@ -1,8 +1,5 @@
-
-#include <iostream>
-#include "ofFileUtils.h"
-#include "ofUtils.h"
 #include "xcodeProject.h"
+#include <iostream>
 
 
 
@@ -130,7 +127,7 @@ STRINGIFY(
 
           <key>OTHER_LDFLAGS</key>
           <array>
-          <string>$(OF_CORE_LIBS)</string>
+          <string>$(OF_CORE_FRAMEWORKS) $(OF_CORE_LIBS)</string>
           </array>
 
 );
@@ -142,7 +139,6 @@ STRINGIFY(
           <key>OTHER_CPLUSPLUSFLAGS</key>
           <array>
 		  <string>"-D__MACOSX_CORE__"</string>
-		  <string>"-lpthread"</string>
 		  <string>"-mtune=native"</string>
           </array>
 
@@ -177,16 +173,14 @@ void xcodeProject::setup(){
 		addonUUID		= "BB4B014C10F69532006C3DED";
 		buildPhaseUUID	= "E4B69E200A3A1BDC003C02F2";
 		resourcesUUID	= "";
-        frameworksUUID              = "E45BE97A0E8CC7DD009D7055";   //system frameworks folder
-        frameworksBuildPhaseUUID    = "E7E077E515D3B63C0020DFD4";   //PBXFrameworksBuildPhase
+        frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase
 	}else{
 		srcUUID			= "E4D8936A11527B74007E1F53";
 		addonUUID		= "BB16F26B0F2B646B00518274";
 		buildPhaseUUID	= "E4D8936E11527B74007E1F53";
 		resourcesUUID   = "BB24DD8F10DA77E000E9C588";
-       
-        frameworksUUID  =  "5326AEA710A23A0500278DE6";   //system frameworks folder
-        buildPhaseResourcesUUID = "5326AEA810A23A0500278DE6";  //PBXFrameworksBuildPhase
+        buildPhaseResourcesUUID = "BB24DDCA10DA781C00E9C588";
+        frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase  // todo: check this?
 	}
 }
 
@@ -305,7 +299,7 @@ bool xcodeProject::createProjectFile(){
         string relPath2 = relRoot;
         relPath2.erase(relPath2.end()-1);
         findandreplaceInTexfile(projectDir + projectName + ".xcodeproj/project.pbxproj", "../../..", relPath2);
-        //findandreplaceInTexfile(projectDir + "Project.xcconfig", "../../../", relRoot);       // fix via https://github.com/ofZach/projectGeneratorSimple/issues/49
+        findandreplaceInTexfile(projectDir + "Project.xcconfig", "../../../", relRoot);
         findandreplaceInTexfile(projectDir + "Project.xcconfig", "../../..", relPath2);
     }
 
@@ -570,15 +564,13 @@ void xcodeProject::addFramework(string name, string path){
     findArrayForUUID(frameworksBuildPhaseUUID, arrayBuild);    // this is the build array (all build refs get added here)
     arrayBuild.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
 
-
 }
 
 
 
 
 void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
-    cout << "addSrc: " << folder << "/" << srcFile << endl;
-    
+
     string buildUUID;
 
     //-----------------------------------------------------------------
@@ -923,7 +915,7 @@ void xcodeProject::addLDFLAG(string ldflag, LibType libType){
 void xcodeProject::addCFLAG(string cflag, LibType libType){
 
     char query[255];
-    sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'OTHER_CFLAGS')]/following-sibling::node()[1]");
+    sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'OTHER_CPLUSPLUSFLAGS')]/following-sibling::node()[1]");
     pugi::xpath_node_set headerArray = doc.select_nodes(query);
 
 
@@ -935,7 +927,7 @@ void xcodeProject::addCFLAG(string cflag, LibType libType){
 
     } else {
 
-        //printf("we don't have OTHER_CFLAGS, so we're adding them... and calling this function again \n");
+        //printf("we don't have OTHER_LDFLAGS, so we're adding them... and calling this function again \n");
         sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'buildSettings')]/following-sibling::node()[1]");
 
         pugi::xpath_node_set dictArray = doc.select_nodes(query);
