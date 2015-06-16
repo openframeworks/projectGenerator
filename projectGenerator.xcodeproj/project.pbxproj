@@ -3,11 +3,10 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 44;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1120712114AE3D360035CB7E /* libpugixml_d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1120712014AE3D360035CB7E /* libpugixml_d.a */; };
 		1120713014AE3D4F0035CB7E /* xcodeProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1120712B14AE3D4F0035CB7E /* xcodeProject.cpp */; };
 		1120713614AE3D840035CB7E /* ofAddon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1120713414AE3D840035CB7E /* ofAddon.cpp */; };
 		113CAA5C14F88EDD00D3906E /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 113CAA5914F88EDD00D3906E /* Utils.cpp */; };
@@ -28,6 +27,7 @@
 		27C4A1C0179491920031C6E4 /* ofxSliderGroup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C4A1B6179491920031C6E4 /* ofxSliderGroup.cpp */; };
 		27C4A1C1179491920031C6E4 /* ofxToggle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C4A1B8179491920031C6E4 /* ofxToggle.cpp */; };
 		667FEFA41982A58D0061271D /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 667FEFA31982A58D0061271D /* CoreVideo.framework */; };
+		699E4C781B306BDE00EE4541 /* pugixml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 699E4C771B306BDE00EE4541 /* pugixml.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
 		E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9710E8CC7DD009D7055 /* AGL.framework */; };
@@ -78,8 +78,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		1120712014AE3D360035CB7E /* libpugixml_d.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpugixml_d.a; path = lib/libpugixml_d.a; sourceTree = "<group>"; };
-		1120712214AE3D410035CB7E /* foreach.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = foreach.hpp; path = src/pugixmlLib/contrib/foreach.hpp; sourceTree = SOURCE_ROOT; };
 		1120712414AE3D4F0035CB7E /* baseProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = baseProject.h; sourceTree = "<group>"; };
 		1120712B14AE3D4F0035CB7E /* xcodeProject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xcodeProject.cpp; sourceTree = "<group>"; };
 		1120712C14AE3D4F0035CB7E /* xcodeProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xcodeProject.h; sourceTree = "<group>"; };
@@ -121,6 +119,7 @@
 		27C4A1B8179491920031C6E4 /* ofxToggle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxToggle.cpp; sourceTree = "<group>"; };
 		27C4A1B9179491920031C6E4 /* ofxToggle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxToggle.h; sourceTree = "<group>"; };
 		667FEFA31982A58D0061271D /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		699E4C771B306BDE00EE4541 /* pugixml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pugixml.cpp; sourceTree = "<group>"; };
 		BBAB23BE13894E4700AA2426 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../libs/glut/lib/osx/GLUT.framework; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E45BE9710E8CC7DD009D7055 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
@@ -164,7 +163,6 @@
 				E4C2424710CC5A17004149E2 /* AppKit.framework in Frameworks */,
 				E4C2424810CC5A17004149E2 /* Cocoa.framework in Frameworks */,
 				E4C2424910CC5A17004149E2 /* IOKit.framework in Frameworks */,
-				1120712114AE3D360035CB7E /* libpugixml_d.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -230,7 +228,6 @@
 		119B95D214A65CA0001E1E20 /* pugixmlLib */ = {
 			isa = PBXGroup;
 			children = (
-				1120712014AE3D360035CB7E /* libpugixml_d.a */,
 				119B95D514A65CA0001E1E20 /* src */,
 			);
 			path = pugixmlLib;
@@ -239,7 +236,7 @@
 		119B95D514A65CA0001E1E20 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				1120712214AE3D410035CB7E /* foreach.hpp */,
+				699E4C771B306BDE00EE4541 /* pugixml.cpp */,
 				119B95D714A65CA0001E1E20 /* pugiconfig.hpp */,
 				119B95D814A65CA0001E1E20 /* pugixml.hpp */,
 			);
@@ -485,6 +482,7 @@
 				27C4A1BE179491920031C6E4 /* ofxPanel.cpp in Sources */,
 				27C4A1BF179491920031C6E4 /* ofxSlider.cpp in Sources */,
 				27C4A1C0179491920031C6E4 /* ofxSliderGroup.cpp in Sources */,
+				699E4C781B306BDE00EE4541 /* pugixml.cpp in Sources */,
 				27C4A1C1179491920031C6E4 /* ofxToggle.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -9,7 +9,6 @@
 #define UTILS_H_
 
 #include "ofConstants.h"
-#define PUGIXML_NO_STL
 #include "pugixml.hpp"
 
 
