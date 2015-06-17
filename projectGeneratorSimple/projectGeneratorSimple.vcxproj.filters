@@ -7,9 +7,6 @@
 		<ClCompile Include="src\main.cpp">
 			<Filter>src</Filter>
 		</ClCompile>
-		<ClCompile Include="src\testApp.cpp">
-			<Filter>src</Filter>
-		</ClCompile>
 		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxToggle.cpp">
 			<Filter>addons\ofxGui\src</Filter>
 		</ClCompile>
@@ -123,9 +120,6 @@
 			<Filter>src</Filter>
 		</ClInclude>
 		<ClInclude Include="src\textButton.h">
-			<Filter>src</Filter>
-		</ClInclude>
-		<ClInclude Include="src\testApp.h">
 			<Filter>src</Filter>
 		</ClInclude>
 		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxBaseGui.h">
