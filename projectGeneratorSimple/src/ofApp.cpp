@@ -1,4 +1,4 @@
-#include "testApp.h"
+#include "ofApp.h"
 #include "Utils.h"
 #include <stdio.h>
 #include "ofConstants.h"
@@ -18,7 +18,7 @@ string windowsFromUnixPath(string path){
 }
 
 //------------------------------------------------------
-bool testApp::isAddonCore(string addon){
+bool ofApp::isAddonCore(string addon){
 
 
     if (bInited == false){
@@ -69,7 +69,7 @@ void fixStringCharacters(string &toFix){
 
 
 //------------------------------------------------------
-string testApp::setupForTarget(int targ){
+string ofApp::setupForTarget(int targ){
 
     if(project){
 		delete project;
@@ -111,7 +111,7 @@ string testApp::setupForTarget(int targ){
 
 
 
-void testApp::setStatus(string newStatus){
+void ofApp::setStatus(string newStatus){
     statusEnergy = 1;
     status = newStatus;
     statusSetTime = ofGetElapsedTimef();
@@ -120,7 +120,7 @@ void testApp::setStatus(string newStatus){
 
 
 //--------------------------------------------------------------
-void testApp::setup(){
+void ofApp::setup(){
     ofEnableAlphaBlending();
     ofSetLogLevel(OF_LOG_VERBOSE);
     ofSetVerticalSync(true);
@@ -336,7 +336,7 @@ void testApp::setup(){
 
 
 //--------------------------------------------------------------
-void testApp::update(){
+void ofApp::update(){
 
     float diff = ofGetElapsedTimef()- statusSetTime;
     if (diff > 3){
@@ -386,7 +386,7 @@ void testApp::update(){
 }
 
 //--------------------------------------------------------------
-void testApp::draw(){
+void ofApp::draw(){
 
     
     
@@ -444,7 +444,7 @@ void testApp::draw(){
 }
 
 //--------------------------------------------------------------
-void testApp::keyPressed(int key){
+void ofApp::keyPressed(int key){
 
     if (key == ' '){
 
@@ -455,7 +455,7 @@ void testApp::keyPressed(int key){
 
 }
 
-void testApp::generateProject(){
+void ofApp::generateProject(){
 
     vector <int> targetsToMake;
 	if( osxToggle )		targetsToMake.push_back(OF_TARGET_OSX);
@@ -532,24 +532,24 @@ void testApp::generateProject(){
 }
 
 //--------------------------------------------------------------
-void testApp::keyReleased(int key){
+void ofApp::keyReleased(int key){
 
 
 
 }
 
 //--------------------------------------------------------------
-void testApp::mouseMoved(int x, int y ){
+void ofApp::mouseMoved(int x, int y ){
 
 }
 
 //--------------------------------------------------------------
-void testApp::mouseDragged(int x, int y, int button){
+void ofApp::mouseDragged(int x, int y, int button){
 
 }
 
 //--------------------------------------------------------------
-void testApp::mousePressed(int x, int y, int button){
+void ofApp::mousePressed(int x, int y, int button){
 
     if (mode == MODE_NORMAL){
 
@@ -680,12 +680,12 @@ void testApp::mousePressed(int x, int y, int button){
 }
 
 //--------------------------------------------------------------
-void testApp::mouseReleased(int x, int y, int button){
+void ofApp::mouseReleased(int x, int y, int button){
 
 }
 
 //--------------------------------------------------------------
-void testApp::windowResized(int w, int h){
+void ofApp::windowResized(int w, int h){
     generateButton.topLeftAnchor.set(ofGetWidth() - buttons[0].rect.x - generateButton.rect.width + 10 ,
                                      ofGetHeight() - generateButton.rect.height - 40);// 535);
     generateButton.calculateRect();
@@ -697,10 +697,10 @@ void testApp::windowResized(int w, int h){
 }
 
 //--------------------------------------------------------------
-void testApp::gotMessage(ofMessage msg){
+void ofApp::gotMessage(ofMessage msg){
 
 }
-void testApp::addAddon(string addon) {
+void ofApp::addAddon(string addon) {
 	
 	string addons = "";
 	
@@ -734,7 +734,7 @@ void testApp::addAddon(string addon) {
 	buttons[3].setText(addons);
 }
 //--------------------------------------------------------------
-void testApp::dragEvent(ofDragInfo dragInfo){
+void ofApp::dragEvent(ofDragInfo dragInfo){
 	for(int i = 0; i < dragInfo.files.size(); i++) {
 		string path = dragInfo.files[i];
 		ofFile f(path);
