@@ -1,0 +1,177 @@
+<?xml version="1.0"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="projectGeneratorSimple" />
+		<Option makefile_is_custom="1" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Option virtualFolders="addons/;src/;build config/;" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/$(PROJECT_NAME)_debug" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin" />
+				<Option object_output="obj/Debug/" />
+				<Option external_deps="../../../libs/openFrameworksCompiled/lib/linux64/libopenFrameworksDebug.a;" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+			</Target>
+			<Target title="Release">
+				<Option output="bin/$(PROJECT_NAME)" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin" />
+				<Option object_output="obj/Release/" />
+				<Option external_deps="../../../libs/openFrameworksCompiled/lib/linux64/libopenFrameworks.a;" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+			</Target>
+		</Build>
+		<Unit filename="config.make">
+			<Option virtualFolder="build config" />
+		</Unit>
+		<Unit filename="src/main.cpp">
+			<Option virtualFolder="src/" />
+		</Unit>
+		<Unit filename="src/ofApp.cpp">
+			<Option virtualFolder="src/" />
+		</Unit>
+		<Unit filename="src/ofApp.h">
+			<Option virtualFolder="src/" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+		<Unit filename="src/testApp.cpp">
+			<Option virtualFolder="src" />
+		</Unit>
+		<Unit filename="src/textButton.h">
+			<Option virtualFolder="src" />
+		</Unit>
+		<Unit filename="src/testApp.h">
+			<Option virtualFolder="src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxBaseGui.h">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxToggle.cpp">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxToggle.h">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxSliderGroup.h">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxGuiGroup.cpp">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxSliderGroup.cpp">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxBaseGui.cpp">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxGuiGroup.h">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxPanel.h">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxLabel.h">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxButton.h">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxLabel.cpp">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxSlider.cpp">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxPanel.cpp">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxGui.h">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxSlider.h">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxGui/src/ofxButton.cpp">
+			<Option virtualFolder="addons/ofxGui/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxXmlSettings/src/ofxXmlSettings.h">
+			<Option virtualFolder="addons/ofxXmlSettings/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxXmlSettings/src/ofxXmlSettings.cpp">
+			<Option virtualFolder="addons/ofxXmlSettings/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxml.cpp">
+			<Option virtualFolder="addons/ofxXmlSettings/libs" />
+		</Unit>
+		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxml.h">
+			<Option virtualFolder="addons/ofxXmlSettings/libs" />
+		</Unit>
+		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxmlparser.cpp">
+			<Option virtualFolder="addons/ofxXmlSettings/libs" />
+		</Unit>
+		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxmlerror.cpp">
+			<Option virtualFolder="addons/ofxXmlSettings/libs" />
+		</Unit>
+		<Unit filename="../../../addons/ofxProjectGenerator/src/utils/Utils.h">
+			<Option virtualFolder="addons/ofxProjectGenerator/src/utils" />
+		</Unit>
+		<Unit filename="../../../addons/ofxProjectGenerator/src/utils/Utils.cpp">
+			<Option virtualFolder="addons/ofxProjectGenerator/src/utils" />
+		</Unit>
+		<Unit filename="../../../addons/ofxProjectGenerator/src/projects/CBLinuxProject.h">
+			<Option virtualFolder="addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../../../addons/ofxProjectGenerator/src/projects/visualStudioProject.h">
+			<Option virtualFolder="addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../../../addons/ofxProjectGenerator/src/projects/baseProject.h">
+			<Option virtualFolder="addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../../../addons/ofxProjectGenerator/src/projects/baseProject.cpp">
+			<Option virtualFolder="addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../../../addons/ofxProjectGenerator/src/projects/CBWinProject.h">
+			<Option virtualFolder="addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../../../addons/ofxProjectGenerator/src/projects/xcodeProject.cpp">
+			<Option virtualFolder="addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../../../addons/ofxProjectGenerator/src/projects/CBLinuxProject.cpp">
+			<Option virtualFolder="addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../../../addons/ofxProjectGenerator/src/projects/CBWinProject.cpp">
+			<Option virtualFolder="addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../../../addons/ofxProjectGenerator/src/projects/visualStudioProject.cpp">
+			<Option virtualFolder="addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../../../addons/ofxProjectGenerator/src/projects/xcodeProject.h">
+			<Option virtualFolder="addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../../../addons/ofxProjectGenerator/src/addons/ofAddon.h">
+			<Option virtualFolder="addons/ofxProjectGenerator/src/addons" />
+		</Unit>
+		<Unit filename="../../../addons/ofxProjectGenerator/src/addons/ofAddon.cpp">
+			<Option virtualFolder="addons/ofxProjectGenerator/src/addons" />
+		</Unit>
+		<Unit filename="../../../addons/ofxProjectGenerator/libs/pugixml/src/pugixml.hpp">
+			<Option virtualFolder="addons/ofxProjectGenerator/libs/pugixml/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxProjectGenerator/libs/pugixml/src/pugiconfig.hpp">
+			<Option virtualFolder="addons/ofxProjectGenerator/libs/pugixml/src" />
+		</Unit>
+		<Unit filename="../../../addons/ofxProjectGenerator/libs/pugixml/src/pugixml.cpp">
+			<Option virtualFolder="addons/ofxProjectGenerator/libs/pugixml/src" />
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
