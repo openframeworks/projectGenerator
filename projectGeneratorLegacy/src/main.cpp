@@ -99,11 +99,10 @@ int main(  int argc, char *argv[]  ){
 	}
 #else 
     cout << "IN HERE!!" << endl;
-    ofAppGlutWindow window;
-    ofSetupOpenGL(&window, 1024,768, OF_WINDOW);
+    ofSetupOpenGL(1024,768, OF_WINDOW);
     ofApp * app = new ofApp;
     app->buildAllExamples = false;
-    ofRunApp( app );
+    return ofRunApp( app );
     
 #endif
     
