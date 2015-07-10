@@ -1,0 +1,14 @@
+language: objective-c
+compiler: clang
+node_js: '0.10'
+env:
+  global:
+    secure: LBTN8d1hS7ocrqDwxLQqU0tfK3FMCXBI8q1yASEjtkp/v5HEyFkbj22H4jXZ20SkpCTlIG2L6i/fU3d6KzJUzTFuxkQEWsnjkj4jAhxGEWRsT1RV6VcUPQDGLHapXwTy+ZYgMNxE7aAdQaBskPHdVzAhjrzlTwVuKp6KjFn+kMU=
+  matrix:
+    - NAME="osx" \ SCRIPT_PATH="scripts/$NAME" \ SCRIPT="$SCRIPT_PATH/buildPG.sh"
+    #- NAME="ios" \ SCRIPT_PATH="scripts/$NAME" \ SCRIPT="$SCRIPT_PATH/buildPG.sh"
+script: "$SCRIPT"
+git:
+  depth: 10
+before_install:
+  - openssl aes-256-cbc -K $encrypted_489c559678c5_key -iv $encrypted_489c559678c5_iv -in id_rsa.enc -out id_rsa -d
