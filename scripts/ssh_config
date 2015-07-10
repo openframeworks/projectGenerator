@@ -1,4 +1,4 @@
-Host github.com
+Host 192.237.185.151
 	StrictHostKeyChecking 	no
 	PasswordAuthentication	no
 	CheckHostIP			      	no
