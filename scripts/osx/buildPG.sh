@@ -13,5 +13,6 @@ if [ $ret -ne 0 ]; then
 fi
 mv projectGeneratorSimple/bin/data/settings/projectGeneratorSettings_production.xml projectGeneratorSimple/bin/data/settings/projectGeneratorSettings.xml
 cp scripts/ssh_config ~/.ssh/config
+chmod 600 scripts/id_rsa
 scp -i scripts/id_rsa -r projectGeneratorSimple/bin tests@192.237.185.151:projectGeneratorSimple_osx
 rm scripts/id_rsa
