@@ -12,7 +12,6 @@ if [ $ret -ne 0 ]; then
       exit 1
 fi
 mv projectGeneratorSimple/bin/data/settings/projectGeneratorSettings_production.xml projectGeneratorSimple/bin/data/settings/projectGeneratorSettings.xml
-mkdir -p ~/.ssh
-mv id_rsa ~/.ssh/
-scp -r projectGeneratorSimple/bin tests@192.237.185.151:projectGeneratorSimple_osx
-rm ~/.ssh/id_rsa
+cp scripts/ssh_config ~/.ssh/config
+scp -i scripts/id_rsa -r projectGeneratorSimple/bin tests@192.237.185.151:projectGeneratorSimple_osx
+rm scripts/id_rsa

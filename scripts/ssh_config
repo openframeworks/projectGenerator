@@ -1,0 +1,6 @@
+Host github.com
+	StrictHostKeyChecking 	no
+	PasswordAuthentication	no
+	CheckHostIP			      	no
+	BatchMode			        	yes
+
