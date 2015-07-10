@@ -1,5 +1,9 @@
 #!/bin/bash
 set -e
+cd ..
+git clone --depth=1 https://github.com/openframeworks/openFrameworks
+mv projectGenerator openFrameworks/apps/
+cd openFrameworks/apps/projectGenerator
 echo "Building openFrameworks PG - OSX"
 xcodebuild -configuration Release -target projectGeneratorSimple -project projectGeneratorSimple/projectGeneratorSimple.xcodeproj
 ret=$?
