@@ -1,0 +1,6 @@
+
+<!-- the path from this EXE / APP to the root folder -->
+<appToRoot>../</appToRoot>
+
+<!-- from the OF root, where should we encourage people to put apps -->
+<defaultNewProjectLocation>apps/myApps</defaultNewProjectLocation>
