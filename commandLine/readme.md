@@ -1,12 +1,13 @@
-when you compile this on OSX, we remove fmod and strip the exectuable from the package.  This is happening the project.xcconfig and in the build phases if you are curious. 
+when you compile this on OSX, we remove the fmod dynamic lib dependency and strip the exectuable from the app package (on osx, OF compiles to an app but the actual exectuable is deeper in the package).  This is happening the project.xcconfig and in the build phases if you are curious.
 
 once compiled you should see commandLinePG next to the package -- give that a try.  that's what you want to use.
 
-here's an example of creating a project, setting the OF path (../../../../), using the create mode, and setting the path of the project you want.
+here's an example of creating a project, setting the OF path (../../../../) which is the path to OF from that point in the repo, using the create mode, and setting the path of the project you want to create (paths can be relative or absolute)
 
 ./commandLinePG -o "../../../../" -c -p "../../../../apps/myApps/test"
 
-here's the extended options: 
+here's the extended options if you want to experiment.  please take are that options like recursive and update are very agressive, dryrun is suggested.
+
 
 	OPTIONS:
 	A command line project generator
