@@ -46,13 +46,13 @@ class ofApp : public ofBaseApp{
 		
 		baseProject * project;
     
-        string projectPath;
-        string target;
-		vector <int> targetsToMake;
+        std::string projectPath;
+        std::string target;
+        std::vector <int> targetsToMake;
 		bool buildAllExamples;
 
 #ifndef COMMAND_LINE_ONLY
-		string drawableOfPath;
+		std::string drawableOfPath;
 		ofRectangle ofPathRect;
 		ofPoint ofPathDrawPoint;
 
