@@ -15,8 +15,10 @@ if [ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" = "openframeworks/projectGenerator/m
     mv projectGeneratorSimple/bin/data/settings/projectGeneratorSettings_production.xml projectGeneratorSimple/bin/data/settings/projectGeneratorSettings.xml
     cp scripts/ssh_config ~/.ssh/config
     chmod 600 scripts/id_rsa
-    ssh -i scripts/id_rsa tests@192.237.185.151 "rm -r projectGeneratorSimple_osx"
-    scp -i scripts/id_rsa -r projectGeneratorSimple/bin tests@192.237.185.151:projectGeneratorSimple_osx
+    ssh -i scripts/id_rsa tests@192.237.185.151 "rm -f projectGeneratorSimple_osx.zip"
+    mv projectGeneratorSimple/bin projectGenerator_osx
+    zip -r projectGenerator_osx.zip projectGenerator_osx
+    scp -i scripts/id_rsa projectGenerator_osx.zip tests@192.237.185.151:projectGenerator_osx.zip
 fi
 rm scripts/id_rsa
 
