@@ -87,7 +87,7 @@ public:
         
         
         if (!bHelpRequested){
-        
+            
             //-------------------------------------------------------------------------------
             // try to get the OF_PATH as an environt variable
             char* pPath;
@@ -307,25 +307,7 @@ public:
         }
     }
     
-	
-	void handleOFPath(const std::string& name, const std::string& value){
-		
-        ofLogNotice() << "setting root of OF to " << value;
-        
-        setOFRoot(value);
-	}
     
-    void handleProjectPath(const std::string& name, const std::string& value){
-		
-        ofLogNotice() << "setting project path to " << value;
-        
-        projectPath = value;
-	}
-    
-    void handleAddons(const std::string& name, const std::string& value){
-		
-        addons = ofSplitString(value, ",", true, true);
-    }
     
     
     bool isGoodProjectPath (string path ){
@@ -451,6 +433,21 @@ public:
         }
         
         
+        //-------------------------- get the path to the current working folder
+        
+        Path cwd            = Path::current();                      // get the current path
+        projectPath         = cwd.resolve(projectPath).toString();  // resolve projectPath vs that.
+        Path resolvedPath   = Path(projectPath).absolute();         // use absolute version of this path
+        projectPath = resolvedPath.toString();
+        
+        //-------------------------- get OF path from env variable if available
+        if (ofPath == "" && ofPathEnv != ""){
+            ofLog(OF_LOG_NOTICE) << "using env var for OF path";
+            ofPath = ofPathEnv;
+        }
+        
+        
+        
         if (args.size() > 0){
 
             projectName = args[0];
@@ -459,7 +456,15 @@ public:
             if (ofFilePath::isAbsolute(projectName)){
                 projectPath = projectName;
             } else {
+
+                
+                
                 projectPath = ofFilePath::join(projectPath, projectName);
+                
+                // this line is arturo's ninja magic to make paths with dots make sense:
+                projectPath = ofFilePath::removeTrailingSlash(ofFilePath::getPathForDirectory(ofFilePath::getAbsolutePath(projectPath,false)));
+                
+                
             }
             
         } else {
@@ -473,7 +478,17 @@ public:
             return Application::EXIT_OK;
         }
         
-     
+        
+        
+        if (!isGoodOFPath(ofPath)){
+            consoleSpace();
+            ofLogError() << "path to openframeworks (" << ofPath << ") seems wrong, please check";
+            consoleSpace();
+            return Application::EXIT_OK;
+        }
+        
+       
+        
         if (ofDirectory(projectPath).exists()){
             ofLogNotice() << projectPath << " exists, using 'update' mode";
             mode = PG_MODE_UPDATE;
@@ -485,10 +500,6 @@ public:
        
         
         
-        if (ofPath == "" && ofPathEnv != ""){
-            ofLog(OF_LOG_NOTICE) << "using env var for OF path";
-            ofPath = ofPathEnv;
-        }
         
         // check things
         
@@ -519,20 +530,7 @@ public:
         }
         
         
-        {
-            
-            Path cwd            = Path::current();                      // get the current path
-            projectPath         = cwd.resolve(projectPath).toString();  // resolve projectPath vs that.
-            Path resolvedPath   = Path(projectPath).absolute();         // use absolute version of this path
-            projectPath = resolvedPath.toString();
-            
-            if (!isGoodOFPath(ofPath)){
-                consoleSpace();
-                ofLogError() << "path to openframeworks (" << ofPath << ") seems wrong, please check";
-                consoleSpace();
-                return Application::EXIT_OK;
-            }
-        }
+        
         
         
         if (mode == PG_MODE_CREATE){
@@ -561,6 +559,7 @@ public:
         } else if (mode == PG_MODE_UPDATE){
             
             if (!bRecursive){
+                cout << projectPath << endl;
                 if (isGoodProjectPath(projectPath) || bForce ){
                     for(int i = 0; i < (int)targets.size(); i++){
                         setupForTarget(targets[i]);
