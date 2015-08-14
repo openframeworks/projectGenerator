@@ -32,7 +32,6 @@ using Poco::Path;
  
  todo:
  
- - commands like what chrisopher suggests
  - really check OF root
  - check if folder exits....
  
@@ -55,8 +54,10 @@ public:
     string              ofPath;
     vector <string>     addons;
     vector <int>        targets;
+    string              ofPathEnv;
+    string              currentWorkingDirectory;
+
     
-    bool bHasCommand;                       // do we have an "update" or "create" command
     bool bVerbose;                          // be verbose
     bool bForce;                            // force even if things like ofRoot seem wrong of if update folder looks wonky
     int mode;                               // what mode are we in?
@@ -68,20 +69,47 @@ public:
     baseProject * project;
     
 	commandLineProjectGenerator(){
+        
         mode = PG_MODE_NONE;
-        bHasCommand = false;
         bVerbose = false;
         bForce = false;
         bRecursive = false;
         bHelpRequested = false;
-        // assume our own platform unless it's set:
         targets.push_back( ofGetTargetPlatform() );
-	}
+	
+    }
     
 	void initialize(Application& self){
-		loadConfiguration(); // load default configuration files, if present
+        
+        
+        consoleSpace();
+        
+        
+        
+        if (!bHelpRequested){
+            
+            //-------------------------------------------------------------------------------
+            // try to get the OF_PATH as an environt variable
+            char* pPath;
+            pPath = getenv ("PG_OF_PATH");
+            if (pPath!=NULL){
+                ofPathEnv = string(pPath);
+                ofLogNotice() << "PG_OF_PATH variable is set to: " << pPath;
+            } else {
+                ofLogNotice() << "PG_OF_PATH not set, -o parameter needs to be set (-h for options)";
+                //printf ("(searched for enviroment variable PG_OF_PATH, none found) \n");
+            }
+            //-------------------------------------------------------------------------------
+        
+        }
+        
+        
+     
+        currentWorkingDirectory = Poco::Path::current();
+        loadConfiguration(); // load default configuration files, if present
 		Application::initialize(self);
-	}
+	
+    }
 	
 	void uninitialize(){
 		Application::uninitialize();
@@ -109,19 +137,6 @@ public:
                           .repeatable(false)
                           .callback(OptionCallback<commandLineProjectGenerator>(this, &commandLineProjectGenerator::handleOption)));
         
-        options.addOption(
-                          Option("create", "c", "create a project file if it doesn't exist")
-                          .required(false)
-                          .noArgument()
-                          .repeatable(false)
-                          .callback(OptionCallback<commandLineProjectGenerator>(this, &commandLineProjectGenerator::handleOption)));
-        
-        options.addOption(
-                          Option("update", "u", "update a project file if it does exist")
-                          .required(false)
-                          .noArgument()
-                          .repeatable(false)
-                          .callback(OptionCallback<commandLineProjectGenerator>(this, &commandLineProjectGenerator::handleOption)));
         
         options.addOption(
                           Option("platforms", "x", "platform list")
@@ -146,12 +161,6 @@ public:
                           .callback(OptionCallback<commandLineProjectGenerator>(this, &commandLineProjectGenerator::handleOption)));
         
 		options.addOption(
-                          Option("projectPath", "p", "project path")
-                          .required(false)
-                          .repeatable(false)
-                          .argument("\"project path\"")
-                          .callback(OptionCallback<commandLineProjectGenerator>(this, &commandLineProjectGenerator::handleOption)));
-        options.addOption(
                           Option("verbose", "v", "run verbose")
                           .required(false)
                           .repeatable(false)
@@ -164,6 +173,7 @@ public:
                           .repeatable(false)
                           .noArgument()
                           .callback(OptionCallback<commandLineProjectGenerator>(this, &commandLineProjectGenerator::handleOption)));
+    
         
         
 	}
@@ -174,18 +184,12 @@ public:
         
         if (name == "help"){
             printHelp();
-        } else if (name == "create"){
-            mode = PG_MODE_CREATE;
-        } else if (name == "update"){
-            mode = PG_MODE_UPDATE;
         } else if (name == "platforms"){
             addPlatforms(value);
         } else if (name == "addons"){
             addons = ofSplitString(value, ",", true, true);
         } else if (name == "ofPath"){
             ofPath = value;
-        } else if (name == "projectPath"){
-            projectPath = value;
         } else if (name == "recursive"){
             bRecursive = true;
         } else if (name == "dryrun"){
@@ -197,13 +201,21 @@ public:
 	void printHelp(){
         bHelpRequested = true;
         HelpFormatter helpFormatter(options());
+        
+        consoleSpace();
+        
+        
+
         string header = "";
-        header += "\nOPTIONS:\n";
-        header += "A command line project generator\n";
-        header += "please use a command \"create\", \"update\"\n";
-        header += "lists should be comma seperated\nand in quotes if there are spaces\n";
+        header += "\n\n\t\tprojectGenerator [options] pathName\n\n";
+        header += "if pathName exists, project is updated\n";
+        header += "if pathName doesn't exist, project is created\n\n";
+        header += "OPTIONS:\n\n";
+        header += "lists should be comma seperated and in quotes if there are spaces\n";
         header += "you can use : or = for parameter based options, such as -o=/usr/...";
         helpFormatter.setHeader(header);
+        
+    
         helpFormatter.setFooter("\n");
         helpFormatter.format(std::cout);
 		stopOptionsProcessing();
@@ -295,25 +307,7 @@ public:
         }
     }
     
-	
-	void handleOFPath(const std::string& name, const std::string& value){
-		
-        cout << "setting root of OF to " << value << endl;
-        
-        setOFRoot(value);
-	}
     
-    void handleProjectPath(const std::string& name, const std::string& value){
-		
-        cout << "setting project path to " << value << endl;
-        
-        projectPath = value;
-	}
-    
-    void handleAddons(const std::string& name, const std::string& value){
-		
-        addons = ofSplitString(value, ",", true, true);
-    }
     
     
     bool isGoodProjectPath (string path ){
@@ -392,6 +386,10 @@ public:
         
     }
     
+    void consoleSpace(){
+        cout << endl << endl;
+    }
+    
     
     void updateProject ( string path ){
         
@@ -423,25 +421,93 @@ public:
     
 	int main(const std::vector<std::string>& args){
         
-        cout << endl;
+        
+        // check for a non option command line arg
+        
+        string projectName = "";
+        
         
         if (bHelpRequested){
+            consoleSpace();
             return Application::EXIT_OK;
         }
-        //
         
         
-        if (mode == PG_MODE_NONE){
-            ofLog(OF_LOG_WARNING) << endl << "no mode selected... please use create or update" << endl;
-            printHelp();
+        //-------------------------- get the path to the current working folder
+        
+        Path cwd            = Path::current();                      // get the current path
+        projectPath         = cwd.resolve(projectPath).toString();  // resolve projectPath vs that.
+        Path resolvedPath   = Path(projectPath).absolute();         // use absolute version of this path
+        projectPath = resolvedPath.toString();
+        
+        //-------------------------- get OF path from env variable if available
+        if (ofPath == "" && ofPathEnv != ""){
+            ofLog(OF_LOG_NOTICE) << "using env var for OF path";
+            ofPath = ofPathEnv;
+        }
+        
+        
+        
+        if (args.size() > 0){
+
+            projectName = args[0];
+            
+            // check if it's an absolute path?
+            if (ofFilePath::isAbsolute(projectName)){
+                projectPath = projectName;
+            } else {
+
+                
+                
+                projectPath = ofFilePath::join(projectPath, projectName);
+                
+                // this line is arturo's ninja magic to make paths with dots make sense:
+                projectPath = ofFilePath::removeTrailingSlash(ofFilePath::getPathForDirectory(ofFilePath::getAbsolutePath(projectPath,false)));
+                
+                
+            }
+            
+        } else {
+            
+            ofLogError() << "usage: projectGenerator [options] pathName";
+            ofLogError() << "usage: if pathName exists, project is updated";
+            ofLogError() << "usage: if pathName doesn't exist, project is created";
+            
+            consoleSpace();
+            
             return Application::EXIT_OK;
         }
+        
+        
+        
+        if (!isGoodOFPath(ofPath)){
+            consoleSpace();
+            ofLogError() << "path to openframeworks (" << ofPath << ") seems wrong, please check";
+            consoleSpace();
+            return Application::EXIT_OK;
+        }
+        
+       
+        
+        if (ofDirectory(projectPath).exists()){
+            ofLogNotice() << projectPath << " exists, using 'update' mode";
+            mode = PG_MODE_UPDATE;
+        } else {
+            ofLogNotice() << projectPath << " does not exist, using 'create' mode";
+            mode = PG_MODE_CREATE;
+        }
+
+       
+        
         
         
         // check things
         
         if (ofPath == ""){
-            ofLog(OF_LOG_NOTICE) << endl << "no OF path set... please use -o or -ofPath" << endl;
+            
+            consoleSpace();
+            ofLog(OF_LOG_ERROR) << endl << "no OF path set... please use -o or -ofPath or set a PG_OF_PATH environment variable";
+            consoleSpace();
             printHelp();
             return Application::EXIT_OK;
         } else {
@@ -463,27 +529,8 @@ public:
             setOFRoot(ofPath);
         }
         
-        // todo : check ofPath
         
         
-        if (projectPath == ""){
-            ofLog(OF_LOG_WARNING) << endl << "no project path set... please use -p or -projectPath" << endl;
-            printHelp();
-            return Application::EXIT_OK;
-        } else {
-            
-            Path cwd            = Path::current();                      // get the current path
-            projectPath         = cwd.resolve(projectPath).toString();  // resolve projectPath vs that.
-            Path resolvedPath   = Path(projectPath).absolute();         // use absolute version of this path
-            projectPath = resolvedPath.toString();
-            
-            if (!isGoodOFPath(ofPath)){
-                return Application::EXIT_OK;
-            }
-            
-            
-            
-        }
         
         
         if (mode == PG_MODE_CREATE){
@@ -512,6 +559,7 @@ public:
         } else if (mode == PG_MODE_UPDATE){
             
             if (!bRecursive){
+                cout << projectPath << endl;
                 if (isGoodProjectPath(projectPath) || bForce ){
                     for(int i = 0; i < (int)targets.size(); i++){
                         setupForTarget(targets[i]);
@@ -530,7 +578,7 @@ public:
             
         }
         
-        cout << endl;
+        consoleSpace();
         
         return Application::EXIT_OK;
 	}
