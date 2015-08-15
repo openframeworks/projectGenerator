@@ -17,8 +17,8 @@ if [ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" = "openframeworks/projectGenerator/m
     chmod 600 scripts/id_rsa
     mv projectGeneratorSimple/bin projectGenerator_osx
     zip -r projectGenerator_osx.zip projectGenerator_osx
-    scp -i scripts/id_rsa projectGenerator_osx.zip tests@192.237.185.151:projectGenerator_osx_new.zip
-    ssh -i scripts/id_rsa tests@192.237.185.151 "mv projectGenerator_osx_new.zip projectGenerator_osx.zip"
+    scp -i scripts/id_rsa projectGenerator_osx.zip tests@192.237.185.151:projectGenerator_builds/projectGenerator_osx_new.zip
+    ssh -i scripts/id_rsa tests@192.237.185.151 "mv projectGenerator_builds/projectGenerator_osx_new.zip projectGenerator_builds/projectGenerator_osx.zip"
 fi
 rm scripts/id_rsa
 
