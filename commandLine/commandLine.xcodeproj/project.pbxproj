@@ -283,7 +283,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/commandLine\" \"$TARGET_BUILD_DIR/commandLinePG\"";
+			shellScript = "cp \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/commandLine\" \"$TARGET_BUILD_DIR/commandLinePG\"\nrm -rf \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app\"\nmv \"$TARGET_BUILD_DIR/commandLinePG\" \"$TARGET_BUILD_DIR/projectGenerator\"";
 		};
 		E4B6FFFD0C3F9AB9008CF71C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
