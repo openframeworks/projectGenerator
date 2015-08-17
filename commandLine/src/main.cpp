@@ -101,8 +101,7 @@ public:
 				ofLogNotice() << "PG_OF_PATH variable is set to: " << pPath;
 			}
 			else {
-				ofLogNotice() << "PG_OF_PATH not set, -o parameter needs to be set (-h for options)";
-				//printf ("(searched for enviroment variable PG_OF_PATH, none found) \n");
+				ofLogNotice() << "PG_OF_PATH not set (see help), -o parameter needs to be set (-h for options)";
 			}
 			//-------------------------------------------------------------------------------
 
@@ -510,7 +509,7 @@ public:
 			return Application::EXIT_OK;
 		}
 
-
+        
 
 		if (ofDirectory(projectPath).exists()) {
 			ofLogNotice() << projectPath << " exists, using 'update' mode";
@@ -555,7 +554,8 @@ public:
 		}
 
 
-
+        consoleSpace();
+        
 
 
 		if (mode == PG_MODE_CREATE) {
@@ -563,19 +563,15 @@ public:
 			for (int i = 0; i < (int)targets.size(); i++) {
 				setupForTarget(targets[i]);
 
+                ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
 				ofLog(OF_LOG_NOTICE) << "setting up a new project";
 				ofLog(OF_LOG_NOTICE) << "target platform is: " << target;
 				ofLog(OF_LOG_NOTICE) << "project path is: " << projectPath;
 
 				if (!bDryRun) project->setup(target);
 				if (!bDryRun) project->create(projectPath);
-
-				cout << "dddd" << endl;
-
-				for (int j = 0; j < (int)addons.size(); j++) {
-
-
-					cout << "aaa" << endl;
+				
+                for (int j = 0; j < (int)addons.size(); j++) {
 
 
 					ofAddon addon;
@@ -586,17 +582,32 @@ public:
 					if (!bDryRun) project->addAddon(addon);
 				}
 				if (!bDryRun) project->save(false);
+                
+                ofLog(OF_LOG_NOTICE) << "project created! ";
+                ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
+                
+
 			}
 		}
 		else if (mode == PG_MODE_UPDATE) {
 
 			if (!bRecursive) {
-				cout << projectPath << endl;
-				if (isGoodProjectPath(projectPath) || bForce) {
+            	if (isGoodProjectPath(projectPath) || bForce) {
 					for (int i = 0; i < (int)targets.size(); i++) {
-						setupForTarget(targets[i]);
+                        
+                        
+                        setupForTarget(targets[i]);
+						
+                        ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
+                        ofLog(OF_LOG_NOTICE) << "updating an existing project";
+                        ofLog(OF_LOG_NOTICE) << "target platform is: " << target;
+                        
 						updateProject(projectPath);
-					}
+                        
+                        ofLog(OF_LOG_NOTICE) << "project updated! ";
+                        ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
+                    
+                    }
 				}
 				else {
 					ofLog(OF_LOG_ERROR) << "there's no src folder in this project path to update, maybe use create instead? (or use force to force updating)";
@@ -604,8 +615,18 @@ public:
 			}
 			else {
 				for (int i = 0; i < (int)targets.size(); i++) {
-					setupForTarget(targets[i]);
+                    
+                    setupForTarget(targets[i]);
+					
+                    ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
+                    ofLog(OF_LOG_NOTICE) << "updating an existing project";
+                    ofLog(OF_LOG_NOTICE) << "target platform is: " << target;
+                    
 					recursiveUpdate(projectPath);
+                    
+                    ofLog(OF_LOG_NOTICE) << "project updated! ";
+                    ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
+
 				}
 			}
 
