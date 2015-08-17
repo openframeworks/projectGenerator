@@ -57,9 +57,8 @@ public:
 	string              ofPathEnv;
 	string              currentWorkingDirectory;
 
-    
+    bool bVerbose;
     bool bAddonsPassedIn;
-	bool bVerbose;                          // be verbose
 	bool bForce;                            // force even if things like ofRoot seem wrong of if update folder looks wonky
 	int mode;                               // what mode are we in?
 	bool bRecursive;                        // do we recurse in update mode?
@@ -71,27 +70,29 @@ public:
 
 	commandLineProjectGenerator() {
         
+        // this is called before params have been parsed.
+        
         bAddonsPassedIn = false;
 		bDryRun = false;
+        bVerbose = false;
 		project = NULL;
 		mode = PG_MODE_NONE;
-		bVerbose = false;
 		bForce = false;
 		bRecursive = false;
 		bHelpRequested = false;
 		targets.push_back(ofGetTargetPlatform());
 
+        
 	}
 
 	void initialize(Application& self) {
-
-        bAddonsPassedIn = false;
-		bDryRun = false;
+        
+        
+        // this is called after params have been parsed.
+        
 		ofSetWorkingDirectoryToDefault();
 		project = NULL;
-
 		consoleSpace();
-
 
 
 		if (!bHelpRequested) {
@@ -208,6 +209,9 @@ public:
 		}
 		else if (name == "dryrun") {
 			bDryRun = true;
+		}
+        else if (name == "verbose") {
+            bVerbose = true;
 		}
 	}
 
@@ -426,7 +430,7 @@ public:
 		ofLog(OF_LOG_NOTICE) << "updating project " << path;
 
 		if (!bDryRun) project->setup(target);
-		if (!bDryRun) project->create(path);
+		if (!bDryRun) project->create(path, false);
 
         bool bConsiderAddonsDotMake = true;
         if (bConsiderParameterAddons && bAddonsPassedIn){
@@ -436,6 +440,7 @@ public:
         }
         
         if (bConsiderAddonsDotMake){
+            ofLogNotice() << "parsing addons.make";
             vector < string > addons;
             addons.clear();
             ofFile file(path + "addons.make");
@@ -450,12 +455,12 @@ public:
 			ofAddon addon;
 			addon.pathToOF = getOFRelPath(path);
 			addon.fromFS(ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), addons[i]), target);
-
+            
 			ofLog(OF_LOG_NOTICE) << "parsing addon " << ofFilePath::join(getOFRoot(), "addons");
 
 			if (!bDryRun) project->addAddon(addon);
 		}
-		if (!bDryRun) project->save(false);
+		if (!bDryRun && !bConsiderAddonsDotMake) project->save(true);
 	}
 
 
@@ -576,6 +581,9 @@ public:
 
         consoleSpace();
         
+        if (bVerbose){
+            ofSetLogLevel(OF_LOG_VERBOSE);
+        }
 
 
 		if (mode == PG_MODE_CREATE) {
@@ -589,7 +597,7 @@ public:
 				ofLog(OF_LOG_NOTICE) << "project path is: " << projectPath;
 
 				if (!bDryRun) project->setup(target);
-				if (!bDryRun) project->create(projectPath);
+				if (!bDryRun) project->create(projectPath, false);
 				
                 for (int j = 0; j < (int)addons.size(); j++) {
 
@@ -601,7 +609,7 @@ public:
 					if (!bDryRun) addon.fromFS(ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), addons[j]), target);
 					if (!bDryRun) project->addAddon(addon);
 				}
-				if (!bDryRun) project->save(false);
+				if (!bDryRun) project->save(true);
                 
                 ofLog(OF_LOG_NOTICE) << "project created! ";
                 ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
