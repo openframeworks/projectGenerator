@@ -57,7 +57,8 @@ public:
 	string              ofPathEnv;
 	string              currentWorkingDirectory;
 
-
+    
+    bool bAddonsPassedIn;
 	bool bVerbose;                          // be verbose
 	bool bForce;                            // force even if things like ofRoot seem wrong of if update folder looks wonky
 	int mode;                               // what mode are we in?
@@ -69,6 +70,8 @@ public:
 	baseProject * project;
 
 	commandLineProjectGenerator() {
+        
+        bAddonsPassedIn = false;
 		bDryRun = false;
 		project = NULL;
 		mode = PG_MODE_NONE;
@@ -82,6 +85,7 @@ public:
 
 	void initialize(Application& self) {
 
+        bAddonsPassedIn = false;
 		bDryRun = false;
 		ofSetWorkingDirectoryToDefault();
 		project = NULL;
@@ -193,6 +197,7 @@ public:
 			addPlatforms(value);
 		}
 		else if (name == "addons") {
+            bAddonsPassedIn = true;
 			addons = ofSplitString(value, ",", true, true);
 		}
 		else if (name == "ofPath") {
@@ -389,7 +394,7 @@ public:
 
 		// second check if this is a folder that has src in it
 		if (isGoodProjectPath(path)) {
-			updateProject(path);
+			updateProject(path, false);
 			return;
 		}
 
@@ -411,20 +416,35 @@ public:
 	}
 
 
-	void updateProject(string path) {
+	void updateProject(string path, bool bConsiderParameterAddons = true) {
 
+        // bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
+        // either we read the addons.make file, or we look at the parameter list.
+        // if we are updating recursively, we *never* consider addons passed as parameters.
+        
+    
 		ofLog(OF_LOG_NOTICE) << "updating project " << path;
 
 		if (!bDryRun) project->setup(target);
 		if (!bDryRun) project->create(path);
 
-		vector < string > addons;
-		addons.clear();
-		ofFile file(path + "addons.make");
-
-		if (file.exists()) {
-			parseAddonsDotMake(path + "addons.make", addons);
-		}
+        bool bConsiderAddonsDotMake = true;
+        if (bConsiderParameterAddons && bAddonsPassedIn){
+            bConsiderAddonsDotMake = false;
+            // parameters were passed in, and we're not a recurive call
+            // so we don't read addons.make
+        }
+        
+        if (bConsiderAddonsDotMake){
+            vector < string > addons;
+            addons.clear();
+            ofFile file(path + "addons.make");
+            if (file.exists()) {
+                parseAddonsDotMake(path + "addons.make", addons);
+            }
+        }
+        
+		
 
 		for (int i = 0; i < (int)addons.size(); i++) {
 			ofAddon addon;
