@@ -95,7 +95,7 @@
 			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
 			<RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
 			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\libs;..\..\..\addons\src;src</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\ofxProjectGenerator\libs;..\..\..\addons\ofxProjectGenerator\libs\pugixml;..\..\..\addons\ofxProjectGenerator\libs\pugixml\src;..\..\..\addons\ofxProjectGenerator\src;..\..\..\addons\ofxProjectGenerator\src\addons;..\..\..\addons\ofxProjectGenerator\src\projects;..\..\..\addons\ofxProjectGenerator\src\utils;..\..\..\addons\libs;..\..\..\addons\src;src</AdditionalIncludeDirectories>
 			<CompileAs>CompileAsCpp</CompileAs>
 		</ClCompile>
 		<Link>
@@ -105,9 +105,7 @@
 			<AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
 			<AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 		</Link>
-		<PostBuildEvent>
-			<Command>xcopy /e /i /y "$(ProjectDir)..\..\..\export\vs\$(Platform_Actual)\*.dll" "$(ProjectDir)bin"</Command>
-		</PostBuildEvent>
+		<PostBuildEvent />
 	</ItemDefinitionGroup>
 	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 		<ClCompile>
@@ -116,7 +114,7 @@
 			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
 			<RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
 			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\libs;..\..\..\addons\src;src</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\ofxProjectGenerator\libs;..\..\..\addons\ofxProjectGenerator\libs\pugixml;..\..\..\addons\ofxProjectGenerator\libs\pugixml\src;..\..\..\addons\ofxProjectGenerator\src;..\..\..\addons\ofxProjectGenerator\src\addons;..\..\..\addons\ofxProjectGenerator\src\projects;..\..\..\addons\ofxProjectGenerator\src\utils;..\..\..\addons\libs;..\..\..\addons\src;src</AdditionalIncludeDirectories>
 			<CompileAs>CompileAsCpp</CompileAs>
 			<MultiProcessorCompilation>true</MultiProcessorCompilation>
 		</ClCompile>
@@ -127,9 +125,7 @@
 			<AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
 			<AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 		</Link>
-		<PostBuildEvent>
-			<Command>xcopy /e /i /y "$(ProjectDir)..\..\..\export\vs\$(Platform_Actual)\*.dll" "$(ProjectDir)bin"</Command>
-		</PostBuildEvent>
+		<PostBuildEvent />
 	</ItemDefinitionGroup>
 	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
 		<ClCompile>
@@ -137,7 +133,7 @@
 			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
 			<RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
 			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\libs;..\..\..\addons\src;src</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\ofxProjectGenerator\libs;..\..\..\addons\ofxProjectGenerator\libs\pugixml;..\..\..\addons\ofxProjectGenerator\libs\pugixml\src;..\..\..\addons\ofxProjectGenerator\src;..\..\..\addons\ofxProjectGenerator\src\addons;..\..\..\addons\ofxProjectGenerator\src\projects;..\..\..\addons\ofxProjectGenerator\src\utils;..\..\..\addons\libs;..\..\..\addons\src;src</AdditionalIncludeDirectories>
 			<CompileAs>CompileAsCpp</CompileAs>
 			<MultiProcessorCompilation>true</MultiProcessorCompilation>
 		</ClCompile>
@@ -151,9 +147,7 @@
 			<AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
 			<AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 		</Link>
-		<PostBuildEvent>
-			<Command>xcopy /e /i /y "$(ProjectDir)..\..\..\export\vs\$(Platform_Actual)\*.dll" "$(ProjectDir)bin"</Command>
-		</PostBuildEvent>
+		<PostBuildEvent />
 	</ItemDefinitionGroup>
 	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
 		<ClCompile>
@@ -161,7 +155,7 @@
 			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
 			<RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
 			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\libs;..\..\..\addons\src;src</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\ofxProjectGenerator\libs;..\..\..\addons\ofxProjectGenerator\libs\pugixml;..\..\..\addons\ofxProjectGenerator\libs\pugixml\src;..\..\..\addons\ofxProjectGenerator\src;..\..\..\addons\ofxProjectGenerator\src\addons;..\..\..\addons\ofxProjectGenerator\src\projects;..\..\..\addons\ofxProjectGenerator\src\utils;..\..\..\addons\libs;..\..\..\addons\src;src</AdditionalIncludeDirectories>
 			<CompileAs>CompileAsCpp</CompileAs>
 		</ClCompile>
 		<Link>
@@ -174,19 +168,34 @@
 			<AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
 			<AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 		</Link>
-		<PostBuildEvent>
-			<Command>xcopy /e /i /y "$(ProjectDir)..\..\..\export\vs\$(Platform_Actual)\*.dll" "$(ProjectDir)bin"</Command>
-		</PostBuildEvent>
+		<PostBuildEvent />
 	</ItemDefinitionGroup>
 	<ItemGroup>
 		<ClCompile Include="src\main.cpp" />
 		<ClCompile Include="src\ofApp.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxProjectGenerator\src\addons\ofAddon.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxProjectGenerator\src\projects\baseProject.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxProjectGenerator\src\projects\CBLinuxProject.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxProjectGenerator\src\projects\CBWinProject.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxProjectGenerator\src\projects\visualStudioProject.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxProjectGenerator\src\projects\xcodeProject.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxProjectGenerator\src\utils\Utils.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxProjectGenerator\libs\pugixml\src\pugixml.cpp" />
 	</ItemGroup>
 	<ItemGroup>
 		<ClInclude Include="src\ofApp.h" />
+		<ClInclude Include="..\..\..\addons\ofxProjectGenerator\src\addons\ofAddon.h" />
+		<ClInclude Include="..\..\..\addons\ofxProjectGenerator\src\projects\baseProject.h" />
+		<ClInclude Include="..\..\..\addons\ofxProjectGenerator\src\projects\CBLinuxProject.h" />
+		<ClInclude Include="..\..\..\addons\ofxProjectGenerator\src\projects\CBWinProject.h" />
+		<ClInclude Include="..\..\..\addons\ofxProjectGenerator\src\projects\visualStudioProject.h" />
+		<ClInclude Include="..\..\..\addons\ofxProjectGenerator\src\projects\xcodeProject.h" />
+		<ClInclude Include="..\..\..\addons\ofxProjectGenerator\src\utils\Utils.h" />
+		<ClInclude Include="..\..\..\addons\ofxProjectGenerator\libs\pugixml\src\pugiconfig.hpp" />
+		<ClInclude Include="..\..\..\addons\ofxProjectGenerator\libs\pugixml\src\pugixml.hpp" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">
+		<ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">
 			<Project>{5837595d-aca9-485c-8e76-729040ce4b0b}</Project>
 		</ProjectReference>
 	</ItemGroup>
@@ -194,6 +203,7 @@
 		<ResourceCompile Include="icon.rc">
 			<AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/D_DEBUG %(AdditionalOptions)</AdditionalOptions>
 			<AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/D_DEBUG %(AdditionalOptions)</AdditionalOptions>
+			<AdditionalIncludeDirectories>$(OF_ROOT)\libs\openFrameworksCompiled\project\vs</AdditionalIncludeDirectories>
 		</ResourceCompile>
 	</ItemGroup>
 	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
