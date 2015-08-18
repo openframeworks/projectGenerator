@@ -1,0 +1,9 @@
+{
+  "name": "your-app",
+  "version": "0.1.0",
+  "main": "main.js",
+  "dependencies": {
+    "async": "^1.4.0",
+    "walk": "^2.3.9"
+  }
+}
