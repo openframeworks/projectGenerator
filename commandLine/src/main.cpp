@@ -49,6 +49,10 @@ public:
 	};
 
 
+    float               startTime;
+    int                 nProjectsUpdated;
+    int                 nProjectsCreated;
+    
 	string              directoryForRecursion;
 	string              projectPath;
 	string              ofPath;
@@ -57,8 +61,8 @@ public:
 	string              ofPathEnv;
 	string              currentWorkingDirectory;
 
-
-	bool bVerbose;                          // be verbose
+    bool bVerbose;
+    bool bAddonsPassedIn;
 	bool bForce;                            // force even if things like ofRoot seem wrong of if update folder looks wonky
 	int mode;                               // what mode are we in?
 	bool bRecursive;                        // do we recurse in update mode?
@@ -69,25 +73,34 @@ public:
 	baseProject * project;
 
 	commandLineProjectGenerator() {
+        
+        // this is called before params have been parsed.
+        
+        bAddonsPassedIn = false;
 		bDryRun = false;
+        bVerbose = false;
 		project = NULL;
 		mode = PG_MODE_NONE;
-		bVerbose = false;
 		bForce = false;
 		bRecursive = false;
 		bHelpRequested = false;
 		targets.push_back(ofGetTargetPlatform());
 
+        
 	}
 
 	void initialize(Application& self) {
-
-		bDryRun = false;
+        
+        
+        
+        // this is called after params have been parsed.
+        
+        startTime = ofGetElapsedTimef();
+        nProjectsUpdated = 0;
+        nProjectsCreated = 0;
 		ofSetWorkingDirectoryToDefault();
 		project = NULL;
-
 		consoleSpace();
-
 
 
 		if (!bHelpRequested) {
@@ -101,8 +114,7 @@ public:
 				ofLogNotice() << "PG_OF_PATH variable is set to: " << pPath;
 			}
 			else {
-				ofLogNotice() << "PG_OF_PATH not set, -o parameter needs to be set (-h for options)";
-				//printf ("(searched for enviroment variable PG_OF_PATH, none found) \n");
+				ofLogNotice() << "PG_OF_PATH not set (see help), -o parameter needs to be set (-h for options)";
 			}
 			//-------------------------------------------------------------------------------
 
@@ -194,6 +206,7 @@ public:
 			addPlatforms(value);
 		}
 		else if (name == "addons") {
+            bAddonsPassedIn = true;
 			addons = ofSplitString(value, ",", true, true);
 		}
 		else if (name == "ofPath") {
@@ -204,6 +217,9 @@ public:
 		}
 		else if (name == "dryrun") {
 			bDryRun = true;
+		}
+        else if (name == "verbose") {
+            bVerbose = true;
 		}
 	}
 
@@ -390,7 +406,8 @@ public:
 
 		// second check if this is a folder that has src in it
 		if (isGoodProjectPath(path)) {
-			updateProject(path);
+            nProjectsUpdated++;
+			updateProject(path, false);
 			return;
 		}
 
@@ -412,31 +429,47 @@ public:
 	}
 
 
-	void updateProject(string path) {
+	void updateProject(string path, bool bConsiderParameterAddons = true) {
 
+        // bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
+        // either we read the addons.make file, or we look at the parameter list.
+        // if we are updating recursively, we *never* consider addons passed as parameters.
+        
+    
 		ofLog(OF_LOG_NOTICE) << "updating project " << path;
 
 		if (!bDryRun) project->setup(target);
-		if (!bDryRun) project->create(path);
+		if (!bDryRun) project->create(path, false);
 
-		vector < string > addons;
-		addons.clear();
-		ofFile file(path + "addons.make");
-
-		if (file.exists()) {
-			parseAddonsDotMake(path + "addons.make", addons);
-		}
+        bool bConsiderAddonsDotMake = true;
+        if (bConsiderParameterAddons && bAddonsPassedIn){
+            bConsiderAddonsDotMake = false;
+            // parameters were passed in, and we're not a recurive call
+            // so we don't read addons.make
+        }
+        
+        if (bConsiderAddonsDotMake){
+            ofLogNotice() << "parsing addons.make";
+            vector < string > addons;
+            addons.clear();
+            ofFile file(path + "addons.make");
+            if (file.exists()) {
+                parseAddonsDotMake(path + "addons.make", addons);
+            }
+        }
+        
+		
 
 		for (int i = 0; i < (int)addons.size(); i++) {
 			ofAddon addon;
 			addon.pathToOF = getOFRelPath(path);
 			addon.fromFS(ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), addons[i]), target);
-
+            
 			ofLog(OF_LOG_NOTICE) << "parsing addon " << ofFilePath::join(getOFRoot(), "addons");
 
 			if (!bDryRun) project->addAddon(addon);
 		}
-		if (!bDryRun) project->save(false);
+		if (!bDryRun && !bConsiderAddonsDotMake) project->save(true);
 	}
 
 
@@ -510,7 +543,7 @@ public:
 			return Application::EXIT_OK;
 		}
 
-
+        
 
 		if (ofDirectory(projectPath).exists()) {
 			ofLogNotice() << projectPath << " exists, using 'update' mode";
@@ -555,27 +588,30 @@ public:
 		}
 
 
-
+        consoleSpace();
+        
+        if (bVerbose){
+            ofSetLogLevel(OF_LOG_VERBOSE);
+        }
 
 
 		if (mode == PG_MODE_CREATE) {
 
+            
+            nProjectsCreated += 1;
+            
 			for (int i = 0; i < (int)targets.size(); i++) {
 				setupForTarget(targets[i]);
 
+                ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
 				ofLog(OF_LOG_NOTICE) << "setting up a new project";
 				ofLog(OF_LOG_NOTICE) << "target platform is: " << target;
 				ofLog(OF_LOG_NOTICE) << "project path is: " << projectPath;
 
 				if (!bDryRun) project->setup(target);
-				if (!bDryRun) project->create(projectPath);
-
-				cout << "dddd" << endl;
-
-				for (int j = 0; j < (int)addons.size(); j++) {
-
-
-					cout << "aaa" << endl;
+				if (!bDryRun) project->create(projectPath, false);
+				
+                for (int j = 0; j < (int)addons.size(); j++) {
 
 
 					ofAddon addon;
@@ -585,18 +621,38 @@ public:
 					if (!bDryRun) addon.fromFS(ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), addons[j]), target);
 					if (!bDryRun) project->addAddon(addon);
 				}
-				if (!bDryRun) project->save(false);
+				if (!bDryRun) project->save(true);
+                
+                ofLog(OF_LOG_NOTICE) << "project created! ";
+                ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
+                
+
 			}
 		}
 		else if (mode == PG_MODE_UPDATE) {
 
 			if (!bRecursive) {
-				cout << projectPath << endl;
-				if (isGoodProjectPath(projectPath) || bForce) {
-					for (int i = 0; i < (int)targets.size(); i++) {
-						setupForTarget(targets[i]);
+            	if (isGoodProjectPath(projectPath) || bForce) {
+					
+                    
+                    nProjectsUpdated += 1;
+                    
+                    
+                    for (int i = 0; i < (int)targets.size(); i++) {
+                        
+                        
+                        setupForTarget(targets[i]);
+						
+                        ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
+                        ofLog(OF_LOG_NOTICE) << "updating an existing project";
+                        ofLog(OF_LOG_NOTICE) << "target platform is: " << target;
+                        
 						updateProject(projectPath);
-					}
+                        
+                        ofLog(OF_LOG_NOTICE) << "project updated! ";
+                        ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
+                    
+                    }
 				}
 				else {
 					ofLog(OF_LOG_ERROR) << "there's no src folder in this project path to update, maybe use create instead? (or use force to force updating)";
@@ -604,8 +660,18 @@ public:
 			}
 			else {
 				for (int i = 0; i < (int)targets.size(); i++) {
-					setupForTarget(targets[i]);
+                    
+                    setupForTarget(targets[i]);
+					
+                    ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
+                    ofLog(OF_LOG_NOTICE) << "updating an existing project";
+                    ofLog(OF_LOG_NOTICE) << "target platform is: " << target;
+                    
 					recursiveUpdate(projectPath);
+                    
+                    ofLog(OF_LOG_NOTICE) << "project updated! ";
+                    ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
+
 				}
 			}
 
@@ -613,6 +679,12 @@ public:
 		}
 
 		consoleSpace();
+        float elapsedTime = ofGetElapsedTimef() - startTime;
+        if (nProjectsCreated > 0) cout << nProjectsCreated << " project created ";
+        if (nProjectsUpdated == 1)cout << nProjectsUpdated << " project updated ";
+        if (nProjectsUpdated > 1) cout << nProjectsUpdated << " projects updated ";
+        cout << "in " << elapsedTime << " seconds" << endl;
+        consoleSpace();
 
 		return Application::EXIT_OK;
 	}
