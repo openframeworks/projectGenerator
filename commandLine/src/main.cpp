@@ -49,6 +49,10 @@ public:
 	};
 
 
+    float               startTime;
+    int                 nProjectsUpdated;
+    int                 nProjectsCreated;
+    
 	string              directoryForRecursion;
 	string              projectPath;
 	string              ofPath;
@@ -88,8 +92,12 @@ public:
 	void initialize(Application& self) {
         
         
+        
         // this is called after params have been parsed.
         
+        startTime = ofGetElapsedTimef();
+        nProjectsUpdated = 0;
+        nProjectsCreated = 0;
 		ofSetWorkingDirectoryToDefault();
 		project = NULL;
 		consoleSpace();
@@ -398,6 +406,7 @@ public:
 
 		// second check if this is a folder that has src in it
 		if (isGoodProjectPath(path)) {
+            nProjectsUpdated++;
 			updateProject(path, false);
 			return;
 		}
@@ -588,6 +597,9 @@ public:
 
 		if (mode == PG_MODE_CREATE) {
 
+            
+            nProjectsCreated += 1;
+            
 			for (int i = 0; i < (int)targets.size(); i++) {
 				setupForTarget(targets[i]);
 
@@ -621,7 +633,12 @@ public:
 
 			if (!bRecursive) {
             	if (isGoodProjectPath(projectPath) || bForce) {
-					for (int i = 0; i < (int)targets.size(); i++) {
+					
+                    
+                    nProjectsUpdated += 1;
+                    
+                    
+                    for (int i = 0; i < (int)targets.size(); i++) {
                         
                         
                         setupForTarget(targets[i]);
@@ -662,6 +679,12 @@ public:
 		}
 
 		consoleSpace();
+        float elapsedTime = ofGetElapsedTimef() - startTime;
+        if (nProjectsCreated > 0) cout << nProjectsCreated << " project created ";
+        if (nProjectsUpdated == 1)cout << nProjectsUpdated << " project updated ";
+        if (nProjectsUpdated > 1) cout << nProjectsUpdated << " projects updated ";
+        cout << "in " << elapsedTime << " seconds" << endl;
+        consoleSpace();
 
 		return Application::EXIT_OK;
 	}
