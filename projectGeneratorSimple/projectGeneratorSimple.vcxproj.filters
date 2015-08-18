@@ -43,6 +43,9 @@
 		<ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxmlerror.cpp">
 			<Filter>addons\ofxXmlSettings\libs</Filter>
 		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxProjectGenerator\src\utils\LibraryBinary.cpp">
+			<Filter>addons\ofxProjectGenerator\src\utils</Filter>
+		</ClCompile>
 		<ClCompile Include="..\..\..\addons\ofxProjectGenerator\src\utils\Utils.cpp">
 			<Filter>addons\ofxProjectGenerator\src\utils</Filter>
 		</ClCompile>
@@ -154,6 +157,9 @@
 		</ClInclude>
 		<ClInclude Include="..\..\..\addons\ofxXmlSettings\libs\tinyxml.h">
 			<Filter>addons\ofxXmlSettings\libs</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxProjectGenerator\src\utils\LibraryBinary.h">
+			<Filter>addons\ofxProjectGenerator\src\utils</Filter>
 		</ClInclude>
 		<ClInclude Include="..\..\..\addons\ofxProjectGenerator\src\utils\Utils.h">
 			<Filter>addons\ofxProjectGenerator\src\utils</Filter>

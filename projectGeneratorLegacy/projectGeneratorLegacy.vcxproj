@@ -95,7 +95,7 @@
 			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
 			<RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
 			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\ofxXmlSettings\libs;..\..\..\addons\ofxXmlSettings\src;..\..\..\addons\ofxGui\libs;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxProjectGenerator\libs;..\..\..\addons\ofxProjectGenerator\libs\pugixml;..\..\..\addons\ofxProjectGenerator\libs\pugixml\src;..\..\..\addons\ofxProjectGenerator\src;..\..\..\addons\ofxProjectGenerator\src\addons;..\..\..\addons\ofxProjectGenerator\src\projects;..\..\..\addons\ofxProjectGenerator\src\utils;..\..\..\addons\libs;..\..\..\addons\src;src</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\ofxXmlSettings\libs;..\..\..\addons\ofxXmlSettings\src;..\..\..\addons\ofxGui\libs;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxProjectGenerator\libs;..\..\..\addons\ofxProjectGenerator\libs\pugixml;..\..\..\addons\ofxProjectGenerator\libs\pugixml\src;..\..\..\addons\ofxProjectGenerator\src;..\..\..\addons\ofxProjectGenerator\src\addons;..\..\..\addons\ofxProjectGenerator\src\projects;..\..\..\addons\ofxProjectGenerator\src\utils;src</AdditionalIncludeDirectories>
 			<CompileAs>CompileAsCpp</CompileAs>
 		</ClCompile>
 		<Link>
@@ -105,9 +105,7 @@
 			<AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
 			<AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 		</Link>
-		<PostBuildEvent>
-			<Command>xcopy /e /i /y "$(ProjectDir)..\..\..\export\vs\$(Platform_Actual)\*.dll" "$(ProjectDir)bin"</Command>
-		</PostBuildEvent>
+		<PostBuildEvent />
 	</ItemDefinitionGroup>
 	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 		<ClCompile>
@@ -116,7 +114,7 @@
 			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
 			<RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
 			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\ofxXmlSettings\libs;..\..\..\addons\ofxXmlSettings\src;..\..\..\addons\ofxGui\libs;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxProjectGenerator\libs;..\..\..\addons\ofxProjectGenerator\libs\pugixml;..\..\..\addons\ofxProjectGenerator\libs\pugixml\src;..\..\..\addons\ofxProjectGenerator\src;..\..\..\addons\ofxProjectGenerator\src\addons;..\..\..\addons\ofxProjectGenerator\src\projects;..\..\..\addons\ofxProjectGenerator\src\utils;..\..\..\addons\libs;..\..\..\addons\src;src</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\ofxXmlSettings\libs;..\..\..\addons\ofxXmlSettings\src;..\..\..\addons\ofxGui\libs;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxProjectGenerator\libs;..\..\..\addons\ofxProjectGenerator\libs\pugixml;..\..\..\addons\ofxProjectGenerator\libs\pugixml\src;..\..\..\addons\ofxProjectGenerator\src;..\..\..\addons\ofxProjectGenerator\src\addons;..\..\..\addons\ofxProjectGenerator\src\projects;..\..\..\addons\ofxProjectGenerator\src\utils;src</AdditionalIncludeDirectories>
 			<CompileAs>CompileAsCpp</CompileAs>
 			<MultiProcessorCompilation>true</MultiProcessorCompilation>
 		</ClCompile>
@@ -127,9 +125,7 @@
 			<AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
 			<AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 		</Link>
-		<PostBuildEvent>
-			<Command>xcopy /e /i /y "$(ProjectDir)..\..\..\export\vs\$(Platform_Actual)\*.dll" "$(ProjectDir)bin"</Command>
-		</PostBuildEvent>
+		<PostBuildEvent />
 	</ItemDefinitionGroup>
 	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
 		<ClCompile>
@@ -137,7 +133,7 @@
 			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
 			<RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
 			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\ofxXmlSettings\libs;..\..\..\addons\ofxXmlSettings\src;..\..\..\addons\ofxGui\libs;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxProjectGenerator\libs;..\..\..\addons\ofxProjectGenerator\libs\pugixml;..\..\..\addons\ofxProjectGenerator\libs\pugixml\src;..\..\..\addons\ofxProjectGenerator\src;..\..\..\addons\ofxProjectGenerator\src\addons;..\..\..\addons\ofxProjectGenerator\src\projects;..\..\..\addons\ofxProjectGenerator\src\utils;..\..\..\addons\libs;..\..\..\addons\src;src</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\ofxXmlSettings\libs;..\..\..\addons\ofxXmlSettings\src;..\..\..\addons\ofxGui\libs;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxProjectGenerator\libs;..\..\..\addons\ofxProjectGenerator\libs\pugixml;..\..\..\addons\ofxProjectGenerator\libs\pugixml\src;..\..\..\addons\ofxProjectGenerator\src;..\..\..\addons\ofxProjectGenerator\src\addons;..\..\..\addons\ofxProjectGenerator\src\projects;..\..\..\addons\ofxProjectGenerator\src\utils;src</AdditionalIncludeDirectories>
 			<CompileAs>CompileAsCpp</CompileAs>
 			<MultiProcessorCompilation>true</MultiProcessorCompilation>
 		</ClCompile>
@@ -151,9 +147,7 @@
 			<AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
 			<AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 		</Link>
-		<PostBuildEvent>
-			<Command>xcopy /e /i /y "$(ProjectDir)..\..\..\export\vs\$(Platform_Actual)\*.dll" "$(ProjectDir)bin"</Command>
-		</PostBuildEvent>
+		<PostBuildEvent />
 	</ItemDefinitionGroup>
 	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
 		<ClCompile>
@@ -161,7 +155,7 @@
 			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
 			<RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
 			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\ofxXmlSettings\libs;..\..\..\addons\ofxXmlSettings\src;..\..\..\addons\ofxGui\libs;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxProjectGenerator\libs;..\..\..\addons\ofxProjectGenerator\libs\pugixml;..\..\..\addons\ofxProjectGenerator\libs\pugixml\src;..\..\..\addons\ofxProjectGenerator\src;..\..\..\addons\ofxProjectGenerator\src\addons;..\..\..\addons\ofxProjectGenerator\src\projects;..\..\..\addons\ofxProjectGenerator\src\utils;..\..\..\addons\libs;..\..\..\addons\src;src</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\ofxXmlSettings\libs;..\..\..\addons\ofxXmlSettings\src;..\..\..\addons\ofxGui\libs;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxProjectGenerator\libs;..\..\..\addons\ofxProjectGenerator\libs\pugixml;..\..\..\addons\ofxProjectGenerator\libs\pugixml\src;..\..\..\addons\ofxProjectGenerator\src;..\..\..\addons\ofxProjectGenerator\src\addons;..\..\..\addons\ofxProjectGenerator\src\projects;..\..\..\addons\ofxProjectGenerator\src\utils;src</AdditionalIncludeDirectories>
 			<CompileAs>CompileAsCpp</CompileAs>
 		</ClCompile>
 		<Link>
@@ -174,9 +168,7 @@
 			<AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
 			<AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 		</Link>
-		<PostBuildEvent>
-			<Command>xcopy /e /i /y "$(ProjectDir)..\..\..\export\vs\$(Platform_Actual)\*.dll" "$(ProjectDir)bin"</Command>
-		</PostBuildEvent>
+		<PostBuildEvent />
 	</ItemDefinitionGroup>
 	<ItemGroup>
 		<ClCompile Include="src\main.cpp" />
@@ -193,6 +185,7 @@
 		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxSlider.cpp" />
 		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxPanel.cpp" />
 		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxButton.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxProjectGenerator\src\utils\LibraryBinary.cpp" />
 		<ClCompile Include="..\..\..\addons\ofxProjectGenerator\src\utils\Utils.cpp" />
 		<ClCompile Include="..\..\..\addons\ofxProjectGenerator\src\projects\baseProject.cpp" />
 		<ClCompile Include="..\..\..\addons\ofxProjectGenerator\src\projects\xcodeProject.cpp" />
@@ -215,6 +208,7 @@
 		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxButton.h" />
 		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxGui.h" />
 		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxSlider.h" />
+		<ClInclude Include="..\..\..\addons\ofxProjectGenerator\src\utils\LibraryBinary.h" />
 		<ClInclude Include="..\..\..\addons\ofxProjectGenerator\src\utils\Utils.h" />
 		<ClInclude Include="..\..\..\addons\ofxProjectGenerator\src\projects\CBLinuxProject.h" />
 		<ClInclude Include="..\..\..\addons\ofxProjectGenerator\src\projects\visualStudioProject.h" />
@@ -226,7 +220,7 @@
 		<ClInclude Include="..\..\..\addons\ofxProjectGenerator\libs\pugixml\src\pugiconfig.hpp" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">
+		<ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">
 			<Project>{5837595d-aca9-485c-8e76-729040ce4b0b}</Project>
 		</ProjectReference>
 	</ItemGroup>
@@ -234,6 +228,7 @@
 		<ResourceCompile Include="icon.rc">
 			<AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/D_DEBUG %(AdditionalOptions)</AdditionalOptions>
 			<AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/D_DEBUG %(AdditionalOptions)</AdditionalOptions>
+			<AdditionalIncludeDirectories>$(OF_ROOT)\libs\openFrameworksCompiled\project\vs</AdditionalIncludeDirectories>
 		</ResourceCompile>
 	</ItemGroup>
 	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -43,6 +43,9 @@
 		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxButton.cpp">
 			<Filter>addons\ofxGui\src</Filter>
 		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxProjectGenerator\src\utils\LibraryBinary.cpp">
+			<Filter>addons\ofxProjectGenerator\src\utils</Filter>
+		</ClCompile>
 		<ClCompile Include="..\..\..\addons\ofxProjectGenerator\src\utils\Utils.cpp">
 			<Filter>addons\ofxProjectGenerator\src\utils</Filter>
 		</ClCompile>
@@ -151,6 +154,9 @@
 		</ClInclude>
 		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxSlider.h">
 			<Filter>addons\ofxGui\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxProjectGenerator\src\utils\LibraryBinary.h">
+			<Filter>addons\ofxProjectGenerator\src\utils</Filter>
 		</ClInclude>
 		<ClInclude Include="..\..\..\addons\ofxProjectGenerator\src\utils\Utils.h">
 			<Filter>addons\ofxProjectGenerator\src\utils</Filter>

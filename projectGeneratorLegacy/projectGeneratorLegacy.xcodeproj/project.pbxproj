@@ -382,11 +382,50 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
+			<key>009DF1B113448B0A2C7658E2</key>
+			<dict>
+				<key>fileRef</key>
+				<string>EACA1B411704D62FE06BA62B</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>EACA1B411704D62FE06BA62B</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>LibraryBinary.cpp</string>
+				<key>path</key>
+				<string>../../../addons/ofxProjectGenerator/src/utils/LibraryBinary.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>2837AD6580984F98391789A9</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Utils.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxProjectGenerator/src/utils/Utils.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
 			<key>819B05EFCD91BFBA0B6B8C5D</key>
 			<dict>
 				<key>children</key>
 				<array>
+					<string>45AB504F96B0A90AC1312FBE</string>
 					<string>2837AD6580984F98391789A9</string>
+					<string>EACA1B411704D62FE06BA62B</string>
 					<string>EE1D340A818221DB5677EAC9</string>
 				</array>
 				<key>isa</key>
@@ -425,7 +464,7 @@
 				<key>sourceTree</key>
 				<string>&lt;group&gt;</string>
 			</dict>
-			<key>2837AD6580984F98391789A9</key>
+			<key>45AB504F96B0A90AC1312FBE</key>
 			<dict>
 				<key>explicitFileType</key>
 				<string>sourcecode.c.h</string>
@@ -434,9 +473,9 @@
 				<key>isa</key>
 				<string>PBXFileReference</string>
 				<key>name</key>
-				<string>Utils.h</string>
+				<string>LibraryBinary.h</string>
 				<key>path</key>
-				<string>../../../addons/ofxProjectGenerator/src/utils/Utils.h</string>
+				<string>../../../addons/ofxProjectGenerator/src/utils/LibraryBinary.h</string>
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
@@ -1125,8 +1164,6 @@
 						<string>../../../addons/ofxProjectGenerator/src/addons</string>
 						<string>../../../addons/ofxProjectGenerator/src/projects</string>
 						<string>../../../addons/ofxProjectGenerator/src/utils</string>
-						<string>../../../addons/libs</string>
-						<string>../../../addons/src</string>
 						<string>src</string>
 					</array>
 					<key>CONFIGURATION_BUILD_DIR</key>
@@ -1166,7 +1203,6 @@
 					<key>OTHER_CPLUSPLUSFLAGS</key>
 					<array>
 						<string>-D__MACOSX_CORE__</string>
-						<string>-lpthread</string>
 						<string>-mtune=native</string>
 					</array>
 					<key>SDKROOT</key>
@@ -1197,8 +1233,6 @@
 						<string>../../../addons/ofxProjectGenerator/src/addons</string>
 						<string>../../../addons/ofxProjectGenerator/src/projects</string>
 						<string>../../../addons/ofxProjectGenerator/src/utils</string>
-						<string>../../../addons/libs</string>
-						<string>../../../addons/src</string>
 						<string>src</string>
 					</array>
 					<key>CONFIGURATION_BUILD_DIR</key>
@@ -1238,7 +1272,6 @@
 					<key>OTHER_CPLUSPLUSFLAGS</key>
 					<array>
 						<string>-D__MACOSX_CORE__</string>
-						<string>-lpthread</string>
 						<string>-mtune=native</string>
 					</array>
 					<key>SDKROOT</key>
@@ -1269,6 +1302,7 @@
 					<string>837220E80EB56CD44AD27F2A</string>
 					<string>F285EB3169F1566CA3D93C20</string>
 					<string>5CBB2AB3A60F65431D7B555D</string>
+					<string>009DF1B113448B0A2C7658E2</string>
 					<string>C76869918AFCFB776E8E4FFD</string>
 					<string>3449DEFEE12D71AE6875CC19</string>
 					<string>F54D82B8E037C3CA692E0726</string>
@@ -1371,8 +1405,6 @@
 						<string>../../../addons/ofxProjectGenerator/src/addons</string>
 						<string>../../../addons/ofxProjectGenerator/src/projects</string>
 						<string>../../../addons/ofxProjectGenerator/src/utils</string>
-						<string>../../../addons/libs</string>
-						<string>../../../addons/src</string>
 						<string>src</string>
 					</array>
 					<key>COMBINE_HIDPI_IMAGES</key>
@@ -1432,8 +1464,6 @@
 						<string>../../../addons/ofxProjectGenerator/src/addons</string>
 						<string>../../../addons/ofxProjectGenerator/src/projects</string>
 						<string>../../../addons/ofxProjectGenerator/src/utils</string>
-						<string>../../../addons/libs</string>
-						<string>../../../addons/src</string>
 						<string>src</string>
 					</array>
 					<key>COMBINE_HIDPI_IMAGES</key>
@@ -1577,9 +1607,10 @@
 				<key>shellPath</key>
 				<string>/bin/sh</string>
 				<key>shellScript</key>
-				<string>cp -f ../../../libs/fmodex/lib/osx/libfmodex.dylib "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/libfmodex.dylib"; install_name_tool -change ./libfmodex.dylib @executable_path/libfmodex.dylib "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME";
+				<string>rsync -aved ../../../libs/fmodex/lib/osx/libfmodex.dylib "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/"; install_name_tool -change ./libfmodex.dylib @executable_path/libfmodex.dylib "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME";
 mkdir -p "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/"
-cp -f "$ICON_FILE" "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/"
+rsync -aved "$ICON_FILE" "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/"
+rsync -aved ../../../libs/glut/lib/osx/GLUT.framework "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Frameworks/"
 </string>
 			</dict>
 			<key>E4C2427710CC5ABF004149E2</key>
