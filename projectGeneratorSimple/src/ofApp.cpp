@@ -122,7 +122,7 @@ void ofApp::setStatus(string newStatus){
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofEnableAlphaBlending();
-    ofSetLogLevel(OF_LOG_VERBOSE);
+    ofSetLogLevel(OF_LOG_SILENT);
     ofSetVerticalSync(true);
     ofSetFrameRate(60);
     
@@ -140,7 +140,9 @@ void ofApp::setup(){
 
     XML.loadFile("settings/projectGeneratorSettings.xml");
     appToRoot = XML.getValue("appToRoot", "../../../../");
+	appToRoot = std::filesystem::path(appToRoot).make_preferred().string();
     defaultLoc = XML.getValue("defaultNewProjectLocation", "apps/myApps");
+	defaultLoc = std::filesystem::path(defaultLoc).make_preferred().string();
        //-------------------------------------
     // calculate the bin path (../../../ on osx) and the sketch path (bin -> root - > defaultLoc)
     //-------------------------------------
