@@ -13,79 +13,159 @@
   <script src="app.js"></script>
   <style>
   .formElement {
-  padding-top: 20px;
+    padding-bottom: 20px;
   }
   .name{
-  font-size: 1.1em;
-  padding-bottom: 0.3em;
+    padding-bottom: 0.3em;
+    color: #555;
+    font-weight: bold;
+    text-transform: uppercase;
   }
 
   .label-spaced {
     margin-right:5px;
     margin-bottom:5px !important;
     display:inline-block;
-}
+  }
+
+  .form-group {
+    margin: 0px 0 20px;
+    padding: 20px;
+    border: 2px dashed #999;
+  }
+
+  body {
+    padding: 10px 30px;
+    background-color: #e6e6e6;
+  }
+
+  #visitOfxAddons {
+    display: block;
+    font-size: 0.8em;
+    color: grey;
+  }
+
+  #pg-title {
+    text-transform: uppercase;
+    font-size: 2em;
+    padding: 0 0 0 140px;
+    background: transparent url(./css/of-logo.svg) no-repeat left center;
+    line-height: 1.4em;
+    /*font-weight: bold;*/
+  }
+
+  .alert h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 1.2em;
+  }
+
+  .alert-info, .alert-warning {
+    color: #FFF;
+    background-color: #555;
+    border-color: #555;
+  }
+
+  .alert-warning h3 {
+    color: #f99527;
+    font-weight: bold;
+  }
+
+  .btn-lg{
+    text-transform: uppercase;
+  }
+
+  #warning-create, #warning-update, #update-btn, #create-btn {
+    display: none;
+  }
+
+  #generate-mode-section.createMode #warning-create, #generate-mode-part.createMode #create-btn {
+    display: block;
+  }
+
+  #generate-mode-section.updateMode #warning-update,#generate-mode-part.updateMode #update-btn {
+    display: block;
+  }
+
+  #generate-mode-section.updateMode .btn {
+    background-color: #f99527;
+  }
+
+  #missingAddons, #generate-mode-section.createMode #missingAddons{
+    display: none;
+  }
+  #missingAddons.missing{
+    display: block;
+  }
+
+  h2 {
+    font-size: 1.8em;
+  }
   </style>
   
 
 
   
-  <body style="padding:10px">
-    <h1>pg</h1>
+  <body>
+    <h1 id="pg-title">Project<br> Generator</h1>
     <br/><br/>
     <!-- We are using io.js <script>document.write(process.version)</script>
     and Electron <script>document.write(process.versions['electron'])</script>. -->
     
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" role="tablist">
-      <li class="active"><a href="#create" role="tab" data-toggle="tab">create</a></li>
-      <li><a href="#update" role="tab" data-toggle="tab">update</a></li>
-      <li><a href="#settings" role="tab" data-toggle="tab">settings</a></li>
+      <li class="active"><a href="#create" role="tab" data-toggle="tab">(re)Generate</a></li>
+      <li><a href="#advanced" role="tab" data-toggle="tab" title="Batch operations">Advanced</a></li>
+      <li><a href="#settings" role="tab" data-toggle="tab">Settings</a></li>
     </ul>
     <!-- Tab panes -->
     <div class="tab-content">
       <!------------------------------- create -------------------------------->
       <div class="tab-pane active" id="create">
-        <form>
-          
-          <div class="formElement">
-            <div class="name">
-              project name:
+        <form id="generate-mode-section" class="createMode">
+          <h2>Project</h2>
+          <div class="form-group">
+            <div class="formElement">
+              <div class="name">Name</div>
+              <input type="text" name="projectName" style="width:250px;" value="myApp" id="projectName">
             </div>
-            <input type="text" name="projectName" style="width:250px;" value="myApp" id="projectName">
+            
+            <div class="formElement">
+              <div class="name">Path</div>
+              <input type="text" name="projectPath" style="width:250px;" value="" id="projectPath">
+              <button type="button" onclick="browseProjectPath()">Browse...</button>
+            </div>
           </div>
-          
-          <div class="formElement">
-            <div class="name">
-              project path:
+
+          <div class="form-group">
+            <div class="formElement">
+              <div class="name">Addons</div>
+              <select data-placeholder="addons..." class="chosen-select" multiple style="width:350px;" id="addonsSelect">
+                <option value=""></option>
+              </select>
+              <a href="#http://www.ofxaddons.com/" id="visitOfxAddons">Browse & download more plugins on ofxaddons.com</a>
             </div>
-            <input type="text" name="projectPath" style="width:250px;" value="" id="projectPath">
-            <button type="button" onclick="getProjectPath()">set project location</button>
-          </div>
-          <div class="formElement">
-            <div class="name">
-              platforms:
+            <div class="alert alert-danger" id="missingAddons">
+                You are missing the following plugins which are needed for this project:<br>
+                <span id="missingAddonsList"></span>
             </div>
-            <select data-placeholder="platforms..." class="chosen-select" multiple style="width:350px;" id="platformSelect">
-              <option value=""></option>
-            </select>
-          </div>
-          <div class="formElement">
-            <div class="name">
-              addons:
-            </div>
-            <select data-placeholder="addons..." class="chosen-select" multiple style="width:350px;" id="addonsSelect">
-              <option value=""></option>
-            </select>
           </div>
           <div class="formElement">
-            <button type="button" onclick="generate()">generate</button>
+            <div class="alert alert-info" role="alert" id="warning-create">
+              <p>This will create a new project file for your target platform(s), and a skeleton openFrameworks app in the "src" folder, including any addon(s) you select.</p>
+            </div>
+            <div class="alert alert-warning" role="alert" id="warning-update">
+              <h3>Warning</h3>
+              <p>Updating will use the "src" folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files (beware). This is useful to fix broken project configurations or update old projects to newer OF versions.</p>
+            </div>
+            <button class="btn btn-lg" type="button" onclick="generate()" id="create-btn">Create New Project</button>
+            <button class="btn btn-lg" type="button" onclick="update()" id="update-btn">Update Project</button>
           </div>
           
         </form>
       </div>
       <!------------------------------- update -------------------------------->
-      <div class="tab-pane" id="update">
+      <div class="tab-pane" id="advanced">
         <form>
           
          <div class="formElement">
@@ -106,7 +186,7 @@
             <div class="name">
               platforms:
             </div>
-            <select data-placeholder="platforms..." class="chosen-select" multiple style="width:350px;" id="platformsSelectUpdate">
+            <select data-placeholder="platforms..." class="chosen-select" multiple style="width:350px;" id="platformsSelectAdvanced">
               <option value="sd">sdsd</option>
               <option value="sd">sdsd</option>
               <option value="sd">sdsd</option>
@@ -132,15 +212,24 @@
       <!------------------------------- settings -------------------------------->
       <div class="tab-pane" id="settings">
         <form>
-          
-          <div class="formElement">
-            <div class="name">
-              of path:
+          <div class="form-group">
+            <div class="formElement">
+              <div class="name">
+                of path:
+              </div>
+              <input type="text" name="ofPath"  style="width:350px;" value="" id="ofPath">
+              <button type="button" onclick="getPath()">set OF path</button>
             </div>
-            <input type="text" name="ofPath"  style="width:350px;" value="" id="ofPath">
-            <button type="button" onclick="getPath()">set OF path</button>
+            
+            <div class="formElement">
+              <div class="name">
+                platforms:
+              </div>
+              <select data-placeholder="platforms..." class="chosen-select" multiple style="width:350px;" id="platformSelect">
+                <option value=""></option>
+              </select>
+            </div>
           </div>
-          
         </form>
       </div>
     </div>
