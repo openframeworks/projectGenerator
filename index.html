@@ -9,11 +9,11 @@
 	<link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-	<header class="jumbotron">
+	<!--<header class="jumbotron">
 		<div class="container">
 			<h1>Project Generator</h1>
 		</div>
-	</header>
+	</header>-->
 	<section class="container">
 		<!-- Nav tabs -->
 		<ul class="nav nav-pills" role="tablist">
@@ -32,7 +32,7 @@
 					<div class="form-group">
 						<label for="projectName">Name</label>
 						<div class="input-group">
-							<input class="form-control" type="text" style="width:250px;" name="projectName" value="myApp" id="projectName">
+							<input class="form-control" type="text" name="projectName" value="myApp" id="projectName">
 							<span class="input-group-btn">
 								<button type="button" class="btn btn-default" onclick="browseImportProject()">Import</button>
 							</span>
@@ -54,7 +54,7 @@
 							<option value=""></option>
 						</select>
 					</div>
-					<div class="form-group" id="addonsForm">>
+					<div class="form-group" id="addonsForm">
 						<label for="addonsSelect">Addons</label>
 						<select data-placeholder="addons..." class="chosen-select form-control" multiple style="width:350px;" id="addonsSelect">
 							<option value=""></option>
@@ -129,6 +129,16 @@
 							<option value="sd">sdsd</option>
 						</select>
 					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<div class="checkbox">
+								<label for="advancedModeToggle">
+									<input type="checkbox" name="advancedModeToggle" value="">
+									Activate Advanced Mode
+								</label>
+							</div>
+						</div>
+					</div>
 				</form>
 			</div>
 		</div>
@@ -137,7 +147,7 @@
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="js/bootstrap-multiselect.js"></script>
 	<script src="app.js"></script>
-	<script src="chosen/chosen.jquery.js" type="text/javascript"></script>
+	<script src="chosen/chosen.jquery.min.js" type="text/javascript"></script>
 	<script type="text/javascript">
 		var config = {
 			'.chosen-select': {},
