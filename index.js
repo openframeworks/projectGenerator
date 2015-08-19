@@ -14,8 +14,16 @@ var menu = require('menu');
 
 
 //--------------------------------------------------------- load settings
-var settings = fs.readFileSync(path.resolve(__dirname, 'settings.json'));
-var obj = JSON.parse(settings, 'utf8');
+var obj;
+try {
+  var settings = fs.readFileSync(path.resolve(__dirname, 'settings.json'));
+	obj = JSON.parse(settings, 'utf8');
+} catch (e) {
+	obj = {
+		"defaultOfPath": "",
+		"useRelativePath": false
+	};
+}
 var defaultOfPath = obj["defaultOfPath"];
 var addons;
 
