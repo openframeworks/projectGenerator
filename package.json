@@ -27,7 +27,9 @@
     "electron-app"
   ],
   "dependencies": {
-    "electron-debug": "^0.1.1"
+    "electron-debug": "^0.1.1",
+    "async": "^1.4.0",
+    "walk": "^2.3.9"
   },
   "devDependencies": {
     "electron-packager": "^5.0.0",
