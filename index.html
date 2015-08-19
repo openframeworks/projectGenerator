@@ -1,186 +1,132 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
-  <head>
-    <title>project generator</title>
-  </head>
-  <!-- Include Twitter Bootstrap and jQuery: -->
-  <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css"/>
-  <link rel="stylesheet" href="chosen/chosen.css">
-  <script type="text/javascript" src="js/jquery.js" onload="window.$ = window.jQuery = module.exports;"></script>
-  <script type="text/javascript" src="js/bootstrap.min.js"></script>
-  <script type="text/javascript" src="js/bootstrap-multiselect.js"></script>
-  <link rel="stylesheet" href="css/bootstrap-multiselect.css" type="text/css"/>
-  <script src="app.js"></script>
-  <style>
-  .formElement {
-  padding-top: 20px;
-  }
-  .name{
-  font-size: 1.1em;
-  padding-bottom: 0.3em;
-  }
-
-  .label-spaced {
-    margin-right:5px;
-    margin-bottom:5px !important;
-    display:inline-block;
-}
-  </style>
-  
-
-
-  
-  <body style="padding:10px">
-    <h1>pg</h1>
-    <br/><br/>
-    <!-- We are using io.js <script>document.write(process.version)</script>
-    and Electron <script>document.write(process.versions['electron'])</script>. -->
-    
-    <!-- Nav tabs -->
-    <ul class="nav nav-tabs" role="tablist">
-      <li class="active"><a href="#create" role="tab" data-toggle="tab">create</a></li>
-      <li><a href="#update" role="tab" data-toggle="tab">update</a></li>
-      <li><a href="#settings" role="tab" data-toggle="tab">settings</a></li>
-    </ul>
-    <!-- Tab panes -->
-    <div class="tab-content">
-      <!------------------------------- create -------------------------------->
-      <div class="tab-pane active" id="create">
-        <form>
-          
-          <div class="formElement">
-            <div class="name">
-              project name:
-            </div>
-            <input type="text" name="projectName" style="width:250px;" value="myApp" id="projectName">
-          </div>
-          
-          <div class="formElement">
-            <div class="name">
-              project path:
-            </div>
-            <input type="text" name="projectPath" style="width:250px;" value="" id="projectPath">
-            <button type="button" onclick="getProjectPath()">set project location</button>
-          </div>
-          <div class="formElement">
-            <div class="name">
-              platforms:
-            </div>
-            <select data-placeholder="platforms..." class="chosen-select" multiple style="width:350px;" id="platformSelect">
-              <option value=""></option>
-            </select>
-          </div>
-          <div class="formElement">
-            <div class="name">
-              addons:
-            </div>
-            <select data-placeholder="addons..." class="chosen-select" multiple style="width:350px;" id="addonsSelect">
-              <option value=""></option>
-            </select>
-          </div>
-          <div class="formElement">
-            <button type="button" onclick="generate()">generate</button>
-          </div>
-          
-        </form>
-      </div>
-      <!------------------------------- update -------------------------------->
-      <div class="tab-pane" id="update">
-        <form>
-          
-         <div class="formElement">
-        <div class = "alert alert-warning" role="alert">warning this updates existing projects and 
-        it may overwrite files.  It will look for src folders as well as addons.mk file 
-        to make new project files.  recursive will do this recursively so please be careful, always be sure you know what folder you are working from.  If you do this from the wrong place, it will may wreak havok on your hard drive</div>
-        </div>
-
-          <div class="formElement">
-            <div class="name">
-              update path:
-            </div>
-            <input type="text" name="updatePath" style="width:250px;" value="" id="updatePath">
-            <button type="button" onclick="getUpdatePath()">set update location</button>
-          </div>
-
-          <div class="formElement">
-            <div class="name">
-              platforms:
-            </div>
-            <select data-placeholder="platforms..." class="chosen-select" multiple style="width:350px;" id="platformsSelectUpdate">
-              <option value="sd">sdsd</option>
-              <option value="sd">sdsd</option>
-              <option value="sd">sdsd</option>
-              <option value="sd">sdsd</option>
-            </select>
-          </div>
-
-          <div class="formElement">
-            <div class="name">
-              recursive:
-            </div>
-            <input type="checkbox" name="recursive" value="recursive" id="platformRecursive">
-          </div>
-          
-          <div class="formElement">
-            <button type="button" onclick="update()">update</button>
-          </div>
-          
-        </form>
-
-      </div>
-     
-      <!------------------------------- settings -------------------------------->
-      <div class="tab-pane" id="settings">
-        <form>
-          
-          <div class="formElement">
-            <div class="name">
-              of path:
-            </div>
-            <input type="text" name="ofPath"  style="width:350px;" value="" id="ofPath">
-            <button type="button" onclick="getPath()">set OF path</button>
-          </div>
-          
-        </form>
-      </div>
-    </div>
-    
-    
-    <script src="chosen/chosen.jquery.js" type="text/javascript"></script>
-    <script type="text/javascript">
-    var config = {
-    '.chosen-select'           : {},
-    '.chosen-select-deselect'  : {allow_single_deselect:true},
-    '.chosen-select-no-single' : {disable_search_threshold:10},
-    '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
-    '.chosen-select-width'     : {width:"95%"}
-    }
-    for (var selector in config) {
-    $(selector).chosen({width: '80%'});
-    }
-    </script>
-    
-    
-  </body>
+<head>
+	<meta charset="utf-8">
+	<title>project generator - openFrameworks</title>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="chosen/chosen.min.css">
+	<link rel="stylesheet" href="css/bootstrap-multiselect.css">
+	<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+	<header class="jumbotron">
+		<div class="container">
+			<h1>project generator</h1>
+		</div>
+	</header>
+	<section class="container">
+		<!-- Nav tabs -->
+		<ul class="nav nav-tabs" role="tablist">
+			<li class="active"><a href="#create" role="tab" data-toggle="tab">create</a></li>
+			<li><a href="#update" role="tab" data-toggle="tab">update</a></li>
+			<li><a href="#settings" role="tab" data-toggle="tab">settings</a></li>
+		</ul>
+		<!-- Tab panes -->
+		<div class="tab-content">
+			<!------------------------------- create -------------------------------->
+			<div class="tab-pane active" id="create">
+				<form>
+					<div class="form-group">
+						<label for="projectName">project name</label>
+						<input class="form-control" type="text" style="width:250px;" name="projectName" value="myApp" id="projectName">
+					</div>
+					<div class="form-group">
+						<label for="projectPath">project path</label>
+						<div class="input-group">
+							<input class="form-control" type="text" name="projectPath" value="" id="projectPath">
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="button" onclick="getProjectPath()">set project location</button>
+							</span>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="platformSelect">platforms</label>
+						<select class="form-control" data-placeholder="platforms..." class="chosen-select" multiple style="width:350px;" id="platformSelect">
+							<option value=""></option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="addonsSelect">addons</label>
+						<select class="form-control" data-placeholder="addons..." class="chosen-select" multiple style="width:350px;" id="addonsSelect">
+							<option value=""></option>
+						</select>
+					</div>
+					<div class="form-group">
+						<button class="btn btn-primary btn-lg" type="button" onclick="generate()">generate</button>
+					</div>
+				</form>
+			</div>
+			<!------------------------------- update -------------------------------->
+			<div class="tab-pane" id="update">
+				<form>
+					<div class="form-group">
+						<div class="alert alert-warning" role="alert">
+							<b>warning</b> this updates existing projects and
+							it may overwrite files.  It will look for src folders as well as addons.mk file
+							to make new project files.  recursive will do this recursively so please be careful,
+							always be sure you know what folder you are working from.  If you do this from the wrong place, it will may wreak havok on your hard drive
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="updatePath">update path</label>
+						<div class="input-group">
+							<input class="form-control" type="text" name="updatePath" value="" id="updatePath">
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="button" onclick="getUpdatePath()">set update location</button>
+							</span>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="platformsSelectUpdate">platforms</label>
+						<select class="form-control" data-placeholder="platforms..." class="chosen-select" multiple style="width:350px;" id="platformsSelectUpdate">
+							<option value="sd">sdsd</option>
+							<option value="sd">sdsd</option>
+							<option value="sd">sdsd</option>
+							<option value="sd">sdsd</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="platformRecursive">
+							<input type="checkbox" name="recursive" value="recursive" id="platformRecursive"> recursive
+						</label>
+					</div>
+					<div class="form-group">
+						<button class="btn btn-primary" type="button" onclick="update()">update</button>
+					</div>
+				</form>
+			</div>
+			<!------------------------------- settings -------------------------------->
+			<div class="tab-pane" id="settings">
+				<form>
+					<div class="form-group">
+						<label for="ofPath">of path</label>
+						<div class="input-group">
+							<input class="form-control" type="text" name="ofPath" value="" id="ofPath">
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="button" onclick="getPath()">set OF path</button>
+							</span>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</section>
+	<script type="text/javascript" src="js/jquery.js" onload="window.$ = window.jQuery = module.exports;"></script>
+	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="js/bootstrap-multiselect.js"></script>
+	<script src="app.js"></script>
+	<script src="chosen/chosen.jquery.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		var config = {
+			'.chosen-select': {},
+			'.chosen-select-deselect': { allow_single_deselect: true },
+			'.chosen-select-no-single': { disable_search_threshold: 10 },
+			'.chosen-select-no-results': { no_results_text: 'Oops, nothing found!' },
+			'.chosen-select-width': { width: "95%" }
+		}
+		for (var selector in config) {
+			$(selector).chosen({ width: '80%' });
+		}
+	</script>
+</body>
 </html>
-<!-- main -->
-<!-- // On the main process.
-var window = null;
-app.on('ready', function() {
-window = new BrowserWindow({width: 800, height: 600});
-window.loadUrl('file://' + __dirname + '/index.html');
-window.webContents.on('did-finish-load', function() {
-window.webContents.send('ping', 'whoooooooh!');
-});
-});
-// index.html
-<html>
-  <body>
-    <script>
-    require('ipc').on('ping', function(message) {
-    console.log(message);  // Prints "whoooooooh!"
-    });
-    </script>
-  </body>
-</html>
--->
