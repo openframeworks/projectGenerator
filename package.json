@@ -1,0 +1,38 @@
+{
+  "name": "pgelectron",
+  "productName": "Pgelectron",
+  "version": "0.0.0",
+  "description": "My priceless app",
+  "license": "MIT",
+  "main": "index.js",
+  "repository": "openframeworks/pgelectron",
+  "author": {
+    "name": "Léo Colombaro",
+    "email": "git@colombaro.fr",
+    "url": "openframeworks.cc"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-packager . $npm_package_productName --out=dist --ignore=dist --prune --asar --all --version=0.30.0"
+  },
+  "files": [
+    "index.js",
+    "index.html",
+    "index.css"
+  ],
+  "keywords": [
+    "electron-app"
+  ],
+  "dependencies": {
+    "electron-debug": "^0.1.1",
+    "async": "^1.4.0",
+    "walk": "^2.3.9"
+  },
+  "devDependencies": {
+    "electron-packager": "^5.0.0",
+    "electron-prebuilt": "^0.30.0"
+  }
+}
