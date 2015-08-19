@@ -11,15 +11,15 @@
 <body>
 	<header class="jumbotron">
 		<div class="container">
-			<h1>project generator</h1>
+			<h1>Project Generator</h1>
 		</div>
 	</header>
 	<section class="container">
 		<!-- Nav tabs -->
 		<ul class="nav nav-tabs" role="tablist">
-			<li class="active"><a href="#create" role="tab" data-toggle="tab">create</a></li>
-			<li><a href="#update" role="tab" data-toggle="tab">update</a></li>
-			<li><a href="#settings" role="tab" data-toggle="tab">settings</a></li>
+			<li class="active"><a href="#create" role="tab" data-toggle="tab">Generate</a></li>
+			<li><a href="#advanced" role="tab" data-toggle="tab" title="Batch operations">Advanced</a></li>
+			<li><a href="#settings" role="tab" data-toggle="tab">Settings</a></li>
 		</ul>
 		<!-- Tab panes -->
 		<div class="tab-content">
@@ -27,37 +27,50 @@
 			<div class="tab-pane active" id="create">
 				<form>
 					<div class="form-group">
-						<label for="projectName">project name</label>
+						<label for="projectName">Name</label>
 						<input class="form-control" type="text" style="width:250px;" name="projectName" value="myApp" id="projectName">
 					</div>
 					<div class="form-group">
-						<label for="projectPath">project path</label>
+						<label for="projectPath">Path</label>
 						<div class="input-group">
 							<input class="form-control" type="text" name="projectPath" value="" id="projectPath">
 							<span class="input-group-btn">
-								<button class="btn btn-default" type="button" onclick="getProjectPath()">set project location</button>
+								<button class="btn btn-default" type="button" onclick="browseProjectPath()">Browse...</button>
 							</span>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="platformSelect">platforms</label>
-						<select class="form-control" data-placeholder="platforms..." class="chosen-select" multiple style="width:350px;" id="platformSelect">
+						<label for="platformSelect">Platforms</label>
+						<select data-placeholder="platforms..." class="chosen-select form-control" multiple style="width:350px;" id="platformSelect">
 							<option value=""></option>
 						</select>
 					</div>
 					<div class="form-group">
-						<label for="addonsSelect">addons</label>
-						<select class="form-control" data-placeholder="addons..." class="chosen-select" multiple style="width:350px;" id="addonsSelect">
+						<label for="addonsSelect">Addons</label>
+						<select data-placeholder="addons..." class="chosen-select form-control" multiple style="width:350px;" id="addonsSelect">
 							<option value=""></option>
 						</select>
+						<a href="#http://www.ofxaddons.com/" id="visitOfxAddons">Browse & download more plugins on ofxaddons.com</a>
+						<div class="alert alert-danger" id="missingAddons">
+							You are missing the following plugins which are needed for this project:<br>
+							<span id="missingAddonsList"></span>
+						</div>
 					</div>
 					<div class="form-group">
-						<button class="btn btn-primary btn-lg" type="button" onclick="generate()">generate</button>
+						<div class="alert alert-info" role="alert" id="warning-create">
+							<p>This will create a new project file for your target platform(s), and a skeleton openFrameworks app in the "src" folder, including any addon(s) you select.</p>
+						</div>
+						<div class="alert alert-warning" role="alert" id="warning-update">
+							<h3>Warning</h3>
+							<p>Updating will use the "src" folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files (beware). This is useful to fix broken project configurations or update old projects to newer OF versions.</p>
+						</div>
+						<button class="btn btn-primary btn-lg" type="button" onclick="generate()" id="create-btn">Create New Project</button>
+						<button class="btn btn-lg" type="button" onclick="update()" id="update-btn">Update Project</button>
 					</div>
 				</form>
 			</div>
-			<!------------------------------- update -------------------------------->
-			<div class="tab-pane" id="update">
+			<!------------------------------- advanced -------------------------------->
+			<div class="tab-pane" id="advanced">
 				<form>
 					<div class="form-group">
 						<div class="alert alert-warning" role="alert">
@@ -75,15 +88,6 @@
 								<button class="btn btn-default" type="button" onclick="getUpdatePath()">set update location</button>
 							</span>
 						</div>
-					</div>
-					<div class="form-group">
-						<label for="platformsSelectUpdate">platforms</label>
-						<select class="form-control" data-placeholder="platforms..." class="chosen-select" multiple style="width:350px;" id="platformsSelectUpdate">
-							<option value="sd">sdsd</option>
-							<option value="sd">sdsd</option>
-							<option value="sd">sdsd</option>
-							<option value="sd">sdsd</option>
-						</select>
 					</div>
 					<div class="form-group">
 						<label for="platformRecursive">
@@ -106,6 +110,15 @@
 								<button class="btn btn-default" type="button" onclick="getPath()">set OF path</button>
 							</span>
 						</div>
+					</div>
+					<div class="form-group">
+						<label for="platformsSelectAdvanced">platforms</label>
+						<select class="form-control" data-placeholder="platforms..." class="chosen-select" multiple style="width:350px;" id="platformsSelectAdvanced">
+							<option value="sd">sdsd</option>
+							<option value="sd">sdsd</option>
+							<option value="sd">sdsd</option>
+							<option value="sd">sdsd</option>
+						</select>
 					</div>
 				</form>
 			</div>

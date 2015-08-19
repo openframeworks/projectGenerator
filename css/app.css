@@ -7,3 +7,27 @@
 	margin-bottom:5px !important;
 	display:inline-block;
 }
+
+#warning-create, #warning-update, #update-btn, #create-btn {
+	display: none;
+}
+
+#generate-mode-section.createMode #warning-create, #generate-mode-part.createMode #create-btn {
+	display: block;
+}
+
+#generate-mode-section.updateMode #warning-update, #generate-mode-part.updateMode #update-btn {
+	display: block;
+}
+
+#generate-mode-section.updateMode .btn {
+	background-color: #f99527;
+}
+
+#missingAddons, #generate-mode-section.createMode #missingAddons {
+	display: none;
+}
+
+	#missingAddons.missing {
+		display: block;
+	}

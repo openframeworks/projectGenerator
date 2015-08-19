@@ -7,6 +7,9 @@ var path = require('path');
 var async = require('async'); // https://github.com/caolan/async
 var Menu = require('menu');
 
+// Debugging: start the Electron PG from the terminal to see the messages from console.log()
+// Example: /path/to/PG/Contents/MacOS/Electron /path/to/PG/Contents/Ressources/app
+// Note: app.js's console.log is also visible from the WebKit inspector. (look for mainWindow.openDevTools() below )
 
 
 //--------------------------------------------------------- load settings
@@ -15,11 +18,9 @@ var obj = JSON.parse(settings, 'utf8');
 var defaultOfPath = obj["defaultOfPath"];
 var addons;
 
-
 if (!path.isAbsolute(defaultOfPath)) {
 	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../../../"), defaultOfPath));
-	console.log("......");
-	console.log(defaultOfPath);
+	console.log("...... OF path changed to absolute: " + defaultOfPath);
 	obj["defaultOfPath"] = defaultOfPath;
 }
 
@@ -57,10 +58,7 @@ app.on('ready', function () {
 	mainWindow.loadUrl('file://' + __dirname + '/index.html');
 
 	// Open the devtools.
-	//mainWindow.openDevTools();
-
-
-
+	mainWindow.openDevTools();
 
 	//when the window is loaded send the defaults
 	mainWindow.webContents.on('did-finish-load', function () {
@@ -151,9 +149,6 @@ app.on('ready', function () {
 	menu = Menu.buildFromTemplate(menuTmpl);
 	Menu.setApplicationMenu(menu);
 
-
-
-
 });
 
 
@@ -162,7 +157,10 @@ function parseAddonsAndUpdateSelect() {
 
 	//path = require('path').resolve(__dirname, defaultOfPath + "/addons");
 	addons = getDirectories(defaultOfPath + "/addons");
+
+	console.log("Reloading the addons folder, these were found:");
 	console.log(addons);
+
 	mainWindow.webContents.send('setAddons', addons)
 
 
@@ -179,17 +177,29 @@ function getDirectories(srcpath) {
 
 	var fsTemp = require('fs');
 	var pathTemp = require('path');
+	var folder;
 
-	return fsTemp.readdirSync(srcpath).filter(function (file) {
+	try {
 
-		console.log(srcpath);
-		console.log(file);
+		return fsTemp.readdirSync(srcpath).filter(function (file) {
 
-		joinedPath = pathTemp.join(srcpath, file)
-		if (joinedPath != null) {
-			return fsTemp.statSync(joinedPath).isDirectory();
+			//console.log(srcpath);
+			//console.log(file);
+
+			joinedPath = pathTemp.join(srcpath, file);
+			if (joinedPath != null) {
+				// only accept folders (potential addons)
+				return fsTemp.statSync(joinedPath).isDirectory();
+			}
+		});
+	} catch (e) {
+		if (e.code === 'ENOENT') {
+			console.log("This doesn't seem to be a valid addons folder:\n" + srcpath);
+			mainWindow.webContents.send('sendUIMessage', "No addons were found in " + srcpath + ".\nIs the OF path correct?");
+		} else {
+			throw e;
 		}
-	});
+	}
 }
 
 // function getDirs(srcpath, cb) {
@@ -211,6 +221,60 @@ function getDirectories(srcpath) {
 //   });
 // }
 
+ipc.on('isOFProjectFolder', function (event, project) {
+	var fsTemp = require('fs');
+	var pathTemp = require('path');
+	var folder;
+	folder = pathTemp.join(project['projectPath'], project['projectName']);
+
+	try {
+
+		var tmpFiles = fsTemp.readdirSync(folder);
+		if (!tmpFiles || tmpFiles.length <= 1) return false; // we need at least 2 files/folders within
+
+		// todo: also check for config.make & addons.make ?
+		var foundSrcFolder = false;
+		var foundAddons = false;
+		tmpFiles.forEach(function (el, i) {
+			if (el == 'src') foundSrcFolder = true;
+			if (el == 'addons.make') foundAddons = true;
+		});
+
+		if (foundSrcFolder) {
+			event.sender.send('setGenerateMode', 'updateMode');
+
+			// todo: pre-fill addons based on the
+			if (foundAddons) {
+				var projectAddons = fsTemp.readFileSync(pathTemp.resolve(folder, 'addons.make')).toString().split("\n");
+
+				projectAddons = projectAddons.filter(function (el) {
+					if (el == '' || el == 'addons') return false; // eleminates these items
+					else return true;
+				});
+
+				//console.log(projectAddons);
+
+				event.sender.send('selectAddons', projectAddons);
+			}
+		}
+		else {
+			event.sender.send('setGenerateMode', 'createMode');
+		}
+
+		/*if (joinedPath != null){
+		  // only accept folders (potential addons)
+		  return fsTemp.statSync(joinedPath).isDirectory();
+		}*/
+	} catch (e) { // error reading dir
+		event.sender.send('setGenerateMode', 'createMode');
+
+		if (e.code === 'ENOENT') { // it's not a directory
+			return false;
+		} else {
+			throw e;
+		}
+	}
+});
 
 // todo: default directories
 
@@ -321,13 +385,10 @@ ipc.on('generate', function (event, arg) {
 	if (generate['projectName'] != null &&
 		generate['projectPath'] != null) {
 
-
 		projectString = "-p\"" + pathTemp.join(generate['projectPath'], generate['projectName']) + "\""
 	}
 
-
 	var pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "commandLinePG"));
-
 
 	pgApp = pgApp.replace(/ /g, '\\ ');
 
