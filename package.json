@@ -1,8 +1,8 @@
 {
   "name": "pgelectron",
-  "productName": "Pgelectron",
-  "version": "0.0.0",
-  "description": "My priceless app",
+  "productName": "pgElectron",
+  "version": "0.0.1",
+  "description": "repo for testing a gui using electron for the project generator",
   "license": "MIT",
   "main": "index.js",
   "repository": "openframeworks/pgelectron",
@@ -19,16 +19,18 @@
     "build": "electron-packager . $npm_package_productName --out=dist --ignore=dist --prune --asar --all --version=0.30.0"
   },
   "files": [
-    "index.js",
     "index.html",
-    "index.css"
+    "js/*",
+    "css/*",
+    "app/*",
+    "chosen/*",
+    "settings.json"
   ],
   "keywords": [
     "electron-app"
   ],
   "dependencies": {
     "electron-debug": "^0.1.1",
-    "async": "^1.4.0",
     "walk": "^2.3.9"
   },
   "devDependencies": {
