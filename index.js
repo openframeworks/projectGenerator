@@ -1,11 +1,12 @@
+"use strict";
+
 var app = require('app');  // Module to control application life.
 var BrowserWindow = require('browser-window');  // Module to create native browser window.
 var dialog = require('dialog');
 var ipc = require('ipc');
 var fs = require('fs');
 var path = require('path');
-var async = require('async'); // https://github.com/caolan/async
-var Menu = require('menu');
+var menu = require('menu');
 
 // Debugging: start the Electron PG from the terminal to see the messages from console.log()
 // Example: /path/to/PG/Contents/MacOS/Electron /path/to/PG/Contents/Ressources/app
@@ -48,7 +49,11 @@ app.on('window-all-closed', function () {
 // initialization and is ready to create browser windows.
 app.on('ready', function () {
 	// Create the browser window.
-	mainWindow = new BrowserWindow({ width: 500, height: 800 });
+	mainWindow = new BrowserWindow({
+		width: 500,
+		height: 800,
+		resizable: false
+	});
 
 	// load jquery here:
 	// http://stackoverflow.com/questions/30271011/electron-jquery-errors
@@ -58,7 +63,7 @@ app.on('ready', function () {
 	mainWindow.loadUrl('file://' + __dirname + '/index.html');
 
 	// Open the devtools.
-	mainWindow.openDevTools();
+	//mainWindow.openDevTools();
 
 	//when the window is loaded send the defaults
 	mainWindow.webContents.on('did-finish-load', function () {
@@ -75,7 +80,7 @@ app.on('ready', function () {
 	mainWindow.on('closed', function () {
 
 		mainWindow = null;
-		process.exit()
+		process.exit();
 		// Dereference the window object, usually you would store windows
 		// in an array if your app supports multi windows, this is the time
 		// when you should delete the corresponding element.
@@ -146,8 +151,8 @@ app.on('ready', function () {
 	  	]
 	  }
 	];
-	menu = Menu.buildFromTemplate(menuTmpl);
-	Menu.setApplicationMenu(menu);
+	var menuV = menu.buildFromTemplate(menuTmpl);
+	menu.setApplicationMenu(menuV);
 
 });
 
@@ -161,7 +166,7 @@ function parseAddonsAndUpdateSelect() {
 	console.log("Reloading the addons folder, these were found:");
 	console.log(addons);
 
-	mainWindow.webContents.send('setAddons', addons)
+	mainWindow.webContents.send('setAddons', addons);
 
 
 }
@@ -177,7 +182,6 @@ function getDirectories(srcpath) {
 
 	var fsTemp = require('fs');
 	var pathTemp = require('path');
-	var folder;
 
 	try {
 
@@ -186,8 +190,8 @@ function getDirectories(srcpath) {
 			//console.log(srcpath);
 			//console.log(file);
 
-			joinedPath = pathTemp.join(srcpath, file);
-			if (joinedPath != null) {
+			var joinedPath = pathTemp.join(srcpath, file);
+			if (joinedPath !== null) {
 				// only accept folders (potential addons)
 				return fsTemp.statSync(joinedPath).isDirectory();
 			}
@@ -230,14 +234,14 @@ ipc.on('isOFProjectFolder', function (event, project) {
 	try {
 
 		var tmpFiles = fsTemp.readdirSync(folder);
-		if (!tmpFiles || tmpFiles.length <= 1) return false; // we need at least 2 files/folders within
+		if (!tmpFiles || tmpFiles.length <= 1) {return false; } // we need at least 2 files/folders within
 
 		// todo: also check for config.make & addons.make ?
 		var foundSrcFolder = false;
 		var foundAddons = false;
 		tmpFiles.forEach(function (el, i) {
-			if (el == 'src') foundSrcFolder = true;
-			if (el == 'addons.make') foundAddons = true;
+			if (el == 'src') {foundSrcFolder = true;}
+			if (el == 'addons.make') {foundAddons = true;}
 		});
 
 		if (foundSrcFolder) {
@@ -248,8 +252,8 @@ ipc.on('isOFProjectFolder', function (event, project) {
 				var projectAddons = fsTemp.readFileSync(pathTemp.resolve(folder, 'addons.make')).toString().split("\n");
 
 				projectAddons = projectAddons.filter(function (el) {
-					if (el == '' || el == 'addons') return false; // eleminates these items
-					else return true;
+					if (el === '' || el === 'addons') {return false;} // eleminates these items
+					else {return true;}
 				});
 
 				//console.log(projectAddons);
@@ -281,7 +285,7 @@ ipc.on('isOFProjectFolder', function (event, project) {
 //----------------------------------------------------------- ipc
 
 ipc.on('refreshAddonList', function (event, arg) {
-	parseAddonsAndUpdateSelect()
+	parseAddonsAndUpdateSelect();
 });
 
 
@@ -299,20 +303,20 @@ ipc.on('update', function (event, arg) {
 	var recursiveString = "";
 
 
-	if (update['updatePath'] != null) {
-		updatePath = "-p\"" + update['updatePath'] + "\""
+	if (update['updatePath'] !== null) {
+		updatePath = "-p\"" + update['updatePath'] + "\"";
 	}
 
-	if (update['platformList'] != null) {
-		platformString = "-x\"" + update['platformList'].join(", ") + "\""
+	if (update['platformList'] !== null) {
+		platformString = "-x\"" + update['platformList'].join(", ") + "\"";
 	}
 
-	if (update['ofPath'] != null) {
-		pathString = "-o\"" + update['ofPath'] + "\""
+	if (update['ofPath'] !== null) {
+		pathString = "-o\"" + update['ofPath'] + "\"";
 	}
 
-	if (update['updateRecursive'] == true) {
-		recursiveString = "-r"
+	if (update['updateRecursive'] === true) {
+		recursiveString = "-r";
 	}
 
 	var pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "commandLinePG"));
@@ -363,29 +367,29 @@ ipc.on('generate', function (event, arg) {
 
 	var pathTemp = require('path');
 
-	var projectString = ""
+	var projectString = "";
 	var pathString = "";
 	var addonString = "";
 	var platformString = "";
 
 	console.log(generate);
 
-	if (generate['platformList'] != null) {
-		platformString = "-x\"" + generate['platformList'].join(", ") + "\""
+	if (generate['platformList'] !== null) {
+		platformString = "-x\"" + generate['platformList'].join(", ") + "\"";
 	}
 
-	if (generate['addonList'] != null) {
-		addonString = "-a\"" + generate['addonList'].join(", ") + "\""
+	if (generate['addonList'] !== null) {
+		addonString = "-a\"" + generate['addonList'].join(", ") + "\"";
 	}
 
-	if (generate['ofPath'] != null) {
-		pathString = "-o\"" + generate['ofPath'] + "\""
+	if (generate['ofPath'] !== null) {
+		pathString = "-o\"" + generate['ofPath'] + "\"";
 	}
 
-	if (generate['projectName'] != null &&
-		generate['projectPath'] != null) {
+	if (generate.projectName !== null &&
+		generate.projectPath !== null) {
 
-		projectString = "-p\"" + pathTemp.join(generate['projectPath'], generate['projectName']) + "\""
+		projectString = "-p\"" + pathTemp.join(generate['projectPath'], generate['projectName']) + "\"";
 	}
 
 	var pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "commandLinePG"));
@@ -414,7 +418,7 @@ ipc.on('pickOfPath', function (event, arg) {
 		properties: ['openDirectory'],
 		filters: []
 	}, function (filenames) {
-		if (filenames != null) {
+		if (filenames !== null) {
 			defaultOfPath = filenames[0];
 			event.sender.send('setOfPath', filenames[0]);
 		}
@@ -428,7 +432,7 @@ ipc.on('pickUpdatePath', function (event, arg) {
 		properties: ['openDirectory'],
 		filters: []
 	}, function (filenames) {
-		if (filenames != null) {
+		if (filenames !== null) {
 			defaultOfPath = filenames[0];
 			event.sender.send('setUpdatePath', filenames[0]);
 		}
@@ -442,7 +446,7 @@ ipc.on('pickProjectPath', function (event, arg) {
 		properties: ['openDirectory'],
 		filters: []
 	}, function (filenames) {
-		if (filenames != null) {
+		if (filenames !== null) {
 			event.sender.send('setProjectPath', filenames[0]);
 		}
 	});

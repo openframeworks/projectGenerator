@@ -1,4 +1,4 @@
-
+"use strict";
 // instead of ipc, maybe?
 // https://github.com/atom/electron/blob/master/docs/api/remote.md
 
@@ -46,9 +46,9 @@ ipc.on('setAddons', function (arg) {
 	var select = document.getElementById("addonsSelect");
 	select.innerHTML = "";
 
-	if (arg != null && arg.length > 0) {
+	if (arg !== null && arg.length > 0) {
 		// add:
-		for (i = 0; i < arg.length; i++) {
+		for (var i = 0; i < arg.length; i++) {
 			var option = document.createElement("option");
 			option.text = arg[i];
 			select.add(option);
@@ -110,7 +110,7 @@ function setOFPath(arg) {
 	} else {
 
 		// else check settings for how we want this path.... make relative if we need to:
-		if (defaultSettings['useRelativePath'] == true) {
+		if (defaultSettings['useRelativePath'] === true) {
 			var relativePath = path.normalize(path.relative(path.resolve(__dirname), arg)) + "/";
 			elem.value = relativePath;
 		} else {
@@ -126,7 +126,7 @@ function setOFPath(arg) {
 			console.log("Unable to save defaultOfPath to settings.json... (Error=" + err.code + ")");
 			ipc.send('sendUIMessage', "OFPath changed but unable to write out the setting.");
 		}
-		else console.log("defaultOfPath=" + elem.value + " (written to settings.json)");
+		else {console.log("defaultOfPath=" + elem.value + " (written to settings.json)");}
 	});
 
 	// trigger reload addons from the new OF path
@@ -146,15 +146,15 @@ function setup() {
 
 	select.innerHTML = "";
 	//selectUpdate.innerHTML = "";
-
+	var option, i;
 	for (i = 0; i < platforms.length; i++) {
-		var option = document.createElement("option");
+		option = document.createElement("option");
 		option.text = platforms[i];
 		select.add(option);
 	}
 
 	for (i = 0; i < platforms.length; i++) {
-		var option = document.createElement("option");
+		option = document.createElement("option");
 		option.text = platforms[i];
 		//selectUpdate.add(option);
 	}
@@ -186,37 +186,33 @@ function generate() {
 
 	// let's get all the info:
 
-	var generate = {}
+	var gen = {};
 
-	generate['projectName'] = $("#projectName").val();
-	generate['projectPath'] = $("#projectPath").val();
-	generate['platformList'] = $("#platformSelect").val();
-	generate['addonList'] = $("#addonsSelect").val();
-	generate['ofPath'] = $("#ofPath").val();
+	gen['projectName'] = $("#projectName").val();
+	gen['projectPath'] = $("#projectPath").val();
+	gen['platformList'] = $("#platformSelect").val();
+	gen['addonList'] = $("#addonsSelect").val();
+	gen['ofPath'] = $("#ofPath").val();
 
-	//console.log(generate);
+	//console.log(gen);
 
-	ipc.send('generate', generate);
+	ipc.send('generate', gen);
 
 }
 
 
 function update() {
-
 	// let's get all the info:
 
-	var update = {}
+	var up = {};
 
-	update['updatePath'] = $("#updatePath").val();
-	update['platformList'] = $("#platformSelect").val();
-	update['updateRecursive'] = $("#platformRecursive").is(":checked")
-	update['ofPath'] = $("#ofPath").val();
-	//console.log(update);
+	up['updatePath'] = $("#updatePath").val();
+	up['platformList'] = $("#platformSelect").val();
+	up['updateRecursive'] = $("#platformRecursive").is(":checked");
+	up['ofPath'] = $("#ofPath").val();
+	//console.log(up);
 
-	// //console.log(generate);
-
-	ipc.send('update', update);
-
+	ipc.send('update', up);
 }
 
 function switchGenerateMode(mode) {
@@ -232,7 +228,7 @@ function switchGenerateMode(mode) {
 		console.log('Switching GenerateMode to Create...');
 
 		// if previously in update mode, deselect Addons
-		if ($("#generate-mode-section").hasClass('updateMode')) clearAddonSelection();
+		if ($("#generate-mode-section").hasClass('updateMode')) {clearAddonSelection();}
 
 		$("#generate-mode-section").removeClass('updateMode').addClass('createMode');
 	}
@@ -250,11 +246,11 @@ function clearAddonSelection() {
 //---------------------------------------- button calls this
 function getPath() {
 	ipc.send('pickOfPath', '');	// current path could go here
-};
+}
 
 function browseProjectPath() {
 	ipc.send('pickProjectPath', '');	// current path could go here
-};
+}
 
 function getUpdatePath() {
 	ipc.send('pickUpdatePath', '');	// current path could go here
