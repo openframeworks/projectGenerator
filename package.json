@@ -16,7 +16,7 @@
   },
   "scripts": {
     "start": "electron .",
-    "build": "electron-packager . $npm_package_productName --out=dist --ignore=dist --prune --asar --all --version=0.30.0 --icon=icon.ico"
+    "build": "electron-packager . $npm_package_productName --out=dist --ignore=['dist','readme.md'] --prune --asar --all --version=0.30.0 --icon=icon.ico"
   },
   "files": [
     "index.html",
