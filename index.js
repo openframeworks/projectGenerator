@@ -4,7 +4,7 @@ var dialog = require('dialog');
 var ipc = require('ipc');
 var fs = require('fs');
 var path = require('path');
-var async = require('async'); // https://github.com/caolan/async
+//var async = require('async'); // https://github.com/caolan/async
 var Menu = require('menu');
 
 // Debugging: start the Electron PG from the terminal to see the messages from console.log()
@@ -438,7 +438,7 @@ ipc.on('pickUpdatePath', function (event, arg) {
 
 ipc.on('pickProjectPath', function (event, arg) {
 	path = dialog.showOpenDialog({
-		title: 'select folder for project, typically apps/myApps',
+		title: 'select parent folder for project, typically apps/myApps',
 		properties: ['openDirectory'],
 		filters: []
 	}, function (filenames) {
@@ -446,4 +446,21 @@ ipc.on('pickProjectPath', function (event, arg) {
 			event.sender.send('setProjectPath', filenames[0]);
 		}
 	});
+});
+
+ipc.on('pickProjectImport', function(event, arg) {
+  path = dialog.showOpenDialog({
+    title: 'Select the folder of your project, typically apps/myApps/myGeniusApp',
+    properties: ['openDirectory'],
+    filters: []
+  }, function(filenames) {
+    if (filenames != null) {
+      // gather project information
+      var tmpPath = require('path');
+      var projectSettings = {};
+      projectSettings['projectName'] = tmpPath.basename( filenames[0] );
+      projectSettings['projectPath'] = tmpPath.dirname( filenames[0] );
+      event.sender.send('importProjectSettings', projectSettings);
+    }
+  });
 });

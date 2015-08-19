@@ -12,11 +12,11 @@
 	display: none;
 }
 
-#generate-mode-section.createMode #warning-create, #generate-mode-part.createMode #create-btn {
+#generate-mode-section.createMode #warning-create, #generate-mode-section.createMode #create-btn {
 	display: block;
 }
 
-#generate-mode-section.updateMode #warning-update, #generate-mode-part.updateMode #update-btn {
+#generate-mode-section.updateMode #warning-update,#generate-mode-section.updateMode #update-btn {
 	display: block;
 }
 
@@ -28,6 +28,31 @@
 	display: none;
 }
 
-	#missingAddons.missing {
-		display: block;
-	}
+#missingAddons.missing {
+	display: block;
+}
+
+#visitOfxAddons, .input-info {
+	display: block;
+	font-size: 0.8em;
+	color: grey;
+	display: none;
+}
+
+.formElement:last-child, #missingAddons:last-child, .formElement#addonsForm {
+	padding-bottom: 0;
+	margin-bottom: 0;
+}
+
+#missingAddons {
+	margin-top: 20px;
+}
+
+.info-message{
+	padding-top: 20px;
+}
+
+.nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
+	background-color: #333;
+}
+

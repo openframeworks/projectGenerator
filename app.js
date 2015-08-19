@@ -36,6 +36,13 @@ ipc.on('setProjectPath', function (arg) {
 ipc.on('setGenerateMode', function (arg) {
 	switchGenerateMode(arg);
 });
+
+ipc.on('importProjectSettings', function(settings){
+	$("#projectPath").val(settings['projectPath']);
+	$("#projectName").val(settings['projectName']).trigger('blur'); // blur triggers addon scanning
+});
+
+
 /*ipc.on('setUpdatePath', function(arg) {
 	var elem = document.getElementById("updatePath");
 	elem.value = arg;
@@ -249,12 +256,16 @@ function clearAddonSelection() {
 
 //---------------------------------------- button calls this
 function getPath() {
-	ipc.send('pickOfPath', '');	// current path could go here
+	ipc.send('pickOfPath', '');	// current path could go here (but the OS also remembers the last used folder)
 };
 
 function browseProjectPath() {
 	ipc.send('pickProjectPath', '');	// current path could go here
 };
+
+function browseImportProject() {
+	ipc.send('pickProjectImport', '');
+}
 
 function getUpdatePath() {
 	ipc.send('pickUpdatePath', '');	// current path could go here

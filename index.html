@@ -16,7 +16,7 @@
 	</header>
 	<section class="container">
 		<!-- Nav tabs -->
-		<ul class="nav nav-tabs" role="tablist">
+		<ul class="nav nav-pills" role="tablist">
 			<li class="active"><a href="#create" role="tab" data-toggle="tab">Generate</a></li>
 			<li><a href="#advanced" role="tab" data-toggle="tab" title="Batch operations">Advanced</a></li>
 			<li><a href="#settings" role="tab" data-toggle="tab">Settings</a></li>
@@ -25,10 +25,19 @@
 		<div class="tab-content">
 			<!------------------------------- create -------------------------------->
 			<div class="tab-pane active" id="create">
-				<form>
+				<div class="info-message">
+					<p>This is useful to generate a new project, fix broken project configurations, change a project's target platform or (try to) update older projects to newer OF versions.</p>
+				</div>
+				<form id="generate-mode-section" class="createMode">
 					<div class="form-group">
 						<label for="projectName">Name</label>
-						<input class="form-control" type="text" style="width:250px;" name="projectName" value="myApp" id="projectName">
+						<div class="input-group">
+							<input class="form-control" type="text" style="width:250px;" name="projectName" value="myApp" id="projectName">
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" onclick="browseImportProject()">Import</button>
+							</span>
+						</div>
+              			<span class="input-info">Name your project or click "import" to load settings from an existing project.</span>
 					</div>
 					<div class="form-group">
 						<label for="projectPath">Path</label>
@@ -45,7 +54,7 @@
 							<option value=""></option>
 						</select>
 					</div>
-					<div class="form-group">
+					<div class="form-group" id="addonsForm">>
 						<label for="addonsSelect">Addons</label>
 						<select data-placeholder="addons..." class="chosen-select form-control" multiple style="width:350px;" id="addonsSelect">
 							<option value=""></option>
@@ -62,7 +71,7 @@
 						</div>
 						<div class="alert alert-warning" role="alert" id="warning-update">
 							<h3>Warning</h3>
-							<p>Updating will use the "src" folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files (beware). This is useful to fix broken project configurations or update old projects to newer OF versions.</p>
+							<p>Updating will use the "src" folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files (beware).</p>
 						</div>
 						<button class="btn btn-primary btn-lg" type="button" onclick="generate()" id="create-btn">Create New Project</button>
 						<button class="btn btn-lg" type="button" onclick="update()" id="update-btn">Update Project</button>
