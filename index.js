@@ -71,7 +71,7 @@ app.on('ready', function () {
 	mainWindow.loadUrl('file://' + __dirname + '/index.html');
 
 	// Open the devtools.
-	//mainWindow.openDevTools();
+	mainWindow.openDevTools();
 
 	//when the window is loaded send the defaults
 	mainWindow.webContents.on('did-finish-load', function () {

@@ -4,8 +4,7 @@
 	<meta charset="utf-8">
 	<title>project generator - openFrameworks</title>
 	<link rel="stylesheet" href="css/bootstrap.min.css">
-	<link rel="stylesheet" href="chosen/chosen.min.css">
-	<link rel="stylesheet" href="css/bootstrap-multiselect.css">
+	<link rel="stylesheet" href="css/select2.css">
 	<link rel="stylesheet" href="css/app.css">
 </head>
 <body>
@@ -123,10 +122,10 @@
 					<div class="form-group">
 						<label for="platformsSelectAdvanced">platforms</label>
 						<select class="form-control" data-placeholder="platforms..." class="chosen-select" multiple style="width:350px;" id="platformsSelectAdvanced">
-							<option value="sd">sdsd</option>
-							<option value="sd">sdsd</option>
-							<option value="sd">sdsd</option>
-							<option value="sd">sdsd</option>
+<option value=""><option>
+  <option value="1">Mustard</option>
+  <option value="2">Ketchup</option>
+  <option value="3">Relish</option>
 						</select>
 					</div>
 					<div class="form-group">
@@ -145,20 +144,15 @@
 	</section>
 	<script type="text/javascript" src="js/jquery.js" onload="window.$ = window.jQuery = module.exports;"></script>
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="js/bootstrap-multiselect.js"></script>
+	<script type="text/javascript" src="js/select2.full.min.js"></script>
 	<script src="app.js"></script>
-	<script src="chosen/chosen.jquery.min.js" type="text/javascript"></script>
 	<script type="text/javascript">
-		var config = {
-			'.chosen-select': {},
-			'.chosen-select-deselect': { allow_single_deselect: true },
-			'.chosen-select-no-single': { disable_search_threshold: 10 },
-			'.chosen-select-no-results': { no_results_text: 'Oops, nothing found!' },
-			'.chosen-select-width': { width: "95%" }
-		}
-		for (var selector in config) {
-			$(selector).chosen({ width: '80%' });
-		}
+		
+
+
+
+
 	</script>
+	
 </body>
 </html>

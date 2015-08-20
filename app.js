@@ -53,6 +53,8 @@ ipc.on('setAddons', function (arg) {
 	var select = document.getElementById("addonsSelect");
 	select.innerHTML = "";
 
+
+
 	if (arg !== null && arg.length > 0) {
 		// add:
 		for (var i = 0; i < arg.length; i++) {
@@ -65,7 +67,9 @@ ipc.on('setAddons', function (arg) {
 		$("#addonsSelect").attr("data-placeholder", "no addons found, is OF path right?");
 	}
 
-	$("#addonsSelect").trigger("chosen:updated");
+	// call select2 to make a good selectable 
+	$("#addonsSelect").select2();
+	//$("#addonsSelect").trigger("chosen:updated");
 });
 
 // select the list of addons and notify if some aren't installed
@@ -85,8 +89,10 @@ ipc.on('selectAddons', function (arg) {
 			$(this).removeAttr('selected');
 		}
 	});
-	$("#addonsSelect").trigger("chosen:updated");
+	
 
+	$("#addonsSelect").select2();
+	
 	if (neededAddons.length > 0) {
 		$("#missingAddons").addClass("missing");
 		$("#missingAddonsList").text(neededAddons.toString());
@@ -146,8 +152,7 @@ function setOFPath(arg) {
 function setup() {
 
 
-	$('select').chosen();
-
+	
 	var select = $("#platformSelect").get(0);
 	//var selectUpdate = document.getElementById("platformsSelectUpdate");
 
@@ -165,10 +170,6 @@ function setup() {
 		option.text = platforms[i];
 		//selectUpdate.add(option);
 	}
-
-
-	$("#platformSelect").trigger("chosen:updated");
-	//$("#platformsSelectUpdate").trigger("chosen:updated");
 
 	$("#projectName").val('myApp');
 
@@ -246,7 +247,8 @@ function clearAddonSelection() {
 	$.each(installedAddons, function (i, ia) {
 		$(this).removeAttr('selected');
 	});
-	$("#addonsSelect").trigger("chosen:updated");
+	$("#addonsSelect").select2();
+	
 }
 
 
