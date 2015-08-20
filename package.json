@@ -1,14 +1,14 @@
 {
   "name": "pgelectron",
-  "productName": "Pgelectron",
-  "version": "0.0.0",
-  "description": "My priceless app",
+  "productName": "pgElectron",
+  "version": "0.0.1",
+  "description": "repo for testing a gui using electron for the project generator",
   "license": "MIT",
   "main": "index.js",
   "repository": "openframeworks/pgelectron",
   "author": {
-    "name": "Léo Colombaro",
-    "email": "git@colombaro.fr",
+    "name": "zach lieberman",
+    "email": "?",
     "url": "openframeworks.cc"
   },
   "engines": {
@@ -16,19 +16,20 @@
   },
   "scripts": {
     "start": "electron .",
-    "build": "electron-packager . $npm_package_productName --out=dist --prune --ignore=dist --ignore=readme.md --all --version=0.30.0"
+    "build": "electron-packager . $npm_package_productName --out=dist --ignore=['dist','readme.md'] --prune --all --version=0.30.0 --icon=icon.ico"
   },
   "files": [
-    "index.js",
     "index.html",
-    "index.css"
+    "js/*",
+    "css/*",
+    "app/*",
+    "chosen/*"
   ],
   "keywords": [
     "electron-app"
   ],
   "dependencies": {
     "electron-debug": "^0.1.1",
-    "async": "^1.4.0",
     "walk": "^2.3.9"
   },
   "devDependencies": {
