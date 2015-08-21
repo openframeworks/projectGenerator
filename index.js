@@ -23,7 +23,8 @@ try {
 		"defaultOfPath": "",
 		"useRelativePath": false,
 		"advancedMode": false,
-		"lastUsedProjectPath" : ""
+		"lastUsedProjectPath" : "",
+		"defaultPlatform" : "Unknown"
 	};
 }
 var defaultOfPath = obj["defaultOfPath"];
