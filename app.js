@@ -27,11 +27,14 @@ ipc.on('setDefaults', function (arg) {
 	defaultSettings = arg;
 	setOFPath(defaultSettings['defaultOfPath']);
 	enableAdvancedMode( defaultSettings['advancedMode'] );
+	$("#projectPath").val( defaultSettings['lastUsedProjectPath'] );
 });
 
 ipc.on('setProjectPath', function (arg) {
 	var elem = document.getElementById("projectPath");
 	elem.value = arg;
+	defaultSettings['lastUsedProjectPath'] = arg;
+	saveDefaultSettings();
 });
 
 ipc.on('setGenerateMode', function (arg) {

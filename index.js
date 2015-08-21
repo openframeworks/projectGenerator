@@ -22,7 +22,8 @@ try {
 	obj = {
 		"defaultOfPath": "",
 		"useRelativePath": false,
-		"advancedMode" : false
+		"advancedMode": false,
+		"lastUsedProjectPath" : ""
 	};
 }
 var defaultOfPath = obj["defaultOfPath"];
@@ -441,7 +442,7 @@ ipc.on('pickUpdatePath', function (event, arg) {
 		properties: ['openDirectory'],
 		filters: []
 	}, function (filenames) {
-		if (filenames !== null) {
+		if (filenames !== undefined && filenames.length > 0) {
 			defaultOfPath = filenames[0];
 			event.sender.send('setUpdatePath', filenames[0]);
 		}
@@ -455,7 +456,7 @@ ipc.on('pickProjectPath', function (event, arg) {
 		properties: ['openDirectory'],
 		filters: []
 	}, function (filenames) {
-		if (filenames !== null) {
+		if (filenames !== undefined && filenames.length > 0) {
 			event.sender.send('setProjectPath', filenames[0]);
 		}
 	});
