@@ -21,7 +21,8 @@ try {
 } catch (e) {
 	obj = {
 		"defaultOfPath": "",
-		"useRelativePath": false
+		"useRelativePath": false,
+		"advancedMode" : false
 	};
 }
 var defaultOfPath = obj["defaultOfPath"];
@@ -58,7 +59,7 @@ app.on('window-all-closed', function () {
 app.on('ready', function () {
 	// Create the browser window.
 	mainWindow = new BrowserWindow({
-		width: 500,
+		width: 900,
 		height: 800,
 		resizable: false
 	});

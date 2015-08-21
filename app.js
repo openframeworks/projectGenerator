@@ -22,10 +22,11 @@ ipc.on('setup', function (arg) {
 
 
 //-----------------------------------------
-// this is called from main when defualts are loaded in:
+// this is called from main when defaults are loaded in:
 ipc.on('setDefaults', function (arg) {
 	defaultSettings = arg;
 	setOFPath(defaultSettings['defaultOfPath']);
+	enableAdvancedMode( defaultSettings['advancedMode'] );
 });
 
 ipc.on('setProjectPath', function (arg) {
@@ -133,14 +134,9 @@ function setOFPath(arg) {
 
 	// update settings & remember the new OF path for next time
 	defaultSettings['defaultOfPath'] = elem.value;
-	var fs = require('fs');
-	fs.writeFile(path.resolve(__dirname, 'settings.json'), JSON.stringify(defaultSettings), function (err) {
-		if (err) {
-			console.log("Unable to save defaultOfPath to settings.json... (Error=" + err.code + ")");
-			ipc.send('sendUIMessage', "OFPath changed but unable to write out the setting.");
-		}
-		else {console.log("defaultOfPath=" + elem.value + " (written to settings.json)");}
-	});
+	if( !saveDefaultSettings() ){
+		ipc.send('sendUIMessage', "OFPath changed but unable to write out the setting.");
+	}
 
 	// trigger reload addons from the new OF path
 	ipc.send('refreshAddonList', '');
@@ -151,8 +147,6 @@ function setOFPath(arg) {
 //----------------------------------------
 function setup() {
 
-
-	
 	var select = $("#platformSelect").get(0);
 	//var selectUpdate = document.getElementById("platformsSelectUpdate");
 
@@ -187,6 +181,25 @@ function setup() {
 
 		// check if project exists
 		ipc.send('isOFProjectFolder', project);
+	});
+
+	$("#advanced-toggle").on("change", function () {
+		enableAdvancedMode( $(this).is(':checked') );
+
+	});
+}
+
+function saveDefaultSettings() {
+	var fs = require('fs');
+	fs.writeFile(path.resolve(__dirname, 'settings.json'), JSON.stringify(defaultSettings), function (err) {
+		if (err) {
+			console.log("Unable to save defaultSettings to settings.json... (Error=" + err.code + ")");
+			return false;
+		}
+		else {
+			console.log("Updated default settings for the PG. (written to settings.json)");
+			return true;
+		}
 	});
 }
 
@@ -249,6 +262,18 @@ function clearAddonSelection() {
 	});
 	$("#addonsSelect").select2();
 	
+}
+
+function enableAdvancedMode( isAdvanced ){
+	if( isAdvanced ) {
+		$("body").addClass('advanced');
+	}
+	else {
+		$("body").removeClass('advanced');
+	}
+	defaultSettings['advancedMode'] = isAdvanced;
+	saveDefaultSettings();
+	$("#advanced-toggle").prop('checked', defaultSettings['advancedMode'] );
 }
 
 

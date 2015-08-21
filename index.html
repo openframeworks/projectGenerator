@@ -17,7 +17,7 @@
 		<!-- Nav tabs -->
 		<ul class="nav nav-pills" role="tablist">
 			<li class="active"><a href="#create" role="tab" data-toggle="tab">Generate</a></li>
-			<li><a href="#advanced" role="tab" data-toggle="tab" title="Batch operations">Advanced</a></li>
+			<li class="advanced-feature"><a href="#advanced" role="tab" data-toggle="tab" title="Batch operations">Advanced</a></li>
 			<li><a href="#settings" role="tab" data-toggle="tab">Settings</a></li>
 		</ul>
 		<!-- Tab panes -->
@@ -119,20 +119,20 @@
 							</span>
 						</div>
 					</div>
-					<div class="form-group">
+					<div class="form-group advanced-feature">
 						<label for="platformsSelectAdvanced">platforms</label>
 						<select class="form-control" data-placeholder="platforms..." class="chosen-select" multiple style="width:350px;" id="platformsSelectAdvanced">
-<option value=""><option>
-  <option value="1">Mustard</option>
-  <option value="2">Ketchup</option>
-  <option value="3">Relish</option>
+							<option value=""><option>
+							<option value="1">Mustard</option>
+							<option value="2">Ketchup</option>
+							<option value="3">Relish</option>
 						</select>
 					</div>
 					<div class="form-group">
 						<div class="input-group">
 							<div class="checkbox">
 								<label for="advancedModeToggle">
-									<input type="checkbox" name="advancedModeToggle" value="">
+									<input type="checkbox" name="advancedModeToggle" value="" id="advanced-toggle">
 									Activate Advanced Mode
 								</label>
 							</div>

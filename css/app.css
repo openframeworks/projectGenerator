@@ -554,3 +554,13 @@
   height: 1px !important;
   position: absolute !important;
 }
+
+/* - - - - - - - - - -  ADVANCED MODE STUFF - - - - - - - - - - - - - - - - - - - */
+.advanced-feature {
+  display: none!important;
+}
+
+body.advanced .advanced-feature {
+  display: block!important;
+}
+
