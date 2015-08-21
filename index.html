@@ -9,65 +9,65 @@
 		<!-- http://stackoverflow.com/questions/23535289/bootstrap-3-disable-navbar-collapse -->
 		<style type="text/css">
    
-    .navbar-header-menu {
-        float: left;
-    }
-    
-        .navbar-header-menu > .navbar-nav {
-            float: left;
-            margin: 0;
-        }
-    
-            .navbar-header-menu > .navbar-nav > li {
-                float: left;
-            }
-    
-                .navbar-header-menu > .navbar-nav > li > a {
-                    padding-top: 15px;
-                    padding-bottom: 15px;
-                }
-    
-            .navbar-header-menu > .navbar-nav .open .dropdown-menu {
-                position: absolute;
-                float: left;
-                width: auto;
-                margin-top: 0;
-                background-color: #fff;
-                border: 1px solid #ccc;
-                border: 1px solid rgba(0,0,0,.15);
-                -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
-                box-shadow: 0 6px 12px rgba(0,0,0,.175);
-            }
-    
-        .navbar-header-menu > .navbar-form {
-            float: left;
-            width: auto;
-            padding-top: 0;
-            padding-bottom: 0;
-            margin-right: 0;
-            margin-left: 0;
-            border: 0;
-            -webkit-box-shadow: none;
-            box-shadow: none;
-        }
-    
-            .navbar-header-menu > .navbar-form > .form-group {
-                display: inline-block;
-                margin-bottom: 0;
-                vertical-align: middle;
-            }
-    
-        .navbar-header-menu > .navbar-left {
-            float: left;
-        }
-    
-        .navbar-header-menu > .navbar-right {
-            float: right !important;
-        }
-    
-        .navbar-header-menu > *.navbar-right:last-child {
-            margin-right: -15px !important;
-        }
+	.navbar-header-menu {
+		float: left;
+	}
+	
+		.navbar-header-menu > .navbar-nav {
+			float: left;
+			margin: 0;
+		}
+	
+			.navbar-header-menu > .navbar-nav > li {
+				float: left;
+			}
+	
+				.navbar-header-menu > .navbar-nav > li > a {
+					padding-top: 15px;
+					padding-bottom: 15px;
+				}
+	
+			.navbar-header-menu > .navbar-nav .open .dropdown-menu {
+				position: absolute;
+				float: left;
+				width: auto;
+				margin-top: 0;
+				background-color: #fff;
+				border: 1px solid #ccc;
+				border: 1px solid rgba(0,0,0,.15);
+				-webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+				box-shadow: 0 6px 12px rgba(0,0,0,.175);
+			}
+	
+		.navbar-header-menu > .navbar-form {
+			float: left;
+			width: auto;
+			padding-top: 0;
+			padding-bottom: 0;
+			margin-right: 0;
+			margin-left: 0;
+			border: 0;
+			-webkit-box-shadow: none;
+			box-shadow: none;
+		}
+	
+			.navbar-header-menu > .navbar-form > .form-group {
+				display: inline-block;
+				margin-bottom: 0;
+				vertical-align: middle;
+			}
+	
+		.navbar-header-menu > .navbar-left {
+			float: left;
+		}
+	
+		.navbar-header-menu > .navbar-right {
+			float: right !important;
+		}
+	
+		.navbar-header-menu > *.navbar-right:last-child {
+			margin-right: -15px !important;
+		}
 .navbar-brand > img {
   object-fit: contain;
   max-height: 100%;
@@ -75,24 +75,24 @@
 }
 
 .navbar-custom {
-    background-color:#ccc;
-    color:#333;
-    border-radius:0;
-    border:none;
-    font-weight: bold;
-    box-shadow: 3px 3px 25px #ccc;
+	background-color:#ccc;
+	color:#333;
+	border-radius:0;
+	border:none;
+	font-weight: bold;
+	box-shadow: 3px 3px 25px #ccc;
 }
 
 .navbar-custom .navbar-nav > li > a {
-    color:#333;
+	color:#333;
 }
 .navbar-custom .navbar-nav > .active > a, .navbar-nav > .active > a:hover, .navbar-nav > .active > a:focus {
-    color: #333;
-    background-color:#aaa;
-     border:none;
+	color: #333;
+	background-color:#aaa;
+	 border:none;
 }
 .navbar-custom .navbar-brand {
-    color:#eeeeee;
+	color:#eeeeee;
 }
 
 body {
@@ -101,59 +101,41 @@ body {
 }
 
 li.right {
-    position: absolute;
-    right: 0;
+	position: absolute;
+	right: 0;
   }
 		</style>
 	</head>
 	<body>
-		<!--<header class="jumbotron">
-				<div class="container">
-						<h1>Project Generator</h1>
+
+		<nav class="navbar navbar-custom" role="navigation">
+			<div class="container-fluid">
+			<!-- Brand and toggle get grouped for better mobile display -->
+				<div class="navbar-header">
+					<a class="navbar-brand" href="#">
+						<img src="img/of-logo-white.svg">
+					</a>
+					<!-- <a class="navbar-brand" href="#"><img src="img/of-logo-white.svg" width="110" height= "58"/></a> -->
+					<div class="navbar-header-menu">
+						<ul class="nav navbar-nav">
+							<li class="active"><a href="#create_update" role="tab" data-toggle="tab">create / update</a></li>
+							<li class="advanced-feature"><a href="#advanced" role="tab" data-toggle="tab" title="Batch operations">update multiple</a></li>
+							<li class="right"><a href="#settings" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-cog"></span></a></li>
+						</ul>
+					</div>
 				</div>
-		</header>-->
-		
+			<!-- /.navbar-collapse -->
+			</div>
+		<!-- /.container-fluid -->
+		</nav>
 
-
-<nav class="navbar navbar-custom" role="navigation">
-    <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-
-<a class="navbar-brand" href="#">
-            <img src="img/of-logo-white.svg">
-        </a>
-            <!-- <a class="navbar-brand" href="#"><img src="img/of-logo-white.svg" width="110" height= "58"/></a>
- -->
-            <div class="navbar-header-menu">
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="#create_update" role="tab" data-toggle="tab">create / update</a></li>
-				<li class="advanced-feature"><a href="#advanced" role="tab" data-toggle="tab" title="Batch operations">update multiple</a></li>
-				<li class="right"><a href="#settings" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-cog"></span></a></li>
-                </ul>
-            	
-                
-            </div>
-
-
-
-
-
-        </div>
-        
-        <!-- /.navbar-collapse -->
-    </div>
-    <!-- /.container-fluid -->
-</nav>
-
-<section class="container">
+		<section class="container">
 			<!-- Nav tabs -->
-<!-- 			<ul class="nav nav-tabs" role="tablist">
+			<!-- <ul class="nav nav-tabs" role="tablist">
 				<li class="active"><a href="#create_update" role="tab" data-toggle="tab">create / update</a></li>
 				<li class="advanced-feature"><a href="#advanced" role="tab" data-toggle="tab" title="Batch operations">update multiple</a></li>
 				<li><a href="#settings" role="tab" data-toggle="tab">Settings</a></li>
 			</ul> -->
-
 
 			<!-- Tab panes -->
 			<div class="tab-content">
@@ -207,15 +189,15 @@ li.right {
 							</div> -->
 							<button class="btn btn-primary" type="button" onclick="generate()" id="create-btn"
 							data-toggle="tooltip" 
-        					data-placement="right" 
-        					title="" 
-        					data-original-title="This will create a new project file for your target platform(s), and a skeleton openFrameworks app in the 'src' folder, including any addon(s) you select.">Create New Project</button>
+							data-placement="right" 
+							title="" 
+							data-original-title="This will create a new project file for your target platform(s), and a skeleton openFrameworks app in the 'src' folder, including any addon(s) you select.">Create New Project</button>
 
 							<button class="btn btn-primary" type="button" onclick="update()" id="update-btn"
 							data-toggle="tooltip" 
-        					data-placement="right" 
-        					title="" 
-        					data-original-title="Updating will use the ''src' folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files but use existing source code">Update Project</button>
+							data-placement="right" 
+							title="" 
+							data-original-title="Updating will use the ''src' folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files but use existing source code">Update Project</button>
 						</div>
 					</form>
 				</div>
@@ -273,9 +255,8 @@ li.right {
 		<script src="app.js"></script>
 		<script type="text/javascript">
 			$(function () { 
-    $("[data-toggle='tooltip']").tooltip(); 
-});
+				$("[data-toggle='tooltip']").tooltip(); 
+			});
 		</script>
-		
 	</body>
 </html>
