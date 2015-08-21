@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>project generator - openFrameworks</title>
+		<title>OF project generator</title>
 		<link rel="stylesheet" href="css/bootstrap.min.css">
 		<link rel="stylesheet" href="css/select2.css">
 		<link rel="stylesheet" href="css/app.css">
@@ -74,8 +74,28 @@
   height: 100%;
 }
 
+.navbar-custom {
+    background-color:#ccc;
+    color:#333;
+    border-radius:0;
+    border:none;
+}
+
+.navbar-custom .navbar-nav > li > a {
+    color:#333;
+}
+.navbar-custom .navbar-nav > .active > a, .navbar-nav > .active > a:hover, .navbar-nav > .active > a:focus {
+    color: #333;
+    background-color:#aaa;
+     border:none;
+}
+.navbar-custom .navbar-brand {
+    color:#eeeeee;
+}
+
 body {
-	padding: 10px;
+	//padding: 10px;
+	background-color:#ededed;
 }
 		</style>
 	</head>
@@ -85,10 +105,10 @@ body {
 						<h1>Project Generator</h1>
 				</div>
 		</header>-->
-		<section class="container">
+		
 
 
-<nav class="navbar navbar-default" role="navigation">
+<nav class="navbar navbar-custom" role="navigation">
     <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
@@ -119,7 +139,7 @@ body {
     <!-- /.container-fluid -->
 </nav>
 
-
+<section class="container">
 			<!-- Nav tabs -->
 <!-- 			<ul class="nav nav-tabs" role="tablist">
 				<li class="active"><a href="#create_update" role="tab" data-toggle="tab">create / update</a></li>
@@ -197,10 +217,7 @@ body {
 					<form>
 						<div class="form-group">
 							<div class="alert alert-warning" role="alert">
-								<b>warning</b> this updates existing projects and
-								it may overwrite files.  It will look for src folders as well as addons.mk file
-								to make new project files.  recursive will do this recursively so please be careful,
-								always be sure you know what folder you are working from.  If you do this from the wrong place, it will may wreak havok on your hard drive
+								<b>warning</b> this updates existing projects <em>recusively</em> from the selected directory.  For example, to generate OF examples for a specific platform, you'd choose the examples folder as the update path.
 							</div>
 						</div>
 						<div class="form-group">
@@ -211,11 +228,6 @@ body {
 									<button class="btn btn-default" type="button" onclick="getUpdatePath()">set update location</button>
 								</span>
 							</div>
-						</div>
-						<div class="form-group">
-							<label for="platformRecursive">
-								<input type="checkbox" name="recursive" value="recursive" id="platformRecursive"> recursive
-							</label>
 						</div>
 						<div class="form-group">
 							<button class="btn btn-primary" type="button" onclick="update()">update multiple</button>
