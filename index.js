@@ -59,7 +59,7 @@ app.on('window-all-closed', function () {
 app.on('ready', function () {
 	// Create the browser window.
 	mainWindow = new BrowserWindow({
-		width: 900,
+		width: 500,
 		height: 800,
 		resizable: false
 	});
