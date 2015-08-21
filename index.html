@@ -173,15 +173,22 @@ body {
 							</div>
 						</div>
 						<div class="form-group">
-							<div class="alert alert-info" role="alert" id="warning-create">
-								<p>This will create a new project file for your target platform(s), and a skeleton openFrameworks app in the "src" folder, including any addon(s) you select.</p>
-							</div>
-							<div class="alert alert-warning" role="alert" id="warning-update">
+							
+							<!-- <div class="alert alert-warning" role="alert" id="warning-update">
 								<h3>Warning</h3>
 								<p>Updating will use the "src" folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files (beware).</p>
-							</div>
-							<button class="btn btn-primary btn-lg" type="button" onclick="generate()" id="create-btn">Create New Project</button>
-							<button class="btn btn-lg" type="button" onclick="update()" id="update-btn">Update Project</button>
+							</div> -->
+							<button class="btn btn-primary" type="button" onclick="generate()" id="create-btn"
+							data-toggle="tooltip" 
+        					data-placement="right" 
+        					title="" 
+        					data-original-title="This will create a new project file for your target platform(s), and a skeleton openFrameworks app in the 'src' folder, including any addon(s) you select.">Create New Project</button>
+
+							<button class="btn btn-primary" type="button" onclick="update()" id="update-btn"
+							data-toggle="tooltip" 
+        					data-placement="right" 
+        					title="" 
+        					data-original-title="Updating will use the ''src' folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files but use existing source code">Update Project</button>
 						</div>
 					</form>
 				</div>
@@ -211,7 +218,7 @@ body {
 							</label>
 						</div>
 						<div class="form-group">
-							<button class="btn btn-primary" type="button" onclick="update()">update</button>
+							<button class="btn btn-primary" type="button" onclick="update()">update multiple</button>
 						</div>
 					</form>
 				</div>
@@ -246,7 +253,9 @@ body {
 		<script type="text/javascript" src="js/select2.full.min.js"></script>
 		<script src="app.js"></script>
 		<script type="text/javascript">
-			
+			$(function () { 
+    $("[data-toggle='tooltip']").tooltip(); 
+});
 		</script>
 		
 	</body>
