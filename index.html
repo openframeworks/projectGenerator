@@ -80,6 +80,7 @@
     border-radius:0;
     border:none;
     font-weight: bold;
+    box-shadow: 3px 3px 25px #ccc;
 }
 
 .navbar-custom .navbar-nav > li > a {
@@ -98,6 +99,11 @@ body {
 	//padding: 10px;
 	background-color:#ededed;
 }
+
+li.right {
+    position: absolute;
+    right: 0;
+  }
 		</style>
 	</head>
 	<body>
@@ -123,9 +129,9 @@ body {
                 <ul class="nav navbar-nav">
                     <li class="active"><a href="#create_update" role="tab" data-toggle="tab">create / update</a></li>
 				<li class="advanced-feature"><a href="#advanced" role="tab" data-toggle="tab" title="Batch operations">update multiple</a></li>
-				<li><a href="#settings" role="tab" data-toggle="tab">Settings</a></li>
-            
+				<li class="right"><a href="#settings" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-cog"></span></a></li>
                 </ul>
+            	
                 
             </div>
 
