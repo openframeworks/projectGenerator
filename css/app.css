@@ -422,6 +422,9 @@
   background-color: #337ab7;
 }
 
+.select2-results__option--highlighted{
+  background-color: #5bc0de !important;
+}
 /**
  * Adjust alignment of Bootstrap 3 buttons in Bootstrap 3 Input Groups to address
  * Multi Select2's height which - depending on how many elements have been selected -
