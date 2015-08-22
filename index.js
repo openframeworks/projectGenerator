@@ -254,7 +254,6 @@ ipc.on('isOFProjectFolder', function (event, project) {
 		if (foundSrcFolder) {
 			event.sender.send('setGenerateMode', 'updateMode');
 
-			// todo: pre-fill addons based on the
 			if (foundAddons) {
 				var projectAddons = fsTemp.readFileSync(pathTemp.resolve(folder, 'addons.make')).toString().split("\n");
 

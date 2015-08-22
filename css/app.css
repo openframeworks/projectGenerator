@@ -32,20 +32,15 @@
 	display: block;
 }
 
-#visitOfxAddons, .input-info {
+.input-info {
 	display: block;
 	font-size: 0.8em;
 	color: grey;
-	display: none;
 }
 
 .formElement:last-child, #missingAddons:last-child, .formElement#addonsForm {
 	padding-bottom: 0;
 	margin-bottom: 0;
-}
-
-#missingAddons {
-	margin-top: 20px;
 }
 
 /*.info-message{
@@ -56,8 +51,30 @@
 	background-color: #333;
 }
 
+/* - - - - - - - - - -  ADVANCED MODE STUFF - - - - - - - - - - - - - - - - - - - */
+.advanced-feature {
+  display: none!important;
+}
 
+body.advanced .advanced-feature {
+  display: block!important;
+}
 
+body:not(.advanced) .platform:not(.platform-selected) {
+  display: none;
+}
+
+/* - - - - - - - - - -  MISSING ADDONS STUFF - - - - - - - - - - - - - - - - - - - */
+#generate-mode-section.has-missing-addons #addonsForm,
+#generate-mode-section.has-missing-addons #submitForm,
+#generate-mode-section.has-missing-addons #platformSelectForm,
+#missingAddonsForm {
+  display: none;
+}
+
+#generate-mode-section.has-missing-addons #missingAddonsForm {
+  display: block;
+}
 
 /*! Select2 Bootstrap 3 CSS v1.4.6 | MIT License | github.com/t0m/select2-bootstrap-css */
 /**
@@ -557,13 +574,3 @@
   height: 1px !important;
   position: absolute !important;
 }
-
-/* - - - - - - - - - -  ADVANCED MODE STUFF - - - - - - - - - - - - - - - - - - - */
-.advanced-feature {
-  display: none!important;
-}
-
-body.advanced .advanced-feature {
-  display: block!important;
-}
-

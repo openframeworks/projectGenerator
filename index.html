@@ -108,10 +108,11 @@
 		border-radius:1px;
 		cursor: pointer;
 		float:left;
+		-webkit-user-select: none;
 		}
 		.platform-selected {
 		background: #fff;
-		cursor: pointer;
+		/*cursor: pointer;*/
 		}
 		</style>
 	</head>
@@ -177,15 +178,16 @@
 								</span>
 							</div>
 						</div>
-						<div class="row" style="padding-left:15px;">
-							<label for="platformSelect">Platforms</label>
-							<div class="platformSelect">
+						<div class="form-group" id="platformSelectForm">
+							<label for="platformSelect">Platform<span class=".advanced-feature">s</span></label>
+							<div class="platformSelect" id="singlePlatformSelect">
 								<!-- <span class="platform">test</span>
 								<span class="platform">test</span>
 								<span class="platform">test</span>
 								<span class="platform">test</span>
 								<span class="platform">test</span> -->
 							</div>
+							<div class="clearfix"></div>
 							<!--
 							<select data-placeholder="platforms..." class="chosen-select form-control" multiple style="width:350px;" id="platformSelect">
 									<option value=""></option>
@@ -196,13 +198,25 @@
 							<select data-placeholder="addons..." class="chosen-select form-control" multiple style="width:350px;" id="addonsSelect">
 								<option value=""></option>
 							</select>
-							<a href="#http://www.ofxaddons.com/" id="visitOfxAddons">Browse & download more plugins on ofxaddons.com</a>
+							<a href="#ofxaddons.com" class="visitOfxAddons input-info">Browse & download more plugins on ofxaddons.com</a>
+						</div>
+						<div class="form-group" id="missingAddonsForm">
+							<label>Addons</label>
 							<div class="alert alert-danger" id="missingAddons">
-								You are missing the following plugins which are needed for this project:<br>
-								<span id="missingAddonsList"></span>
+								<strong>Warning</strong>
+								<p>
+									You are missing the following plugins for this project:<br>
+									<span id="missingAddonsList"></span>
+								</p>
+							</div>
+							<div class="alert alert-info">
+								<p>
+									You can probably download them on <a href="#ofxaddons.com" class="visitOfxAddons">ofxaddons.com</a>.<br>
+									Add them to your addons folder and rescan it.<br>
+									If you don't need any of these addons, you can remove them from the adons.make file within your project (proceed with precaution).
 							</div>
 						</div>
-						<div class="form-group">
+						<div class="form-group" id="submitForm">
 							
 							<!-- <div class="alert alert-warning" role="alert" id="warning-update">
 									<h3>Warning</h3>
@@ -226,7 +240,7 @@
 					<form>
 						<div class="form-group">
 							<div class="alert alert-warning" role="alert">
-								<b>warning</b> this updates existing projects <em>recusively</em> from the selected directory.  For example, to generate OF examples for a specific platform, you'd choose the examples folder as the update path.
+								<b>warning</b> this updates existing projects <em>recusively</em> from the selected directory.	For example, to generate OF examples for a specific platform, you'd choose the examples folder as the update path.
 							</div>
 						</div>
 						<div class="form-group">
@@ -269,6 +283,20 @@
 				</div>
 			</div>
 		</section>
+
+		<!-- begin JS UI modal -->
+		<div class="modal fade in" id="uiModal" tabindex="-1" role="dialog">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-body"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- end modal -->
+
 		<script type="text/javascript" src="js/jquery.js" onload="window.$ = window.jQuery = module.exports;"></script>
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="js/select2.full.min.js"></script>

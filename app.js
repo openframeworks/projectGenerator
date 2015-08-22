@@ -43,7 +43,7 @@ ipc.on('setGenerateMode', function (arg) {
 
 ipc.on('importProjectSettings', function(settings){
 	$("#projectPath").val(settings['projectPath']);
-	$("#projectName").val(settings['projectName']).trigger('blur'); // blur triggers addon scanning
+	$("#projectName").val(settings['projectName']).trigger('change'); // change triggers addon scanning
 });
 
 
@@ -94,22 +94,21 @@ ipc.on('selectAddons', function (arg) {
 		}
 	});
 	
-
+	// syncronises gui with form element
 	$("#addonsSelect").select2();
 	
 	if (neededAddons.length > 0) {
-		$("#create_update").addClass("has-missing-addons");
-		$("#missingAddonsList").text(neededAddons.toString());
+		$("#generate-mode-section").addClass("has-missing-addons");
+		$("#missingAddonsList").text(neededAddons.join(", "));
 	}
 	else {
-		$("#create_update").removeClass("has-missing-addons");
+		$("#generate-mode-section").removeClass("has-missing-addons");
 	}
 });
 
 // allow main to send UI messages
 ipc.on('sendUIMessage', function (arg) {
-	// todo: this has to become a modal message
-	alert(arg);
+	displayModal(arg);
 });
 
 
@@ -138,9 +137,7 @@ function setOFPath(arg) {
 
 	// update settings & remember the new OF path for next time
 	defaultSettings['defaultOfPath'] = elem.value;
-	if( !saveDefaultSettings() ){
-		ipc.send('sendUIMessage', "OFPath changed but unable to write out the setting.");
-	}
+	saveDefaultSettings();
 
 	// trigger reload addons from the new OF path
 	ipc.send('refreshAddonList', '');
@@ -185,20 +182,25 @@ function setup() {
 		shell.openExternal('http://www.ofxaddons.com/');
 	});
 
-	// should this be on blur or on change ?
-	$("#projectName").on('blur', function () {
+	$("#projectName").on('change', function () {
+		if( $(this).is(":focus")===true ){ console.log($(this).is(":focus")); return; }
+
 		var project = {};
 		project['projectName'] = $("#projectName").val();
 		project['projectPath'] = $("#projectPath").val();
 
 		// check if project exists
 		ipc.send('isOFProjectFolder', project);
+	}).trigger('change');
+	$("#projectName").on('focusout', function () {
+		$(this).trigger('change');
 	});
 
 	$("#advanced-toggle").on("change", function () {
 		enableAdvancedMode( $(this).is(':checked') );
-
 	});
+
+	$("#uiModal").modal({'show':false});
 }
 
 function saveDefaultSettings() {
@@ -206,11 +208,9 @@ function saveDefaultSettings() {
 	fs.writeFile(path.resolve(__dirname, 'settings.json'), JSON.stringify(defaultSettings), function (err) {
 		if (err) {
 			console.log("Unable to save defaultSettings to settings.json... (Error=" + err.code + ")");
-			return false;
 		}
 		else {
 			console.log("Updated default settings for the PG. (written to settings.json)");
-			return true;
 		}
 	});
 }
@@ -224,15 +224,14 @@ function generate() {
 	gen['projectName'] = $("#projectName").val();
 	gen['projectPath'] = $("#projectPath").val();
 	
-	// TODO: 
-	//gen['platformList'] = $("#platformSelect").val();
+	gen['platformList'] = getPlatformList("#singlePlatformSelect");
 	gen['addonList'] = $("#addonsSelect").val();
 	gen['ofPath'] = $("#ofPath").val();
 
-	//console.log(gen);
+	console.log(gen);
 
 	if( gen['platformList'] === null ){
-		ipc.send('sendUIMessage', "Please select a platform first.");
+		displayModal("Please select a platform first.");
 	}
 	else {
 		ipc.send('generate', gen);
@@ -249,12 +248,17 @@ function update() {
 	up['updatePath'] = $("#updatePath").val();
 	
 	//TODO: 
-	//up['platformList'] = $("#platformSelect").val();
+	up['platformList'] = getPlatformList("#batchPlatformSelect");
 	up['updateRecursive'] = $("#platformRecursive").is(":checked");
 	up['ofPath'] = $("#ofPath").val();
 	//console.log(up);
 
-	ipc.send('update', up);
+	if( up['platformList'] === null ){
+		displayModal("Please select a platform first.");
+	}
+	else {
+		ipc.send('update', up);
+	}
 }
 
 function switchGenerateMode(mode) {
@@ -271,7 +275,7 @@ function switchGenerateMode(mode) {
 
 		// if previously in update mode, deselect Addons
 		if ($("#generate-mode-section").hasClass('updateMode')) {
-			$("#create_update").removeClass("has-missing-addons");
+			$("#generate-mode-section").removeClass("has-missing-addons");
 			clearAddonSelection();
 		}
 
@@ -298,6 +302,22 @@ function enableAdvancedMode( isAdvanced ){
 	defaultSettings['advancedMode'] = isAdvanced;
 	saveDefaultSettings();
 	$("#advanced-toggle").prop('checked', defaultSettings['advancedMode'] );
+}
+
+function getPlatformList( platformSelector ){
+	var selected = [];
+
+	$(platformSelector).children(".platform.platform-selected").each(function(){
+		selected.push( $(this).text() );
+	});
+
+	if(selected.length == 0){ return null; }
+	else { return selected; }
+}
+
+function displayModal( message ){
+	$("#uiModal .modal-body").text(message);
+	$("#uiModal").modal('show');
 }
 
 
