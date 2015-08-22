@@ -421,7 +421,7 @@ ipc.on('pickOfPath', function (event, arg) {
 		properties: ['openDirectory'],
 		filters: []
 	}, function (filenames) {
-		if (filenames !== null) {
+		if (filenames !== undefined && filenames.length > 0) {
 			defaultOfPath = filenames[0];
 			event.sender.send('setOfPath', filenames[0]);
 		}

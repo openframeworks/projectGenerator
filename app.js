@@ -159,12 +159,20 @@ function setup() {
 		// option.className = "platform";
 		// option.text = platforms[i];
 		// select.add(option);
-		$(".platformSelect").append("<div class='platform'>" + platforms[i] + "</span>");
+		var myClass = 'platform';
+		if( platforms[i] === defaultSettings['defaultPlatform'] ){ myClass += " platform-selected" }
+		$(".platformSelect").append("<div class='"+myClass+"'>" + platforms[i] + "</span>");
 	}
 
 
 	$( "div.platform" ).click(function() {
-  		$( this ).toggleClass( "platform-selected" );
+		if( $(this).hasClass("platform-selected") && $(this).parent().children(".platform-selected").length <= 1 ){
+			// always 1 has to remain selected
+			$( this ).addClass( "platform-selected" );
+		}
+		else {
+			$( this ).toggleClass( "platform-selected" );
+		}
 	});
 
 
@@ -201,6 +209,8 @@ function setup() {
 	});
 
 	$("#uiModal").modal({'show':false});
+
+	$("#defaultPlatform").html( defaultSettings['defaultPlatform'] );
 }
 
 function saveDefaultSettings() {
@@ -248,13 +258,20 @@ function update() {
 	up['updatePath'] = $("#updatePath").val();
 	
 	//TODO: 
-	up['platformList'] = getPlatformList("#batchPlatformSelect");
+	up['platformList'] = getPlatformList("#singlePlatformSelect");
 	up['updateRecursive'] = $("#platformRecursive").is(":checked");
 	up['ofPath'] = $("#ofPath").val();
-	//console.log(up);
 
 	if( up['platformList'] === null ){
 		displayModal("Please select a platform first.");
+	}
+	else if( $("#generate-mode-section").hasClass("has-missing-addons") ){
+		displayModal(
+			'<div class="alert alert-info">'+
+				'<div class="alert alert-danger">'+ $("#missingAddons").html() +'</div>'+
+				'<p>You can probably download them on <a href="#ofxaddons.com" class="visitOfxAddons">ofxaddons.com</a>.<br>Add them to your addons folder and rescan it.<br>If you don\'t need any of these addons, you can remove them from the adons.make file within your project (proceed with precaution).</p>'+
+			'</div><button class="btn btn-primary" type="button" onclick="rescanAddons()">Rescan addons folder</button>'
+		);
 	}
 	else {
 		ipc.send('update', up);
@@ -316,7 +333,7 @@ function getPlatformList( platformSelector ){
 }
 
 function displayModal( message ){
-	$("#uiModal .modal-body").text(message);
+	$("#uiModal .modal-body").html(message);
 	$("#uiModal").modal('show');
 }
 

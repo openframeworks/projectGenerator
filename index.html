@@ -111,7 +111,8 @@
 		-webkit-user-select: none;
 		}
 		.platform-selected {
-		background: #fff;
+		background: #333;
+		color: #fff;
 		/*cursor: pointer;*/
 		}
 		</style>
@@ -167,7 +168,7 @@
 									<button type="button" class="btn btn-info" onclick="browseImportProject()">Import</button>
 								</span>
 							</div>
-							<span class="input-info">Name your project or click "import" to load settings from an existing project.</span>
+							<!--<span class="input-info">Name your project or click "import" to load settings from an existing project.</span>-->
 						</div>
 						<div class="form-group">
 							<label for="projectPath">Path</label>
@@ -178,8 +179,8 @@
 								</span>
 							</div>
 						</div>
-						<div class="form-group" id="platformSelectForm">
-							<label for="platformSelect">Platform<span class=".advanced-feature">s</span></label>
+						<div class="form-group advanced-feature" id="platformSelectForm">
+							<label for="platformSelect">Platforms</label>
 							<div class="platformSelect" id="singlePlatformSelect">
 								<!-- <span class="platform">test</span>
 								<span class="platform">test</span>
@@ -193,15 +194,19 @@
 									<option value=""></option>
 							</select> -->
 						</div>
+						<div class="form-group simple-feature">
+							<label for="platformSelect">Platform</label>
+							<div>
+								<span id="defaultPlatform" class="platform platform-selected">Unknown</span>
+							</div>
+							<div class="clearfix"></div>
+						</div>
 						<div class="form-group" id="addonsForm">
 							<label for="addonsSelect">Addons</label>
 							<select data-placeholder="addons..." class="chosen-select form-control" multiple style="width:350px;" id="addonsSelect">
 								<option value=""></option>
 							</select>
 							<a href="#ofxaddons.com" class="visitOfxAddons input-info">Browse & download more plugins on ofxaddons.com</a>
-						</div>
-						<div class="form-group" id="missingAddonsForm">
-							<label>Addons</label>
 							<div class="alert alert-danger" id="missingAddons">
 								<strong>Warning</strong>
 								<p>
@@ -209,13 +214,6 @@
 									<span id="missingAddonsList"></span>
 								</p>
 							</div>
-							<div class="alert alert-info">
-								<p>
-									You can probably download them on <a href="#ofxaddons.com" class="visitOfxAddons">ofxaddons.com</a>.<br>
-									Add them to your addons folder and rescan it.<br>
-									If you don't need any of these addons, you can remove them from the adons.make file within your project (proceed with precaution).
-							</div>
-							<button class="btn btn-primary" type="button" onclick="rescanAddons()">Rescan addons folder</button>
 						</div>
 						<div class="form-group" id="submitForm">
 							

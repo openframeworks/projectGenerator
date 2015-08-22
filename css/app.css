@@ -60,16 +60,20 @@ body.advanced .advanced-feature {
   display: block!important;
 }
 
+body.advanced .simple-feature {
+  display: none!important;
+}
+
 body:not(.advanced) .platform:not(.platform-selected) {
   display: none;
 }
 
 /* - - - - - - - - - -  MISSING ADDONS STUFF - - - - - - - - - - - - - - - - - - - */
-#generate-mode-section.has-missing-addons #addonsForm,
+/*#generate-mode-section.has-missing-addons #addonsForm,
 #generate-mode-section.has-missing-addons #submitForm,
-#generate-mode-section.has-missing-addons #platformSelectForm,
-#missingAddonsForm {
-  display: none;
+#generate-mode-section.has-missing-addons #platformSelectForm,*/
+#missingAddons {
+  margin-top: 20px;
 }
 
 #generate-mode-section.has-missing-addons #missingAddonsForm {
