@@ -28,7 +28,7 @@
 	display: none;
 }
 
-#missingAddons.missing {
+.has-missing-addons #missingAddons {
 	display: block;
 }
 
@@ -48,9 +48,9 @@
 	margin-top: 20px;
 }
 
-.info-message{
+/*.info-message{
 	padding-top: 20px;
-}
+}*/
 
 .nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
 	background-color: #333;

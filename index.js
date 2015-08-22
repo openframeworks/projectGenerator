@@ -22,7 +22,9 @@ try {
 	obj = {
 		"defaultOfPath": "",
 		"useRelativePath": false,
-		"advancedMode" : false
+		"advancedMode": false,
+		"lastUsedProjectPath" : "",
+		"defaultPlatform" : "Unknown"
 	};
 }
 var defaultOfPath = obj["defaultOfPath"];
@@ -66,7 +68,6 @@ app.on('ready', function () {
 
 	// load jquery here:
 	// http://stackoverflow.com/questions/30271011/electron-jquery-errors
-
 
 	// and load the index.html of the app.
 	mainWindow.loadUrl('file://' + __dirname + '/index.html');
@@ -164,8 +165,7 @@ app.on('ready', function () {
 	menu.setApplicationMenu(menuV);
 
 });
-
-
+	
 function parseAddonsAndUpdateSelect() {
 
 
@@ -179,8 +179,6 @@ function parseAddonsAndUpdateSelect() {
 
 
 }
-
-
 
 function getDirectories(srcpath) {
 
@@ -297,7 +295,6 @@ ipc.on('refreshAddonList', function (event, arg) {
 	parseAddonsAndUpdateSelect();
 });
 
-
 ipc.on('update', function (event, arg) {
 
 	var update = arg;
@@ -345,8 +342,6 @@ ipc.on('update', function (event, arg) {
 	//console.log(__dirname);
 
 });
-
-
 
 ipc.on('generate', function (event, arg) {
 
@@ -434,20 +429,18 @@ ipc.on('pickOfPath', function (event, arg) {
 	});
 });
 
-
 ipc.on('pickUpdatePath', function (event, arg) {
 	path = dialog.showOpenDialog({
 		title: 'select the folder or root folder where you want to update',
 		properties: ['openDirectory'],
 		filters: []
 	}, function (filenames) {
-		if (filenames !== null) {
+		if (filenames !== undefined && filenames.length > 0) {
 			defaultOfPath = filenames[0];
 			event.sender.send('setUpdatePath', filenames[0]);
 		}
 	});
 });
-
 
 ipc.on('pickProjectPath', function (event, arg) {
 	path = dialog.showOpenDialog({
@@ -455,7 +448,7 @@ ipc.on('pickProjectPath', function (event, arg) {
 		properties: ['openDirectory'],
 		filters: []
 	}, function (filenames) {
-		if (filenames !== null) {
+		if (filenames !== undefined && filenames.length > 0) {
 			event.sender.send('setProjectPath', filenames[0]);
 		}
 	});

@@ -27,11 +27,14 @@ ipc.on('setDefaults', function (arg) {
 	defaultSettings = arg;
 	setOFPath(defaultSettings['defaultOfPath']);
 	enableAdvancedMode( defaultSettings['advancedMode'] );
+	$("#projectPath").val( defaultSettings['lastUsedProjectPath'] );
 });
 
 ipc.on('setProjectPath', function (arg) {
 	var elem = document.getElementById("projectPath");
 	elem.value = arg;
+	defaultSettings['lastUsedProjectPath'] = arg;
+	saveDefaultSettings();
 });
 
 ipc.on('setGenerateMode', function (arg) {
@@ -95,16 +98,17 @@ ipc.on('selectAddons', function (arg) {
 	$("#addonsSelect").select2();
 	
 	if (neededAddons.length > 0) {
-		$("#missingAddons").addClass("missing");
+		$("#create_update").addClass("has-missing-addons");
 		$("#missingAddonsList").text(neededAddons.toString());
 	}
 	else {
-		$("#missingAddons").removeClass("missing");
+		$("#create_update").removeClass("has-missing-addons");
 	}
 });
 
 // allow main to send UI messages
 ipc.on('sendUIMessage', function (arg) {
+	// todo: this has to become a modal message
 	alert(arg);
 });
 
@@ -227,7 +231,12 @@ function generate() {
 
 	//console.log(gen);
 
-	ipc.send('generate', gen);
+	if( gen['platformList'] === null ){
+		ipc.send('sendUIMessage', "Please select a platform first.");
+	}
+	else {
+		ipc.send('generate', gen);
+	}
 
 }
 
@@ -261,7 +270,10 @@ function switchGenerateMode(mode) {
 		console.log('Switching GenerateMode to Create...');
 
 		// if previously in update mode, deselect Addons
-		if ($("#generate-mode-section").hasClass('updateMode')) {clearAddonSelection();}
+		if ($("#generate-mode-section").hasClass('updateMode')) {
+			$("#create_update").removeClass("has-missing-addons");
+			clearAddonSelection();
+		}
 
 		$("#generate-mode-section").removeClass('updateMode').addClass('createMode');
 	}
