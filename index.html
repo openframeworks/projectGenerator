@@ -202,11 +202,16 @@
 							<div class="clearfix"></div>
 						</div>
 						<div class="form-group" id="addonsForm">
-							<label for="addonsSelect">Addons</label>
+							<label for="addonsSelect"
+								data-toggle="tooltip"
+								data-placement="right"
+								title=""
+								data-original-title="Browse &amp; download more plugins on ofxaddons.com"
+							>Addons</label>
 							<select data-placeholder="addons..." class="chosen-select form-control" multiple style="width:350px;" id="addonsSelect">
 								<option value=""></option>
 							</select>
-							<a href="#ofxaddons.com" class="visitOfxAddons input-info">Browse & download more plugins on ofxaddons.com</a>
+							<!--<a href="#ofxaddons.com" class="visitOfxAddons input-info">Browse &amp; download more plugins on ofxaddons.com</a>-->
 							<div class="alert alert-danger" id="missingAddons">
 								<strong>Warning</strong>
 								<p>
@@ -300,12 +305,5 @@
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="js/select2.full.min.js"></script>
 		<script src="app.js"></script>
-		<script type="text/javascript">
-			$(function () {
-			$("[data-toggle='tooltip']").tooltip();
-			});
-			
-		</script>
-		
 	</body>
 </html>

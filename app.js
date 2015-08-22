@@ -211,6 +211,9 @@ function setup() {
 	$("#uiModal").modal({'show':false});
 
 	$("#defaultPlatform").html( defaultSettings['defaultPlatform'] );
+
+	// Enable tooltips
+	$("[data-toggle='tooltip']").tooltip();
 }
 
 function saveDefaultSettings() {
@@ -333,7 +336,10 @@ function getPlatformList( platformSelector ){
 }
 
 function displayModal( message ){
-	$("#uiModal .modal-body").html(message);
+	$("#uiModal .modal-body").html(message).find('.visitOfxAddons').click(function () {
+		var shell = require('shell');
+		shell.openExternal('http://www.ofxaddons.com/');
+	});
 	$("#uiModal").modal('show');
 }
 
