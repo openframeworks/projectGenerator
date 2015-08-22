@@ -21,10 +21,11 @@ try {
 } catch (e) {
 	obj = {
 		"defaultOfPath": "",
-		"useRelativePath": false,
+		"useRelativePath": false, /* can this setting be removed? */
 		"advancedMode": false,
 		"lastUsedProjectPath" : "",
-		"defaultPlatform" : "Unknown"
+		"defaultPlatform" : "Unknown",
+		"showConsole" : false
 	};
 }
 var defaultOfPath = obj["defaultOfPath"];
@@ -334,6 +335,7 @@ ipc.on('update', function (event, arg) {
 	exec(wholeString, function callback(error, stdout, stderr) {
 		// result
 		console.log(stdout);
+		event.sender.send('consoleMessage', stdout );
 	});
 
 	console.log(wholeString);
@@ -404,6 +406,7 @@ ipc.on('generate', function (event, arg) {
 	exec(wholeString, function callback(error, stdout, stderr) {
 		// result
 		console.log(stdout);
+		event.sender.send('consoleMessage', stdout );
 	});
 
 	console.log(wholeString);

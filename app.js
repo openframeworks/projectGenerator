@@ -27,6 +27,7 @@ ipc.on('setDefaults', function (arg) {
 	defaultSettings = arg;
 	setOFPath(defaultSettings['defaultOfPath']);
 	enableAdvancedMode( defaultSettings['advancedMode'] );
+	enableConsole( defaultSettings['showConsole'] );
 	$("#projectPath").val( defaultSettings['lastUsedProjectPath'] );
 });
 
@@ -111,6 +112,9 @@ ipc.on('sendUIMessage', function (arg) {
 	displayModal(arg);
 });
 
+ipc.on('consoleMessage', function( msg ){
+	consoleMessage( msg );
+});
 
 
 //----------------------------------------
@@ -206,6 +210,10 @@ function setup() {
 
 	$("#advanced-toggle").on("change", function () {
 		enableAdvancedMode( $(this).is(':checked') );
+	});
+
+	$("#consoleToggle").on("change", function () {
+		enableConsole( $(this).is(':checked') );
 	});
 
 	$("#uiModal").modal({'show':false});
@@ -324,6 +332,18 @@ function enableAdvancedMode( isAdvanced ){
 	$("#advanced-toggle").prop('checked', defaultSettings['advancedMode'] );
 }
 
+function enableConsole( showConsole ){
+	if( showConsole ) {
+		$("body").addClass('showConsole');
+	}
+	else {
+		$("body").removeClass('showConsole');
+	}
+	defaultSettings['showConsole'] = showConsole;
+	saveDefaultSettings();
+	$("#consoleToggle").prop('checked', defaultSettings['showConsole'] );
+}
+
 function getPlatformList( platformSelector ){
 	var selected = [];
 
@@ -341,6 +361,11 @@ function displayModal( message ){
 		shell.openExternal('http://www.ofxaddons.com/');
 	});
 	$("#uiModal").modal('show');
+}
+
+function consoleMessage( message ){
+	message = (message + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1'+ "<br>\n" +'$2'); // nl2br
+	$("#console").append( $("<p>").html(message) );
 }
 
 

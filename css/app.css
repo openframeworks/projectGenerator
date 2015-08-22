@@ -80,6 +80,53 @@ body:not(.advanced) .platform:not(.platform-selected) {
   display: block;
 }
 
+/* - - - - - - - - - -  MISSING ADDONS STUFF - - - - - - - - - - - - - - - - - - - */
+#consoleContainer {
+  display: none;
+  width: 100%;
+  background-color: #333;
+  color: #FFF;
+  height: 100px;
+  position: fixed;
+  bottom: 0;
+  box-shadow: inset 0px 0px 9px 0px rgba(0,0,0,0.75);
+  overflow-y: scroll;
+}
+
+#consoleContainer::-webkit-scrollbar {
+  width: 9px;
+}
+#consoleContainer::-webkit-scrollbar-track {
+  background-color: transparent;
+  margin: 4px 0;
+}
+#consoleContainer::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.6);
+  border: 2px solid rgba(0, 0, 0, 0);
+  border-right-width: 4px;
+  background-clip: padding-box;
+}
+
+body.showConsole {
+  padding-bottom: 100px;
+}
+
+body.showConsole #consoleContainer {
+  display: block;
+}
+
+#console {
+  width: 100%;
+  font-family: monospace;
+  padding: 20px 0;
+  font-size: 8pt;
+  word-wrap: break-word;
+}
+
+#console p {
+
+}
+
 /*! Select2 Bootstrap 3 CSS v1.4.6 | MIT License | github.com/t0m/select2-bootstrap-css */
 /**
  * Reset Bootstrap 3 .form-control styles which - if applied to the
