@@ -8,159 +8,157 @@
 		<link rel="stylesheet" href="css/app.css">
 		<!-- http://stackoverflow.com/questions/23535289/bootstrap-3-disable-navbar-collapse -->
 		<style type="text/css">
-   
-    .navbar-header-menu {
-        float: left;
-    }
-    
-        .navbar-header-menu > .navbar-nav {
-            float: left;
-            margin: 0;
-        }
-    
-            .navbar-header-menu > .navbar-nav > li {
-                float: left;
-            }
-    
-                .navbar-header-menu > .navbar-nav > li > a {
-                    padding-top: 15px;
-                    padding-bottom: 15px;
-                }
-    
-            .navbar-header-menu > .navbar-nav .open .dropdown-menu {
-                position: absolute;
-                float: left;
-                width: auto;
-                margin-top: 0;
-                background-color: #fff;
-                border: 1px solid #ccc;
-                border: 1px solid rgba(0,0,0,.15);
-                -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
-                box-shadow: 0 6px 12px rgba(0,0,0,.175);
-            }
-    
-        .navbar-header-menu > .navbar-form {
-            float: left;
-            width: auto;
-            padding-top: 0;
-            padding-bottom: 0;
-            margin-right: 0;
-            margin-left: 0;
-            border: 0;
-            -webkit-box-shadow: none;
-            box-shadow: none;
-        }
-    
-            .navbar-header-menu > .navbar-form > .form-group {
-                display: inline-block;
-                margin-bottom: 0;
-                vertical-align: middle;
-            }
-    
-        .navbar-header-menu > .navbar-left {
-            float: left;
-        }
-    
-        .navbar-header-menu > .navbar-right {
-            float: right !important;
-        }
-    
-        .navbar-header-menu > *.navbar-right:last-child {
-            margin-right: -15px !important;
-        }
-.navbar-brand > img {
-  object-fit: contain;
-  max-height: 100%;
-  height: 100%;
-}
-
-.navbar-custom {
-    background-color:#ccc;
-    color:#333;
-    border-radius:0;
-    border:none;
-    font-weight: bold;
-    box-shadow: 3px 3px 25px #ccc;
-}
-
-.navbar-custom .navbar-nav > li > a {
-    color:#333;
-}
-.navbar-custom .navbar-nav > .active > a, .navbar-nav > .active > a:hover, .navbar-nav > .active > a:focus {
-    color: #333;
-    background-color:#aaa;
-     border:none;
-}
-.navbar-custom .navbar-brand {
-    color:#eeeeee;
-}
-
-body {
-	//padding: 10px;
-	background-color:#ededed;
-}
-
-li.right {
-    position: absolute;
-    right: 0;
-  }
+		
+		.navbar-header-menu {
+		float: left;
+		}
+		
+		.navbar-header-menu > .navbar-nav {
+		float: left;
+		margin: 0;
+		}
+		
+		.navbar-header-menu > .navbar-nav > li {
+		float: left;
+		}
+		
+		.navbar-header-menu > .navbar-nav > li > a {
+		padding-top: 15px;
+		padding-bottom: 15px;
+		}
+		
+		.navbar-header-menu > .navbar-nav .open .dropdown-menu {
+		position: absolute;
+		float: left;
+		width: auto;
+		margin-top: 0;
+		background-color: #fff;
+		border: 1px solid #ccc;
+		border: 1px solid rgba(0,0,0,.15);
+		-webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+		box-shadow: 0 6px 12px rgba(0,0,0,.175);
+		}
+		
+		.navbar-header-menu > .navbar-form {
+		float: left;
+		width: auto;
+		padding-top: 0;
+		padding-bottom: 0;
+		margin-right: 0;
+		margin-left: 0;
+		border: 0;
+		-webkit-box-shadow: none;
+		box-shadow: none;
+		}
+		
+		.navbar-header-menu > .navbar-form > .form-group {
+		display: inline-block;
+		margin-bottom: 0;
+		vertical-align: middle;
+		}
+		
+		.navbar-header-menu > .navbar-left {
+		float: left;
+		}
+		
+		.navbar-header-menu > .navbar-right {
+		float: right !important;
+		}
+		
+		.navbar-header-menu > *.navbar-right:last-child {
+		margin-right: -15px !important;
+		}
+		.navbar-brand > img {
+		object-fit: contain;
+		max-height: 100%;
+		height: 100%;
+		}
+		.navbar-custom {
+		background-color:#ccc;
+		color:#333;
+		border-radius:0;
+		border:none;
+		font-weight: bold;
+		box-shadow: 3px 3px 25px #ccc;
+		}
+		.navbar-custom .navbar-nav > li > a {
+		color:#333;
+		}
+		.navbar-custom .navbar-nav > .active > a, .navbar-nav > .active > a:hover, .navbar-nav > .active > a:focus {
+		color: #333;
+		background-color:#aaa;
+		border:none;
+		}
+		.navbar-custom .navbar-brand {
+		color:#eeeeee;
+		}
+		body {
+		//padding: 10px;
+		background-color:#ededed;
+		}
+		li.right {
+		position: absolute;
+		right: 0;
+		}
+		.platform {
+		padding: 10px 15px 10px 15px;
+		margin-right: 10px;
+		margin-bottom: 10px;
+		background: #ddd;
+		border-radius:1px;
+		cursor: pointer;
+		float:left;
+		}
+		.platform-selected {
+		background: #fff;
+		cursor: pointer;
+		}
 		</style>
 	</head>
 	<body>
 		<!--<header class="jumbotron">
-				<div class="container">
-						<h1>Project Generator</h1>
-				</div>
+					<div class="container">
+								<h1>Project Generator</h1>
+					</div>
 		</header>-->
 		
-
-
-<nav class="navbar navbar-custom" role="navigation">
-    <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-
-<a class="navbar-brand" href="#">
-            <img src="img/of-logo-white.svg">
-        </a>
-            <!-- <a class="navbar-brand" href="#"><img src="img/of-logo-white.svg" width="110" height= "58"/></a>
- -->
-            <div class="navbar-header-menu">
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="#create_update" role="tab" data-toggle="tab">create / update</a></li>
-				<li class="advanced-feature"><a href="#advanced" role="tab" data-toggle="tab" title="Batch operations">update multiple</a></li>
-				<li class="right"><a href="#settings" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-cog"></span></a></li>
-                </ul>
-            	
-                
-            </div>
-
-
-
-
-
-        </div>
-        
-        <!-- /.navbar-collapse -->
-    </div>
-    <!-- /.container-fluid -->
-</nav>
-
-<section class="container">
+		<nav class="navbar navbar-custom" role="navigation">
+			<div class="container-fluid">
+				<!-- Brand and toggle get grouped for better mobile display -->
+				<div class="navbar-header">
+					<a class="navbar-brand" href="#">
+						<img src="img/of-logo-white.svg">
+					</a>
+					<!-- <a class="navbar-brand" href="#"><img src="img/of-logo-white.svg" width="110" height= "58"/></a>
+					-->
+					<div class="navbar-header-menu">
+						<ul class="nav navbar-nav">
+							<li class="active"><a href="#create_update" role="tab" data-toggle="tab">create / update</a></li>
+							<li class="advanced-feature"><a href="#advanced" role="tab" data-toggle="tab" title="Batch operations">update multiple</a></li>
+							<li class="right"><a href="#settings" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-cog"></span></a></li>
+						</ul>
+						
+						
+					</div>
+				</div>
+				
+				<!-- /.navbar-collapse -->
+			</div>
+			<!-- /.container-fluid -->
+		</nav>
+		<section class="container">
 			<!-- Nav tabs -->
-<!-- 			<ul class="nav nav-tabs" role="tablist">
-				<li class="active"><a href="#create_update" role="tab" data-toggle="tab">create / update</a></li>
-				<li class="advanced-feature"><a href="#advanced" role="tab" data-toggle="tab" title="Batch operations">update multiple</a></li>
-				<li><a href="#settings" role="tab" data-toggle="tab">Settings</a></li>
+			<!-- 			<ul class="nav nav-tabs" role="tablist">
+					<li class="active"><a href="#create_update" role="tab" data-toggle="tab">create / update</a></li>
+					<li class="advanced-feature"><a href="#advanced" role="tab" data-toggle="tab" title="Batch operations">update multiple</a></li>
+					<li><a href="#settings" role="tab" data-toggle="tab">Settings</a></li>
 			</ul> -->
-
-
 			<!-- Tab panes -->
 			<div class="tab-content">
 				<!------------------------------- create -------------------------------->
 				<div class="tab-pane active" id="create_update">
 					<!-- <div class="info-message">
-							<p>This is useful to generate a new project, fix broken project configurations, change a project's target platform or (try to) update older projects to newer OF versions.</p>
+								<p>This is useful to generate a new project, fix broken project configurations, change a project's target platform or (try to) update older projects to newer OF versions.</p>
 					</div> -->
 					<form id="generate-mode-section" class="createMode">
 						<div class="form-group">
@@ -182,11 +180,19 @@ li.right {
 								</span>
 							</div>
 						</div>
-						<div class="form-group">
+						<div class="row" style="padding-left:15px;">
 							<label for="platformSelect">Platforms</label>
+							<div class="platformSelect">
+								<!-- <span class="platform">test</span>
+								<span class="platform">test</span>
+								<span class="platform">test</span>
+								<span class="platform">test</span>
+								<span class="platform">test</span> -->
+							</div>
+							<!--
 							<select data-placeholder="platforms..." class="chosen-select form-control" multiple style="width:350px;" id="platformSelect">
-								<option value=""></option>
-							</select>
+									<option value=""></option>
+							</select> -->
 						</div>
 						<div class="form-group" id="addonsForm">
 							<label for="addonsSelect">Addons</label>
@@ -202,20 +208,19 @@ li.right {
 						<div class="form-group">
 							
 							<!-- <div class="alert alert-warning" role="alert" id="warning-update">
-								<h3>Warning</h3>
-								<p>Updating will use the "src" folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files (beware).</p>
+									<h3>Warning</h3>
+									<p>Updating will use the "src" folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files (beware).</p>
 							</div> -->
-							<button class="btn btn-primary" type="button" onclick="generate()" id="create-btn"
-							data-toggle="tooltip" 
-        					data-placement="right" 
-        					title="" 
-        					data-original-title="This will create a new project file for your target platform(s), and a skeleton openFrameworks app in the 'src' folder, including any addon(s) you select.">Create New Project</button>
-
+							<button class="btn btn-info" type="button" onclick="generate()" id="create-btn"
+							data-toggle="tooltip"
+							data-placement="right"
+							title=""
+							data-original-title="This will create a new project file for your target platform(s), and a skeleton openFrameworks app in the 'src' folder, including any addon(s) you select.">Create New Project</button>
 							<button class="btn btn-primary" type="button" onclick="update()" id="update-btn"
-							data-toggle="tooltip" 
-        					data-placement="right" 
-        					title="" 
-        					data-original-title="Updating will use the ''src' folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files but use existing source code">Update Project</button>
+							data-toggle="tooltip"
+							data-placement="right"
+							title=""
+							data-original-title="Updating will use the ''src' folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files but use existing source code">Update Project</button>
 						</div>
 					</form>
 				</div>
@@ -272,9 +277,10 @@ li.right {
 		<script type="text/javascript" src="js/select2.full.min.js"></script>
 		<script src="app.js"></script>
 		<script type="text/javascript">
-			$(function () { 
-    $("[data-toggle='tooltip']").tooltip(); 
-});
+			$(function () {
+			$("[data-toggle='tooltip']").tooltip();
+			});
+			
 		</script>
 		
 	</body>

@@ -147,23 +147,31 @@ function setOFPath(arg) {
 //----------------------------------------
 function setup() {
 
-	var select = $("#platformSelect").get(0);
-	//var selectUpdate = document.getElementById("platformsSelectUpdate");
+	// var select = $("#platformSelect").get(0);
+	// //var selectUpdate = document.getElementById("platformsSelectUpdate");
 
-	select.innerHTML = "";
-	//selectUpdate.innerHTML = "";
+	// select.innerHTML = "";
+	// //selectUpdate.innerHTML = "";
 	var option, i;
 	for (i = 0; i < platforms.length; i++) {
-		option = document.createElement("option");
-		option.text = platforms[i];
-		select.add(option);
+		// option = document.createElement("span");
+		// option.className = "platform";
+		// option.text = platforms[i];
+		// select.add(option);
+		$(".platformSelect").append("<div class='platform'>" + platforms[i] + "</span>");
 	}
 
-	for (i = 0; i < platforms.length; i++) {
-		option = document.createElement("option");
-		option.text = platforms[i];
-		//selectUpdate.add(option);
-	}
+
+	$( "div.platform" ).click(function() {
+  		$( this ).toggleClass( "platform-selected" );
+	});
+
+
+	// for (i = 0; i < platforms.length; i++) {
+	// 	option = document.createElement("option");
+	// 	option.text = platforms[i];
+	// 	//selectUpdate.add(option);
+	// }
 
 	$("#projectName").val('myApp');
 
@@ -211,7 +219,9 @@ function generate() {
 
 	gen['projectName'] = $("#projectName").val();
 	gen['projectPath'] = $("#projectPath").val();
-	gen['platformList'] = $("#platformSelect").val();
+	
+	// TODO: 
+	//gen['platformList'] = $("#platformSelect").val();
 	gen['addonList'] = $("#addonsSelect").val();
 	gen['ofPath'] = $("#ofPath").val();
 
@@ -228,7 +238,9 @@ function update() {
 	var up = {};
 
 	up['updatePath'] = $("#updatePath").val();
-	up['platformList'] = $("#platformSelect").val();
+	
+	//TODO: 
+	//up['platformList'] = $("#platformSelect").val();
 	up['updateRecursive'] = $("#platformRecursive").is(":checked");
 	up['ofPath'] = $("#ofPath").val();
 	//console.log(up);
