@@ -337,3 +337,7 @@ function browseImportProject() {
 function getUpdatePath() {
 	ipc.send('pickUpdatePath', '');	// current path could go here
 }
+
+function rescanAddons() {
+	ipc.send('refreshAddonList', '');
+}
