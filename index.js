@@ -267,6 +267,9 @@ ipc.on('isOFProjectFolder', function (event, project) {
 
 				event.sender.send('selectAddons', projectAddons);
 			}
+			else {
+				event.sender.send('selectAddons', {});
+			}
 		}
 		else {
 			event.sender.send('setGenerateMode', 'createMode');
@@ -334,8 +337,24 @@ ipc.on('update', function (event, arg) {
 
 	exec(wholeString, function callback(error, stdout, stderr) {
 		// result
-		console.log(stdout);
-		event.sender.send('consoleMessage', stdout );
+		event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ stdout );
+
+		if(error === null){
+			event.sender.send('sendUIMessage', 
+				'<strong>Success!</strong><br>'+
+				'Updating your project was successful! <span class="monospace">'+ update['updatePath'] +'</span><br><br>' +
+				'<button class="btn btn-default advanced-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
+				'<div id="fullConsoleOutput"><br><textarea>'+ stdout +'</textarea></div>'
+			);
+			event.sender.send('updateCompleted', true );
+		}
+		else {
+			event.sender.send('sendUIMessage', 
+				'<strong>Error...</strong><br>'+
+				'There was a problem updating your project... <span class="monospace">'+ update['updatePath'] +'</span>' +
+				'<div id="fullConsoleOutput" class="not-hidden"><br><textarea>'+ error.message +'</textarea></div>'
+			);
+		}
 	});
 
 	console.log(wholeString);
@@ -404,9 +423,28 @@ ipc.on('generate', function (event, arg) {
 	var wholeString = pgApp + " -c " + pathString + " " + addonString + " " + platformString + " " + projectString;
 
 	exec(wholeString, function callback(error, stdout, stderr) {
-		// result
-		console.log(stdout);
-		event.sender.send('consoleMessage', stdout );
+		event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ stdout );
+
+		var fullPath = pathTemp.join(generate['projectPath'], generate['projectName']);
+		if(error === null){
+			event.sender.send('sendUIMessage', 
+				'<strong>Success!</strong><br>'+
+				'Your can now find your project in <span class="monospace">'+ fullPath +'</span><br><br>' +
+				'<button class="btn btn-default advanced-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
+				'<div id="fullConsoleOutput"><br><textarea>'+ stdout +'</textarea></div>'
+			);
+			event.sender.send('generateCompleted', true );
+		}
+		else {
+			// note: stderr mostly seems to be also included in error.message
+			// also available: error.code, error.killed, error.signal, error.cmd
+			// info: error.code=127 means commandLinePG was not found
+			event.sender.send('sendUIMessage', 
+				'<strong>Error...</strong><br>'+
+				'There was a problem generating your project... <span class="monospace">'+ fullPath +'</span>' +
+				'<div id="fullConsoleOutput" class="not-hidden"><br><textarea>'+ error.message +'</textarea></div>'
+			);
+		}
 	});
 
 	console.log(wholeString);

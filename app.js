@@ -36,6 +36,7 @@ ipc.on('setProjectPath', function (arg) {
 	elem.value = arg;
 	defaultSettings['lastUsedProjectPath'] = arg;
 	saveDefaultSettings();
+	$("#projectName").trigger('change'); // checks if we need to be in update or generate mode
 });
 
 ipc.on('setGenerateMode', function (arg) {
@@ -114,6 +115,19 @@ ipc.on('sendUIMessage', function (arg) {
 
 ipc.on('consoleMessage', function( msg ){
 	consoleMessage( msg );
+});
+
+ipc.on('generateCompleted', function( isSuccessful ){
+	if(isSuccessful===true){
+		// We want to switch to update mode now
+		$("#projectName").trigger('change');
+	}
+});
+
+ipc.on('updateCompleted', function( isSuccessful ){
+	if(isSuccessful===true){
+		// eventual callback after update completed
+	}
 });
 
 
