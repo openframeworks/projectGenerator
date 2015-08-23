@@ -68,9 +68,9 @@ ipc.on('setAddons', function (arg) {
 			option.text = arg[i];
 			select.add(option);
 		}
-		$("#addonsSelect").attr("data-placeholder", "addons...");
+		// $("#addonsSelect").attr("data-placeholder", "Addons...");
 	} else {
-		$("#addonsSelect").attr("data-placeholder", "no addons found, is OF path right?");
+		$("#addonsSelect").attr("data-placeholder", "No addons found, is OF path right?");
 	}
 
 	// call select2 to make a good selectable 
@@ -222,7 +222,7 @@ function setup() {
 		$(this).trigger('change');
 	});
 
-	$("#advanced-toggle").on("change", function () {
+	$("#advancedToggle").on("change", function () {
 		enableAdvancedMode( $(this).is(':checked') );
 	});
 
@@ -343,7 +343,7 @@ function enableAdvancedMode( isAdvanced ){
 	}
 	defaultSettings['advancedMode'] = isAdvanced;
 	saveDefaultSettings();
-	$("#advanced-toggle").prop('checked', defaultSettings['advancedMode'] );
+	$("#advancedToggle").prop('checked', defaultSettings['advancedMode'] );
 }
 
 function enableConsole( showConsole ){
