@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>OF project generator</title>
+		<title>openFrameworks Project Generator</title>
 		<link rel="stylesheet" href="css/bootstrap.min.css">
 		<link rel="stylesheet" href="css/select2.css">
 		<link rel="stylesheet" href="css/app.css">
@@ -134,8 +134,8 @@
 					<!-- <a class="navbar-brand" href="#"><img src="img/of-logo-white.svg" width="110" height= "58"/></a> -->
 					<div class="navbar-header-menu">
 						<ul class="nav navbar-nav">
-							<li class="active"><a href="#create_update" role="tab" data-toggle="tab">create / update</a></li>
-							<li class="advanced-feature"><a href="#advanced" role="tab" data-toggle="tab" title="Batch operations">update multiple</a></li>
+							<li class="active"><a href="#create_update" role="tab" data-toggle="tab">Create / Update</a></li>
+							<li class="advanced-feature"><a href="#advanced" role="tab" data-toggle="tab" title="Batch operations">Update Multiple</a></li>
 							<li class="right"><a href="#settings" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-cog"></span></a></li>
 						</ul>
 					</div>
@@ -175,8 +175,27 @@
 							<div class="input-group">
 								<input class="form-control" type="text" name="projectPath" value="" id="projectPath">
 								<span class="input-group-btn">
-									<button class="btn btn-info" type="button" onclick="browseProjectPath()">Browse...</button>
+									<button class="btn btn-info" type="button" onclick="browseProjectPath()">Browse</button>
 								</span>
+							</div>
+						</div>
+						<div class="form-group" id="addonsForm">
+							<label for="addonsSelect"
+								data-toggle="tooltip"
+								data-placement="right"
+								title=""
+								data-original-title="Get more addons at http://ofxaddons.com/"
+							>Addons</label>
+							<select class="chosen-select form-control" multiple id="addonsSelect">
+								<option value=""></option>
+							</select>
+							<!--<a href="#ofxaddons.com" class="visitOfxAddons input-info">Browse &amp; download more plugins on ofxaddons.com</a>-->
+							<div class="alert alert-danger" id="missingAddons">
+								<strong>Error</strong>
+								<p>
+									You are missing the following plugins for this project:<br>
+									<span id="missingAddonsList"></span>
+								</p>
 							</div>
 						</div>
 						<div class="form-group advanced-feature" id="platformSelectForm">
@@ -201,41 +220,22 @@
 							</div>
 							<div class="clearfix"></div>
 						</div>
-						<div class="form-group" id="addonsForm">
-							<label for="addonsSelect"
-								data-toggle="tooltip"
-								data-placement="right"
-								title=""
-								data-original-title="Browse &amp; download more plugins on ofxaddons.com"
-							>Addons</label>
-							<select data-placeholder="addons..." class="chosen-select form-control" multiple style="width:350px;" id="addonsSelect">
-								<option value=""></option>
-							</select>
-							<!--<a href="#ofxaddons.com" class="visitOfxAddons input-info">Browse &amp; download more plugins on ofxaddons.com</a>-->
-							<div class="alert alert-danger" id="missingAddons">
-								<strong>Warning</strong>
-								<p>
-									You are missing the following plugins for this project:<br>
-									<span id="missingAddonsList"></span>
-								</p>
-							</div>
-						</div>
 						<div class="form-group" id="submitForm">
 							
 							<!-- <div class="alert alert-warning" role="alert" id="warning-update">
 									<h3>Warning</h3>
 									<p>Updating will use the "src" folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files (beware).</p>
 							</div> -->
-							<button class="btn btn-info" type="button" onclick="generate()" id="create-btn"
+							<button class="btn btn-primary" type="button" onclick="generate()" id="create-btn"
 							data-toggle="tooltip"
 							data-placement="right"
 							title=""
-							data-original-title="This will create a new project file for your target platform(s), and a skeleton openFrameworks app in the 'src' folder, including any addon(s) you select.">Create New Project</button>
+							data-original-title="This will create a new project file for your target platform(s), and a skeleton openFrameworks app in the &quot;src&quot; folder, including any addon(s) you select.">Create New Project</button>
 							<button class="btn btn-primary" type="button" onclick="update()" id="update-btn"
 							data-toggle="tooltip"
 							data-placement="right"
 							title=""
-							data-original-title="Updating will use the ''src' folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files but use existing source code">Update Project</button>
+							data-original-title="Updating will use the &quot;src&quot; folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files but use existing source code.">Update Project</button>
 						</div>
 					</form>
 				</div>
@@ -244,20 +244,22 @@
 					<form>
 						<div class="form-group">
 							<div class="alert alert-warning" role="alert">
-								<b>warning</b> this updates existing projects <em>recusively</em> from the selected directory.	For example, to generate OF examples for a specific platform, you'd choose the examples folder as the update path.
+								<strong>Warning</strong>
+								<p>This updates existing projects <em>recursively</em> in the selected directory. For example, to generate examples for a specific platform, you'd choose the examples folder as the update path.
+								</p>
 							</div>
 						</div>
 						<div class="form-group">
-							<label for="updatePath">update path</label>
+							<label for="updatePath">Path</label>
 							<div class="input-group">
 								<input class="form-control" type="text" name="updatePath" value="" id="updatePath">
 								<span class="input-group-btn">
-									<button class="btn btn-info" type="button" onclick="getUpdatePath()">set update location</button>
+									<button class="btn btn-info" type="button" onclick="getUpdatePath()">Browse</button>
 								</span>
 							</div>
 						</div>
 						<div class="form-group">
-							<button class="btn btn-primary" type="button" onclick="update()">update multiple</button>
+							<button class="btn btn-primary" type="button" onclick="update()">Update Multiple</button>
 						</div>
 					</form>
 				</div>
@@ -265,20 +267,20 @@
 				<div class="tab-pane" id="settings">
 					<form>
 						<div class="form-group">
-							<label for="ofPath">of path</label>
+							<label for="ofPath">openFrameworks Path</label>
 							<div class="input-group">
 								<input class="form-control" type="text" name="ofPath" value="" id="ofPath">
 								<span class="input-group-btn">
-									<button class="btn btn-info" type="button" onclick="getPath()">set OF path</button>
+									<button class="btn btn-info" type="button" onclick="getPath()">Browse</button>
 								</span>
 							</div>
 						</div>
 						<div class="form-group">
 							<div class="input-group">
 								<div class="checkbox">
-									<label for="advancedModeToggle">
-										<input type="checkbox" name="advancedModeToggle" value="" id="advanced-toggle">
-										advanced mode
+									<label for="advancedToggle">
+										<input type="checkbox" name="advancedToggle" value="" id="advancedToggle">
+										Show advanced options
 									</label>
 								</div>
 							</div>
@@ -288,7 +290,7 @@
 								<div class="checkbox">
 									<label for="consoleToggle">
 										<input type="checkbox" name="consoleToggle" value="" id="consoleToggle">
-										show console
+										Show console output
 									</label>
 								</div>
 							</div>
