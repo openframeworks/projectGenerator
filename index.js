@@ -7,7 +7,7 @@ var ipc = require('ipc');
 var fs = require('fs');
 var path = require('path');
 var menu = require('menu');
-
+var settings;
 // Debugging: start the Electron PG from the terminal to see the messages from console.log()
 // Example: /path/to/PG/Contents/MacOS/Electron /path/to/PG/Contents/Ressources/app
 // Note: app.js's console.log is also visible from the WebKit inspector. (look for mainWindow.openDevTools() below )
@@ -16,24 +16,23 @@ var menu = require('menu');
 //--------------------------------------------------------- load settings
 var obj;
 try {
-  var settings = fs.readFileSync(path.resolve(__dirname, 'settings.json'));
+  	var settings = fs.readFileSync(path.resolve(__dirname, 'settings.json'));
 	obj = JSON.parse(settings, 'utf8');
 } catch (e) {
 	obj = {
 		"defaultOfPath": "",
-		"useRelativePath": false, /* can this setting be removed? */
 		"advancedMode": false,
-		"lastUsedProjectPath" : "",
 		"defaultPlatform" : "Unknown",
-		"showConsole" : false
+		"showConsole" : false,
+		"showDeveloperTools":false
 	};
 }
 var defaultOfPath = obj["defaultOfPath"];
 var addons;
 
 if (!path.isAbsolute(defaultOfPath)) {
+	// todo: this needs to be PLATFORM specific: 
 	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../../../"), defaultOfPath));
-	console.log("...... OF path changed to absolute: " + defaultOfPath);
 	obj["defaultOfPath"] = defaultOfPath;
 }
 
@@ -74,8 +73,9 @@ app.on('ready', function () {
 	mainWindow.loadUrl('file://' + __dirname + '/index.html');
 
 	// Open the devtools.
-	mainWindow.openDevTools();
-
+	if (obj["showDeveloperTools"]){
+		mainWindow.openDevTools();
+	}
 	//when the window is loaded send the defaults
 	mainWindow.webContents.on('did-finish-load', function () {
 		//parseAddonsAndUpdateSelect();

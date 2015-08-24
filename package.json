@@ -1,6 +1,6 @@
 {
-  "name": "pgelectron",
-  "productName": "pgElectron",
+  "name": "projectGenerator",
+  "productName": "projectGenerator",
   "version": "0.0.1",
   "description": "repo for testing a gui using electron for the project generator",
   "license": "MIT",
@@ -16,7 +16,7 @@
   },
   "scripts": {
     "start": "electron .",
-    "build": "electron-packager . $npm_package_productName --out=dist --ignore=['dist','readme.md'] --prune --all --version=0.30.0 --icon=icon.ico"
+    "build": "electron-packager . $npm_package_productName --out=dist --ignore='dist' --ignore='readme.md' --prune --all --overwrite --version=0.30.0"
   },
   "files": [
     "index.html",

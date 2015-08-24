@@ -28,7 +28,10 @@ ipc.on('setDefaults', function (arg) {
 	setOFPath(defaultSettings['defaultOfPath']);
 	enableAdvancedMode( defaultSettings['advancedMode'] );
 	enableConsole( defaultSettings['showConsole'] );
-	$("#projectPath").val( defaultSettings['lastUsedProjectPath'] );
+
+	// todo: main app should figure out the best name for the settings pass this through
+	
+	//$("#projectPath").val( defaultSettings['lastUsedProjectPath'] );
 });
 
 ipc.on('setProjectPath', function (arg) {
@@ -348,10 +351,10 @@ function enableAdvancedMode( isAdvanced ){
 
 function enableConsole( showConsole ){
 	if( showConsole ) {
-		$("body").addClass('showConsole');
+		$("#consoleContainer").addClass('showConsole');
 	}
 	else {
-		$("body").removeClass('showConsole');
+		$("#consoleContainer").removeClass('showConsole');
 	}
 	defaultSettings['showConsole'] = showConsole;
 	saveDefaultSettings();
