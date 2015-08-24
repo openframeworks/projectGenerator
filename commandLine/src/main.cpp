@@ -60,6 +60,7 @@ public:
 	vector <int>        targets;
 	string              ofPathEnv;
 	string              currentWorkingDirectory;
+    
 
     bool bVerbose;
     bool bAddonsPassedIn;
@@ -74,6 +75,12 @@ public:
 
 	commandLineProjectGenerator() {
         
+        
+        // on OSX there's some wonkiness in ofUtils that messes with CWD on OSX.
+        // Let's store it here and use it later without worrying about that
+        
+        currentWorkingDirectory = Poco::Path::current();
+        
         // this is called before params have been parsed.
         
         bAddonsPassedIn = false;
@@ -86,6 +93,7 @@ public:
 		bHelpRequested = false;
 		targets.push_back(ofGetTargetPlatform());
 
+        
         
 	}
 
@@ -122,7 +130,7 @@ public:
 
 
 
-		currentWorkingDirectory = Poco::Path::current();
+		
 		loadConfiguration(); // load default configuration files, if present
 		Application::initialize(self);
 
@@ -489,7 +497,7 @@ public:
 
 		//-------------------------- get the path to the current working folder
 
-		Path cwd = Path::current();                      // get the current path
+		Path cwd = currentWorkingDirectory;                      // get the current path
 		projectPath = cwd.resolve(projectPath).toString();  // resolve projectPath vs that.
 		Path resolvedPath = Path(projectPath).absolute();         // use absolute version of this path
 		projectPath = resolvedPath.toString();
@@ -536,13 +544,7 @@ public:
 
 
 
-		if (!isGoodOFPath(ofPath)) {
-			consoleSpace();
-			ofLogError() << "path to openframeworks (" << ofPath << ") seems wrong, please check";
-			consoleSpace();
-			return Application::EXIT_OK;
-		}
-
+		
         
 
 		if (ofDirectory(projectPath).exists()) {
@@ -567,14 +569,13 @@ public:
 			consoleSpace();
 			printHelp();
 			return Application::EXIT_OK;
-		}
-		else {
+		} else {
 
 			// let's try to resolve this path vs the current path
 			// so things like ../ can work
 			// see http://www.appinf.com/docs/poco/Poco.Path.html
 
-			Path cwd = Path::current();                  // get the current path
+			Path cwd = currentWorkingDirectory;                  // get the current path
 			ofPath = cwd.resolve(ofPath).toString();   // resolve ofPath vs that.
 			Path resolvedPath = Path(ofPath).absolute();    // make that new path absolute
 			ofPath = resolvedPath.toString();
@@ -586,6 +587,14 @@ public:
 			ofLog(OF_LOG_NOTICE) << "setting OF path to: " << ofPath;
 			setOFRoot(ofPath);
 		}
+        
+        if (!isGoodOFPath(ofPath)) {
+			consoleSpace();
+			ofLogError() << "path to openframeworks (" << ofPath << ") seems wrong, please check";
+			consoleSpace();
+			return Application::EXIT_OK;
+		}
+
 
 
         consoleSpace();
