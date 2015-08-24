@@ -18,6 +18,7 @@ var obj;
 try {
   	var settings = fs.readFileSync(path.resolve(__dirname, 'settings.json'));
 	obj = JSON.parse(settings, 'utf8');
+	console.log(obj);
 } catch (e) {
 	obj = {
 		"defaultOfPath": "",
@@ -35,6 +36,40 @@ if (!path.isAbsolute(defaultOfPath)) {
 	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../../../"), defaultOfPath));
 	obj["defaultOfPath"] = defaultOfPath;
 }
+
+// now, let's look for a folder called mySketch, and keep counting until we find one that doesn't exist
+
+var defaultPathForProjects = path.join(obj["defaultOfPath"], obj["defaultRelativeProjectPath"]);
+var foundOne = false;
+var foundCounter = 0;
+
+while (foundOne === false){
+	
+	var pathToTest = "";
+	if (foundCounter !== 0){
+		pathToTest = path.join(defaultPathForProjects, "mySketch" + foundCounter.toString());
+	} else {
+		pathToTest = path.join(defaultPathForProjects, "mySketch");
+	}
+
+	if (fs.existsSync(pathToTest)){
+		foundCounter++;
+	} else {
+		foundOne = true;
+	}
+}
+
+console.log("a");
+
+var goodName = ""
+if (foundCounter !== 0){
+	goodName =  "mySketch" + foundCounter.toString();
+} else {
+	goodName =  "mySketch";
+}
+
+obj["startingProjectPath"] = defaultPathForProjects;
+obj["startingProjectName"] = goodName;
 
 
 //---------------------------------------------------------
@@ -62,7 +97,7 @@ app.on('ready', function () {
 	// Create the browser window.
 	mainWindow = new BrowserWindow({
 		width: 500,
-		height: 800,
+		height: 600,
 		resizable: false
 	});
 

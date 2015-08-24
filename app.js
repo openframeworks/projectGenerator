@@ -24,14 +24,23 @@ ipc.on('setup', function (arg) {
 //-----------------------------------------
 // this is called from main when defaults are loaded in:
 ipc.on('setDefaults', function (arg) {
+
 	defaultSettings = arg;
+	var startPath = defaultSettings['startingProjectPath'];  // this gets delete on save, so grab it first. 
+	var startName = defaultSettings['startingProjectName'];  // this gets delete on save, so grab it first. 
+	
 	setOFPath(defaultSettings['defaultOfPath']);
 	enableAdvancedMode( defaultSettings['advancedMode'] );
 	enableConsole( defaultSettings['showConsole'] );
 
-	// todo: main app should figure out the best name for the settings pass this through
-	
-	//$("#projectPath").val( defaultSettings['lastUsedProjectPath'] );
+	// index.js has looked for and provided a good starting path.   this gets delete on save
+	// it's not the cleanest way to do this (we should open up another ipc channel) 
+
+	$("#projectPath").val(startPath);
+	$("#projectName").val(startName).trigger('change');
+
+	console.log(startName);
+
 });
 
 ipc.on('setProjectPath', function (arg) {
@@ -203,7 +212,7 @@ function setup() {
 	// 	//selectUpdate.add(option);
 	// }
 
-	$("#projectName").val('myApp');
+	//$("#projectName").val('myApp');
 
 	// bind ofxAddons URL (load it in default browser; not within Electron)
 	$("#visitOfxAddons").click(function () {
@@ -242,6 +251,15 @@ function setup() {
 }
 
 function saveDefaultSettings() {
+
+	if ('startingProjectPath' in defaultSettings){
+		delete defaultSettings.startingProjectPath
+	}
+	if ('startingProjectName' in defaultSettings){
+		delete defaultSettings.startingProjectName
+	}
+	
+
 	var fs = require('fs');
 	fs.writeFile(path.resolve(__dirname, 'settings.json'), JSON.stringify(defaultSettings, null, '\t'), function (err) {
 		if (err) {
