@@ -96,7 +96,6 @@ ipc.on('setAddons', function (arg) {
 
 	// call select2 to make a good selectable 
 	$("#addonsSelect").select2();
-	//$("#addonsSelect").trigger("chosen:updated");
 });
 
 // select the list of addons and notify if some aren't installed
