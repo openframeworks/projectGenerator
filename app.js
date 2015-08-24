@@ -35,22 +35,17 @@ ipc.on('setup', function (arg) {
 ipc.on('setDefaults', function (arg) {
 
 	defaultSettings = arg;
-	var startPath = defaultSettings['startingProjectPath'];  // this gets delete on save, so grab it first. 
-	var startName = defaultSettings['startingProjectName'];  // this gets delete on save, so grab it first. 
-	
+
 	setOFPath(defaultSettings['defaultOfPath']);
 	enableAdvancedMode( defaultSettings['advancedMode'] );
 	//enableConsole( defaultSettings['showConsole'] );
 	if( defaultSettings['showConsole'] ) $("body").addClass('showConsole');
 
-	// index.js has looked for and provided a good starting path.   this gets delete on save
-	// it's not the cleanest way to do this (we should open up another ipc channel) 
+});
 
-	$("#projectPath").val(startPath);
-	$("#projectName").val(startName).trigger('change');
-
-	console.log(startName);
-
+ipc.on('setStartingProject', function (arg){
+	$("#projectPath").val(arg['path']);
+	$("#projectName").val(arg['name']);
 });
 
 ipc.on('setProjectPath', function (arg) {
@@ -69,7 +64,6 @@ ipc.on('importProjectSettings', function(settings){
 	$("#projectName").val(settings['projectName']).trigger('change'); // change triggers addon scanning
 });
 
-
 /*ipc.on('setUpdatePath', function(arg) {
 	var elem = document.getElementById("updatePath");
 	elem.value = arg;
@@ -79,8 +73,6 @@ ipc.on('setAddons', function (arg) {
 
 	var select = document.getElementById("addonsSelect");
 	select.innerHTML = "";
-
-
 
 	if (arg !== null && arg.length > 0) {
 		// add:
@@ -277,14 +269,6 @@ function setup() {
 }
 
 function saveDefaultSettings() {
-
-	if ('startingProjectPath' in defaultSettings){
-		delete defaultSettings.startingProjectPath
-	}
-	if ('startingProjectName' in defaultSettings){
-		delete defaultSettings.startingProjectName
-	}
-	
 
 	var fs = require('fs');
 	fs.writeFile(path.resolve(__dirname, 'settings.json'), JSON.stringify(defaultSettings, null, '\t'), function (err) {

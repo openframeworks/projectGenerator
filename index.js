@@ -7,7 +7,8 @@ var ipc = require('ipc');
 var fs = require('fs');
 var path = require('path');
 var menu = require('menu');
-var settings;
+var moniker = require('moniker');
+
 // Debugging: start the Electron PG from the terminal to see the messages from console.log()
 // Example: /path/to/PG/Contents/MacOS/Electron /path/to/PG/Contents/Ressources/app
 // Note: app.js's console.log is also visible from the WebKit inspector. (look for mainWindow.openDevTools() below )
@@ -39,39 +40,10 @@ if (!path.isAbsolute(defaultOfPath)) {
 }
 
 // now, let's look for a folder called mySketch, and keep counting until we find one that doesn't exist
-
-var defaultPathForProjects = path.join(obj["defaultOfPath"], obj["defaultRelativeProjectPath"]);
-var foundOne = false;
-var foundCounter = 0;
-
-while (foundOne === false){
-	
-	var pathToTest = "";
-	if (foundCounter !== 0){
-		pathToTest = path.join(defaultPathForProjects, "mySketch" + foundCounter.toString());
-	} else {
-		pathToTest = path.join(defaultPathForProjects, "mySketch");
-	}
-
-	if (fs.existsSync(pathToTest)){
-		foundCounter++;
-	} else {
-		foundOne = true;
-	}
-}
-
-console.log("a");
-
-var goodName = ""
-if (foundCounter !== 0){
-	goodName =  "mySketch" + foundCounter.toString();
-} else {
-	goodName =  "mySketch";
-}
-
-obj["startingProjectPath"] = defaultPathForProjects;
-obj["startingProjectName"] = goodName;
-
+var startingProject = {};
+startingProject['name'] = "";
+startingProject['path'] = "";
+getStartingProjectName();
 
 //---------------------------------------------------------
 // Report crashes to our server.
@@ -115,6 +87,7 @@ app.on('ready', function () {
 	//when the window is loaded send the defaults
 	mainWindow.webContents.on('did-finish-load', function () {
 		//parseAddonsAndUpdateSelect();
+		mainWindow.webContents.send('setStartingProject', startingProject);
 		mainWindow.webContents.send('setDefaults', obj);
 		mainWindow.webContents.send('setup', '');
 	});
@@ -202,6 +175,27 @@ app.on('ready', function () {
 	menu.setApplicationMenu(menuV);
 
 });
+
+function getStartingProjectName(){
+	var defaultPathForProjects = path.join(obj["defaultOfPath"], obj["defaultRelativeProjectPath"]);
+	var foundOne = false;
+	var projectNames = moniker.generator([moniker.adjective]);
+	var goodName = "mySketch";
+	
+	while (foundOne === false){
+		if( fs.existsSync( path.join(defaultPathForProjects, goodName) ) ){
+			console.log("«"+ goodName +"» already exists, generating a new name...");
+			var adjective = projectNames.choose();
+			goodName = "my"+ adjective.charAt(0).toUpperCase() + adjective.slice(1) +"Sketch";
+		}
+		else {
+			foundOne = true;
+		}
+	}
+	
+	startingProject['path'] = defaultPathForProjects;
+	startingProject['name'] = goodName;
+}
 	
 function parseAddonsAndUpdateSelect() {
 
