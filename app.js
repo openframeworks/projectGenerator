@@ -6,7 +6,16 @@ var ipc = require('ipc');
 var path = require('path');
 
 
-var platforms = ["osx", "win_cb", "vs", "ios", "linux", "linux64", "linuxarmv6l", "linuxarmv7l"];
+var platforms = {
+	"osx" : "OS X (Xcode)",
+	"win_cb" : "Windows (Code::Blocks)",
+	"vs" : "Windows (Visual Studio 2015)",
+	"ios" : "iOS (Xcode)",
+	"linux" : "Linux 32-bit (Code::Blocks)",
+	"linux64" : "Linux 64-bit (Code::Blocks)",
+	"linuxarmv6l" : "Linux ARMv6 (Makefiles)",
+	"linuxarmv7l" : "Linux ARMv7 (Makefiles)"
+};
 
 var defaultSettings;
 
@@ -183,14 +192,14 @@ function setup() {
 	// select.innerHTML = "";
 	// //selectUpdate.innerHTML = "";
 	var option, i;
-	for (i = 0; i < platforms.length; i++) {
+	for (var i in platforms) {
 		// option = document.createElement("span");
 		// option.className = "platform";
 		// option.text = platforms[i];
 		// select.add(option);
 		var myClass = 'platform';
 		if( platforms[i] === defaultSettings['defaultPlatform'] ){ myClass += " platform-selected" }
-		$(".platformSelect").append("<div class='"+myClass+"'>" + platforms[i] + "</span>");
+		$(".platformSelect").append("<div class='"+myClass+"' data-value='"+i+"'>" + platforms[i] + "</span>");
 	}
 
 
@@ -392,7 +401,7 @@ function getPlatformList( platformSelector ){
 	var selected = [];
 
 	$(platformSelector).children(".platform.platform-selected").each(function(){
-		selected.push( $(this).text() );
+		selected.push( $(this).data('value') );
 	});
 
 	if(selected.length == 0){ return null; }
