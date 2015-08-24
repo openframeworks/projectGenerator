@@ -198,7 +198,7 @@ function setup() {
 		// option.text = platforms[i];
 		// select.add(option);
 		var myClass = 'platform';
-		if( platforms[i] === defaultSettings['defaultPlatform'] ){ myClass += " platform-selected" }
+		if( i === defaultSettings['defaultPlatform'] ){ myClass += " platform-selected only-one" }
 		$(".platformSelect").append("<div class='"+myClass+"' data-value='"+i+"'>" + platforms[i] + "</span>");
 	}
 
@@ -210,6 +210,14 @@ function setup() {
 		}
 		else {
 			$( this ).toggleClass( "platform-selected" );
+		}
+		// handle css class when only 1 is selected
+		var candidates = $(this).parent().children("div.platform");
+		if(candidates.filter(".platform-selected").length <= 1){
+			candidates.filter(".platform-selected").addClass("only-one");
+		}
+		else {
+			candidates.removeClass("only-one");
 		}
 	});
 

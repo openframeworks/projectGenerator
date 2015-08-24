@@ -273,10 +273,12 @@ body.showConsole .console-feature {
   background-color: #ccc;
   border-color: #333;
   color: #333;
+  padding-left: 30px;
 }
 
-body.advanced .platform {
-  padding-left: 30px;
+.platform-selected.only-one {
+  padding-left: 15px;
+  cursor: default;
 }
 
 body.advanced .platform-selected:before {
@@ -285,14 +287,18 @@ body.advanced .platform-selected:before {
   display: inline-block;
   float: left;
   margin: 3px 0 0 -20px;
-  padding: 0px 1px;
-  font-size: 8pt;
+  font-size: 16pt;
+  line-height: 0.6em; /* positions X vertically */
   box-sizing: border-box;
   width: 15px;
   height: 15px;
   background-color: #333;
   color: #fff;
   opacity: 0.2;
+}
+
+body.advanced .platform-selected.only-one:before{
+  display: none;
 }
 
 body.advanced .platform-selected:hover:before {
