@@ -213,7 +213,7 @@ body.showConsole {
   /*padding-bottom: 100px;*/
 }
 
-body.showConsole #consoleContainer {
+body.showConsole:not(.page-settings) #consoleContainer {
   display: block;
 }
 

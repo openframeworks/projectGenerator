@@ -265,6 +265,11 @@ function setup() {
 
 	// Enable tooltips
 	$("[data-toggle='tooltip']").tooltip();
+
+	// add current menu element in body tag for CSS styling
+	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+  		$('body').removeClass('page-create_update page-settings page-advanced').addClass( 'page-' + $(e.target).attr("href").replace('#', '') );
+	});
 }
 
 function saveDefaultSettings() {
