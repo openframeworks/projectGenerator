@@ -106,8 +106,8 @@ body:not(.advanced) .platform:not(.platform-selected) {
   background-color: #333;
   color: #FFF;
   height: 100px;
-  position: fixed;
-  bottom: 0;
+  //position: fixed;
+  //bottom: 0;
   box-shadow: inset 0px 0px 9px 0px rgba(0,0,0,0.75);
   overflow-y: scroll;
 }
@@ -126,13 +126,13 @@ body:not(.advanced) .platform:not(.platform-selected) {
   background-clip: padding-box;
 }
 
-body.showConsole {
+/*body.showConsole {
   padding-bottom: 100px;
 }
 
 body.showConsole #consoleContainer {
   display: block;
-}
+}*/
 
 #console {
   width: 100%;
