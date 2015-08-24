@@ -40,7 +40,8 @@ ipc.on('setDefaults', function (arg) {
 	
 	setOFPath(defaultSettings['defaultOfPath']);
 	enableAdvancedMode( defaultSettings['advancedMode'] );
-	enableConsole( defaultSettings['showConsole'] );
+	//enableConsole( defaultSettings['showConsole'] );
+	if( defaultSettings['showConsole'] ) $("body").addClass('showConsole');
 
 	// index.js has looked for and provided a good starting path.   this gets delete on save
 	// it's not the cleanest way to do this (we should open up another ipc channel) 
@@ -186,23 +187,15 @@ function setOFPath(arg) {
 //----------------------------------------
 function setup() {
 
-	// var select = $("#platformSelect").get(0);
-	// //var selectUpdate = document.getElementById("platformsSelectUpdate");
-
-	// select.innerHTML = "";
-	// //selectUpdate.innerHTML = "";
+	// populate platform selection forms
 	var option, i;
 	for (var i in platforms) {
-		// option = document.createElement("span");
-		// option.className = "platform";
-		// option.text = platforms[i];
-		// select.add(option);
 		var myClass = 'platform';
 		if( i === defaultSettings['defaultPlatform'] ){ myClass += " platform-selected only-one" }
 		$(".platformSelect").append("<div class='"+myClass+"' data-value='"+i+"'>" + platforms[i] + "</span>");
 	}
 
-
+	// handle platform selection
 	$( "div.platform" ).click(function() {
 		if( $(this).hasClass("platform-selected") && $(this).parent().children(".platform-selected").length <= 1 ){
 			// always 1 has to remain selected
@@ -264,12 +257,15 @@ function setup() {
 		enableAdvancedMode( $(this).is(':checked') );
 	});
 
+	/* Stuff for the console setting (removed from UI)
 	$("#consoleToggle").on("change", function () {
 		enableConsole( $(this).is(':checked') );
-	});
+	});*/
 
+	// initialise the overall-use modal
 	$("#uiModal").modal({'show':false});
 
+	// show default platform in GUI
 	$("#defaultPlatform").html( defaultSettings['defaultPlatform'] );
 
 	// Enable tooltips
@@ -404,6 +400,7 @@ function enableAdvancedMode( isAdvanced ){
 	$("#advancedToggle").prop('checked', defaultSettings['advancedMode'] );
 }
 
+/* Stuff for the console setting (removed from UI)
 function enableConsole( showConsole ){
 	if( showConsole ) {
 		// this has to be in body for CSS reasons
@@ -415,7 +412,7 @@ function enableConsole( showConsole ){
 	defaultSettings['showConsole'] = showConsole;
 	saveDefaultSettings();
 	$("#consoleToggle").prop('checked', defaultSettings['showConsole'] );
-}
+}*/
 
 function getPlatformList( platformSelector ){
 	var selected = [];
