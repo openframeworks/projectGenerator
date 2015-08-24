@@ -471,6 +471,38 @@ public:
 		}
 		if (!bDryRun && !bConsiderAddonsDotMake) project->save(true);
 	}
+    
+    
+    
+    std::string get_working_path()
+    {
+        char temp [ PATH_MAX ];
+        
+        if ( getcwd(temp, PATH_MAX) != 0)
+            return std::string ( temp );
+        
+        int error = errno;
+        
+        switch ( error ) {
+                // EINVAL can't happen - size argument > 0
+                
+                // PATH_MAX includes the terminating nul,
+                // so ERANGE should not be returned
+                
+            case EACCES:
+                throw std::runtime_error("Access denied");
+                
+            case ENOMEM:
+                // I'm not sure whether this can happen or not
+                throw std::runtime_error("Insufficient storage");
+                
+            default: {
+                std::ostringstream str;
+                str << "Unrecognised error" << error;
+                throw std::runtime_error(str.str());
+            }
+        }
+    }
 
 
 	int main(const std::vector<std::string>& args) {
@@ -489,7 +521,9 @@ public:
 
 		//-------------------------- get the path to the current working folder
 
-		Path cwd = Path::current();                      // get the current path
+        //cout << projectPath << " ????? " << Path::current() << endl << get_working_path() << " ??? " << getenv("PWD") <<  endl;
+        
+		Path cwd = getenv("PWD"); //Path::current();                      // get the current path
 		projectPath = cwd.resolve(projectPath).toString();  // resolve projectPath vs that.
 		Path resolvedPath = Path(projectPath).absolute();         // use absolute version of this path
 		projectPath = resolvedPath.toString();
@@ -536,12 +570,7 @@ public:
 
 
 
-		if (!isGoodOFPath(ofPath)) {
-			consoleSpace();
-			ofLogError() << "path to openframeworks (" << ofPath << ") seems wrong, please check";
-			consoleSpace();
-			return Application::EXIT_OK;
-		}
+		
 
         
 
@@ -573,11 +602,36 @@ public:
 			// let's try to resolve this path vs the current path
 			// so things like ../ can work
 			// see http://www.appinf.com/docs/poco/Poco.Path.html
+            
+            
+            if (ofFilePath::isAbsolute(ofPath)) {
+			
+            } else {
+                
+                
+                
+				ofPath = ofFilePath::join(getenv("PWD"), ofPath);
+                
+				// this line is arturo's ninja magic to make paths with dots make sense:
+				ofPath = ofFilePath::removeTrailingSlash(ofFilePath::getPathForDirectory(ofFilePath::getAbsolutePath(ofPath, false)));
+                
+			}
+            
 
-			Path cwd = Path::current();                  // get the current path
-			ofPath = cwd.resolve(ofPath).toString();   // resolve ofPath vs that.
-			Path resolvedPath = Path(ofPath).absolute();    // make that new path absolute
-			ofPath = resolvedPath.toString();
+//			Path cwd = getenv("PWD"); //Path cwd = Path::current();                  // get the current path
+//			
+//            cout << "ofPath a" <<  ofPath << endl;
+//            
+//            ofPath = cwd.resolve(ofPath).toString();   // resolve ofPath vs that.
+//            cout << "ofPath b" <<  ofPath << endl;
+//            
+//            ofPath = ofFilePath::removeTrailingSlash(ofFilePath::getPathForDirectory(ofFilePath::getAbsolutePath(ofPath, false)));
+//            
+//            cout << "ofPath c" <<  ofPath << endl;
+//            
+//                                                                                                                
+//			Path resolvedPath = Path(ofPath).absolute();    // make that new path absolute
+//			ofPath = resolvedPath.toString();
 
 			if (!isGoodOFPath(ofPath)) {
 				return Application::EXIT_OK;
@@ -585,6 +639,13 @@ public:
 
 			ofLog(OF_LOG_NOTICE) << "setting OF path to: " << ofPath;
 			setOFRoot(ofPath);
+		}
+        
+        if (!isGoodOFPath(ofPath)) {
+			consoleSpace();
+			ofLogError() << "path to openframeworks (" << ofPath << ") seems wrong, please check";
+			consoleSpace();
+			return Application::EXIT_OK;
 		}
 
 
