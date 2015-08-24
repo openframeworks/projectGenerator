@@ -25,7 +25,8 @@ try {
 		"advancedMode": false,
 		"defaultPlatform" : "Unknown",
 		"showConsole" : false,
-		"showDeveloperTools":false
+		"showDeveloperTools" : false,
+		"defaultRelativeProjectPath" : "apps/myApps"
 	};
 }
 var defaultOfPath = obj["defaultOfPath"];
@@ -33,7 +34,7 @@ var addons;
 
 if (!path.isAbsolute(defaultOfPath)) {
 	// todo: this needs to be PLATFORM specific: 
-	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../../../"), defaultOfPath));
+	defaultOfPath = path.resolve(path.join( path.join(__dirname, "../../../../"), defaultOfPath));
 	obj["defaultOfPath"] = defaultOfPath;
 }
 
@@ -371,19 +372,18 @@ ipc.on('update', function (event, arg) {
 	var wholeString = pgApp + " -u " + recursiveString + " " + pathString + " " + platformString + " " + updatePath;
 
 	exec(wholeString, function callback(error, stdout, stderr) {
-		// result
-		event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ stdout );
-
 		if(error === null){
+			event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ stdout );
 			event.sender.send('sendUIMessage', 
 				'<strong>Success!</strong><br>'+
 				'Updating your project was successful! <span class="monospace">'+ update['updatePath'] +'</span><br><br>' +
-				'<button class="btn btn-default advanced-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
+				'<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
 				'<div id="fullConsoleOutput"><br><textarea>'+ stdout +'</textarea></div>'
 			);
 			event.sender.send('updateCompleted', true );
 		}
 		else {
+			event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ error.message );
 			event.sender.send('sendUIMessage', 
 				'<strong>Error...</strong><br>'+
 				'There was a problem updating your project... <span class="monospace">'+ update['updatePath'] +'</span>' +
@@ -458,19 +458,20 @@ ipc.on('generate', function (event, arg) {
 	var wholeString = pgApp + " -c " + pathString + " " + addonString + " " + platformString + " " + projectString;
 
 	exec(wholeString, function callback(error, stdout, stderr) {
-		event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ stdout );
 
 		var fullPath = pathTemp.join(generate['projectPath'], generate['projectName']);
 		if(error === null){
+			event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ stdout );
 			event.sender.send('sendUIMessage', 
 				'<strong>Success!</strong><br>'+
 				'Your can now find your project in <span class="monospace">'+ fullPath +'</span><br><br>' +
-				'<button class="btn btn-default advanced-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
+				'<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
 				'<div id="fullConsoleOutput"><br><textarea>'+ stdout +'</textarea></div>'
 			);
 			event.sender.send('generateCompleted', true );
 		}
 		else {
+			event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ error.message );
 			// note: stderr mostly seems to be also included in error.message
 			// also available: error.code, error.killed, error.signal, error.cmd
 			// info: error.code=127 means commandLinePG was not found

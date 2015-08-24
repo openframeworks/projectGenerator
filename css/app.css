@@ -39,28 +39,104 @@
 	margin-bottom: 0;
 }
 
-#fullConsoleOutput {
-  display: none;
+body {
+  background-color:#ededed;
+}
+li.right {
+  position: absolute;
+  right: 0;
 }
 
-#fullConsoleOutput.not-hidden {
-  display: block;
-}
-
-#fullConsoleOutput textarea {
-  background-color: #333;
-  color: #FFF;
-  padding: 10px 5px;
-  font-family: monospace;
-  width: 100%;
-  height: 150px;
-  line-height: 1.3em;
-  font-size: 0.8em;
-}
-
+/* - - - - - - - - - -  NAVBAR STYLING - - - - - - - - - - - - - - - - - - - */
+/* http://stackoverflow.com/questions/23535289/bootstrap-3-disable-navbar-collapse */
 .nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
 	background-color: #333;
 }
+
+.navbar-header-menu {
+  float: left;
+}
+
+.navbar-header-menu > .navbar-nav {
+  float: left;
+  margin: 0;
+}
+
+.navbar-header-menu > .navbar-nav > li {
+  float: left;
+}
+
+.navbar-header-menu > .navbar-nav > li > a {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.navbar-header-menu > .navbar-nav .open .dropdown-menu {
+  position: absolute;
+  float: left;
+  width: auto;
+  margin-top: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0,0,0,.15);
+  -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+  box-shadow: 0 6px 12px rgba(0,0,0,.175);
+}
+
+.navbar-header-menu > .navbar-form {
+  float: left;
+  width: auto;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-right: 0;
+  margin-left: 0;
+  border: 0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.navbar-header-menu > .navbar-form > .form-group {
+  display: inline-block;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.navbar-header-menu > .navbar-left {
+  float: left;
+}
+
+.navbar-header-menu > .navbar-right {
+  float: right !important;
+}
+
+.navbar-header-menu > *.navbar-right:last-child {
+  margin-right: -15px !important;
+}
+.navbar-brand > img {
+  object-fit: contain;
+  max-height: 100%;
+  height: 100%;
+}
+.navbar-custom {
+  background-color:#ccc;
+  color:#333;
+  border-radius:0;
+  border:none;
+  font-weight: bold;
+  box-shadow: 3px 3px 25px #ccc;
+}
+.navbar-custom .navbar-nav > li > a {
+  color:#333;
+}
+.navbar-custom .navbar-nav > .active > a, .navbar-nav > .active > a:hover, .navbar-nav > .active > a:focus {
+  color: #333;
+  background-color:#aaa;
+  border:none;
+}
+.navbar-custom .navbar-brand {
+  color:#eeeeee;
+}
+
 
 /* - - - - - - - - - -  ADVANCED MODE STUFF - - - - - - - - - - - - - - - - - - - */
 .advanced-feature {
@@ -99,14 +175,14 @@ body:not(.advanced) .platform:not(.platform-selected) {
   display: block;
 }
 
-/* - - - - - - - - - -  MISSING ADDONS STUFF - - - - - - - - - - - - - - - - - - - */
+/* - - - - - - - - - -  CONSOLE STYLING - - - - - - - - - - - - - - - - - - - */
 #consoleContainer {
   display: none;
   width: 100%;
   background-color: #333;
   color: #FFF;
   height: 100px;
-  position: fixed;
+  position: relative;
   bottom: 0;
   box-shadow: inset 0px 0px 9px 0px rgba(0,0,0,0.75);
   overflow-y: scroll;
@@ -127,7 +203,7 @@ body:not(.advanced) .platform:not(.platform-selected) {
 }
 
 body.showConsole {
-  padding-bottom: 100px;
+  /*padding-bottom: 100px;*/
 }
 
 body.showConsole #consoleContainer {
@@ -144,6 +220,76 @@ body.showConsole #consoleContainer {
 
 #console p {
 
+}
+
+#fullConsoleOutput {
+  display: none;
+}
+
+#fullConsoleOutput.not-hidden {
+  display: block;
+}
+
+#fullConsoleOutput textarea {
+  background-color: #333;
+  color: #FFF;
+  padding: 10px 5px;
+  font-family: monospace;
+  width: 100%;
+  height: 150px;
+  line-height: 1.3em;
+  font-size: 0.8em;
+}
+
+.console-feature {
+  display: none!important;
+}
+
+body.showConsole .console-feature {
+  display: block!important;
+}
+
+/* - - - - - - - - - -  PLATFORM SELECT STYLING - - - - - - - - - - - - - - - - - - - */
+.platform {
+  padding: 10px 15px 10px 15px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  background-color: #ddd;
+  border-radius:1px;
+  cursor: pointer;
+  float:left;
+  -webkit-user-select: none;
+  border: #ddd solid 1px;
+  color: #666;
+}
+.platform-selected {
+  background-color: #ccc;
+  border-color: #333;
+  color: #333;
+}
+
+body.advanced .platform {
+  padding-left: 30px;
+}
+
+body.advanced .platform-selected:before {
+  content: "\00d7"; /* CSS equivalent of &times; */
+  text-align: center;
+  display: inline-block;
+  float: left;
+  margin: 3px 0 0 -20px;
+  padding: 0px 1px;
+  font-size: 8pt;
+  box-sizing: border-box;
+  width: 15px;
+  height: 15px;
+  background-color: #333;
+  color: #fff;
+  opacity: 0.2;
+}
+
+body.advanced .platform-selected:hover:before {
+  opacity: 1;
 }
 
 /*! Select2 Bootstrap 3 CSS v1.4.6 | MIT License | github.com/t0m/select2-bootstrap-css */

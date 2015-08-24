@@ -44,10 +44,9 @@ ipc.on('setDefaults', function (arg) {
 });
 
 ipc.on('setProjectPath', function (arg) {
-	var elem = document.getElementById("projectPath");
-	elem.value = arg;
-	defaultSettings['lastUsedProjectPath'] = arg;
-	saveDefaultSettings();
+	$("#projectPath").val( arg );
+	//defaultSettings['lastUsedProjectPath'] = arg;
+	//saveDefaultSettings();
 	$("#projectName").trigger('change'); // checks if we need to be in update or generate mode
 });
 
@@ -220,8 +219,17 @@ function setup() {
 		shell.openExternal('http://www.ofxaddons.com/');
 	});
 
+	$("#projectPath").on('change', function () {
+		if( $(this).is(":focus")===true ){ return; }
+
+		$("#projectName").trigger('change'); // checks the project on the new location
+	});
+	$("#projectPath").on('focusout', function () {
+		$(this).trigger('change');
+	});
+
 	$("#projectName").on('change', function () {
-		if( $(this).is(":focus")===true ){ console.log($(this).is(":focus")); return; }
+		if( $(this).is(":focus")===true ){ return; }
 
 		var project = {};
 		project['projectName'] = $("#projectName").val();
@@ -369,10 +377,11 @@ function enableAdvancedMode( isAdvanced ){
 
 function enableConsole( showConsole ){
 	if( showConsole ) {
-		$("#consoleContainer").addClass('showConsole');
+		// this has to be in body for CSS reasons
+		$("body").addClass('showConsole');
 	}
 	else {
-		$("#consoleContainer").removeClass('showConsole');
+		$("body").removeClass('showConsole');
 	}
 	defaultSettings['showConsole'] = showConsole;
 	saveDefaultSettings();
@@ -401,6 +410,7 @@ function displayModal( message ){
 function consoleMessage( message ){
 	message = (message + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1'+ "<br>\n" +'$2'); // nl2br
 	$("#console").append( $("<p>").html(message) );
+	$("#consoleContainer").scrollTop( $('#console').offset().top ); // scrolls to bottom
 }
 
 
