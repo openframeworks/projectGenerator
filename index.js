@@ -378,7 +378,7 @@ ipc.on('update', function (event, arg) {
 				'<strong>Success!</strong><br>'+
 				'Updating your project was successful! <span class="monospace">'+ update['updatePath'] +'</span><br><br>' +
 				'<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
-				'<div id="fullConsoleOutput"><br><textarea>'+ stdout +'</textarea></div>'
+				'<div id="fullConsoleOutput"><br><textarea class="selectable">'+ stdout +'</textarea></div>'
 			);
 			event.sender.send('updateCompleted', true );
 		}
@@ -387,7 +387,7 @@ ipc.on('update', function (event, arg) {
 			event.sender.send('sendUIMessage', 
 				'<strong>Error...</strong><br>'+
 				'There was a problem updating your project... <span class="monospace">'+ update['updatePath'] +'</span>' +
-				'<div id="fullConsoleOutput" class="not-hidden"><br><textarea>'+ error.message +'</textarea></div>'
+				'<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">'+ error.message +'</textarea></div>'
 			);
 		}
 	});
@@ -466,7 +466,7 @@ ipc.on('generate', function (event, arg) {
 				'<strong>Success!</strong><br>'+
 				'Your can now find your project in <span class="monospace">'+ fullPath +'</span><br><br>' +
 				'<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
-				'<div id="fullConsoleOutput"><br><textarea>'+ stdout +'</textarea></div>'
+				'<div id="fullConsoleOutput"><br><textarea class="selectable">'+ stdout +'</textarea></div>'
 			);
 			event.sender.send('generateCompleted', true );
 		}
@@ -478,7 +478,7 @@ ipc.on('generate', function (event, arg) {
 			event.sender.send('sendUIMessage', 
 				'<strong>Error...</strong><br>'+
 				'There was a problem generating your project... <span class="monospace">'+ fullPath +'</span>' +
-				'<div id="fullConsoleOutput" class="not-hidden"><br><textarea>'+ error.message +'</textarea></div>'
+				'<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">'+ error.message +'</textarea></div>'
 			);
 		}
 	});

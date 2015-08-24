@@ -1,3 +1,10 @@
+* {
+  -webkit-user-select: none;
+}
+.selectable, .selectable * {
+  -webkit-user-select: text;
+}
+
 .tab-content {
 	padding-top: 20px;
 }
