@@ -303,7 +303,13 @@ function generate() {
 
 	console.log(gen);
 
-	if( gen['platformList'] === null ){
+	if( gen['projectName'] === '' ) {
+		displayModal("Please name your sketch first.");
+	}
+	else if( gen['projectPath'] === '' ) {
+		displayModal("Your project path is empty...");
+	}
+	else if( gen['platformList'] === null ){
 		displayModal("Please select a platform first.");
 	}
 	else {
