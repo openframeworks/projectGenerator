@@ -243,7 +243,7 @@ function setup() {
 
 function saveDefaultSettings() {
 	var fs = require('fs');
-	fs.writeFile(path.resolve(__dirname, 'settings.json'), JSON.stringify(defaultSettings), function (err) {
+	fs.writeFile(path.resolve(__dirname, 'settings.json'), JSON.stringify(defaultSettings, null, '\t'), function (err) {
 		if (err) {
 			console.log("Unable to save defaultSettings to settings.json... (Error=" + err.code + ")");
 		}
