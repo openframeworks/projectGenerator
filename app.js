@@ -231,7 +231,8 @@ function setup() {
 	//$("#projectName").val('myApp');
 
 	// bind ofxAddons URL (load it in default browser; not within Electron)
-	$("#visitOfxAddons").click(function () {
+	$(".visitOfxAddons").click(function (e) {
+		e.preventDefault();
 		var shell = require('shell');
 		shell.openExternal('http://www.ofxaddons.com/');
 	});
