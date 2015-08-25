@@ -214,11 +214,11 @@ function setup() {
 
 	//$("#projectName").val('myApp');
 
-	// bind ofxAddons URL (load it in default browser; not within Electron)
-	$(".visitOfxAddons").click(function (e) {
+	// bind external URLs (load it in default browser; not within Electron)
+	$('*[data-toggle="external_target"]').click(function (e) {
 		e.preventDefault();
 		var shell = require('shell');
-		shell.openExternal('http://www.ofxaddons.com/');
+		shell.openExternal( $(this).prop('href') );
 	});
 
 	$("#projectPath").on('change', function () {
@@ -314,14 +314,14 @@ function generate() {
 
 function update() {
 	// let's get all the info:
-
 	var up = {};
 
-	up['updatePath'] = $("#updatePath").val();
-	
-	//TODO: 
+	up['updatePath'] = $("#projectPath").val();
+	up['updateName'] = $("#projectName").val();
+
 	up['platformList'] = getPlatformList("#singlePlatformSelect");
-	up['updateRecursive'] = $("#platformRecursive").is(":checked");
+	//up['updateRecursive'] = $("#platformRecursive").is(":checked");
+	up['addonList'] = $("#addonsSelect").val();
 	up['ofPath'] = $("#ofPath").val();
 
 	if( up['platformList'] === null ){
@@ -331,7 +331,7 @@ function update() {
 		displayModal(
 			'<div class="alert alert-info">'+
 				'<div class="alert alert-danger">'+ $("#missingAddons").html() +'</div>'+
-				'<p>You can probably download them on <a href="#ofxaddons.com" class="visitOfxAddons">ofxaddons.com</a>.<br>Add them to your addons folder and rescan it.<br>If you don\'t need any of these addons, you can remove them from the adons.make file within your project (proceed with precaution).</p>'+
+				'<p>You can probably download them on <a href="http://www.ofxaddons.com/" data-toggle="external_target">ofxaddons.com</a>.<br>Add them to your addons folder and rescan it.<br>If you don\'t need any of these addons, you can remove them from the adons.make file within your project (proceed with precaution).</p>'+
 			'</div><button class="btn btn-primary" type="button" onclick="rescanAddons()">Rescan addons folder</button>'
 		);
 	}
@@ -409,9 +409,10 @@ function getPlatformList( platformSelector ){
 }
 
 function displayModal( message ){
-	$("#uiModal .modal-body").html(message).find('.visitOfxAddons').click(function () {
+	$("#uiModal .modal-body").html(message).find('*[data-toggle="external_target"]').click(function (e) {
+		e.preventDefault();
 		var shell = require('shell');
-		shell.openExternal('http://www.ofxaddons.com/');
+		shell.openExternal( $(this).prop("href") );
 	});
 	$("#uiModal").modal('show');
 }
