@@ -3,194 +3,190 @@
 	<head>
 		<meta charset="utf-8">
 		<title>openFrameworks Project Generator</title>
-		<link rel="stylesheet" href="css/bootstrap.min.css">
-		<link rel="stylesheet" href="css/select2.css">
-		<link rel="stylesheet" href="css/app.css">
+		<link rel="stylesheet" href="css/semantic.min.css">
+		<!-- 		<link rel="stylesheet" href="css/select2.css">
+		<link rel="stylesheet" href="css/app.css"> -->
+		<style>
+		body {
+		background-color: #ddd;
+		}
+		</style>
 	</head>
 	<body class="page-create_update">
-		<!--<header class="jumbotron">
-					<div class="container">
-								<h1>Project Generator</h1>
-					</div>
-		</header>-->
-		
-		<nav class="navbar navbar-custom" role="navigation">
-			<div class="container-fluid">
-			<!-- Brand and toggle get grouped for better mobile display -->
-				<div class="navbar-header">
-					<a class="navbar-brand" href="#">
-						<img src="img/of-logo-white.svg">
-					</a>
-					<!-- <a class="navbar-brand" href="#"><img src="img/of-logo-white.svg" width="110" height= "58"/></a> -->
-					<div class="navbar-header-menu">
-						<ul class="nav navbar-nav">
-							<li class="active"><a href="#create_update" role="tab" data-toggle="tab">Create / Update</a></li>
-							<li class="advanced-feature"><a href="#advanced" role="tab" data-toggle="tab" title="Batch operations">Update Multiple</a></li>
-							<li class="right"><a href="#settings" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-cog"></span></a></li>
-						</ul>
-					</div>
-				</div>
-			<!-- /.navbar-collapse -->
+		<div class="ui fixed inverted main menu">
+			<div class="ui container">
+				<a class="item active" data-tab="create">create / update</a>
+				<a class="item" data-tab="updateMulti">update multiple</a>
+				<a class="item" data-tab="settings">settings</a>
 			</div>
-		<!-- /.container-fluid -->
-		</nav>
+		</div>
 		
-		<section class="container">
-			<!-- Nav tabs -->
-			<!-- 			<ul class="nav nav-tabs" role="tablist">
-					<li class="active"><a href="#create_update" role="tab" data-toggle="tab">create / update</a></li>
-					<li class="advanced-feature"><a href="#advanced" role="tab" data-toggle="tab" title="Batch operations">update multiple</a></li>
-					<li><a href="#settings" role="tab" data-toggle="tab">Settings</a></li>
-			</ul> -->
-			<!-- Tab panes -->
-			<div class="tab-content">
-				<!------------------------------- create -------------------------------->
-				<div class="tab-pane active" id="create_update">
-					<!-- <div class="info-message">
-								<p>This is useful to generate a new project, fix broken project configurations, change a project's target platform or (try to) update older projects to newer OF versions.</p>
-					</div> -->
-					<form id="generate-mode-section" class="createMode">
-						<div class="form-group">
-							<label for="projectName">Name</label>
-							<div class="input-group">
-								<input class="form-control" type="text" name="projectName" value="myApp" id="projectName">
-								<span class="input-group-btn">
-									<button type="button" class="btn btn-info" onclick="browseImportProject()">Import</button>
-								</span>
-							</div>
-							<!--<span class="input-info">Name your project or click "import" to load settings from an existing project.</span>-->
-						</div>
-						<div class="form-group">
-							<label for="projectPath">Path</label>
-							<div class="input-group">
-								<input class="form-control" type="text" name="projectPath" value="" id="projectPath">
-								<span class="input-group-btn">
-									<button class="btn btn-info" type="button" onclick="browseProjectPath()">Browse</button>
-								</span>
-							</div>
-						</div>
-						<div class="form-group" id="addonsForm">
-							<label for="addonsSelect">
-								Addons
-								&nbsp; <a href="#ofxaddons.com" class="visitOfxAddons">
-									<span data-toggle="tooltip" data-placement="right" title="" data-original-title="Get more addons at ofxAddons.com" class="glyphicon glyphicon-share"></span>
-								</a>
-							</label>
-							<select class="form-control" multiple id="addonsSelect">
-								<option value=""></option>
-							</select>
-							<div class="alert alert-danger" id="missingAddons">
-								<strong>Error</strong>
-								<p>
-									You are missing the following plugins for this project:<br>
-									<span id="missingAddonsList"></span>
-								</p>
-							</div>
-						</div>
-						<div class="form-group advanced-feature" id="platformSelectForm">
-							<label for="platformSelect">Platforms</label>
-							<div class="platformSelect" id="singlePlatformSelect">
-								<!-- <span class="platform">test</span>
-								<span class="platform">test</span>
-								<span class="platform">test</span>
-								<span class="platform">test</span>
-								<span class="platform">test</span> -->
-							</div>
-							<div class="clearfix"></div>
-						</div>
-						<div class="form-group simple-feature">
-							<label for="platformSelect">Platform</label>
-							<div>
-								<span id="defaultPlatform" class="platform platform-selected">Unknown</span>
-							</div>
-							<div class="clearfix"></div>
-						</div>
-						<div class="form-group" id="submitForm">
-							
-							<!-- <div class="alert alert-warning" role="alert" id="warning-update">
-									<h3>Warning</h3>
-									<p>Updating will use the "src" folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files (beware).</p>
-							</div> -->
-							<button class="btn btn-primary" type="button" onclick="generate()" id="create-btn"
-							data-toggle="tooltip"
-							data-placement="right"
-							title=""
-							data-original-title="This will create a new project file for your target platform(s), and a skeleton openFrameworks app in the &quot;src&quot; folder, including any addon(s) you select.">Create New Project</button>
-							<button class="btn btn-primary" type="button" onclick="update()" id="update-btn"
-							data-toggle="tooltip"
-							data-placement="right"
-							title=""
-							data-original-title="Updating will use the &quot;src&quot; folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files but use existing source code.">Update Project</button>
-						</div>
-					</form>
+		<br/><br/><br/><br/>
+		
+		<div class="main ui container">
+			
+			<!------------------------------- create -------------------------------->
+			<div class="ui tab active" data-tab="create">
+				<!-- <div class="info-message">
+												<p>This is useful to generate a new project, fix broken project configurations, change a project's target platform or (try to) update older projects to newer OF versions.</p>
+				</div> -->
+				<div class="row">
+					<div class="ui action input">
+						<input type="text" placeholder="Project name...">
+						<div class="ui olive button">import</div>
+					</div>
 				</div>
-				<!------------------------------- advanced -------------------------------->
-				<div class="tab-pane" id="advanced">
-					<form>
-						<div class="form-group">
-							<div class="alert alert-warning" role="alert">
-								<strong>Warning</strong>
-								<p>This updates existing projects <em>recursively</em> in the selected directory. For example, to generate examples for a specific platform, you'd choose the examples folder as the update path.
-								</p>
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="updatePath">Path</label>
-							<div class="input-group">
-								<input class="form-control" type="text" name="updatePath" value="" id="updatePath">
-								<span class="input-group-btn">
-									<button class="btn btn-info" type="button" onclick="getUpdatePath()">Browse</button>
-								</span>
-							</div>
-						</div>
-						<div class="form-group">
-							<button class="btn btn-primary" type="button" onclick="update()">Update Multiple</button>
-						</div>
-					</form>
+				
+				<br/>
+				<div class="row">
+					<div class="ui action input">
+						<input type="text" placeholder="Project path...">
+						<div class="ui olive button">search</div>
+					</div>
 				</div>
-				<!------------------------------- settings -------------------------------->
-				<div class="tab-pane" id="settings">
-					<form>
-						<div class="form-group">
-							<label for="ofPath">openFrameworks Path</label>
-							<div class="input-group">
-								<input class="form-control" type="text" name="ofPath" value="" id="ofPath">
-								<span class="input-group-btn">
-									<button class="btn btn-info" type="button" onclick="getPath()">Browse</button>
-								</span>
-							</div>
-						</div>
-						<div class="form-group">
-							<div class="input-group">
-								<div class="checkbox">
-									<label for="advancedToggle">
-										<input type="checkbox" name="advancedToggle" value="" id="advancedToggle">
-										Show advanced options
-									</label>
-								</div>
-							</div>
-						</div>
-						<div class="form-group advanced-feature">
-							<div class="input-group">
-								<div class="checkbox">
-									<label for="consoleToggle">
-										<input type="checkbox" name="consoleToggle" value="" id="consoleToggle">
-										Show console output
-									</label>
-								</div>
-							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-		</section>
 
+				<br/>
+				<br/>
+				
+				<form id="generate-mode-section" class="createMode">
+					<div class="form-group">
+						<label for="projectName">Name</label>
+						<div class="input-group">
+							<input class="form-control" type="text" name="projectName" value="myApp" id="projectName">
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-info" onclick="browseImportProject()">Import</button>
+							</span>
+						</div>
+						<!--<span class="input-info">Name your project or click "import" to load settings from an existing project.</span>-->
+					</div>
+					<div class="form-group">
+						<label for="projectPath">Path</label>
+						<div class="input-group">
+							<input class="form-control" type="text" name="projectPath" value="" id="projectPath">
+							<span class="input-group-btn">
+								<button class="btn btn-info" type="button" onclick="browseProjectPath()">Browse</button>
+							</span>
+						</div>
+					</div>
+					<div class="form-group" id="addonsForm">
+						<label for="addonsSelect">
+							Addons
+							&nbsp; <a href="#ofxaddons.com" class="visitOfxAddons">
+								<span data-toggle="tooltip" data-placement="right" title="" data-original-title="Get more addons at ofxAddons.com" class="glyphicon glyphicon-share"></span>
+							</a>
+						</label>
+						<select class="form-control" multiple id="addonsSelect">
+							<option value=""></option>
+						</select>
+						<div class="alert alert-danger" id="missingAddons">
+							<strong>Error</strong>
+							<p>
+								You are missing the following plugins for this project:<br>
+								<span id="missingAddonsList"></span>
+							</p>
+						</div>
+					</div>
+					<div class="form-group advanced-feature" id="platformSelectForm">
+						<label for="platformSelect">Platforms</label>
+						<div class="platformSelect" id="singlePlatformSelect">
+							<!-- <span class="platform">test</span>
+							<span class="platform">test</span>
+							<span class="platform">test</span>
+							<span class="platform">test</span>
+							<span class="platform">test</span> -->
+						</div>
+						<div class="clearfix"></div>
+					</div>
+					<div class="form-group simple-feature">
+						<label for="platformSelect">Platform</label>
+						<div>
+							<span id="defaultPlatform" class="platform platform-selected">Unknown</span>
+						</div>
+						<div class="clearfix"></div>
+					</div>
+					<div class="form-group" id="submitForm">
+						
+						<!-- <div class="alert alert-warning" role="alert" id="warning-update">
+													<h3>Warning</h3>
+													<p>Updating will use the "src" folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files (beware).</p>
+						</div> -->
+						<button class="btn btn-primary" type="button" onclick="generate()" id="create-btn"
+						data-toggle="tooltip"
+						data-placement="right"
+						title=""
+						data-original-title="This will create a new project file for your target platform(s), and a skeleton openFrameworks app in the &quot;src&quot; folder, including any addon(s) you select.">Create New Project</button>
+						<button class="btn btn-primary" type="button" onclick="update()" id="update-btn"
+						data-toggle="tooltip"
+						data-placement="right"
+						title=""
+						data-original-title="Updating will use the &quot;src&quot; folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files but use existing source code.">Update Project</button>
+					</div>
+				</form>
+			</div>
+			<!------------------------------- advanced -------------------------------->
+			<div class="ui tab" data-tab="updateMulti">
+				<form>
+					<div class="form-group">
+						<div class="alert alert-warning" role="alert">
+							<strong>Warning</strong>
+							<p>This updates existing projects <em>recursively</em> in the selected directory. For example, to generate examples for a specific platform, you'd choose the examples folder as the update path.
+							</p>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="updatePath">Path</label>
+						<div class="input-group">
+							<input class="form-control" type="text" name="updatePath" value="" id="updatePath">
+							<span class="input-group-btn">
+								<button class="btn btn-info" type="button" onclick="getUpdatePath()">Browse</button>
+							</span>
+						</div>
+					</div>
+					<div class="form-group">
+						<button class="btn btn-primary" type="button" onclick="update()">Update Multiple</button>
+					</div>
+				</form>
+			</div>
+			<!------------------------------- settings -------------------------------->
+			<div class="ui tab" data-tab="settings">
+				<form>
+					<div class="form-group">
+						<label for="ofPath">openFrameworks Path</label>
+						<div class="input-group">
+							<input class="form-control" type="text" name="ofPath" value="" id="ofPath">
+							<span class="input-group-btn">
+								<button class="btn btn-info" type="button" onclick="getPath()">Browse</button>
+							</span>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<div class="checkbox">
+								<label for="advancedToggle">
+									<input type="checkbox" name="advancedToggle" value="" id="advancedToggle">
+									Show advanced options
+								</label>
+							</div>
+						</div>
+					</div>
+					<div class="form-group advanced-feature">
+						<div class="input-group">
+							<div class="checkbox">
+								<label for="consoleToggle">
+									<input type="checkbox" name="consoleToggle" value="" id="consoleToggle">
+									Show console output
+								</label>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
 		<section class="container" id="consoleContainer">
 			<div id="console" class="selectable">
 				<p>Welcome to the console :)</p>
 			</div>
 		</section>
-
 		<!-- begin JS UI modal -->
 		<div class="modal fade in" id="uiModal" tabindex="-1" role="dialog">
 			<div class="modal-dialog" role="document">
@@ -203,10 +199,8 @@
 			</div>
 		</div>
 		<!-- end modal -->
-
-		<script type="text/javascript" src="js/jquery.js" onload="window.$ = window.jQuery = module.exports;"></script>
-		<script type="text/javascript" src="js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="js/select2.full.min.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
+		<script type="text/javascript" src="js/semantic.min.js"></script>
 		<script src="app.js"></script>
 	</body>
 </html>

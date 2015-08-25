@@ -71,7 +71,8 @@ app.on('ready', function () {
 	mainWindow = new BrowserWindow({
 		width: 500,
 		height: 600,
-		resizable: false
+		resizable: false, 
+		frame: false 
 	});
 
 	// load jquery here:
