@@ -69,25 +69,55 @@ ipc.on('importProjectSettings', function(settings){
 	elem.value = arg;
 });*/
 
+
+// <div class="field">
+// 								<label>Addons:</label>
+// 								<div class="ui multiple search selection dropdown">
+// 									<input name="addons" type="hidden">
+// 									<i class="dropdown icon"></i>
+// 									<div class="default text">Addons...</div>
+// 									<div class="menu" id="addonsList">
+// 									</div>
+// 								</div>
+// 							</div>
+
+
+ // <div class="menu">
+ //          <div class="item" data-value="angular">Angular</div>
+
 ipc.on('setAddons', function (arg) {
 
-	var select = document.getElementById("addonsSelect");
+	var select = document.getElementById("addonsList");
 	select.innerHTML = "";
 
 	if (arg !== null && arg.length > 0) {
 		// add:
 		for (var i = 0; i < arg.length; i++) {
-			var option = document.createElement("option");
-			option.text = arg[i];
-			select.add(option);
+			
+			$('<div/>', {
+    			"class" : 'item',
+    			"data-value": arg[i]
+			}).html(arg[i]).appendTo(select);
+
+
+			// var option = document.createElement("div");
+			// option.class = "arg[i];"
+			// select.add(option);
 		}
 		// $("#addonsSelect").attr("data-placeholder", "Addons...");
 	} else {
-		$("#addonsSelect").attr("data-placeholder", "No addons found, is OF path right?");
+		
+		// TODO: error message
+		//$("#addonsSelect").attr("data-placeholder", "No addons found, is OF path right?");
 	}
 
+
+	$('.ui.dropdown')
+	.dropdown({
+    allowAdditions: false
+ 	});
 	// call select2 to make a good selectable 
-	$("#addonsSelect").select2();
+	//$("#addonsSelect").select2();
 });
 
 // select the list of addons and notify if some aren't installed
