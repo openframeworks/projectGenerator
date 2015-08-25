@@ -6,7 +6,16 @@ var ipc = require('ipc');
 var path = require('path');
 
 
-var platforms = ["osx", "win_cb", "vs", "ios", "linux", "linux64", "linuxarmv6l", "linuxarmv7l"];
+var platforms = {
+	"osx" : "OS X (Xcode)",
+	"win_cb" : "Windows (Code::Blocks)",
+	"vs" : "Windows (Visual Studio 2015)",
+	"ios" : "iOS (Xcode)",
+	"linux" : "Linux 32-bit (Code::Blocks)",
+	"linux64" : "Linux 64-bit (Code::Blocks)",
+	"linuxarmv6l" : "Linux ARMv6 (Makefiles)",
+	"linuxarmv7l" : "Linux ARMv7 (Makefiles)"
+};
 
 var defaultSettings;
 
@@ -26,28 +35,23 @@ ipc.on('setup', function (arg) {
 ipc.on('setDefaults', function (arg) {
 
 	defaultSettings = arg;
-	var startPath = defaultSettings['startingProjectPath'];  // this gets delete on save, so grab it first. 
-	var startName = defaultSettings['startingProjectName'];  // this gets delete on save, so grab it first. 
-	
+
 	setOFPath(defaultSettings['defaultOfPath']);
 	enableAdvancedMode( defaultSettings['advancedMode'] );
-	enableConsole( defaultSettings['showConsole'] );
-
-	// index.js has looked for and provided a good starting path.   this gets delete on save
-	// it's not the cleanest way to do this (we should open up another ipc channel) 
-
-	$("#projectPath").val(startPath);
-	$("#projectName").val(startName).trigger('change');
-
-	console.log(startName);
+	//enableConsole( defaultSettings['showConsole'] );
+	if( defaultSettings['showConsole'] ) $("body").addClass('showConsole');
 
 });
 
+ipc.on('setStartingProject', function (arg){
+	$("#projectPath").val(arg['path']);
+	$("#projectName").val(arg['name']);
+});
+
 ipc.on('setProjectPath', function (arg) {
-	var elem = document.getElementById("projectPath");
-	elem.value = arg;
-	defaultSettings['lastUsedProjectPath'] = arg;
-	saveDefaultSettings();
+	$("#projectPath").val( arg );
+	//defaultSettings['lastUsedProjectPath'] = arg;
+	//saveDefaultSettings();
 	$("#projectName").trigger('change'); // checks if we need to be in update or generate mode
 });
 
@@ -60,7 +64,6 @@ ipc.on('importProjectSettings', function(settings){
 	$("#projectName").val(settings['projectName']).trigger('change'); // change triggers addon scanning
 });
 
-
 /*ipc.on('setUpdatePath', function(arg) {
 	var elem = document.getElementById("updatePath");
 	elem.value = arg;
@@ -70,8 +73,6 @@ ipc.on('setAddons', function (arg) {
 
 	var select = document.getElementById("addonsSelect");
 	select.innerHTML = "";
-
-
 
 	if (arg !== null && arg.length > 0) {
 		// add:
@@ -87,7 +88,6 @@ ipc.on('setAddons', function (arg) {
 
 	// call select2 to make a good selectable 
 	$("#addonsSelect").select2();
-	//$("#addonsSelect").trigger("chosen:updated");
 });
 
 // select the list of addons and notify if some aren't installed
@@ -178,23 +178,15 @@ function setOFPath(arg) {
 //----------------------------------------
 function setup() {
 
-	// var select = $("#platformSelect").get(0);
-	// //var selectUpdate = document.getElementById("platformsSelectUpdate");
-
-	// select.innerHTML = "";
-	// //selectUpdate.innerHTML = "";
+	// populate platform selection forms
 	var option, i;
-	for (i = 0; i < platforms.length; i++) {
-		// option = document.createElement("span");
-		// option.className = "platform";
-		// option.text = platforms[i];
-		// select.add(option);
+	for (var i in platforms) {
 		var myClass = 'platform';
-		if( platforms[i] === defaultSettings['defaultPlatform'] ){ myClass += " platform-selected" }
-		$(".platformSelect").append("<div class='"+myClass+"'>" + platforms[i] + "</span>");
+		if( i === defaultSettings['defaultPlatform'] ){ myClass += " platform-selected only-one" }
+		$(".platformSelect").append("<div class='"+myClass+"' data-value='"+i+"'>" + platforms[i] + "</span>");
 	}
 
-
+	// handle platform selection
 	$( "div.platform" ).click(function() {
 		if( $(this).hasClass("platform-selected") && $(this).parent().children(".platform-selected").length <= 1 ){
 			// always 1 has to remain selected
@@ -202,6 +194,14 @@ function setup() {
 		}
 		else {
 			$( this ).toggleClass( "platform-selected" );
+		}
+		// handle css class when only 1 is selected
+		var candidates = $(this).parent().children("div.platform");
+		if(candidates.filter(".platform-selected").length <= 1){
+			candidates.filter(".platform-selected").addClass("only-one");
+		}
+		else {
+			candidates.removeClass("only-one");
 		}
 	});
 
@@ -215,13 +215,23 @@ function setup() {
 	//$("#projectName").val('myApp');
 
 	// bind ofxAddons URL (load it in default browser; not within Electron)
-	$("#visitOfxAddons").click(function () {
+	$(".visitOfxAddons").click(function (e) {
+		e.preventDefault();
 		var shell = require('shell');
 		shell.openExternal('http://www.ofxaddons.com/');
 	});
 
+	$("#projectPath").on('change', function () {
+		if( $(this).is(":focus")===true ){ return; }
+
+		$("#projectName").trigger('change'); // checks the project on the new location
+	});
+	$("#projectPath").on('focusout', function () {
+		$(this).trigger('change');
+	});
+
 	$("#projectName").on('change', function () {
-		if( $(this).is(":focus")===true ){ console.log($(this).is(":focus")); return; }
+		if( $(this).is(":focus")===true ){ return; }
 
 		var project = {};
 		project['projectName'] = $("#projectName").val();
@@ -238,27 +248,27 @@ function setup() {
 		enableAdvancedMode( $(this).is(':checked') );
 	});
 
+	/* Stuff for the console setting (removed from UI)
 	$("#consoleToggle").on("change", function () {
 		enableConsole( $(this).is(':checked') );
-	});
+	});*/
 
+	// initialise the overall-use modal
 	$("#uiModal").modal({'show':false});
 
+	// show default platform in GUI
 	$("#defaultPlatform").html( defaultSettings['defaultPlatform'] );
 
 	// Enable tooltips
 	$("[data-toggle='tooltip']").tooltip();
+
+	// add current menu element in body tag for CSS styling
+	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+  		$('body').removeClass('page-create_update page-settings page-advanced').addClass( 'page-' + $(e.target).attr("href").replace('#', '') );
+	});
 }
 
 function saveDefaultSettings() {
-
-	if ('startingProjectPath' in defaultSettings){
-		delete defaultSettings.startingProjectPath
-	}
-	if ('startingProjectName' in defaultSettings){
-		delete defaultSettings.startingProjectName
-	}
-	
 
 	var fs = require('fs');
 	fs.writeFile(path.resolve(__dirname, 'settings.json'), JSON.stringify(defaultSettings, null, '\t'), function (err) {
@@ -286,7 +296,13 @@ function generate() {
 
 	console.log(gen);
 
-	if( gen['platformList'] === null ){
+	if( gen['projectName'] === '' ) {
+		displayModal("Please name your sketch first.");
+	}
+	else if( gen['projectPath'] === '' ) {
+		displayModal("Your project path is empty...");
+	}
+	else if( gen['platformList'] === null ){
 		displayModal("Please select a platform first.");
 	}
 	else {
@@ -367,23 +383,25 @@ function enableAdvancedMode( isAdvanced ){
 	$("#advancedToggle").prop('checked', defaultSettings['advancedMode'] );
 }
 
+/* Stuff for the console setting (removed from UI)
 function enableConsole( showConsole ){
 	if( showConsole ) {
-		$("#consoleContainer").addClass('showConsole');
+		// this has to be in body for CSS reasons
+		$("body").addClass('showConsole');
 	}
 	else {
-		$("#consoleContainer").removeClass('showConsole');
+		$("body").removeClass('showConsole');
 	}
 	defaultSettings['showConsole'] = showConsole;
 	saveDefaultSettings();
 	$("#consoleToggle").prop('checked', defaultSettings['showConsole'] );
-}
+}*/
 
 function getPlatformList( platformSelector ){
 	var selected = [];
 
 	$(platformSelector).children(".platform.platform-selected").each(function(){
-		selected.push( $(this).text() );
+		selected.push( $(this).data('value') );
 	});
 
 	if(selected.length == 0){ return null; }
@@ -401,6 +419,7 @@ function displayModal( message ){
 function consoleMessage( message ){
 	message = (message + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1'+ "<br>\n" +'$2'); // nl2br
 	$("#console").append( $("<p>").html(message) );
+	$("#consoleContainer").scrollTop( $('#console').offset().top ); // scrolls to bottom
 }
 
 

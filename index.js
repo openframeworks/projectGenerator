@@ -7,7 +7,8 @@ var ipc = require('ipc');
 var fs = require('fs');
 var path = require('path');
 var menu = require('menu');
-var settings;
+var moniker = require('moniker');
+
 // Debugging: start the Electron PG from the terminal to see the messages from console.log()
 // Example: /path/to/PG/Contents/MacOS/Electron /path/to/PG/Contents/Ressources/app
 // Note: app.js's console.log is also visible from the WebKit inspector. (look for mainWindow.openDevTools() below )
@@ -25,7 +26,8 @@ try {
 		"advancedMode": false,
 		"defaultPlatform" : "Unknown",
 		"showConsole" : false,
-		"showDeveloperTools":false
+		"showDeveloperTools" : false,
+		"defaultRelativeProjectPath" : "apps/myApps"
 	};
 }
 var defaultOfPath = obj["defaultOfPath"];
@@ -33,44 +35,15 @@ var addons;
 
 if (!path.isAbsolute(defaultOfPath)) {
 	// todo: this needs to be PLATFORM specific: 
-	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../../../"), defaultOfPath));
+	defaultOfPath = path.resolve(path.join( path.join(__dirname, "../../../../"), defaultOfPath));
 	obj["defaultOfPath"] = defaultOfPath;
 }
 
 // now, let's look for a folder called mySketch, and keep counting until we find one that doesn't exist
-
-var defaultPathForProjects = path.join(obj["defaultOfPath"], obj["defaultRelativeProjectPath"]);
-var foundOne = false;
-var foundCounter = 0;
-
-while (foundOne === false){
-	
-	var pathToTest = "";
-	if (foundCounter !== 0){
-		pathToTest = path.join(defaultPathForProjects, "mySketch" + foundCounter.toString());
-	} else {
-		pathToTest = path.join(defaultPathForProjects, "mySketch");
-	}
-
-	if (fs.existsSync(pathToTest)){
-		foundCounter++;
-	} else {
-		foundOne = true;
-	}
-}
-
-console.log("a");
-
-var goodName = ""
-if (foundCounter !== 0){
-	goodName =  "mySketch" + foundCounter.toString();
-} else {
-	goodName =  "mySketch";
-}
-
-obj["startingProjectPath"] = defaultPathForProjects;
-obj["startingProjectName"] = goodName;
-
+var startingProject = {};
+startingProject['name'] = "";
+startingProject['path'] = "";
+getStartingProjectName();
 
 //---------------------------------------------------------
 // Report crashes to our server.
@@ -114,6 +87,7 @@ app.on('ready', function () {
 	//when the window is loaded send the defaults
 	mainWindow.webContents.on('did-finish-load', function () {
 		//parseAddonsAndUpdateSelect();
+		mainWindow.webContents.send('setStartingProject', startingProject);
 		mainWindow.webContents.send('setDefaults', obj);
 		mainWindow.webContents.send('setup', '');
 	});
@@ -201,6 +175,27 @@ app.on('ready', function () {
 	menu.setApplicationMenu(menuV);
 
 });
+
+function getStartingProjectName(){
+	var defaultPathForProjects = path.join(obj["defaultOfPath"], obj["defaultRelativeProjectPath"]);
+	var foundOne = false;
+	var projectNames = moniker.generator([moniker.adjective]);
+	var goodName = "mySketch";
+	
+	while (foundOne === false){
+		if( fs.existsSync( path.join(defaultPathForProjects, goodName) ) ){
+			console.log("«"+ goodName +"» already exists, generating a new name...");
+			var adjective = projectNames.choose();
+			goodName = "my"+ adjective.charAt(0).toUpperCase() + adjective.slice(1) +"Sketch";
+		}
+		else {
+			foundOne = true;
+		}
+	}
+	
+	startingProject['path'] = defaultPathForProjects;
+	startingProject['name'] = goodName;
+}
 	
 function parseAddonsAndUpdateSelect() {
 
@@ -371,23 +366,22 @@ ipc.on('update', function (event, arg) {
 	var wholeString = pgApp + " -u " + recursiveString + " " + pathString + " " + platformString + " " + updatePath;
 
 	exec(wholeString, function callback(error, stdout, stderr) {
-		// result
-		event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ stdout );
-
 		if(error === null){
+			event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ stdout );
 			event.sender.send('sendUIMessage', 
 				'<strong>Success!</strong><br>'+
 				'Updating your project was successful! <span class="monospace">'+ update['updatePath'] +'</span><br><br>' +
-				'<button class="btn btn-default advanced-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
-				'<div id="fullConsoleOutput"><br><textarea>'+ stdout +'</textarea></div>'
+				'<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
+				'<div id="fullConsoleOutput"><br><textarea class="selectable">'+ stdout +'</textarea></div>'
 			);
 			event.sender.send('updateCompleted', true );
 		}
 		else {
+			event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ error.message );
 			event.sender.send('sendUIMessage', 
 				'<strong>Error...</strong><br>'+
 				'There was a problem updating your project... <span class="monospace">'+ update['updatePath'] +'</span>' +
-				'<div id="fullConsoleOutput" class="not-hidden"><br><textarea>'+ error.message +'</textarea></div>'
+				'<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">'+ error.message +'</textarea></div>'
 			);
 		}
 	});
@@ -458,26 +452,27 @@ ipc.on('generate', function (event, arg) {
 	var wholeString = pgApp + " -c " + pathString + " " + addonString + " " + platformString + " " + projectString;
 
 	exec(wholeString, function callback(error, stdout, stderr) {
-		event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ stdout );
 
 		var fullPath = pathTemp.join(generate['projectPath'], generate['projectName']);
 		if(error === null){
+			event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ stdout );
 			event.sender.send('sendUIMessage', 
 				'<strong>Success!</strong><br>'+
 				'Your can now find your project in <span class="monospace">'+ fullPath +'</span><br><br>' +
-				'<button class="btn btn-default advanced-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
-				'<div id="fullConsoleOutput"><br><textarea>'+ stdout +'</textarea></div>'
+				'<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
+				'<div id="fullConsoleOutput"><br><textarea class="selectable">'+ stdout +'</textarea></div>'
 			);
 			event.sender.send('generateCompleted', true );
 		}
 		else {
+			event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ error.message );
 			// note: stderr mostly seems to be also included in error.message
 			// also available: error.code, error.killed, error.signal, error.cmd
 			// info: error.code=127 means commandLinePG was not found
 			event.sender.send('sendUIMessage', 
 				'<strong>Error...</strong><br>'+
 				'There was a problem generating your project... <span class="monospace">'+ fullPath +'</span>' +
-				'<div id="fullConsoleOutput" class="not-hidden"><br><textarea>'+ error.message +'</textarea></div>'
+				'<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">'+ error.message +'</textarea></div>'
 			);
 		}
 	});
