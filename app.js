@@ -215,8 +215,8 @@ function setup() {
 	$(document).ready(function(){
 
 
-		$('a.updateMultiMenuOption').hide();
-		
+		//$('a.updateMultiMenuOption').hide();
+
 		// populate platform selection forms
 		var select = document.getElementById("platformList");
 		var option, i;
@@ -395,11 +395,21 @@ function switchGenerateMode(mode) {
 
 	// switch to update mode
 	if (mode == 'updateMode') {
+		
+		$("#generateButton").hide();
+		$("#updateButton").show();
+
+
 		console.log('Switching GenerateMode to Update...');
 		$("#generate-mode-section").removeClass('createMode').addClass('updateMode');
+
 	}
 		// [default]: switch to createMode (generate new projects)
 	else {
+
+		$("#generateButton").show();
+		$("#generateButton").hide();
+
 		console.log('Switching GenerateMode to Create...');
 
 		// if previously in update mode, deselect Addons

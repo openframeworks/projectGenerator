@@ -9,6 +9,7 @@
 		<style>
 		body {
 		background-color: #ddd;
+		padding: 0px 20px 0px 20px;
 		}
 		</style>
 	</head>
@@ -21,9 +22,9 @@
 			</div>
 		</div>
 		<!-- <div class="ui pointing secondary demo menu">
-							<a class="active red item" data-tab="first">One</a>
-							<a class="blue item" data-tab="second">Two</a>
-							<a class="green item" data-tab="third">Three</a>
+								<a class="active red item" data-tab="first">One</a>
+								<a class="blue item" data-tab="second">Two</a>
+								<a class="green item" data-tab="third">Three</a>
 		</div>
 		<div class="ui active tab segment" data-tab="first">First</div>
 		<div class="ui tab segment" data-tab="second">Second</div>
@@ -44,7 +45,7 @@
 								<input type="text" placeholder="Project name...">
 							</div>
 							<div class="field">
-								<div class="ui olive button small">import</div>
+								<div class="ui grey button">import</div>
 							</div>
 						</div>
 					</div>
@@ -75,11 +76,14 @@
 							</div>
 						</div>
 					</div>
+					<div class="ui hidden divider"></div>
+					<div class="field">
+						<div class="ui olive button" id="generateButton">Generate</div>
+						<div class="ui orange button" id="updateButton" style="display: none">Update</div>
+					</div>
+
+
 				</div>
-				
-				
-				
-				
 			</div>
 			<!------------------------------- advanced -------------------------------->
 			<div class="ui tab" data-tab="updateMulti">
@@ -88,6 +92,30 @@
 						Warning
 					</div>
 					<p>This updates existing projects <em>recursively</em> in the selected directory. For example, to generate examples for a specific platform, you'd choose the examples folder as the update path.</p>
+				</div>
+				<div class="ui form">
+
+					<div class="field">
+						<label>Project path:</label>
+						<div class="ui icon input fluid">
+							<input type="text" placeholder="Update path...">
+							<i class="search link icon"></i>
+						</div>
+					</div>
+					<div class="field">
+						<label>Platforms:</label>
+						<div class="ui multiple search selection dropdown" id="platformsDropdownMulti">
+							<input name="addons" type="hidden">
+							<i class="dropdown icon"></i>
+							<div class="default text">Platforms...</div>
+							<div class="menu" id="platformList">
+							</div>
+						</div>
+					</div>
+					<div class="ui hidden divider"></div>
+					<div class="field">
+						<div class="ui orange button" id="updateButton">Update multiple</div>
+					</div>
 				</div>
 			</div>
 			<!------------------------------- settings -------------------------------->
@@ -100,42 +128,41 @@
 							<i class="search link icon"></i>
 						</div>
 					</div>
-
 					<div class="ui checkbox">
-  						<input type="checkbox" name="Advanced" id="advancedOptions">
-  						<label>Advanced options</label>
+						<input type="checkbox" name="Advanced" id="advancedOptions">
+						<label>Advanced options</label>
 					</div>
 				</div>
 				<!-- <form>
-									<div class="form-group">
-														<label for="ofPath">openFrameworks Path</label>
-														<div class="input-group">
-																			<input class="form-control" type="text" name="ofPath" value="" id="ofPath">
-																			<span class="input-group-btn">
-																								<button class="btn btn-info" type="button" onclick="getPath()">Browse</button>
-																			</span>
-														</div>
-									</div>
-									<div class="form-group">
-														<div class="input-group">
-																			<div class="checkbox">
-																								<label for="advancedToggle">
-																													<input type="checkbox" name="advancedToggle" value="" id="advancedToggle">
-																													Show advanced options
-																								</label>
-																			</div>
-														</div>
-									</div>
-									<div class="form-group advanced-feature">
-														<div class="input-group">
-																			<div class="checkbox">
-																								<label for="consoleToggle">
-																													<input type="checkbox" name="consoleToggle" value="" id="consoleToggle">
-																													Show console output
-																								</label>
-																			</div>
-														</div>
-									</div>
+										<div class="form-group">
+																<label for="ofPath">openFrameworks Path</label>
+																<div class="input-group">
+																						<input class="form-control" type="text" name="ofPath" value="" id="ofPath">
+																						<span class="input-group-btn">
+																												<button class="btn btn-info" type="button" onclick="getPath()">Browse</button>
+																						</span>
+																</div>
+										</div>
+										<div class="form-group">
+																<div class="input-group">
+																						<div class="checkbox">
+																												<label for="advancedToggle">
+																																		<input type="checkbox" name="advancedToggle" value="" id="advancedToggle">
+																																		Show advanced options
+																												</label>
+																						</div>
+																</div>
+										</div>
+										<div class="form-group advanced-feature">
+																<div class="input-group">
+																						<div class="checkbox">
+																												<label for="consoleToggle">
+																																		<input type="checkbox" name="consoleToggle" value="" id="consoleToggle">
+																																		Show console output
+																												</label>
+																						</div>
+																</div>
+										</div>
 				</form> -->
 			</div>
 		</div>
