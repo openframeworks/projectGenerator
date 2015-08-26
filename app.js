@@ -290,12 +290,20 @@ function setup() {
 	$("#defaultPlatform").html( defaultSettings['defaultPlatform'] );
 
 	// Enable tooltips
-	$("[data-toggle='tooltip']").tooltip();
+	//$("[data-toggle='tooltip']").tooltip();
 
 	// add current menu element in body tag for CSS styling
-	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-  		$('body').removeClass('page-create_update page-settings page-advanced').addClass( 'page-' + $(e.target).attr("href").replace('#', '') );
+	// $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+ //  		$('body').removeClass('page-create_update page-settings page-advanced').addClass( 'page-' + $(e.target).attr("href").replace('#', '') );
+	// });
+
+
+	$(document).ready(function(){
+		console.log("hi");
+    	$('.main.menu .item').tab({history:false});
 	});
+
+
 }
 
 function saveDefaultSettings() {
