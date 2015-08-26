@@ -210,63 +210,68 @@ function setOFPath(arg) {
 //----------------------------------------
 function setup() {
 
-	// populate platform selection forms
+	
 
-	$(function() {
-	var select = document.getElementById("platformList");
-	var option, i;
-	for (var i in platforms) {
-		var myClass = 'platform';
+	$(document).ready(function(){
+
+
+		$('a.updateMultiMenuOption').hide();
 		
-		$('<div/>', {
-    			"class" : 'item',
-    			"data-value": i
-			}).html(platforms[i]).appendTo(select);
-		//if( i === defaultSettings['defaultPlatform'] ){ myClass += " platform-selected only-one" }
-		//$(".platformSelect").append("<div class='"+myClass+"' data-value='"+i+"'>" + platforms[i] + "</span>");
-	}
+		// populate platform selection forms
+		var select = document.getElementById("platformList");
+		var option, i;
+		for (var i in platforms) {
+			var myClass = 'platform';
+			
+			$('<div/>', {
+	    			"class" : 'item',
+	    			"data-value": i
+				}).html(platforms[i]).appendTo(select);
+			//if( i === defaultSettings['defaultPlatform'] ){ myClass += " platform-selected only-one" }
+			//$(".platformSelect").append("<div class='"+myClass+"' data-value='"+i+"'>" + platforms[i] + "</span>");
+		}
 
-	$('#platformsDropdown')
-		.dropdown({
-	    allowAdditions: false
-	 	});
-
+		// start the platform drop down. 
+		$('#platformsDropdown')
+			.dropdown({
+		    allowAdditions: false
+		 	});
+		
+		// set the platform to default
 		$('#platformsDropdown').dropdown('set exactly',defaultSettings['defaultPlatform'] );
 
 
-	});
 
 
+		// // bind ofxAddons URL (load it in default browser; not within Electron)
+		// $(".visitOfxAddons").click(function (e) {
+		// 	e.preventDefault();
+		// 	var shell = require('shell');
+		// 	shell.openExternal('http://www.ofxaddons.com/');
+		// });
 
-	// bind ofxAddons URL (load it in default browser; not within Electron)
-	$(".visitOfxAddons").click(function (e) {
-		e.preventDefault();
-		var shell = require('shell');
-		shell.openExternal('http://www.ofxaddons.com/');
-	});
+	// $("#projectPath").on('change', function () {
+	// 	if( $(this).is(":focus")===true ){ return; }
 
-	$("#projectPath").on('change', function () {
-		if( $(this).is(":focus")===true ){ return; }
+	// 	$("#projectName").trigger('change'); // checks the project on the new location
+	// });
+	// $("#projectPath").on('focusout', function () {
+	// 	$(this).trigger('change');
+	// });
 
-		$("#projectName").trigger('change'); // checks the project on the new location
-	});
-	$("#projectPath").on('focusout', function () {
-		$(this).trigger('change');
-	});
+	// $("#projectName").on('change', function () {
+	// 	if( $(this).is(":focus")===true ){ return; }
 
-	$("#projectName").on('change', function () {
-		if( $(this).is(":focus")===true ){ return; }
+	// 	var project = {};
+	// 	project['projectName'] = $("#projectName").val();
+	// 	project['projectPath'] = $("#projectPath").val();
 
-		var project = {};
-		project['projectName'] = $("#projectName").val();
-		project['projectPath'] = $("#projectPath").val();
-
-		// check if project exists
-		ipc.send('isOFProjectFolder', project);
-	}).trigger('change');
-	$("#projectName").on('focusout', function () {
-		$(this).trigger('change');
-	});
+	// 	// check if project exists
+	// 	ipc.send('isOFProjectFolder', project);
+	// }).trigger('change');
+	// $("#projectName").on('focusout', function () {
+	// 	$(this).trigger('change');
+	// });
 
 	// $("#advancedOptions").on("change", function () {
 	// 	console.log($("#advancedOptions").checkbox('is checked'));
@@ -275,6 +280,7 @@ function setup() {
 	// });
 	$("#advancedOptions").checkbox();
 	$("#advancedOptions").on("change", function () {
+		console.log("hi")
 		 if ($("#advancedOptions").filter(":checked").length > 0){
 		 	enableAdvancedMode(true);
 		 } else {
@@ -305,7 +311,7 @@ function setup() {
 	// });
 
 
-	$(document).ready(function(){
+	
 		$('.main.menu .item').tab({history:false});
 	});
 
@@ -422,12 +428,16 @@ function enableAdvancedMode( isAdvanced ){
 	if( isAdvanced ) {
 		$('#platformsDropdown').removeClass("disabled");
 		$("body").addClass('advanced');
+		$('a.updateMultiMenuOption').show();
+
 	}
 	else {
 		$('#platformsDropdown').addClass("disabled");
 		$('#platformsDropdown').dropdown('set exactly',defaultSettings['defaultPlatform'] );
 		
 		$("body").removeClass('advanced');
+		$('a.updateMultiMenuOption').hide();
+		
 	}
 	defaultSettings['advancedMode'] = isAdvanced;
 	saveDefaultSettings();
