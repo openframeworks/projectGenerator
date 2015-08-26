@@ -8,7 +8,6 @@ var path = require('path');
 
 var platforms = {
     "osx": "OS X (Xcode)",
-    "win_cb": "Windows (Code::Blocks)",
     "vs": "Windows (Visual Studio 2015)",
     "ios": "iOS (Xcode)",
     "linux": "Linux 32-bit (Code::Blocks)",

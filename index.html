@@ -42,7 +42,7 @@
 						<label>Project name:</label>
 						<div class="fields">
 							<div class="field">
-								<input type="text" placeholder="Project name...">
+								<input type="text" placeholder="Project name..." id="projectName">
 							</div>
 							<div class="field">
 								<div class="ui grey button" onclick="browseImportProject()">import</div>
@@ -52,7 +52,7 @@
 					<div class="field">
 						<label>Project path:</label>
 						<div class="ui icon input fluid">
-							<input type="text" placeholder="Project path...">
+							<input type="text" placeholder="Project path..." id="projectPath">
 							<i class="search link icon" onclick="browseProjectPath()"></i>
 						</div>
 					</div>
@@ -88,10 +88,12 @@
 			<!------------------------------- advanced -------------------------------->
 			<div class="ui tab" data-tab="updateMulti">
 				<div class="ui message">
+					<p>
 					<div class="header">
 						Warning
 					</div>
-					<p>This updates existing projects <em>recursively</em> in the selected directory. For example, to generate examples for a specific platform, you'd choose the examples folder as the update path.</p>
+					</p>
+					<p>This updates existing projects <em>recursively</em> in the selected directory. For example, to generate examples for a specific platform, you'd choose the examples folder as the update path. </p><p><i>To update a single project, use the import tool on the "create / update" page.</i></p>
 				</div>
 				<div class="ui form">
 
