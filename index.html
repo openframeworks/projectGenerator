@@ -9,7 +9,7 @@
 		<style>
 		body {
 		background-color: #ddd;
-									-webkit-user-select: none;			// this should be over-rid on console.
+												-webkit-user-select: none;			// this should be over-rid on console.
 		}
 		.main.menu {
 			-webkit-app-region: drag;
@@ -38,7 +38,7 @@
 		</div>
 		
 		
-		<div class="main ui container" style="padding: 90px 40px 0px 40px">
+		<div class="main ui container" style="padding: 90px 40px 50px 40px">
 			
 			<!------------------------------- create -------------------------------->
 			<div class="ui tab active" data-tab="create">
@@ -70,6 +70,17 @@
 							<div class="menu " id="addonsList">
 							</div>
 						</div>
+					</div>
+					<div class="ui red message" id="missingAddonMessage" style="display: none">
+						<p>
+							<div class="header">
+								Missing addons
+							</div>
+						</p>
+						<p>you are attempting to update a project that is missing the following addons</p>
+						<p><div id="missingAddonList">...</div></p>
+						<p>please download the missing addons and put them in your addons folder, then relaunch the project generator.</p>
+						<p>if you choose to update this project without these addons, you may overwrite the settings on the project.</p>
 					</div>
 					<div class="field">
 						<label>Platforms:</label>
@@ -140,36 +151,31 @@
 				
 			</div>
 		</div>
-
-
 		
-
 		<!-- overlay / page dimmer -->
-<div class="ui page dimmer">
-  <div class="content">
-    <div class="center">
-
-   		 <div class="ui message">
-   						 <div class="header">
+		<div class="ui page dimmer">
+			<div class="content">
+				<div class="center">
+					<div class="ui message">
+						<div class="header">
 							Is the openFrameworks path right?
 						</div>
-    		Sorry, it looks like the path settings for openframeworks is not right or not set. 
-    		Please be sure that you have the root folder (where libs, addons, apps are) selected. 
-    	</div>
-
-    </div>
-  </div>
-</div>
+						Sorry, it looks like the path settings for openframeworks is not right or not set.
+						Please be sure that you have the root folder (where libs, addons, apps are) selected.
+					</div>
+				</div>
+			</div>
+		</div>
 		<!-- begin JS UI modal -->
 		<!-- <div class="modal fade in" id="uiModal" tabindex="-1" role="dialog">
-					<div class="modal-dialog" role="document">
-								<div class="modal-content">
-											<div class="modal-body"></div>
-											<div class="modal-footer">
-														<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-											</div>
-								</div>
-					</div>
+						<div class="modal-dialog" role="document">
+										<div class="modal-content">
+														<div class="modal-body"></div>
+														<div class="modal-footer">
+																		<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+														</div>
+										</div>
+						</div>
 		</div> -->
 		<!-- end modal -->
 		<script type="text/javascript" src="js/jquery.min.js" onload="window.$ = window.jQuery = module.exports;"></script>

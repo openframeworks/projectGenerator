@@ -17,6 +17,7 @@ var platforms = {
 };
 
 var defaultSettings;
+var addonsInstalled;
 
 
 //-----------------------------------------------------------------------------------
@@ -74,6 +75,8 @@ ipc.on('setAddons', function(arg) {
 
     console.log("got set addons");
 
+    addonsInstalled = arg;
+
     var select = document.getElementById("addonsList");
     select.innerHTML = "";
 
@@ -85,20 +88,20 @@ ipc.on('setAddons', function(arg) {
                 "class": 'item',
                 "data-value": arg[i]
             }).html(arg[i]).appendTo(select);
-
-
-            // var option = document.createElement("div");
-            // option.class = "arg[i];"
-            // select.add(option);
         }
-        // $("#addonsSelect").attr("data-placeholder", "Addons...");
+    
     } else {
 
-$('.main .ui').tab('change tab', 'settings')
-        $('.ui.dimmer')
-  .dimmer('show')
+        // if there's no addons, something is wrong ! 
+        // let's tell them via an overlay
+        // and bounce to settings (if it's wrong when you open the app, we should move you to seetings)
+
+        // give the something is wrong message: 
+        $('.ui.dimmer').dimmer('show')
   
-        //$("#addonsSelect").attr("data-placeholder", "No addons found, is OF path right?");
+        // bounce to settings
+        $('.main .ui').tab('change tab', 'settings')
+        
     }
 
 
@@ -106,37 +109,68 @@ $('.main .ui').tab('change tab', 'settings')
         .dropdown({
             allowAdditions: false
         });
-    // call select2 to make a good selectable 
-    //$("#addonsSelect").select2();
 });
 
 //-------------------------------------------
 // select the list of addons and notify if some aren't installed
 ipc.on('selectAddons', function(arg) {
-    var installedAddons = $("#addonsSelect option");
-    var neededAddons = arg;
 
-    $.each(installedAddons, function(i, ia) {
-        if ($.inArray(this.value, neededAddons) != -1) {
-            $(this).attr('selected', 'selected');
-            var tmpVal = this.value;
-            neededAddons = $.grep(neededAddons, function(val) {
-                return val != tmpVal;
-            });
+    var addonsAlreadyPicked = $("#addonsDropdown").val().split(',');
+
+    console.log(addonsAlreadyPicked);
+    console.log(arg);
+    console.log(addonsInstalled);
+
+    var neededAddons = [];
+
+    //haystack.indexOf(needle) >= 0
+
+    for (var i = 0; i < arg.length; i++) {
+        // first, check if it's already picked, then do nothing
+        if (addonsAlreadyPicked.indexOf(arg[i]) >= 0){
+            console.log("already picked"); // alread picked
         } else {
-            $(this).removeAttr('selected');
-        }
-    });
+            
+            // if not picked, check if have it and try to pick it
+            if (addonsInstalled.indexOf(arg[i]) >= 0){
+                $('#addonsDropdown').dropdown('set selected', arg[i]);
+            } else {
+                neededAddons.push(arg[i]);
+            }
 
-    // syncronises gui with form element
-    $("#addonsSelect").select2();
+        }
+    }
 
     if (neededAddons.length > 0) {
-        $("#generate-mode-section").addClass("has-missing-addons");
-        $("#missingAddonsList").text(neededAddons.join(", "));
+        console.log("missing addons");
+        // $("#generate-mode-section").addClass("has-missing-addons");
+        $('#missingAddonList').empty();
+        $('#missingAddonList').append("<b>" + neededAddons.join(", ") + "</b>");
+        $("#missingAddonMessage").show();
+
     } else {
-        $("#generate-mode-section").removeClass("has-missing-addons");
+
+        $("#missingAddonMessage").hide();
+        
+        // $("#generate-mode-section").removeClass("has-missing-addons");
     }
+
+
+// <div class="ui red message" id="missingAddonMessage" style="display: none">
+//     <p>
+//         <div class="header">
+//             Missing addons
+//         </div>
+//     </p>
+//     <p>you are attempting to update a project that is missing the following addons</p>
+//     <p><div id="missingAddonList"></div></p>
+//     <p>please download the missing addons and put them in your addons folder, then relaunch the project generator.</p>
+//     <p>if you choose to update this project without these addons, you may overwrite the settings on the project.</p>
+// </div>
+
+
+
+
 });
 
 //-------------------------------------------
@@ -233,6 +267,7 @@ function setup() {
         // set the platform to default
         $('#platformsDropdown').dropdown('set exactly', defaultSettings['defaultPlatform']);
 
+
         // // bind ofxAddons URL (load it in default browser; not within Electron)
         // $(".visitOfxAddons").click(function (e) {
         // 	e.preventDefault();
@@ -240,34 +275,34 @@ function setup() {
         // 	shell.openExternal('http://www.ofxaddons.com/');
         // });
 
-        // $("#projectPath").on('change', function () {
-        // 	if( $(this).is(":focus")===true ){ return; }
+        $("#projectPath").on('change', function () {
+        	if( $(this).is(":focus")===true ){ return; }
 
-        // 	$("#projectName").trigger('change'); // checks the project on the new location
-        // });
-        // $("#projectPath").on('focusout', function () {
-        // 	$(this).trigger('change');
-        // });
+            $("#projectName").trigger('change'); // checks the project on the new location
+        });
+        $("#projectPath").on('focusout', function () {
+        	$(this).trigger('change');
+        });
 
-        // $("#projectName").on('change', function () {
-        // 	if( $(this).is(":focus")===true ){ return; }
+        $("#projectName").on('change', function () {
+        	if( $(this).is(":focus")===true ){ return; }
 
-        // 	var project = {};
-        // 	project['projectName'] = $("#projectName").val();
-        // 	project['projectPath'] = $("#projectPath").val();
+        	var project = {};
+        	project['projectName'] = $("#projectName").val();
+        	project['projectPath'] = $("#projectPath").val();
 
-        // 	// check if project exists
-        // 	ipc.send('isOFProjectFolder', project);
-        // }).trigger('change');
-        // $("#projectName").on('focusout', function () {
-        // 	$(this).trigger('change');
-        // });
+        	// check if project exists
+        	ipc.send('isOFProjectFolder', project);
+        }).trigger('change');
+        $("#projectName").on('focusout', function () {
+        	$(this).trigger('change');
+        });
 
         // $("#advancedOptions").on("change", function () {
         // 	console.log($("#advancedOptions").checkbox('is checked'));
-
         // 	//enableAdvancedMode( $(this).is(':checked') );
         // });
+
         $("#advancedOptions").checkbox();
         $("#advancedOptions").on("change", function() {
             if ($("#advancedOptions").filter(":checked").length > 0) {
@@ -344,7 +379,7 @@ function generate() {
     gen['projectPath'] = $("#projectPath").val();
 
     gen['platformList'] = getPlatformList("#singlePlatformSelect");
-    gen['addonList'] = $("#addonsSelect").val();
+    gen['addonList'] = $("#addonsDropdown").val();
     gen['ofPath'] = $("#ofPath").val();
 
     console.log(gen);
@@ -398,37 +433,32 @@ function switchGenerateMode(mode) {
 
         $("#generateButton").hide();
         $("#updateButton").show();
-
+        $("#missingAddonMessage").hide();
 
         console.log('Switching GenerateMode to Update...');
-        $("#generate-mode-section").removeClass('createMode').addClass('updateMode');
-
+        
+        clearAddonSelection();
+        
     }
     // [default]: switch to createMode (generate new projects)
     else {
 
         $("#generateButton").show();
-        $("#generateButton").hide();
+        $("#updateButton").hide();
+        $("#missingAddonMessage").hide();
 
         console.log('Switching GenerateMode to Create...');
 
         // if previously in update mode, deselect Addons
-        if ($("#generate-mode-section").hasClass('updateMode')) {
-            $("#generate-mode-section").removeClass("has-missing-addons");
-            clearAddonSelection();
-        }
-
-        $("#generate-mode-section").removeClass('updateMode').addClass('createMode');
+        clearAddonSelection();
+        
     }
 }
 
 //----------------------------------------
 function clearAddonSelection() {
-    var installedAddons = $("#addonsSelect option");
-    $.each(installedAddons, function(i, ia) {
-        $(this).removeAttr('selected');
-    });
-    $("#addonsSelect").select2();
+
+    $('#addonsDropdown').dropdown('clear');
 
 }
 
