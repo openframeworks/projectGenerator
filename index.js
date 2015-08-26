@@ -21,10 +21,26 @@ try {
 	obj = JSON.parse(settings, 'utf8');
 	console.log(obj);
 } catch (e) {
+
+	// automatic platform detection
+	var os = require("os");
+	var myPlatform = "Unknown";
+	if( /^win/.test(process.platform) ){ myPlatform = 'win_cb'; }
+	// TODO: make the difference between osx and ios
+	else if( process.platform === "darwin" ){ myPlatform = 'osx'; }
+	else if( process.platform === "linux" ){
+		myPlatform = 'linux';
+		if( process.arch === 'ia32' ){ myPlatform = 'linux'; }
+		else if( process.arch === 'arm' ){
+			if( os.cpus()[0].model.indexOf('ARMv6') == 0 ){ myPlatform = 'linuxarmv6l'; }
+			else { myPlatform = 'linuxarmv7l'; }
+		}
+		else if( process.arch === 'x64' ){ myPlatform = 'linux64'; }
+	}
 	obj = {
 		"defaultOfPath": "",
 		"advancedMode": false,
-		"defaultPlatform" : "Unknown",
+		"defaultPlatform" : myPlatform,
 		"showConsole" : false,
 		"showDeveloperTools" : false,
 		"defaultRelativeProjectPath" : "apps/myApps"
