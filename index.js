@@ -337,40 +337,44 @@ ipc.on('update', function (event, arg) {
 	console.log(update);
 
 	var updatePath = "";
-	var pathString = "";
-	var platformString = "";
-	var recursiveString = "";
-
-
-	if (update['updatePath'] !== null) {
-		updatePath = "-p\"" + update['updatePath'] + "\"";
+	if (update['updatePath'] !== null && update['updateName'] !== null) {
+		updatePath = "\"" + pathTemp.join(update['updatePath'], update['updateName']) + "\"";
 	}
 
+	var platformString = "";
 	if (update['platformList'] !== null) {
 		platformString = "-x\"" + update['platformList'].join(", ") + "\"";
 	}
 
+	var ofPathString = "";
 	if (update['ofPath'] !== null) {
-		pathString = "-o\"" + update['ofPath'] + "\"";
+		ofPathString = "-o\"" + update['ofPath'] + "\"";
 	}
 
+	var recursiveString = "";
 	if (update['updateRecursive'] === true) {
 		recursiveString = "-r";
 	}
 
-	var pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "commandLinePG"));
+	var addonString;
+	if( update['addonList'] !==null ){
+		addonString = "-a\"" + update['addonList'].join(", ") + "\"";
+	}
 
+	var pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "commandLinePG"));
 
 	pgApp = pgApp.replace(/ /g, '\\ ');
 
-	var wholeString = pgApp + " -u " + recursiveString + " " + pathString + " " + platformString + " " + updatePath;
+	var wholeString = pgApp + " " + recursiveString + " " + ofPathString + " " + addonString + " " + platformString + " " + updatePath;
 
 	exec(wholeString, function callback(error, stdout, stderr) {
+		
+		var fullPath = pathTemp.join(update['updatePath'], update['updateName']);
 		if(error === null){
 			event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ stdout );
 			event.sender.send('sendUIMessage', 
 				'<strong>Success!</strong><br>'+
-				'Updating your project was successful! <span class="monospace">'+ update['updatePath'] +'</span><br><br>' +
+				'Updating your project was successful! <a href="file:///'+ fullPath +'" class="monospace" data-toggle="external_target">'+ fullPath +'</a><br><br>' +
 				'<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
 				'<div id="fullConsoleOutput"><br><textarea class="selectable">'+ stdout +'</textarea></div>'
 			);
@@ -380,7 +384,7 @@ ipc.on('update', function (event, arg) {
 			event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ error.message );
 			event.sender.send('sendUIMessage', 
 				'<strong>Error...</strong><br>'+
-				'There was a problem updating your project... <span class="monospace">'+ update['updatePath'] +'</span>' +
+				'There was a problem updating your project... <span class="monospace">'+ fullPath +'</span>' +
 				'<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">'+ error.message +'</textarea></div>'
 			);
 		}
@@ -420,36 +424,38 @@ ipc.on('generate', function (event, arg) {
 
 	var pathTemp = require('path');
 
-	var projectString = "";
-	var pathString = "";
-	var addonString = "";
-	var platformString = "";
+	
+	
+	
+	
 
 	console.log(generate);
 
+	var platformString = "";
 	if (generate['platformList'] !== null) {
 		platformString = "-x\"" + generate['platformList'].join(", ") + "\"";
 	}
 
+	var addonString = "";
 	if (generate['addonList'] !== null) {
 		addonString = "-a\"" + generate['addonList'].join(", ") + "\"";
 	}
 
+	var ofPathString = "";
 	if (generate['ofPath'] !== null) {
-		pathString = "-o\"" + generate['ofPath'] + "\"";
+		ofPathString = "-o\"" + generate['ofPath'] + "\"";
 	}
 
-	if (generate.projectName !== null &&
-		generate.projectPath !== null) {
-
-		projectString = "-p\"" + pathTemp.join(generate['projectPath'], generate['projectName']) + "\"";
+	var projectString = "";
+	if (generate.projectName !== null && generate.projectPath !== null) {
+		projectString = "\"" + pathTemp.join(generate['projectPath'], generate['projectName']) + "\"";
 	}
 
 	var pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "commandLinePG"));
 
 	pgApp = pgApp.replace(/ /g, '\\ ');
 
-	var wholeString = pgApp + " -c " + pathString + " " + addonString + " " + platformString + " " + projectString;
+	var wholeString = pgApp + " " + ofPathString + " " + addonString + " " + platformString + " " + projectString;
 
 	exec(wholeString, function callback(error, stdout, stderr) {
 
@@ -458,7 +464,7 @@ ipc.on('generate', function (event, arg) {
 			event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ stdout );
 			event.sender.send('sendUIMessage', 
 				'<strong>Success!</strong><br>'+
-				'Your can now find your project in <span class="monospace">'+ fullPath +'</span><br><br>' +
+				'Your can now find your project in <a href="file:///'+fullPath+'" data-toggle="external_target" class="monospace">'+ fullPath +'</a><br><br>' +
 				'<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
 				'<div id="fullConsoleOutput"><br><textarea class="selectable">'+ stdout +'</textarea></div>'
 			);

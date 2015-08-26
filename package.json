@@ -22,14 +22,14 @@
     "index.html",
     "js/*",
     "css/*",
-    "app/*",
-    "chosen/*"
+    "app/*"
   ],
   "keywords": [
     "electron-app"
   ],
   "dependencies": {
     "electron-debug": "^0.1.1",
+    "moniker": "^0.1.2",
     "walk": "^2.3.9"
   },
   "devDependencies": {
