@@ -94,7 +94,10 @@ ipc.on('setAddons', function(arg) {
         // $("#addonsSelect").attr("data-placeholder", "Addons...");
     } else {
 
-        // TODO: error message
+$('.main .ui').tab('change tab', 'settings')
+        $('.ui.dimmer')
+  .dimmer('show')
+  
         //$("#addonsSelect").attr("data-placeholder", "No addons found, is OF path right?");
     }
 
