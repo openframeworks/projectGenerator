@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="utf-8">
@@ -13,25 +13,22 @@
 		</style>
 	</head>
 	<body>
-		 <div class="ui fixed inverted main menu">
+		<div class="ui fixed inverted main menu">
 			<div class="ui container">
 				<a class="item active" data-tab="create">create / update</a>
 				<a class="item" data-tab="updateMulti">update multiple</a>
 				<a class="item" data-tab="settings">settings</a>
 			</div>
-		</div> 
-
-
-<!-- <div class="ui pointing secondary demo menu">
-    <a class="active red item" data-tab="first">One</a>
-    <a class="blue item" data-tab="second">Two</a>
-    <a class="green item" data-tab="third">Three</a>
-</div>
-
-<div class="ui active tab segment" data-tab="first">First</div>
-<div class="ui tab segment" data-tab="second">Second</div>
-<div class="ui tab segment" data-tab="third">Third</div>
- -->
+		</div>
+		<!-- <div class="ui pointing secondary demo menu">
+							<a class="active red item" data-tab="first">One</a>
+							<a class="blue item" data-tab="second">Two</a>
+							<a class="green item" data-tab="third">Three</a>
+		</div>
+		<div class="ui active tab segment" data-tab="first">First</div>
+		<div class="ui tab segment" data-tab="second">Second</div>
+		<div class="ui tab segment" data-tab="third">Third</div>
+		-->
 		
 		<br/><br/><br/><br/>
 		
@@ -39,202 +36,128 @@
 			
 			<!------------------------------- create -------------------------------->
 			<div class="ui tab active" data-tab="create">
-				<!-- <div class="info-message">
-																						<p>This is useful to generate a new project, fix broken project configurations, change a project's target platform or (try to) update older projects to newer OF versions.</p>
-				</div> -->
-				<!-- <div class="two fields">
-													<div class="field">
-						<label>Primary Skill</label> -->
-						<div class="ui form">
+				<div class="ui form">
+					<div class="field">
+						<label>Project name:</label>
+						<div class="fields">
 							<div class="field">
-								<label>Project name:</label>
-								<div class="fields">
-									<div class="field">
-										<input type="text" placeholder="Project name...">
-									</div>
-									<div class="field">
-										<div class="ui olive button small">import</div>
-									</div>
-								</div>
+								<input type="text" placeholder="Project name...">
 							</div>
 							<div class="field">
-								<label>Project path:</label>
-								<div class="ui icon input fluid">
-									<input type="text" placeholder="Project path...">
-									<i class="search link icon"></i>
-								</div>
+								<div class="ui olive button small">import</div>
 							</div>
-							<div class="field">
-								<label>Addons:</label>
-								<div class="ui multiple search selection dropdown">
-									<input name="addons" type="hidden">
-									<i class="dropdown icon"></i>
-									<div class="default text">Addons...</div>
-									<div class="menu" id="addonsList">
-									</div>
-								</div>
+						</div>
+					</div>
+					<div class="field">
+						<label>Project path:</label>
+						<div class="ui icon input fluid">
+							<input type="text" placeholder="Project path...">
+							<i class="search link icon"></i>
+						</div>
+					</div>
+					<div class="field">
+						<label>Addons:</label>
+						<div class="ui multiple search selection dropdown" id="addonsDropdown">
+							<input name="addons" type="hidden">
+							<i class="dropdown icon"></i>
+							<div class="default text">Addons...</div>
+							<div class="menu " id="addonsList">
 							</div>
+						</div>
+					</div>
+					<div class="field">
+						<label>Platforms:</label>
+						<div class="ui multiple search selection dropdown" id="platformsDropdown">
+							<input name="addons" type="hidden">
+							<i class="dropdown icon"></i>
+							<div class="default text">Platforms...</div>
+							<div class="menu" id="platformList">
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				
+				
+				
+			</div>
+			<!------------------------------- advanced -------------------------------->
+			<div class="ui tab" data-tab="updateMulti">
+				<div class="ui message">
+					<div class="header">
+						Warning
+					</div>
+					<p>This updates existing projects <em>recursively</em> in the selected directory. For example, to generate examples for a specific platform, you'd choose the examples folder as the update path.</p>
+				</div>
+			</div>
+			<!------------------------------- settings -------------------------------->
+			<div class="ui tab" data-tab="settings">
+				<div class="ui form">
+					<div class="field">
+						<label>openFrameworks path:</label>
+						<div class="ui icon input fluid">
+							<input type="text" placeholder="openFrameworks path..." id="ofPath">
+							<i class="search link icon"></i>
+						</div>
+					</div>
 
-							<div class="field">
-								<label>Platforms:</label>
-							</div>
-						</div>
-						
-						
-						
-						<form id="generate-mode-section" class="createMode">
-							<div class="form-group">
-								<label for="projectName">Name</label>
-								<div class="input-group">
-									<input class="form-control" type="text" name="projectName" value="myApp" id="projectName">
-									<span class="input-group-btn">
-										<button type="button" class="btn btn-info" onclick="browseImportProject()">Import</button>
-									</span>
-								</div>
-								<!--<span class="input-info">Name your project or click "import" to load settings from an existing project.</span>-->
-							</div>
-							<div class="form-group">
-								<label for="projectPath">Path</label>
-								<div class="input-group">
-									<input class="form-control" type="text" name="projectPath" value="" id="projectPath">
-									<span class="input-group-btn">
-										<button class="btn btn-info" type="button" onclick="browseProjectPath()">Browse</button>
-									</span>
-								</div>
-							</div>
-							<div class="form-group" id="addonsForm">
-								<label for="addonsSelect">
-									Addons
-									&nbsp; <a href="#ofxaddons.com" class="visitOfxAddons">
-										<span data-toggle="tooltip" data-placement="right" title="" data-original-title="Get more addons at ofxAddons.com" class="glyphicon glyphicon-share"></span>
-									</a>
-								</label>
-								<select class="form-control" multiple id="addonsSelect">
-									<option value=""></option>
-								</select>
-								<div class="alert alert-danger" id="missingAddons">
-									<strong>Error</strong>
-									<p>
-										You are missing the following plugins for this project:<br>
-										<span id="missingAddonsList"></span>
-									</p>
-								</div>
-							</div>
-							<div class="form-group advanced-feature" id="platformSelectForm">
-								<label for="platformSelect">Platforms</label>
-								<div class="platformSelect" id="singlePlatformSelect">
-									<!-- <span class="platform">test</span>
-									<span class="platform">test</span>
-									<span class="platform">test</span>
-									<span class="platform">test</span>
-									<span class="platform">test</span> -->
-								</div>
-								<div class="clearfix"></div>
-							</div>
-							<div class="form-group simple-feature">
-								<label for="platformSelect">Platform</label>
-								<div>
-									<span id="defaultPlatform" class="platform platform-selected">Unknown</span>
-								</div>
-								<div class="clearfix"></div>
-							</div>
-							<div class="form-group" id="submitForm">
-								
-								<!-- <div class="alert alert-warning" role="alert" id="warning-update">
-																									<h3>Warning</h3>
-																									<p>Updating will use the "src" folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files (beware).</p>
-								</div> -->
-								<button class="btn btn-primary" type="button" onclick="generate()" id="create-btn"
-								data-toggle="tooltip"
-								data-placement="right"
-								title=""
-								data-original-title="This will create a new project file for your target platform(s), and a skeleton openFrameworks app in the &quot;src&quot; folder, including any addon(s) you select.">Create New Project</button>
-								<button class="btn btn-primary" type="button" onclick="update()" id="update-btn"
-								data-toggle="tooltip"
-								data-placement="right"
-								title=""
-								data-original-title="Updating will use the &quot;src&quot; folder in your project folder and the selected addons to generate a new project file. It will overwrite old project files but use existing source code.">Update Project</button>
-							</div>
-						</form>
-					</div>
-					<!------------------------------- advanced -------------------------------->
-					<div class="ui tab" data-tab="updateMulti">
-						<form>
-							<div class="form-group">
-								<div class="alert alert-warning" role="alert">
-									<strong>Warning</strong>
-									<p>This updates existing projects <em>recursively</em> in the selected directory. For example, to generate examples for a specific platform, you'd choose the examples folder as the update path.
-									</p>
-								</div>
-							</div>
-							<div class="form-group">
-								<label for="updatePath">Path</label>
-								<div class="input-group">
-									<input class="form-control" type="text" name="updatePath" value="" id="updatePath">
-									<span class="input-group-btn">
-										<button class="btn btn-info" type="button" onclick="getUpdatePath()">Browse</button>
-									</span>
-								</div>
-							</div>
-							<div class="form-group">
-								<button class="btn btn-primary" type="button" onclick="update()">Update Multiple</button>
-							</div>
-						</form>
-					</div>
-					<!------------------------------- settings -------------------------------->
-					<div class="ui tab" data-tab="settings">
-						<form>
-							<div class="form-group">
-								<label for="ofPath">openFrameworks Path</label>
-								<div class="input-group">
-									<input class="form-control" type="text" name="ofPath" value="" id="ofPath">
-									<span class="input-group-btn">
-										<button class="btn btn-info" type="button" onclick="getPath()">Browse</button>
-									</span>
-								</div>
-							</div>
-							<div class="form-group">
-								<div class="input-group">
-									<div class="checkbox">
-										<label for="advancedToggle">
-											<input type="checkbox" name="advancedToggle" value="" id="advancedToggle">
-											Show advanced options
-										</label>
-									</div>
-								</div>
-							</div>
-							<div class="form-group advanced-feature">
-								<div class="input-group">
-									<div class="checkbox">
-										<label for="consoleToggle">
-											<input type="checkbox" name="consoleToggle" value="" id="consoleToggle">
-											Show console output
-										</label>
-									</div>
-								</div>
-							</div>
-						</form>
+					<div class="ui checkbox">
+  						<input type="checkbox" name="Advanced" id="advancedOptions">
+  						<label>Advanced options</label>
 					</div>
 				</div>
-				<section class="container" id="consoleContainer">
-					<div id="console" class="selectable">
-						<p>Welcome to the console :)</p>
-					</div>
-				</section>
-				<!-- begin JS UI modal -->
-				<div class="modal fade in" id="uiModal" tabindex="-1" role="dialog">
-					<div class="modal-dialog" role="document">
-						<div class="modal-content">
-							<div class="modal-body"></div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-							</div>
-						</div>
+				<!-- <form>
+									<div class="form-group">
+														<label for="ofPath">openFrameworks Path</label>
+														<div class="input-group">
+																			<input class="form-control" type="text" name="ofPath" value="" id="ofPath">
+																			<span class="input-group-btn">
+																								<button class="btn btn-info" type="button" onclick="getPath()">Browse</button>
+																			</span>
+														</div>
+									</div>
+									<div class="form-group">
+														<div class="input-group">
+																			<div class="checkbox">
+																								<label for="advancedToggle">
+																													<input type="checkbox" name="advancedToggle" value="" id="advancedToggle">
+																													Show advanced options
+																								</label>
+																			</div>
+														</div>
+									</div>
+									<div class="form-group advanced-feature">
+														<div class="input-group">
+																			<div class="checkbox">
+																								<label for="consoleToggle">
+																													<input type="checkbox" name="consoleToggle" value="" id="consoleToggle">
+																													Show console output
+																								</label>
+																			</div>
+														</div>
+									</div>
+				</form> -->
+			</div>
+		</div>
+		<!-- 				<section class="container" id="consoleContainer">
+			<div id="console" class="selectable">
+				<p>Welcome to the console :)</p>
+			</div>
+		</section> -->
+		<!-- begin JS UI modal -->
+		<div class="modal fade in" id="uiModal" tabindex="-1" role="dialog">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-body"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 					</div>
 				</div>
-				<!-- end modal -->
-				<script type="text/javascript" src="js/jquery.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
-				<script type="text/javascript" src="js/semantic.min.js"></script>
-				<script src="app.js"></script>
-			</body>
-		</html>
+			</div>
+		</div>
+		<!-- end modal -->
+		<script type="text/javascript" src="js/jquery.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
+		<script type="text/javascript" src="js/semantic.min.js"></script>
+		<script src="app.js"></script>
+	</body>
+</html>

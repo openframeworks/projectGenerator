@@ -19,7 +19,6 @@ var platforms = {
 
 var defaultSettings;
 
-
 ipc.on('setOfPath', function (arg) {
 	setOFPath(arg);
 });
@@ -87,6 +86,8 @@ ipc.on('importProjectSettings', function(settings){
 
 ipc.on('setAddons', function (arg) {
 
+	console.log("got set addons");
+
 	var select = document.getElementById("addonsList");
 	select.innerHTML = "";
 
@@ -112,7 +113,7 @@ ipc.on('setAddons', function (arg) {
 	}
 
 
-	$('.ui.dropdown')
+	$('#addonsDropdown')
 	.dropdown({
     allowAdditions: false
  	});
@@ -199,6 +200,7 @@ function setOFPath(arg) {
 	defaultSettings['defaultOfPath'] = elem.value;
 	saveDefaultSettings();
 
+	console.log("requesting addons");
 	// trigger reload addons from the new OF path
 	ipc.send('refreshAddonList', '');
 
@@ -209,40 +211,32 @@ function setOFPath(arg) {
 function setup() {
 
 	// populate platform selection forms
+
+	$(function() {
+	var select = document.getElementById("platformList");
 	var option, i;
 	for (var i in platforms) {
 		var myClass = 'platform';
-		if( i === defaultSettings['defaultPlatform'] ){ myClass += " platform-selected only-one" }
-		$(".platformSelect").append("<div class='"+myClass+"' data-value='"+i+"'>" + platforms[i] + "</span>");
+		
+		$('<div/>', {
+    			"class" : 'item',
+    			"data-value": i
+			}).html(platforms[i]).appendTo(select);
+		//if( i === defaultSettings['defaultPlatform'] ){ myClass += " platform-selected only-one" }
+		//$(".platformSelect").append("<div class='"+myClass+"' data-value='"+i+"'>" + platforms[i] + "</span>");
 	}
 
-	// handle platform selection
-	$( "div.platform" ).click(function() {
-		if( $(this).hasClass("platform-selected") && $(this).parent().children(".platform-selected").length <= 1 ){
-			// always 1 has to remain selected
-			$( this ).addClass( "platform-selected" );
-		}
-		else {
-			$( this ).toggleClass( "platform-selected" );
-		}
-		// handle css class when only 1 is selected
-		var candidates = $(this).parent().children("div.platform");
-		if(candidates.filter(".platform-selected").length <= 1){
-			candidates.filter(".platform-selected").addClass("only-one");
-		}
-		else {
-			candidates.removeClass("only-one");
-		}
+	$('#platformsDropdown')
+		.dropdown({
+	    allowAdditions: false
+	 	});
+
+		$('#platformsDropdown').dropdown('set exactly',defaultSettings['defaultPlatform'] );
+
+
 	});
 
 
-	// for (i = 0; i < platforms.length; i++) {
-	// 	option = document.createElement("option");
-	// 	option.text = platforms[i];
-	// 	//selectUpdate.add(option);
-	// }
-
-	//$("#projectName").val('myApp');
 
 	// bind ofxAddons URL (load it in default browser; not within Electron)
 	$(".visitOfxAddons").click(function (e) {
@@ -274,9 +268,22 @@ function setup() {
 		$(this).trigger('change');
 	});
 
-	$("#advancedToggle").on("change", function () {
-		enableAdvancedMode( $(this).is(':checked') );
+	// $("#advancedOptions").on("change", function () {
+	// 	console.log($("#advancedOptions").checkbox('is checked'));
+
+	// 	//enableAdvancedMode( $(this).is(':checked') );
+	// });
+	$("#advancedOptions").checkbox();
+	$("#advancedOptions").on("change", function () {
+		 if ($("#advancedOptions").filter(":checked").length > 0){
+		 	enableAdvancedMode(true);
+		 } else {
+		 	enableAdvancedMode(false);
+		 }
 	});
+ 
+
+
 
 	/* Stuff for the console setting (removed from UI)
 	$("#consoleToggle").on("change", function () {
@@ -299,8 +306,7 @@ function setup() {
 
 
 	$(document).ready(function(){
-		console.log("hi");
-    	$('.main.menu .item').tab({history:false});
+		$('.main.menu .item').tab({history:false});
 	});
 
 
@@ -410,15 +416,23 @@ function clearAddonSelection() {
 }
 
 function enableAdvancedMode( isAdvanced ){
+
+
+
 	if( isAdvanced ) {
+		$('#platformsDropdown').removeClass("disabled");
 		$("body").addClass('advanced');
 	}
 	else {
+		$('#platformsDropdown').addClass("disabled");
+		$('#platformsDropdown').dropdown('set exactly',defaultSettings['defaultPlatform'] );
+		
 		$("body").removeClass('advanced');
 	}
 	defaultSettings['advancedMode'] = isAdvanced;
 	saveDefaultSettings();
-	$("#advancedToggle").prop('checked', defaultSettings['advancedMode'] );
+	
+	//$("#advancedToggle").prop('checked', defaultSettings['advancedMode'] );
 }
 
 /* Stuff for the console setting (removed from UI)
