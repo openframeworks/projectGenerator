@@ -536,3 +536,8 @@ ipc.on('pickProjectImport', function(event, arg) {
     }
   });
 });
+
+ipc.on('quit', function (event, arg) {
+	app.quit();
+});
+

@@ -597,6 +597,9 @@ function consoleMessage(message) {
 // Button calls
 //-----------------------------------------------------------------------------------
 
+function quit(){
+    ipc.send('quit', '');
+}
 function browseOfPath() {
     ipc.send('pickOfPath', ''); // current path could go here (but the OS also remembers the last used folder)
 }
