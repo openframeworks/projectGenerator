@@ -288,20 +288,22 @@ function setup() {
         	if( $(this).is(":focus")===true ){ return; }
 
         	var project = {};
+
+            // fix "non alpha numeric characters here" as we did in the old PG
+            var currentStr = $("#projectName").val()
+            var stripped = currentStr.replace(/[^A-Za-z0-9]/g, '_');
+            $("#projectName").val(stripped)
+
         	project['projectName'] = $("#projectName").val();
         	project['projectPath'] = $("#projectPath").val();
 
         	// check if project exists
         	ipc.send('isOFProjectFolder', project);
         }).trigger('change');
+
         $("#projectName").on('focusout', function () {
         	$(this).trigger('change');
         });
-
-        // $("#advancedOptions").on("change", function () {
-        // 	console.log($("#advancedOptions").checkbox('is checked'));
-        // 	//enableAdvancedMode( $(this).is(':checked') );
-        // });
 
         $("#advancedOptions").checkbox();
         $("#advancedOptions").on("change", function() {
