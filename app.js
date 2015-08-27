@@ -107,7 +107,8 @@ ipc.on('setAddons', function(arg) {
 
     $('#addonsDropdown')
         .dropdown({
-            allowAdditions: false
+            allowAdditions: false,
+            fullTextSearch: true
         });
 });
 
