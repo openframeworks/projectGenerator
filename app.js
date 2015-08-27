@@ -537,9 +537,10 @@ function getPlatformList(platformSelector) {
 
 //----------------------------------------
 function displayModal(message) {
-    $("#uiModal .modal-body").html(message).find('.visitOfxAddons').click(function() {
-        var shell = require('shell');
-        shell.openExternal('http://www.ofxaddons.com/');
+    $("#uiModal .content").html(message).find('*[data-toggle="external_target"]').click(function (e) {
+		e.preventDefault();
+		var shell = require('shell');
+		shell.openExternal( $(this).prop("href") );
     });
     $("#uiModal").modal('show');
 }
