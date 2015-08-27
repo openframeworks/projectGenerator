@@ -417,6 +417,8 @@ ipc.on('generate', function (event, arg) {
 	if (generate['addonList'] !== null && 
 		generate['addonList'].length > 0) {
 		addonString = "-a\"" + generate['addonList'].join(", ") + "\"";
+	} else {
+		addonString = "-a \" \"";
 	}
 
 	if (generate['ofPath'] !== null) {

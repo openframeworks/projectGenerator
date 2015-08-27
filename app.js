@@ -388,15 +388,10 @@ function generate() {
         addonValueArray.push($(addonsPicked[i]).attr("data-value"));
     }    
 
-    var platformString = platformValueArray.join(",");
-    var addonString = addonValueArray.join(",");
-
-
     var gen = {};
 
     gen['projectName'] = $("#projectName").val();
     gen['projectPath'] = $("#projectPath").val();
-
     gen['platformList'] = platformValueArray;
     gen['addonList'] = addonValueArray; //$("#addonsDropdown").val();
     gen['ofPath'] = $("#ofPath").val();
@@ -418,29 +413,39 @@ function generate() {
 
 //----------------------------------------
 function update() {
-    // let's get all the info:
 
-    var up = {};
+    // var platformsPicked = $("#platformsDropdown  .active");
+    // var addonsPicked = $("#addonsDropdown  .active");
+    // var platformValueArray = [];
+    // var addonValueArray = [];
 
-    up['updatePath'] = $("#updatePath").val();
+    // for (var i = 0; i < platformsPicked.length; i++){
+    //     platformValueArray.push($(platformsPicked[i]).attr("data-value"));
+    // }
 
-    //TODO: 
-    up['platformList'] = getPlatformList("#singlePlatformSelect");
-    up['updateRecursive'] = $("#platformRecursive").is(":checked");
-    up['ofPath'] = $("#ofPath").val();
+    // for (var i = 0; i < addonsPicked.length; i++){
+    //     addonValueArray.push($(addonsPicked[i]).attr("data-value"));
+    // }    
 
-    if (up['platformList'] === null) {
-        displayModal("Please select a platform first.");
-    } else if ($("#generate-mode-section").hasClass("has-missing-addons")) {
-        displayModal(
-            '<div class="alert alert-info">' +
-            '<div class="alert alert-danger">' + $("#missingAddons").html() + '</div>' +
-            '<p>You can probably download them on <a href="#ofxaddons.com" class="visitOfxAddons">ofxaddons.com</a>.<br>Add them to your addons folder and rescan it.<br>If you don\'t need any of these addons, you can remove them from the adons.make file within your project (proceed with precaution).</p>' +
-            '</div><button class="btn btn-primary" type="button" onclick="rescanAddons()">Rescan addons folder</button>'
-        );
-    } else {
-        ipc.send('update', up);
-    }
+    // var gen = {};
+
+    // gen['projectName'] = $("#projectName").val();
+    // gen['projectPath'] = $("#projectPath").val();
+    // gen['platformList'] = platformValueArray;
+    // gen['addonList'] = addonValueArray; //$("#addonsDropdown").val();
+    // gen['ofPath'] = $("#ofPath").val();
+
+    // // console.log(gen);
+
+    // if (gen['projectName'] === '') {
+    //     displayModal("Please name your sketch first.");
+    // } else if (gen['projectPath'] === '') {
+    //     displayModal("Your project path is empty...");
+    // } else if (gen['platformList'] === null || gen['platformList'] === "") {
+    //     displayModal("Please select a platform first.");
+    // } else {
+    //     ipc.send('generate', gen);
+    // }
 }
 
 //----------------------------------------
