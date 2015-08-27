@@ -359,7 +359,7 @@ ipc.on('update', function (event, arg) {
 		recursiveString = "-r";
 	}
 
-	var pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "commandLinePG"));
+	var pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
 
 
 	pgApp = pgApp.replace(/ /g, '\\ ');
@@ -398,24 +398,6 @@ ipc.on('generate', function (event, arg) {
 
 	var generate = arg;
 
-	/*
-
-  -r, --recursive                                 update recursively (applies
-												  only to update)
-  -h, --help
-  -c, --create                                    create a project file if it
-												  doesn't exist
-  -u, --update                                    update a project file if it
-												  does exist
-  -x"platform list", --platforms="platform list"  platform list
-  -a"addons list", --addons="addons list"         addons list
-  -o"OF path", --ofPath="OF path"                 openframeworks path
-  -p"project path", --projectPath="project path"  project path
-  -v, --verbose                                   run verbose
-  -d, --dryrun                                    don't change files
-
-  */
-
 	var exec = require('child_process').exec;
 
 
@@ -432,7 +414,8 @@ ipc.on('generate', function (event, arg) {
 		platformString = "-x\"" + generate['platformList'].join(", ") + "\"";
 	}
 
-	if (generate['addonList'] !== null) {
+	if (generate['addonList'] !== null && 
+		generate['addonList'].length > 0) {
 		addonString = "-a\"" + generate['addonList'].join(", ") + "\"";
 	}
 
@@ -443,14 +426,14 @@ ipc.on('generate', function (event, arg) {
 	if (generate.projectName !== null &&
 		generate.projectPath !== null) {
 
-		projectString = "-p\"" + pathTemp.join(generate['projectPath'], generate['projectName']) + "\"";
+		projectString = pathTemp.join(generate['projectPath'], generate['projectName']);
 	}
 
-	var pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "commandLinePG"));
+	var pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
 
 	pgApp = pgApp.replace(/ /g, '\\ ');
 
-	var wholeString = pgApp + " -c " + pathString + " " + addonString + " " + platformString + " " + projectString;
+	var wholeString = pgApp + " " + pathString + " " + addonString + " " + platformString + " " + projectString;
 
 	exec(wholeString, function callback(error, stdout, stderr) {
 

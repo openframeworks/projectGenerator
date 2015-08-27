@@ -374,23 +374,40 @@ function saveDefaultSettings() {
 function generate() {
 
     // let's get all the info:
+    var platformsPicked = $("#platformsDropdown  .active");
+    var addonsPicked = $("#addonsDropdown  .active");
+
+    var platformValueArray = [];
+    var addonValueArray = [];
+
+    for (var i = 0; i < platformsPicked.length; i++){
+        platformValueArray.push($(platformsPicked[i]).attr("data-value"));
+    }
+
+    for (var i = 0; i < addonsPicked.length; i++){
+        addonValueArray.push($(addonsPicked[i]).attr("data-value"));
+    }    
+
+    var platformString = platformValueArray.join(",");
+    var addonString = addonValueArray.join(",");
+
 
     var gen = {};
 
     gen['projectName'] = $("#projectName").val();
     gen['projectPath'] = $("#projectPath").val();
 
-    gen['platformList'] = getPlatformList("#singlePlatformSelect");
-    gen['addonList'] = $("#addonsDropdown").val();
+    gen['platformList'] = platformValueArray;
+    gen['addonList'] = addonValueArray; //$("#addonsDropdown").val();
     gen['ofPath'] = $("#ofPath").val();
 
-    console.log(gen);
+    // console.log(gen);
 
     if (gen['projectName'] === '') {
         displayModal("Please name your sketch first.");
     } else if (gen['projectPath'] === '') {
         displayModal("Your project path is empty...");
-    } else if (gen['platformList'] === null) {
+    } else if (gen['platformList'] === null || gen['platformList'] === "") {
         displayModal("Please select a platform first.");
     } else {
         ipc.send('generate', gen);
@@ -524,9 +541,9 @@ function displayModal(message) {
 
 //----------------------------------------
 function consoleMessage(message) {
-    message = (message + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + "<br>\n" + '$2'); // nl2br
-    $("#console").append($("<p>").html(message));
-    $("#consoleContainer").scrollTop($('#console').offset().top); // scrolls to bottom
+    // message = (message + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + "<br>\n" + '$2'); // nl2br
+    // $("#console").append($("<p>").html(message));
+    // $("#consoleContainer").scrollTop($('#console').offset().top); // scrolls to bottom
 }
 
 //-----------------------------------------------------------------------------------

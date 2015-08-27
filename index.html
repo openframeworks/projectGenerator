@@ -85,7 +85,7 @@
 					<div class="field">
 						<label>Platforms:</label>
 						<div class="ui multiple search selection dropdown" id="platformsDropdown">
-							<input name="addons" type="hidden">
+							<input name="platforms" type="hidden">
 							<i class="dropdown icon"></i>
 							<div class="default text">Platforms...</div>
 							<div class="menu" id="platformList">
@@ -94,8 +94,8 @@
 					</div>
 					<div class="ui hidden divider"></div>
 					<div class="field">
-						<div class="ui olive button" id="generateButton">Generate</div>
-						<div class="ui orange button" id="updateButton" style="display: none">Update</div>
+						<div class="ui olive button" id="generateButton" onclick="generate()">Generate</div>
+						<div class="ui orange button" id="updateButton" style="display: none" onclick="update()">Update</div>
 					</div>
 				</div>
 			</div>
