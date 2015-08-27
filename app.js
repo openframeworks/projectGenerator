@@ -18,7 +18,7 @@ var platforms = {
 
 var defaultSettings;
 var addonsInstalled;
-
+var currentPath;
 
 //-----------------------------------------------------------------------------------
 // IPC 
@@ -27,6 +27,17 @@ var addonsInstalled;
 //-------------------------------------------
 ipc.on('setOfPath', function(arg) {
     setOFPath(arg);
+});
+
+ipc.on('cwd', function(arg) {
+    
+    console.log(arg);
+});
+
+ipc.on('setUpdatePath', function(arg) {
+    var elem = document.getElementById("updateMultiplePath");
+    elem.value = arg;
+
 });
 
 //-------------------------------------------
@@ -247,6 +258,15 @@ function setup() {
     $(document).ready(function() {
 
 
+        $('.main.menu .item').tab({
+            history: false
+        });
+
+
+
+
+
+
 
         // populate platform selection forms
         var select = document.getElementById("platformList");
@@ -267,6 +287,7 @@ function setup() {
 
         // set the platform to default
         $('#platformsDropdown').dropdown('set exactly', defaultSettings['defaultPlatform']);
+
 
 
         // // bind ofxAddons URL (load it in default browser; not within Electron)
@@ -348,11 +369,30 @@ function setup() {
         //  		$('body').removeClass('page-create_update page-settings page-advanced').addClass( 'page-' + $(e.target).attr("href").replace('#', '') );
         // });
 
+        
+        // setup the multi update list as well. 
+
+        var select = document.getElementById("platformListMulti");
+        var option, i;
+        for (var i in platforms) {
+            var myClass = 'platform';
+
+            $('<div/>', {
+                "class": 'item',
+                "data-value": i
+            }).html(platforms[i]).appendTo(select);        }
+
+        // start the platform drop down. 
+        $('#platformsDropdownMulti')
+            .dropdown({
+                allowAdditions: false
+            });
+
+        // // set the platform to default
+            $('#platformsDropdownMulti').dropdown('set exactly', defaultSettings['defaultPlatform']);
 
 
-        $('.main.menu .item').tab({
-            history: false
-        });
+        
     });
 
 

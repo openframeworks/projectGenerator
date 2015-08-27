@@ -91,7 +91,9 @@
 							<div class="menu" id="platformList">
 							</div>
 						</div>
+						<div id="test"></div>
 					</div>
+
 					<div class="ui hidden divider"></div>
 					<div class="field">
 						<div class="ui olive button" id="generateButton" onclick="generate()">Generate</div>
@@ -113,8 +115,8 @@
 					<div class="field">
 						<label>Project path:</label>
 						<div class="ui icon input fluid">
-							<input type="text" placeholder="Update path...">
-							<i class="search link icon"></i>
+							<input type="text" placeholder="Update path..." id="updateMultiplePath">
+							<i class="search link icon" onclick="getUpdatePath()"></i>
 						</div>
 					</div>
 					<div class="field">
@@ -123,7 +125,7 @@
 							<input name="addons" type="hidden">
 							<i class="dropdown icon"></i>
 							<div class="default text">Platforms...</div>
-							<div class="menu" id="platformList">
+							<div class="menu" id="platformListMulti">
 							</div>
 						</div>
 					</div>

@@ -8,10 +8,16 @@ var fs = require('fs');
 var path = require('path');
 var menu = require('menu');
 var moniker = require('moniker');
-
+var process = require('process');
 // Debugging: start the Electron PG from the terminal to see the messages from console.log()
 // Example: /path/to/PG/Contents/MacOS/Electron /path/to/PG/Contents/Ressources/app
 // Note: app.js's console.log is also visible from the WebKit inspector. (look for mainWindow.openDevTools() below )
+
+
+// where is the executable located?  (not where this script is, but where is the electron ide)
+
+
+
 
 
 //--------------------------------------------------------- load settings
@@ -88,6 +94,10 @@ app.on('ready', function () {
 	//when the window is loaded send the defaults
 	mainWindow.webContents.on('did-finish-load', function () {
 		//parseAddonsAndUpdateSelect();
+
+		mainWindow.webContents.send('cwd', app.getAppPath());
+		mainWindow.webContents.send('cwd', __dirname);
+		mainWindow.webContents.send('cwd', process.resourcesPath);
 		mainWindow.webContents.send('setStartingProject', startingProject);
 		mainWindow.webContents.send('setDefaults', obj);
 		mainWindow.webContents.send('setup', '');
@@ -487,7 +497,7 @@ ipc.on('pickOfPath', function (event, arg) {
 
 ipc.on('pickUpdatePath', function (event, arg) {
 	path = dialog.showOpenDialog({
-		title: 'select the folder or root folder where you want to update',
+		title: 'select root folder where you want to update',
 		properties: ['openDirectory'],
 		filters: []
 	}, function (filenames) {
