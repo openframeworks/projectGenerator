@@ -195,7 +195,9 @@ app.on('ready', function () {
 function getStartingProjectName(){
 	var defaultPathForProjects = path.join(obj["defaultOfPath"], obj["defaultRelativeProjectPath"]);
 	var foundOne = false;
-	var projectNames = moniker.generator([moniker.adjective]);
+
+	var projectNames = new moniker.Dictionary();
+	projectNames.read( path.join( __dirname, './node_modules/moniker/dict/sketchAdjectives.txt' ) );
 	var goodName = "mySketch";
 	
 	while (foundOne === false){
