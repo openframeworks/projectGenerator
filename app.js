@@ -342,7 +342,6 @@ function setup() {
 
         // updates ofPath when the field is manually changed
         $("#ofPath").on('blur', function(e){
-            console.log($(this).val());
             setOFPath($(this).val());
         }).on('keypress', function(e){
             if(e.which==13){
