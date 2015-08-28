@@ -344,7 +344,15 @@ function setup() {
         	$('.checkbox').checkbox("set checked");
         }
 
-
+        // updates ofPath when the field is manually changed
+        $("#ofPath").on('blur', function(e){
+            setOFPath($(this).val());
+        }).on('keypress', function(e){
+            if(e.which==13){
+                e.preventDefault();
+                $(this).blur();
+            }
+        });
 
 
         /* Stuff for the console setting (removed from UI)

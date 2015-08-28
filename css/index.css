@@ -12,6 +12,7 @@
   overflow-y: scroll;
   padding: 0 40px;
   margin-bottom: -80px;
+  transition: margin-bottom .2s ease-in-out;
 }
 
 #consoleContainer::-webkit-scrollbar {
