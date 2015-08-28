@@ -262,13 +262,7 @@ function setup() {
             history: false
         });
 
-
-
-
-
-
-
-        // populate platform selection forms
+         // populate platform selection forms
         var select = document.getElementById("platformList");
         var option, i;
         for (var i in platforms) {
@@ -277,7 +271,8 @@ function setup() {
             $('<div/>', {
                 "class": 'item',
                 "data-value": i
-            }).html(platforms[i]).appendTo(select);        }
+            }).html(platforms[i]).appendTo(select);
+        }
 
         // start the platform drop down. 
         $('#platformsDropdown')
@@ -352,6 +347,10 @@ function setup() {
 	$("#consoleToggle").on("change", function () {
 		enableConsole( $(this).is(':checked') );
 	});*/
+        // enable console? (hiddens setting)
+        if(defaultSettings['showConsole']){ $("body").addClass('enableConsole'); }
+        $("#showConsole").on('click', function(){ $('body').addClass('showConsole'); });
+        $("#hideConsole").on('click', function(){ $('body').removeClass('showConsole'); });
 
         // initialise the overall-use modal
         $("#uiModal").modal({
@@ -588,9 +587,9 @@ function displayModal(message) {
 
 //----------------------------------------
 function consoleMessage(message) {
-    // message = (message + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + "<br>\n" + '$2'); // nl2br
-    // $("#console").append($("<p>").html(message));
-    // $("#consoleContainer").scrollTop($('#console').offset().top); // scrolls to bottom
+    message = (message + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + "<br>\n" + '$2'); // nl2br
+    $("#console").append($("<p>").html(message));
+    $("#consoleContainer").scrollTop($('#console').offset().top); // scrolls console to bottom
 }
 
 //-----------------------------------------------------------------------------------
