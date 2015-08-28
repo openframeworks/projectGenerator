@@ -9,6 +9,10 @@ var path = require('path');
 var menu = require('menu');
 var moniker = require('moniker');
 var process = require('process');
+var os = require("os");
+
+ 
+
 // Debugging: start the Electron PG from the terminal to see the messages from console.log()
 // Example: /path/to/PG/Contents/MacOS/Electron /path/to/PG/Contents/Ressources/app
 // Note: app.js's console.log is also visible from the WebKit inspector. (look for mainWindow.openDevTools() below )
@@ -246,12 +250,13 @@ function getDirectories(srcpath) {
 			}
 		});
 	} catch (e) {
-		if (e.code === 'ENOENT') {
-			console.log("This doesn't seem to be a valid addons folder:\n" + srcpath);
-			mainWindow.webContents.send('sendUIMessage', "No addons were found in " + srcpath + ".\nIs the OF path correct?");
-		} else {
-			throw e;
-		}
+		return null;
+		// if (e.code === 'ENOENT') {
+		// 	console.log("This doesn't seem to be a valid addons folder:\n" + srcpath);
+		// 	mainWindow.webContents.send('sendUIMessage', "No addons were found in " + srcpath + ".\nIs the OF path correct?");
+		// } else {
+		// 	throw e;
+		// }
 	}
 }
 
@@ -421,14 +426,16 @@ ipc.on('generate', function (event, arg) {
 	console.log(generate);
 
 	if (generate['platformList'] !== null) {
-		platformString = "-x\"" + generate['platformList'].join(", ") + "\"";
+		platformString = "-x\"" + generate['platformList'].join(", ") + " \"";
+	} else {
+		platformString = "-x\" \"";
 	}
 
 	if (generate['addonList'] !== null && 
 		generate['addonList'].length > 0) {
 		addonString = "-a\"" + generate['addonList'].join(", ") + "\"";
 	} else {
-		addonString = "-a \" \"";
+		addonString = "-a\" \"";
 	}
 
 	if (generate['ofPath'] !== null) {
@@ -449,8 +456,22 @@ ipc.on('generate', function (event, arg) {
 
 	exec(wholeString, function callback(error, stdout, stderr) {
 
+		var wasError = false;
+		var text = stdout; //Big text with many line breaks
+		var lines = text.split(os.EOL); //Will return an array of lines on every OS node works
+		for (var i = 0; i < lines.length; i++){
+			if (lines[i].indexOf("Result:") > -1){
+				if (lines[i].indexOf("error") > -1){
+					wasError = true;
+				}
+			}
+		}
+
+		// wasError = did the PG spit out an error (like a bad path, etc) 
+		// error = did node have an error running this command line app
+
 		var fullPath = pathTemp.join(generate['projectPath'], generate['projectName']);
-		if(error === null){
+		if(error === null && wasError === false){
 			event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ stdout );
 			event.sender.send('sendUIMessage', 
 				'<strong>Success!</strong><br>'+
@@ -460,7 +481,7 @@ ipc.on('generate', function (event, arg) {
 			);
 			event.sender.send('generateCompleted', true );
 		}
-		else {
+		else if (error !== null) {
 			event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ error.message );
 			// note: stderr mostly seems to be also included in error.message
 			// also available: error.code, error.killed, error.signal, error.cmd
@@ -470,6 +491,16 @@ ipc.on('generate', function (event, arg) {
 				'There was a problem generating your project... <span class="monospace">'+ fullPath +'</span>' +
 				'<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">'+ error.message +'</textarea></div>'
 			);
+		} else if (wasError === true){
+			event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ stdout );
+			event.sender.send('sendUIMessage', 
+				'<strong>Error!</strong><br>'+
+				'<strong>Error...</strong><br>'+
+				'There was a problem generating your project... <span class="monospace">'+ fullPath +'</span>' +
+				'<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">'+ stdout +'</textarea></div>'
+			
+			);
+
 		}
 	});
 

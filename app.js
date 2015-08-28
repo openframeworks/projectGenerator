@@ -85,7 +85,8 @@ ipc.on('importProjectSettings', function(settings) {
 ipc.on('setAddons', function(arg) {
 
     console.log("got set addons");
-
+    console.log(arg);
+    
     addonsInstalled = arg;
 
     var select = document.getElementById("addonsList");
@@ -103,6 +104,7 @@ ipc.on('setAddons', function(arg) {
     
     } else {
 
+        console.log("here");
         // if there's no addons, something is wrong ! 
         // let's tell them via an overlay
         // and bounce to settings (if it's wrong when you open the app, we should move you to seetings)
@@ -239,14 +241,7 @@ function setOFPath(arg) {
         }
     }
 
-    // update settings & remember the new OF path for next time
-    defaultSettings['defaultOfPath'] = elem.value;
-    saveDefaultSettings();
-
-    console.log("requesting addons");
-    // trigger reload addons from the new OF path
-    ipc.send('refreshAddonList', '');
-
+    $("#ofPath").trigger('change');
 }
 
 
@@ -329,6 +324,15 @@ function setup() {
             } else {
                 enableAdvancedMode(false);
             }
+        });
+
+        $("#ofPath").on("change", function(){
+            defaultSettings['defaultOfPath'] =  $("#ofPath").val();
+            saveDefaultSettings();
+
+            console.log("requesting addons");
+            // trigger reload addons from the new OF path
+            ipc.send('refreshAddonList', '');
         });
 
 
@@ -428,6 +432,8 @@ function generate() {
         addonValueArray.push($(addonsPicked[i]).attr("data-value"));
     }    
 
+    var lengthOfPlatforms = platformValueArray.length;
+
     var gen = {};
 
     gen['projectName'] = $("#projectName").val();
@@ -442,7 +448,7 @@ function generate() {
         displayModal("Please name your sketch first.");
     } else if (gen['projectPath'] === '') {
         displayModal("Your project path is empty...");
-    } else if (gen['platformList'] === null || gen['platformList'] === "") {
+    } else if (gen['platformList'] === null || gen['platformList'] === "" || lengthOfPlatforms == 0) {
         displayModal("Please select a platform first.");
     } else {
         ipc.send('generate', gen);
