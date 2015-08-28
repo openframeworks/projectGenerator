@@ -19,6 +19,7 @@ var platforms = {
 var defaultSettings;
 var addonsInstalled;
 var currentPath;
+var isOfPathGood = false;
 
 //-----------------------------------------------------------------------------------
 // IPC 
@@ -52,7 +53,6 @@ ipc.on('setDefaults', function(arg) {
     defaultSettings = arg;
     setOFPath(defaultSettings['defaultOfPath']);
     enableAdvancedMode(defaultSettings['advancedMode']);
-
 
 });
 
@@ -101,20 +101,25 @@ ipc.on('setAddons', function(arg) {
                 "data-value": arg[i]
             }).html(arg[i]).appendTo(select);
         }
-    
+        
+        $("#ofPathWrongMessage").hide();
+        isOfPathGood = true;
+
+       
+
     } else {
 
-        console.log("here");
-        // if there's no addons, something is wrong ! 
-        // let's tell them via an overlay
-        // and bounce to settings (if it's wrong when you open the app, we should move you to seetings)
+        console.log("hi??");
 
-        // give the something is wrong message: 
-        $('.ui.dimmer').dimmer('show')
-  
+        $("#ofPathWrongMessage").show();
+        isOfPathGood = false;
+        $('#settingsButton').click();
+
         // bounce to settings
-        $('.main .ui').tab('change tab', 'settings')
+        //$('.main .ui').tab('change tab', 'settings')
         
+
+
     }
 
 
@@ -257,6 +262,51 @@ function setup() {
             history: false
         });
 
+        $("#createButon").tab({
+            'onVisible':function(){
+                if (isOfPathGood !== true){
+                    $('#settingsButton').click();
+                     $('#ofPathError').modal({
+                        onHide: function () {
+                             $('#settingsButton').click();
+                        }
+                    }).modal("show");
+               }      
+            }
+        });
+
+        $("#updateButton").tab({
+            'onVisible':function(){
+                if (isOfPathGood !== true){
+                    $('#settingsButton').click();
+                     $('#ofPathError').modal({
+                        onHide: function () {
+                             $('#settingsButton').click();
+                        }
+                    }).modal("show");
+               }  
+            }
+        });
+
+        $("#settingsButton").tab({
+            'onVisible':function(){
+                console.log("settings!! ");
+                $('#createButon').removeClass('active');
+                $('#updateButton').removeClass('active');
+                $('#settingsButton').addClass('active');
+        }
+        });
+        // $('.main.menu .item').filter('.updateMultiMenuOption').tab({
+        //     'onVisible':function(){
+        //         alert("wh");
+        //         // if (isOfPathGood !== true){
+        //         //     $('.main .ui').tab('change tab', 'settings')
+        //         // }
+        //     }
+        // });
+
+
+
          // populate platform selection forms
         var select = document.getElementById("platformList");
         var option, i;
@@ -328,11 +378,12 @@ function setup() {
 
         $("#ofPath").on("change", function(){
             defaultSettings['defaultOfPath'] =  $("#ofPath").val();
+            console.log("ofPath val " + $("#ofPath").val());
             saveDefaultSettings();
 
             console.log("requesting addons");
             // trigger reload addons from the new OF path
-            ipc.send('refreshAddonList', '');
+            ipc.send('refreshAddonList', $("#ofPath").val());
         });
 
 
@@ -402,6 +453,7 @@ function setup() {
         // // set the platform to default
             $('#platformsDropdownMulti').dropdown('set exactly', defaultSettings['defaultPlatform']);
 
+        $("#ofPath").change();
 
         
     });
@@ -625,5 +677,5 @@ function getUpdatePath() {
 }
 
 function rescanAddons() {
-    ipc.send('refreshAddonList', '');
+    ipc.send('refreshAddonList', $("#ofPath").val());
 }

@@ -105,6 +105,7 @@ app.on('ready', function () {
 		mainWindow.webContents.send('setStartingProject', startingProject);
 		mainWindow.webContents.send('setDefaults', obj);
 		mainWindow.webContents.send('setup', '');
+		mainWindow.webContents.send('checkOfPathAfterSetup', '');
 	});
 
 
@@ -212,11 +213,11 @@ function getStartingProjectName(){
 	startingProject['name'] = goodName;
 }
 	
-function parseAddonsAndUpdateSelect() {
+function parseAddonsAndUpdateSelect(arg) {
 
-
+	console.log("in parseAddonsAndUpdateSelect " + arg);
 	//path = require('path').resolve(__dirname, defaultOfPath + "/addons");
-	addons = getDirectories(defaultOfPath + "/addons");
+	addons = getDirectories(arg + "/addons");
 
 	console.log("Reloading the addons folder, these were found:");
 	console.log(addons);
@@ -341,7 +342,8 @@ ipc.on('isOFProjectFolder', function (event, project) {
 //----------------------------------------------------------- ipc
 
 ipc.on('refreshAddonList', function (event, arg) {
-	parseAddonsAndUpdateSelect();
+	console.log("in refresh " + arg)
+	parseAddonsAndUpdateSelect(arg);
 });
 
 ipc.on('update', function (event, arg) {

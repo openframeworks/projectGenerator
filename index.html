@@ -17,6 +17,10 @@
 		.main.menu {
 			-webkit-app-region: drag;
 		}
+
+		.ui.dimmer > .content {
+			-webkit-user-select: none !important;
+		}
 		</style>
 	</head>
 	<body>
@@ -27,13 +31,13 @@
 					<div style="-webkit-app-region: no-drag !important; padding:6px;" onclick="quit()"><i class="remove link icon" ></i>
 					</div>
 				</a>
-				<a class="item active" data-tab="create">
+				<a class="item active" data-tab="create" id="createButon">
 					<div style="-webkit-app-region: no-drag !important; padding:6px;">create / update</div>
 				</a>
-				<a class="item updateMultiMenuOption" data-tab="updateMulti" style="display: none">
+				<a class="item updateMultiMenuOption" data-tab="updateMulti" style="display: none" id="updateButton">
 					<div style="-webkit-app-region: no-drag !important; padding:6px;">update multiple</div>
 				</a>
-				<a class="item right floated" data-tab="settings">
+				<a class="item right floated" data-tab="settings" id="settingsButton">
 					<div style="-webkit-app-region: no-drag !important; padding:6px;"><i class="setting link icon"></i>
 					</div>
 				</a>
@@ -96,7 +100,6 @@
 						</div>
 						<div id="test"></div>
 					</div>
-
 					<div class="ui hidden divider"></div>
 					<div class="field">
 						<div class="ui olive button" id="generateButton" onclick="generate()">Generate</div>
@@ -148,6 +151,13 @@
 							<i class="search link icon" onclick="browseOfPath()"></i>
 						</div>
 					</div>
+					<div class="ui negative message" id="ofPathWrongMessage" style="display: none">
+						<div class="header">
+							openFrameworks path is wrong
+						</div>
+						<p>Please set the OF path to root of openframeworks (ie, the folder which has "addons", "libs", in it)
+						</p>
+					</div>
 					<div class="ui checkbox">
 						<input type="checkbox" name="Advanced" id="advancedOptions">
 						<label>Advanced options</label>
@@ -157,20 +167,15 @@
 			</div>
 		</div>
 		
-		<!-- overlay / page dimmer -->
-		<div class="ui page dimmer">
-			<div class="content">
-				<div class="center">
-					<div class="ui message">
-						<div class="header">
-							Is the openFrameworks path right?
-						</div>
-						Sorry, it looks like the path settings for openframeworks is not right or not set.
-						Please be sure that you have the root folder (where libs, addons, apps are) selected.
-					</div>
-				</div>
-			</div>
-		</div>
+		<div class="ui small modal" id="ofPathError">
+  
+  <div class="content">
+    <div class="description">
+      please fix the openFrameworks path before procceeding.
+    </div>
+  </div>
+</div>
+		
 		<!-- begin JS UI modal -->
 		<div class="ui modal" id="uiModal" tabindex="-1" role="dialog">
 			<div class="content">
