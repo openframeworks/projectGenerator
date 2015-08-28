@@ -452,40 +452,35 @@ function generate() {
 
 
 //----------------------------------------
-function update() {
+function updateRecursive() {
 
-    // var platformsPicked = $("#platformsDropdown  .active");
-    // var addonsPicked = $("#addonsDropdown  .active");
-    // var platformValueArray = [];
-    // var addonValueArray = [];
+    // get the path and the platform list
 
-    // for (var i = 0; i < platformsPicked.length; i++){
-    //     platformValueArray.push($(platformsPicked[i]).attr("data-value"));
-    // }
+    
+    //platformsDropdownMulti
 
-    // for (var i = 0; i < addonsPicked.length; i++){
-    //     addonValueArray.push($(addonsPicked[i]).attr("data-value"));
-    // }    
+    console.log( $("#").val() );
+    
+    var platformsPicked = $("#platformsDropdownMulti  .active");
+    var platformValueArray = [];
+    for (var i = 0; i < platformsPicked.length; i++){
+        platformValueArray.push($(platformsPicked[i]).attr("data-value"));
+    }
 
-    // var gen = {};
+    var gen = {};
+    gen['updatePath'] = $("#updateMultiplePath").val();
+    gen['platformList'] = platformValueArray;
+    gen['updateRecursive'] = true;
+    gen['ofPath'] = $("#ofPath").val();
 
-    // gen['projectName'] = $("#projectName").val();
-    // gen['projectPath'] = $("#projectPath").val();
-    // gen['platformList'] = platformValueArray;
-    // gen['addonList'] = addonValueArray; //$("#addonsDropdown").val();
-    // gen['ofPath'] = $("#ofPath").val();
 
-    // // console.log(gen);
-
-    // if (gen['projectName'] === '') {
-    //     displayModal("Please name your sketch first.");
-    // } else if (gen['projectPath'] === '') {
-    //     displayModal("Your project path is empty...");
-    // } else if (gen['platformList'] === null || gen['platformList'] === "") {
-    //     displayModal("Please select a platform first.");
-    // } else {
-    //     ipc.send('generate', gen);
-    // }
+    if (gen['projectName'] === '') {
+        displayModal("Please name your sketch first.");
+    } else if (gen['platformList'] === null || gen['platformList'] === "") {
+        displayModal("Please select a platform first.");
+    } else {
+        ipc.send('update', gen);
+    }
 }
 
 //----------------------------------------

@@ -354,7 +354,7 @@ ipc.on('update', function (event, arg) {
 
 
 	if (update['updatePath'] !== null) {
-		updatePath = "-p\"" + update['updatePath'] + "\"";
+		updatePath = update['updatePath'];
 	}
 
 	if (update['platformList'] !== null) {
@@ -374,7 +374,7 @@ ipc.on('update', function (event, arg) {
 
 	pgApp = pgApp.replace(/ /g, '\\ ');
 
-	var wholeString = pgApp + " -u " + recursiveString + " " + pathString + " " + platformString + " " + updatePath;
+	var wholeString = pgApp + " " + recursiveString + " " + pathString + " " + platformString + " " + updatePath;
 
 	exec(wholeString, function callback(error, stdout, stderr) {
 		if(error === null){
