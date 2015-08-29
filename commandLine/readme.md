@@ -9,23 +9,24 @@ here's an example of creating a project, setting the OF path (../../../../) whic
 here's the extended options if you want to experiment.  please take are that options like recursive and update are very agressive, dryrun is suggested.
 
 
+	usage:
+
+
+	      projectGenerator [options] pathName
+
+	if pathName exists, project is updated
+	if pathName doesn't exist, project is created
+
 	OPTIONS:
-	A command line project generator
-	please use a command "create", "update"
-	lists should be comma seperated
-	and in quotes if there are spaces
+
+	lists should be comma seperated and in quotes if there are spaces
 	you can use : or = for parameter based options, such as -o=/usr/...
 
 	-r, --recursive                                 update recursively (applies
 	                                                only to update)
 	-h, --help
-	-c, --create                                    create a project file if it
-	                                                doesn't exist
-	-u, --update                                    update a project file if it
-	                                                does exist
 	-x"platform list", --platforms="platform list"  platform list
 	-a"addons list", --addons="addons list"         addons list
 	-o"OF path", --ofPath="OF path"                 openframeworks path
-	-p"project path", --projectPath="project path"  project path
 	-v, --verbose                                   run verbose
 	-d, --dryrun                                    don't change files
