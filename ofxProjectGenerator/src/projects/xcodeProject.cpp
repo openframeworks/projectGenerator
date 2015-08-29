@@ -746,6 +746,15 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 
                 nodeToAddTo.child("array").append_child("string").append_child(pugi::node_pcdata).set_value(UUID.c_str());
 
+            } else if (folders[0] == "local_addons"){
+                string xmlStr = "//key[contains(.,'"+addonUUID+"')]/following-sibling::node()[1]";
+
+                folders.erase(folders.begin());
+                pugi::xml_node node = doc.select_single_node(xmlStr.c_str()).node();
+                pugi::xml_node nodeToAddTo = findOrMakeFolderSet( node, folders, "local_addons");
+
+                nodeToAddTo.child("array").append_child("string").append_child(pugi::node_pcdata).set_value(UUID.c_str());
+
             } else {
                 string xmlStr = "//key[contains(.,'"+srcUUID+"')]/following-sibling::node()[1]";
 

@@ -98,7 +98,7 @@ public:
         startTime = ofGetElapsedTimef();
         nProjectsUpdated = 0;
         nProjectsCreated = 0;
-		ofSetWorkingDirectoryToDefault();
+		ofRestoreWorkingDirectoryToDefault();
 		project = NULL;
 		consoleSpace();
 
