@@ -26,6 +26,7 @@
 #   GTK is installed, one might test that here and create a variable to check. 
 ################################################################################
 # None
+APPNAME = projectGenerator
 
 ################################################################################
 # PROJECT EXTERNAL SOURCE PATHS
