@@ -83,6 +83,20 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
+			<key>6124BBF923A944AD4A3546A7</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>F528BDA35834104A3F0862F6</string>
+					<string>F4B09ECED1D13F0D76544CB1</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>addons</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
 			<key>F528BDA35834104A3F0862F6</key>
 			<dict>
 				<key>explicitFileType</key>
@@ -268,6 +282,28 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
+			<key>9697481EAA02F3E74E7AD862</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>EE4968879E321EE44D61A69C</string>
+					<string>A3A1A17CA417A08C2C2CBB65</string>
+					<string>C47F6FDA9CA2AD85298B06D8</string>
+					<string>B9F3E7A5103CD741ED442779</string>
+					<string>CBC114F51E6DAF8C2200203D</string>
+					<string>851AF667222EF52C8558BAAE</string>
+					<string>803C4742042031C3E87B29F9</string>
+					<string>FA4F9DE03C98D1A6780A3A43</string>
+					<string>0B6DF1A36467F4AD999991D0</string>
+					<string>D76644EB0E1973DB9CC96EDD</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>projects</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
 			<key>EE4968879E321EE44D61A69C</key>
 			<dict>
 				<key>explicitFileType</key>
@@ -342,6 +378,50 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
+			<key>B4751297016F5F8452E60318</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>456CA2B4C9B2F06809B2BFFA</string>
+					<string>CC7E9EFF5EDF044D0D60E84E</string>
+					<string>85AE4BA4B2C36DE3FDEA205B</string>
+					<string>F48CCF18A98E718E487ED699</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>utils</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>83765DC827B9B790FCADF6F5</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>B4751297016F5F8452E60318</string>
+					<string>9697481EAA02F3E74E7AD862</string>
+					<string>6124BBF923A944AD4A3546A7</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>src</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>C69618BC66D066BFCFC5A9BA</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>83765DC827B9B790FCADF6F5</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>ofxProjectGenerator</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
 			<key>456CA2B4C9B2F06809B2BFFA</key>
 			<dict>
 				<key>explicitFileType</key>
@@ -365,6 +445,19 @@
 				<string>PBXGroup</string>
 				<key>name</key>
 				<string>addons</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>6948EE371B920CB800B5AC1A</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>C69618BC66D066BFCFC5A9BA</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>local_addons</string>
 				<key>sourceTree</key>
 				<string>&lt;group&gt;</string>
 			</dict>
@@ -436,6 +529,7 @@
 					<string>E4B69E1C0A3A1BDC003C02F2</string>
 					<string>E4EEC9E9138DF44700A80321</string>
 					<string>BB4B014C10F69532006C3DED</string>
+					<string>6948EE371B920CB800B5AC1A</string>
 					<string>E4B69B5B0A3A1756003C02F2</string>
 				</array>
 				<key>isa</key>

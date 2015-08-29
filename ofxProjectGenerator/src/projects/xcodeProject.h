@@ -40,6 +40,7 @@ public:
 
     std::string srcUUID;
     std::string addonUUID;
+    std::string localAddonUUID;
     std::string resourcesUUID;
     std::string buildPhaseUUID;
     std::string frameworksUUID;

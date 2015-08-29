@@ -407,9 +407,9 @@ void ofAddon::fromFS(string path, string platform){
     string containedPath;
     if(isLocalAddon){
         name = path;
-        addonPath = path;
+        addonPath = ofFilePath::join(pathToProject,path);
         containedPath = ofFilePath::addTrailingSlash(pathToProject); //we need to add a trailing slash for the erase to work properly
-        path = ofFilePath::join(pathToProject,path);
+        path = addonPath;
     }else{
         name = ofFilePath::getFileName(path);
         addonPath = ofFilePath::join(getAddonsRoot(),name);

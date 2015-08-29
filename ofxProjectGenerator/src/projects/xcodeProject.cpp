@@ -171,12 +171,14 @@ void xcodeProject::setup(){
 	if( target == "osx" ){
 		srcUUID			= "E4B69E1C0A3A1BDC003C02F2";
 		addonUUID		= "BB4B014C10F69532006C3DED";
+		localAddonUUID  = "6948EE371B920CB800B5AC1A";
 		buildPhaseUUID	= "E4B69E200A3A1BDC003C02F2";
 		resourcesUUID	= "";
         frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase
 	}else{
 		srcUUID			= "E4D8936A11527B74007E1F53";
 		addonUUID		= "BB16F26B0F2B646B00518274";
+        localAddonUUID  = "6948EE371B920CB800B5AC1A";
 		buildPhaseUUID	= "E4D8936E11527B74007E1F53";
 		resourcesUUID   = "BB24DD8F10DA77E000E9C588";
         buildPhaseResourcesUUID = "BB24DDCA10DA781C00E9C588";
@@ -213,10 +215,14 @@ void xcodeProject::saveScheme(){
 
 void xcodeProject::saveMakefile(){
     string makefile = ofFilePath::join(projectDir,"Makefile");
-    ofFile::copyFromTo(templatePath + "Makefile", makefile, true, true);
+    if(!ofFile(makefile).exists()){
+        ofFile::copyFromTo(templatePath + "Makefile", makefile, true, true);
+    }
 
     string configmake = ofFilePath::join(projectDir,"config.make");
-    ofFile::copyFromTo(templatePath + "config.make", configmake, true, true);
+    if(!ofFile(configmake).exists()){
+        ofFile::copyFromTo(templatePath + "config.make", configmake, true, true);
+    }
 }
 
 
@@ -747,7 +753,7 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
                 nodeToAddTo.child("array").append_child("string").append_child(pugi::node_pcdata).set_value(UUID.c_str());
 
             } else if (folders[0] == "local_addons"){
-                string xmlStr = "//key[contains(.,'"+addonUUID+"')]/following-sibling::node()[1]";
+                string xmlStr = "//key[contains(.,'"+localAddonUUID+"')]/following-sibling::node()[1]";
 
                 folders.erase(folders.begin());
                 pugi::xml_node node = doc.select_single_node(xmlStr.c_str()).node();

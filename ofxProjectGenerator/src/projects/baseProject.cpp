@@ -89,7 +89,7 @@ bool baseProject::create(string path,  bool bParseAddonsDotMake){
 //		}
 
 #if defined(TARGET_LINUX) || defined(TARGET_OSX)
-    		if (bParseAddonsDotMake) parseAddons();
+    	if (bParseAddonsDotMake) parseAddons();
 #endif
         // get a unique list of the paths that are needed for the includes.
         list < string > paths;
