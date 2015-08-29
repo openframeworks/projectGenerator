@@ -317,7 +317,7 @@ public:
 			project = new visualStudioProject;
 			target = "vs";
 			break;
-		case OF_TARGET_IPHONE:
+		case OF_TARGET_IOS:
 			project = new xcodeProject;
 			target = "ios";
 			break;
@@ -428,6 +428,26 @@ public:
 		cout << endl << endl;
 	}
 
+	void addAddons(string projectPath){
+        for (int i = 0; i < (int)addons.size(); i++) {
+            ofAddon addon;
+            addon.pathToOF = getOFRelPath(projectPath);
+            addon.pathToProject = ofFilePath::getAbsolutePath(projectPath);
+            auto localPath = ofFilePath::join(addon.pathToProject, addons[i]);
+            if(ofDirectory(localPath).exists()){
+                addon.isLocalAddon = true;
+                addon.fromFS(addons[i], target);
+            }else{
+                addon.isLocalAddon = false;
+                auto standardPath = ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), addons[i]);
+                addon.fromFS(standardPath, target);
+            }
+
+
+            if (!bDryRun) project->addAddon(addon);
+        }
+	}
+
 
 	void updateProject(string path, bool bConsiderParameterAddons = true) {
 
@@ -436,7 +456,7 @@ public:
         // if we are updating recursively, we *never* consider addons passed as parameters.
         
     
-		ofLog(OF_LOG_NOTICE) << "updating project " << path;
+		ofLogNotice() << "updating project " << path;
 
 		if (!bDryRun) project->setup(target);
 		if (!bDryRun) project->create(path, false);
@@ -450,26 +470,16 @@ public:
         
         if (bConsiderAddonsDotMake){
             ofLogNotice() << "parsing addons.make";
-            vector < string > addons;
             addons.clear();
-            ofFile file(path + "addons.make");
+            ofFile file(ofFilePath::join(path, "addons.make"));
             if (file.exists()) {
-                parseAddonsDotMake(path + "addons.make", addons);
+                parseAddonsDotMake(file.path(), addons);
             }
         }
         
 		
-
-		for (int i = 0; i < (int)addons.size(); i++) {
-			ofAddon addon;
-			addon.pathToOF = getOFRelPath(path);
-			addon.fromFS(ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), addons[i]), target);
-            
-			ofLog(OF_LOG_NOTICE) << "parsing addon " << ofFilePath::join(getOFRoot(), "addons");
-
-			if (!bDryRun) project->addAddon(addon);
-		}
-		if (!bDryRun && !bConsiderAddonsDotMake) project->save(true);
+        addAddons(path);
+		if (!bDryRun) project->save(true);
 	}
 
 
@@ -611,16 +621,7 @@ public:
 				if (!bDryRun) project->setup(target);
 				if (!bDryRun) project->create(projectPath, false);
 				
-                for (int j = 0; j < (int)addons.size(); j++) {
-
-
-					ofAddon addon;
-
-					ofLog(OF_LOG_NOTICE) << "parsing addon: " << ofFilePath::join(getOFRoot(), "addons");
-
-					if (!bDryRun) addon.fromFS(ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), addons[j]), target);
-					if (!bDryRun) project->addAddon(addon);
-				}
+                addAddons(projectPath);
 				if (!bDryRun) project->save(true);
                 
                 ofLog(OF_LOG_NOTICE) << "project created! ";

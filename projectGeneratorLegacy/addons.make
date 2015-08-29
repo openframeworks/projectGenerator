@@ -1,3 +1,3 @@
 ofxXmlSettings
 ofxGui
-ofxProjectGenerator
+../ofxProjectGenerator
