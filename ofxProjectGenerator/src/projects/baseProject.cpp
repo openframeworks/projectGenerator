@@ -9,18 +9,50 @@
 #include "baseProject.h"
 #include "ofFileUtils.h"
 #include "ofLog.h"
+#include "Utils.h"
 #include "ofConstants.h"
 using namespace std;
 
-void baseProject::setup(string _target){
+baseProject::baseProject(string _target){
+    bLoaded = false;
     target = _target;
-    templatePath = ofFilePath::join(getOFRoot(),"scripts/" + target + "/template/");
-    setup(); // call the inherited class setup(), now that target is set.
 }
 
-// todo: this bool param should be removed.
-bool baseProject::create(string path,  bool bParseAddonsDotMake){
-    
+std::string baseProject::getPlatformTemplateDir(){
+    return ofFilePath::join(getOFRoot(),"scripts/" + target + "/template");
+}
+
+void recursiveTemplateCopy(const ofDirectory & templateDir, ofDirectory & projectDir){
+    for(auto & f: templateDir){
+        if(f.isDirectory()){
+            ofDirectory templateSubDir(f.path());
+            ofDirectory projectSubDir(ofFilePath::join(projectDir.path(),f.getFileName()));
+            recursiveTemplateCopy(templateSubDir, projectSubDir);
+        }else{
+            f.copyTo(ofFilePath::join(projectDir.path(),f.getFileName()),false,true);
+        }
+    }
+}
+
+vector<ofDirectory> baseProject::listAvailableTemplates(std::string target){
+    vector<ofDirectory> templates;
+    ofDirectory additionalTemplates(getPlatformTemplateDir());
+    for(auto & f: additionalTemplates){
+        if(f.isDirectory()){
+            templates.emplace_back(f.path());
+        }
+    }
+    ofDirectory anyPlatformTemplate(ofFilePath::join(getOFRoot(),"scripts/pgtemplates/"));
+    for(auto & f: anyPlatformTemplate){
+        if(f.isDirectory()){
+            templates.emplace_back(f.path());
+        }
+    }
+    return templates;
+}
+
+bool baseProject::create(string path, std::string templateName){
+    templatePath = ofFilePath::join(getPlatformTemplateDir(),"standard");
     addons.clear();
 
     if(!ofFilePath::isAbsolute(path)){
@@ -39,10 +71,24 @@ bool baseProject::create(string path,  bool bParseAddonsDotMake){
         ofDirectory(ofFilePath::join(templatePath,"bin")).copyTo(ofFilePath::join(projectDir,"bin"));
     }
 
-    // if overwrite then ask for permission...
+
 
     bool ret = createProjectFile();
     if(!ret) return false;
+
+    if(templateName!="standard"){
+        ofDirectory additionalTemplate(ofFilePath::join(getOFRoot(),"scripts/" + target + "/template/" + templateName));
+        ofDirectory anyPlatformTemplate(ofFilePath::join(getOFRoot(),"scripts/pgtemplates/" + templateName));
+        if(additionalTemplate.exists()){
+            ofDirectory project(projectDir);
+            recursiveTemplateCopy(additionalTemplate,project);
+        }else if(anyPlatformTemplate.exists()){
+            ofDirectory project(projectDir);
+            recursiveTemplateCopy(anyPlatformTemplate,project);
+        }else{
+            ofLogWarning() << "Cannot find " << templateName << " using standard template only";
+        }
+    }
 
     ret = loadProjectFile();
     if(!ret) return false;
@@ -88,9 +134,6 @@ bool baseProject::create(string path,  bool bParseAddonsDotMake){
 //			}
 //		}
 
-#if defined(TARGET_LINUX) || defined(TARGET_OSX)
-    	if (bParseAddonsDotMake) parseAddons();
-#endif
         // get a unique list of the paths that are needed for the includes.
         list < string > paths;
         vector < string > includePaths;
@@ -117,25 +160,34 @@ bool baseProject::create(string path,  bool bParseAddonsDotMake){
     return true;
 }
 
-bool baseProject::save(bool createMakeFile){
-
-    // only save an addons.make file if requested on ANY platform
-    // this way we don't thrash the git repo for our examples, but
-    // we do make the addons.make file for any new projects...that
-    // way it can be distributed and re-used by others with the PG
-
-    if(createMakeFile){
-        
-        ofLog(OF_LOG_NOTICE) << "saving addons.make";
-        ofFile addonsMake(ofFilePath::join(projectDir,"addons.make"), ofFile::WriteOnly);
-        for(int i = 0; i < addons.size(); i++){
+bool baseProject::save(){
+    ofLog(OF_LOG_NOTICE) << "saving addons.make";
+    ofFile addonsMake(ofFilePath::join(projectDir,"addons.make"), ofFile::WriteOnly);
+    for(int i = 0; i < addons.size(); i++){
+        if(addons[i].isLocalAddon){
+            addonsMake << addons[i].addonPath << endl;
+        }else{
             addonsMake << addons[i].name << endl;
         }
-        
-        
     }
 
 	return saveProjectFile();
+}
+
+void baseProject::addAddon(std::string addonName){
+    ofAddon addon;
+    addon.pathToOF = getOFRelPath(projectDir);
+    addon.pathToProject = ofFilePath::getAbsolutePath(projectDir);
+    auto localPath = ofFilePath::join(addon.pathToProject, addonName);
+    if(ofDirectory(localPath).exists()){
+        addon.isLocalAddon = true;
+        addon.fromFS(addonName, target);
+    }else{
+        addon.isLocalAddon = false;
+        auto standardPath = ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), addonName);
+        addon.fromFS(standardPath, target);
+    }
+    addAddon(addon);
 }
 
 void baseProject::addAddon(ofAddon & addon){
@@ -146,43 +198,43 @@ void baseProject::addAddon(ofAddon & addon){
 	addons.push_back(addon);
 
     for(int i=0;i<(int)addon.includePaths.size();i++){
-        ofLogNotice() << "adding addon include path: " << addon.includePaths[i];
+        ofLogVerbose() << "adding addon include path: " << addon.includePaths[i];
         addInclude(addon.includePaths[i]);
     }
     for(int i=0;i<(int)addon.libs.size();i++){
-        ofLogNotice() << "adding addon libs: " << addon.libs[i].path;
+        ofLogVerbose() << "adding addon libs: " << addon.libs[i].path;
         addLibrary(addon.libs[i]);
     }
     for(int i=0;i<(int)addon.cflags.size();i++){
-        ofLogNotice() << "adding addon cflags: " << addon.cflags[i];
+        ofLogVerbose() << "adding addon cflags: " << addon.cflags[i];
         addCFLAG(addon.cflags[i]);
     }
 	for(int i=0;i<(int)addon.cppflags.size();i++){
-	    ofLogNotice() << "adding addon cppflags: " << addon.cppflags[i];
+	    ofLogVerbose() << "adding addon cppflags: " << addon.cppflags[i];
         addCPPFLAG(addon.cppflags[i]);
     }
     for(int i=0;i<(int)addon.ldflags.size();i++){
-        ofLogNotice() << "adding addon ldflags: " << addon.ldflags[i];
+        ofLogVerbose() << "adding addon ldflags: " << addon.ldflags[i];
         addLDFLAG(addon.ldflags[i]);
     }
     for(int i=0;i<(int)addon.srcFiles.size(); i++){
-        ofLogNotice() << "adding addon srcFiles: " << addon.srcFiles[i];
+        ofLogVerbose() << "adding addon srcFiles: " << addon.srcFiles[i];
         addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
     }
     for(int i=0;i<(int)addon.csrcFiles.size(); i++){
-        ofLogNotice() << "adding addon c srcFiles: " << addon.csrcFiles[i];
+        ofLogVerbose() << "adding addon c srcFiles: " << addon.csrcFiles[i];
         addSrc(addon.csrcFiles[i],addon.filesToFolders[addon.csrcFiles[i]],C);
     }
     for(int i=0;i<(int)addon.cppsrcFiles.size(); i++){
-        ofLogNotice() << "adding addon cpp srcFiles: " << addon.cppsrcFiles[i];
+        ofLogVerbose() << "adding addon cpp srcFiles: " << addon.cppsrcFiles[i];
         addSrc(addon.cppsrcFiles[i],addon.filesToFolders[addon.cppsrcFiles[i]],CPP);
     }
     for(int i=0;i<(int)addon.objcsrcFiles.size(); i++){
-        ofLogNotice() << "adding addon objc srcFiles: " << addon.objcsrcFiles[i];
+        ofLogVerbose() << "adding addon objc srcFiles: " << addon.objcsrcFiles[i];
         addSrc(addon.objcsrcFiles[i],addon.filesToFolders[addon.objcsrcFiles[i]],OBJC);
     }
     for(int i=0;i<(int)addon.headersrcFiles.size(); i++){
-        ofLogNotice() << "adding addon header srcFiles: " << addon.headersrcFiles[i];
+        ofLogVerbose() << "adding addon header srcFiles: " << addon.headersrcFiles[i];
         addSrc(addon.headersrcFiles[i],addon.filesToFolders[addon.headersrcFiles[i]],HEADER);
     }
 }
@@ -191,15 +243,10 @@ void baseProject::parseAddons(){
 	ofFile addonsMake(ofFilePath::join(projectDir,"addons.make"));
 	ofBuffer addonsMakeMem;
 	addonsMake >> addonsMakeMem;
-	while(!addonsMakeMem.isLastLine()){
-	    string line = addonsMakeMem.getNextLine();
-	    if(line[0] == '#') continue;
-        if(ofTrim(line) == "") continue;
-		ofAddon addon;
-		cout << projectDir << endl;
-		addon.pathToOF = getOFRelPath(projectDir);
-		cout << addon.pathToOF << endl;
-		addon.fromFS(ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), line),target);
-		addAddon(addon);
+	for(auto line: addonsMakeMem.getLines()){
+	    auto addon = ofTrim(line);
+	    if(addon[0] == '#') continue;
+        if(addon == "") continue;
+        addAddon(addon);
 	}
 }

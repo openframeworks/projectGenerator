@@ -46,6 +46,7 @@ public:
 
     // metadata
     std::string name;
+    std::string addonPath;
     std::string description;
     std::string author;
     std::vector<std::string> tags;
@@ -95,8 +96,6 @@ private:
     std::vector<std::string> excludeLibs;
     std::vector<std::string> excludeSources;
     std::vector<std::string> excludeIncludes;
-
-    std::string addonPath;
 };
 
 #endif /* OFADDON_H_ */

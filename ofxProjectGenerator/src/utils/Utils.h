@@ -16,6 +16,7 @@
 #include "ofUtils.h"
 #include "ofSystemUtils.h"
 #include "LibraryBinary.h"
+#include "baseProject.h"
 
 
 string generateUUID(string input);
@@ -41,8 +42,6 @@ void getFrameworksRecursively( const string & path, vector < string > & framewor
 void splitFromLast(string toSplit, string deliminator, string & first, string & second);
 void splitFromFirst(string toSplit, string deliminator, string & first, string & second);
 
-void parseAddonsDotMake(string path, vector < string > & addons);
-
 void fixSlashOrder(string & toFix);
 string unsplitString (vector < string > strings, string deliminator );
 
@@ -52,7 +51,9 @@ bool checkConfigExists();
 bool askOFRoot();
 string getOFRootFromConfig();
 
-string platformFSSeparator();
+std::string getTargetString(ofTargetPlatform t);
+
+std::unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ);
 
 template <class T>
 inline bool isInVector(T item, vector<T> & vec){

@@ -3,14 +3,13 @@
 #pragma once
 
 #include "baseProject.h"
+#include "pugixml.hpp"
 
 class xcodeProject : public baseProject {
 
 public:
 
-    xcodeProject(){};
-
-    void setup();
+    xcodeProject(std::string target);
 
 private:
 

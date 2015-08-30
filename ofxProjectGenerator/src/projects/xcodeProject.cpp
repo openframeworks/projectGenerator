@@ -1,5 +1,6 @@
 #include "xcodeProject.h"
 #include <iostream>
+#include "Utils.h"
 
 
 
@@ -166,25 +167,25 @@ STRINGIFY(
 
 );
 
-
-void xcodeProject::setup(){
-	if( target == "osx" ){
-		srcUUID			= "E4B69E1C0A3A1BDC003C02F2";
-		addonUUID		= "BB4B014C10F69532006C3DED";
-		localAddonUUID  = "6948EE371B920CB800B5AC1A";
-		buildPhaseUUID	= "E4B69E200A3A1BDC003C02F2";
-		resourcesUUID	= "";
-        frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase
-	}else{
-		srcUUID			= "E4D8936A11527B74007E1F53";
-		addonUUID		= "BB16F26B0F2B646B00518274";
+xcodeProject::xcodeProject(std::string target)
+:baseProject(target){
+    if( target == "osx" ){
+        srcUUID         = "E4B69E1C0A3A1BDC003C02F2";
+        addonUUID       = "BB4B014C10F69532006C3DED";
         localAddonUUID  = "6948EE371B920CB800B5AC1A";
-		buildPhaseUUID	= "E4D8936E11527B74007E1F53";
-		resourcesUUID   = "BB24DD8F10DA77E000E9C588";
+        buildPhaseUUID  = "E4B69E200A3A1BDC003C02F2";
+        resourcesUUID   = "";
+        frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase
+    }else{
+        srcUUID         = "E4D8936A11527B74007E1F53";
+        addonUUID       = "BB16F26B0F2B646B00518274";
+        localAddonUUID  = "6948EE371B920CB800B5AC1A";
+        buildPhaseUUID  = "E4D8936E11527B74007E1F53";
+        resourcesUUID   = "BB24DD8F10DA77E000E9C588";
         buildPhaseResourcesUUID = "BB24DDCA10DA781C00E9C588";
         frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase  // todo: check this?
-	}
-}
+    }
+};
 
 
 void xcodeProject::saveScheme(){
@@ -300,6 +301,10 @@ bool xcodeProject::createProjectFile(){
         relPath2.erase(relPath2.end()-1);
         findandreplaceInTexfile(projectDir + projectName + ".xcodeproj/project.pbxproj", "../../..", relPath2);
         findandreplaceInTexfile(projectDir + "Project.xcconfig", "../../..", relPath2);
+        if( target == "osx" ){
+            findandreplaceInTexfile(projectDir + "Makefile", "../../..", relPath2);
+            findandreplaceInTexfile(projectDir + "config.make", "../../..", relPath2);
+        }
     }
 
     return true;

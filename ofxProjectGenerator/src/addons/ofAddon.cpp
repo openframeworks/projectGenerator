@@ -330,7 +330,12 @@ void ofAddon::exclude(vector<LibraryBinary> & variable, vector<string> exclusion
 }
 
 void ofAddon::parseConfig(){
-	ofFile addonConfig(ofFilePath::join(addonPath,"addon_config.mk"));
+	ofFile addonConfig;
+	if(isLocalAddon){
+	    addonConfig.open(ofFilePath::join(ofFilePath::join(pathToProject,addonPath),"addon_config.mk"));
+	}else{
+	    addonConfig.open(ofFilePath::join(addonPath,"addon_config.mk"));
+	}
 
 	if(!addonConfig.exists()) return;
 
@@ -406,13 +411,13 @@ void ofAddon::fromFS(string path, string platform){
 
     string containedPath;
     if(isLocalAddon){
-        name = path;
-        addonPath = ofFilePath::join(pathToProject,path);
+        name = std::filesystem::path(path).stem().string();
+        addonPath = path;
         containedPath = ofFilePath::addTrailingSlash(pathToProject); //we need to add a trailing slash for the erase to work properly
-        path = addonPath;
+        path = ofFilePath::join(pathToProject,path);
     }else{
         name = ofFilePath::getFileName(path);
-        addonPath = ofFilePath::join(getAddonsRoot(),name);
+        addonPath = ofFilePath::join(getAddonsRoot(),path);
         containedPath = ofFilePath::addTrailingSlash(getOFRoot()); //we need to add a trailing slash for the erase to work properly
         prefixPath = pathToOF;
     }
@@ -432,8 +437,7 @@ void ofAddon::fromFS(string path, string platform){
     	if(!isLocalAddon){
             folder = srcFiles[i].substr(init,end);
     	}else{
-            auto addonName = std::filesystem::path(name).stem().string();
-            init = srcFiles[i].find(addonName);
+            init = srcFiles[i].find(name);
             folder = ofFilePath::join("local_addons", srcFiles[i].substr(init,end-init));
     	}
     	srcFiles[i] = prefixPath + srcFiles[i];

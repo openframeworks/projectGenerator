@@ -19,6 +19,11 @@
 #include <fstream>
 #include <string>
 
+#include "CBLinuxProject.h"
+#include "CBWinProject.h"
+#include "xcodeProject.h"
+#include "visualStudioProject.h"
+
 #include "Poco/String.h"
 
 #include "Poco/HMACEngine.h"
@@ -362,12 +367,6 @@ void getLibsRecursively(const string & path, vector < string > & libFiles, vecto
     
 }
 
-string platformFSSeparator() {
-	return std::filesystem::path("/").make_preferred().string();
-}
-
-
-
 void fixSlashOrder(string & toFix){
     std::replace(toFix.begin(), toFix.end(),'/', '\\');
 }
@@ -444,21 +443,6 @@ string getOFRelPath(string from){
     return relPath;
 }
 
-void parseAddonsDotMake(std::string path, std::vector < std::string > & addons){
-    addons.clear();
-	ofFile addonsmake(path);
-	if(!addonsmake.exists()){
-		return;
-	}
-	ofBuffer addonsmakebuff;
-	addonsmake >> addonsmakebuff;
-	for(auto line: addonsmakebuff.getLines()){
-		if(line!="" && ofTrim(line)[0]!='#'){
-			addons.push_back(line);
-		}
-	}
-}
-
 bool checkConfigExists(){
 	ofFile config(ofFilePath::join(ofFilePath::getUserHomeDir(),".ofprojectgenerator/config"));
 	return config.exists();
@@ -480,4 +464,54 @@ string getOFRootFromConfig(){
 	ofFile configFile(ofFilePath::join(ofFilePath::getUserHomeDir(),".ofprojectgenerator/config"),ofFile::ReadOnly);
 	ofBuffer filePath = configFile.readToBuffer();
 	return filePath.getFirstLine();
+}
+
+std::string getTargetString(ofTargetPlatform t){
+    switch (t) {
+    case OF_TARGET_OSX:
+        return "osx";
+    case OF_TARGET_WINGCC:
+        return "win_cb";
+    case OF_TARGET_WINVS:
+        return "vs";
+    case OF_TARGET_IOS:
+        return "ios";
+    case OF_TARGET_ANDROID:
+        return "android";
+    case OF_TARGET_LINUX:
+        return "linux";
+    case OF_TARGET_LINUX64:
+        return "linux64";
+    case OF_TARGET_LINUXARMV6L:
+        return "linuxarmv6l";
+    case OF_TARGET_LINUXARMV7L:
+        return "linuxarmv7l";
+    default:
+        return "";
+    }
+}
+
+
+unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ) {
+    switch (targ) {
+    case OF_TARGET_OSX:
+        return unique_ptr<xcodeProject>(new xcodeProject(getTargetString(targ)));
+    case OF_TARGET_WINGCC:
+        return unique_ptr<CBWinProject>(new CBWinProject(getTargetString(targ)));
+    case OF_TARGET_WINVS:
+        return unique_ptr<visualStudioProject>(new visualStudioProject(getTargetString(targ)));
+    case OF_TARGET_IOS:
+        return unique_ptr<xcodeProject>(new xcodeProject(getTargetString(targ)));
+    case OF_TARGET_LINUX:
+        return unique_ptr<CBLinuxProject>(new CBLinuxProject(getTargetString(targ)));
+    case OF_TARGET_LINUX64:
+        return unique_ptr<CBLinuxProject>(new CBLinuxProject(getTargetString(targ)));
+    case OF_TARGET_LINUXARMV6L:
+        return unique_ptr<CBLinuxProject>(new CBLinuxProject(getTargetString(targ)));
+    case OF_TARGET_LINUXARMV7L:
+        return unique_ptr<CBLinuxProject>(new CBLinuxProject(getTargetString(targ)));
+    case OF_TARGET_ANDROID:
+    default:
+        return unique_ptr<baseProject>();
+    }
 }

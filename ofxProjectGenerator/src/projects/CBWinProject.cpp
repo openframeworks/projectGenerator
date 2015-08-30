@@ -11,11 +11,6 @@
 #include "Utils.h"
 
 string CBWinProject::LOG_NAME = "CBWinProject";
-
-void CBWinProject::setup() {
-    ;
-}
-
 bool CBWinProject::createProjectFile(){
 
     string project = projectDir + projectName + ".cbp";

@@ -12,10 +12,9 @@
 #include "ofAddon.h"
 #include "baseProject.h"
 
-class CBWinProject: virtual public baseProject  {
+class CBWinProject: public baseProject  {
 public:
-
-    void setup();
+    CBWinProject(std::string target):baseProject(target){};
 
     bool createProjectFile();
     bool loadProjectFile();

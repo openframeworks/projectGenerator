@@ -15,23 +15,14 @@
 
 class CBLinuxProject: public CBWinProject {
 public:
-
-	enum Arch{
-		Linux,
-		Linux64
-	};
-
-    void setup();
+	CBLinuxProject(std::string target):CBWinProject(target){};
 
     bool createProjectFile();
     void addInclude(std::string includeName){};
     void addLibrary(const LibraryBinary & lib){};
+    std::string getPlatformTemplateDir();
 
 	static std::string LOG_NAME;
-
-private:
-
-	Arch arch;
 };
 
 #endif /* CBLINUXPROJECT_H_ */

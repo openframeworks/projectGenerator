@@ -30,7 +30,7 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
  
-		void setupForTarget(int targ);
+		void setupForTarget(ofTargetPlatform targ);
         void generateExamplesCB();
 		void generateExamples();
 		
@@ -44,11 +44,11 @@ class ofApp : public ofBaseApp{
 		
 		void setupDrawableOFPath();
 		
-		baseProject * project;
+		std::unique_ptr<baseProject> project;
     
         std::string projectPath;
         std::string target;
-        std::vector <int> targetsToMake;
+        std::vector <ofTargetPlatform> targetsToMake;
 		bool buildAllExamples;
 
 #ifndef COMMAND_LINE_ONLY

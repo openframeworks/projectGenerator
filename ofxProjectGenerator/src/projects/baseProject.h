@@ -5,8 +5,9 @@
 #include <set>
 
 #include "ofAddon.h"
-#include "Utils.h"
 #include "ofConstants.h"
+#include "ofFileUtils.h"
+#include "pugixml.hpp"
 
 class baseProject {
 
@@ -25,21 +26,17 @@ public:
     	OBJC
     };
 
-    baseProject(){
-        bLoaded = false;
-    };
+    baseProject(std::string _target);
 
     virtual ~baseProject(){};
 
-    void setup(std::string _target);
-
-    bool create(std::string path, bool bParseAddonsDotMake = true);
-    bool save(bool createMakeFile);
+    bool create(std::string path, std::string templateName="standard");
+    void parseAddons();
+    bool save();
 
     // this shouldn't be called by anyone.  call "create(...), save" etc
 private:
 
-    virtual void setup()=0;
     virtual bool createProjectFile()=0;
     virtual bool loadProjectFile()=0;
     virtual bool saveProjectFile()=0;
@@ -56,10 +53,14 @@ public:
     virtual void addCFLAG(std::string cflag, LibType libType = RELEASE_LIB){}; // C_FLAGS
     virtual void addCPPFLAG(std::string cppflag, LibType libType = RELEASE_LIB){}; // CXX_FLAGS
 
+    virtual void addAddon(std::string addon);
 	virtual void addAddon(ofAddon & addon);
 
 	std::string getName() { return projectName;};
 	std::string getPath() { return projectDir; };
+
+	vector<ofDirectory> listAvailableTemplates(std::string target);
+	virtual std::string getPlatformTemplateDir();
 
     pugi::xml_document doc;
     bool bLoaded;
@@ -68,10 +69,6 @@ public:
     std::string projectName;
     std::string templatePath;
     std::string target;
-
-private:
-
-    void parseAddons();
 
 protected:
 

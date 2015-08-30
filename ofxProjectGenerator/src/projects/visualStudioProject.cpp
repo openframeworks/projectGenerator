@@ -6,10 +6,6 @@
 
 string visualStudioProject::LOG_NAME = "visualStudioProjectFile";
 
-void visualStudioProject::setup() {
-    ;
-}
-
 
 bool visualStudioProject::createProjectFile(){
 

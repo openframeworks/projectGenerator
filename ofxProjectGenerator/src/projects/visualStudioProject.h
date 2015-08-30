@@ -9,7 +9,7 @@
 class visualStudioProject : public baseProject {
 
 public:
-    void setup();
+    visualStudioProject(std::string target):baseProject(target){};
 
     bool createProjectFile();
     bool loadProjectFile();

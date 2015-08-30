@@ -54,9 +54,9 @@ class ofApp : public ofBaseApp{
         int mode;
         enum { MODE_NORMAL, MODE_ADDON, MODE_PLATFORM };
     
-        baseProject * project;
+        std::unique_ptr<baseProject> project;
     
-        string setupForTarget(int targ);
+        string setupForTarget(ofTargetPlatform targ);
     
         void generateProject();
     
