@@ -167,6 +167,29 @@ STRINGIFY(
 
 );
 
+const char afterRule[] =
+STRINGIFY(
+        <key>928F60851B6710B200E2D791</key>
+        <dict>
+            <key>buildActionMask</key>
+            <string>2147483647</string>
+            <key>files</key>
+            <array />
+            <key>inputPaths</key>
+            <array />
+            <key>isa</key>
+            <string>PBXShellScriptBuildPhase</string>
+            <key>outputPaths</key>
+            <array />
+            <key>runOnlyForDeploymentPostprocessing</key>
+            <string>0</string>
+            <key>shellPath</key>
+            <string>/bin/sh</string>
+            <key>shellScript</key>
+            <string>SHELL_SCRIPT</string>
+        </dict>
+);
+
 xcodeProject::xcodeProject(std::string target)
 :baseProject(target){
     if( target == "osx" ){
@@ -176,6 +199,7 @@ xcodeProject::xcodeProject(std::string target)
         buildPhaseUUID  = "E4B69E200A3A1BDC003C02F2";
         resourcesUUID   = "";
         frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase
+        afterPhaseUUID  = "928F60851B6710B200E2D791";
     }else{
         srcUUID         = "E4D8936A11527B74007E1F53";
         addonUUID       = "BB16F26B0F2B646B00518274";
@@ -184,6 +208,7 @@ xcodeProject::xcodeProject(std::string target)
         resourcesUUID   = "BB24DD8F10DA77E000E9C588";
         buildPhaseResourcesUUID = "BB24DDCA10DA781C00E9C588";
         frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase  // todo: check this?
+        afterPhaseUUID  = "928F60851B6710B200E2D791";
     }
 };
 
@@ -197,10 +222,10 @@ void xcodeProject::saveScheme(){
 	ofDirectory::createDirectory(schemeFolder, false, true);
     
 	string schemeToD = projectDir  + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/" + projectName + " Debug.xcscheme";
-    ofFile::copyFromTo(templatePath + "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample Debug.xcscheme", schemeToD);
+    ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample Debug.xcscheme"), schemeToD);
 
 	string schemeToR = projectDir  + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/" + projectName + " Release.xcscheme";
-    ofFile::copyFromTo(templatePath + "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample Release.xcscheme", schemeToR);
+    ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample Release.xcscheme"), schemeToR);
 	
     findandreplaceInTexfile(schemeToD, "emptyExample", projectName);
     findandreplaceInTexfile(schemeToR, "emptyExample", projectName);
@@ -965,6 +990,28 @@ void xcodeProject::addCFLAG(string cflag, LibType libType){
     }
 
     //saveFile(projectDir + "/" + projectName + ".xcodeproj" + "/project.pbxproj");
+}
+
+void xcodeProject::addAfterRule(string rule){
+    char query[255];
+    sprintf(query, "//key[contains(.,'objects')]/following-sibling::node()[1]");
+    pugi::xpath_node_set objects = doc.select_nodes(query);
+
+
+    if (objects.size() > 0){
+        for (auto node: objects){
+            //node.node().print(std::cout);
+            string ldXML = string(afterRule);
+            ofStringReplace(ldXML,"SHELL_SCRIPT",rule);
+            pugi::xml_document ldDoc;
+            pugi::xml_parse_result result = ldDoc.load_buffer(ldXML.c_str(), strlen(ldXML.c_str()));
+
+            // insert it at <plist><dict><dict>
+            node.node().prepend_copy(ldDoc.first_child().next_sibling());   // KEY FIRST
+            node.node().prepend_copy(ldDoc.first_child());                  // ARRAY SECOND
+        }
+
+    }
 }
 
 void xcodeProject::addCPPFLAG(string cppflag, LibType libType){

@@ -437,6 +437,25 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
+			<key>928F60851B6710B200E2D791</key>
+			<dict>
+				<key>buildActionMask</key>
+				<string>2147483647</string>
+				<key>files</key>
+				<array />
+				<key>inputPaths</key>
+				<array />
+				<key>isa</key>
+				<string>PBXShellScriptBuildPhase</string>
+				<key>outputPaths</key>
+				<array />
+				<key>runOnlyForDeploymentPostprocessing</key>
+				<string>0</string>
+				<key>shellPath</key>
+				<string>/bin/sh</string>
+				<key>shellScript</key>
+				<string>cp "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME" "$TARGET_BUILD_DIR/commandLinePG"; rm -rf "$TARGET_BUILD_DIR/$PRODUCT_NAME.app";	mv "$TARGET_BUILD_DIR/commandLinePG" "$TARGET_BUILD_DIR/projectGenerator"</string>
+			</dict>
 			<key>BB4B014C10F69532006C3DED</key>
 			<dict>
 				<key>children</key>

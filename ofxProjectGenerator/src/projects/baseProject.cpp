@@ -52,7 +52,7 @@ vector<ofDirectory> baseProject::listAvailableTemplates(std::string target){
 }
 
 bool baseProject::create(string path, std::string templateName){
-    templatePath = ofFilePath::join(getPlatformTemplateDir(),"standard");
+    templatePath = ofFilePath::join(getPlatformTemplateDir(),"standard/");
     addons.clear();
 
     if(!ofFilePath::isAbsolute(path)){
@@ -92,6 +92,8 @@ bool baseProject::create(string path, std::string templateName){
 
     ret = loadProjectFile();
     if(!ret) return false;
+
+    parseConfigMake();
 
     if (bDoesDirExist){
         vector < string > fileNames;
@@ -249,4 +251,28 @@ void baseProject::parseAddons(){
         if(addon == "") continue;
         addAddon(addon);
 	}
+}
+
+void baseProject::parseConfigMake(){
+    ofFile configMake(ofFilePath::join(projectDir,"config.make"));
+    ofBuffer configMakeMem;
+    configMake >> configMakeMem;
+    cout << "parsing config.make" << endl;
+    for(auto line: configMakeMem.getLines()){
+        auto config = ofTrim(line);
+        if(config[0] == '#') continue;
+        if(config == "") continue;
+        if(config.find("=")!=std::string::npos){
+            cout << "begin" << ofTrimBack(" hola ") << "end" << endl;
+            auto varValue = ofSplitString(config,"=",true,true);
+            auto var = ofTrim(varValue[0]);
+            auto value = ofTrim(varValue[1]);
+            cout << "found variable " << var << ": " << value << " @ " << target << endl;
+            if (var=="PROJECT_AFTER_OSX" && target=="osx"){
+                cout << "found after rule " << value << endl;
+                addAfterRule(value);
+            }
+        }
+    }
+
 }

@@ -32,6 +32,7 @@ public:
 
     bool create(std::string path, std::string templateName="standard");
     void parseAddons();
+    void parseConfigMake();
     bool save();
 
     // this shouldn't be called by anyone.  call "create(...), save" etc
@@ -52,6 +53,7 @@ public:
     virtual void addLDFLAG(std::string ldflag, LibType libType = RELEASE_LIB){}
     virtual void addCFLAG(std::string cflag, LibType libType = RELEASE_LIB){}; // C_FLAGS
     virtual void addCPPFLAG(std::string cppflag, LibType libType = RELEASE_LIB){}; // CXX_FLAGS
+    virtual void addAfterRule(std::string script){};
 
     virtual void addAddon(std::string addon);
 	virtual void addAddon(ofAddon & addon);

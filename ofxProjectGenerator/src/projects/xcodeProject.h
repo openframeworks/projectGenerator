@@ -26,6 +26,7 @@ public:
     void addLDFLAG(std::string ldflag, LibType libType = RELEASE_LIB);
     void addCFLAG(std::string cflag, LibType libType = RELEASE_LIB); // Other C Flags
     void addCPPFLAG(std::string cppflag, LibType libType = RELEASE_LIB); // Other C++ Flags
+    void addAfterRule(std::string script);
     
     // specific to OSX
     void addFramework(std::string name, std::string path);
@@ -45,6 +46,7 @@ public:
     std::string frameworksUUID;
     std::string buildPhaseResourcesUUID;
     std::string frameworksBuildPhaseUUID;
+    std::string afterPhaseUUID;
     
 
     pugi::xml_node findOrMakeFolderSet( pugi::xml_node nodeToAddTo, std::vector < std::string > & folders, std::string pathForHash);

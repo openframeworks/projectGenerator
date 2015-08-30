@@ -27,6 +27,7 @@
 ################################################################################
 # None
 APPNAME = projectGenerator
+PROJECT_AFTER_OSX = cp "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME" "$TARGET_BUILD_DIR/commandLinePG"; rm -rf "$TARGET_BUILD_DIR/$PRODUCT_NAME.app";	mv "$TARGET_BUILD_DIR/commandLinePG" "$TARGET_BUILD_DIR/projectGenerator"
 
 ################################################################################
 # PROJECT EXTERNAL SOURCE PATHS
