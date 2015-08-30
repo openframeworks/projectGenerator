@@ -38,7 +38,20 @@ ipc.on('cwd', function(arg) {
 ipc.on('setUpdatePath', function(arg) {
     var elem = document.getElementById("updateMultiplePath");
     elem.value = arg;
+    $("#updateMultiplePath").change();
 
+});
+
+ipc.on('isUpdateMultiplePathOk', function(arg) {
+   if (arg == true){
+        $("#updateMultipleWrongMessage").hide();
+        $("#updateMultipleButton").removeClass("disabled");
+
+   } else {
+        $("#updateMultipleWrongMessage").show();
+        $("#updateMultipleButton").addClass("disabled");
+        
+   }
 });
 
 //-------------------------------------------
@@ -363,6 +376,10 @@ function setup() {
 
         $("#projectName").on('focusout', function () {
         	$(this).trigger('change');
+        });
+
+        $("#updateMultiplePath").on('change', function () {
+            ipc.send('checkMultiUpdatePath', $("#updateMultiplePath").val());
         });
 
         $("#advancedOptions").checkbox();

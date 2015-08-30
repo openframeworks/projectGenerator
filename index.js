@@ -388,7 +388,7 @@ ipc.on('update', function (event, arg) {
 			event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ stdout );
 			event.sender.send('sendUIMessage', 
 				'<strong>Success!</strong><br>'+
-				'Updating your project was successful! <span class="monospace" style="word-wrap: break-word;">'+ update['updatePath'] +'</span><br><br>' +
+				'Updating your project was successful! <span class="monospace">'+ update['updatePath'] +'</span><br><br>' +
 				'<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
 				'<div id="fullConsoleOutput"><br><textarea class="selectable">'+ stdout +'</textarea></div>'
 			);
@@ -551,6 +551,17 @@ ipc.on('pickProjectPath', function (event, arg) {
 			event.sender.send('setProjectPath', filenames[0]);
 		}
 	});
+});
+
+ipc.on('checkMultiUpdatePath', function (event, arg) {
+	
+
+	if (fs.existsSync( arg )){
+		event.sender.send('isUpdateMultiplePathOk', true);
+	} else {
+		event.sender.send('isUpdateMultiplePathOk', false);
+	}
+
 });
 
 ipc.on('pickProjectImport', function(event, arg) {

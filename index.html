@@ -147,6 +147,13 @@
 							<i class="search link icon" onclick="getUpdatePath()"></i>
 						</div>
 					</div>
+					<div class="ui negative message" id="updateMultipleWrongMessage" style="display: none">
+						<div class="header">
+							Update path doesn't exist
+						</div>
+						<p>Please set the path to the root of the folders you want to update. The folder needs to exists.
+						</p>
+					</div>
 					<div class="field">
 						<label>Platforms:</label>
 						<div class="ui multiple search selection dropdown" id="platformsDropdownMulti">
@@ -159,7 +166,7 @@
 					</div>
 					<div class="ui hidden divider"></div>
 					<div class="field">
-						<div class="ui orange button" id="updateButton" onclick="updateRecursive()">Update multiple</div>
+						<div class="ui orange button" id="updateMultipleButton" onclick="updateRecursive()">Update multiple</div>
 					</div>
 				</div>
 			</div>
