@@ -109,11 +109,9 @@ ipc.on('setAddons', function(arg) {
 
     } else {
 
-        console.log("hi??");
-
         $("#ofPathWrongMessage").show();
         isOfPathGood = false;
-        $('#settingsButton').click();
+        $('#settingsMenuButton').click();
 
         // bounce to settings
         //$('.main .ui').tab('change tab', 'settings')
@@ -262,38 +260,38 @@ function setup() {
             history: false
         });
 
-        $("#createButon").tab({
+        $("#createMenuButon").tab({
             'onVisible':function(){
                 if (isOfPathGood !== true){
-                    $('#settingsButton').click();
+                    $('#settingsMenuButton').click();
                      $('#ofPathError').modal({
                         onHide: function () {
-                             $('#settingsButton').click();
+                             $('#settingsMenuButton').click();
                         }
                     }).modal("show");
                }      
             }
         });
 
-        $("#updateButton").tab({
+        $("#updateMenuButton").tab({
             'onVisible':function(){
                 if (isOfPathGood !== true){
-                    $('#settingsButton').click();
+                    $('#settingsMenuButton').click();
                      $('#ofPathError').modal({
                         onHide: function () {
-                             $('#settingsButton').click();
+                             $('#settingsMenuButton').click();
                         }
                     }).modal("show");
                }  
             }
         });
 
-        $("#settingsButton").tab({
+        $("#settingsMenuButton").tab({
             'onVisible':function(){
                 console.log("settings!! ");
-                $('#createButon').removeClass('active');
-                $('#updateButton').removeClass('active');
-                $('#settingsButton').addClass('active');
+                $('#createMenuButon').removeClass('active');
+                $('#updateMenuButton').removeClass('active');
+                $('#settingsMenuButton').addClass('active');
         }
         });
         // $('.main.menu .item').filter('.updateMultiMenuOption').tab({
@@ -533,6 +531,8 @@ function updateRecursive() {
         platformValueArray.push($(platformsPicked[i]).attr("data-value"));
     }
 
+
+
     var gen = {};
     gen['updatePath'] = $("#updateMultiplePath").val();
     gen['platformList'] = platformValueArray;
@@ -540,9 +540,9 @@ function updateRecursive() {
     gen['ofPath'] = $("#ofPath").val();
 
 
-    if (gen['projectName'] === '') {
-        displayModal("Please name your sketch first.");
-    } else if (gen['platformList'] === null || gen['platformList'] === "") {
+    if (gen['updatePath'] === '') {
+        displayModal("Please set update path");
+    } else if (platformValueArray.length === 0) {
         displayModal("Please select a platform first.");
     } else {
         ipc.send('update', gen);

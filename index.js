@@ -365,7 +365,7 @@ ipc.on('update', function (event, arg) {
 	}
 
 	if (update['platformList'] !== null) {
-		platformString = "-x\"" + update['platformList'].join(", ") + "\"";
+		platformString = "-x\"" + update['platformList'].join(",") + "\"";
 	}
 
 	if (update['ofPath'] !== null) {
@@ -388,7 +388,7 @@ ipc.on('update', function (event, arg) {
 			event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ stdout );
 			event.sender.send('sendUIMessage', 
 				'<strong>Success!</strong><br>'+
-				'Updating your project was successful! <span class="monospace">'+ update['updatePath'] +'</span><br><br>' +
+				'Updating your project was successful! <span class="monospace" style="word-wrap: break-word;">'+ update['updatePath'] +'</span><br><br>' +
 				'<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
 				'<div id="fullConsoleOutput"><br><textarea class="selectable">'+ stdout +'</textarea></div>'
 			);
@@ -428,14 +428,15 @@ ipc.on('generate', function (event, arg) {
 	console.log(generate);
 
 	if (generate['platformList'] !== null) {
-		platformString = "-x\"" + generate['platformList'].join(", ") + " \"";
+		platformString = "-x\"" + generate['platformList'].join(",") + "\"";
 	} else {
+		// this shouldn't happen. 
 		platformString = "-x\" \"";
 	}
 
 	if (generate['addonList'] !== null && 
 		generate['addonList'].length > 0) {
-		addonString = "-a\"" + generate['addonList'].join(", ") + "\"";
+		addonString = "-a\"" + generate['addonList'].join(",") + "\"";
 	} else {
 		addonString = "-a\" \"";
 	}
@@ -478,8 +479,7 @@ ipc.on('generate', function (event, arg) {
 			event.sender.send('sendUIMessage', 
 				'<strong>Success!</strong><br>'+
 				'Your can now find your project in <span class="monospace">'+ fullPath +'</span><br><br>' +
-				'<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
-				'<div id="fullConsoleOutput"><br><textarea class="selectable">'+ stdout +'</textarea></div>'
+				'<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">'+ stdout +'</textarea></div>'
 			);
 			event.sender.send('generateCompleted', true );
 		}
