@@ -201,6 +201,8 @@ void getFilesRecursively(const string & path, vector < string > & fileNames){
     for (int i = 0; i < dir.size(); i++){
         ofFile temp(dir.getFile(i));
         if (dir.getName(i) == ".svn" || dir.getName(i)==".git") continue; // ignore svn and git
+        if (ofIsStringInString(dir.getName(i),".framework")) continue; // ignore frameworks
+        
         if (temp.isFile()){
             fileNames.push_back(dir.getPath(i));
         } else if (temp.isDirectory()){
@@ -248,14 +250,17 @@ void splitFromFirst(string toSplit, string deliminator, string & first, string &
 
 void getFoldersRecursively(const string & path, vector < string > & folderNames, string platform){
     ofDirectory dir;
-    dir.listDir(path);
-    for (int i = 0; i < dir.size(); i++){
-        ofFile temp(dir.getFile(i));
-        if (temp.isDirectory() && isFolderNotCurrentPlatform(temp.getFileName(), platform) == false ){
-            getFoldersRecursively(dir.getPath(i), folderNames, platform);
+    
+    if (!ofIsStringInString(path, ".framework")){
+        dir.listDir(path);
+        for (int i = 0; i < dir.size(); i++){
+            ofFile temp(dir.getFile(i));
+            if (temp.isDirectory() && isFolderNotCurrentPlatform(temp.getFileName(), platform) == false ){
+                getFoldersRecursively(dir.getPath(i), folderNames, platform);
+            }
         }
+        folderNames.push_back(path);
     }
-    folderNames.push_back(path);
 }
 
 

@@ -443,6 +443,7 @@ void ofAddon::fromFS(string path, string platform){
     	srcFiles[i] = prefixPath + srcFiles[i];
     	filesToFolders[srcFiles[i]] = folder;
     }
+    
 
     string libsPath = ofFilePath::join(path, "/libs");
     vector < string > libFiles;
@@ -487,15 +488,46 @@ void ofAddon::fromFS(string path, string platform){
 
     for (int i = 0; i < (int)frameworks.size(); i++){
 
-        // does libs[] have any path ? let's fix if so.
-    	int end = frameworks[i].rfind(std::filesystem::path::preferred_separator);
-        if (end > 0){
-
-            frameworks[i].erase (frameworks[i].begin(), frameworks[i].begin()+containedPath.length());
-            frameworks[i] = prefixPath + frameworks[i];
+        // knowing if we are system framework or not is important....
+        
+        bool bIsSystemFramework = false;
+        size_t foundUnixPath = frameworks[i].find('/');
+        size_t foundWindowsPath = frameworks[i].find('\\');
+        if (foundUnixPath==std::string::npos &&
+            foundWindowsPath==std::string::npos){
+            bIsSystemFramework = true;                  // we have no "path" so we are system
         }
+        
+        if (bIsSystemFramework){
+            
+            ; // do we need to do anything here?
+            
+        } else {
+            
+            
+           
+            // erease out the OF root path.  this assumes the frames is *in* the OF folder....
+            frameworks[i].erase (frameworks[i].begin(), frameworks[i].begin()+prefixPath.length());
+            
+            
+            
+            int init = 0;
+    	    int end = frameworks[i].rfind(std::filesystem::path::preferred_separator);
+            
+            string folder = frameworks[i].substr(init,end);
+            frameworks[i] = pathToOF + frameworks[i];
+            filesToFolders[frameworks[i]] = folder;
+            
+            
+            
+        }
+        
+       
 
     }
+
+
+
 
 
 

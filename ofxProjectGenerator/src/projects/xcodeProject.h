@@ -29,12 +29,13 @@ public:
     void addAfterRule(std::string script);
     
     // specific to OSX
-    void addFramework(std::string name, std::string path);
+    void addFramework(string name, string path, string folder="");  // folder if for non system frameworks
     
         
     
     void addAddon(ofAddon & addon);
 
+    void saveWorkspaceXML();
     void saveScheme();
     void renameProject();
 
