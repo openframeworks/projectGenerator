@@ -370,6 +370,9 @@ function setup() {
 
         	// check if project exists
         	ipc.send('isOFProjectFolder', project);
+
+            // update link to local project files
+            $("#revealProjectFiles").prop('href', 'file:///' + path.join(project['projectPath'],project['projectName']) );
         }).trigger('change');
 
         $("#projectName").on('focusout', function () {
