@@ -365,6 +365,28 @@ ipc.on('refreshAddonList', function (event, arg) {
 	parseAddonsAndUpdateSelect(arg);
 });
 
+ipc.on('getRandomSketchName', function (event, arg){
+	var currentProjectPath = arg;
+	var foundOne = false;
+
+	// Note: path.join throws an error when switched to (single) update and back to create mode...
+	var projectNames = new moniker.Dictionary();
+	projectNames.read( path.join( __dirname, "./node_modules/moniker/dict/sketchAdjectives.txt" ) );
+	var goodName = "";
+
+	while (foundOne === false){
+		if( goodName==="" || fs.existsSync( path.join(currentProjectPath, goodName) ) ){
+			console.log("«"+ goodName +"» already exists, generating a new name...");
+			var adjective = projectNames.choose();
+			goodName = "my"+ adjective.charAt(0).toUpperCase() + adjective.slice(1) +"Sketch";
+		}
+		else {
+			foundOne = true;
+		}
+	}
+	event.sender.send('setRandomisedSketchName', goodName);
+});
+
 ipc.on('update', function (event, arg) {
 
 	var update = arg;

@@ -77,6 +77,9 @@
 							<a class="ui icon tooltip" href="#" data-toggle="external_url" data-content="Click to open your project in your default file browser." data-position="right center" id="revealProjectFiles">
 								<i class="external icon"></i>
 							</a>
+							<a class="ui icon tooltip" href="#randomName" onclick="getRandomSketchName()" id="nameRandomiser" data-content="Click to generate a random sketch name" data-position="right center">
+								<i class="random icon"></i>
+							</a>
 						</label>
 						
 
@@ -97,7 +100,10 @@
 						</div>
 					</div>
 					<div class="field">
-						<label>Addons: &nbsp;
+						<label>Addons: &nbsp; 
+							<a class="ui icon tooltip" href="#rescanAddons" onclick="rescanAddons()" data-content="Click to reload addons folder" data-position="right center">
+								<i class="refresh icon"></i>
+							</a> &nbsp;
 							<a class="ui icon tooltip" href="http://www.ofxaddons.com/" data-toggle="external_target" data-content="Get more addons at ofxAddons.com" data-position="right center">
 								<i class="external icon"></i>
 							</a>

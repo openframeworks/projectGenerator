@@ -229,6 +229,10 @@ ipc.on('updateCompleted', function(isSuccessful) {
     }
 });
 
+ipc.on('setRandomisedSketchName', function(newName) {
+    $("#projectName").val(newName);
+});
+
 
 //-----------------------------------------------------------------------------------
 // functions
@@ -592,6 +596,8 @@ function switchGenerateMode(mode) {
         $("#generateButton").hide();
         $("#updateButton").show();
         $("#missingAddonMessage").hide();
+        $("#nameRandomiser").hide();
+        $("#revealProjectFiles").show();
 
         console.log('Switching GenerateMode to Update...');
         
@@ -604,6 +610,8 @@ function switchGenerateMode(mode) {
         $("#generateButton").show();
         $("#updateButton").hide();
         $("#missingAddonMessage").hide();
+        $("#nameRandomiser").show();
+        $("#revealProjectFiles").hide();
 
         console.log('Switching GenerateMode to Create...');
 
@@ -726,4 +734,14 @@ function getUpdatePath() {
 
 function rescanAddons() {
     ipc.send('refreshAddonList', $("#ofPath").val());
+}
+
+function getRandomSketchName(){
+    var path = $("#projectPath").val();
+    if (path === ''){
+        $("#projectPath").oneTimeTooltip('Please specify a path first...');
+    }
+    else {
+        ipc.send('getRandomSketchName', path );
+    }
 }
