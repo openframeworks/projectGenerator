@@ -682,15 +682,30 @@ function browseOfPath() {
 }
 
 function browseProjectPath() {
-    ipc.send('pickProjectPath', ''); // current path could go here
+
+    var path = $("#projectPath").val();
+    if (path === ''){
+        path = $("#ofPath").val();
+    }
+    ipc.send('pickProjectPath', path); // current path could go here
 }
 
 function browseImportProject() {
-    ipc.send('pickProjectImport', '');
+    var path = $("#projectPath").val();
+    if (path === ''){
+        path = $("#ofPath").val();
+    }
+    ipc.send('pickProjectImport', 'path');
 }
 
 function getUpdatePath() {
-    ipc.send('pickUpdatePath', ''); // current path could go here
+
+    var path = $("#updateMultiplePath").val();
+    if (path === ''){
+        path = $("#ofPath").val();
+    }
+
+    ipc.send('pickUpdatePath', path); // current path could go here
 }
 
 function rescanAddons() {

@@ -519,7 +519,8 @@ ipc.on('pickOfPath', function (event, arg) {
 	path = dialog.showOpenDialog({
 		title: 'select the root of OF, where you see libs, addons, etc',
 		properties: ['openDirectory'],
-		filters: []
+		filters: [],
+		defaultPath : arg
 	}, function (filenames) {
 		if (filenames !== undefined && filenames.length > 0) {
 			defaultOfPath = filenames[0];
@@ -532,7 +533,8 @@ ipc.on('pickUpdatePath', function (event, arg) {
 	path = dialog.showOpenDialog({
 		title: 'select root folder where you want to update',
 		properties: ['openDirectory'],
-		filters: []
+		filters: [],
+		defaultPath : arg
 	}, function (filenames) {
 		if (filenames !== undefined && filenames.length > 0) {
 			defaultOfPath = filenames[0];
@@ -545,7 +547,8 @@ ipc.on('pickProjectPath', function (event, arg) {
 	path = dialog.showOpenDialog({
 		title: 'select parent folder for project, typically apps/myApps',
 		properties: ['openDirectory'],
-		filters: []
+		filters: [],
+		defaultPath : arg
 	}, function (filenames) {
 		if (filenames !== undefined && filenames.length > 0) {
 			event.sender.send('setProjectPath', filenames[0]);
