@@ -386,11 +386,12 @@ ipc.on('update', function (event, arg) {
 	var wholeString = pgApp + " " + recursiveString + " " + pathString + " " + platformString + " " + updatePath;
 
 	exec(wholeString, function callback(error, stdout, stderr) {
+
 		if(error === null){
 			event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ stdout );
 			event.sender.send('sendUIMessage', 
 				'<strong>Success!</strong><br>'+
-				'Updating your project was successful! <span class="monospace">'+ update['updatePath'] +'</span><br><br>' +
+				'Updating your project was successful! <a href="file:///'+ update['updatePath'] +'" class="monospace" data-toggle="external_target">'+ update['updatePath'] +'</a><br><br>' +
 				'<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
 				'<div id="fullConsoleOutput"><br><textarea class="selectable">'+ stdout +'</textarea></div>'
 			);
@@ -480,7 +481,7 @@ ipc.on('generate', function (event, arg) {
 			event.sender.send('consoleMessage', "<strong>"+ wholeString +"</strong><br>"+ stdout );
 			event.sender.send('sendUIMessage', 
 				'<strong>Success!</strong><br>'+
-				'Your can now find your project in <span class="monospace">'+ fullPath +'</span><br><br>' +
+				'Your can now find your project in <a href="file:///'+fullPath+'" data-toggle="external_target" class="monospace">'+ fullPath +'</a><br><br>' +
 				'<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">'+ stdout +'</textarea></div>'
 			);
 			event.sender.send('generateCompleted', true );
