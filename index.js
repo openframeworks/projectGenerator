@@ -195,9 +195,11 @@ app.on('ready', function () {
 function getStartingProjectName(){
 	var defaultPathForProjects = path.join(obj["defaultOfPath"], obj["defaultRelativeProjectPath"]);
 	var foundOne = false;
-	var projectNames = moniker.generator([moniker.adjective]);
+
+	var projectNames = new moniker.Dictionary();
+	projectNames.read( path.join( __dirname, './node_modules/moniker/dict/sketchAdjectives.txt' ) );
 	var goodName = "mySketch";
-	
+
 	while (foundOne === false){
 		if( fs.existsSync( path.join(defaultPathForProjects, goodName) ) ){
 			console.log("«"+ goodName +"» already exists, generating a new name...");
