@@ -15,18 +15,27 @@
   transition: margin-bottom .2s ease-in-out;
 }
 
-#consoleContainer::-webkit-scrollbar {
+#consoleContainer::-webkit-scrollbar, #fullConsoleOutput textarea::-webkit-scrollbar {
   width: 9px;
 }
-#consoleContainer::-webkit-scrollbar-track {
+#consoleContainer::-webkit-scrollbar-track::, #fullConsoleOutput textarea::-webkit-scrollbar-track {
   background-color: transparent;
   margin: 4px 0;
 }
-#consoleContainer::-webkit-scrollbar-thumb {
+#consoleContainer::-webkit-scrollbar-thumb, #fullConsoleOutput textarea::-webkit-scrollbar-thumb {
   background-color: rgba(255,255,255,0.6);
   border: 2px solid rgba(0, 0, 0, 0);
   border-right-width: 4px;
   background-clip: padding-box;
+}
+
+#fullConsoleOutput textarea::-webkit-scrollbar-corner {
+  background-color: transparent;
+  display: none;
+}
+
+#fullConsoleOutput textarea::-webkit-resizer {
+  border-color: transparent;
 }
 
 body.enableConsole
