@@ -74,20 +74,25 @@
 				<div class="ui form">
 					<div class="field">
 						<label>Project name: &nbsp; 
-							<a class="ui icon tooltip" href="#" data-toggle="external_url" data-content="Click to open your project in your default file browser." data-position="right center" id="revealProjectFiles">
+							<a class="ui icon tooltip" href="#" data-toggle="external_url" data-content="Click to open your project in your default file browser." data-position="left bottom" id="revealProjectFiles">
 								<i class="external icon"></i>
 							</a>
-							<a class="ui icon tooltip" href="#randomName" onclick="getRandomSketchName()" id="nameRandomiser" data-content="Click to generate a random sketch name" data-position="right center">
+							<!-- <a class="ui icon tooltip" href="#randomName" onclick="getRandomSketchName()" id="nameRandomiser" data-content="Click to generate a random sketch name" data-position="right center">
 								<i class="random icon"></i>
-							</a>
+							</a> -->
 						</label>
 						
 
 						<div class="fields">
 							<div class="field">
+								<div class="ui icon input fluid" style="width:250px;">
 								<input type="text" placeholder="Project name..." id="projectName">
+								
+								<i class="random link icon" onclick="getRandomSketchName()" ></i>
+							
+								</div>
 							</div>
-							<div class="field">
+							<div class="field" style="padding-left:20px">
 								<div class="ui grey button" onclick="browseImportProject()">import</div>
 							</div>
 						</div>
