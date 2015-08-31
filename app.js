@@ -339,14 +339,12 @@ function setup() {
         // set the platform to default
         $('#platformsDropdown').dropdown('set exactly', defaultSettings['defaultPlatform']);
 
-
-
-        // // bind ofxAddons URL (load it in default browser; not within Electron)
-        // $(".visitOfxAddons").click(function (e) {
-        // 	e.preventDefault();
-        // 	var shell = require('shell');
-        // 	shell.openExternal('http://www.ofxaddons.com/');
-        // });
+        // bind external URLs (load it in default browser; not within Electron)
+        $('*[data-toggle="external_target"]').click(function (e) {
+            e.preventDefault();
+            var shell = require('shell');
+            shell.openExternal( $(this).prop('href') );
+        });
 
         $("#projectPath").on('change', function () {
         	if( $(this).is(":focus")===true ){ return; }
@@ -466,10 +464,12 @@ function setup() {
             });
 
         // // set the platform to default
-            $('#platformsDropdownMulti').dropdown('set exactly', defaultSettings['defaultPlatform']);
+        $('#platformsDropdownMulti').dropdown('set exactly', defaultSettings['defaultPlatform']);
 
         $("#ofPath").change();
 
+        // enable tool tips
+        $('.tooltip').popup();
         
     });
 
