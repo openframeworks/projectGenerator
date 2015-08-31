@@ -60,6 +60,9 @@ body.enableConsole #consoleContainer {
   font-size: 7pt;
   color: #999;
   text-transform: uppercase;
+  position: fixed;
+  right: 0;
+  padding-right: 50px;
 }
 #showConsole:hover, #hideConsole:hover {
   color: #FFF;
