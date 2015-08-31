@@ -187,5 +187,62 @@
 		<Unit filename="../../../addons/ofxProjectGenerator/libs/pugixml/src/pugixml.hpp">
 			<Option virtualFolder="addons/ofxProjectGenerator/libs/pugixml/src" />
 		</Unit>
+		<Unit filename="../ofxProjectGenerator/src/utils/LibraryBinary.h">
+			<Option virtualFolder="local_addons/ofxProjectGenerator/src/utils" />
+		</Unit>
+		<Unit filename="../ofxProjectGenerator/src/utils/Utils.h">
+			<Option virtualFolder="local_addons/ofxProjectGenerator/src/utils" />
+		</Unit>
+		<Unit filename="../ofxProjectGenerator/src/utils/LibraryBinary.cpp">
+			<Option virtualFolder="local_addons/ofxProjectGenerator/src/utils" />
+		</Unit>
+		<Unit filename="../ofxProjectGenerator/src/utils/Utils.cpp">
+			<Option virtualFolder="local_addons/ofxProjectGenerator/src/utils" />
+		</Unit>
+		<Unit filename="../ofxProjectGenerator/src/projects/CBLinuxProject.h">
+			<Option virtualFolder="local_addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../ofxProjectGenerator/src/projects/visualStudioProject.h">
+			<Option virtualFolder="local_addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../ofxProjectGenerator/src/projects/baseProject.h">
+			<Option virtualFolder="local_addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../ofxProjectGenerator/src/projects/baseProject.cpp">
+			<Option virtualFolder="local_addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../ofxProjectGenerator/src/projects/CBWinProject.h">
+			<Option virtualFolder="local_addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../ofxProjectGenerator/src/projects/xcodeProject.cpp">
+			<Option virtualFolder="local_addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../ofxProjectGenerator/src/projects/CBLinuxProject.cpp">
+			<Option virtualFolder="local_addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../ofxProjectGenerator/src/projects/CBWinProject.cpp">
+			<Option virtualFolder="local_addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../ofxProjectGenerator/src/projects/visualStudioProject.cpp">
+			<Option virtualFolder="local_addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../ofxProjectGenerator/src/projects/xcodeProject.h">
+			<Option virtualFolder="local_addons/ofxProjectGenerator/src/projects" />
+		</Unit>
+		<Unit filename="../ofxProjectGenerator/src/addons/ofAddon.h">
+			<Option virtualFolder="local_addons/ofxProjectGenerator/src/addons" />
+		</Unit>
+		<Unit filename="../ofxProjectGenerator/src/addons/ofAddon.cpp">
+			<Option virtualFolder="local_addons/ofxProjectGenerator/src/addons" />
+		</Unit>
+		<Unit filename="../ofxProjectGenerator/libs/pugixml/src/pugixml.hpp">
+			<Option virtualFolder="../ofxProjectGenerator/libs/pugixml/src" />
+		</Unit>
+		<Unit filename="../ofxProjectGenerator/libs/pugixml/src/pugiconfig.hpp">
+			<Option virtualFolder="../ofxProjectGenerator/libs/pugixml/src" />
+		</Unit>
+		<Unit filename="../ofxProjectGenerator/libs/pugixml/src/pugixml.cpp">
+			<Option virtualFolder="../ofxProjectGenerator/libs/pugixml/src" />
+		</Unit>
 	</Project>
 </CodeBlocks_project_file>

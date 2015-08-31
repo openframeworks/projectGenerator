@@ -15,7 +15,7 @@ void ofApp::setup(){
 
 	setupDrawableOFPath();
 
-	int targ = ofGetTargetPlatform();
+	auto targ = ofGetTargetPlatform();
 	//plat = OF_TARGET_IPHONE;
 
     setupForTarget(targ);
@@ -25,16 +25,9 @@ void ofApp::setup(){
 			if(buildAllExamples){
 				generateExamples();
 			}else{
-				project->setup(target);
 				project->create(projectPath);
-				vector < string > addons;
-				parseAddonsDotMake(project->getPath() + "addons.make", addons);
-				for (int i = 0; i < (int)addons.size(); i++){
-					ofAddon addon;
-					addon.fromFS(ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), addons[i]),target);
-					project->addAddon(addon);
-				}
-				project->save(false);
+				project->parseAddons();
+				project->save();
 			}
     	}
         std::exit(0);
@@ -84,48 +77,9 @@ void ofApp::setup(){
 #endif
 }
 
-void ofApp::setupForTarget(int targ){
-
-    if(project){
-		delete project;
-	}
-
-    switch(targ){
-        case OF_TARGET_OSX:
-            project = new xcodeProject;
-            target = "osx";
-            break;
-        case OF_TARGET_WINGCC:
-            project = new CBWinProject;
-            target = "win_cb";
-            break;
-        case OF_TARGET_WINVS:
-            project = new visualStudioProject;
-            target = "vs";
-            break;
-        case OF_TARGET_IPHONE:
-            project = new xcodeProject;
-            target = "ios";
-            break;
-        case OF_TARGET_ANDROID:
-            break;
-        case OF_TARGET_LINUX:
-            project = new CBLinuxProject;
-            target = "linux";
-            break;
-        case OF_TARGET_LINUX64:
-            project = new CBLinuxProject;
-            target = "linux64";
-            break;
-        case OF_TARGET_LINUXARMV6L:
-            project = new CBLinuxProject;
-            target = "linuxarmv6l";
-            break;
-        case OF_TARGET_LINUXARMV7L:
-            project = new CBLinuxProject;
-            target = "linuxarmv7l";
-            break;
-    }
+void ofApp::setupForTarget(ofTargetPlatform targ){
+    target = getTargetString(targ);
+    project = getTargetProject(targ);
 }
 
 void ofApp::generateExamplesCB(){
@@ -151,7 +105,7 @@ void ofApp::generateExamplesCB(){
 		generateExamples();
 	}
 
-	int target = ofGetTargetPlatform();
+	auto target = ofGetTargetPlatform();
     setupForTarget(target);
 #endif
 
@@ -192,17 +146,16 @@ void ofApp::generateExamples(){
 			ofLogNotice() << "Generating example: " << subdir.getPath(j);
 			ofLogNotice() << "------------------------------------------------";
 
-            project->setup(target);
             project->create(subdir.getPath(j));
             vector < string > addons;
-            parseAddonsDotMake(project->getPath() + "addons.make", addons);
             for (int i = 0; i < (int)addons.size(); i++){
                 ofAddon addon;
                 addon.pathToOF = getOFRelPath(subdir.getPath(j));
                 addon.fromFS(ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), addons[i]),target);
                 project->addAddon(addon);
             }
-            project->save(false);
+            project->parseAddons();
+            project->save();
 
         }
     }
@@ -217,7 +170,7 @@ ofFileDialogResult ofApp::makeNewProjectViaDialog(){
     if (res.fileName == "" || res.filePath == "") return res;
     //base.pushDirectory(res.fileName);   // somehow an extra things here helps?
 
-    vector <int> targetsToMake;
+    vector <ofTargetPlatform> targetsToMake;
 	if( osxToggle )		targetsToMake.push_back(OF_TARGET_OSX);
 	if( iosToggle )		targetsToMake.push_back(OF_TARGET_IPHONE);
 	if( wincbToggle )	targetsToMake.push_back(OF_TARGET_WINGCC);
@@ -234,7 +187,6 @@ ofFileDialogResult ofApp::makeNewProjectViaDialog(){
 
 	for(int i = 0; i < (int)targetsToMake.size(); i++){
 		setupForTarget(targetsToMake[i]);
-        project->setup(target);
         if(project->create(res.filePath)){
             vector<string> addonsToggles = panelAddons.getControlNames();
             for (int i = 0; i < (int) addonsToggles.size(); i++){
@@ -248,7 +200,7 @@ ofFileDialogResult ofApp::makeNewProjectViaDialog(){
 
                 }
             }
-            project->save(true);
+            project->save();
         }
 	}
     return res;
@@ -263,7 +215,7 @@ ofFileDialogResult ofApp::updateProjectViaDialog(){
     if (res.fileName == "" || res.filePath == "") return res;
     //base.pushDirectory(res.fileName);   // somehow an extra things here helps?
 
-    vector <int> targetsToMake;
+    vector <ofTargetPlatform> targetsToMake;
 	if( osxToggle )		targetsToMake.push_back(OF_TARGET_OSX);
 	if( iosToggle )		targetsToMake.push_back(OF_TARGET_IPHONE);
 	if( wincbToggle )	targetsToMake.push_back(OF_TARGET_WINGCC);
@@ -280,7 +232,6 @@ ofFileDialogResult ofApp::updateProjectViaDialog(){
 
 	for(int i = 0; i < (int)targetsToMake.size(); i++){
 		setupForTarget(targetsToMake[i]);
-        project->setup(target);
         project->create(res.filePath);
         vector<string> addonsToggles = panelAddons.getControlNames();
         for (int i = 0; i < (int)addonsToggles.size(); i++){
@@ -297,7 +248,7 @@ ofFileDialogResult ofApp::updateProjectViaDialog(){
 
             }
         }
-        project->save(true);
+        project->save();
 	}
 
 	return res;

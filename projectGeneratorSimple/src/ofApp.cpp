@@ -69,44 +69,11 @@ void fixStringCharacters(string &toFix){
 
 
 //------------------------------------------------------
-string ofApp::setupForTarget(int targ){
+string ofApp::setupForTarget(ofTargetPlatform targ){
 
-    if(project){
-		delete project;
-	}
-    string target;
-    switch(targ){
-        case OF_TARGET_OSX:
-            project = new xcodeProject;
-            target = "osx";
-            break;
-        case OF_TARGET_WINGCC:
-            project = new CBWinProject;
-            target = "win_cb";
-            break;
-        case OF_TARGET_WINVS:
-            project = new visualStudioProject;
-            target = "vs";
-            break;
-        case OF_TARGET_IPHONE:
-            project = new xcodeProject();
-            target = "ios";
-            break;
-        case OF_TARGET_ANDROID:
-            break;
-        case OF_TARGET_LINUX64:
-            project = new CBLinuxProject;
-            target = "linux64";
-            break;
-        case OF_TARGET_LINUX:
-            project = new CBLinuxProject;
-            target = "linux";
-            break;
-    }
+    project = getTargetProject(targ);
 
-    project->setup(target);
-
-    return target;
+    return getTargetString(targ);
 }
 
 
@@ -122,7 +89,7 @@ void ofApp::setStatus(string newStatus){
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofEnableAlphaBlending();
-    ofSetLogLevel(OF_LOG_SILENT);
+    ofSetLogLevel(OF_LOG_WARNING);
     ofSetVerticalSync(true);
     ofSetFrameRate(60);
     
@@ -459,9 +426,9 @@ void ofApp::keyPressed(int key){
 
 void ofApp::generateProject(){
 
-    vector <int> targetsToMake;
+    vector <ofTargetPlatform> targetsToMake;
 	if( osxToggle )		targetsToMake.push_back(OF_TARGET_OSX);
-	if( iosToggle )		targetsToMake.push_back(OF_TARGET_IPHONE);
+	if( iosToggle )		targetsToMake.push_back(OF_TARGET_IOS);
 	if( wincbToggle )	targetsToMake.push_back(OF_TARGET_WINGCC);
 	if( winvsToggle )	targetsToMake.push_back(OF_TARGET_WINVS);
 	if( linuxcbToggle )	targetsToMake.push_back(OF_TARGET_LINUX);
@@ -522,7 +489,9 @@ void ofApp::generateProject(){
                 }
             }
 
-            project->save(true);
+            project->save();
+        }else{
+            ofLogError() << "creating project";
         }
 	}
 

@@ -1,1 +1,1 @@
-ofxProjectGenerator
+../ofxProjectGenerator

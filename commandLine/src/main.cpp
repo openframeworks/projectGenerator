@@ -9,13 +9,14 @@
 #include "Poco/Util/HelpFormatter.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/AutoPtr.h"
+#include <Poco/Path.h>
 #include <iostream>
 
 #include "CBLinuxProject.h"
 #include "CBWinProject.h"
 #include "visualStudioProject.h"
 #include "xcodeProject.h"
-#include <Poco/Path.h>
+#include "Utils.h"
 
 
 using Poco::Util::Application;
@@ -27,7 +28,6 @@ using Poco::Util::OptionCallback;
 using Poco::AutoPtr;
 using Poco::Path;
 
-
 /*
 
 todo:
@@ -36,6 +36,66 @@ todo:
 - check if folder exits....
 
 */
+
+
+class ofColorsLoggerChannel: public ofBaseLoggerChannel{
+    std::string CON_DEFAULT="\033[0m";
+    std::string CON_BOLD="\033[1m";
+    std::string CON_RED="\033[31m";
+    std::string CON_YELLOW="\033[33m";
+    std::string CON_GREEN="\033[32m";
+    std::string getColor(ofLogLevel level) const{
+        switch(level){
+        case OF_LOG_FATAL_ERROR:
+        case OF_LOG_ERROR:
+            return CON_RED;
+        case OF_LOG_WARNING:
+            return CON_YELLOW;
+        case OF_LOG_NOTICE:
+            return "";
+        default:
+            return CON_DEFAULT;
+        }
+    }
+public:
+    void log(ofLogLevel level, const std::string & module, const std::string & message){
+        if(level>=OF_LOG_WARNING){
+            std::cout << CON_BOLD << getColor(level);
+        }else{
+            std::cout << getColor(level);
+        }
+        if(module != ""){
+            std::cout << module << ": ";
+        }
+        if(level>=OF_LOG_WARNING){
+            std::cout << message << CON_DEFAULT << std::endl;
+        }else{
+            std::cout << message << std::endl;
+        }
+    }
+
+    void log(ofLogLevel level, const std::string & module, const char* format, ...){
+        va_list args;
+        va_start(args, format);
+        log(level, module, format, args);
+        va_end(args);
+    }
+
+    void log(ofLogLevel level, const std::string & module, const char* format, va_list args){
+        if(level>=OF_LOG_WARNING){
+            fprintf(stdout, "%s", (CON_BOLD + getColor(level)).c_str());
+        }
+        if(module != ""){
+            fprintf(stdout, "%s: ", module.c_str());
+        }
+        vfprintf(stdout, format, args);
+        if(level>=OF_LOG_WARNING){
+            fprintf(stdout, "%s", CON_DEFAULT.c_str());
+        }
+        fprintf(stdout, "\n");
+    }
+};
+
 
 class commandLineProjectGenerator : public Application {
 public:
@@ -57,20 +117,20 @@ public:
 	string              projectPath;
 	string              ofPath;
 	vector <string>     addons;
-	vector <int>        targets;
+	vector <ofTargetPlatform>        targets;
 	string              ofPathEnv;
 	string              currentWorkingDirectory;
+	string              templateName;
 
+	bool busingEnvVar;
     bool bVerbose;
     bool bAddonsPassedIn;
 	bool bForce;                            // force even if things like ofRoot seem wrong of if update folder looks wonky
 	int mode;                               // what mode are we in?
 	bool bRecursive;                        // do we recurse in update mode?
 	bool bHelpRequested;                    // did we request help?
+    bool bListTemplates;                    // did we request help?
 	bool bDryRun;                           // do dry run (useful for debugging recursive update)
-
-	string target;                          // the current project target platform in string form (for finding templates)
-	baseProject * project;
 
 	commandLineProjectGenerator() {
         
@@ -78,29 +138,30 @@ public:
         
         bAddonsPassedIn = false;
 		bDryRun = false;
+		busingEnvVar = false;
         bVerbose = false;
-		project = NULL;
 		mode = PG_MODE_NONE;
 		bForce = false;
 		bRecursive = false;
 		bHelpRequested = false;
+		bListTemplates = false;
 		targets.push_back(ofGetTargetPlatform());
-
+		startTime = 0;
+		nProjectsUpdated = 0;
+		nProjectsCreated = 0;
+		templateName = "standard";
         
 	}
 
 	void initialize(Application& self) {
-        
-        
-        
         // this is called after params have been parsed.
         
         startTime = ofGetElapsedTimef();
         nProjectsUpdated = 0;
         nProjectsCreated = 0;
-		ofSetWorkingDirectoryToDefault();
-		project = NULL;
+        of::priv::setWorkingDirectoryToDefault();
 		consoleSpace();
+		ofSetLoggerChannel(std::make_shared<ofColorsLoggerChannel>());
 
 
 		if (!bHelpRequested) {
@@ -111,10 +172,6 @@ public:
 			pPath = getenv("PG_OF_PATH");
 			if (pPath != NULL) {
 				ofPathEnv = string(pPath);
-				ofLogNotice() << "PG_OF_PATH variable is set to: " << pPath;
-			}
-			else {
-				ofLogNotice() << "PG_OF_PATH not set (see help), -o parameter needs to be set (-h for options)";
 			}
 			//-------------------------------------------------------------------------------
 
@@ -154,9 +211,15 @@ public:
 			.repeatable(false)
 			.callback(OptionCallback<commandLineProjectGenerator>(this, &commandLineProjectGenerator::handleOption)));
 
+        options.addOption(
+            Option("listtemplates", "l", "list templates available for the specified or current platform(s)")
+            .required(false)
+            .repeatable(false)
+            .callback(OptionCallback<commandLineProjectGenerator>(this, &commandLineProjectGenerator::handleOption)));
+
 
 		options.addOption(
-			Option("platforms", "x", "platform list")
+			Option("platforms", "p", "platform list")
 			.required(false)
 			.repeatable(false)
 			.argument("\"platform list\"")
@@ -184,6 +247,13 @@ public:
 			.noArgument()
 			.callback(OptionCallback<commandLineProjectGenerator>(this, &commandLineProjectGenerator::handleOption)));
 
+        options.addOption(
+            Option("template", "t", "project template")
+            .required(false)
+            .repeatable(false)
+            .argument("\"project_template\"")
+            .callback(OptionCallback<commandLineProjectGenerator>(this, &commandLineProjectGenerator::handleOption)));
+
 		options.addOption(
 			Option("dryrun", "d", "don't change files")
 			.required(false)
@@ -196,12 +266,12 @@ public:
 	}
 
 	void handleOption(const std::string& name, const std::string& value) {
-
-
-
 		if (name == "help") {
-			printHelp();
+		    bHelpRequested = true;
 		}
+        else if (name == "listtemplates") {
+            bListTemplates = true;
+        }
 		else if (name == "platforms") {
 			addPlatforms(value);
 		}
@@ -221,6 +291,9 @@ public:
         else if (name == "verbose") {
             bVerbose = true;
 		}
+        else if (name == "template") {
+            templateName = value;
+        }
 	}
 
 
@@ -248,14 +321,24 @@ public:
 	}
 
 
+    void printTemplates() {
+        for(auto & target: targets){
+            ofLogNotice() << "Templates for target " << getTargetString(target);
+            auto templates = getTargetProject(target)->listAvailableTemplates(getTargetString(target));
+            for(auto & templateDir: templates){
+                ofLogNotice() << ofFile(templateDir.path()).getFileName();
+            }
+        }
+    }
+
+
 
 	void addPlatforms(string value) {
 
 		targets.clear();
 		vector < string > platforms = ofSplitString(value, ",", true, true);
 
-		for (int i = 0; i < platforms.size(); i++) {
-
+		for (size_t i = 0; i < platforms.size(); i++) {
 			if (platforms[i] == "linux") {
 				targets.push_back(OF_TARGET_LINUX);
 			}
@@ -292,57 +375,12 @@ public:
 				targets.push_back(OF_TARGET_WINGCC);
 				targets.push_back(OF_TARGET_WINVS);
 				targets.push_back(OF_TARGET_OSX);
-				targets.push_back(OF_TARGET_IPHONE);
+				targets.push_back(OF_TARGET_IOS);
+			}else{
+			    ofLogError() << "platform " << platforms[i] << " not valid";
 			}
 		}
 	}
-
-
-	void setupForTarget(int targ) {
-
-		if (project) {
-			delete project;
-		}
-
-		switch (targ) {
-		case OF_TARGET_OSX:
-			project = new xcodeProject;
-			target = "osx";
-			break;
-		case OF_TARGET_WINGCC:
-			project = new CBWinProject;
-			target = "win_cb";
-			break;
-		case OF_TARGET_WINVS:
-			project = new visualStudioProject;
-			target = "vs";
-			break;
-		case OF_TARGET_IPHONE:
-			project = new xcodeProject;
-			target = "ios";
-			break;
-		case OF_TARGET_ANDROID:
-			break;
-		case OF_TARGET_LINUX:
-			project = new CBLinuxProject;
-			target = "linux";
-			break;
-		case OF_TARGET_LINUX64:
-			project = new CBLinuxProject;
-			target = "linux64";
-			break;
-		case OF_TARGET_LINUXARMV6L:
-			project = new CBLinuxProject;
-			target = "linuxarmv6l";
-			break;
-		case OF_TARGET_LINUXARMV7L:
-			project = new CBLinuxProject;
-			target = "linuxarmv7l";
-			break;
-		}
-	}
-
-
 
 
 	bool isGoodProjectPath(string path) {
@@ -354,7 +392,7 @@ public:
 
 		dir.listDir();
 		bool bHasSrc = false;
-		for (int i = 0; i < dir.size(); i++) {
+		for (size_t i = 0; i < dir.size(); i++) {
 			if (dir.getName(i) == "src") {
 				bHasSrc = true;
 			}
@@ -374,13 +412,13 @@ public:
 
 		ofDirectory dir(path);
 		if (!dir.isDirectory()) {
-			ofLog(OF_LOG_ERROR) << "ofPath seems wrong... not a directory";
+			ofLogError() << "ofPath seems wrong... not a directory";
 			return false;
 		}
 
 		dir.listDir();
 		bool bHasTemplates = false;
-		for (int i = 0; i < dir.size(); i++) {
+		for (size_t i = 0; i < dir.size(); i++) {
 			if (dir.getName(i) == "scripts") {
 				bHasTemplates = true;
 			}
@@ -390,13 +428,13 @@ public:
 			return true;
 		}
 		else {
-			ofLog(OF_LOG_ERROR) << "ofPath seems wrong... no scripts / templates directory";
+			ofLogError() << "ofPath seems wrong... no scripts / templates directory";
 			return false;
 		}
 
 	}
 
-	void recursiveUpdate(string path) {
+	void recursiveUpdate(string path, ofTargetPlatform target) {
 
 		ofDirectory dir(path);
 
@@ -407,16 +445,17 @@ public:
 		// second check if this is a folder that has src in it
 		if (isGoodProjectPath(path)) {
             nProjectsUpdated++;
-			updateProject(path, false);
+            auto project = getTargetProject(target);
+			updateProject(path, target, false);
 			return;
 		}
 
 		// finally, recursively look at this
 		dir.listDir();
-		for (int i = 0; i < dir.size(); i++) {
+		for (size_t i = 0; i < dir.size(); i++) {
 			ofDirectory subDir(dir.getPath(i));
 			if (subDir.isDirectory()) {
-				recursiveUpdate(dir.getPath(i));
+				recursiveUpdate(dir.getPath(i), target);
 			}
 		}
 
@@ -425,51 +464,32 @@ public:
 	}
 
 	void consoleSpace() {
-		cout << endl << endl;
+		cout << endl;
 	}
 
 
-	void updateProject(string path, bool bConsiderParameterAddons = true) {
+	void updateProject(string path, ofTargetPlatform target, bool bConsiderParameterAddons = true) {
 
         // bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
         // either we read the addons.make file, or we look at the parameter list.
         // if we are updating recursively, we *never* consider addons passed as parameters.
         
     
-		ofLog(OF_LOG_NOTICE) << "updating project " << path;
+		ofLogNotice() << "updating project " << path;
+		auto project = getTargetProject(target);
 
-		if (!bDryRun) project->setup(target);
-		if (!bDryRun) project->create(path, false);
+		if (!bDryRun) project->create(path, templateName);
 
-        bool bConsiderAddonsDotMake = true;
-        if (bConsiderParameterAddons && bAddonsPassedIn){
-            bConsiderAddonsDotMake = false;
-            // parameters were passed in, and we're not a recurive call
-            // so we don't read addons.make
-        }
-        
-        if (bConsiderAddonsDotMake){
-            ofLogNotice() << "parsing addons.make";
-            vector < string > addons;
-            addons.clear();
-            ofFile file(path + "addons.make");
-            if (file.exists()) {
-                parseAddonsDotMake(path + "addons.make", addons);
+		if(bConsiderParameterAddons && bAddonsPassedIn){
+            for(auto & addon: addons){
+                project->addAddon(addon);
             }
+		}else{
+            ofLogNotice() << "parsing addons.make";
+            project->parseAddons();
         }
-        
-		
 
-		for (int i = 0; i < (int)addons.size(); i++) {
-			ofAddon addon;
-			addon.pathToOF = getOFRelPath(path);
-			addon.fromFS(ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), addons[i]), target);
-            
-			ofLog(OF_LOG_NOTICE) << "parsing addon " << ofFilePath::join(getOFRoot(), "addons");
-
-			if (!bDryRun) project->addAddon(addon);
-		}
-		if (!bDryRun && !bConsiderAddonsDotMake) project->save(true);
+		if (!bDryRun) project->save();
 	}
 
 
@@ -481,57 +501,82 @@ public:
 		string projectName = "";
 
 
+
 		if (bHelpRequested) {
+            printHelp();
 			consoleSpace();
-			return Application::EXIT_OK;
-		}
 
-
-		//-------------------------- get the path to the current working folder
-
-		Path cwd = Path::current();                      // get the current path
-		projectPath = cwd.resolve(projectPath).toString();  // resolve projectPath vs that.
-		Path resolvedPath = Path(projectPath).absolute();         // use absolute version of this path
-		projectPath = resolvedPath.toString();
-
-		//-------------------------- get OF path from env variable if available
-		if (ofPath == "" && ofPathEnv != "") {
-			ofLog(OF_LOG_NOTICE) << "using env var for OF path";
-			ofPath = ofPathEnv;
+	        if(!bListTemplates){
+	            return Application::EXIT_OK;
+	        }
 		}
 
 
 
+        //-------------------------- get OF path from env variable if available
+        if (ofPath == "" && ofPathEnv != "") {
+            busingEnvVar = true;
+            ofPath = ofPathEnv;
+        }
+        if (ofPath == "") {
+
+            consoleSpace();
+            ofLogError() << "no OF path set... please use -o or --ofPath or set a PG_OF_PATH environment variable";
+            consoleSpace();
+            printHelp();
+            return Application::EXIT_USAGE;
+        }
+        else {
+
+            // let's try to resolve this path vs the current path
+            // so things like ../ can work
+            // see http://www.appinf.com/docs/poco/Poco.Path.html
+
+            Path cwd = Path::current();                  // get the current path
+            ofPath = cwd.resolve(ofPath).toString();   // resolve ofPath vs that.
+            Path resolvedPath = Path(ofPath).absolute();    // make that new path absolute
+            ofPath = resolvedPath.toString();
+
+            if (!isGoodOFPath(ofPath)) {
+                return Application::EXIT_USAGE;
+            }
+            setOFRoot(ofPath);
+        }
+
+
+        if(bListTemplates){
+            printTemplates();
+            consoleSpace();
+            return Application::EXIT_OK;
+        }
+
+        //-------------------------- get the path to the current working folder
+        Path cwd = Path::current();                      // get the current path
+        projectPath = cwd.resolve(projectPath).toString();  // resolve projectPath vs that.
+        Path resolvedPath = Path(projectPath).absolute();         // use absolute version of this path
+        projectPath = resolvedPath.toString();
+
+        // check things
 		if (args.size() > 0) {
-
 			projectName = args[0];
 
 			// check if it's an absolute path?
 			if (ofFilePath::isAbsolute(projectName)) {
 				projectPath = projectName;
-			}
-			else {
-
-
-
+			} else {
 				projectPath = ofFilePath::join(projectPath, projectName);
 
 				// this line is arturo's ninja magic to make paths with dots make sense:
 				projectPath = ofFilePath::removeTrailingSlash(ofFilePath::getPathForDirectory(ofFilePath::getAbsolutePath(projectPath, false)));
-
-
 			}
 
-		}
-		else {
-
-			ofLogError() << "usage: projectGenerator [options] pathName";
-			ofLogError() << "usage: if pathName exists, project is updated";
-			ofLogError() << "usage: if pathName doesn't exist, project is created";
+		} else {
+		    ofLogError() << "Missing project path";
+		    printHelp();
 
 			consoleSpace();
 
-			return Application::EXIT_OK;
+			return Application::EXIT_USAGE;
 		}
 
 
@@ -540,55 +585,23 @@ public:
 			consoleSpace();
 			ofLogError() << "path to openframeworks (" << ofPath << ") seems wrong, please check";
 			consoleSpace();
-			return Application::EXIT_OK;
+			return Application::EXIT_USAGE;
 		}
 
         
 
-		if (ofDirectory(projectPath).exists()) {
-			ofLogNotice() << projectPath << " exists, using 'update' mode";
-			mode = PG_MODE_UPDATE;
-		}
-		else {
-			ofLogNotice() << projectPath << " does not exist, using 'create' mode";
-			mode = PG_MODE_CREATE;
-		}
 
 
 
 
 
-		// check things
 
-		if (ofPath == "") {
-
-			consoleSpace();
-			ofLog(OF_LOG_ERROR) << endl << "no OF path set... please use -o or -ofPath or set a PG_OF_PATH environment variable";
-			consoleSpace();
-			printHelp();
-			return Application::EXIT_OK;
-		}
-		else {
-
-			// let's try to resolve this path vs the current path
-			// so things like ../ can work
-			// see http://www.appinf.com/docs/poco/Poco.Path.html
-
-			Path cwd = Path::current();                  // get the current path
-			ofPath = cwd.resolve(ofPath).toString();   // resolve ofPath vs that.
-			Path resolvedPath = Path(ofPath).absolute();    // make that new path absolute
-			ofPath = resolvedPath.toString();
-
-			if (!isGoodOFPath(ofPath)) {
-				return Application::EXIT_OK;
-			}
-
-			ofLog(OF_LOG_NOTICE) << "setting OF path to: " << ofPath;
-			setOFRoot(ofPath);
-		}
-
-
-        consoleSpace();
+        if (ofDirectory(projectPath).exists()) {
+            mode = PG_MODE_UPDATE;
+        }
+        else {
+            mode = PG_MODE_CREATE;
+        }
         
         if (bVerbose){
             ofSetLogLevel(OF_LOG_VERBOSE);
@@ -601,30 +614,41 @@ public:
             nProjectsCreated += 1;
             
 			for (int i = 0; i < (int)targets.size(); i++) {
-				setupForTarget(targets[i]);
+				auto project = getTargetProject(targets[i]);
+				auto target = getTargetString(targets[i]);
 
-                ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
-				ofLog(OF_LOG_NOTICE) << "setting up a new project";
-				ofLog(OF_LOG_NOTICE) << "target platform is: " << target;
-				ofLog(OF_LOG_NOTICE) << "project path is: " << projectPath;
+                ofLogNotice() << "-----------------------------------------------";
+                ofLogNotice() << "setting OF path to: " << ofPath;
+                if(busingEnvVar){
+                    ofLogNotice() << "from PG_OF_PATH environment variable";
+                }else{
+                    ofLogNotice() << "from -o option";
+                }
+                consoleSpace();
+				ofLogNotice() << "target platform is: " << target;
+				ofLogNotice() << "project path is: " << projectPath;
 
-				if (!bDryRun) project->setup(target);
-				if (!bDryRun) project->create(projectPath, false);
+                if(templateName!="standard"){
+                    consoleSpace();
+                    ofLogNotice() << "using additional template " << templateName;
+                }
+                consoleSpace();
+
+
+                ofLogNotice() << "setting up new project " << projectPath;
+                consoleSpace();
+				if (!bDryRun) project->create(projectPath, templateName);
 				
-                for (int j = 0; j < (int)addons.size(); j++) {
-
-
-					ofAddon addon;
-
-					ofLog(OF_LOG_NOTICE) << "parsing addon: " << ofFilePath::join(getOFRoot(), "addons");
-
-					if (!bDryRun) addon.fromFS(ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), addons[j]), target);
-					if (!bDryRun) project->addAddon(addon);
-				}
-				if (!bDryRun) project->save(true);
+                if (!bDryRun){
+                    for(auto & addon: addons){
+                        project->addAddon(addon);
+                    }
+                }
+				if (!bDryRun) project->save();
                 
-                ofLog(OF_LOG_NOTICE) << "project created! ";
-                ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
+                ofLogNotice() << "project created! ";
+                ofLogNotice() << "-----------------------------------------------";
+                consoleSpace();
                 
 
 			}
@@ -639,38 +663,44 @@ public:
                     
                     
                     for (int i = 0; i < (int)targets.size(); i++) {
+                        ofLogNotice() << "-----------------------------------------------";
+                        ofLogNotice() << "setting OF path to: " << ofPath;
+                        if(busingEnvVar){
+                            ofLogNotice() << "from PG_OF_PATH environment variable";
+                        }else{
+                            ofLogNotice() << "from -o option";
+                        }
+                        consoleSpace();
+                        ofLogNotice() << "target platform is: " << getTargetString(targets[i]);
                         
+                        if(templateName!="standard"){
+                            consoleSpace();
+                            ofLogNotice() << "using additional template " << templateName;
+                        }
+                        consoleSpace();
+
+						updateProject(projectPath,targets[i]);
                         
-                        setupForTarget(targets[i]);
-						
-                        ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
-                        ofLog(OF_LOG_NOTICE) << "updating an existing project";
-                        ofLog(OF_LOG_NOTICE) << "target platform is: " << target;
-                        
-						updateProject(projectPath);
-                        
-                        ofLog(OF_LOG_NOTICE) << "project updated! ";
-                        ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
+                        ofLogNotice() << "project updated! ";
+                        ofLogNotice() << "-----------------------------------------------";
+                        consoleSpace();
                     
                     }
 				}
 				else {
-					ofLog(OF_LOG_ERROR) << "there's no src folder in this project path to update, maybe use create instead? (or use force to force updating)";
+					ofLogError() << "there's no src folder in this project path to update, maybe use create instead? (or use force to force updating)";
 				}
 			}
 			else {
 				for (int i = 0; i < (int)targets.size(); i++) {
+                    ofLogNotice() << "-----------------------------------------------";
+                    ofLogNotice() << "updating an existing project";
+                    ofLogNotice() << "target platform is: " << getTargetString(targets[i]);
                     
-                    setupForTarget(targets[i]);
-					
-                    ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
-                    ofLog(OF_LOG_NOTICE) << "updating an existing project";
-                    ofLog(OF_LOG_NOTICE) << "target platform is: " << target;
+					recursiveUpdate(projectPath, targets[i]);
                     
-					recursiveUpdate(projectPath);
-                    
-                    ofLog(OF_LOG_NOTICE) << "project updated! ";
-                    ofLog(OF_LOG_NOTICE) << "-----------------------------------------------";
+                    ofLogNotice() << "project updated! ";
+                    ofLogNotice() << "-----------------------------------------------";
 
 				}
 			}
@@ -683,7 +713,7 @@ public:
         if (nProjectsCreated > 0) cout << nProjectsCreated << " project created ";
         if (nProjectsUpdated == 1)cout << nProjectsUpdated << " project updated ";
         if (nProjectsUpdated > 1) cout << nProjectsUpdated << " projects updated ";
-        cout << "in " << elapsedTime << " seconds" << endl;
+        ofLogNotice() << "in " << elapsedTime << " seconds" << endl;
         consoleSpace();
 
 		return Application::EXIT_OK;
