@@ -70,3 +70,7 @@ body.enableConsole.showConsole {
 body.enableConsole.showConsole #consoleContainer {
   margin-bottom: 0;
 }
+
+#uiModal:focus {
+  outline: none;
+}
