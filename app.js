@@ -264,7 +264,22 @@ function setOFPath(arg) {
 //----------------------------------------
 function setup() {
 
-
+    jQuery.fn.extend({
+      oneTimeTooltip: function(msg) {
+        return this.each(function() {
+            $(this).popup({
+                content : msg,
+                position : 'bottom center',
+                on: 'manual',
+                onVisible: function(e){
+                    // hide on focus / change / onShow (for dropdowns)
+                    $(e).one('focus change click', function(){ $(this).popup('hide');} );
+                    console.log($(e).children('input'));
+                }
+            }).popup('show')
+        });
+      }
+    });
 
     $(document).ready(function() {
 
@@ -331,8 +346,7 @@ function setup() {
         }
 
         // start the platform drop down. 
-        $('#platformsDropdown')
-            .dropdown({
+        $('#platformsDropdown').dropdown({
                 allowAdditions: false
             });
 
@@ -521,13 +535,12 @@ function generate() {
     gen['ofPath'] = $("#ofPath").val();
 
     // console.log(gen);
-
     if (gen['projectName'] === '') {
-        displayModal("Please name your sketch first.");
+        $("#projectName").oneTimeTooltip("Please name your sketch first.");
     } else if (gen['projectPath'] === '') {
-        displayModal("Your project path is empty...");
+        $("#projectPath").oneTimeTooltip("Your project path is empty...");
     } else if (gen['platformList'] === null || gen['platformList'] === "" || lengthOfPlatforms == 0) {
-        displayModal("Please select a platform first.");
+        $("#platformsDropdown").oneTimeTooltip("Please select a platform first.");
     } else {
         ipc.send('generate', gen);
     }
