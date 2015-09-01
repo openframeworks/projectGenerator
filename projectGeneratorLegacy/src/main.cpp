@@ -14,8 +14,7 @@ int main(  int argc, char *argv[]  ){
     
 #ifdef TARGET_LINUX
 	if(argc==1){
-		ofAppGlutWindow window;
-		ofSetupOpenGL(&window, 1024,768, OF_WINDOW);
+		ofSetupOpenGL(1024,768, OF_WINDOW);
 		ofRunApp( new ofApp());
 	}else{
 		ofAppNoWindow window;
