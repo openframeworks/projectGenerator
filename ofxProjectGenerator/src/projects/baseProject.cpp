@@ -19,7 +19,7 @@ baseProject::baseProject(string _target){
 }
 
 std::string baseProject::getPlatformTemplateDir(){
-    return ofFilePath::join(getOFRoot(),"scripts/" + target + "/template");
+    return ofFilePath::join(getOFRoot(),"scripts/templates/" + target);
 }
 
 void recursiveTemplateCopy(const ofDirectory & templateDir, ofDirectory & projectDir){
@@ -28,31 +28,63 @@ void recursiveTemplateCopy(const ofDirectory & templateDir, ofDirectory & projec
             ofDirectory templateSubDir(f.path());
             ofDirectory projectSubDir(ofFilePath::join(projectDir.path(),f.getFileName()));
             recursiveTemplateCopy(templateSubDir, projectSubDir);
-        }else{
+        }else if(f.getFileName()!="template.config"){
             f.copyTo(ofFilePath::join(projectDir.path(),f.getFileName()),false,true);
         }
     }
 }
 
-vector<ofDirectory> baseProject::listAvailableTemplates(std::string target){
-    vector<ofDirectory> templates;
-    ofDirectory additionalTemplates(getPlatformTemplateDir());
-    for(auto & f: additionalTemplates){
-        if(f.isDirectory()){
-            templates.emplace_back(f.path());
+bool isPlatformName(std::string file){
+    for(int platform=OF_TARGET_OSX;platform<OF_TARGET_EMSCRIPTEN+1;platform++){
+        if(file==getTargetString((ofTargetPlatform)platform)){
+            return true;
         }
     }
-    ofDirectory anyPlatformTemplate(ofFilePath::join(getOFRoot(),"scripts/pgtemplates/"));
-    for(auto & f: anyPlatformTemplate){
-        if(f.isDirectory()){
-            templates.emplace_back(f.path());
+    return false;
+}
+
+vector<baseProject::Template> baseProject::listAvailableTemplates(std::string target){
+    vector<baseProject::Template> templates;
+    ofDirectory templatesDir(ofFilePath::join(getOFRoot(),"scripts/templates"));
+    templatesDir.sort();
+    for(auto & f: templatesDir){
+        if(f.isDirectory() && !isPlatformName(f.getFileName())){
+            ofBuffer templateconfig;
+            ofFile templateconfigFile(ofFilePath::join(f.path(), "template.config"));
+            if(templateconfigFile.exists()){
+                templateconfigFile >> templateconfig;
+                auto supported = false;
+                Template templateConfig;
+                templateConfig.dir = ofDirectory(f.path());
+                templateConfig.name = f.getFileName();
+                for(auto line: templateconfig.getLines()){
+                    auto varValue = ofSplitString(line,"=",true,true);
+                    if(varValue.size() < 2) continue;
+                    auto var = varValue[0];
+                    auto value = varValue[1];
+                    if(var=="PLATFORMS"){
+                        auto platforms = ofSplitString(value," ",true,true);
+                        for(auto platform: platforms){
+                            if(platform==target){
+                                supported = true;
+                            }
+                            templateConfig.platforms.push_back(platform);
+                        }
+                    }else if(var=="DESCRIPTION"){
+                        templateConfig.description = value;
+                    }
+                }
+                if(supported){
+                    templates.push_back(templateConfig);
+                }
+            }
         }
     }
     return templates;
 }
 
 bool baseProject::create(string path, std::string templateName){
-    templatePath = ofFilePath::join(getPlatformTemplateDir(),"standard/");
+    templatePath = getPlatformTemplateDir();
     addons.clear();
 
     if(!ofFilePath::isAbsolute(path)){
@@ -76,17 +108,13 @@ bool baseProject::create(string path, std::string templateName){
     bool ret = createProjectFile();
     if(!ret) return false;
 
-    if(templateName!="standard"){
-        ofDirectory additionalTemplate(ofFilePath::join(getOFRoot(),"scripts/" + target + "/template/" + templateName));
-        ofDirectory anyPlatformTemplate(ofFilePath::join(getOFRoot(),"scripts/pgtemplates/" + templateName));
-        if(additionalTemplate.exists()){
+    if(templateName!=""){
+        ofDirectory templateDir(ofFilePath::join(getOFRoot(),"scripts/templates/" + templateName));
+        if(templateDir.exists()){
             ofDirectory project(projectDir);
-            recursiveTemplateCopy(additionalTemplate,project);
-        }else if(anyPlatformTemplate.exists()){
-            ofDirectory project(projectDir);
-            recursiveTemplateCopy(anyPlatformTemplate,project);
+            recursiveTemplateCopy(templateDir,project);
         }else{
-            ofLogWarning() << "Cannot find " << templateName << " using standard template only";
+            ofLogWarning() << "Cannot find " << templateName << " using platform template only";
         }
     }
 

@@ -149,7 +149,6 @@ public:
 		startTime = 0;
 		nProjectsUpdated = 0;
 		nProjectsCreated = 0;
-		templateName = "standard";
         
 	}
 
@@ -321,13 +320,54 @@ public:
 	}
 
 
-    void printTemplates() {
-        for(auto & target: targets){
-            ofLogNotice() << "Templates for target " << getTargetString(target);
-            auto templates = getTargetProject(target)->listAvailableTemplates(getTargetString(target));
-            for(auto & templateDir: templates){
-                ofLogNotice() << ofFile(templateDir.path()).getFileName();
+    bool printTemplates() {
+        if(targets.size()>1){
+            vector<vector<baseProject::Template>> allPlatformsTemplates;
+            for(auto & target: targets){
+                auto templates = getTargetProject(target)->listAvailableTemplates(getTargetString(target));
+                allPlatformsTemplates.push_back(templates);
             }
+            set<baseProject::Template> commonTemplates;
+            for(auto & templates: allPlatformsTemplates){
+                for(auto & t: templates){
+                    bool foundInAll = true;
+                    for(auto & otherTemplates: allPlatformsTemplates){
+                        auto found = false;
+                        for(auto & otherT: otherTemplates){
+                            if(otherT.name == t.name){
+                                found = true;
+                                continue;
+                            }
+                        }
+                        foundInAll &= found;
+                    }
+                    if(foundInAll){
+                        commonTemplates.emplace(t);
+                    }
+                }
+            }
+            if(commonTemplates.empty()){
+                ofLogNotice() << "No templates available for all targets";
+                return false;
+            }else{
+                ofLogNotice() << "Templates available for all targets";
+                for(auto & t: commonTemplates){
+                    ofLogNotice() << t.name << "\t\t" << t.description;
+                }
+                return true;
+            }
+        }else{
+            bool templatesFound = false;
+            for(auto & target: targets){
+                ofLogNotice() << "Templates for target " << getTargetString(target);
+                auto templates = getTargetProject(target)->listAvailableTemplates(getTargetString(target));
+                for(auto & templateConfig: templates){
+                    ofLogNotice() << templateConfig.name << "\t\t" << templateConfig.description;
+                }
+                consoleSpace();
+                templatesFound = !templates.empty();
+            }
+            return templatesFound;
         }
     }
 
@@ -545,9 +585,13 @@ public:
 
 
         if(bListTemplates){
-            printTemplates();
+            auto ret = printTemplates();
             consoleSpace();
-            return Application::EXIT_OK;
+            if(ret){
+                return Application::EXIT_OK;
+            }else{
+                return Application::EXIT_DATAERR;
+            }
         }
 
         //-------------------------- get the path to the current working folder
