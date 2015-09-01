@@ -321,11 +321,47 @@ public:
 
 
     void printTemplates() {
-        for(auto & target: targets){
-            ofLogNotice() << "Templates for target " << getTargetString(target);
-            auto templates = getTargetProject(target)->listAvailableTemplates(getTargetString(target));
-            for(auto & templateConfig: templates){
-                ofLogNotice() << templateConfig.name << "\t\t" << templateConfig.description;
+        if(targets.size()>1){
+            vector<vector<baseProject::Template>> allPlatformsTemplates;
+            for(auto & target: targets){
+                auto templates = getTargetProject(target)->listAvailableTemplates(getTargetString(target));
+                allPlatformsTemplates.push_back(templates);
+            }
+            set<baseProject::Template> commonTemplates;
+            for(auto & templates: allPlatformsTemplates){
+                for(auto & t: templates){
+                    bool foundInAll = true;
+                    for(auto & otherTemplates: allPlatformsTemplates){
+                        auto found = false;
+                        for(auto & otherT: otherTemplates){
+                            if(otherT.name == t.name){
+                                found = true;
+                                continue;
+                            }
+                        }
+                        foundInAll &= found;
+                    }
+                    if(foundInAll){
+                        commonTemplates.emplace(t);
+                    }
+                }
+            }
+            if(commonTemplates.empty()){
+                ofLogNotice() << "No templates available for all targets";
+            }else{
+                ofLogNotice() << "Templates available for all targets";
+                for(auto & t: commonTemplates){
+                    ofLogNotice() << t.name << "\t\t" << t.description;
+                }
+            }
+        }else{
+            for(auto & target: targets){
+                ofLogNotice() << "Templates for target " << getTargetString(target);
+                auto templates = getTargetProject(target)->listAvailableTemplates(getTargetString(target));
+                for(auto & templateConfig: templates){
+                    ofLogNotice() << templateConfig.name << "\t\t" << templateConfig.description;
+                }
+                consoleSpace();
             }
         }
     }

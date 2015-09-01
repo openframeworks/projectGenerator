@@ -31,6 +31,9 @@ public:
         std::string name;
         vector<std::string> platforms;
         std::string description;
+        bool operator<(const Template & other) const{
+            return dir<other.dir;
+        }
     };
 
     baseProject(std::string _target);
