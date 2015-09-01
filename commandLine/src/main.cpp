@@ -149,7 +149,6 @@ public:
 		startTime = 0;
 		nProjectsUpdated = 0;
 		nProjectsCreated = 0;
-		templateName = "standard";
         
 	}
 
@@ -325,8 +324,8 @@ public:
         for(auto & target: targets){
             ofLogNotice() << "Templates for target " << getTargetString(target);
             auto templates = getTargetProject(target)->listAvailableTemplates(getTargetString(target));
-            for(auto & templateDir: templates){
-                ofLogNotice() << ofFile(templateDir.path()).getFileName();
+            for(auto & templateConfig: templates){
+                ofLogNotice() << templateConfig.name << "\t\t" << templateConfig.description;
             }
         }
     }

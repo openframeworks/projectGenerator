@@ -353,7 +353,7 @@ bool xcodeProject::createProjectFile(){
 
     // this is for xcode 4 scheme issues. but I'm not sure this is right.
 
-    saveWorkspaceXML();
+    //saveWorkspaceXML();
     saveScheme();
     saveMakefile();
 

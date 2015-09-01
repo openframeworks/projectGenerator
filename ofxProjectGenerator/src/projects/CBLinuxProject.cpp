@@ -12,10 +12,6 @@
 
 string CBLinuxProject::LOG_NAME = "CBLinuxProject";
 
-std::string CBLinuxProject::getPlatformTemplateDir(){
-    return ofFilePath::join(getOFRoot(),"scripts/linux/template/" + target);
-}
-
 bool CBLinuxProject::createProjectFile(){
 	ofDirectory dir(projectDir);
 	if(!dir.exists()) dir.create(true);

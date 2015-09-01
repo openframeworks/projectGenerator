@@ -26,11 +26,18 @@ public:
     	OBJC
     };
 
+    struct Template{
+        ofDirectory dir;
+        std::string name;
+        vector<std::string> platforms;
+        std::string description;
+    };
+
     baseProject(std::string _target);
 
     virtual ~baseProject(){};
 
-    bool create(std::string path, std::string templateName="standard");
+    bool create(std::string path, std::string templateName="");
     void parseAddons();
     void parseConfigMake();
     bool save();
@@ -61,7 +68,7 @@ public:
 	std::string getName() { return projectName;};
 	std::string getPath() { return projectDir; };
 
-	vector<ofDirectory> listAvailableTemplates(std::string target);
+	vector<Template> listAvailableTemplates(std::string target);
 	virtual std::string getPlatformTemplateDir();
 
     pugi::xml_document doc;

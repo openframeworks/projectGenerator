@@ -20,7 +20,6 @@ public:
     bool createProjectFile();
     void addInclude(std::string includeName){};
     void addLibrary(const LibraryBinary & lib){};
-    std::string getPlatformTemplateDir();
 
 	static std::string LOG_NAME;
 };
