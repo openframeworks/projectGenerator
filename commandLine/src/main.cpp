@@ -320,7 +320,7 @@ public:
 	}
 
 
-    void printTemplates() {
+    bool printTemplates() {
         if(targets.size()>1){
             vector<vector<baseProject::Template>> allPlatformsTemplates;
             for(auto & target: targets){
@@ -348,13 +348,16 @@ public:
             }
             if(commonTemplates.empty()){
                 ofLogNotice() << "No templates available for all targets";
+                return false;
             }else{
                 ofLogNotice() << "Templates available for all targets";
                 for(auto & t: commonTemplates){
                     ofLogNotice() << t.name << "\t\t" << t.description;
                 }
+                return true;
             }
         }else{
+            bool templatesFound = false;
             for(auto & target: targets){
                 ofLogNotice() << "Templates for target " << getTargetString(target);
                 auto templates = getTargetProject(target)->listAvailableTemplates(getTargetString(target));
@@ -362,7 +365,9 @@ public:
                     ofLogNotice() << templateConfig.name << "\t\t" << templateConfig.description;
                 }
                 consoleSpace();
+                templatesFound = !templates.empty();
             }
+            return templatesFound;
         }
     }
 
@@ -580,9 +585,13 @@ public:
 
 
         if(bListTemplates){
-            printTemplates();
+            auto ret = printTemplates();
             consoleSpace();
-            return Application::EXIT_OK;
+            if(ret){
+                return Application::EXIT_OK;
+            }else{
+                return Application::EXIT_DATAERR;
+            }
         }
 
         //-------------------------- get the path to the current working folder
