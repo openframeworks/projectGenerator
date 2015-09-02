@@ -48,6 +48,8 @@ public:
     std::string buildPhaseResourcesUUID;
     std::string frameworksBuildPhaseUUID;
     std::string afterPhaseUUID;
+    std::string buildPhaseStepUUID;
+    
     
 
     pugi::xml_node findOrMakeFolderSet( pugi::xml_node nodeToAddTo, std::vector < std::string > & folders, std::string pathForHash);

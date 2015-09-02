@@ -291,7 +291,6 @@ void baseProject::parseConfigMake(){
         if(config[0] == '#') continue;
         if(config == "") continue;
         if(config.find("=")!=std::string::npos){
-            cout << "begin" << ofTrimBack(" hola ") << "end" << endl;
             auto varValue = ofSplitString(config,"=",true,true);
             auto var = ofTrim(varValue[0]);
             auto value = ofTrim(varValue[1]);
