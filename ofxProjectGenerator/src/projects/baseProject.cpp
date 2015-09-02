@@ -46,8 +46,7 @@ bool isPlatformName(std::string file){
 vector<baseProject::Template> baseProject::listAvailableTemplates(std::string target){
     vector<baseProject::Template> templates;
     ofDirectory templatesDir(ofFilePath::join(getOFRoot(),"scripts/templates"));
-    templatesDir.sort();
-    for(auto & f: templatesDir){
+    for(auto & f: templatesDir.getSorted()){
         if(f.isDirectory() && !isPlatformName(f.getFileName())){
             ofBuffer templateconfig;
             ofFile templateconfigFile(ofFilePath::join(f.path(), "template.config"));
