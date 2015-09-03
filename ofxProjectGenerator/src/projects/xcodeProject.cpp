@@ -20,9 +20,6 @@ some additional things that might be useful to try in the future:
 
 */
 
-
-
-
 // we are going to use POCO for computing the MD5 Hash of file names and paths, etc:
 // to add things to the xcode project file, we need some template XML around
 // these are common things we'll want to add
@@ -213,11 +210,11 @@ xcodeProject::xcodeProject(std::string target)
         srcUUID         = "E4B69E1C0A3A1BDC003C02F2";
         addonUUID       = "BB4B014C10F69532006C3DED";
         localAddonUUID  = "6948EE371B920CB800B5AC1A";
-        buildPhaseUUID  = "E4B69E200A3A1BDC003C02F2";
+        buildPhaseUUID  = "E4B69E200A3A1BDC003C02F2";   
         resourcesUUID   = "";
         frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase
         afterPhaseUUID  = "928F60851B6710B200E2D791";
-        buildPhaseStepUUID  = "E4C2427710CC5ABF004149E2";
+        buildPhasesUUID  = "E4C2427710CC5ABF004149E2";      
     }else{
         srcUUID         = "E4D8936A11527B74007E1F53";
         addonUUID       = "BB16F26B0F2B646B00518274";
@@ -227,6 +224,7 @@ xcodeProject::xcodeProject(std::string target)
         buildPhaseResourcesUUID = "BB24DDCA10DA781C00E9C588";
         frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase  // todo: check this?
         afterPhaseUUID  = "928F60851B6710B200E2D791";
+        buildPhasesUUID = "9255DD331112741900D6945E";   //
     }
 };
 
@@ -1095,7 +1093,7 @@ void xcodeProject::addAfterRule(string rule){
             
 
             pugi::xml_node array;
-            findArrayForUUID(buildPhaseStepUUID, array);    // this is the build array (all build refs get added here)
+            findArrayForUUID(buildPhasesUUID, array);    // this is the build array (all build refs get added here)
             array.append_child("string").append_child(pugi::node_pcdata).set_value(afterPhaseUUID.c_str());
             
         }

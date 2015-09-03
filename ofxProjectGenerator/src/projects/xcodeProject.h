@@ -43,12 +43,14 @@ public:
     std::string addonUUID;
     std::string localAddonUUID;
     std::string resourcesUUID;
-    std::string buildPhaseUUID;
+    std::string buildPhaseUUID;                 // note this UUID keeps refs all things to build
     std::string frameworksUUID;
     std::string buildPhaseResourcesUUID;
     std::string frameworksBuildPhaseUUID;
     std::string afterPhaseUUID;
-    std::string buildPhaseStepUUID;
+    std::string buildPhasesUUID;                // note this UUID is in an array of *all* the build steps (ie build phases)
+    
+    
     
     
 
