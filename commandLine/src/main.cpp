@@ -342,7 +342,7 @@ public:
                         foundInAll &= found;
                     }
                     if(foundInAll){
-                        commonTemplates.emplace(t);
+                        commonTemplates.insert(t);
                     }
                 }
             }

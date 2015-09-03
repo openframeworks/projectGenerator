@@ -130,7 +130,7 @@ PROJECT_AFTER_OSX = cp "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PROD
 #
 #   Note: Leave a leading space when adding list items with the += operator
 ################################################################################
-# PROJECT_OPTIMIZATION_CFLAGS_RELEASE = 
+PROJECT_OPTIMIZATION_CFLAGS_RELEASE = -O3
 # PROJECT_OPTIMIZATION_CFLAGS_DEBUG = 
 
 ################################################################################

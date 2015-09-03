@@ -465,7 +465,7 @@ void ofAddon::fromFS(string path, string platform){
     	libFiles[i].erase (libFiles[i].begin(), libFiles[i].begin()+containedPath.length());
 		//ofLogVerbose() << " libFiles " << libFiles[i];
     	int init = 0;
-        int end = libFiles[i].rfind(std::filesystem::path::preferred_separator);
+        int end = libFiles[i].rfind(std::filesystem::path("/").make_preferred().string());
         if (end > 0){
             string folder = libFiles[i].substr(init,end);
             libFiles[i] = prefixPath + libFiles[i];
@@ -478,7 +478,7 @@ void ofAddon::fromFS(string path, string platform){
     for (int i = 0; i < (int)libs.size(); i++){
 
         // does libs[] have any path ? let's fix if so.
-    	int end = libs[i].path.rfind(std::filesystem::path::preferred_separator);
+    	int end = libs[i].path.rfind(std::filesystem::path("/").make_preferred().string());
         if (end > 0){
             libs[i].path.erase (libs[i].path.begin(), libs[i].path.begin()+containedPath.length());
             libs[i].path = prefixPath + libs[i].path;
@@ -512,7 +512,7 @@ void ofAddon::fromFS(string path, string platform){
             
             
             int init = 0;
-    	    int end = frameworks[i].rfind(std::filesystem::path::preferred_separator);
+    	    int end = frameworks[i].rfind(std::filesystem::path("/").make_preferred().string());
             
             string folder = frameworks[i].substr(init,end);
             frameworks[i] = pathToOF + frameworks[i];
@@ -535,7 +535,7 @@ void ofAddon::fromFS(string path, string platform){
     list < string > paths;
     for (int i = 0; i < (int)srcFiles.size(); i++){
         size_t found;
-    	found = srcFiles[i].find_last_of(std::filesystem::path::preferred_separator);
+    	found = srcFiles[i].find_last_of(std::filesystem::path("/").make_preferred().string());
         paths.push_back(srcFiles[i].substr(0,found));
     }
 
