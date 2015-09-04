@@ -83,10 +83,37 @@ body.enableConsole.showConsole #consoleContainer {
   margin-bottom: 0;
 }
 
-#uiModal:focus {
+#uiModal:focus, #fileDropModal:focus {
   outline: none;
 }
 
 #ofx-addons-link, #ofx-addons-link:hover {
   color: inherit;
+}
+
+.drop-zone {
+  height: 100px;
+  width: 100%;
+  border: 1px dashed black;
+  margin: 10px 0;
+  padding: 20px;
+}
+
+.drop-zone.accept {
+  background-color: #e5f9e7;
+  border-color: #b5cc18;
+  border-width: 2px;
+}
+
+.drop-zone.deny {
+  background-color: #ffe8e6;
+  border-color: #db2828;
+}
+
+#dropZoneBatchUpdate {
+  display: none;
+}
+
+.advanced #dropZoneBatchUpdate {
+  display: block;
 }

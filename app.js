@@ -451,7 +451,7 @@ function setup() {
         $("#hideConsole").on('click', function(){ $('body').removeClass('showConsole'); });
 
         // initialise the overall-use modal
-        $("#uiModal").modal({
+        $("#uiModal, #fileDropModal").modal({
             'show': false
         });
 
@@ -493,9 +493,82 @@ function setup() {
         // enable tool tips
         $('.tooltip').popup();
         
+        // Open file drop zone
+        $('body').on('dragenter', openDragInputModal);
+
+        //Close file drop zone
+        $(window).on('mouseout', closeDragInputModal );
+        $(document).on('dragend', closeDragInputModal );
+
+        // prevent dropping anywhere (dropping files loads them)
+        // note: yes, dragover is also needed
+        $(window).on('drop dragover', function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        });
+        
+        // bind update thingy
+        // note: dragover is needed because dragleave is called pretty randomly
+        $("#dropZoneUpdate").on('dragenter dragover drop', onDragUpdateFile).on('dragleave', function(e){
+            $(this).removeClass("accept deny");
+        });
     });
+}
 
+function onDragUpdateFile( e ){
+    e.preventDefault();
+    e.stopPropagation();
 
+    // handle file
+    var files = e.originalEvent.dataTransfer.files;
+    var types = e.originalEvent.dataTransfer.types;
+
+    // this first check filters out most files
+    if(files.length == 1 && files[0].type==="" && types[0]=="Files"){
+
+        // this folder check is more relayable
+        var file = e.originalEvent.dataTransfer.items[0].webkitGetAsEntry();
+        if( file.isDirectory ){
+            $("#dropZoneUpdate").addClass("accept").removeClass("deny");
+
+            // drop event ? --> import it!
+            if( e.type=="drop" ){
+                $("#projectName").val( files[0].name );
+                var regExp = new RegExp("\\b/"+files[0].name+"\\b","gi");
+                $("#projectPath").val( files[0].path.replace(regExp,"") ).trigger('change');
+
+                $("createMenuButon").trigger('click');
+            }
+        }
+        else {
+            $("#dropZoneUpdate").addClass("deny").removeClass("accept");
+        }
+    }
+    else {
+        $("#dropZoneUpdate").addClass("deny").removeClass("accept");
+    }
+    return false;
+}
+
+function closeDragInputModal(e){
+    e.preventDefault();
+    e.stopPropagation();
+
+    if( $('body').hasClass('incommingFile') ){
+        $('body').removeClass('incommingFile');
+        $("#fileDropModal").modal('hide');
+        $("#dropZoneUpdate").removeClass("accept deny");
+    }
+}
+
+function openDragInputModal(e){
+    e.preventDefault();
+    e.stopPropagation();
+    if(!$('body').hasClass('incommingFile')){
+        $('body').addClass('incommingFile');
+        $("#fileDropModal").modal('show');
+    } 
 }
 
 //----------------------------------------
