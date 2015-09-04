@@ -9,6 +9,21 @@
 		<string>46</string>
 		<key>objects</key>
 		<dict>
+			<key>D31F54C5A271FBBD54B015EB</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>pugixml.hpp</string>
+				<key>path</key>
+				<string>../ofxProjectGenerator/libs/pugixml/src/pugixml.hpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
 			<key>1981524E5F6AF02B961F2A51</key>
 			<dict>
 				<key>fileRef</key>
@@ -46,7 +61,7 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
-			<key>D31F54C5A271FBBD54B015EB</key>
+			<key>CC7E9EFF5EDF044D0D60E84E</key>
 			<dict>
 				<key>explicitFileType</key>
 				<string>sourcecode.c.h</string>
@@ -55,267 +70,9 @@
 				<key>isa</key>
 				<string>PBXFileReference</string>
 				<key>name</key>
-				<string>pugixml.hpp</string>
+				<string>Utils.h</string>
 				<key>path</key>
-				<string>../ofxProjectGenerator/libs/pugixml/src/pugixml.hpp</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
-			</dict>
-			<key>4C06EAFF49DAB0A2342A6823</key>
-			<dict>
-				<key>fileRef</key>
-				<string>F4B09ECED1D13F0D76544CB1</string>
-				<key>isa</key>
-				<string>PBXBuildFile</string>
-			</dict>
-			<key>F4B09ECED1D13F0D76544CB1</key>
-			<dict>
-				<key>explicitFileType</key>
-				<string>sourcecode.cpp.cpp</string>
-				<key>fileEncoding</key>
-				<string>30</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>name</key>
-				<string>ofAddon.cpp</string>
-				<key>path</key>
-				<string>../ofxProjectGenerator/src/addons/ofAddon.cpp</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
-			</dict>
-			<key>6124BBF923A944AD4A3546A7</key>
-			<dict>
-				<key>children</key>
-				<array>
-					<string>F528BDA35834104A3F0862F6</string>
-					<string>F4B09ECED1D13F0D76544CB1</string>
-				</array>
-				<key>isa</key>
-				<string>PBXGroup</string>
-				<key>name</key>
-				<string>addons</string>
-				<key>sourceTree</key>
-				<string>&lt;group&gt;</string>
-			</dict>
-			<key>F528BDA35834104A3F0862F6</key>
-			<dict>
-				<key>explicitFileType</key>
-				<string>sourcecode.c.h</string>
-				<key>fileEncoding</key>
-				<string>30</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>name</key>
-				<string>ofAddon.h</string>
-				<key>path</key>
-				<string>../ofxProjectGenerator/src/addons/ofAddon.h</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
-			</dict>
-			<key>D76644EB0E1973DB9CC96EDD</key>
-			<dict>
-				<key>explicitFileType</key>
-				<string>sourcecode.c.h</string>
-				<key>fileEncoding</key>
-				<string>30</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>name</key>
-				<string>xcodeProject.h</string>
-				<key>path</key>
-				<string>../ofxProjectGenerator/src/projects/xcodeProject.h</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
-			</dict>
-			<key>B3779BEA5981FB5F1270ACAE</key>
-			<dict>
-				<key>fileRef</key>
-				<string>0B6DF1A36467F4AD999991D0</string>
-				<key>isa</key>
-				<string>PBXBuildFile</string>
-			</dict>
-			<key>0B6DF1A36467F4AD999991D0</key>
-			<dict>
-				<key>explicitFileType</key>
-				<string>sourcecode.cpp.cpp</string>
-				<key>fileEncoding</key>
-				<string>30</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>name</key>
-				<string>visualStudioProject.cpp</string>
-				<key>path</key>
-				<string>../ofxProjectGenerator/src/projects/visualStudioProject.cpp</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
-			</dict>
-			<key>DDB005FE0475131486143812</key>
-			<dict>
-				<key>fileRef</key>
-				<string>FA4F9DE03C98D1A6780A3A43</string>
-				<key>isa</key>
-				<string>PBXBuildFile</string>
-			</dict>
-			<key>FA4F9DE03C98D1A6780A3A43</key>
-			<dict>
-				<key>explicitFileType</key>
-				<string>sourcecode.cpp.cpp</string>
-				<key>fileEncoding</key>
-				<string>30</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>name</key>
-				<string>CBWinProject.cpp</string>
-				<key>path</key>
-				<string>../ofxProjectGenerator/src/projects/CBWinProject.cpp</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
-			</dict>
-			<key>E6100CF42CB89BA4B2F20024</key>
-			<dict>
-				<key>fileRef</key>
-				<string>803C4742042031C3E87B29F9</string>
-				<key>isa</key>
-				<string>PBXBuildFile</string>
-			</dict>
-			<key>803C4742042031C3E87B29F9</key>
-			<dict>
-				<key>explicitFileType</key>
-				<string>sourcecode.cpp.cpp</string>
-				<key>fileEncoding</key>
-				<string>30</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>name</key>
-				<string>CBLinuxProject.cpp</string>
-				<key>path</key>
-				<string>../ofxProjectGenerator/src/projects/CBLinuxProject.cpp</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
-			</dict>
-			<key>93C19E76048C3DC7D9B1A13F</key>
-			<dict>
-				<key>fileRef</key>
-				<string>851AF667222EF52C8558BAAE</string>
-				<key>isa</key>
-				<string>PBXBuildFile</string>
-			</dict>
-			<key>851AF667222EF52C8558BAAE</key>
-			<dict>
-				<key>explicitFileType</key>
-				<string>sourcecode.cpp.cpp</string>
-				<key>fileEncoding</key>
-				<string>30</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>name</key>
-				<string>xcodeProject.cpp</string>
-				<key>path</key>
-				<string>../ofxProjectGenerator/src/projects/xcodeProject.cpp</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
-			</dict>
-			<key>CBC114F51E6DAF8C2200203D</key>
-			<dict>
-				<key>explicitFileType</key>
-				<string>sourcecode.c.h</string>
-				<key>fileEncoding</key>
-				<string>30</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>name</key>
-				<string>CBWinProject.h</string>
-				<key>path</key>
-				<string>../ofxProjectGenerator/src/projects/CBWinProject.h</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
-			</dict>
-			<key>8F4438678C7D9198482E7C2A</key>
-			<dict>
-				<key>fileRef</key>
-				<string>B9F3E7A5103CD741ED442779</string>
-				<key>isa</key>
-				<string>PBXBuildFile</string>
-			</dict>
-			<key>B9F3E7A5103CD741ED442779</key>
-			<dict>
-				<key>explicitFileType</key>
-				<string>sourcecode.cpp.cpp</string>
-				<key>fileEncoding</key>
-				<string>30</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>name</key>
-				<string>baseProject.cpp</string>
-				<key>path</key>
-				<string>../ofxProjectGenerator/src/projects/baseProject.cpp</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
-			</dict>
-			<key>C47F6FDA9CA2AD85298B06D8</key>
-			<dict>
-				<key>explicitFileType</key>
-				<string>sourcecode.c.h</string>
-				<key>fileEncoding</key>
-				<string>30</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>name</key>
-				<string>baseProject.h</string>
-				<key>path</key>
-				<string>../ofxProjectGenerator/src/projects/baseProject.h</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
-			</dict>
-			<key>A3A1A17CA417A08C2C2CBB65</key>
-			<dict>
-				<key>explicitFileType</key>
-				<string>sourcecode.c.h</string>
-				<key>fileEncoding</key>
-				<string>30</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>name</key>
-				<string>visualStudioProject.h</string>
-				<key>path</key>
-				<string>../ofxProjectGenerator/src/projects/visualStudioProject.h</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
-			</dict>
-			<key>9697481EAA02F3E74E7AD862</key>
-			<dict>
-				<key>children</key>
-				<array>
-					<string>EE4968879E321EE44D61A69C</string>
-					<string>A3A1A17CA417A08C2C2CBB65</string>
-					<string>C47F6FDA9CA2AD85298B06D8</string>
-					<string>B9F3E7A5103CD741ED442779</string>
-					<string>CBC114F51E6DAF8C2200203D</string>
-					<string>851AF667222EF52C8558BAAE</string>
-					<string>803C4742042031C3E87B29F9</string>
-					<string>FA4F9DE03C98D1A6780A3A43</string>
-					<string>0B6DF1A36467F4AD999991D0</string>
-					<string>D76644EB0E1973DB9CC96EDD</string>
-				</array>
-				<key>isa</key>
-				<string>PBXGroup</string>
-				<key>name</key>
-				<string>projects</string>
-				<key>sourceTree</key>
-				<string>&lt;group&gt;</string>
-			</dict>
-			<key>EE4968879E321EE44D61A69C</key>
-			<dict>
-				<key>explicitFileType</key>
-				<string>sourcecode.c.h</string>
-				<key>fileEncoding</key>
-				<string>30</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>name</key>
-				<string>CBLinuxProject.h</string>
-				<key>path</key>
-				<string>../ofxProjectGenerator/src/projects/CBLinuxProject.h</string>
+				<string>../ofxProjectGenerator/src/utils/Utils.h</string>
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
@@ -341,6 +98,37 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
+			<key>456CA2B4C9B2F06809B2BFFA</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>LibraryBinary.h</string>
+				<key>path</key>
+				<string>../ofxProjectGenerator/src/utils/LibraryBinary.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>D58CADC2E0D0B22492A9A638</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>85AE4BA4B2C36DE3FDEA205B</string>
+					<string>456CA2B4C9B2F06809B2BFFA</string>
+					<string>F48CCF18A98E718E487ED699</string>
+					<string>CC7E9EFF5EDF044D0D60E84E</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>utils</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
 			<key>0B53F62F5AB3D260CD9989DC</key>
 			<dict>
 				<key>fileRef</key>
@@ -363,7 +151,7 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
-			<key>CC7E9EFF5EDF044D0D60E84E</key>
+			<key>D76644EB0E1973DB9CC96EDD</key>
 			<dict>
 				<key>explicitFileType</key>
 				<string>sourcecode.c.h</string>
@@ -372,35 +160,240 @@
 				<key>isa</key>
 				<string>PBXFileReference</string>
 				<key>name</key>
-				<string>Utils.h</string>
+				<string>xcodeProject.h</string>
 				<key>path</key>
-				<string>../ofxProjectGenerator/src/utils/Utils.h</string>
+				<string>../ofxProjectGenerator/src/projects/xcodeProject.h</string>
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
-			<key>B4751297016F5F8452E60318</key>
+			<key>93C19E76048C3DC7D9B1A13F</key>
+			<dict>
+				<key>fileRef</key>
+				<string>851AF667222EF52C8558BAAE</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>851AF667222EF52C8558BAAE</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>xcodeProject.cpp</string>
+				<key>path</key>
+				<string>../ofxProjectGenerator/src/projects/xcodeProject.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>A3A1A17CA417A08C2C2CBB65</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>visualStudioProject.h</string>
+				<key>path</key>
+				<string>../ofxProjectGenerator/src/projects/visualStudioProject.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>B3779BEA5981FB5F1270ACAE</key>
+			<dict>
+				<key>fileRef</key>
+				<string>0B6DF1A36467F4AD999991D0</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>0B6DF1A36467F4AD999991D0</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>visualStudioProject.cpp</string>
+				<key>path</key>
+				<string>../ofxProjectGenerator/src/projects/visualStudioProject.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>CBC114F51E6DAF8C2200203D</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>CBWinProject.h</string>
+				<key>path</key>
+				<string>../ofxProjectGenerator/src/projects/CBWinProject.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>DDB005FE0475131486143812</key>
+			<dict>
+				<key>fileRef</key>
+				<string>FA4F9DE03C98D1A6780A3A43</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>FA4F9DE03C98D1A6780A3A43</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>CBWinProject.cpp</string>
+				<key>path</key>
+				<string>../ofxProjectGenerator/src/projects/CBWinProject.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>EE4968879E321EE44D61A69C</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>CBLinuxProject.h</string>
+				<key>path</key>
+				<string>../ofxProjectGenerator/src/projects/CBLinuxProject.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>E6100CF42CB89BA4B2F20024</key>
+			<dict>
+				<key>fileRef</key>
+				<string>803C4742042031C3E87B29F9</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>803C4742042031C3E87B29F9</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>CBLinuxProject.cpp</string>
+				<key>path</key>
+				<string>../ofxProjectGenerator/src/projects/CBLinuxProject.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>C47F6FDA9CA2AD85298B06D8</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>baseProject.h</string>
+				<key>path</key>
+				<string>../ofxProjectGenerator/src/projects/baseProject.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>ECBF6BD750C89FA1831D523E</key>
 			<dict>
 				<key>children</key>
 				<array>
-					<string>456CA2B4C9B2F06809B2BFFA</string>
-					<string>CC7E9EFF5EDF044D0D60E84E</string>
-					<string>85AE4BA4B2C36DE3FDEA205B</string>
-					<string>F48CCF18A98E718E487ED699</string>
+					<string>B9F3E7A5103CD741ED442779</string>
+					<string>C47F6FDA9CA2AD85298B06D8</string>
+					<string>803C4742042031C3E87B29F9</string>
+					<string>EE4968879E321EE44D61A69C</string>
+					<string>FA4F9DE03C98D1A6780A3A43</string>
+					<string>CBC114F51E6DAF8C2200203D</string>
+					<string>0B6DF1A36467F4AD999991D0</string>
+					<string>A3A1A17CA417A08C2C2CBB65</string>
+					<string>851AF667222EF52C8558BAAE</string>
+					<string>D76644EB0E1973DB9CC96EDD</string>
 				</array>
 				<key>isa</key>
 				<string>PBXGroup</string>
 				<key>name</key>
-				<string>utils</string>
+				<string>projects</string>
 				<key>sourceTree</key>
 				<string>&lt;group&gt;</string>
 			</dict>
-			<key>83765DC827B9B790FCADF6F5</key>
+			<key>8F4438678C7D9198482E7C2A</key>
+			<dict>
+				<key>fileRef</key>
+				<string>B9F3E7A5103CD741ED442779</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>B9F3E7A5103CD741ED442779</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>baseProject.cpp</string>
+				<key>path</key>
+				<string>../ofxProjectGenerator/src/projects/baseProject.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>F528BDA35834104A3F0862F6</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofAddon.h</string>
+				<key>path</key>
+				<string>../ofxProjectGenerator/src/addons/ofAddon.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>1EC7C71C6A2F145CDCCA8F9A</key>
 			<dict>
 				<key>children</key>
 				<array>
-					<string>B4751297016F5F8452E60318</string>
-					<string>9697481EAA02F3E74E7AD862</string>
-					<string>6124BBF923A944AD4A3546A7</string>
+					<string>F4B09ECED1D13F0D76544CB1</string>
+					<string>F528BDA35834104A3F0862F6</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>addons</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>E903244952694ECC7C690A10</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>1EC7C71C6A2F145CDCCA8F9A</string>
+					<string>ECBF6BD750C89FA1831D523E</string>
+					<string>D58CADC2E0D0B22492A9A638</string>
 				</array>
 				<key>isa</key>
 				<string>PBXGroup</string>
@@ -409,11 +402,11 @@
 				<key>sourceTree</key>
 				<string>&lt;group&gt;</string>
 			</dict>
-			<key>C69618BC66D066BFCFC5A9BA</key>
+			<key>8D8BB035A756F20E9A485A8C</key>
 			<dict>
 				<key>children</key>
 				<array>
-					<string>83765DC827B9B790FCADF6F5</string>
+					<string>E903244952694ECC7C690A10</string>
 				</array>
 				<key>isa</key>
 				<string>PBXGroup</string>
@@ -422,18 +415,25 @@
 				<key>sourceTree</key>
 				<string>&lt;group&gt;</string>
 			</dict>
-			<key>456CA2B4C9B2F06809B2BFFA</key>
+			<key>4C06EAFF49DAB0A2342A6823</key>
+			<dict>
+				<key>fileRef</key>
+				<string>F4B09ECED1D13F0D76544CB1</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>F4B09ECED1D13F0D76544CB1</key>
 			<dict>
 				<key>explicitFileType</key>
-				<string>sourcecode.c.h</string>
+				<string>sourcecode.cpp.cpp</string>
 				<key>fileEncoding</key>
 				<string>30</string>
 				<key>isa</key>
 				<string>PBXFileReference</string>
 				<key>name</key>
-				<string>LibraryBinary.h</string>
+				<string>ofAddon.cpp</string>
 				<key>path</key>
-				<string>../ofxProjectGenerator/src/utils/LibraryBinary.h</string>
+				<string>../ofxProjectGenerator/src/addons/ofAddon.cpp</string>
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
@@ -471,7 +471,7 @@
 			<dict>
 				<key>children</key>
 				<array>
-					<string>C69618BC66D066BFCFC5A9BA</string>
+					<string>8D8BB035A756F20E9A485A8C</string>
 				</array>
 				<key>isa</key>
 				<string>PBXGroup</string>
@@ -754,14 +754,14 @@
 				<array>
 					<string>E4B69E200A3A1BDC003C02F2</string>
 					<string>E4B69E210A3A1BDC003C02F2</string>
-					<string>0B53F62F5AB3D260CD9989DC</string>
-					<string>9D8D62C244DFE08B13F67942</string>
+					<string>4C06EAFF49DAB0A2342A6823</string>
 					<string>8F4438678C7D9198482E7C2A</string>
-					<string>93C19E76048C3DC7D9B1A13F</string>
 					<string>E6100CF42CB89BA4B2F20024</string>
 					<string>DDB005FE0475131486143812</string>
 					<string>B3779BEA5981FB5F1270ACAE</string>
-					<string>4C06EAFF49DAB0A2342A6823</string>
+					<string>93C19E76048C3DC7D9B1A13F</string>
+					<string>0B53F62F5AB3D260CD9989DC</string>
+					<string>9D8D62C244DFE08B13F67942</string>
 					<string>1981524E5F6AF02B961F2A51</string>
 				</array>
 				<key>isa</key>
@@ -792,6 +792,7 @@
 					<string>E4B69B590A3A1756003C02F2</string>
 					<string>E4B6FFFD0C3F9AB9008CF71C</string>
 					<string>E4C2427710CC5ABF004149E2</string>
+					<string>928F60851B6710B200E2D791</string>
 				</array>
 				<key>buildRules</key>
 				<array />
