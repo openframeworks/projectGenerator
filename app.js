@@ -606,17 +606,19 @@ function switchGenerateMode(mode) {
     }
     // [default]: switch to createMode (generate new projects)
     else {
+        // if previously in update mode, deselect Addons
+        if( $("#updateButton").is(":visible") ){ clearAddonSelection(); }
 
         $("#generateButton").show();
         $("#updateButton").hide();
         $("#missingAddonMessage").hide();
         $("#nameRandomiser").show();
         $("#revealProjectFiles").hide();
+        $("#adons-refresh-icon").hide();
 
         console.log('Switching GenerateMode to Create...');
 
-        // if previously in update mode, deselect Addons
-        clearAddonSelection();
+        
         
     }
 }
