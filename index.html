@@ -106,7 +106,7 @@
 					</div>
 					<div class="field">
 						<label>Addons: &nbsp; 
-							<a class="ui icon tooltip" href="#rescanAddons" onclick="rescanAddons()" data-content="Click to reload addons folder" data-position="right center">
+							<a class="ui icon tooltip" href="#rescanAddons" onclick="rescanAddons()" data-content="Click to reload addons folder" data-position="right center" id="adons-refresh-icon">
 								<i class="refresh icon"></i>
 							</a> &nbsp;
 							<a class="ui icon tooltip" href="http://www.ofxaddons.com/" data-toggle="external_target" data-content="Get more addons at ofxAddons.com" data-position="right center">
@@ -128,10 +128,10 @@
 								Missing addons
 							</div>
 						</p>
-						<p>you are attempting to update a project that is missing the following addons</p>
+						<p>You are attempting to update a project that is missing the following addons:</p>
 						<p><div id="missingAddonList">...</div></p>
-						<p>please download the missing addons and put them in your addons folder, then relaunch the project generator.</p>
-						<p>if you choose to update this project without these addons, you may overwrite the settings on the project.</p>
+						<p>Please download the missing addons and put them in your addons folder, then <a href="#rescanAddons" onclick="rescanAddons()">rescan it</a>.</p>
+						<p>If you choose to update this project without these addons, you may overwrite the settings on the project.</p>
 					</div>
 					<div class="field">
 						<label>Platforms:</label>
