@@ -86,3 +86,7 @@ body.enableConsole.showConsole #consoleContainer {
 #uiModal:focus {
   outline: none;
 }
+
+#ofx-addons-link, #ofx-addons-link:hover {
+  color: inherit;
+}
