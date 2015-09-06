@@ -214,7 +214,7 @@ function getStartingProjectName(){
 	var foundOne = false;
 
 	var projectNames = new moniker.Dictionary();
-	projectNames.read( path.join( __dirname, './node_modules/moniker/dict/sketchAdjectives.txt' ) );
+	projectNames.read( path.join( __dirname, '.sketchAdjectives.txt' ) );
 	var goodName = "mySketch";
 
 	while (foundOne === false){

@@ -1,12 +1,4 @@
-# Many lines to exclude node_mudules BUT our moniker dictionary
-!node_modules
-node_modules/*
-!node_modules/moniker
-node_modules/moniker/*
-!node_modules/moniker/dict
-node_modules/moniker/dict/*
-!node_modules/moniker/dict/sketchAdjectives.txt
-
+node_modules
 
 dist/
 settings.json
