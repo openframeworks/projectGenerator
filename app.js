@@ -524,12 +524,14 @@ function onDragUpdateFile( e ){
     var files = e.originalEvent.dataTransfer.files;
     var types = e.originalEvent.dataTransfer.types;
 
+    var rejected = true;
     // this first check filters out most files
     if(files.length == 1 && files[0].type==="" && types[0]=="Files"){
 
         // this folder check is more relayable
         var file = e.originalEvent.dataTransfer.items[0].webkitGetAsEntry();
         if( file.isDirectory ){
+            rejected = false;
             $("#dropZoneUpdate").addClass("accept").removeClass("deny");
 
             // drop event ? --> import it!
@@ -539,14 +541,20 @@ function onDragUpdateFile( e ){
                 $("#projectPath").val( files[0].path.replace(regExp,"") ).trigger('change');
 
                 $("createMenuButon").trigger('click');
+                return true;
             }
         }
-        else {
-            $("#dropZoneUpdate").addClass("deny").removeClass("accept");
-        }
     }
-    else {
+
+    if(rejected) {
         $("#dropZoneUpdate").addClass("deny").removeClass("accept");
+
+        if( e.type=="drop" ){
+            displayModal(
+                "The file you dropped is not compatible for importing.<br>"+
+                "To import an OpenFrameworks project, drag & drop the whole project folder."
+            );
+        }
     }
     return false;
 }
