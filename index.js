@@ -59,6 +59,16 @@ try {
 }
 var defaultOfPath = obj["defaultOfPath"];
 var addons;
+var platforms = {
+    "osx": "OS X (Xcode)",
+    "vs": "Windows (Visual Studio 2015)",
+    "ios": "iOS (Xcode)",
+    "linux": "Linux 32-bit (Code::Blocks)",
+    "linux64": "Linux 64-bit (Code::Blocks)",
+    "linuxarmv6l": "Linux ARMv6 (Makefiles)",
+    "linuxarmv7l": "Linux ARMv7 (Makefiles)"
+};
+
 
 if (!path.isAbsolute(defaultOfPath)) {
 	// todo: this needs to be PLATFORM specific: 
@@ -233,18 +243,37 @@ function getStartingProjectName(){
 }
 	
 function parseAddonsAndUpdateSelect(arg) {
-
 	console.log("in parseAddonsAndUpdateSelect " + arg);
 	//path = require('path').resolve(__dirname, defaultOfPath + "/addons");
 	addons = getDirectories(arg + "/addons");
-
 	console.log("Reloading the addons folder, these were found:");
 	console.log(addons);
-
 	mainWindow.webContents.send('setAddons', addons);
+}
 
+function parsePlatformsAndUpdateSelect(arg) {
+	var folders = getDirectories(arg + "/scripts/templates");
+	console.log("Reloading the templates folder, these were found:");
+	console.log(folders);
+	
+	var platformsWeHave = {};
+
+	for(var key in platforms)
+	{
+		 if (folders.indexOf(key) > -1){
+ 		 	console.log("key " + key + " has value " + platforms[key]);
+ 		 	platformsWeHave[key] = platforms[key];
+		 }
+	}
+	// saninty check...
+	// for(var key in platformsWeHave){
+	// 	console.log("key " + key + " has value " + platformsWeHave[key]);
+	// }
+	mainWindow.webContents.send('setPlatforms', platformsWeHave);
+	
 
 }
+
 
 function getDirectories(srcpath) {
 
@@ -364,6 +393,12 @@ ipc.on('refreshAddonList', function (event, arg) {
 	console.log("in refresh " + arg)
 	parseAddonsAndUpdateSelect(arg);
 });
+
+ipc.on('refreshPlatformList', function (event, arg) {
+	parsePlatformsAndUpdateSelect(arg);
+});
+
+
 
 ipc.on('getRandomSketchName', function (event, arg){
 	var currentProjectPath = arg;

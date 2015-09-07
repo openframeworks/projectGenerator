@@ -5,16 +5,17 @@
 var ipc = require('ipc');
 var path = require('path');
 
+var platforms;
 
-var platforms = {
-    "osx": "OS X (Xcode)",
-    "vs": "Windows (Visual Studio 2015)",
-    "ios": "iOS (Xcode)",
-    "linux": "Linux 32-bit (Code::Blocks)",
-    "linux64": "Linux 64-bit (Code::Blocks)",
-    "linuxarmv6l": "Linux ARMv6 (Makefiles)",
-    "linuxarmv7l": "Linux ARMv7 (Makefiles)"
-};
+// var platforms = {
+//     "osx": "OS X (Xcode)",
+//     "vs": "Windows (Visual Studio 2015)",
+//     "ios": "iOS (Xcode)",
+//     "linux": "Linux 32-bit (Code::Blocks)",
+//     "linux64": "Linux 64-bit (Code::Blocks)",
+//     "linuxarmv6l": "Linux ARMv6 (Makefiles)",
+//     "linuxarmv7l": "Linux ARMv7 (Makefiles)"
+// };
 
 var defaultSettings;
 var addonsInstalled;
@@ -140,6 +141,60 @@ ipc.on('setAddons', function(arg) {
             fullTextSearch: true
         });
 });
+
+
+ipc.on('setPlatforms', function(arg) {
+
+    console.log("got set platforms");
+    console.log(arg);
+    console.log("got set platforms");
+    
+    platforms = arg;
+
+    
+    var select = document.getElementById("platformList");
+    var option, i;
+    for (var i in platforms) {
+        var myClass = 'platform';
+
+        $('<div/>', {
+            "class": 'item',
+            "data-value": i
+        }).html(platforms[i]).appendTo(select);
+    }
+
+    // start the platform drop down. 
+    $('#platformsDropdown').dropdown({
+            allowAdditions: false
+        });
+
+    // set the platform to default
+    $('#platformsDropdown').dropdown('set exactly', defaultSettings['defaultPlatform']);
+
+    var select = document.getElementById("platformListMulti");
+    var option, i;
+    for (var i in platforms) {
+        var myClass = 'platform';
+
+        $('<div/>', {
+            "class": 'item',
+            "data-value": i
+        }).html(platforms[i]).appendTo(select);        }
+
+    // start the platform drop down. 
+    $('#platformsDropdownMulti')
+        .dropdown({
+            allowAdditions: false
+        });
+
+    // // set the platform to default
+    $('#platformsDropdownMulti').dropdown('set exactly', defaultSettings['defaultPlatform']);
+});
+
+
+
+
+
 
 //-------------------------------------------
 // select the list of addons and notify if some aren't installed
@@ -338,25 +393,7 @@ function setup() {
 
 
 
-         // populate platform selection forms
-        var select = document.getElementById("platformList");
-        var option, i;
-        for (var i in platforms) {
-            var myClass = 'platform';
-
-            $('<div/>', {
-                "class": 'item',
-                "data-value": i
-            }).html(platforms[i]).appendTo(select);
-        }
-
-        // start the platform drop down. 
-        $('#platformsDropdown').dropdown({
-                allowAdditions: false
-            });
-
-        // set the platform to default
-        $('#platformsDropdown').dropdown('set exactly', defaultSettings['defaultPlatform']);
+        
 
         // bind external URLs (load it in default browser; not within Electron)
         $('*[data-toggle="external_target"]').click(function (e) {
@@ -419,6 +456,7 @@ function setup() {
             console.log("requesting addons");
             // trigger reload addons from the new OF path
             ipc.send('refreshAddonList', $("#ofPath").val());
+            ipc.send('refreshPlatformList', $("#ofPath").val());
         });
 
 
@@ -469,24 +507,7 @@ function setup() {
         
         // setup the multi update list as well. 
 
-        var select = document.getElementById("platformListMulti");
-        var option, i;
-        for (var i in platforms) {
-            var myClass = 'platform';
 
-            $('<div/>', {
-                "class": 'item',
-                "data-value": i
-            }).html(platforms[i]).appendTo(select);        }
-
-        // start the platform drop down. 
-        $('#platformsDropdownMulti')
-            .dropdown({
-                allowAdditions: false
-            });
-
-        // // set the platform to default
-        $('#platformsDropdownMulti').dropdown('set exactly', defaultSettings['defaultPlatform']);
 
         $("#ofPath").change();
 
@@ -507,12 +528,14 @@ function setup() {
             e.stopPropagation();
             return false;
         });
+
         
         // bind update thingy
         // note: dragover is needed because dragleave is called pretty randomly
         $("#dropZoneUpdate").on('dragenter dragover drop', onDragUpdateFile).on('dragleave', function(e){
             $(this).removeClass("accept deny");
         });
+
     });
 }
 
