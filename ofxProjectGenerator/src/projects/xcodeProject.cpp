@@ -356,7 +356,9 @@ bool xcodeProject::createProjectFile(){
 
     //saveWorkspaceXML();
     saveScheme();
-    saveMakefile();
+    if(target=="osx"){
+    	saveMakefile();
+    }
 
     // make everything relative the right way.
     string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
