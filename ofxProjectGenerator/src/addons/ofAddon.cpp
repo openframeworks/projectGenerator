@@ -343,11 +343,11 @@ void ofAddon::parseConfig(){
 	int lineNum = 0;
 	while(addonConfig.good()){
 		lineNum++;
-		getline(addonConfig,originalLine);
+		std::getline(addonConfig,originalLine);
 		line = originalLine;
 		ofStringReplace(line,"\r","");
 		ofStringReplace(line,"\n","");
-		Poco::trimInPlace(line);
+		line = ofTrim(line);
 
 		// discard comments
 		if(line[0]=='#' || line == ""){
@@ -417,7 +417,7 @@ void ofAddon::fromFS(string path, string platform){
         path = ofFilePath::join(pathToProject,path);
     }else{
         name = ofFilePath::getFileName(path);
-        addonPath = ofFilePath::join(getAddonsRoot(),path);
+        addonPath = path;
         containedPath = ofFilePath::addTrailingSlash(getOFRoot()); //we need to add a trailing slash for the erase to work properly
         prefixPath = pathToOF;
     }
