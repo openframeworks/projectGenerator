@@ -291,12 +291,13 @@ void baseProject::parseConfigMake(){
         if(config == "") continue;
         if(config.find("=")!=std::string::npos){
             auto varValue = ofSplitString(config,"=",true,true);
-            auto var = ofTrim(varValue[0]);
-            auto value = ofTrim(varValue[1]);
-            cout << "found variable " << var << ": " << value << " @ " << target << endl;
-            if (var=="PROJECT_AFTER_OSX" && target=="osx"){
-                cout << "found after rule " << value << endl;
-                addAfterRule(value);
+            if(varValue.size()>1){
+				auto var = ofTrim(varValue[0]);
+				auto value = ofTrim(varValue[1]);
+				if (var=="PROJECT_AFTER_OSX" && target=="osx"){
+					cout << "found after rule " << value << endl;
+					addAfterRule(value);
+				}
             }
         }
     }
