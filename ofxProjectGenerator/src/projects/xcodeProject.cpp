@@ -237,14 +237,19 @@ void xcodeProject::saveScheme(){
     }
 	ofDirectory::createDirectory(schemeFolder, false, true);
     
-	string schemeToD = projectDir  + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/" + projectName + " Debug.xcscheme";
-    ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample Debug.xcscheme"), schemeToD);
-
-	string schemeToR = projectDir  + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/" + projectName + " Release.xcscheme";
-    ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample Release.xcscheme"), schemeToR);
+	if(target=="osx"){
+		string schemeToD = projectDir  + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/" + projectName + " Debug.xcscheme";
+		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample Debug.xcscheme"), schemeToD);
 	
-    findandreplaceInTexfile(schemeToD, "emptyExample", projectName);
-    findandreplaceInTexfile(schemeToR, "emptyExample", projectName);
+		string schemeToR = projectDir  + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/" + projectName + " Release.xcscheme";
+		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample Release.xcscheme"), schemeToR);
+	    findandreplaceInTexfile(schemeToD, "emptyExample", projectName);
+	    findandreplaceInTexfile(schemeToR, "emptyExample", projectName);
+	}else{
+		string schemeTo = projectDir  + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/" + projectName + ".xcscheme";
+		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme"), schemeTo);
+	    findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
+	}
 	
 	//TODO: do we still need this?
     //string xcsettings = projectDir  + projectName + ".xcodeproj" + "/xcshareddata/WorkspaceSettings.xcsettings";
@@ -276,12 +281,12 @@ void xcodeProject::saveWorkspaceXML(){
 void xcodeProject::saveMakefile(){
     string makefile = ofFilePath::join(projectDir,"Makefile");
     if(!ofFile(makefile).exists()){
-        ofFile::copyFromTo(templatePath + "Makefile", makefile, true, true);
+        ofFile::copyFromTo(ofFilePath::join(templatePath, "Makefile"), makefile, true, true);
     }
 
     string configmake = ofFilePath::join(projectDir,"config.make");
     if(!ofFile(configmake).exists()){
-        ofFile::copyFromTo(templatePath + "config.make", configmake, true, true);
+        ofFile::copyFromTo(ofFilePath::join(templatePath, "config.make"), configmake, true, true);
     }
 }
 
