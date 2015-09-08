@@ -284,7 +284,6 @@ void baseProject::parseConfigMake(){
     ofFile configMake(ofFilePath::join(projectDir,"config.make"));
     ofBuffer configMakeMem;
     configMake >> configMakeMem;
-    cout << "parsing config.make" << endl;
     for(auto line: configMakeMem.getLines()){
         auto config = ofTrim(line);
         if(config[0] == '#') continue;
@@ -295,7 +294,6 @@ void baseProject::parseConfigMake(){
 				auto var = ofTrim(varValue[0]);
 				auto value = ofTrim(varValue[1]);
 				if (var=="PROJECT_AFTER_OSX" && target=="osx"){
-					cout << "found after rule " << value << endl;
 					addAfterRule(value);
 				}
             }
