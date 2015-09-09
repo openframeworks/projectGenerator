@@ -315,7 +315,7 @@ function getDirectories(srcpath, acceptedPrefix) {
             //console.log(file);
             try{
                 var joinedPath = pathTemp.join(srcpath, file);
-                if ((acceptedPrefix==null || file.substring(0,3)==acceptedPrefix) && joinedPath !== null) {
+                if ((acceptedPrefix==null || file.substring(0,acceptedPrefix.length)==acceptedPrefix) && joinedPath !== null) {
                     // only accept folders (potential addons)
                     return fsTemp.statSync(joinedPath).isDirectory();
                 }
