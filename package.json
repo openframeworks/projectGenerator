@@ -16,13 +16,14 @@
   },
   "scripts": {
     "start": "electron .",
-    "build": "electron-packager . $npm_package_productName --out=dist --ignore='dist' --ignore='readme.md' --prune --all --overwrite --version=0.30.0"
+    "build": "electron-packager . $npm_package_productName --icon=icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --all --overwrite --version=0.30.0"
   },
   "files": [
     "index.html",
     "js/*",
     "css/*",
-    "app/*"
+    "app/*",
+    "data/*"
   ],
   "keywords": [
     "electron-app"

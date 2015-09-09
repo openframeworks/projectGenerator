@@ -21,7 +21,7 @@ var defaultSettings;
 var addonsInstalled;
 var currentPath;
 var isOfPathGood = false;
-
+var bVerbose = false;
 //-----------------------------------------------------------------------------------
 // IPC 
 //-----------------------------------------------------------------------------------
@@ -448,6 +448,20 @@ function setup() {
             }
         });
 
+         $("#verboseOption").checkbox();
+         $("#verboseOption").on("change", function() {
+            if ($("#verboseOption").filter(":checked").length > 0) {
+                 defaultSettings['verboseOutput'] = true;
+                 bVerbose = true;
+                 saveDefaultSettings();
+            } else {
+                 defaultSettings['verboseOutput'] = false;
+                 bVerbose = false;
+                 saveDefaultSettings();
+            }
+        });
+
+
         $("#ofPath").on("change", function(){
             defaultSettings['defaultOfPath'] =  $("#ofPath").val();
             console.log("ofPath val " + $("#ofPath").val());
@@ -461,11 +475,12 @@ function setup() {
 
 
         if (defaultSettings['advancedMode'] === true){
-        	// for some reason I can only get to the check box not via ID
-        	// this may break if we have more then one checkbox...
-        	// but for now it's ok.  I think getting this more specific 
-        	// would be great: 
-        	$('.checkbox').checkbox("set checked");
+        	$("#advancedOptions").attr('Checked','Checked'); 
+        }
+
+        if (defaultSettings['verboseOutput'] === true){
+            $('#verboseOption').attr('Checked','Checked'); 
+            bVerbose = true;
         }
 
         // updates ofPath when the field is manually changed
@@ -484,9 +499,9 @@ function setup() {
 		enableConsole( $(this).is(':checked') );
 	});*/
         // enable console? (hiddens setting)
-        if(defaultSettings['showConsole']){ $("body").addClass('enableConsole'); }
-        $("#showConsole").on('click', function(){ $('body').addClass('showConsole'); });
-        $("#hideConsole").on('click', function(){ $('body').removeClass('showConsole'); });
+        // if(defaultSettings['showConsole']){ $("body").addClass('enableConsole'); }
+        // $("#showConsole").on('click', function(){ $('body').addClass('showConsole'); });
+        // $("#hideConsole").on('click', function(){ $('body').removeClass('showConsole'); });
 
         // initialise the overall-use modal
         $("#uiModal, #fileDropModal").modal({
@@ -618,6 +633,9 @@ function saveDefaultSettings() {
 //----------------------------------------
 function generate() {
 
+
+
+
     // let's get all the info:
     var platformsPicked = $("#platformsDropdown  .active");
     var addonsPicked = $("#addonsDropdown  .active");
@@ -642,6 +660,7 @@ function generate() {
     gen['platformList'] = platformValueArray;
     gen['addonList'] = addonValueArray; //$("#addonsDropdown").val();
     gen['ofPath'] = $("#ofPath").val();
+    gen['verbose'] = bVerbose;
 
     // console.log(gen);
     if (gen['projectName'] === '') {
@@ -665,7 +684,7 @@ function updateRecursive() {
     
     //platformsDropdownMulti
 
-    console.log( $("#").val() );
+    
     
     var platformsPicked = $("#platformsDropdownMulti  .active");
     var platformValueArray = [];
@@ -680,7 +699,7 @@ function updateRecursive() {
     gen['platformList'] = platformValueArray;
     gen['updateRecursive'] = true;
     gen['ofPath'] = $("#ofPath").val();
-
+    gen['verbose'] = bVerbose;
 
     if (gen['updatePath'] === '') {
         displayModal("Please set update path");
@@ -827,7 +846,7 @@ function browseImportProject() {
     if (path === ''){
         path = $("#ofPath").val();
     }
-    ipc.send('pickProjectImport', 'path');
+    ipc.send('pickProjectImport', path);
 }
 
 function getUpdatePath() {

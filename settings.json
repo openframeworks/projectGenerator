@@ -1,8 +1,8 @@
 {
-	"advancedMode": true,
-	"defaultOfPath": "/Users/zachlieberman/Documents/openframeworks/git/openFrameworks",
+	"advancedMode": false,
+	"defaultOfPath": "../",
 	"defaultPlatform": "osx",
 	"defaultRelativeProjectPath": "apps/myApps",
 	"showConsole": false,
-	"showDeveloperTools": true
+	"showDeveloperTools": false
 }

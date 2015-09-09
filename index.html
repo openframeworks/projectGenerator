@@ -14,9 +14,22 @@
 		.selectable, .selectable * {
 			-webkit-user-select: text;
 		}
-		.main.menu {
+		
+		.draggable {
 			-webkit-app-region: drag;
 		}
+
+		.undraggable {
+			-webkit-app-region: no-drag !important;
+		}
+
+		.menuItem {
+			-webkit-app-region: no-drag !important;
+			border-top-right-radius: 0.0em !important;
+			border-top-left-radius: 0.0em !important;
+		}
+
+
 
 		.ui.dimmer > .content {
 			-webkit-user-select: none !important;
@@ -28,6 +41,14 @@
 
 		.monospace{
 			word-wrap: break-word !important;
+		}
+		
+		.fixedElement {
+position: fixed;
+  z-index: 101;
+  margin: 0em;
+  width: 100%;
+
 		}
 
 		#fullConsoleOutput textarea{
@@ -47,27 +68,43 @@
 	</head>
 	<body>
 		<!-- there is a little bit of wonkiness here to make the window draggable but also make the top bar clickable.  I basically enable drag for the menu, but disable it in divs around the text.  from a UI perspective, it's kind of weird cause the highlight is happening, but you need to click closer to the text to trigger the tab change.  I'm still thinking about how to do this well -->
-		<div class="ui borderless fixed inverted main menu" >
-			<div class="ui container">
-				<a class="item">
-					<div style="-webkit-app-region: no-drag !important; padding:6px;" onclick="quit()"><i class="remove link icon" ></i>
+		<div class="fixedElement">
+		<div style="background-color: #3d3d3d">
+	
+
+		<div class="draggable" id="df" style="padding:0px; margin:0px; background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)); height:2.5em">
+		<button class="circular ui secondary mini icon button undraggable" onclick="quit()" style="margin:5px;">
+  <i class="icon remove"></i>
+</button>
+			<<!-- div class="ui container" style="padding:0px; margin:0px;">
+				<a class="item menuItem">
+					<div style="white" onclick="quit()"><i class="remove link icon white" style="color:#fff"></i>
 					</div>
 				</a>
-				<a class="item active" data-tab="create" id="createMenuButon">
-					<div style="-webkit-app-region: no-drag !important; padding:6px;">create / update</div>
+			</div> -->
+		</div>
+		<div class="ui borderless inverted main menu attached" id="mainMenu" style="padding:0px; margin:0px; background-color: rgba(0,0,0,0.85);">
+			<div class="ui container draggable">
+				
+				<div class="item" style="width:40px;">
+				</div>
+				<a class="item active menuItem" data-tab="create" id="createMenuButon">
+					<div style="padding:6px;">create / update</div>
 				</a>
-				<a class="item updateMultiMenuOption" data-tab="updateMulti" style="display: none" id="updateMenuButton">
-					<div style="-webkit-app-region: no-drag !important; padding:6px;">update multiple</div>
+				<a class="item updateMultiMenuOption menuItem" data-tab="updateMulti" style="display: none" id="updateMenuButton">
+					<div style="padding:6px;">update multiple</div>
 				</a>
-				<a class="item right floated" data-tab="settings" id="settingsMenuButton">
+				<a class="item right floated menuItem" data-tab="settings" id="settingsMenuButton">
 					<div style="-webkit-app-region: no-drag !important; padding:6px;"><i class="setting link icon"></i>
 					</div>
 				</a>
 			</div>
 		</div>
+		</div>
+		</div>
+
 		
-		
-		<div class="main ui container" style="padding: 90px 40px 50px 40px">
+		<div class="main ui container" style="padding: 130px 40px 50px 40px">
 			
 			<!------------------------------- create -------------------------------->
 			<div class="ui tab active" data-tab="create">
@@ -148,6 +185,8 @@
 					</div>
 				</div>
 			</div>
+
+			
 			<!------------------------------- advanced -------------------------------->
 			<div class="ui tab" data-tab="updateMulti">
 				<div class="ui message">
@@ -156,7 +195,7 @@
 							Warning
 						</div>
 					</p>
-					<p>This updates existing projects <em>recursively</em> in the selected directory. For example, to generate examples for a specific platform, you'd choose the examples folder as the update path. </p><p><i>To update a single project, use the import tool on the "create / update" page.</i></p>
+					<p>This updates existing projects <em>recursively</em> in the selected directory. For example, to generate examples for a specific platform, you'd choose the examples folder as the update path. </p>
 				</div>
 				<div class="ui form">
 					<div class="field">
@@ -206,10 +245,20 @@
 						<p>Please set the OF path to root of openframeworks (ie, the folder which has "addons", "libs", in it)
 						</p>
 					</div>
-					<div class="ui checkbox">
+					<div class="field">
+					<div class="ui checkbox verbose">
+						<input type="checkbox" name="Verbose" id="verboseOption">
+						<label>Verbose output</label>
+					</div>
+					</div>
+					<div class="field">
+					<div class="ui checkbox advanced">
 						<input type="checkbox" name="Advanced" id="advancedOptions">
 						<label>Advanced options</label>
 					</div>
+					</div>
+
+
 				</div>
 				
 			</div>
@@ -236,7 +285,7 @@
 		<!-- end modal -->
 
 		<!-- begin File Drop modal -->
-		<div class="ui modal" id="fileDropModal" tabindex="-1" role="dialog">
+		<!-- <div class="ui modal" id="fileDropModal" tabindex="-1" role="dialog">
 			<div class="content">
 				<p>Incomming! Please give me cookies!</p>
 				<div class="drop-zone" id="dropZoneUpdate">
@@ -246,7 +295,7 @@
 					<p>Update Multiple</p>
 				</div>
 			</div>
-		</div>
+		</div> -->
 		<!-- end modal -->
 
 		<!-- console area -->
