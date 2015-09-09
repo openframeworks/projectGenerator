@@ -28,11 +28,24 @@ here's the extended options if you want to experiment.  please take are that opt
 	-d, --dryrun                                         don't change files
 
 
-**note that on windows, command line flags are written with "/" not "-", so -r would be /r.**
+**note that on windows, command line flags are written with "/" not "-" and don't have abbreviations, so -r would be /recusive**
+
+	/recursive                    update recursively (applies only to update)
+	/help
+	/listtemplates                list templates available for the specified or
+                              	      current platform(s)
+	/platforms="platform list"    platform list
+	/addons="addons list"         addons list
+	/ofPath="OF path"             openframeworks path
+	/verbose                      run verbose
+	/template="project_template"  project template
+	/dryrun                       don't change files
+
 
 for example, to make a new project, you'd say: 
 
     ./projectGenerator -o "pathToOF" pathOfNewProject
+    (on windows: ./projectGenerator /ofPath="pathToOF" pathOfNewProject)
 
 to update an existing project: 
 
@@ -40,12 +53,14 @@ to update an existing project:
 
 to update a folder of projects
 
-
     ./projectGenerator -o "pathToOF" -r pathToFolderOfProjects
 
 you can also specify platforms (default platform is inferred) such as: 
 
     ./projectGenerator -o "pathToOF" -p"ios" pathOfNewIOSProject
+
+
+
 
 
 ## Environment variable
