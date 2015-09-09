@@ -38,7 +38,7 @@ try {
     var os = require("os");
     var myPlatform = "Unknown";
     if (/^win/.test(process.platform)) {
-        myPlatform = 'win_cb';
+        myPlatform = 'vs';
     }
     // TODO: make the difference between osx and ios
     else if (process.platform === "darwin") {
@@ -68,7 +68,17 @@ try {
     };
 }
 
-var bIsWindows = /^win/.test(process.platform); // are we windows?
+var hostplatform = "";
+if (/^win/.test(process.platform)) {
+    hostplatform = 'windows';
+} else if (process.platform === "darwin") {
+    hostplatform = 'osx';
+} else if (process.platform === "linux") {
+    hostplatform = 'linux';
+}
+
+console.log("detected platform: " + hostplatform + " in " + __dirname);
+
 var defaultOfPath = obj["defaultOfPath"];
 var addons;
 var platforms = {
@@ -89,9 +99,9 @@ if (!path.isAbsolute(defaultOfPath)) {
     // arturo, this may differ on linux, if putting ../ in settings doesn't work for the default path 
     // take a look at this...
 
-    if (bIsWindows){
+    if (hostplatform=="windows" || hostplatform=="linux"){
     	defaultOfPath = path.resolve(path.join(path.join(__dirname,"../../"), defaultOfPath));
-    } else {
+    } else if(hostplatform=="osx"){
     	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../../../"), defaultOfPath));
     }
     
@@ -463,7 +473,7 @@ ipc.on('update', function(event, arg) {
     }
 
     if (update['platformList'] !== null) {
-        if (!bIsWindows) {
+        if (hostplatform!="windows") {
             platformString = "-p\"" + update['platformList'].join(",") + "\"";
         } else {
             platformString = "/platforms=\"" + update['platformList'].join(",") + "\"";
@@ -471,7 +481,7 @@ ipc.on('update', function(event, arg) {
     }
 
     if (update['ofPath'] !== null) {
-        if (!bIsWindows) {
+        if (hostplatform!="windows") {
             pathString = "-o\"" + update['ofPath'] + "\"";
         } else {
             pathString = "/ofPath=\"" + update['ofPath'] + "\"";
@@ -479,7 +489,7 @@ ipc.on('update', function(event, arg) {
     }
 
     if (update['updateRecursive'] === true) {
-        if (!bIsWindows) {
+        if (hostplatform!="windows") {
             recursiveString = "-r";
         } else {
             recursiveString = "/recusive";
@@ -487,7 +497,7 @@ ipc.on('update', function(event, arg) {
     }
 
     if (update['verbose'] === true) {
-        if (!bIsWindows) {
+        if (hostplatform!="windows") {
             recursiveString = "-v";
         } else {
             recursiveString = "/verbose";
@@ -547,13 +557,13 @@ ipc.on('generate', function(event, arg) {
 
 
     if (generate['platformList'] !== null) {
-        if (!bIsWindows) {
+        if (hostplatform!="windows") {
             platformString = "-p\"" + generate['platformList'].join(",") + "\"";
         } else {
             platformString = "/platforms=\"" + generate['platformList'].join(",") + "\"";
         }
     } else {
-        if (!bIsWindows) {
+        if (hostplatform!="windows") {
             platformString = "-p\" \"";
         } else {
             platformString = "/platforms=\" \"";
@@ -563,13 +573,13 @@ ipc.on('generate', function(event, arg) {
     if (generate['addonList'] !== null &&
         generate['addonList'].length > 0) {
 
-        if (!bIsWindows) {
+        if (hostplatform!="windows") {
             addonString = "-a\"" + generate['addonList'].join(",") + "\"";
         } else {
             addonString = "/addons=\"" + generate['addonList'].join(",") + "\"";
         }
     } else {
-        if (!bIsWindows) {
+        if (hostplatform!="windows") {
             addonString = "-a\" \"";
         } else {
             addonString = "/addons=\" \"";
@@ -577,7 +587,7 @@ ipc.on('generate', function(event, arg) {
     }
 
     if (generate['ofPath'] !== null) {
-        if (!bIsWindows) {
+        if (hostplatform!="windows") {
             pathString = "-o\"" + generate['ofPath'] + "\"";
         } else {
             pathString = "/ofPath=\"" + generate['ofPath'] + "\"";
@@ -585,7 +595,7 @@ ipc.on('generate', function(event, arg) {
     }
 
     if (generate['verbose'] === true) {
-        if (!bIsWindows) {
+        if (hostplatform!="windows") {
             verboseString = "-v";
         } else {
             verboseString = "/verbose";
@@ -598,7 +608,12 @@ ipc.on('generate', function(event, arg) {
         projectString = pathTemp.join(generate['projectPath'], generate['projectName']);
     }
 
-    var pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
+    var pgApp="";
+    if(hostplatform == "linux"){	
+        pgApp = "projectGenerator";
+    }else{
+        pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
+    }
 
     pgApp = pgApp.replace(/ /g, '\\ ');
 
