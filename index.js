@@ -255,7 +255,7 @@ function getStartingProjectName() {
 function parseAddonsAndUpdateSelect(arg) {
     console.log("in parseAddonsAndUpdateSelect " + arg);
     //path = require('path').resolve(__dirname, defaultOfPath + "/addons");
-    addons = getDirectories(arg + "/addons");
+    addons = getDirectories(arg + "/addons","ofx");
     console.log("Reloading the addons folder, these were found:");
     console.log(addons);
     mainWindow.webContents.send('setAddons', addons);
@@ -287,7 +287,7 @@ function parsePlatformsAndUpdateSelect(arg) {
 }
 
 
-function getDirectories(srcpath) {
+function getDirectories(srcpath, acceptedPrefix) {
 
     // because this is called at a different time, fs and path
     // seemed to be "bad" for some reason...
@@ -303,14 +303,16 @@ function getDirectories(srcpath) {
 
             //console.log(srcpath);
             //console.log(file);
-
-            var joinedPath = pathTemp.join(srcpath, file);
-            if (joinedPath !== null) {
-                // only accept folders (potential addons)
-                return fsTemp.statSync(joinedPath).isDirectory();
-            }
+            try{
+                var joinedPath = pathTemp.join(srcpath, file);
+                if ((acceptedPrefix==null || file.substring(0,3)==acceptedPrefix) && joinedPath !== null) {
+                    // only accept folders (potential addons)
+                    return fsTemp.statSync(joinedPath).isDirectory();
+                }
+            }catch(e){}
         });
     } catch (e) {
+        console.log(e);
         return null;
         // if (e.code === 'ENOENT') {
         // 	console.log("This doesn't seem to be a valid addons folder:\n" + srcpath);
