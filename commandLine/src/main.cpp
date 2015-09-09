@@ -39,11 +39,11 @@ todo:
 
 
 class ofColorsLoggerChannel: public ofBaseLoggerChannel{
-    std::string CON_DEFAULT="\033[0m";
-    std::string CON_BOLD="\033[1m";
-    std::string CON_RED="\033[31m";
-    std::string CON_YELLOW="\033[33m";
-    std::string CON_GREEN="\033[32m";
+    std::string CON_DEFAULT="";//"\033[0m";
+    std::string CON_BOLD="";//"\033[1m";
+    std::string CON_RED="";//"\033[31m";
+    std::string CON_YELLOW="";//"\033[33m";
+    std::string CON_GREEN="";//"\033[32m";
     std::string getColor(ofLogLevel level) const{
         switch(level){
         case OF_LOG_FATAL_ERROR:
