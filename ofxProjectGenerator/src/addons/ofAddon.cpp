@@ -135,7 +135,7 @@ void ofAddon::addReplaceStringVector(vector<string> & variable, string value, st
 	for(int i=0;i<(int)values.size();i++){
 		if(values[i]!=""){
             Poco::RegularExpression::Match match;
-            if(int pos = regEX.match(values[i],match)){
+            if(regEX.match(values[i],match)){
                 string varName = values[i].substr(match.offset,match.length);
                 string varValue;
                 if(getenv(varName.c_str())){
@@ -165,7 +165,7 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 	for (int i = 0; i<(int)values.size(); i++) {
 		if (values[i] != "") {
 			Poco::RegularExpression::Match match;
-			if (int pos = regEX.match(values[i], match)) {
+			if (regEX.match(values[i], match)) {
 				string varName = values[i].substr(match.offset, match.length);
 				string varValue;
 				if (getenv(varName.c_str())) {
@@ -289,43 +289,33 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 	}
 }
 
-void ofAddon::exclude(vector<string> & variable, vector<string> exclusions){
-	for(int i=0;i<(int)exclusions.size();i++){
-		string exclusion = exclusions[i];
-		//ofStringReplace(exclusion,"/","\\/");
+void ofAddon::exclude(vector<string> & variables, vector<string> exclusions){
+	for(auto & exclusion: exclusions){
 		ofStringReplace(exclusion,"\\","/");
 		ofStringReplace(exclusion,".","\\.");
 		ofStringReplace(exclusion,"%",".*");
 		exclusion =".*"+ exclusion;
 		Poco::RegularExpression regExp(exclusion);
-		for(int j=0;j<(int)variable.size();j++){
-			auto forwardSlashedVariable = variable[j];
+		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const string & variable){
+			auto forwardSlashedVariable = variable;
 			ofStringReplace(forwardSlashedVariable, "\\", "/");
-			if(regExp.match(forwardSlashedVariable)){
-				variable.erase(variable.begin()+j);
-				j--;
-			}
-		}
+			return regExp.match(forwardSlashedVariable);
+		}), variables.end());
 	}
 }
 
-void ofAddon::exclude(vector<LibraryBinary> & variable, vector<string> exclusions) {
-	for (int i = 0; i<(int)exclusions.size(); i++) {
-		string exclusion = exclusions[i];
-		//ofStringReplace(exclusion,"/","\\/");
-		ofStringReplace(exclusion, "\\", "/");
-		ofStringReplace(exclusion, ".", "\\.");
-		ofStringReplace(exclusion, "%", ".*");
-		exclusion = ".*" + exclusion;
+void ofAddon::exclude(vector<LibraryBinary> & variables, vector<string> exclusions) {
+	for(auto & exclusion: exclusions){
+		ofStringReplace(exclusion,"\\","/");
+		ofStringReplace(exclusion,".","\\.");
+		ofStringReplace(exclusion,"%",".*");
+		exclusion =".*"+ exclusion;
 		Poco::RegularExpression regExp(exclusion);
-		for (int j = 0; j<(int)variable.size(); j++) {
-			auto forwardSlashedVariable = variable[j].path;
+		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const LibraryBinary & variable){
+			auto forwardSlashedVariable = variable.path;
 			ofStringReplace(forwardSlashedVariable, "\\", "/");
-			if (regExp.match(forwardSlashedVariable)) {
-				variable.erase(variable.begin() + j);
-				j--;
-			}
-		}
+			return regExp.match(forwardSlashedVariable);
+		}), variables.end());
 	}
 }
 
