@@ -72,7 +72,9 @@ string generateUUID(string input){
 
     digestString = digestString.substr(0,24);
     digestString = StringToUpper(digestString);
-    return digestString;
+
+    string returnStr = digestString; // make a copy to return, fixes some odd visual studio behavior
+    return returnStr;
 }
 
 
