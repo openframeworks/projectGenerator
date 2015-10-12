@@ -89,6 +89,9 @@ void consoleSpace() {
 
 
 bool printTemplates() {
+    
+    cout << "getOFRoot() " << getOFRoot() << endl;
+    
     if(targets.size()>1){
         vector<vector<baseProject::Template>> allPlatformsTemplates;
         for(auto & target: targets){
@@ -324,6 +327,13 @@ void printHelp(){
               );
     footer += "\n";
     footer += "(recursively update the examples folder)";
+    footer += "\nn";
+    footer +=
+    STRINGIFY(
+              projectGenerator -o"../../../../" -a"ofxXmlSettings, ofxOpenCv" ../../../../apps/myApps/newExample
+              );
+    footer += "\n";
+    footer += "(create / update an example with addons)";
     cout << footer << endl;
     
     consoleSpace();
@@ -368,8 +378,7 @@ int main(int argc, char* argv[]){
 
     // templates:
     if (options[LISTTEMPLATES].count() > 0){
-        printTemplates();
-        return EXIT_OK;
+        bListTemplates = true;
     }
     
     if (options[RECURSIVE].count() > 0){
@@ -455,8 +464,7 @@ int main(int argc, char* argv[]){
         
         //return
         return EXIT_USAGE;
-    }
-    else {
+    } else {
 
         // let's try to resolve this path vs the current path
         // so things like ../ can work
@@ -467,14 +475,14 @@ int main(int argc, char* argv[]){
         Path resolvedPath = Path(ofPath).absolute();    // make that new path absolute
         ofPath = resolvedPath.toString();
         
-        cout << "ofPath " << ofPath << endl;
         
         if (!isGoodOFPath(ofPath)) {
             return EXIT_USAGE;
         }
         
-        
         setOFRoot(ofPath);
+        
+        
     }
 
     
