@@ -28,6 +28,7 @@
 
 using Poco::Path;
 
+#define STRINGIFY(A)  #A
 
 //-----------------------------------------------------
 enum pgMode {
@@ -65,14 +66,14 @@ bool bDryRun;                           // do dry run (useful for debugging recu
 enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN };
 const option::Descriptor usage[] =
 {
-    {UNKNOWN, 0, "", "",option::Arg::None, "USAGE: projectGenerator [options]\n\n"
-        "Options:" },
+    {UNKNOWN, 0, "", "",option::Arg::None, ""
+        "Options:\n" },
     {HELP, 0,"h", "help",option::Arg::None, "  --help  \tPrint usage and exit." },
     {RECURSIVE, 0,"r","recursive",option::Arg::None, "  --recursive, -r  \tupdate recursively (applies only to update)" },
     {LISTTEMPLATES, 0,"l","listtemplates",option::Arg::None, "  --listtemplates, -l  \tlist templates available for the specified or current platform(s)" },
     {PLATFORMS, 0,"p","platforms",option::Arg::Optional, "  --platforms, -p  \tplatform list (such as osx, ios, winvs)" },
     {ADDONS, 0,"a","addons",option::Arg::Optional, "  --addons, -a  \taddon list (such as ofxOpenCv, ofxGui, ofxXmlSettings)" },
-    {OFPATH, 0,"o","ofPath",option::Arg::Optional, "  --ofPath, -o  \tpath to openframeworks (relative or absolute). This must be set, or you can also alternatively use an enviornment variable PG_OF_PATH" },
+    {OFPATH, 0,"o","ofPath",option::Arg::Optional, "  --ofPath, -o  \tpath to openframeworks (relative or absolute). This must be set, or you can also alternatively use an environment variable PG_OF_PATH" },
     {VERBOSE, 0,"v","verbose",option::Arg::None, "  --verbose, -v  \trun verbose" },
     {TEMPLATE, 0,"t","template",option::Arg::None, "  --template, -t  \tproject template" },
     {DRYRUN, 0,"d","dryrun",option::Arg::None, "  --dryrun, -d  \tdry run, don't change files" },
@@ -297,12 +298,9 @@ void printHelp(){
     consoleSpace();
     
     string header = "";
-    header += "\n\n\t\tprojectGenerator [options] pathName\n\n";
+    header += "\tprojectGenerator [options] pathName\n\n";
     header += "if pathName exists, project is updated\n";
-    header += "if pathName doesn't exist, project is created\n\n";
-    header += "OPTIONS:\n\n";
-    header += "lists should be comma seperated and in quotes if there are spaces\n";
-    header += "you can use : or = for parameter based options, such as -o=/usr/...";
+    header += "if pathName doesn't exist, project is created";
     cout << header << endl;
     
     consoleSpace();
@@ -311,6 +309,24 @@ void printHelp(){
     
     consoleSpace();
     
+    string footer = "";
+    footer += "examples:\n\n";
+    footer +=
+    STRINGIFY(
+        projectGenerator -o"../../../../" ../../../../apps/myApps/newExample
+    );
+    footer += "\n";
+    footer += "(create a project called newExample using a\nrelative path for the OF root and the project. note the relative path may be different depending on where this app is located)";
+    footer += "\n\n";
+    footer +=
+    STRINGIFY(
+              projectGenerator -r -o"../../../../" ../../../../examples
+              );
+    footer += "\n";
+    footer += "(recursively update the examples folder)";
+    cout << footer << endl;
+    
+    consoleSpace();
 }
 
 
@@ -376,11 +392,8 @@ int main(int argc, char* argv[]){
     }
     
     if (options[ADDONS].count() > 0){
-        
         bAddonsPassedIn = true; // could be empty
-        
         if (options[ADDONS].arg != NULL){
-            
             string addonsString(options[ADDONS].arg);
             addons = ofSplitString(addonsString, ",", true, true);
         }
