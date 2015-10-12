@@ -332,7 +332,10 @@ int main(int argc, char* argv[]){
     startTime = 0;
     nProjectsUpdated = 0;
     nProjectsCreated = 0;
+    string projectName = "";
     projectPath = "";
+    templateName = "standard";
+    
     
     // ------------------------------------------------------ parse args
     argc-=(argc>0); argv+=(argc>0); // skip program name argv[0] if present
@@ -373,11 +376,17 @@ int main(int argc, char* argv[]){
     }
     
     if (options[ADDONS].count() > 0){
+        
+        bAddonsPassedIn = true; // could be empty
+        
         if (options[ADDONS].arg != NULL){
+            
             string addonsString(options[ADDONS].arg);
             addons = ofSplitString(addonsString, ",", true, true);
         }
     }
+    
+    
     
     if (options[OFPATH].count() > 0){
         if (options[OFPATH].arg != NULL){
@@ -395,7 +404,7 @@ int main(int argc, char* argv[]){
 
 
     if (parse.nonOptionsCount() > 0){
-        projectPath = parse.nonOption(0);
+        projectName = parse.nonOption(0);
     }
     
     
@@ -444,14 +453,18 @@ int main(int argc, char* argv[]){
         ofPath = cwd.resolve(ofPath).toString();   // resolve ofPath vs that.
         Path resolvedPath = Path(ofPath).absolute();    // make that new path absolute
         ofPath = resolvedPath.toString();
-
+        
+        cout << "ofPath " << ofPath << endl;
+        
         if (!isGoodOFPath(ofPath)) {
             return EXIT_USAGE;
         }
+        
+        
         setOFRoot(ofPath);
     }
 
-
+    
     if(bListTemplates){
         auto ret = printTemplates();
         consoleSpace();
@@ -461,39 +474,26 @@ int main(int argc, char* argv[]){
             return EXIT_DATAERR;
         }
     }
+    
+    if (projectName != ""){
+        if (ofFilePath::isAbsolute(projectName)) {
+            projectPath = projectName;
+        } else {
+            projectPath = ofFilePath::join(projectPath, projectName);
+            // this line is arturo's ninja magic to make paths with dots make sense:
+            projectPath = ofFilePath::removeTrailingSlash(ofFilePath::getPathForDirectory(ofFilePath::getAbsolutePath(projectPath, false)));
+        }
+    } else {
+        ofLogError() << "Missing project path";
+        printHelp();
+        consoleSpace();
+        return EXIT_USAGE;
+    }
 
-    //-------------------------- get the path to the current working folder
-    Path cwd = Path::current();                      // get the current path
-    projectPath = cwd.resolve(projectPath).toString();  // resolve projectPath vs that.
-    Path resolvedPath = Path(projectPath).absolute();         // use absolute version of this path
-    projectPath = resolvedPath.toString();
 
-    // check things
     
     
-//    if (args.size() > 0) {
-//        projectName = args[0];
-//
-//        // check if it's an absolute path?
-//        if (ofFilePath::isAbsolute(projectName)) {
-//            projectPath = projectName;
-//        } else {
-//            projectPath = ofFilePath::join(projectPath, projectName);
-//
-//            // this line is arturo's ninja magic to make paths with dots make sense:
-//            projectPath = ofFilePath::removeTrailingSlash(ofFilePath::getPathForDirectory(ofFilePath::getAbsolutePath(projectPath, false)));
-//        }
-//
-//    } else {
-//        ofLogError() << "Missing project path";
-//        printHelp();
-//
-//        consoleSpace();
-//
-//        return EXIT_USAGE;
-//    }
-
-
+    cout << "projectPath " << " " << projectPath << endl;
 
     if (!isGoodOFPath(ofPath)) {
         consoleSpace();
@@ -501,13 +501,6 @@ int main(int argc, char* argv[]){
         consoleSpace();
         return EXIT_USAGE;
     }
-
-
-
-
-
-
-
 
 
     if (ofDirectory(projectPath).exists()) {
