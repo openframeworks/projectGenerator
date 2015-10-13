@@ -501,9 +501,13 @@ int main(int argc, char* argv[]){
             projectPath = projectName;
         } else {
             projectPath = ofFilePath::join(projectPath, projectName);
+			
             // this line is arturo's ninja magic to make paths with dots make sense:
             projectPath = ofFilePath::removeTrailingSlash(ofFilePath::getPathForDirectory(ofFilePath::getAbsolutePath(projectPath, false)));
-        }
+			projectPath = Path(projectPath).absolute().toString();		// make absolute...
+
+			
+		}
     } else {
         ofLogError() << "Missing project path";
         printHelp();
@@ -511,8 +515,6 @@ int main(int argc, char* argv[]){
         return EXIT_USAGE;
     }
 
-
-    
     
     cout << "projectPath " << " " << projectPath << endl;
 
