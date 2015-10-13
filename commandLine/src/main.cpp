@@ -516,8 +516,7 @@ int main(int argc, char* argv[]){
     }
 
     
-    cout << "projectPath " << " " << projectPath << endl;
-
+   
     if (!isGoodOFPath(ofPath)) {
         consoleSpace();
         ofLogError() << "path to openframeworks (" << ofPath << ") seems wrong, please check";
@@ -554,19 +553,15 @@ int main(int argc, char* argv[]){
             }else{
                 ofLogNotice() << "from -o option";
             }
-            consoleSpace();
             ofLogNotice() << "target platform is: " << target;
             ofLogNotice() << "project path is: " << projectPath;
-
+            
             if(templateName!="standard"){
-                consoleSpace();
                 ofLogNotice() << "using additional template " << templateName;
             }
-            consoleSpace();
-
+            
 
             ofLogNotice() << "setting up new project " << projectPath;
-            consoleSpace();
             if (!bDryRun) project->create(projectPath, templateName);
 
             if (!bDryRun){
@@ -600,15 +595,11 @@ int main(int argc, char* argv[]){
                     }else{
                         ofLogNotice() << "from -o option";
                     }
-                    consoleSpace();
                     ofLogNotice() << "target platform is: " << getTargetString(targets[i]);
 
                     if(templateName!="standard"){
-                        consoleSpace();
                         ofLogNotice() << "using additional template " << templateName;
                     }
-                    consoleSpace();
-
                     updateProject(projectPath,targets[i]);
 
                     ofLogNotice() << "project updated! ";
