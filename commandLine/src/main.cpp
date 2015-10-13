@@ -73,7 +73,7 @@ const option::Descriptor usage[] =
     {LISTTEMPLATES, 0,"l","listtemplates",option::Arg::None, "  --listtemplates, -l  \tlist templates available for the specified or current platform(s)" },
     {PLATFORMS, 0,"p","platforms",option::Arg::Optional, "  --platforms, -p  \tplatform list (such as osx, ios, winvs)" },
     {ADDONS, 0,"a","addons",option::Arg::Optional, "  --addons, -a  \taddon list (such as ofxOpenCv, ofxGui, ofxXmlSettings)" },
-    {OFPATH, 0,"o","ofPath",option::Arg::Optional, "  --ofPath, -o  \tpath to openframeworks (relative or absolute). This must be set, or you can also alternatively use an environment variable PG_OF_PATH" },
+    {OFPATH, 0,"o","ofPath",option::Arg::Optional, "  --ofPath, -o  \tpath to openframeworks (relative or absolute). This *must* be set, or you can also alternatively use an environment variable PG_OF_PATH and if this isn't set, it will use that value instead" },
     {VERBOSE, 0,"v","verbose",option::Arg::None, "  --verbose, -v  \trun verbose" },
     {TEMPLATE, 0,"t","template",option::Arg::None, "  --template, -t  \tproject template" },
     {DRYRUN, 0,"d","dryrun",option::Arg::None, "  --dryrun, -d  \tdry run, don't change files" },
@@ -319,7 +319,7 @@ void printHelp(){
         projectGenerator -o"../../../../" ../../../../apps/myApps/newExample
     );
     footer += "\n";
-    footer += "(create a project called newExample using a\nrelative path for the OF root and the project. note the relative path may be different depending on where this app is located)";
+    footer += "(create a project called newExample using a relative path for the OF root and the project. note the relative path may be different depending on where this app is located)";
     footer += "\n\n";
     footer +=
     STRINGIFY(
@@ -327,7 +327,7 @@ void printHelp(){
               );
     footer += "\n";
     footer += "(recursively update the examples folder)";
-    footer += "\nn";
+    footer += "\n\n";
     footer +=
     STRINGIFY(
               projectGenerator -o"../../../../" -a"ofxXmlSettings, ofxOpenCv" ../../../../apps/myApps/newExample
@@ -360,7 +360,7 @@ int main(int argc, char* argv[]){
     nProjectsCreated = 0;
     string projectName = "";
     projectPath = "";
-    templateName = "standard";
+    templateName = "";
     
     
     // ------------------------------------------------------ parse args
