@@ -83,7 +83,7 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
-			<key>6124BBF923A944AD4A3546A7</key>
+			<key>1EC7C71C6A2F145CDCCA8F9A</key>
 			<dict>
 				<key>children</key>
 				<array>
@@ -109,6 +109,28 @@
 				<string>ofAddon.h</string>
 				<key>path</key>
 				<string>../ofxProjectGenerator/src/addons/ofAddon.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>F748F59011CFED6B10193AF4</key>
+			<dict>
+				<key>fileRef</key>
+				<string>4E53FCB5E7AA562E02ABC033</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>4E53FCB5E7AA562E02ABC033</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>qtcreatorproject.cpp</string>
+				<key>path</key>
+				<string>../ofxProjectGenerator/src/projects/qtcreatorproject.cpp</string>
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
@@ -267,6 +289,21 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
+			<key>4593D109B0918A50B53C389D</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>qtcreatorproject.h</string>
+				<key>path</key>
+				<string>../ofxProjectGenerator/src/projects/qtcreatorproject.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
 			<key>A3A1A17CA417A08C2C2CBB65</key>
 			<dict>
 				<key>explicitFileType</key>
@@ -282,12 +319,13 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
-			<key>9697481EAA02F3E74E7AD862</key>
+			<key>ECBF6BD750C89FA1831D523E</key>
 			<dict>
 				<key>children</key>
 				<array>
 					<string>EE4968879E321EE44D61A69C</string>
 					<string>A3A1A17CA417A08C2C2CBB65</string>
+					<string>4593D109B0918A50B53C389D</string>
 					<string>C47F6FDA9CA2AD85298B06D8</string>
 					<string>B9F3E7A5103CD741ED442779</string>
 					<string>CBC114F51E6DAF8C2200203D</string>
@@ -296,6 +334,7 @@
 					<string>FA4F9DE03C98D1A6780A3A43</string>
 					<string>0B6DF1A36467F4AD999991D0</string>
 					<string>D76644EB0E1973DB9CC96EDD</string>
+					<string>4E53FCB5E7AA562E02ABC033</string>
 				</array>
 				<key>isa</key>
 				<string>PBXGroup</string>
@@ -341,6 +380,28 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
+			<key>3866B7C8C7DE4AD99541F65C</key>
+			<dict>
+				<key>fileRef</key>
+				<string>E9FC21C0CD8184B841FD849E</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>E9FC21C0CD8184B841FD849E</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>file</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>Utils.cpp.orig</string>
+				<key>path</key>
+				<string>../ofxProjectGenerator/src/utils/Utils.cpp.orig</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
 			<key>0B53F62F5AB3D260CD9989DC</key>
 			<dict>
 				<key>fileRef</key>
@@ -378,13 +439,14 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
-			<key>B4751297016F5F8452E60318</key>
+			<key>D58CADC2E0D0B22492A9A638</key>
 			<dict>
 				<key>children</key>
 				<array>
 					<string>456CA2B4C9B2F06809B2BFFA</string>
 					<string>CC7E9EFF5EDF044D0D60E84E</string>
 					<string>85AE4BA4B2C36DE3FDEA205B</string>
+					<string>E9FC21C0CD8184B841FD849E</string>
 					<string>F48CCF18A98E718E487ED699</string>
 				</array>
 				<key>isa</key>
@@ -394,13 +456,13 @@
 				<key>sourceTree</key>
 				<string>&lt;group&gt;</string>
 			</dict>
-			<key>83765DC827B9B790FCADF6F5</key>
+			<key>E903244952694ECC7C690A10</key>
 			<dict>
 				<key>children</key>
 				<array>
-					<string>B4751297016F5F8452E60318</string>
-					<string>9697481EAA02F3E74E7AD862</string>
-					<string>6124BBF923A944AD4A3546A7</string>
+					<string>D58CADC2E0D0B22492A9A638</string>
+					<string>ECBF6BD750C89FA1831D523E</string>
+					<string>1EC7C71C6A2F145CDCCA8F9A</string>
 				</array>
 				<key>isa</key>
 				<string>PBXGroup</string>
@@ -409,11 +471,11 @@
 				<key>sourceTree</key>
 				<string>&lt;group&gt;</string>
 			</dict>
-			<key>C69618BC66D066BFCFC5A9BA</key>
+			<key>8D8BB035A756F20E9A485A8C</key>
 			<dict>
 				<key>children</key>
 				<array>
-					<string>83765DC827B9B790FCADF6F5</string>
+					<string>E903244952694ECC7C690A10</string>
 				</array>
 				<key>isa</key>
 				<string>PBXGroup</string>
@@ -970,7 +1032,7 @@
 			<dict>
 				<key>children</key>
 				<array>
-					<string>C69618BC66D066BFCFC5A9BA</string>
+					<string>8D8BB035A756F20E9A485A8C</string>
 				</array>
 				<key>isa</key>
 				<string>PBXGroup</string>
@@ -1272,12 +1334,14 @@
 					<string>F285EB3169F1566CA3D93C20</string>
 					<string>5CBB2AB3A60F65431D7B555D</string>
 					<string>0B53F62F5AB3D260CD9989DC</string>
+					<string>3866B7C8C7DE4AD99541F65C</string>
 					<string>9D8D62C244DFE08B13F67942</string>
 					<string>8F4438678C7D9198482E7C2A</string>
 					<string>93C19E76048C3DC7D9B1A13F</string>
 					<string>E6100CF42CB89BA4B2F20024</string>
 					<string>DDB005FE0475131486143812</string>
 					<string>B3779BEA5981FB5F1270ACAE</string>
+					<string>F748F59011CFED6B10193AF4</string>
 					<string>4C06EAFF49DAB0A2342A6823</string>
 					<string>1981524E5F6AF02B961F2A51</string>
 				</array>

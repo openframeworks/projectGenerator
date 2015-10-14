@@ -186,12 +186,14 @@
 		<ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxmlparser.cpp" />
 		<ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxmlerror.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\utils\LibraryBinary.cpp" />
+		<ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp.orig" />
 		<ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\baseProject.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\xcodeProject.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBWinProject.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\visualStudioProject.cpp" />
+		<ClCompile Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\addons\ofAddon.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\libs\pugixml\src\pugixml.cpp" />
 	</ItemGroup>
@@ -213,6 +215,7 @@
 		<ClInclude Include="..\ofxProjectGenerator\src\utils\Utils.h" />
 		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.h" />
 		<ClInclude Include="..\ofxProjectGenerator\src\projects\visualStudioProject.h" />
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.h" />
 		<ClInclude Include="..\ofxProjectGenerator\src\projects\baseProject.h" />
 		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBWinProject.h" />
 		<ClInclude Include="..\ofxProjectGenerator\src\projects\xcodeProject.h" />
