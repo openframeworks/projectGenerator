@@ -12,7 +12,7 @@ constexpr option::Descriptor usage[] =
     {ADDONS, 0,"a","addons",option::Arg::Optional, "  --addons, -a  \taddon list (such as ofxOpenCv, ofxGui, ofxXmlSettings)" },
     {OFPATH, 0,"o","ofPath",option::Arg::Optional, "  --ofPath, -o  \tpath to openframeworks (relative or absolute). This *must* be set, or you can also alternatively use an environment variable PG_OF_PATH and if this isn't set, it will use that value instead" },
     {VERBOSE, 0,"v","verbose",option::Arg::None, "  --verbose, -v  \trun verbose" },
-    {TEMPLATE, 0,"t","template",option::Arg::None, "  --template, -t  \tproject template" },
+    {TEMPLATE, 0,"t","template",option::Arg::Optional, "  --template, -t  \tproject template" },
     {DRYRUN, 0,"d","dryrun",option::Arg::None, "  --dryrun, -d  \tdry run, don't change files" },
     {0,0,0,0,0,0}
 };
@@ -419,7 +419,12 @@ int main(int argc, char* argv[]){
         if (options[TEMPLATE].arg != NULL){
             string templateString(options[TEMPLATE].arg);
             templateName = templateString;
+            cout << "template: " << templateName << endl;
+        }else{
+        	cout << "has template but null" << endl;
         }
+    }else{
+    	cout << "no extra template" << endl;
     }
 
 
