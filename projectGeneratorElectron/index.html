@@ -3,8 +3,8 @@
 	<head>
 		<meta charset="utf-8">
 		<title>openFrameworks Project Generator</title>
-		<link rel="stylesheet" href="css/semantic.css">
-		<link rel="stylesheet" href="css/index.css">
+		<link rel="stylesheet" href="static/css/semantic.css">
+		<link rel="stylesheet" href="static/css/index.css">
 		<style>
 		body {
 			background-color: #ddd;
@@ -42,6 +42,10 @@
 		.monospace{
 			word-wrap: break-word !important;
 		}
+
+		.topBar{
+			background-image: url("static/img/topbar.png");
+		}
 		
 		.fixedElement {
 position: fixed;
@@ -69,7 +73,7 @@ position: fixed;
 	<body>
 		<!-- there is a little bit of wonkiness here to make the window draggable but also make the top bar clickable.  I basically enable drag for the menu, but disable it in divs around the text.  from a UI perspective, it's kind of weird cause the highlight is happening, but you need to click closer to the text to trigger the tab change.  I'm still thinking about how to do this well -->
 		<div class="fixedElement">
-		<div style="background-color: #3d3d3d">
+		<div style="background-color: #3d3d3d" class="topBar">
 	
 
 		<div class="draggable" id="df" style="padding:0px; margin:0px; background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)); height:2.5em">
@@ -306,8 +310,8 @@ position: fixed;
 				<p>Welcome to the console :)</p>
 			</div>
 		</section>
-		<script type="text/javascript" src="js/jquery.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
-		<script type="text/javascript" src="js/semantic.min.js"></script>
+		<script type="text/javascript" src="static/js/jquery.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
+		<script type="text/javascript" src="static/js/semantic.min.js"></script>
 		<script src="app.js"></script>
 	</body>
 </html>

@@ -1,0 +1,119 @@
+
+/* - - - - - - - - - -  CONSOLE STYLING - - - - - - - - - - - - - - - - - - - */
+#consoleContainer {
+  display: none;
+  width: 100%;
+  background-color: #333;
+  color: #FFF;
+  height: 100px;
+  position: fixed;
+  bottom: 0;
+  box-shadow: inset 0px 0px 9px 0px rgba(0,0,0,0.75);
+  overflow-y: scroll;
+  padding: 0 40px;
+  margin-bottom: -80px;
+  transition: margin-bottom .2s ease-in-out;
+}
+
+#consoleContainer::-webkit-scrollbar, #fullConsoleOutput textarea::-webkit-scrollbar {
+  width: 9px;
+}
+#consoleContainer::-webkit-scrollbar-track::, #fullConsoleOutput textarea::-webkit-scrollbar-track {
+  background-color: transparent;
+  margin: 4px 0;
+}
+#consoleContainer::-webkit-scrollbar-thumb, #fullConsoleOutput textarea::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.6);
+  border: 2px solid rgba(0, 0, 0, 0);
+  border-right-width: 4px;
+  background-clip: padding-box;
+}
+
+#fullConsoleOutput textarea::-webkit-scrollbar-corner {
+  background-color: transparent;
+  display: none;
+}
+
+#fullConsoleOutput textarea::-webkit-resizer {
+  border-color: transparent;
+}
+
+body.enableConsole
+ {
+  padding-bottom: 20px;
+}
+
+body.enableConsole #consoleContainer {
+  display: block;
+}
+
+#console {
+  width: 100%;
+  font-family: monospace;
+  padding: 20px 1em;
+  font-size: 8pt;
+  word-wrap: break-word;
+}
+
+#showConsole, #hideConsole {
+  float: right;
+  font-size: 7pt;
+  color: #999;
+  text-transform: uppercase;
+  position: fixed;
+  right: 0;
+  padding-right: 50px;
+}
+#showConsole:hover, #hideConsole:hover {
+  color: #FFF;
+  cursor: pointer;
+}
+
+#hideConsole, body.showConsole #showConsole {
+  display: none;
+}
+body.showConsole #hideConsole {
+  display: inline;
+}
+
+body.enableConsole.showConsole {
+  padding-bottom: 100px; /* same height as console */
+}
+body.enableConsole.showConsole #consoleContainer {
+  margin-bottom: 0;
+}
+
+#uiModal:focus, #fileDropModal:focus {
+  outline: none;
+}
+
+#ofx-addons-link, #ofx-addons-link:hover {
+  color: inherit;
+}
+
+.drop-zone {
+  height: 100px;
+  width: 100%;
+  border: 1px dashed black;
+  margin: 10px 0;
+  padding: 20px;
+}
+
+.drop-zone.accept {
+  background-color: #e5f9e7;
+  border-color: #b5cc18;
+  border-width: 2px;
+}
+
+.drop-zone.deny {
+  background-color: #ffe8e6;
+  border-color: #db2828;
+}
+
+#dropZoneBatchUpdate {
+  display: none;
+}
+
+.advanced #dropZoneBatchUpdate {
+  display: block;
+}
