@@ -72,7 +72,10 @@ string generateUUID(string input){
 
     digestString = digestString.substr(0,24);
     digestString = StringToUpper(digestString);
-    return digestString;
+    
+    string tempString = digestString;
+    return tempString;
+    
 }
 
 
