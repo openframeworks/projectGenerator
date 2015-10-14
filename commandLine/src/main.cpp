@@ -303,7 +303,8 @@ void printHelp(){
     string header = "";
     header += "\tprojectGenerator [options] pathName\n\n";
     header += "if pathName exists, project is updated\n";
-    header += "if pathName doesn't exist, project is created";
+    header += "if pathName doesn't exist, project is created\n";
+    header += "(pathName must follow options, which can come in any order)";
     cout << header << endl;
     
     consoleSpace();
