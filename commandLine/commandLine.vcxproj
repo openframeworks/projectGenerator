@@ -174,7 +174,6 @@
 		<ClCompile Include="src\main.cpp" />
 		<ClCompile Include="src\ofApp.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\utils\LibraryBinary.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp.orig" />
 		<ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\baseProject.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\xcodeProject.cpp" />

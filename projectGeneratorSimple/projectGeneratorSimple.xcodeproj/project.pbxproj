@@ -380,28 +380,6 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
-			<key>3866B7C8C7DE4AD99541F65C</key>
-			<dict>
-				<key>fileRef</key>
-				<string>E9FC21C0CD8184B841FD849E</string>
-				<key>isa</key>
-				<string>PBXBuildFile</string>
-			</dict>
-			<key>E9FC21C0CD8184B841FD849E</key>
-			<dict>
-				<key>explicitFileType</key>
-				<string>file</string>
-				<key>fileEncoding</key>
-				<string>30</string>
-				<key>isa</key>
-				<string>PBXFileReference</string>
-				<key>name</key>
-				<string>Utils.cpp.orig</string>
-				<key>path</key>
-				<string>../ofxProjectGenerator/src/utils/Utils.cpp.orig</string>
-				<key>sourceTree</key>
-				<string>SOURCE_ROOT</string>
-			</dict>
 			<key>0B53F62F5AB3D260CD9989DC</key>
 			<dict>
 				<key>fileRef</key>
@@ -446,7 +424,6 @@
 					<string>456CA2B4C9B2F06809B2BFFA</string>
 					<string>CC7E9EFF5EDF044D0D60E84E</string>
 					<string>85AE4BA4B2C36DE3FDEA205B</string>
-					<string>E9FC21C0CD8184B841FD849E</string>
 					<string>F48CCF18A98E718E487ED699</string>
 				</array>
 				<key>isa</key>
@@ -1349,7 +1326,6 @@
 					<string>5A4349E9754D6FA14C0F2A3A</string>
 					<string>9D44DC88EF9E7991B4A09951</string>
 					<string>0B53F62F5AB3D260CD9989DC</string>
-					<string>3866B7C8C7DE4AD99541F65C</string>
 					<string>9D8D62C244DFE08B13F67942</string>
 					<string>8F4438678C7D9198482E7C2A</string>
 					<string>93C19E76048C3DC7D9B1A13F</string>

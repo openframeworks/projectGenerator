@@ -10,9 +10,6 @@
 		<ClCompile Include="..\ofxProjectGenerator\src\utils\LibraryBinary.cpp">
 			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
 		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp.orig">
-			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
-		</ClCompile>
 		<ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp">
 			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
 		</ClCompile>

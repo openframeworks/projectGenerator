@@ -186,7 +186,6 @@
 		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxPanel.cpp" />
 		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxButton.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\utils\LibraryBinary.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp.orig" />
 		<ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\baseProject.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\xcodeProject.cpp" />
