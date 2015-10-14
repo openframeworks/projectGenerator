@@ -1,9 +1,25 @@
 
 
+#include "optionparser.h"
+enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN };
+constexpr option::Descriptor usage[] =
+{
+    {UNKNOWN, 0, "", "",option::Arg::None, "Options:\n" },
+    {HELP, 0,"h", "help",option::Arg::None, "  --help  \tPrint usage and exit." },
+    {RECURSIVE, 0,"r","recursive",option::Arg::None, "  --recursive, -r  \tupdate recursively (applies only to update)" },
+    {LISTTEMPLATES, 0,"l","listtemplates",option::Arg::None, "  --listtemplates, -l  \tlist templates available for the specified or current platform(s)" },
+    {PLATFORMS, 0,"p","platforms",option::Arg::Optional, "  --platforms, -p  \tplatform list (such as osx, ios, winvs)" },
+    {ADDONS, 0,"a","addons",option::Arg::Optional, "  --addons, -a  \taddon list (such as ofxOpenCv, ofxGui, ofxXmlSettings)" },
+    {OFPATH, 0,"o","ofPath",option::Arg::Optional, "  --ofPath, -o  \tpath to openframeworks (relative or absolute). This *must* be set, or you can also alternatively use an environment variable PG_OF_PATH and if this isn't set, it will use that value instead" },
+    {VERBOSE, 0,"v","verbose",option::Arg::None, "  --verbose, -v  \trun verbose" },
+    {TEMPLATE, 0,"t","template",option::Arg::None, "  --template, -t  \tproject template" },
+    {DRYRUN, 0,"d","dryrun",option::Arg::None, "  --dryrun, -d  \tdry run, don't change files" },
+    {0,0,0,0,0,0}
+};
+
 #include <iostream>
 #include <string>
 #include <vector>
-#include "optionparser.h"
 #include "ofMain.h"
 
 #include "Poco/Util/Application.h"
@@ -15,8 +31,7 @@
 #include <Poco/Path.h>
 #include <iostream>
 
-#include "CBLinuxProject.h"
-#include "CBWinProject.h"
+#include "qtcreatorproject.h"
 #include "visualStudioProject.h"
 #include "xcodeProject.h"
 #include "Utils.h"
@@ -61,24 +76,6 @@ bool bHelpRequested;                    // did we request help?
 bool bListTemplates;                    // did we request help?
 bool bDryRun;                           // do dry run (useful for debugging recursive update)
 
-
-
-enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN };
-const option::Descriptor usage[] =
-{
-    {UNKNOWN, 0, "", "",option::Arg::None, ""
-        "Options:\n" },
-    {HELP, 0,"h", "help",option::Arg::None, "  --help  \tPrint usage and exit." },
-    {RECURSIVE, 0,"r","recursive",option::Arg::None, "  --recursive, -r  \tupdate recursively (applies only to update)" },
-    {LISTTEMPLATES, 0,"l","listtemplates",option::Arg::None, "  --listtemplates, -l  \tlist templates available for the specified or current platform(s)" },
-    {PLATFORMS, 0,"p","platforms",option::Arg::Optional, "  --platforms, -p  \tplatform list (such as osx, ios, winvs)" },
-    {ADDONS, 0,"a","addons",option::Arg::Optional, "  --addons, -a  \taddon list (such as ofxOpenCv, ofxGui, ofxXmlSettings)" },
-    {OFPATH, 0,"o","ofPath",option::Arg::Optional, "  --ofPath, -o  \tpath to openframeworks (relative or absolute). This *must* be set, or you can also alternatively use an environment variable PG_OF_PATH and if this isn't set, it will use that value instead" },
-    {VERBOSE, 0,"v","verbose",option::Arg::None, "  --verbose, -v  \trun verbose" },
-    {TEMPLATE, 0,"t","template",option::Arg::None, "  --template, -t  \tproject template" },
-    {DRYRUN, 0,"d","dryrun",option::Arg::None, "  --dryrun, -d  \tdry run, don't change files" },
-    {0,0,0,0,0,0}
-};
 
 
 
