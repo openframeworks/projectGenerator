@@ -43,39 +43,62 @@ bool isPlatformName(std::string file){
     return false;
 }
 
+std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirectory & templateDir){
+    auto name = ofFilePath::getBaseName(templateDir.getOriginalDirectory());
+    if(templateDir.isDirectory() && !isPlatformName(name)){
+        ofBuffer templateconfig;
+        ofFile templateconfigFile(ofFilePath::join(templateDir.path(), "template.config"));
+        if(templateconfigFile.exists()){
+            templateconfigFile >> templateconfig;
+            auto supported = false;
+            auto templateConfig = std::make_unique<Template>();
+            templateConfig->dir = templateDir;
+            templateConfig->name = name;
+            for(auto line: templateconfig.getLines()){
+                if(ofTrim(line).front() == '#') continue;
+                auto varValue = ofSplitString(line,"+=",true,true);
+                if(varValue.size() < 2) {
+                    varValue = ofSplitString(line,"=",true,true);
+                }
+                if(varValue.size() < 2) continue;
+                auto var = varValue[0];
+                auto value = varValue[1];
+                if(var=="PLATFORMS"){
+                    auto platforms = ofSplitString(value," ",true,true);
+                    for(auto platform: platforms){
+                        if(platform==target){
+                            supported = true;
+                        }
+                        templateConfig->platforms.push_back(platform);
+                    }
+                }else if(var=="DESCRIPTION"){
+                    templateConfig->description = value;
+                }else if(var=="RENAME"){
+                    auto fromTo = ofSplitString(value,",");
+                    if(fromTo.size()==2){
+                        auto from = ofTrim(fromTo[0]);
+                        auto to = ofTrim(fromTo[1]);
+                        ofStringReplace(to,"${PROJECTNAME}",projectName);
+                        templateConfig->renames[from] = to;
+                    }
+                }
+            }
+            if(supported){
+                return templateConfig;
+            }
+        }
+    }
+    return std::unique_ptr<baseProject::Template>();
+}
+
 vector<baseProject::Template> baseProject::listAvailableTemplates(std::string target){
     vector<baseProject::Template> templates;
     ofDirectory templatesDir(ofFilePath::join(getOFRoot(),"scripts/templates"));
     for(auto & f: templatesDir.getSorted()){
-        if(f.isDirectory() && !isPlatformName(f.getFileName())){
-            ofBuffer templateconfig;
-            ofFile templateconfigFile(ofFilePath::join(f.path(), "template.config"));
-            if(templateconfigFile.exists()){
-                templateconfigFile >> templateconfig;
-                auto supported = false;
-                Template templateConfig;
-                templateConfig.dir = ofDirectory(f.path());
-                templateConfig.name = f.getFileName();
-                for(auto line: templateconfig.getLines()){
-                    auto varValue = ofSplitString(line,"=",true,true);
-                    if(varValue.size() < 2) continue;
-                    auto var = varValue[0];
-                    auto value = varValue[1];
-                    if(var=="PLATFORMS"){
-                        auto platforms = ofSplitString(value," ",true,true);
-                        for(auto platform: platforms){
-                            if(platform==target){
-                                supported = true;
-                            }
-                            templateConfig.platforms.push_back(platform);
-                        }
-                    }else if(var=="DESCRIPTION"){
-                        templateConfig.description = value;
-                    }
-                }
-                if(supported){
-                    templates.push_back(templateConfig);
-                }
+        if(f.isDirectory()){
+            auto templateConfig = parseTemplate(ofDirectory(f));
+            if(templateConfig){
+                templates.push_back(*templateConfig);
             }
         }
     }
@@ -102,16 +125,20 @@ bool baseProject::create(string path, std::string templateName){
         ofDirectory(ofFilePath::join(templatePath,"bin")).copyTo(ofFilePath::join(projectDir,"bin"));
     }
 
-
-
     bool ret = createProjectFile();
     if(!ret) return false;
 
     if(templateName!=""){
         ofDirectory templateDir(ofFilePath::join(getOFRoot(),"scripts/templates/" + templateName));
-        if(templateDir.exists()){
+        auto templateConfig = parseTemplate(templateDir);
+        if(templateConfig){
             ofDirectory project(projectDir);
             recursiveTemplateCopy(templateDir,project);
+            for(auto & rename: templateConfig->renames){
+                auto from = (projectDir / rename.first).string();
+                auto to = (projectDir / rename.second).string();
+                ofFile(from).moveTo(to,true,true);
+            }
         }else{
             ofLogWarning() << "Cannot find " << templateName << " using platform template only";
         }

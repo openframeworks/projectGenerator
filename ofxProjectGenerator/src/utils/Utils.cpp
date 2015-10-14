@@ -19,7 +19,7 @@
 #include <fstream>
 #include <string>
 
-#include "CBLinuxProject.h"
+#include "qtcreatorproject.h"
 #include "CBWinProject.h"
 #include "xcodeProject.h"
 #include "visualStudioProject.h"
@@ -51,14 +51,6 @@ using namespace Poco;
 
 #include "ofUtils.h"
 
-
-string StringToUpper(string strToConvert)
-{
-    std::transform(strToConvert.begin(), strToConvert.end(), strToConvert.begin(), ::toupper);
-    
-    return strToConvert;
-}
-
 string generateUUID(string input){
 
     std::string passphrase("openFrameworks"); // HMAC needs a passphrase
@@ -71,7 +63,7 @@ string generateUUID(string input){
 	digestString = DigestEngine::digestToHex(digest); // convert to a string of hexadecimal numbers
 
     digestString = digestString.substr(0,24);
-    digestString = StringToUpper(digestString);
+    digestString = ofToUpper(digestString);
 
     string returnStr = digestString; // make a copy to return, fixes some odd visual studio behavior
     return returnStr;
@@ -504,19 +496,19 @@ unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ) {
     case OF_TARGET_OSX:
         return unique_ptr<xcodeProject>(new xcodeProject(getTargetString(targ)));
     case OF_TARGET_WINGCC:
-        return unique_ptr<CBWinProject>(new CBWinProject(getTargetString(targ)));
+        return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
     case OF_TARGET_WINVS:
         return unique_ptr<visualStudioProject>(new visualStudioProject(getTargetString(targ)));
     case OF_TARGET_IOS:
         return unique_ptr<xcodeProject>(new xcodeProject(getTargetString(targ)));
     case OF_TARGET_LINUX:
-        return unique_ptr<CBLinuxProject>(new CBLinuxProject(getTargetString(targ)));
+        return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
     case OF_TARGET_LINUX64:
-        return unique_ptr<CBLinuxProject>(new CBLinuxProject(getTargetString(targ)));
+        return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
     case OF_TARGET_LINUXARMV6L:
-        return unique_ptr<CBLinuxProject>(new CBLinuxProject(getTargetString(targ)));
+        return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
     case OF_TARGET_LINUXARMV7L:
-        return unique_ptr<CBLinuxProject>(new CBLinuxProject(getTargetString(targ)));
+        return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
     case OF_TARGET_ANDROID:
     default:
         return unique_ptr<baseProject>();
