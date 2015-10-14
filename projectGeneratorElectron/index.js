@@ -18,11 +18,6 @@ var os = require("os");
 // Note: app.js's console.log is also visible from the WebKit inspector. (look for mainWindow.openDevTools() below )
 
 
-// where is the executable located?  (not where this script is, but where is the electron ide)
-
-
-
-
 
 //--------------------------------------------------------- load settings
 var obj;
@@ -245,7 +240,7 @@ function getStartingProjectName() {
     var foundOne = false;
 
     var projectNames = new moniker.Dictionary();
-    projectNames.read(path.join(path.join(__dirname, 'data'), 'sketchAdjectives.txt'));
+    projectNames.read(  path.join(__dirname, 'static', 'data', 'sketchAdjectives.txt'));
     var goodName = "mySketch";
 
     while (foundOne === false) {
@@ -439,7 +434,7 @@ ipc.on('getRandomSketchName', function(event, arg) {
     // Note: path.join throws an error when switched to (single) update and back to create mode...
     var projectNames = new moniker.Dictionary();
     var pathTemp = require('path');
-    projectNames.read(pathTemp.join(__dirname, "./node_modules/moniker/dict/sketchAdjectives.txt"));
+    projectNames.read( path.join(__dirname, 'static', 'data', 'sketchAdjectives.txt') );
     var goodName = "";
 
     while (foundOne === false) {
@@ -473,35 +468,19 @@ ipc.on('update', function(event, arg) {
     }
 
     if (update['platformList'] !== null) {
-        if (hostplatform!="windows") {
-            platformString = "-p\"" + update['platformList'].join(",") + "\"";
-        } else {
-            platformString = "/platforms=\"" + update['platformList'].join(",") + "\"";
-        }
+        platformString = "-p\"" + update['platformList'].join(",") + "\"";
     }
 
     if (update['ofPath'] !== null) {
-        if (hostplatform!="windows") {
-            pathString = "-o\"" + update['ofPath'] + "\"";
-        } else {
-            pathString = "/ofPath=\"" + update['ofPath'] + "\"";
-        }
+        pathString = "-o\"" + update['ofPath'] + "\"";
     }
 
     if (update['updateRecursive'] === true) {
-        if (hostplatform!="windows") {
-            recursiveString = "-r";
-        } else {
-            recursiveString = "/recusive";
-        }
+        recursiveString = "-r";
     }
 
     if (update['verbose'] === true) {
-        if (hostplatform!="windows") {
-            recursiveString = "-v";
-        } else {
-            recursiveString = "/verbose";
-        }
+        verboseString = "-v";
     }
 
     var pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
@@ -557,49 +536,22 @@ ipc.on('generate', function(event, arg) {
 
 
     if (generate['platformList'] !== null) {
-        if (hostplatform!="windows") {
-            platformString = "-p\"" + generate['platformList'].join(",") + "\"";
-        } else {
-            platformString = "/platforms=\"" + generate['platformList'].join(",") + "\"";
-        }
-    } else {
-        if (hostplatform!="windows") {
-            platformString = "-p\" \"";
-        } else {
-            platformString = "/platforms=\" \"";
-        }
-    }
+        platformString = "-p\"" + generate['platformList'].join(",") + "\"";
+    } 
 
     if (generate['addonList'] !== null &&
         generate['addonList'].length > 0) {
-
-        if (hostplatform!="windows") {
-            addonString = "-a\"" + generate['addonList'].join(",") + "\"";
-        } else {
-            addonString = "/addons=\"" + generate['addonList'].join(",") + "\"";
-        }
+        addonString = "-a\"" + generate['addonList'].join(",") + "\"";
     } else {
-        if (hostplatform!="windows") {
-            addonString = "-a\" \"";
-        } else {
-            addonString = "/addons=\" \"";
-        }
+        addonString = "-a\" \"";
     }
 
     if (generate['ofPath'] !== null) {
-        if (hostplatform!="windows") {
-            pathString = "-o\"" + generate['ofPath'] + "\"";
-        } else {
-            pathString = "/ofPath=\"" + generate['ofPath'] + "\"";
-        }
+        pathString = "-o\"" + generate['ofPath'] + "\"";
     }
 
     if (generate['verbose'] === true) {
-        if (hostplatform!="windows") {
-            verboseString = "-v";
-        } else {
-            verboseString = "/verbose";
-        }
+        verboseString = "-v";
     }
 
     if (generate.projectName !== null &&
