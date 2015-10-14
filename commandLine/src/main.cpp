@@ -554,7 +554,7 @@ int main(int argc, char* argv[]){
             ofLogNotice() << "target platform is: " << target;
             ofLogNotice() << "project path is: " << projectPath;
             
-            if(templateName!="standard"){
+            if(templateName!=""){
                 ofLogNotice() << "using additional template " << templateName;
             }
             
@@ -595,7 +595,7 @@ int main(int argc, char* argv[]){
                     }
                     ofLogNotice() << "target platform is: " << getTargetString(targets[i]);
 
-                    if(templateName!="standard"){
+                    if(templateName!=""){
                         ofLogNotice() << "using additional template " << templateName;
                     }
                     updateProject(projectPath,targets[i]);
