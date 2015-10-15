@@ -3,7 +3,6 @@
 #consoleContainer {
   display: none;
   width: 100%;
-  background-color: #333;
   color: #FFF;
   height: 100px;
   position: fixed;
@@ -13,6 +12,20 @@
   padding: 0 40px;
   margin-bottom: -80px;
   transition: margin-bottom .2s ease-in-out;
+
+  background: black url("../img/topbar.png") repeat left bottom;
+}
+
+/* overlay to fade the bg */
+#consoleContainer:before {
+  content : "";
+  display: block;
+  position: fixed;
+  left: 0;
+  width: 500px;
+  height: 100px;
+  z-index: -1;
+  background-color: rgba(0,0,0,0.9);
 }
 
 #consoleContainer::-webkit-scrollbar, #fullConsoleOutput textarea::-webkit-scrollbar {

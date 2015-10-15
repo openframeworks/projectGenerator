@@ -499,9 +499,9 @@ function setup() {
 		enableConsole( $(this).is(':checked') );
 	});*/
         // enable console? (hiddens setting)
-        // if(defaultSettings['showConsole']){ $("body").addClass('enableConsole'); }
-        // $("#showConsole").on('click', function(){ $('body').addClass('showConsole'); });
-        // $("#hideConsole").on('click', function(){ $('body').removeClass('showConsole'); });
+        if(defaultSettings['showConsole']){ $("body").addClass('enableConsole'); }
+        $("#showConsole").on('click', function(){ $('body').addClass('showConsole'); });
+        $("#hideConsole").on('click', function(){ $('body').removeClass('showConsole'); });
 
         // initialise the overall-use modal
         $("#uiModal, #fileDropModal").modal({
