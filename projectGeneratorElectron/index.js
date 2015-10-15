@@ -434,7 +434,7 @@ ipc.on('getRandomSketchName', function(event, arg) {
     // Note: path.join throws an error when switched to (single) update and back to create mode...
     var projectNames = new moniker.Dictionary();
     var pathTemp = require('path');
-    projectNames.read( path.join(__dirname, 'static', 'data', 'sketchAdjectives.txt') );
+    projectNames.read( pathTemp.join(__dirname, 'static', 'data', 'sketchAdjectives.txt') );
     var goodName = "";
 
     while (foundOne === false) {

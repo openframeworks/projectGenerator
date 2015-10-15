@@ -286,7 +286,7 @@ ipc.on('updateCompleted', function(isSuccessful) {
 });
 
 ipc.on('setRandomisedSketchName', function(newName) {
-    $("#projectName").val(newName);
+    $("#projectName").val(newName).blur().trigger('change');
 });
 
 
