@@ -420,10 +420,10 @@ void ofAddon::fromFS(string path, string platform){
     }
 
     for(int i=0;i<(int)srcFiles.size();i++){
-    	string folder;
         srcFiles[i].erase(srcFiles[i].begin(), srcFiles[i].begin()+containedPath.length());
         int end = srcFiles[i].rfind(std::filesystem::path("/").make_preferred().string());
         int init = 0;
+		string folder;
     	if(!isLocalAddon){
             folder = srcFiles[i].substr(init,end);
     	}else{
@@ -457,7 +457,14 @@ void ofAddon::fromFS(string path, string platform){
     	int init = 0;
         int end = libFiles[i].rfind(std::filesystem::path("/").make_preferred().string());
         if (end > 0){
-            string folder = libFiles[i].substr(init,end);
+			string folder;
+			if (!isLocalAddon) {
+				folder = libFiles[i].substr(init, end);
+			}
+			else {
+				init = libFiles[i].find(name);
+				folder = ofFilePath::join("local_addons", libFiles[i].substr(init, end - init));
+			}
             libFiles[i] = prefixPath + libFiles[i];
             srcFiles.push_back(libFiles[i]);
             filesToFolders[libFiles[i]] = folder;
@@ -504,7 +511,14 @@ void ofAddon::fromFS(string path, string platform){
             int init = 0;
     	    int end = frameworks[i].rfind(std::filesystem::path("/").make_preferred().string());
             
-            string folder = frameworks[i].substr(init,end);
+			string folder;
+			if (!isLocalAddon) {
+				folder = frameworks[i].substr(init, end);
+			}
+			else {
+				init = frameworks[i].find(name);
+				folder = ofFilePath::join("local_addons", frameworks[i].substr(init, end - init));
+			}
             frameworks[i] = pathToOF + frameworks[i];
             filesToFolders[frameworks[i]] = folder;
             

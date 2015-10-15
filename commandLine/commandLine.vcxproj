@@ -173,32 +173,31 @@
 	<ItemGroup>
 		<ClCompile Include="src\main.cpp" />
 		<ClCompile Include="src\ofApp.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\utils\LibraryBinary.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp" />
+		<ClCompile Include="..\ofxProjectGenerator\src\addons\ofAddon.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\baseProject.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\xcodeProject.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBWinProject.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\visualStudioProject.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\addons\ofAddon.cpp" />
+		<ClCompile Include="..\ofxProjectGenerator\src\projects\visualStudioProject.cpp" />
+		<ClCompile Include="..\ofxProjectGenerator\src\projects\xcodeProject.cpp" />
+		<ClCompile Include="..\ofxProjectGenerator\src\utils\LibraryBinary.cpp" />
+		<ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\libs\pugixml\src\pugixml.cpp" />
 	</ItemGroup>
 	<ItemGroup>
 		<ClInclude Include="src\ofApp.h" />
-		<ClInclude Include="src\ball.h" />
 		<ClInclude Include="src\optionparser.h" />
+		<ClInclude Include="..\ofxProjectGenerator\src\addons\ofAddon.h" />
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\baseProject.h" />
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.h" />
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBWinProject.h" />
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.h" />
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\visualStudioProject.h" />
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\xcodeProject.h" />
 		<ClInclude Include="..\ofxProjectGenerator\src\utils\LibraryBinary.h" />
 		<ClInclude Include="..\ofxProjectGenerator\src\utils\Utils.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\visualStudioProject.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\baseProject.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBWinProject.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\xcodeProject.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\addons\ofAddon.h" />
-		<ClInclude Include="..\ofxProjectGenerator\libs\pugixml\src\pugixml.hpp" />
 		<ClInclude Include="..\ofxProjectGenerator\libs\pugixml\src\pugiconfig.hpp" />
+		<ClInclude Include="..\ofxProjectGenerator\libs\pugixml\src\pugixml.hpp" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">

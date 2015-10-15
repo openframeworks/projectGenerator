@@ -366,10 +366,14 @@ int main(int argc, char* argv[]){
     std::vector<option::Option> options(stats.options_max);
     std::vector<option::Option> buffer(stats.buffer_max);
     option::Parser parse(usage, argc, argv, &options[0], &buffer[0]);
-    if (parse.error())
-        return 1;
+	if (parse.error()) {
+		
+		return 1;
+	}
     if (options[HELP] || argc == 0) {
+		ofLogError() << "No arguments";
         printHelp();
+		
         return EXIT_OK;
     }
 
@@ -418,12 +422,7 @@ int main(int argc, char* argv[]){
         if (options[TEMPLATE].arg != NULL){
             string templateString(options[TEMPLATE].arg);
             templateName = templateString;
-            cout << "template: " << templateName << endl;
-        }else{
-        	cout << "has template but null" << endl;
         }
-    }else{
-    	cout << "no extra template" << endl;
     }
 
 
@@ -465,6 +464,7 @@ int main(int argc, char* argv[]){
         //printHelp();
         
         //return
+		
         return EXIT_USAGE;
     } else {
 
@@ -479,6 +479,7 @@ int main(int argc, char* argv[]){
         
         
         if (!isGoodOFPath(ofPath)) {
+			
             return EXIT_USAGE;
         }
         
@@ -492,8 +493,10 @@ int main(int argc, char* argv[]){
         auto ret = printTemplates();
         consoleSpace();
         if(ret){
+			
             return EXIT_OK;
         }else{
+			
             return EXIT_DATAERR;
         }
     }
@@ -514,6 +517,7 @@ int main(int argc, char* argv[]){
         ofLogError() << "Missing project path";
         printHelp();
         consoleSpace();
+		
         return EXIT_USAGE;
     }
 
@@ -523,6 +527,7 @@ int main(int argc, char* argv[]){
         consoleSpace();
         ofLogError() << "path to openframeworks (" << ofPath << ") seems wrong, please check";
         consoleSpace();
+		
         return EXIT_USAGE;
     }
 
@@ -639,6 +644,7 @@ int main(int argc, char* argv[]){
     ofLogNotice() << "in " << elapsedTime << " seconds" << endl;
     consoleSpace();
 
+	
     return EXIT_OK;
 }
 
