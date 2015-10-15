@@ -58,7 +58,6 @@ try {
         "advancedMode": false,
         "defaultPlatform": myPlatform,
         "verboseOutput" : false,
-        "showConsole": false,
         "showDeveloperTools": false,
         "defaultRelativeProjectPath": "apps/myApps"
     };
@@ -495,21 +494,25 @@ ipc.on('update', function(event, arg) {
     exec(wholeString, function callback(error, stdout, stderr) {
 
         if (error === null) {
-            event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
-            event.sender.send('sendUIMessage',
-                '<strong>Success!</strong><br>' +
-                'Updating your project was successful! <a href="file:///' + update['updatePath'] + '" class="monospace" data-toggle="external_target">' + update['updatePath'] + '</a><br><br>' +
-                '<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
-                '<div id="fullConsoleOutput"><br><textarea class="selectable">' + stdout + '</textarea></div>'
-            );
+
+            if( generate.verbose === true ){
+                //event.sender.send('sendUIMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
+                event.sender.send('sendUIMessage',
+                    '<strong>Success!</strong><br>' +
+                    'Updating your project was successful! <a href="file:///' + update['updatePath'] + '" class="monospace" data-toggle="external_target">' + update['updatePath'] + '</a><br><br>' +
+                    '<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
+                    '<div id="fullConsoleOutput"><br><textarea class="selectable">' + stdout + '</textarea></div>'
+                );
+            }
             event.sender.send('updateCompleted', true);
         } else {
-            event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + error.message);
+            //event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + error.message);
             event.sender.send('sendUIMessage',
                 '<strong>Error...</strong><br>' +
                 'There was a problem updating your project... <span class="monospace">' + update['updatePath'] + '</span>' +
                 '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + error.message + '</textarea></div>'
             );
+            event.sender.send('updateCompleted', false);
         }
     });
 
@@ -590,16 +593,17 @@ ipc.on('generate', function(event, arg) {
 
         var fullPath = pathTemp.join(generate['projectPath'], generate['projectName']);
         if (error === null && wasError === false) {
-            event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
-            if( settings.verboseOutput === true ){
+            //event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
+            if( generate.verbose === true ){
                 event.sender.send('sendUIMessage',
                     '<strong>Success!</strong><br>' +
                     'Your can now find your project in <a href="file:///' + fullPath + '" data-toggle="external_target" class="monospace">' + fullPath + '</a><br><br>' +
                     '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stdout + '</textarea></div>'
                 );
             }
+            event.sender.send('generateCompleted', true);
         } else if (error !== null) {
-            event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + error.message);
+            //event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + error.message);
             // note: stderr mostly seems to be also included in error.message
             // also available: error.code, error.killed, error.signal, error.cmd
             // info: error.code=127 means commandLinePG was not found
@@ -608,8 +612,9 @@ ipc.on('generate', function(event, arg) {
                 'There was a problem generating your project... <span class="monospace">' + fullPath + '</span>' +
                 '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + error.message + '</textarea></div>'
             );
+            event.sender.send('generateCompleted', false);
         } else if (wasError === true) {
-            event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
+            //event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
             event.sender.send('sendUIMessage',
                 '<strong>Error!</strong><br>' +
                 '<strong>Error...</strong><br>' +
@@ -617,8 +622,8 @@ ipc.on('generate', function(event, arg) {
                 '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stdout + '</textarea></div>'
 
             );
+            event.sender.send('generateCompleted', false);
         }
-        event.sender.send('generateCompleted', true);
     });
 
     console.log(wholeString);

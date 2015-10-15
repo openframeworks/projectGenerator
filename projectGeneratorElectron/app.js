@@ -266,11 +266,6 @@ ipc.on('sendUIMessage', function(arg) {
 });
 
 //-------------------------------------------
-ipc.on('consoleMessage', function(msg) {
-    consoleMessage(msg);
-});
-
-//-------------------------------------------
 ipc.on('generateCompleted', function(isSuccessful) {
 
     if (isSuccessful === true) {
@@ -292,6 +287,14 @@ ipc.on('updateCompleted', function(isSuccessful) {
     if (isSuccessful === true) {
         // eventual callback after update completed
     }
+
+    // notify via button
+    var btnText = isSuccessful?"Success!":"Error...";
+    var btnClass = isSuccessful?"olive":"red";
+    var btnCachedText = $("#updateButton").text();
+    $("#updateButton").removeClass("orange").addClass(btnClass).text(btnText).delay(1000).queue(function() {
+      $( this ).addClass("orange").removeClass(btnClass).text(btnCachedText).dequeue();
+    });
 });
 
 ipc.on('setRandomisedSketchName', function(newName) {
@@ -507,10 +510,6 @@ function setup() {
 	$("#consoleToggle").on("change", function () {
 		enableConsole( $(this).is(':checked') );
 	});*/
-        // enable console? (hiddens setting)
-        if(defaultSettings['showConsole']){ $("body").addClass('enableConsole'); }
-        $("#showConsole").on('click', function(){ $('body').addClass('showConsole'); });
-        $("#hideConsole").on('click', function(){ $('body').removeClass('showConsole'); });
 
         // initialise the overall-use modal
         $("#uiModal, #fileDropModal").modal({
@@ -784,20 +783,6 @@ function enableAdvancedMode(isAdvanced) {
     //$("#advancedToggle").prop('checked', defaultSettings['advancedMode'] );
 }
 
-/* Stuff for the console setting (removed from UI)
-function enableConsole( showConsole ){
-	if( showConsole ) {
-		// this has to be in body for CSS reasons
-		$("body").addClass('showConsole');
-	}
-	else {
-		$("body").removeClass('showConsole');
-	}
-	defaultSettings['showConsole'] = showConsole;
-	saveDefaultSettings();
-	$("#consoleToggle").prop('checked', defaultSettings['showConsole'] );
-}*/
-
 //----------------------------------------
 function getPlatformList(platformSelector) {
     var selected = [];
@@ -821,13 +806,6 @@ function displayModal(message) {
 		shell.openExternal( $(this).prop("href") );
     });
     $("#uiModal").modal('show');
-}
-
-//----------------------------------------
-function consoleMessage(message) {
-    message = (message + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + "<br>\n" + '$2'); // nl2br
-    $("#console").append($("<p>").html(message));
-    $("#consoleContainer").scrollTop($('#console').offset().top); // scrolls console to bottom
 }
 
 //-----------------------------------------------------------------------------------
