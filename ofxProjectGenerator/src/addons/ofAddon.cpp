@@ -505,7 +505,6 @@ void ofAddon::fromFS(string path, string platform){
             
             
             frameworks[i].erase (frameworks[i].begin(), frameworks[i].begin()+containedPath.length());
-            frameworks[i] = prefixPath + frameworks[i];
             
             int init = 0;
     	    int end = frameworks[i].rfind(std::filesystem::path("/").make_preferred().string());
@@ -518,11 +517,12 @@ void ofAddon::fromFS(string path, string platform){
 				init = frameworks[i].find(name);
 				folder = ofFilePath::join("local_addons", frameworks[i].substr(init, end - init));
 			}
+            
+            frameworks[i] = prefixPath + frameworks[i];
+            
 
             filesToFolders[frameworks[i]] = folder;
 
-            
-            
         }
         
        
