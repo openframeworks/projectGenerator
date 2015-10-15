@@ -7,16 +7,16 @@
 		<ClCompile Include="src\main.cpp">
 			<Filter>src</Filter>
 		</ClCompile>
-		<ClCompile Include="src\main.cpp">
-			<Filter>src</Filter>
+		<ClCompile Include="..\ofxProjectGenerator\src\utils\LibraryBinary.cpp">
+			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
 		</ClCompile>
-		<ClCompile Include="src\ofApp.cpp">
-			<Filter>src</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\addons\ofAddon.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\addons</Filter>
+		<ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp">
+			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
 		</ClCompile>
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\baseProject.cpp">
+			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+		</ClCompile>
+		<ClCompile Include="..\ofxProjectGenerator\src\projects\xcodeProject.cpp">
 			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
 		</ClCompile>
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.cpp">
@@ -25,20 +25,14 @@
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBWinProject.cpp">
 			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
 		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClCompile>
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\visualStudioProject.cpp">
 			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
 		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\xcodeProject.cpp">
+		<ClCompile Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.cpp">
 			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
 		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\utils\LibraryBinary.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
+		<ClCompile Include="..\ofxProjectGenerator\src\addons\ofAddon.cpp">
+			<Filter>local_addons\ofxProjectGenerator\src\addons</Filter>
 		</ClCompile>
 		<ClCompile Include="..\ofxProjectGenerator\libs\pugixml\src\pugixml.cpp">
 			<Filter>local_addons\ofxProjectGenerator\libs\pugixml\src</Filter>
@@ -57,14 +51,14 @@
 		<Filter Include="local_addons\ofxProjectGenerator\src">
 			<UniqueIdentifier>{22BFB2DF-FDA3-838A-F39D-033B}</UniqueIdentifier>
 		</Filter>
-		<Filter Include="local_addons\ofxProjectGenerator\src\addons">
-			<UniqueIdentifier>{48D8BC28-D905-C666-C179-A88B}</UniqueIdentifier>
+		<Filter Include="local_addons\ofxProjectGenerator\src\utils">
+			<UniqueIdentifier>{A62DD3D9-F18F-2AD2-EAED-2F82}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="local_addons\ofxProjectGenerator\src\projects">
 			<UniqueIdentifier>{624EB3BE-8A01-BFBA-5112-0A69}</UniqueIdentifier>
 		</Filter>
-		<Filter Include="local_addons\ofxProjectGenerator\src\utils">
-			<UniqueIdentifier>{A62DD3D9-F18F-2AD2-EAED-2F82}</UniqueIdentifier>
+		<Filter Include="local_addons\ofxProjectGenerator\src\addons">
+			<UniqueIdentifier>{48D8BC28-D905-C666-C179-A88B}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="local_addons\ofxProjectGenerator\libs">
 			<UniqueIdentifier>{9F03FF9D-1F79-82C4-31CB-5058}</UniqueIdentifier>
@@ -80,32 +74,11 @@
 		<ClInclude Include="src\ofApp.h">
 			<Filter>src</Filter>
 		</ClInclude>
-		<ClInclude Include="src\ofApp.h">
+		<ClInclude Include="src\ball.h">
 			<Filter>src</Filter>
 		</ClInclude>
 		<ClInclude Include="src\optionparser.h">
 			<Filter>src</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\addons\ofAddon.h">
-			<Filter>local_addons\ofxProjectGenerator\src\addons</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\baseProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBWinProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\visualStudioProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\xcodeProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
 		</ClInclude>
 		<ClInclude Include="..\ofxProjectGenerator\src\utils\LibraryBinary.h">
 			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
@@ -113,10 +86,31 @@
 		<ClInclude Include="..\ofxProjectGenerator\src\utils\Utils.h">
 			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
 		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\libs\pugixml\src\pugiconfig.hpp">
-			<Filter>local_addons\ofxProjectGenerator\libs\pugixml\src</Filter>
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.h">
+			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+		</ClInclude>
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\visualStudioProject.h">
+			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+		</ClInclude>
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.h">
+			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+		</ClInclude>
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\baseProject.h">
+			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+		</ClInclude>
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBWinProject.h">
+			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+		</ClInclude>
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\xcodeProject.h">
+			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+		</ClInclude>
+		<ClInclude Include="..\ofxProjectGenerator\src\addons\ofAddon.h">
+			<Filter>local_addons\ofxProjectGenerator\src\addons</Filter>
 		</ClInclude>
 		<ClInclude Include="..\ofxProjectGenerator\libs\pugixml\src\pugixml.hpp">
+			<Filter>local_addons\ofxProjectGenerator\libs\pugixml\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\ofxProjectGenerator\libs\pugixml\src\pugiconfig.hpp">
 			<Filter>local_addons\ofxProjectGenerator\libs\pugixml\src</Filter>
 		</ClInclude>
 	</ItemGroup>

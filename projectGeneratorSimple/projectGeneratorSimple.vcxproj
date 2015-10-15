@@ -95,7 +95,7 @@
 			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
 			<RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
 			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\ofxProjectGenerator\libs;..\ofxProjectGenerator\libs\pugixml;..\ofxProjectGenerator\libs\pugixml\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxXmlSettings\libs;..\..\..\addons\ofxXmlSettings\src;..\ofxProjectGenerator\libs;..\ofxProjectGenerator\libs\pugixml;..\ofxProjectGenerator\libs\pugixml\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils</AdditionalIncludeDirectories>
 			<CompileAs>CompileAsCpp</CompileAs>
 		</ClCompile>
 		<Link>
@@ -114,7 +114,7 @@
 			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
 			<RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
 			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\ofxProjectGenerator\libs;..\ofxProjectGenerator\libs\pugixml;..\ofxProjectGenerator\libs\pugixml\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxXmlSettings\libs;..\..\..\addons\ofxXmlSettings\src;..\ofxProjectGenerator\libs;..\ofxProjectGenerator\libs\pugixml;..\ofxProjectGenerator\libs\pugixml\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils</AdditionalIncludeDirectories>
 			<CompileAs>CompileAsCpp</CompileAs>
 			<MultiProcessorCompilation>true</MultiProcessorCompilation>
 		</ClCompile>
@@ -133,7 +133,7 @@
 			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
 			<RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
 			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\ofxProjectGenerator\libs;..\ofxProjectGenerator\libs\pugixml;..\ofxProjectGenerator\libs\pugixml\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxXmlSettings\libs;..\..\..\addons\ofxXmlSettings\src;..\ofxProjectGenerator\libs;..\ofxProjectGenerator\libs\pugixml;..\ofxProjectGenerator\libs\pugixml\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils</AdditionalIncludeDirectories>
 			<CompileAs>CompileAsCpp</CompileAs>
 			<MultiProcessorCompilation>true</MultiProcessorCompilation>
 		</ClCompile>
@@ -155,7 +155,7 @@
 			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
 			<RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
 			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\ofxProjectGenerator\libs;..\ofxProjectGenerator\libs\pugixml;..\ofxProjectGenerator\libs\pugixml\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxXmlSettings\libs;..\..\..\addons\ofxXmlSettings\src;..\ofxProjectGenerator\libs;..\ofxProjectGenerator\libs\pugixml;..\ofxProjectGenerator\libs\pugixml\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils</AdditionalIncludeDirectories>
 			<CompileAs>CompileAsCpp</CompileAs>
 		</ClCompile>
 		<Link>
@@ -173,31 +173,54 @@
 	<ItemGroup>
 		<ClCompile Include="src\main.cpp" />
 		<ClCompile Include="src\ofApp.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\addons\ofAddon.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\baseProject.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBWinProject.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\visualStudioProject.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\xcodeProject.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxToggle.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxGuiGroup.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxBaseGui.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxLabel.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxSlider.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxPanel.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxGui\src\ofxButton.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxXmlSettings\src\ofxXmlSettings.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxml.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxmlparser.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxmlerror.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\utils\LibraryBinary.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp" />
+		<ClCompile Include="..\ofxProjectGenerator\src\projects\baseProject.cpp" />
+		<ClCompile Include="..\ofxProjectGenerator\src\projects\xcodeProject.cpp" />
+		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.cpp" />
+		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBWinProject.cpp" />
+		<ClCompile Include="..\ofxProjectGenerator\src\projects\visualStudioProject.cpp" />
+		<ClCompile Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.cpp" />
+		<ClCompile Include="..\ofxProjectGenerator\src\addons\ofAddon.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\libs\pugixml\src\pugixml.cpp" />
 	</ItemGroup>
 	<ItemGroup>
 		<ClInclude Include="src\ofApp.h" />
 		<ClInclude Include="src\textButton.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\addons\ofAddon.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\baseProject.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBWinProject.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\visualStudioProject.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\xcodeProject.h" />
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxBaseGui.h" />
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxToggle.h" />
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.h" />
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxGuiGroup.h" />
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxPanel.h" />
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxLabel.h" />
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxButton.h" />
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxGui.h" />
+		<ClInclude Include="..\..\..\addons\ofxGui\src\ofxSlider.h" />
+		<ClInclude Include="..\..\..\addons\ofxXmlSettings\src\ofxXmlSettings.h" />
+		<ClInclude Include="..\..\..\addons\ofxXmlSettings\libs\tinyxml.h" />
 		<ClInclude Include="..\ofxProjectGenerator\src\utils\LibraryBinary.h" />
 		<ClInclude Include="..\ofxProjectGenerator\src\utils\Utils.h" />
-		<ClInclude Include="..\ofxProjectGenerator\libs\pugixml\src\pugiconfig.hpp" />
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.h" />
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\visualStudioProject.h" />
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.h" />
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\baseProject.h" />
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBWinProject.h" />
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\xcodeProject.h" />
+		<ClInclude Include="..\ofxProjectGenerator\src\addons\ofAddon.h" />
 		<ClInclude Include="..\ofxProjectGenerator\libs\pugixml\src\pugixml.hpp" />
+		<ClInclude Include="..\ofxProjectGenerator\libs\pugixml\src\pugiconfig.hpp" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">
