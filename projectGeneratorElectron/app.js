@@ -272,10 +272,19 @@ ipc.on('consoleMessage', function(msg) {
 
 //-------------------------------------------
 ipc.on('generateCompleted', function(isSuccessful) {
+
     if (isSuccessful === true) {
         // We want to switch to update mode now
         $("#projectName").trigger('change');
     }
+
+    // notify via button
+    var btnText = isSuccessful?"Success!":"Error...";
+    var btnClass = isSuccessful?"olive":"red";
+    var btnCachedText = $("#updateButton").text();
+    $("#updateButton").removeClass("orange").addClass(btnClass).text(btnText).delay(1000).queue(function() {
+      $( this ).addClass("orange").removeClass(btnClass).text(btnCachedText).dequeue();
+    });
 });
 
 //-------------------------------------------

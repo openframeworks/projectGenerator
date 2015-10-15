@@ -57,6 +57,7 @@ try {
         "defaultOfPath": "",
         "advancedMode": false,
         "defaultPlatform": myPlatform,
+        "verboseOutput" : false,
         "showConsole": false,
         "showDeveloperTools": false,
         "defaultRelativeProjectPath": "apps/myApps"
@@ -590,12 +591,13 @@ ipc.on('generate', function(event, arg) {
         var fullPath = pathTemp.join(generate['projectPath'], generate['projectName']);
         if (error === null && wasError === false) {
             event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
-            event.sender.send('sendUIMessage',
-                '<strong>Success!</strong><br>' +
-                'Your can now find your project in <a href="file:///' + fullPath + '" data-toggle="external_target" class="monospace">' + fullPath + '</a><br><br>' +
-                '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stdout + '</textarea></div>'
-            );
-            event.sender.send('generateCompleted', true);
+            if( settings.verboseOutput === true ){
+                event.sender.send('sendUIMessage',
+                    '<strong>Success!</strong><br>' +
+                    'Your can now find your project in <a href="file:///' + fullPath + '" data-toggle="external_target" class="monospace">' + fullPath + '</a><br><br>' +
+                    '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stdout + '</textarea></div>'
+                );
+            }
         } else if (error !== null) {
             event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + error.message);
             // note: stderr mostly seems to be also included in error.message
@@ -615,8 +617,8 @@ ipc.on('generate', function(event, arg) {
                 '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stdout + '</textarea></div>'
 
             );
-
         }
+        event.sender.send('generateCompleted', true);
     });
 
     console.log(wholeString);
