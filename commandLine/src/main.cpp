@@ -1,5 +1,8 @@
 
 
+#include <iostream>
+#include <string>
+#include <vector>
 #include "optionparser.h"
 enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN };
 constexpr option::Descriptor usage[] =
@@ -17,9 +20,6 @@ constexpr option::Descriptor usage[] =
     {0,0,0,0,0,0}
 };
 
-#include <iostream>
-#include <string>
-#include <vector>
 #include "ofMain.h"
 
 #include "Poco/Util/Application.h"
@@ -29,7 +29,6 @@ constexpr option::Descriptor usage[] =
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/AutoPtr.h"
 #include <Poco/Path.h>
-#include <iostream>
 
 #include "qtcreatorproject.h"
 #include "visualStudioProject.h"

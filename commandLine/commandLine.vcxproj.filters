@@ -1,126 +1,120 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<ItemGroup>
-		<ClCompile Include="src\ofApp.cpp">
-			<Filter>src</Filter>
-		</ClCompile>
-		<ClCompile Include="src\main.cpp">
-			<Filter>src</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\utils\LibraryBinary.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\baseProject.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\xcodeProject.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBWinProject.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\visualStudioProject.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\addons\ofAddon.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\addons</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\libs\pugixml\src\pugixml.cpp">
-			<Filter>..\ofxProjectGenerator\libs\pugixml\src</Filter>
-		</ClCompile>
-	</ItemGroup>
-	<ItemGroup>
-		<Filter Include="src">
-			<UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="local_addons">
-			<UniqueIdentifier>{DE6745C7-E99D-D8E0-F77D-C032}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="local_addons\ofxProjectGenerator">
-			<UniqueIdentifier>{04ADF8B0-AE7A-FB41-E0DF-5AB6}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="local_addons\ofxProjectGenerator\src">
-			<UniqueIdentifier>{22BFB2DF-FDA3-838A-F39D-033B}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="local_addons\ofxProjectGenerator\src\utils">
-			<UniqueIdentifier>{A62DD3D9-F18F-2AD2-EAED-2F82}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="local_addons\ofxProjectGenerator\src\projects">
-			<UniqueIdentifier>{624EB3BE-8A01-BFBA-5112-0A69}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="local_addons\ofxProjectGenerator\src\addons">
-			<UniqueIdentifier>{48D8BC28-D905-C666-C179-A88B}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="..">
-			<UniqueIdentifier>{4D9CEAFB-F547-B569-E206-D76B}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="..\ofxProjectGenerator">
-			<UniqueIdentifier>{9D0E57C1-2304-461E-880C-315D}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="..\ofxProjectGenerator\libs">
-			<UniqueIdentifier>{FD9CCD85-CE94-FAEE-1ABF-1C27}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="..\ofxProjectGenerator\libs\pugixml">
-			<UniqueIdentifier>{1E56D5F7-54CF-7C20-7D30-539C}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="..\ofxProjectGenerator\libs\pugixml\src">
-			<UniqueIdentifier>{6D2939C1-2AD9-C584-EAB1-71E3}</UniqueIdentifier>
-		</Filter>
-	</ItemGroup>
-	<ItemGroup>
-		<ClInclude Include="src\ofApp.h">
-			<Filter>src</Filter>
-		</ClInclude>
-		<ClInclude Include="src\ball.h">
-			<Filter>src</Filter>
-		</ClInclude>
-		<ClInclude Include="src\optionparser.h">
-			<Filter>src</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\utils\LibraryBinary.h">
-			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\utils\Utils.h">
-			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\visualStudioProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\baseProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBWinProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\xcodeProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\addons\ofAddon.h">
-			<Filter>local_addons\ofxProjectGenerator\src\addons</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\libs\pugixml\src\pugixml.hpp">
-			<Filter>..\ofxProjectGenerator\libs\pugixml\src</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\libs\pugixml\src\pugiconfig.hpp">
-			<Filter>..\ofxProjectGenerator\libs\pugixml\src</Filter>
-		</ClInclude>
-	</ItemGroup>
-	<ItemGroup>
-		<ResourceCompile Include="icon.rc" />
-	</ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ofApp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\utils\LibraryBinary.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\baseProject.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\xcodeProject.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\CBWinProject.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\visualStudioProject.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\addons\ofAddon.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\addons</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\libs\pugixml\src\pugixml.cpp">
+      <Filter>local_addons\ofxProjectGenerator\libs\pugixml\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local_addons">
+      <UniqueIdentifier>{DE6745C7-E99D-D8E0-F77D-C032}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local_addons\ofxProjectGenerator">
+      <UniqueIdentifier>{04ADF8B0-AE7A-FB41-E0DF-5AB6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local_addons\ofxProjectGenerator\src">
+      <UniqueIdentifier>{22BFB2DF-FDA3-838A-F39D-033B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local_addons\ofxProjectGenerator\src\utils">
+      <UniqueIdentifier>{A62DD3D9-F18F-2AD2-EAED-2F82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local_addons\ofxProjectGenerator\src\projects">
+      <UniqueIdentifier>{624EB3BE-8A01-BFBA-5112-0A69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local_addons\ofxProjectGenerator\src\addons">
+      <UniqueIdentifier>{48D8BC28-D905-C666-C179-A88B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local_addons\ofxProjectGenerator\libs">
+      <UniqueIdentifier>{FD9CCD85-CE94-FAEE-1ABF-1C27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local_addons\ofxProjectGenerator\libs\pugixml">
+      <UniqueIdentifier>{1E56D5F7-54CF-7C20-7D30-539C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local_addons\ofxProjectGenerator\libs\pugixml\src">
+      <UniqueIdentifier>{6D2939C1-2AD9-C584-EAB1-71E3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ofApp.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ball.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\optionparser.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\utils\LibraryBinary.h">
+      <Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\utils\Utils.h">
+      <Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.h">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\visualStudioProject.h">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.h">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\baseProject.h">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\CBWinProject.h">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\xcodeProject.h">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\addons\ofAddon.h">
+      <Filter>local_addons\ofxProjectGenerator\src\addons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\libs\pugixml\src\pugixml.hpp">
+      <Filter>local_addons\ofxProjectGenerator\libs\pugixml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\libs\pugixml\src\pugiconfig.hpp">
+      <Filter>local_addons\ofxProjectGenerator\libs\pugixml\src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="icon.rc" />
+  </ItemGroup>
 </Project>
