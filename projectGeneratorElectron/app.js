@@ -418,7 +418,7 @@ function setup() {
 
             // fix "non alpha numeric characters here" as we did in the old PG
             var currentStr = $("#projectName").val()
-            var stripped = currentStr.replace(/[^A-Za-z0-9]/g, '_');
+            var stripped = currentStr.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g,'_');
             $("#projectName").val(stripped)
 
         	project['projectName'] = $("#projectName").val();
