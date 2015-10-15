@@ -448,7 +448,7 @@ void ofAddon::fromFS(string path, string platform){
         }
 
     }
-
+    
 
     // I need to add libFiles to srcFiles
     for (int i = 0; i < (int)libFiles.size(); i++){
@@ -465,6 +465,8 @@ void ofAddon::fromFS(string path, string platform){
 
     }
 
+    
+    
     for (int i = 0; i < (int)libs.size(); i++){
 
         // does libs[] have any path ? let's fix if so.
@@ -495,19 +497,15 @@ void ofAddon::fromFS(string path, string platform){
         } else {
             
             
-           
-            // erease out the OF root path.  this assumes the frames is *in* the OF folder....
-            frameworks[i].erase (frameworks[i].begin(), frameworks[i].begin()+prefixPath.length());
-            
-            
+            frameworks[i].erase (frameworks[i].begin(), frameworks[i].begin()+containedPath.length());
+            frameworks[i] = prefixPath + frameworks[i];
             
             int init = 0;
     	    int end = frameworks[i].rfind(std::filesystem::path("/").make_preferred().string());
             
             string folder = frameworks[i].substr(init,end);
-            frameworks[i] = pathToOF + frameworks[i];
             filesToFolders[frameworks[i]] = folder;
-            
+
             
             
         }
