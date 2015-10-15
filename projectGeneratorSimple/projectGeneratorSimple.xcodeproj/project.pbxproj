@@ -46,6 +46,47 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
+			<key>1B6DF51DE08041699DCF6AEE</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>D31F54C5A271FBBD54B015EB</string>
+					<string>72CE8271548D53B6CB127FD0</string>
+					<string>8620A60A3AE4156124F1E5B3</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>src</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>E91B83C35426831CE7C44911</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>1B6DF51DE08041699DCF6AEE</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>pugixml</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>E4ED65FA0B4F8C0D7FBC4278</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>E91B83C35426831CE7C44911</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>libs</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
 			<key>D31F54C5A271FBBD54B015EB</key>
 			<dict>
 				<key>explicitFileType</key>
@@ -453,6 +494,7 @@
 				<key>children</key>
 				<array>
 					<string>E903244952694ECC7C690A10</string>
+					<string>E4ED65FA0B4F8C0D7FBC4278</string>
 				</array>
 				<key>isa</key>
 				<string>PBXGroup</string>

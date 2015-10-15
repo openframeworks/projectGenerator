@@ -221,7 +221,7 @@ bool baseProject::save(){
     ofFile addonsMake(ofFilePath::join(projectDir,"addons.make"), ofFile::WriteOnly);
     for(int i = 0; i < addons.size(); i++){
         if(addons[i].isLocalAddon){
-            addonsMake << addons[i].addonPath << endl;
+            addonsMake << std::filesystem::path(addons[i].addonPath).generic_string() << endl;
         }else{
             addonsMake << addons[i].name << endl;
         }
