@@ -465,6 +465,7 @@ ipc.on('update', function(event, arg) {
 
     if (update['updatePath'] !== null) {
         updatePath = update['updatePath'];
+        updatePath = "\"" + updatePath + "\"";
     }
 
     if (update['platformList'] !== null) {
@@ -556,8 +557,7 @@ ipc.on('generate', function(event, arg) {
 
     if (generate.projectName !== null &&
         generate.projectPath !== null) {
-
-        projectString = pathTemp.join(generate['projectPath'], generate['projectName']);
+        projectString = "\"" + pathTemp.join(generate['projectPath'], generate['projectName']) + "\"";
     }
 
     var pgApp="";
