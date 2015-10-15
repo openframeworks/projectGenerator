@@ -14,8 +14,8 @@ fi
 if [ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" = "openframeworks/projectGenerator/master" ]; then
     cp scripts/ssh_config ~/.ssh/config
     chmod 600 scripts/id_rsa
-    scp -i scripts/id_rsa commandLine/bin/projectGenerator tests@192.237.185.151:projectGenerator_builds/projectGenerator_osx_new
-    ssh -i scripts/id_rsa tests@192.237.185.151 "mv projectGenerator_builds/projectGenerator_osx_new projectGenerator_builds/projectGenerator_osx"
+    scp -i scripts/id_rsa commandLine/bin/projectGenerator tests@198.61.170.130:projectGenerator_builds/projectGenerator_osx_new
+    ssh -i scripts/id_rsa tests@198.61.170.130 "mv projectGenerator_builds/projectGenerator_osx_new projectGenerator_builds/projectGenerator_osx"
 fi
 rm scripts/id_rsa
 
