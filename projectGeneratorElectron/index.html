@@ -186,6 +186,8 @@ position: fixed;
 					<div class="field">
 						<div class="ui olive button" id="generateButton" onclick="generate()">Generate</div>
 						<div class="ui orange button" id="updateButton" style="display: none" onclick="generate()">Update</div>
+						<div class="ui grey button" id="launchButton" style="display: none" onclick="launchInIDE()">Launch</div>
+						<!--<div class="ui grey button" id="runButton" style="display: none" onclick="runProject()">Run</div>-->
 					</div>
 				</div>
 			</div>
@@ -302,14 +304,6 @@ position: fixed;
 		</div> -->
 		<!-- end modal -->
 
-		<!-- console area -->
-		<section class="ui" id="consoleContainer">
-			<span id="showConsole">Show Console</span>
-			<span id="hideConsole">Hide</span>
-			<div id="console" class="selectable">
-				<p>Welcome to the console :)</p>
-			</div>
-		</section>
 		<script type="text/javascript" src="static/js/jquery.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
 		<script type="text/javascript" src="static/js/semantic.min.js"></script>
 		<script src="app.js"></script>

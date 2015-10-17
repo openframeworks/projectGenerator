@@ -57,7 +57,7 @@ try {
         "defaultOfPath": "",
         "advancedMode": false,
         "defaultPlatform": myPlatform,
-        "showConsole": false,
+        "verboseOutput" : false,
         "showDeveloperTools": false,
         "defaultRelativeProjectPath": "apps/myApps"
     };
@@ -434,7 +434,7 @@ ipc.on('getRandomSketchName', function(event, arg) {
     // Note: path.join throws an error when switched to (single) update and back to create mode...
     var projectNames = new moniker.Dictionary();
     var pathTemp = require('path');
-    projectNames.read( path.join(__dirname, 'static', 'data', 'sketchAdjectives.txt') );
+    projectNames.read( pathTemp.join(__dirname, 'static', 'data', 'sketchAdjectives.txt') );
     var goodName = "";
 
     while (foundOne === false) {
@@ -494,21 +494,25 @@ ipc.on('update', function(event, arg) {
     exec(wholeString, function callback(error, stdout, stderr) {
 
         if (error === null) {
-            event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
-            event.sender.send('sendUIMessage',
-                '<strong>Success!</strong><br>' +
-                'Updating your project was successful! <a href="file:///' + update['updatePath'] + '" class="monospace" data-toggle="external_target">' + update['updatePath'] + '</a><br><br>' +
-                '<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
-                '<div id="fullConsoleOutput"><br><textarea class="selectable">' + stdout + '</textarea></div>'
-            );
+
+            if( generate.verbose === true ){
+                //event.sender.send('sendUIMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
+                event.sender.send('sendUIMessage',
+                    '<strong>Success!</strong><br>' +
+                    'Updating your project was successful! <a href="file:///' + update['updatePath'] + '" class="monospace" data-toggle="external_target">' + update['updatePath'] + '</a><br><br>' +
+                    '<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
+                    '<div id="fullConsoleOutput"><br><textarea class="selectable">' + stdout + '</textarea></div>'
+                );
+            }
             event.sender.send('updateCompleted', true);
         } else {
-            event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + error.message);
+            //event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + error.message);
             event.sender.send('sendUIMessage',
                 '<strong>Error...</strong><br>' +
                 'There was a problem updating your project... <span class="monospace">' + update['updatePath'] + '</span>' +
                 '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + error.message + '</textarea></div>'
             );
+            event.sender.send('updateCompleted', false);
         }
     });
 
@@ -589,15 +593,17 @@ ipc.on('generate', function(event, arg) {
 
         var fullPath = pathTemp.join(generate['projectPath'], generate['projectName']);
         if (error === null && wasError === false) {
-            event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
-            event.sender.send('sendUIMessage',
-                '<strong>Success!</strong><br>' +
-                'Your can now find your project in <a href="file:///' + fullPath + '" data-toggle="external_target" class="monospace">' + fullPath + '</a><br><br>' +
-                '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stdout + '</textarea></div>'
-            );
+            //event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
+            if( generate.verbose === true ){
+                event.sender.send('sendUIMessage',
+                    '<strong>Success!</strong><br>' +
+                    'Your can now find your project in <a href="file:///' + fullPath + '" data-toggle="external_target" class="monospace">' + fullPath + '</a><br><br>' +
+                    '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stdout + '</textarea></div>'
+                );
+            }
             event.sender.send('generateCompleted', true);
         } else if (error !== null) {
-            event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + error.message);
+            //event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + error.message);
             // note: stderr mostly seems to be also included in error.message
             // also available: error.code, error.killed, error.signal, error.cmd
             // info: error.code=127 means commandLinePG was not found
@@ -606,8 +612,9 @@ ipc.on('generate', function(event, arg) {
                 'There was a problem generating your project... <span class="monospace">' + fullPath + '</span>' +
                 '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + error.message + '</textarea></div>'
             );
+            event.sender.send('generateCompleted', false);
         } else if (wasError === true) {
-            event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
+            //event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
             event.sender.send('sendUIMessage',
                 '<strong>Error!</strong><br>' +
                 '<strong>Error...</strong><br>' +
@@ -615,7 +622,7 @@ ipc.on('generate', function(event, arg) {
                 '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stdout + '</textarea></div>'
 
             );
-
+            event.sender.send('generateCompleted', false);
         }
     });
 
@@ -696,6 +703,54 @@ ipc.on('pickProjectImport', function(event, arg) {
             event.sender.send('importProjectSettings', projectSettings);
         }
     });
+});
+
+// arg holds: projectName, projectPath, platform, ofPath
+ipc.on('launchProjectinIDE', function(event, arg) {
+    if( arg.platform != obj.defaultPlatform ){
+        event.sender.send('projectLaunchCompleted', false);
+        return;
+    }
+
+    var pathTemp = require('path');
+    var fsTemp = require('fs');
+    var fullPath = pathTemp.join(arg['projectPath'], arg['projectName']);
+
+    if( fsTemp.statSync(fullPath).isDirectory() == false ){
+        // project doesn't exist
+        event.sender.send('projectLaunchCompleted', false );
+        return;
+    }
+
+    // launch xcode
+    if( arg.platform == 'osx' ){
+        var osxPath = pathTemp.join(fullPath, arg['projectName']+'.xcodeproj');
+         console.log( osxPath );
+        if( fsTemp.statSync(osxPath).isDirectory() == true ){ // note: .xcodeproj is a folder, not a file
+            var exec = require('child_process').exec;
+            exec('open '+osxPath, function callback(error, stdout, stderr){
+                event.sender.send('projectLaunchCompleted', (error==null) );
+                return;
+            });
+        }
+        else {
+            console.log('OSX project file not found!');
+            event.sender.send('projectLaunchCompleted', false );
+            return;
+        }
+    }
+
+    // linux
+    else if( arg.platform == 'linux' || arg.platform == 'linux64' ){
+        // xdg-open $DESTINATION_PATH
+    }
+
+    // unknown platform
+    else {
+        console.log("Unsupported platform for Launch feature...");
+        event.sender.send('projectLaunchCompleted', false );
+                return;
+    }
 });
 
 ipc.on('quit', function(event, arg) {
