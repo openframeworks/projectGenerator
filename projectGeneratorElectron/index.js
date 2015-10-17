@@ -705,6 +705,54 @@ ipc.on('pickProjectImport', function(event, arg) {
     });
 });
 
+// arg holds: projectName, projectPath, platform, ofPath
+ipc.on('launchProjectinIDE', function(event, arg) {
+    if( arg.platform != obj.defaultPlatform ){
+        event.sender.send('projectLaunchCompleted', false);
+        return;
+    }
+
+    var pathTemp = require('path');
+    var fsTemp = require('fs');
+    var fullPath = pathTemp.join(arg['projectPath'], arg['projectName']);
+
+    if( fsTemp.statSync(fullPath).isDirectory() == false ){
+        // project doesn't exist
+        event.sender.send('projectLaunchCompleted', false );
+        return;
+    }
+
+    // launch xcode
+    if( arg.platform == 'osx' ){
+        var osxPath = pathTemp.join(fullPath, arg['projectName']+'.xcodeproj');
+         console.log( osxPath );
+        if( fsTemp.statSync(osxPath).isDirectory() == true ){ // note: .xcodeproj is a folder, not a file
+            var exec = require('child_process').exec;
+            exec('open '+osxPath, function callback(error, stdout, stderr){
+                event.sender.send('projectLaunchCompleted', (error==null) );
+                return;
+            });
+        }
+        else {
+            console.log('OSX project file not found!');
+            event.sender.send('projectLaunchCompleted', false );
+            return;
+        }
+    }
+
+    // linux
+    else if( arg.platform == 'linux' || arg.platform == 'linux64' ){
+        // xdg-open $DESTINATION_PATH
+    }
+
+    // unknown platform
+    else {
+        console.log("Unsupported platform for Launch feature...");
+        event.sender.send('projectLaunchCompleted', false );
+                return;
+    }
+});
+
 ipc.on('quit', function(event, arg) {
     app.quit();
 });

@@ -283,6 +283,22 @@ ipc.on('generateCompleted', function(isSuccessful) {
 });
 
 //-------------------------------------------
+ipc.on('projectLaunchCompleted', function(isSuccessful) {
+    if (isSuccessful === true) {
+        // eventual callback after update completed
+
+    }
+
+    else {
+        $("#launchButton").removeClass("grey").addClass('red').text("Failed!").delay(1000).queue(function() {
+            $( this ).addClass("grey").removeClass('red').text( $(this).data('originalText') ).dequeue();
+        });
+    }
+
+    
+});
+
+//-------------------------------------------
 ipc.on('updateCompleted', function(isSuccessful) {
     if (isSuccessful === true) {
         // eventual callback after update completed
@@ -559,6 +575,9 @@ function setup() {
             $(this).removeClass("accept deny");
         });
 
+        // cache data for interactivity
+        $("#launchButton").data('originalText', $("#launchButton").text());
+
     });
 }
 
@@ -727,6 +746,8 @@ function switchGenerateMode(mode) {
 
         $("#generateButton").hide();
         $("#updateButton").show();
+        $("#launchButton").show();
+        $("#runButton").hide();
         $("#missingAddonMessage").hide();
         $("#nameRandomiser").hide();
         $("#revealProjectFiles").show();
@@ -744,6 +765,8 @@ function switchGenerateMode(mode) {
 
         $("#generateButton").show();
         $("#updateButton").hide();
+        $("#launchButton").hide();
+        $("#runButton").hide();
         $("#missingAddonMessage").hide();
         $("#nameRandomiser").show();
         $("#revealProjectFiles").hide();
@@ -858,4 +881,21 @@ function getRandomSketchName(){
     else {
         ipc.send('getRandomSketchName', path );
     }
+}
+
+function launchInIDE(){
+
+    
+    if( $("#launchButton").text() == 'Launching...'){ return; }
+    $("#launchButton").text('Launching...').delay(1000).queue(function() {
+        $( this ).text( $(this).data('originalText') ).dequeue();
+    });
+
+    var project = {};
+    project['projectName'] = $("#projectName").val();
+    project['projectPath'] = $("#projectPath").val();
+    project['platform'] = defaultSettings['defaultPlatform']; // ignores OS selection
+    project['ofPath'] = $("#ofPath").val();
+
+    ipc.send('launchProjectinIDE', project );
 }
