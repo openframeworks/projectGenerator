@@ -1188,7 +1188,11 @@ void xcodeProject::addAddon(ofAddon & addon){
         
         size_t found=addon.frameworks[i].find('/');
         if (found==std::string::npos){
+            if (target == "ios"){
+                addFramework( addon.frameworks[i] + ".framework", "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/" + addon.frameworks[i] + ".framework", "addons/" + addon.name + "/frameworks");
+            } else {
              addFramework( addon.frameworks[i] + ".framework", "/System/Library/Frameworks/" + addon.frameworks[i] + ".framework", "addons/" + addon.name + "/frameworks");
+            }
         } else {
             
             if (ofIsStringInString(addon.frameworks[i], "/System/Library")){
