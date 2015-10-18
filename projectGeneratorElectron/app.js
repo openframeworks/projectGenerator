@@ -861,6 +861,10 @@ function getUpdatePath() {
 
 function rescanAddons() {
     ipc.send('refreshAddonList', $("#ofPath").val());
+    var projectInfo = {};
+    projectInfo['projectName'] = $("#projectName").val();
+    projectInfo['projectPath'] = $("#projectPath").val();
+    ipc.send('isOFProjectFolder', projectInfo);     // <- this forces addon reload
 }
 
 function getRandomSketchName(){
