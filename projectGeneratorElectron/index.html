@@ -163,6 +163,7 @@ position: fixed;
 							</div>
 						</div>
 					</div>
+					
 					<div class="ui red message" id="missingAddonMessage" style="display: none">
 						<p>
 							<div class="header">
@@ -174,6 +175,20 @@ position: fixed;
 						<p>Please download the missing addons and put them in your addons folder, then <a href="#rescanAddons" onclick="rescanAddons()">rescan it</a>.</p>
 						<p>If you choose to update this project without these addons, you may overwrite the settings on the project.</p>
 					</div>
+
+					<div class="ui yellow message" id="localAddonMessage" style="display: none">
+						<p>
+							<div class="header">
+								Local addons
+							</div>
+						</p>
+						<p>You are attempting to update a project that is using the following local addons:</p>
+						<p><div id="localAddonList">...</div></p>
+						<p>To alter these local addons, edit the addons.make file inside this project and reimport</p>
+					</div>
+
+
+
 					<div class="field">
 						<label>Platforms:</label>
 						<div class="ui multiple search selection dropdown" id="platformsDropdown">

@@ -4,6 +4,8 @@
 
 var ipc = require('ipc');
 var path = require('path');
+var fs = require('fs');
+
 
 var platforms;
 
@@ -22,6 +24,10 @@ var addonsInstalled;
 var currentPath;
 var isOfPathGood = false;
 var bVerbose = false;
+var localAddons = [];
+
+
+
 //-----------------------------------------------------------------------------------
 // IPC 
 //-----------------------------------------------------------------------------------
@@ -200,6 +206,9 @@ ipc.on('setPlatforms', function(arg) {
 // select the list of addons and notify if some aren't installed
 ipc.on('selectAddons', function(arg) {
 
+
+    // todo : DEAL WITH LOCAL ADDONS HERE....
+
     var addonsAlreadyPicked = $("#addonsDropdown").val().split(',');
 
     console.log(addonsAlreadyPicked);
@@ -207,6 +216,7 @@ ipc.on('selectAddons', function(arg) {
     console.log(addonsInstalled);
 
     var neededAddons = [];
+    localAddons = [];
 
     //haystack.indexOf(needle) >= 0
 
@@ -220,11 +230,21 @@ ipc.on('selectAddons', function(arg) {
             if (addonsInstalled.indexOf(arg[i]) >= 0){
                 $('#addonsDropdown').dropdown('set selected', arg[i]);
             } else {
-                neededAddons.push(arg[i]);
-            }
 
+                var neededAddonPathRel = path.join($("#projectPath").val(), $("#projectName").val(), arg[i]);
+                console.log(neededAddonPathRel);
+                if (fs.existsSync(neededAddonPathRel) || 
+                    fs.existsSync(neededAddons[i])){
+                    localAddons.push(arg[i]);
+                } else {
+                    neededAddons.push(arg[i]);
+                }
+
+                
+            }
         }
     }
+
 
     if (neededAddons.length > 0) {
         console.log("missing addons");
@@ -237,8 +257,18 @@ ipc.on('selectAddons', function(arg) {
     } else {
         $("#adons-refresh-icon").hide();
         $("#missingAddonMessage").hide();
-        
+
         // $("#generate-mode-section").removeClass("has-missing-addons");
+    }
+
+    if (localAddons.length > 0){
+        // $("#generate-mode-section").addClass("has-missing-addons");
+        $('#localAddonList').empty();
+        $('#localAddonList').append("<b>" + localAddons.join(", ") + "</b>");
+        $("#localAddonMessage").show();
+        //$("#adons-refresh-icon").show();
+    } else {
+        $("#localAddonMessage").hide();
     }
 
 
@@ -323,6 +353,7 @@ function setOFPath(arg) {
 
 //----------------------------------------
 function setup() {
+
 
     jQuery.fn.extend({
       oneTimeTooltip: function(msg) {
@@ -634,8 +665,6 @@ function saveDefaultSettings() {
 function generate() {
 
 
-
-
     // let's get all the info:
     var platformsPicked = $("#platformsDropdown  .active");
     var addonsPicked = $("#addonsDropdown  .active");
@@ -651,6 +680,11 @@ function generate() {
         addonValueArray.push($(addonsPicked[i]).attr("data-value"));
     }    
 
+    // add any local addons
+    for (var i = 0; i < localAddons.length; i++){
+        addonValueArray.push(localAddons[i]);
+    }
+    
     var lengthOfPlatforms = platformValueArray.length;
 
     var gen = {};
@@ -720,6 +754,7 @@ function switchGenerateMode(mode) {
         $("#generateButton").hide();
         $("#updateButton").show();
         $("#missingAddonMessage").hide();
+        $("#localAddonMessage").hide();
         $("#nameRandomiser").hide();
         $("#revealProjectFiles").show();
         $("#adons-refresh-icon").hide();
@@ -737,6 +772,7 @@ function switchGenerateMode(mode) {
         $("#generateButton").show();
         $("#updateButton").hide();
         $("#missingAddonMessage").hide();
+        $("#localAddonMessage").hide();
         $("#nameRandomiser").show();
         $("#revealProjectFiles").hide();
         $("#adons-refresh-icon").hide();
