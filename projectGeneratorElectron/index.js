@@ -59,7 +59,8 @@ try {
         "defaultPlatform": myPlatform,
         "showConsole": false,
         "showDeveloperTools": false,
-        "defaultRelativeProjectPath": "apps/myApps"
+        "defaultRelativeProjectPath": "apps/myApps",
+        "useDictionaryNameGenerator": false
     };
 }
 
@@ -85,7 +86,7 @@ var platforms = {
     "linuxarmv6l": "Linux ARMv6 (Makefiles)",
     "linuxarmv7l": "Linux ARMv7 (Makefiles)"
 };
-
+var bUseMoniker = obj["useDictionaryNameGenerator"];
 
 
 if (!path.isAbsolute(defaultOfPath)) {
@@ -126,6 +127,46 @@ app.on('window-all-closed', function() {
         app.quit();
     }
 });
+
+
+
+function formatDate(d){
+    //get the month
+    var month = d.getMonth();
+    //get the day
+    var day = d.getDate();
+    //get the year
+    var year = d.getFullYear();
+    //pull the last two digits of the year
+    year = year.toString().substr(2,2);
+    //increment month by 1 since it is 0 indexed
+    month = month + 1;
+    //converts month to a string
+    month = month + "";
+
+    //if month is 1-9 pad right with a 0 for two digits
+    if (month.length == 1){
+        month = "0" + month;
+    }
+    //convert day to string
+    day = day + "";
+    //if day is between 1-9 pad right with a 0 for two digits
+    if (day.length == 1){
+        day = "0" + day;
+    }
+    //return the string "MMddyy"
+    return month + day + year;
+}
+
+// wraps over to bb no aa, why?
+function toLetters(num) {
+    var mod = num % 26,
+        pow = num / 26 | 0,
+        out = mod ? String.fromCharCode(96 + (num % 26)) : (--pow, 'z');
+    return pow ? toLetters(pow) + out : out;
+}
+
+
 
 //-------------------------------------------------------- window
 // This method will be called when Electron has finished
@@ -236,23 +277,10 @@ app.on('ready', function() {
 });
 
 function getStartingProjectName() {
+    
     var defaultPathForProjects = path.join(obj["defaultOfPath"], obj["defaultRelativeProjectPath"]);
     var foundOne = false;
-
-    var projectNames = new moniker.Dictionary();
-    projectNames.read(  path.join(__dirname, 'static', 'data', 'sketchAdjectives.txt'));
-    var goodName = "mySketch";
-
-    while (foundOne === false) {
-        if (fs.existsSync(path.join(defaultPathForProjects, goodName))) {
-            console.log("«" + goodName + "» already exists, generating a new name...");
-            var adjective = projectNames.choose();
-            goodName = "my" + adjective.charAt(0).toUpperCase() + adjective.slice(1) + "Sketch";
-        } else {
-            foundOne = true;
-        }
-    }
-
+    var goodName = getGoodSketchName(defaultPathForProjects);
     startingProject['path'] = defaultPathForProjects;
     startingProject['name'] = goodName;
 }
@@ -288,6 +316,50 @@ function parsePlatformsAndUpdateSelect(arg) {
     // }
     mainWindow.webContents.send('setPlatforms', platformsWeHave);
 
+
+}
+
+function getGoodSketchName(arg){
+
+    var currentProjectPath = arg;
+    var foundOne = false;
+    var goodName = "mySketch";
+
+    if (bUseMoniker){
+        
+        var projectNames = new moniker.Dictionary();
+        projectNames.read(  path.join(__dirname, 'static', 'data', 'sketchAdjectives.txt'));
+        goodName = "mySketch";
+
+        while (foundOne === false) {
+            if (fs.existsSync(path.join(currentProjectPath, goodName))) {
+                console.log("«" + goodName + "» already exists, generating a new name...");
+                var adjective = projectNames.choose();
+                goodName = "my" + adjective.charAt(0).toUpperCase() + adjective.slice(1) + "Sketch";
+            } else {
+                foundOne = true;
+            }
+        }
+
+    } else {
+
+        var date = new Date();
+        var formattedDate = formatDate(date);
+        goodName = "sketch_" + formattedDate;
+        var count = 1;
+
+         while (foundOne === false) {
+            if (fs.existsSync(path.join(currentProjectPath, goodName))) {
+                console.log("«" + goodName + "» already exists, generating a new name...");
+                goodName = "sketch_" + formattedDate + toLetters(count);
+                count++;
+            } else {
+                foundOne = true;
+            }
+        }
+    }
+
+    return goodName;
 
 }
 
@@ -428,24 +500,7 @@ ipc.on('refreshPlatformList', function(event, arg) {
 
 
 ipc.on('getRandomSketchName', function(event, arg) {
-    var currentProjectPath = arg;
-    var foundOne = false;
-
-    // Note: path.join throws an error when switched to (single) update and back to create mode...
-    var projectNames = new moniker.Dictionary();
-    var pathTemp = require('path');
-    projectNames.read( path.join(__dirname, 'static', 'data', 'sketchAdjectives.txt') );
-    var goodName = "";
-
-    while (foundOne === false) {
-        if (goodName === "" || fs.existsSync(pathTemp.join(currentProjectPath, goodName))) {
-            console.log("«" + goodName + "» already exists, generating a new name...");
-            var adjective = projectNames.choose();
-            goodName = "my" + adjective.charAt(0).toUpperCase() + adjective.slice(1) + "Sketch";
-        } else {
-            foundOne = true;
-        }
-    }
+    var goodName = getGoodSketchName(arg);
     event.sender.send('setRandomisedSketchName', goodName);
     event.sender.send('setGenerateMode', 'createMode'); // it's a new sketch name, we are in create mode
 });

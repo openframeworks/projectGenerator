@@ -4,5 +4,6 @@
 	"defaultPlatform": "osx",
 	"defaultRelativeProjectPath": "apps/myApps",
 	"showConsole": false,
-	"showDeveloperTools": false
+	"showDeveloperTools": false,
+	"useDictionaryNameGenerator": true
 }
