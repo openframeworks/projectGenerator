@@ -447,6 +447,7 @@ ipc.on('getRandomSketchName', function(event, arg) {
         }
     }
     event.sender.send('setRandomisedSketchName', goodName);
+    event.sender.send('setGenerateMode', 'createMode'); // it's a new sketch name, we are in create mode
 });
 
 ipc.on('update', function(event, arg) {
