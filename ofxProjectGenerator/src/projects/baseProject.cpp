@@ -234,8 +234,18 @@ void baseProject::addAddon(std::string addonName){
     ofAddon addon;
     addon.pathToOF = getOFRelPath(projectDir);
     addon.pathToProject = ofFilePath::getAbsolutePath(projectDir);
+    
+
+    
     auto localPath = ofFilePath::join(addon.pathToProject, addonName);
-    if(ofDirectory(localPath).exists()){
+    
+    if (ofDirectory(addonName).exists()){
+        // if it's an absolute path, convert to relative...
+        string relativePath = ofFilePath::makeRelative(addon.pathToProject, addonName);
+        addonName = relativePath;
+        addon.isLocalAddon = true;
+        addon.fromFS(addonName, target);
+    } else if(ofDirectory(localPath).exists()){
         addon.isLocalAddon = true;
         addon.fromFS(addonName, target);
     }else{
