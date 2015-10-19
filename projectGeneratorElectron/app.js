@@ -141,10 +141,11 @@ ipc.on('setAddons', function(arg) {
     }
 
 
-    $('#addonsDropdown')
+  $('#addonsDropdown')
         .dropdown({
             allowAdditions: false,
-            fullTextSearch: true
+            fullTextSearch: false,
+            match: "text"
         });
 });
 
