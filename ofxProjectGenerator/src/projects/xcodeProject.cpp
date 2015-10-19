@@ -222,7 +222,7 @@ xcodeProject::xcodeProject(std::string target)
         buildPhaseUUID  = "E4D8936E11527B74007E1F53";
         resourcesUUID   = "BB24DD8F10DA77E000E9C588";
         buildPhaseResourcesUUID = "BB24DDCA10DA781C00E9C588";
-        frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase  // todo: check this?
+        frameworksUUID  = "1DF5F4E00D08C38300B7A737";   //PBXFrameworksBuildPhase  // todo: check this?
         afterPhaseUUID  = "928F60851B6710B200E2D791";
         buildPhasesUUID = "9255DD331112741900D6945E";   //
     }
@@ -582,23 +582,32 @@ void xcodeProject::addFramework(string name, string path, string folder){
     doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child().next_sibling());   // UUID FIRST
     doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child());                  // DICT SECOND
     
-    string buildUUID2 = generateUUID(name + "-build2");
-    pbxbuildfile = string(PBXBuildFile);
-    findandreplace( pbxbuildfile, "FILEUUID", UUID);
-    findandreplace( pbxbuildfile, "BUILDUUID", buildUUID2);
-    fileRefDoc.load_buffer(pbxbuildfile.c_str(), strlen(pbxbuildfile.c_str()));
-    doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child().next_sibling());   // UUID FIRST
-    doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child());                  // DICT SECOND
+    
     
     // we add one of the build refs to the list of frameworks
     
     pugi::xml_node array;
+    
+    
+  
+    
     findArrayForUUID(frameworksUUID, array);    // this is the build array (all build refs get added here)
     array.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
 
     // we add the second to a final build phase for copying the framework into app.   we need to make sure we *don't* do this for system frameworks
     
     if (folder.size() != 0){
+        
+        string buildUUID2 = generateUUID(name + "-build2");
+        pbxbuildfile = string(PBXBuildFile);
+        findandreplace( pbxbuildfile, "FILEUUID", UUID);
+        findandreplace( pbxbuildfile, "BUILDUUID", buildUUID2);
+        fileRefDoc.load_buffer(pbxbuildfile.c_str(), strlen(pbxbuildfile.c_str()));
+        doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child().next_sibling());   // UUID FIRST
+        doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child());                  // DICT SECOND
+   
+        
+        
         pugi::xpath_node xpathResult = doc.select_node("//string[contains(.,'PBXCopyFilesBuildPhase')]/../array");
         pugi::xml_node node = xpathResult.node();
         node.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID2.c_str());
