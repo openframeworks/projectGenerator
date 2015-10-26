@@ -214,7 +214,9 @@ xcodeProject::xcodeProject(std::string target)
         resourcesUUID   = "";
         frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase
         afterPhaseUUID  = "928F60851B6710B200E2D791";
-        buildPhasesUUID  = "E4C2427710CC5ABF004149E2";      
+        buildPhasesUUID  = "E4C2427710CC5ABF004149E2";
+        frameworksBuildPhaseUUID = "E4328149138ABC9F0047C5CB";
+        
     }else{
         srcUUID         = "E4D8936A11527B74007E1F53";
         addonUUID       = "BB16F26B0F2B646B00518274";
@@ -681,15 +683,12 @@ void xcodeProject::addFramework(string name, string path, string folder){
     }
 
     
-    
-    //PBXCopyFilesBuildPhase
-    
-    
-    // add it to the build phases...
-//    pugi::xml_node arrayBuild;
-//    findArrayForUUID(frameworksBuildPhaseUUID, arrayBuild);    // this is the build array (all build refs get added here)
-//    arrayBuild.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
-
+    if (target != "ios" && folder.size() != 0){
+        // add it to the linking phases...
+        pugi::xml_node arrayBuild;
+        findArrayForUUID(frameworksBuildPhaseUUID, arrayBuild);    // this is the build array (all build refs get added here)
+        arrayBuild.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
+    }
 }
 
 
