@@ -598,7 +598,10 @@ void xcodeProject::addFramework(string name, string path, string folder){
 
     // we add the second to a final build phase for copying the framework into app.   we need to make sure we *don't* do this for system frameworks
     
-    if (folder.size() != 0){
+    
+
+    if (folder.size() != 0 && !ofIsStringInString(path, "/System/Library/Frameworks")
+        && target != "ios"){
         
         string buildUUID2 = generateUUID(name + "-build2");
         pbxbuildfile = string(PBXBuildFile);
@@ -607,8 +610,6 @@ void xcodeProject::addFramework(string name, string path, string folder){
         fileRefDoc.load_buffer(pbxbuildfile.c_str(), strlen(pbxbuildfile.c_str()));
         doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child().next_sibling());   // UUID FIRST
         doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child());                  // DICT SECOND
-   
-        
         
         pugi::xpath_node xpathResult = doc.select_node("//string[contains(.,'PBXCopyFilesBuildPhase')]/../array");
         pugi::xml_node node = xpathResult.node();
@@ -638,7 +639,7 @@ void xcodeProject::addFramework(string name, string path, string folder){
     
     // finally, this is for making folders based on the frameworks position in the addon. so it can appear in the sidebar / file explorer
     
-    if (folder.size() > 0){
+    if (folder.size() > 0 && !ofIsStringInString(folder, "/System/Library/Frameworks")){
         
         vector < string > folders = ofSplitString(folder, "/", true);
         
