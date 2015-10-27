@@ -48,8 +48,7 @@ public:
     std::string buildPhaseResourcesUUID;
     std::string frameworksBuildPhaseUUID;
     std::string afterPhaseUUID;
-    std::string buildPhasesUUID;                // note this UUID is in an array of *all* the build steps (ie build phases)
-    
+    std::string buildPhasesUUID;                // note this UUID is in an array of *all* the build steps 
     
     
     
