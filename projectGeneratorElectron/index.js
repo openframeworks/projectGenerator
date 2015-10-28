@@ -77,6 +77,17 @@ console.log("detected platform: " + hostplatform + " in " + __dirname);
 
 var defaultOfPath = obj["defaultOfPath"];
 var addons;
+
+// hide some addons, per https://github.com/openframeworks/projectGenerator/issues/62
+
+var addonsToSkip = [
+    "ofxiOS",
+    "ofxMultiTouch",
+    "ofxEmscripten", 
+    "ofxAccelerometer",
+    "ofxAndroid"
+]
+
 var platforms = {
     "osx": "OS X (Xcode)",
     "vs": "Windows (Visual Studio 2015)",
@@ -289,6 +300,27 @@ function parseAddonsAndUpdateSelect(arg) {
     console.log("in parseAddonsAndUpdateSelect " + arg);
     //path = require('path').resolve(__dirname, defaultOfPath + "/addons");
     addons = getDirectories(arg + "/addons","ofx");
+
+    var a = addons;
+    var b = addonsToSkip;
+    var addonsThatShouldBeShown = [];
+    var found;
+    for (var i = 0; i < a.length; i++) {
+        found = false;
+        // find a[i] in b
+        for (var j = 0; j < b.length; j++) {
+            if (a[i] == b[j]) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            addonsThatShouldBeShown.push(a[i]);
+        }
+    }
+
+    addons = addonsThatShouldBeShown;
+
     console.log("Reloading the addons folder, these were found:");
     console.log(addons);
     mainWindow.webContents.send('setAddons', addons);
