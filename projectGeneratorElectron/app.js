@@ -222,6 +222,7 @@ ipc.on('selectAddons', function(arg) {
     //haystack.indexOf(needle) >= 0
 
     for (var i = 0; i < arg.length; i++) {
+        arg[i] = arg[i].trim();
         // first, check if it's already picked, then do nothing
         if (addonsAlreadyPicked.indexOf(arg[i]) >= 0){
             console.log("already picked"); // alread picked
