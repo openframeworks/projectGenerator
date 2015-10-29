@@ -814,10 +814,13 @@ ipc.on('launchProjectinIDE', function(event, arg) {
         exec('xdg-open ' + linuxPath, function callback(error, stdout, stderr){
             return;
         });
-    } else {
-        console.log("Unsupported platform for Launch feature...");
-        event.sender.send('projectLaunchCompleted', false );
-                return;
+    } else {    
+        var windowsPath = pathTemp.join(fullPath, arg['projectName'] + '.sln');
+        console.log( windowsPath );
+        var exec = require('child_process').exec;
+        exec('start ' + windowsPath, function callback(error, stdout, stderr){
+            return;
+        });
     }
 });
 
