@@ -796,29 +796,25 @@ ipc.on('launchProjectinIDE', function(event, arg) {
 
     // // launch xcode
     if( arg.platform == 'osx' ){
-          var osxPath = pathTemp.join(fullPath, arg['projectName'] + '.xcodeproj');
+        var osxPath = pathTemp.join(fullPath, arg['projectName'] + '.xcodeproj');
         console.log( osxPath );
         if( fsTemp.statSync(osxPath).isDirectory() == true ){ // note: .xcodeproj is a folder, not a file
-            var exec = require('child_process').exec;
-            exec('open ' + osxPath, function callback(error, stdout, stderr){
-                event.sender.send('projectLaunchCompleted', (error==null) );
-                return;
-            });
+                var exec = require('child_process').exec;
+                exec('open ' + osxPath, function callback(error, stdout, stderr){
+                    return;
+                });
         }
         else {
-            // console.log('OSX project file not found!');
-            // event.sender.send('projectLaunchCompleted', false );
-            // return;
+            console.log('OSX project file not found!');
         }
-    }
-
-    // linux
-    else if( arg.platform == 'linux' || arg.platform == 'linux64' ){
-        // xdg-open $DESTINATION_PATH
-    }
-
-    // unknown platform
-    else {
+    } else if( arg.platform == 'linux' || arg.platform == 'linux64' ){
+        var linuxPath = pathTemp.join(fullPath, arg['projectName'] + '.cbp');
+        console.log( linuxPath );
+        var exec = require('child_process').exec;
+        exec('xdg-open ' + linuxPath, function callback(error, stdout, stderr){
+            return;
+        });
+    } else {
         console.log("Unsupported platform for Launch feature...");
         event.sender.send('projectLaunchCompleted', false );
                 return;
