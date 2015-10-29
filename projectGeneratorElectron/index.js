@@ -301,9 +301,13 @@ function parseAddonsAndUpdateSelect(arg) {
     //path = require('path').resolve(__dirname, defaultOfPath + "/addons");
     addons = getDirectories(arg + "/addons","ofx");
 
-    addons = addons.filter( function(addon) {
-        return addonsToSkip.indexOf(addon)==-1;
-    });
+    if (addons){
+    if (addons.length > 0){
+        addons = addons.filter( function(addon) {
+            return addonsToSkip.indexOf(addon)==-1;
+        });
+    }
+    }
 
     console.log("Reloading the addons folder, these were found:");
     console.log(addons);
@@ -571,15 +575,17 @@ ipc.on('update', function(event, arg) {
                 '<strong>Success!</strong><br>' +
                 'Updating your project was successful! <a href="file:///' + update['updatePath'] + '" class="monospace" data-toggle="external_target">' + update['updatePath'] + '</a><br><br>' +
                 '<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
-                '<div id="fullConsoleOutput"><br><textarea class="selectable">' + stdout + '</textarea></div>'
+                '<div id="fullConsoleOutput"><br><textarea class="selectable">' + stdout + '\n\n\n(command used:' + wholeString + ')\n\n\n</textarea></div>'
             );
+
+            //
             event.sender.send('updateCompleted', true);
         } else {
             event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + error.message);
             event.sender.send('sendUIMessage',
                 '<strong>Error...</strong><br>' +
                 'There was a problem updating your project... <span class="monospace">' + update['updatePath'] + '</span>' +
-                '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + error.message + '</textarea></div>'
+                '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + error.message + '\n\n\n(command used:' + wholeString + ')\n\n\n</textarea></div>'
             );
         }
     });
@@ -665,7 +671,7 @@ ipc.on('generate', function(event, arg) {
             event.sender.send('sendUIMessage',
                 '<strong>Success!</strong><br>' +
                 'Your can now find your project in <a href="file:///' + fullPath + '" data-toggle="external_target" class="monospace">' + fullPath + '</a><br><br>' +
-                '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stdout + '</textarea></div>'
+                '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stdout + '\n\n\n(command used: ' + wholeString + ')\n\n\n</textarea></div>'
             );
             event.sender.send('generateCompleted', true);
         } else if (error !== null) {
@@ -684,7 +690,7 @@ ipc.on('generate', function(event, arg) {
                 '<strong>Error!</strong><br>' +
                 '<strong>Error...</strong><br>' +
                 'There was a problem generating your project... <span class="monospace">' + fullPath + '</span>' +
-                '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stdout + '</textarea></div>'
+                '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stdout + '\n\n\n(command used: ' + wholeString + ')\n\n\n</textarea></div>'
 
             );
 
@@ -768,6 +774,55 @@ ipc.on('pickProjectImport', function(event, arg) {
             event.sender.send('importProjectSettings', projectSettings);
         }
     });
+});
+
+
+ipc.on('launchProjectinIDE', function(event, arg) {
+    
+    if( arg.platform != obj.defaultPlatform ){
+        event.sender.send('projectLaunchCompleted', false);
+        return;
+    }
+
+    var pathTemp = require('path');
+    var fsTemp = require('fs');
+    var fullPath = pathTemp.join(arg['projectPath'], arg['projectName']);
+
+    if( fsTemp.statSync(fullPath).isDirectory() == false ){
+        // project doesn't exist
+        event.sender.send('projectLaunchCompleted', false );
+        return;
+    }
+
+    // // launch xcode
+    if( arg.platform == 'osx' ){
+          var osxPath = pathTemp.join(fullPath, arg['projectName'] + '.xcodeproj');
+        console.log( osxPath );
+        if( fsTemp.statSync(osxPath).isDirectory() == true ){ // note: .xcodeproj is a folder, not a file
+            var exec = require('child_process').exec;
+            exec('open ' + osxPath, function callback(error, stdout, stderr){
+                event.sender.send('projectLaunchCompleted', (error==null) );
+                return;
+            });
+        }
+        else {
+            // console.log('OSX project file not found!');
+            // event.sender.send('projectLaunchCompleted', false );
+            // return;
+        }
+    }
+
+    // linux
+    else if( arg.platform == 'linux' || arg.platform == 'linux64' ){
+        // xdg-open $DESTINATION_PATH
+    }
+
+    // unknown platform
+    else {
+        console.log("Unsupported platform for Launch feature...");
+        event.sender.send('projectLaunchCompleted', false );
+                return;
+    }
 });
 
 ipc.on('quit', function(event, arg) {
