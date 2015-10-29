@@ -92,8 +92,8 @@ var platforms = {
     "osx": "OS X (Xcode)",
     "vs": "Windows (Visual Studio 2015)",
     "ios": "iOS (Xcode)",
-    "linux": "Linux 32-bit (Code::Blocks)",
-    "linux64": "Linux 64-bit (Code::Blocks)",
+    "linux": "Linux 32-bit (qtCreator)",
+    "linux64": "Linux 64-bit (qtCreator)",
     "linuxarmv6l": "Linux ARMv6 (Makefiles)",
     "linuxarmv7l": "Linux ARMv7 (Makefiles)"
 };
@@ -808,7 +808,7 @@ ipc.on('launchProjectinIDE', function(event, arg) {
             console.log('OSX project file not found!');
         }
     } else if( arg.platform == 'linux' || arg.platform == 'linux64' ){
-        var linuxPath = pathTemp.join(fullPath, arg['projectName'] + '.cbp');
+        var linuxPath = pathTemp.join(fullPath, arg['projectName'] + '.qbs');
         console.log( linuxPath );
         var exec = require('child_process').exec;
         exec('xdg-open ' + linuxPath, function callback(error, stdout, stderr){
