@@ -932,7 +932,6 @@ function getRandomSketchName(){
 
 function launchInIDE(){
 
-console.log("sdfsadfasdf?");
     var project = {};
     project['projectName'] = $("#projectName").val();
     project['projectPath'] = $("#projectPath").val();
