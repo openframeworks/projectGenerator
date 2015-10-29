@@ -294,6 +294,10 @@ ipc.on('selectAddons', function(arg) {
 //-------------------------------------------
 // allow main to send UI messages
 ipc.on('sendUIMessage', function(arg) {
+
+    // check if it has "success" message: 
+
+
     displayModal(arg);
 });
 
@@ -480,6 +484,11 @@ function setup() {
                 enableAdvancedMode(false);
             }
         });
+
+         $("#IDEButton").on("click", function() {  
+            launchInIDE();
+         });
+
 
          $("#verboseOption").checkbox();
          $("#verboseOption").on("change", function() {
@@ -849,6 +858,13 @@ function displayModal(message) {
 		var shell = require('shell');
 		shell.openExternal( $(this).prop("href") );
     });
+
+    if (message.indexOf("Success!") > -1){
+        $("#IDEButton").show();
+    } else {
+        $("#IDEButton").hide();
+    }
+
     $("#uiModal").modal('show');
 }
 
@@ -914,3 +930,15 @@ function getRandomSketchName(){
         ipc.send('getRandomSketchName', path );
     }
 }
+
+function launchInIDE(){
+
+    var project = {};
+    project['projectName'] = $("#projectName").val();
+    project['projectPath'] = $("#projectPath").val();
+    project['platform'] = defaultSettings['defaultPlatform']; // ignores OS selection
+    project['ofPath'] = $("#ofPath").val();
+
+    ipc.send('launchProjectinIDE', project );
+}
+
