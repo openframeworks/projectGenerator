@@ -348,7 +348,8 @@ function getGoodSketchName(arg){
     if (bUseMoniker){
         
         var projectNames = new moniker.Dictionary();
-        projectNames.read(  path.join(__dirname, 'static', 'data', 'sketchAdjectives.txt'));
+        var tmpPath = require('path');
+        projectNames.read(  tmpPath.join(__dirname, 'static', 'data', 'sketchAdjectives.txt'));
         goodName = "mySketch";
 
         while (foundOne === false) {
