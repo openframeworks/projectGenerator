@@ -830,7 +830,7 @@ ipc.on('launchProjectinIDE', function(event, arg) {
         console.log( windowsPath );
         windowsPath = "\"" + windowsPath + "\"";
         var exec = require('child_process').exec;
-        exec('start ' + windowsPath, function callback(error, stdout, stderr){
+        exec('start ' + "\"\"" + " " + windowsPath, function callback(error, stdout, stderr){
             return;
         });
     }
