@@ -564,8 +564,12 @@ ipc.on('update', function(event, arg) {
     var pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
 
 
-    pgApp = pgApp.replace(/ /g, '\\ ');
-
+    if( arg.platform == 'osx' || arg.platform == 'linux' || arg.platform == 'linux64' ){
+        pgApp = pgApp.replace(/ /g, '\\ ');
+    } else {
+        pgApp = pgApp.replace(/ /g, '^ ');
+    }
+    
     var wholeString = pgApp + " " + recursiveString + " " + verboseString + " " + pathString + " " + platformString + " " + updatePath;
 
     exec(wholeString, function callback(error, stdout, stderr) {
@@ -646,7 +650,11 @@ ipc.on('generate', function(event, arg) {
         pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
     }
 
-    pgApp = pgApp.replace(/ /g, '\\ ');
+    if( arg.platform == 'osx' || arg.platform == 'linux' || arg.platform == 'linux64' ){
+        pgApp = pgApp.replace(/ /g, '\\ ');
+    } else {
+        pgApp = pgApp.replace(/ /g, '^ ');
+    }
 
     var wholeString = pgApp + " " + verboseString + " " + pathString + " " + addonString + " " + platformString + " " + projectString;
 
