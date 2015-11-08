@@ -807,16 +807,11 @@ ipc.on('launchProjectinIDE', function(event, arg) {
     if( arg.platform == 'osx' ){
         var osxPath = pathTemp.join(fullPath, arg['projectName'] + '.xcodeproj');
         console.log( osxPath );
-        osxPath = osxPath.replace(/ /g, '\\ ');
-        if( fsTemp.statSync(osxPath).isDirectory() == true ){ // note: .xcodeproj is a folder, not a file
-                var exec = require('child_process').exec;
-                exec('open ' + osxPath, function callback(error, stdout, stderr){
-                    return;
-                });
-        }
-        else {
-            console.log('OSX project file not found!');
-        }
+        osxPath = "\"" + osxPath + "\"";
+		var exec = require('child_process').exec;
+        exec('open ' + osxPath, function callback(error, stdout, stderr){
+            return;
+        });
     } else if( arg.platform == 'linux' || arg.platform == 'linux64' ){
         var linuxPath = pathTemp.join(fullPath, arg['projectName'] + '.qbs');
         linuxPath = linuxPath.replace(/ /g, '\\ ');
