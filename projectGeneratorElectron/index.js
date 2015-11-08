@@ -564,8 +564,12 @@ ipc.on('update', function(event, arg) {
     var pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
 
 
-    pgApp = pgApp.replace(/ /g, '\\ ');
-
+    if( arg.platform == 'osx' || arg.platform == 'linux' || arg.platform == 'linux64' ){
+        pgApp = pgApp.replace(/ /g, '\\ ');
+    } else {
+        pgApp = "\"" + pgApp + "\"";
+    }
+    
     var wholeString = pgApp + " " + recursiveString + " " + verboseString + " " + pathString + " " + platformString + " " + updatePath;
 
     exec(wholeString, function callback(error, stdout, stderr) {
@@ -646,7 +650,11 @@ ipc.on('generate', function(event, arg) {
         pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
     }
 
-    pgApp = pgApp.replace(/ /g, '\\ ');
+    if( arg.platform == 'osx' || arg.platform == 'linux' || arg.platform == 'linux64' ){
+        pgApp = pgApp.replace(/ /g, '\\ ');
+    } else {
+        pgApp = pgApp = "\"" + pgApp + "\"";
+    }
 
     var wholeString = pgApp + " " + verboseString + " " + pathString + " " + addonString + " " + platformString + " " + projectString;
 
@@ -799,17 +807,14 @@ ipc.on('launchProjectinIDE', function(event, arg) {
     if( arg.platform == 'osx' ){
         var osxPath = pathTemp.join(fullPath, arg['projectName'] + '.xcodeproj');
         console.log( osxPath );
-        if( fsTemp.statSync(osxPath).isDirectory() == true ){ // note: .xcodeproj is a folder, not a file
-                var exec = require('child_process').exec;
-                exec('open ' + osxPath, function callback(error, stdout, stderr){
-                    return;
-                });
-        }
-        else {
-            console.log('OSX project file not found!');
-        }
+        osxPath = "\"" + osxPath + "\"";
+		var exec = require('child_process').exec;
+        exec('open ' + osxPath, function callback(error, stdout, stderr){
+            return;
+        });
     } else if( arg.platform == 'linux' || arg.platform == 'linux64' ){
         var linuxPath = pathTemp.join(fullPath, arg['projectName'] + '.qbs');
+        linuxPath = linuxPath.replace(/ /g, '\\ ');
         console.log( linuxPath );
         var exec = require('child_process').exec;
         exec('xdg-open ' + linuxPath, function callback(error, stdout, stderr){
@@ -818,8 +823,9 @@ ipc.on('launchProjectinIDE', function(event, arg) {
     } else {    
         var windowsPath = pathTemp.join(fullPath, arg['projectName'] + '.sln');
         console.log( windowsPath );
+        windowsPath = "\"" + windowsPath + "\"";
         var exec = require('child_process').exec;
-        exec('start ' + windowsPath, function callback(error, stdout, stderr){
+        exec('start ' + "\"\"" + " " + windowsPath, function callback(error, stdout, stderr){
             return;
         });
     }
