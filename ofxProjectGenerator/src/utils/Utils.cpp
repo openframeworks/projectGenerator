@@ -211,7 +211,7 @@ static vector <string> platforms;
 bool isFolderNotCurrentPlatform(string folderName, string platform){
 	if( platforms.size() == 0 ){
 		platforms.push_back("osx");
-		platforms.push_back("win_cb");
+        platforms.push_back("msys2");
 		platforms.push_back("vs");
 		platforms.push_back("ios");
 		platforms.push_back("linux");
@@ -469,8 +469,8 @@ std::string getTargetString(ofTargetPlatform t){
     switch (t) {
     case OF_TARGET_OSX:
         return "osx";
-    case OF_TARGET_WINGCC:
-        return "win_cb";
+    case OF_TARGET_MINGW:
+        return "msys2";
     case OF_TARGET_WINVS:
         return "vs";
     case OF_TARGET_IOS:
@@ -495,7 +495,7 @@ unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ) {
     switch (targ) {
     case OF_TARGET_OSX:
         return unique_ptr<xcodeProject>(new xcodeProject(getTargetString(targ)));
-    case OF_TARGET_WINGCC:
+    case OF_TARGET_MINGW:
         return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
     case OF_TARGET_WINVS:
         return unique_ptr<visualStudioProject>(new visualStudioProject(getTargetString(targ)));

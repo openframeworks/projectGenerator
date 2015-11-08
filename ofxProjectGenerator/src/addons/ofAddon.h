@@ -68,7 +68,7 @@ private:
     	Common,
     	Linux,
     	Linux64,
-    	WinCB,
+        MinGW,
     	VS,
     	LinuxARMv6,
     	LinuxARMv7,

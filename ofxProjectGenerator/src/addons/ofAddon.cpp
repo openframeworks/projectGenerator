@@ -26,7 +26,7 @@ ofAddon::ConfigParseState ofAddon::stateFromString(string name){
 	if(name=="common") return Common;
 	if(name=="linux64") return Linux64;
 	if(name=="linux") return Linux;
-	if(name=="win_cb") return WinCB;
+    if(name=="msys2") return MinGW;
 	if(name=="vs") return VS;
 	if(name=="linuxarmv6l") return LinuxARMv6;
 	if(name=="linuxarmv7l") return LinuxARMv7;
@@ -47,8 +47,8 @@ string ofAddon::stateName(ofAddon::ConfigParseState state){
 		return "linux";
 	case Linux64:
 		return "linux64";
-	case WinCB:
-		return "win_cb";
+    case MinGW:
+        return "msys2";
 	case VS:
 		return "vs";
 	case LinuxARMv6:
@@ -78,7 +78,7 @@ bool ofAddon::checkCorrectPlatform(ConfigParseState state){
 		return true;
 	case Linux:
 	case Linux64:
-	case WinCB:
+    case MinGW:
 	case VS:
 	case LinuxARMv6:
 	case LinuxARMv7:
@@ -101,7 +101,7 @@ bool ofAddon::checkCorrectVariable(string variable, ConfigParseState state){
 	case Common:
 	case Linux:
 	case Linux64:
-	case WinCB:
+    case MinGW:
 	case VS:
 	case LinuxARMv6:
 	case LinuxARMv7:

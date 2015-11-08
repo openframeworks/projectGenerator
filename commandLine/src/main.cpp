@@ -156,8 +156,8 @@ void addPlatforms(string value) {
         else if (platforms[i] == "linuxarmv7l") {
             targets.push_back(OF_TARGET_LINUXARMV7L);
         }
-        else if (platforms[i] == "win_cb") {
-            targets.push_back(OF_TARGET_WINGCC);
+        else if (platforms[i] == "msys2") {
+            targets.push_back(OF_TARGET_MINGW);
         }
         else if (platforms[i] == "vs") {
             targets.push_back(OF_TARGET_WINVS);
@@ -177,7 +177,7 @@ void addPlatforms(string value) {
             targets.push_back(OF_TARGET_LINUX64);
             targets.push_back(OF_TARGET_LINUXARMV6L);
             targets.push_back(OF_TARGET_LINUXARMV7L);
-            targets.push_back(OF_TARGET_WINGCC);
+            targets.push_back(OF_TARGET_MINGW);
             targets.push_back(OF_TARGET_WINVS);
             targets.push_back(OF_TARGET_OSX);
             targets.push_back(OF_TARGET_IOS);
@@ -516,16 +516,6 @@ int main(int argc, char* argv[]){
     } else {
         ofLogError() << "Missing project path";
         printHelp();
-        consoleSpace();
-		
-        return EXIT_USAGE;
-    }
-
-    
-   
-    if (!isGoodOFPath(ofPath)) {
-        consoleSpace();
-        ofLogError() << "path to openframeworks (" << ofPath << ") seems wrong, please check";
         consoleSpace();
 		
         return EXIT_USAGE;
