@@ -23,6 +23,7 @@
 #include "CBWinProject.h"
 #include "xcodeProject.h"
 #include "visualStudioProject.h"
+#include "androidStudioProject.h"
 
 #include "Poco/String.h"
 
@@ -510,6 +511,7 @@ unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ) {
     case OF_TARGET_LINUXARMV7L:
         return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
     case OF_TARGET_ANDROID:
+        return unique_ptr<AndroidStudioProject>(new AndroidStudioProject(getTargetString(targ)));
     default:
         return unique_ptr<baseProject>();
     }

@@ -33,6 +33,7 @@ constexpr option::Descriptor usage[] =
 #include "qtcreatorproject.h"
 #include "visualStudioProject.h"
 #include "xcodeProject.h"
+#include "androidStudioProject.h"
 #include "Utils.h"
 
 
@@ -169,8 +170,7 @@ void addPlatforms(string value) {
             targets.push_back(OF_TARGET_IPHONE);
         }
         else if (platforms[i] == "android") {
-            ofLogError() << "android platform not supported yet" << endl;
-            std::exit(1);
+            targets.push_back(OF_TARGET_ANDROID);
         }
         else if (platforms[i] == "allplatforms") {
             targets.push_back(OF_TARGET_LINUX);
@@ -181,6 +181,7 @@ void addPlatforms(string value) {
             targets.push_back(OF_TARGET_WINVS);
             targets.push_back(OF_TARGET_OSX);
             targets.push_back(OF_TARGET_IOS);
+            targets.push_back(OF_TARGET_ANDROID);
         }else{
             ofLogError() << "platform " << platforms[i] << " not valid";
         }

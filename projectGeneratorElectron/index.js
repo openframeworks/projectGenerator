@@ -83,7 +83,7 @@ var addons;
 var addonsToSkip = [
     "ofxiOS",
     "ofxMultiTouch",
-    "ofxEmscripten", 
+    "ofxEmscripten",
     "ofxAccelerometer",
     "ofxAndroid"
 ]
@@ -92,6 +92,7 @@ var platforms = {
     "osx": "OS X (Xcode)",
     "vs": "Windows (Visual Studio 2015)",
     "ios": "iOS (Xcode)",
+    "android": "Android (Android Studio)",
     "linux": "Linux 32-bit (qtCreator)",
     "linux64": "Linux 64-bit (qtCreator)",
     "linuxarmv6l": "Linux ARMv6 (Makefiles)",
@@ -101,9 +102,9 @@ var bUseMoniker = obj["useDictionaryNameGenerator"];
 
 
 if (!path.isAbsolute(defaultOfPath)) {
-    
-    // todo: this needs to be PLATFORM specific b/c of where things are placed. 
-    // arturo, this may differ on linux, if putting ../ in settings doesn't work for the default path 
+
+    // todo: this needs to be PLATFORM specific b/c of where things are placed.
+    // arturo, this may differ on linux, if putting ../ in settings doesn't work for the default path
     // take a look at this...
 
     if (hostplatform=="windows" || hostplatform=="linux"){
@@ -111,7 +112,7 @@ if (!path.isAbsolute(defaultOfPath)) {
     } else if(hostplatform=="osx"){
     	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../../../"), defaultOfPath));
     }
-    
+
     obj["defaultOfPath"] = defaultOfPath;
 }
 
@@ -288,7 +289,7 @@ app.on('ready', function() {
 });
 
 function getStartingProjectName() {
-    
+
     var defaultPathForProjects = path.join(obj["defaultOfPath"], obj["defaultRelativeProjectPath"]);
     var foundOne = false;
     var goodName = getGoodSketchName(defaultPathForProjects);
@@ -346,7 +347,7 @@ function getGoodSketchName(arg){
     var goodName = "mySketch";
 
     if (bUseMoniker){
-        
+
         var projectNames = new moniker.Dictionary();
         var tmpPath = require('path');
         projectNames.read(  tmpPath.join(__dirname, 'static', 'data', 'sketchAdjectives.txt'));
@@ -569,7 +570,7 @@ ipc.on('update', function(event, arg) {
     } else {
         pgApp = "\"" + pgApp + "\"";
     }
-    
+
     var wholeString = pgApp + " " + recursiveString + " " + verboseString + " " + pathString + " " + platformString + " " + updatePath;
 
     exec(wholeString, function callback(error, stdout, stderr) {
@@ -621,7 +622,7 @@ ipc.on('generate', function(event, arg) {
 
     if (generate['platformList'] !== null) {
         platformString = "-p\"" + generate['platformList'].join(",") + "\"";
-    } 
+    }
 
     if (generate['addonList'] !== null &&
         generate['addonList'].length > 0) {
@@ -644,7 +645,7 @@ ipc.on('generate', function(event, arg) {
     }
 
     var pgApp="";
-    if(hostplatform == "linux"){	
+    if(hostplatform == "linux"){
         pgApp = "projectGenerator";
     }else{
         pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
@@ -671,7 +672,7 @@ ipc.on('generate', function(event, arg) {
             }
         }
 
-        // wasError = did the PG spit out an error (like a bad path, etc) 
+        // wasError = did the PG spit out an error (like a bad path, etc)
         // error = did node have an error running this command line app
 
         var fullPath = pathTemp.join(generate['projectPath'], generate['projectName']);
@@ -787,7 +788,7 @@ ipc.on('pickProjectImport', function(event, arg) {
 
 
 ipc.on('launchProjectinIDE', function(event, arg) {
-    
+
     if( arg.platform != obj.defaultPlatform ){
         event.sender.send('projectLaunchCompleted', false);
         return;
@@ -808,7 +809,7 @@ ipc.on('launchProjectinIDE', function(event, arg) {
         var osxPath = pathTemp.join(fullPath, arg['projectName'] + '.xcodeproj');
         console.log( osxPath );
         osxPath = "\"" + osxPath + "\"";
-		var exec = require('child_process').exec;
+				var exec = require('child_process').exec;
         exec('open ' + osxPath, function callback(error, stdout, stderr){
             return;
         });
@@ -820,7 +821,9 @@ ipc.on('launchProjectinIDE', function(event, arg) {
         exec('xdg-open ' + linuxPath, function callback(error, stdout, stderr){
             return;
         });
-    } else {    
+    } else if( arg.platform == 'android'){
+       // Can't find a way to open android studio using "Open existing android studio project"
+    } else {
         var windowsPath = pathTemp.join(fullPath, arg['projectName'] + '.sln');
         console.log( windowsPath );
         windowsPath = "\"" + windowsPath + "\"";
