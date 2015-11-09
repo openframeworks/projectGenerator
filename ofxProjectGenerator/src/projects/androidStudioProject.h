@@ -14,10 +14,4 @@ public:
     bool saveProjectFile(){};
     static std::string LOG_NAME;
 
-private:
-    void addAddon(ofAddon & addon){};
-  /*  using baseProject::addAddon;
-    std::set<std::string> qbsProjectFiles;
-    ofBuffer qbs;
-    std::string originalFilesStr, originalAddonsStr;*/
 };
