@@ -14,6 +14,19 @@
 		93C19E76048C3DC7D9B1A13F /* xcodeProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 851AF667222EF52C8558BAAE /* xcodeProject.cpp */; };
 		9D8D62C244DFE08B13F67942 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F48CCF18A98E718E487ED699 /* Utils.cpp */; };
 		B3779BEA5981FB5F1270ACAE /* visualStudioProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B6DF1A36467F4AD999991D0 /* visualStudioProject.cpp */; };
+		DD4831D91BF0AABF00E9C93C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4B69E1D0A3A1BDC003C02F2 /* main.cpp */; };
+		DD4831DA1BF0AAC200E9C93C /* ofApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */; };
+		DD4831DD1BF0AB5900E9C93C /* LibraryBinary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85AE4BA4B2C36DE3FDEA205B /* LibraryBinary.cpp */; };
+		DD4831DE1BF0AB5900E9C93C /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F48CCF18A98E718E487ED699 /* Utils.cpp */; };
+		DD4831DF1BF0AB5900E9C93C /* baseProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9F3E7A5103CD741ED442779 /* baseProject.cpp */; };
+		DD4831E01BF0AB5900E9C93C /* xcodeProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 851AF667222EF52C8558BAAE /* xcodeProject.cpp */; };
+		DD4831E11BF0AB5900E9C93C /* CBWinProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA4F9DE03C98D1A6780A3A43 /* CBWinProject.cpp */; };
+		DD4831E21BF0AB5900E9C93C /* CBLinuxProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 803C4742042031C3E87B29F9 /* CBLinuxProject.cpp */; };
+		DD4831E31BF0AB5900E9C93C /* visualStudioProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B6DF1A36467F4AD999991D0 /* visualStudioProject.cpp */; };
+		DD4831E41BF0AB5900E9C93C /* qtcreatorproject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E53FCB5E7AA562E02ABC033 /* qtcreatorproject.cpp */; };
+		DD4831E51BF0AB5900E9C93C /* ofAddon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F4B09ECED1D13F0D76544CB1 /* ofAddon.cpp */; };
+		DD4831E61BF0AB5900E9C93C /* pugixml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8620A60A3AE4156124F1E5B3 /* pugixml.cpp */; };
+		DD4831E71BF0AB6100E9C93C /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
 		DDB005FE0475131486143812 /* CBWinProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA4F9DE03C98D1A6780A3A43 /* CBWinProject.cpp */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
 		E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4B69E1D0A3A1BDC003C02F2 /* main.cpp */; };
@@ -23,6 +36,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		DD4831DB1BF0AB4500E9C93C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = E4B27C1410CBEB8E00536013;
+			remoteInfo = openFrameworks;
+		};
 		E4328147138ABC890047C5CB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */;
@@ -40,6 +60,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		DD4831D01BF0AAB100E9C93C /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		E4C2427710CC5ABF004149E2 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -68,8 +97,9 @@
 		CC7E9EFF5EDF044D0D60E84E /* Utils.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Utils.h; path = ../ofxProjectGenerator/src/utils/Utils.h; sourceTree = SOURCE_ROOT; };
 		D31F54C5A271FBBD54B015EB /* pugixml.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = pugixml.hpp; path = ../ofxProjectGenerator/libs/pugixml/src/pugixml.hpp; sourceTree = SOURCE_ROOT; };
 		D76644EB0E1973DB9CC96EDD /* xcodeProject.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = xcodeProject.h; path = ../ofxProjectGenerator/src/projects/xcodeProject.h; sourceTree = SOURCE_ROOT; };
+		DD4831D21BF0AAB100E9C93C /* projectGenerator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = projectGenerator; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
-		E4B69B5B0A3A1756003C02F2 /* commandLineDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = commandLineDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E4B69B5B0A3A1756003C02F2 /* commandLine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = commandLine.app; path = /Users/jonas/Development/openframeworks/openFrameworks/apps/projectGenerator/commandLine/bin/commandLine.app; sourceTree = "<absolute>"; };
 		E4B69E1D0A3A1BDC003C02F2 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = SOURCE_ROOT; };
 		E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofApp.cpp; path = src/ofApp.cpp; sourceTree = SOURCE_ROOT; };
 		E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ofApp.h; path = src/ofApp.h; sourceTree = SOURCE_ROOT; };
@@ -85,6 +115,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		DD4831CF1BF0AAB100E9C93C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD4831E71BF0AB6100E9C93C /* openFrameworksDebug.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E4B69B590A3A1756003C02F2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -167,7 +205,7 @@
 				E4EEC9E9138DF44700A80321 /* openFrameworks */,
 				BB4B014C10F69532006C3DED /* addons */,
 				6948EE371B920CB800B5AC1A /* local_addons */,
-				E4B69B5B0A3A1756003C02F2 /* commandLineDebug.app */,
+				DD4831D21BF0AAB100E9C93C /* projectGenerator */,
 			);
 			sourceTree = "<group>";
 		};
@@ -220,17 +258,17 @@
 		ECBF6BD750C89FA1831D523E /* projects */ = {
 			isa = PBXGroup;
 			children = (
-				EE4968879E321EE44D61A69C /* CBLinuxProject.h */,
-				A3A1A17CA417A08C2C2CBB65 /* visualStudioProject.h */,
-				4593D109B0918A50B53C389D /* qtcreatorproject.h */,
 				C47F6FDA9CA2AD85298B06D8 /* baseProject.h */,
 				B9F3E7A5103CD741ED442779 /* baseProject.cpp */,
-				CBC114F51E6DAF8C2200203D /* CBWinProject.h */,
-				851AF667222EF52C8558BAAE /* xcodeProject.cpp */,
-				803C4742042031C3E87B29F9 /* CBLinuxProject.cpp */,
-				FA4F9DE03C98D1A6780A3A43 /* CBWinProject.cpp */,
-				0B6DF1A36467F4AD999991D0 /* visualStudioProject.cpp */,
 				D76644EB0E1973DB9CC96EDD /* xcodeProject.h */,
+				851AF667222EF52C8558BAAE /* xcodeProject.cpp */,
+				CBC114F51E6DAF8C2200203D /* CBWinProject.h */,
+				FA4F9DE03C98D1A6780A3A43 /* CBWinProject.cpp */,
+				803C4742042031C3E87B29F9 /* CBLinuxProject.cpp */,
+				EE4968879E321EE44D61A69C /* CBLinuxProject.h */,
+				A3A1A17CA417A08C2C2CBB65 /* visualStudioProject.h */,
+				0B6DF1A36467F4AD999991D0 /* visualStudioProject.cpp */,
+				4593D109B0918A50B53C389D /* qtcreatorproject.h */,
 				4E53FCB5E7AA562E02ABC033 /* qtcreatorproject.cpp */,
 			);
 			name = projects;
@@ -239,6 +277,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		DD4831D11BF0AAB100E9C93C /* projectGenerator */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DD4831D61BF0AAB100E9C93C /* Build configuration list for PBXNativeTarget "projectGenerator" */;
+			buildPhases = (
+				DD4831CE1BF0AAB100E9C93C /* Sources */,
+				DD4831CF1BF0AAB100E9C93C /* Frameworks */,
+				DD4831D01BF0AAB100E9C93C /* CopyFiles */,
+				DD4831E81BF0AB6E00E9C93C /* ShellScript */,
+				DD4831E91BF0AB8C00E9C93C /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DD4831DC1BF0AB4500E9C93C /* PBXTargetDependency */,
+			);
+			name = projectGenerator;
+			productName = projectGenerator;
+			productReference = DD4831D21BF0AAB100E9C93C /* projectGenerator */;
+			productType = "com.apple.product-type.tool";
+		};
 		E4B69B5A0A3A1756003C02F2 /* commandLine */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E4B69B5F0A3A1757003C02F2 /* Build configuration list for PBXNativeTarget "commandLine" */;
@@ -256,7 +314,7 @@
 			);
 			name = commandLine;
 			productName = myOFApp;
-			productReference = E4B69B5B0A3A1756003C02F2 /* commandLineDebug.app */;
+			productReference = E4B69B5B0A3A1756003C02F2 /* commandLine.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -266,6 +324,11 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0600;
+				TargetAttributes = {
+					DD4831D11BF0AAB100E9C93C = {
+						CreatedOnToolsVersion = 7.1;
+					};
+				};
 			};
 			buildConfigurationList = E4B69B4D0A3A1720003C02F2 /* Build configuration list for PBXProject "commandLine" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -289,6 +352,7 @@
 			projectRoot = "";
 			targets = (
 				E4B69B5A0A3A1756003C02F2 /* commandLine */,
+				DD4831D11BF0AAB100E9C93C /* projectGenerator */,
 			);
 		};
 /* End PBXProject section */
@@ -317,6 +381,32 @@
 			shellPath = /bin/sh;
 			shellScript = "cp \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\" \"$TARGET_BUILD_DIR/commandLinePG\"; rm -rf \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app\";\tmv \"$TARGET_BUILD_DIR/commandLinePG\" \"$TARGET_BUILD_DIR/projectGenerator\"";
 		};
+		DD4831E81BF0AB6E00E9C93C /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "rsync -aved ../../../libs/fmodex/lib/osx/libfmodex.dylib \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/\"; install_name_tool -change ./libfmodex.dylib @executable_path/libfmodex.dylib \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\";\nmkdir -p \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/\"\nrsync -aved \"$ICON_FILE\" \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/\"\nrsync -aved ../../../libs/glut/lib/osx/GLUT.framework \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Frameworks/\"\n";
+		};
+		DD4831E91BF0AB8C00E9C93C /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\" \"$TARGET_BUILD_DIR/commandLinePG\"; rm -rf \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app\";\tmv \"$TARGET_BUILD_DIR/commandLinePG\" \"$TARGET_BUILD_DIR/projectGenerator\"";
+		};
 		E4B6FFFD0C3F9AB9008CF71C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -333,6 +423,25 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		DD4831CE1BF0AAB100E9C93C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DD4831DD1BF0AB5900E9C93C /* LibraryBinary.cpp in Sources */,
+				DD4831DE1BF0AB5900E9C93C /* Utils.cpp in Sources */,
+				DD4831DF1BF0AB5900E9C93C /* baseProject.cpp in Sources */,
+				DD4831E01BF0AB5900E9C93C /* xcodeProject.cpp in Sources */,
+				DD4831E11BF0AB5900E9C93C /* CBWinProject.cpp in Sources */,
+				DD4831E21BF0AB5900E9C93C /* CBLinuxProject.cpp in Sources */,
+				DD4831E31BF0AB5900E9C93C /* visualStudioProject.cpp in Sources */,
+				DD4831E41BF0AB5900E9C93C /* qtcreatorproject.cpp in Sources */,
+				DD4831E51BF0AB5900E9C93C /* ofAddon.cpp in Sources */,
+				DD4831E61BF0AB5900E9C93C /* pugixml.cpp in Sources */,
+				DD4831DA1BF0AAC200E9C93C /* ofApp.cpp in Sources */,
+				DD4831D91BF0AABF00E9C93C /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E4B69B580A3A1756003C02F2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -355,6 +464,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		DD4831DC1BF0AB4500E9C93C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = openFrameworks;
+			targetProxy = DD4831DB1BF0AB4500E9C93C /* PBXContainerItemProxy */;
+		};
 		E4EEB9AC138B136A00A80321 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = openFrameworks;
@@ -363,6 +477,82 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		DD4831D71BF0AAB100E9C93C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		DD4831D81BF0AAB100E9C93C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		E4B69B4E0A3A1720003C02F2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E4EB6923138AFD0F00A09F29 /* Project.xcconfig */;
@@ -516,6 +706,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		DD4831D61BF0AAB100E9C93C /* Build configuration list for PBXNativeTarget "projectGenerator" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DD4831D71BF0AAB100E9C93C /* Debug */,
+				DD4831D81BF0AAB100E9C93C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		E4B69B4D0A3A1720003C02F2 /* Build configuration list for PBXProject "commandLine" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
