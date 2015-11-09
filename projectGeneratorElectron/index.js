@@ -353,7 +353,7 @@ function getGoodSketchName(arg){
         goodName = "mySketch";
 
         while (foundOne === false) {
-            if (fs.existsSync(path.join(currentProjectPath, goodName))) {
+            if (fs.existsSync(tmpPath.join(currentProjectPath, goodName))) {
                 console.log("«" + goodName + "» already exists, generating a new name...");
                 var adjective = projectNames.choose();
                 goodName = "my" + adjective.charAt(0).toUpperCase() + adjective.slice(1) + "Sketch";
