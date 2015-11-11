@@ -260,6 +260,10 @@ void baseProject::addAddon(ofAddon & addon){
     for(int i=0;i<(int)addons.size();i++){
 		if(addons[i].name==addon.name) return;
 	}
+    
+    for(int i=0;i<addon.dependencies.size();i++){
+        addAddon(addon.dependencies[i]);
+    }
 
 	addons.push_back(addon);
 

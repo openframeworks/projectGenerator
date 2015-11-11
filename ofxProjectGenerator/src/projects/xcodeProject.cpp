@@ -1165,6 +1165,10 @@ void xcodeProject::addAddon(ofAddon & addon){
 		if(addons[i].name==addon.name) return;
 	}
 
+    for(int i=0;i<addon.dependencies.size();i++){
+        baseProject::addAddon(addon.dependencies[i]);
+    }
+
 	addons.push_back(addon);
 
     for(int i=0;i<(int)addon.includePaths.size();i++){
