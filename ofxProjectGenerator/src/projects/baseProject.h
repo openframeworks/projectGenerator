@@ -67,7 +67,7 @@ public:
     virtual void addAfterRule(std::string script){}
 
     virtual void addAddon(std::string addon);
-	virtual void addAddon(ofAddon & addon);
+    virtual void addAddon(ofAddon & addon);
 
     std::string getName() { return projectName;}
     std::string getPath() { return projectDir; }
