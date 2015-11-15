@@ -262,18 +262,11 @@ void baseProject::addAddon(std::string addonName){
 
         for (auto& filename : addon.data) {
             ofFile src(ofFilePath::join(addon.addonPath, filename));
-
-            if (src.isFile()) {
-                src.copyTo(ofFilePath::join(dest, src.getFileName()), false, true);
-            } else if (src.isDirectory()) {
-                string folderPath = ofFilePath::join(addon.addonPath, filename);
-                ofDirectory dir(folderPath);
-                dir.listDir();
-                for (auto& file : dir) {
-                    file.copyTo(ofFilePath::join(dest, file.getFileName()), false, true);
-                }
+            if (!src.exists()) {
+                ofLogWarning() << "addon data file does not exist, skipping: " << filename;
             } else {
-                ofLogWarning() << filename << " is not a file or directory, skipping";
+                ofLogVerbose() << "adding addon data files: " << filename;
+                src.copyTo(ofFilePath::join(dest, src.getFileName()), false, true);
             }
         }
     }
