@@ -436,7 +436,7 @@ int main(int argc, char* argv[]){
     startTime = ofGetElapsedTimef();
     nProjectsUpdated = 0;
     nProjectsCreated = 0;
-    of::priv::setWorkingDirectoryToDefault();
+    of::priv::initutils();
     consoleSpace();
 
     // try to get the OF_PATH as an environt variable
