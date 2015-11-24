@@ -4,19 +4,21 @@
 #include <string>
 #include <vector>
 #include "optionparser.h"
-enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN };
+enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, AVAILPLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, FORCE, DRYRUN };
 constexpr option::Descriptor usage[] =
 {
-    {UNKNOWN, 0, "", "",option::Arg::None, "Options:\n" },
-    {HELP, 0,"h", "help",option::Arg::None, "  --help  \tPrint usage and exit." },
-    {RECURSIVE, 0,"r","recursive",option::Arg::None, "  --recursive, -r  \tupdate recursively (applies only to update)" },
-    {LISTTEMPLATES, 0,"l","listtemplates",option::Arg::None, "  --listtemplates, -l  \tlist templates available for the specified or current platform(s)" },
-    {PLATFORMS, 0,"p","platforms",option::Arg::Optional, "  --platforms, -p  \tplatform list (such as osx, ios, winvs)" },
-    {ADDONS, 0,"a","addons",option::Arg::Optional, "  --addons, -a  \taddon list (such as ofxOpenCv, ofxGui, ofxXmlSettings)" },
-    {OFPATH, 0,"o","ofPath",option::Arg::Optional, "  --ofPath, -o  \tpath to openframeworks (relative or absolute). This *must* be set, or you can also alternatively use an environment variable PG_OF_PATH and if this isn't set, it will use that value instead" },
-    {VERBOSE, 0,"v","verbose",option::Arg::None, "  --verbose, -v  \trun verbose" },
-    {TEMPLATE, 0,"t","template",option::Arg::Optional, "  --template, -t  \tproject template" },
-    {DRYRUN, 0,"d","dryrun",option::Arg::None, "  --dryrun, -d  \tdry run, don't change files" },
+    {UNKNOWN, 0, "", "", option::Arg::None, "Options:\n" },
+    {HELP, 0, "h", "help", option::Arg::None, "  --help, -h  \tPrint usage and exit" },
+    {RECURSIVE, 0, "r", "recursive", option::Arg::None, "  --recursive, -r  \tUpdate recursively (applies only to update)" },
+    {LISTTEMPLATES, 0, "l", "listtemplates", option::Arg::None, "  --listtemplates, -l  \tList templates available for the specified or current platform(s)" },
+    {PLATFORMS, 0, "p", "platforms", option::Arg::Optional, "  --platforms, -p  \tSpecify a list of target platforms (see --available-platforms)" },
+    {AVAILPLATFORMS, 0, "", "available-platforms", option::Arg::Optional, "  --available-platforms \tShow the currently available platforms" },
+    {ADDONS, 0, "a", "addons", option::Arg::Optional, "  --addons, -a  \tAddon list (such as ofxOpenCv, ofxGui, ofxXmlSettings)" },
+    {OFPATH, 0, "o", "ofPath", option::Arg::Optional, "  --ofPath, -o  \tPath to openframeworks (relative or absolute). If this argument is not given, the value of the PG_OF_PATH environment variable will be used" },
+    {VERBOSE, 0, "v", "verbose", option::Arg::None, "  --verbose, -v  \tShow detailed output" },
+    {TEMPLATE, 0, "t", "template", option::Arg::Optional, "  --template, -t  \tUse a project template" },
+    {FORCE, 0, "f", "force", option::Arg::Optional, "  --force, -f  \tForce updating, even if used folders don't seem right" },
+    {DRYRUN, 0, "d", "dryrun", option::Arg::None, "  --dryrun, -d  \tOnly do a dry run (don't change files)" },
     {0,0,0,0,0,0}
 };
 
@@ -65,9 +67,9 @@ string              ofPathEnv;
 string              currentWorkingDirectory;
 string              templateName;
 
-bool busingEnvVar;
-bool bVerbose;
-bool bAddonsPassedIn;
+bool bUsingEnvVar;                      // do we use the environment variable for the OF path?
+bool bVerbose;                          // show extra output?
+bool bAddonsPassedIn;                   // do we need to add any addons to the project?
 bool bForce;                            // force even if things like ofRoot seem wrong of if update folder looks wonky
 int mode;                               // what mode are we in?
 bool bRecursive;                        // do we recurse in update mode?
@@ -75,19 +77,15 @@ bool bHelpRequested;                    // did we request help?
 bool bListTemplates;                    // did we request help?
 bool bDryRun;                           // do dry run (useful for debugging recursive update)
 
-
-
-
 //-------------------------------------------
 void consoleSpace() {
     cout << endl;
 }
 
-
 bool printTemplates() {
-    
+
     cout << "getOFRoot() " << getOFRoot() << endl;
-    
+
     if(targets.size()>1){
         vector<vector<baseProject::Template>> allPlatformsTemplates;
         for(auto & target: targets){
@@ -123,6 +121,7 @@ bool printTemplates() {
             }
             return true;
         }
+
     }else{
         bool templatesFound = false;
         for(auto & target: targets){
@@ -217,7 +216,7 @@ bool isGoodOFPath(string path) {
 
     ofDirectory dir(path);
     if (!dir.isDirectory()) {
-        ofLogError() << "ofPath seems wrong... not a directory";
+        ofLogError() << "The provided OF Path is not a directory.";
         return false;
     }
 
@@ -231,14 +230,12 @@ bool isGoodOFPath(string path) {
 
     if (bHasTemplates == true) {
         return true;
-    }
-    else {
-        ofLogError() << "ofPath seems wrong... no scripts / templates directory";
+    } else {
+        ofLogError() << "The given OF path does not contain a scripts and/or templates directory.";
         return false;
     }
 
 }
-
 
 
 void updateProject(string path, ofTargetPlatform target, bool bConsiderParameterAddons = true) {
@@ -247,8 +244,7 @@ void updateProject(string path, ofTargetPlatform target, bool bConsiderParameter
     // either we read the addons.make file, or we look at the parameter list.
     // if we are updating recursively, we *never* consider addons passed as parameters.
 
-
-    ofLogNotice() << "updating project " << path;
+    ofLogNotice() << "Updating project " << path;
     auto project = getTargetProject(target);
 
     if (!bDryRun) project->create(path, templateName);
@@ -258,7 +254,7 @@ void updateProject(string path, ofTargetPlatform target, bool bConsiderParameter
             project->addAddon(addon);
         }
     }else{
-        ofLogNotice() << "parsing addons.make";
+        ofLogNotice() << "Parsing addons.make";
         project->parseAddons();
     }
 
@@ -267,13 +263,12 @@ void updateProject(string path, ofTargetPlatform target, bool bConsiderParameter
 
 
 void recursiveUpdate(string path, ofTargetPlatform target) {
-    
+
     ofDirectory dir(path);
-    
-    
+
     // first, bail if it's just a file
     if (dir.isDirectory() == false) return;
-    
+
     // second check if this is a folder that has src in it
     if (isGoodProjectPath(path)) {
         nProjectsUpdated++;
@@ -281,7 +276,7 @@ void recursiveUpdate(string path, ofTargetPlatform target) {
         updateProject(path, target, false);
         return;
     }
-    
+
     // finally, recursively look at this
     dir.listDir();
     for (size_t i = 0; i < dir.size(); i++) {
@@ -292,59 +287,47 @@ void recursiveUpdate(string path, ofTargetPlatform target) {
     }
 }
 
+
 void printHelp(){
-    
+
     consoleSpace();
-    
+
     string header = "";
     header += "\tprojectGenerator [options] pathName\n\n";
-    header += "if pathName exists, project is updated\n";
-    header += "if pathName doesn't exist, project is created\n";
-    header += "(pathName must follow options, which can come in any order)";
+    header += "If pathName exists, project is updated. Otherwise, if pathName doesn't exist, project is created\n";
+    header += "Pathname has to be the last argument. Other options can come in any order.";
     cout << header << endl;
-    
+
     consoleSpace();
-    
+
     option::printUsage(std::cout, usage);
-    
+
     consoleSpace();
-    
+
     string footer = "";
-    footer += "examples:\n\n";
-    footer +=
-    STRINGIFY(
-        projectGenerator -o"../../../../" ../../../../apps/myApps/newExample
-    );
-    footer += "\n";
-    footer += "(create a project called newExample using a relative path for the OF root and the project. note the relative path may be different depending on where this app is located)";
-    footer += "\n\n";
-    footer +=
-    STRINGIFY(
-              projectGenerator -r -o"../../../../" ../../../../examples
-              );
-    footer += "\n";
-    footer += "(recursively update the examples folder)";
-    footer += "\n\n";
-    footer +=
-    STRINGIFY(
-              projectGenerator -o"../../../../" -a"ofxXmlSettings, ofxOpenCv" ../../../../apps/myApps/newExample
-              );
-    footer += "\n";
-    footer += "(create / update an example with addons)";
+    footer += "Examples:\n\n";
+    footer += "  To make a new project called newProject\n";
+    footer += "    projectGenerator -o \"pathToOF\" pathOfNewProject\n";
+    footer += "  To update an existing project:\n";
+    footer += "    ./projectGenerator -o \"pathToOF\" pathToExistingProject\n\n";
+    footer += "  To update a folder of projects:\n";
+    footer += "    ./projectGenerator -o \"pathToOF\" -r pathToFolderOfProjects\n\n";
+    footer += "  To specify specific platforms:\n";
+    footer += "    projectGenerator -o \"pathToOF\" -p \"ios\" pathOfNewIOSProject";
+
     cout << footer << endl;
-    
+
     consoleSpace();
 }
 
 
 //-------------------------------------------
 int main(int argc, char* argv[]){
-    
-    
+
     //------------------------------------------- pre-parse
     bAddonsPassedIn = false;
     bDryRun = false;
-    busingEnvVar = false;
+    bUsingEnvVar = false;
     bVerbose = false;
     mode = PG_MODE_NONE;
     bForce = false;
@@ -358,22 +341,25 @@ int main(int argc, char* argv[]){
     string projectName = "";
     projectPath = "";
     templateName = "";
-    
-    
+
     // ------------------------------------------------------ parse args
     argc-=(argc>0); argv+=(argc>0); // skip program name argv[0] if present
     option::Stats  stats(usage, argc, argv);
     std::vector<option::Option> options(stats.options_max);
     std::vector<option::Option> buffer(stats.buffer_max);
     option::Parser parse(usage, argc, argv, &options[0], &buffer[0]);
-	if (parse.error()) {
-		
-		return 1;
-	}
-    if (options[HELP] || argc == 0) {
-		ofLogError() << "No arguments";
+    if (parse.error()) {
+        return 1;
+    }
+
+    if (options[HELP]){
         printHelp();
-		
+        return EXIT_OK;
+    }
+
+    if (argc == 0) {
+        ofLogError() << "No arguments given";
+        printHelp();
         return EXIT_OK;
     }
 
@@ -381,26 +367,35 @@ int main(int argc, char* argv[]){
     if (options[LISTTEMPLATES].count() > 0){
         bListTemplates = true;
     }
-    
+
     if (options[RECURSIVE].count() > 0){
         bRecursive = true;
     }
-    
+
+    if (options[FORCE].count() > 0){
+        bForce = true;
+    }
+
     if (options[DRYRUN].count() > 0){
         bDryRun = true;
     }
-    
+
     if (options[VERBOSE].count() > 0){
         bVerbose = true;
     }
-    
+
     if (options[PLATFORMS].count() > 0){
         if (options[PLATFORMS].arg != NULL){
             string platformString(options[PLATFORMS].arg);
             addPlatforms(platformString);
         }
     }
-    
+
+    if (options[AVAILPLATFORMS].count() > 0){
+        ofLogNotice() << "Currently available target platforms are: allplatforms, osx, ios, msys2, android (not yet supported), linux, linux64, linuxarmv6l, linuxarmv7l, vs";
+        return EXIT_OK;
+    }
+
     if (options[ADDONS].count() > 0){
         bAddonsPassedIn = true; // could be empty
         if (options[ADDONS].arg != NULL){
@@ -408,16 +403,14 @@ int main(int argc, char* argv[]){
             addons = ofSplitString(addonsString, ",", true, true);
         }
     }
-    
-    
-    
+
     if (options[OFPATH].count() > 0){
         if (options[OFPATH].arg != NULL){
             string ofPathString(options[OFPATH].arg);
             ofPath = ofPathString;
         }
     }
-    
+
     if (options[TEMPLATE].count() > 0){
         if (options[TEMPLATE].arg != NULL){
             string templateString(options[TEMPLATE].arg);
@@ -425,14 +418,12 @@ int main(int argc, char* argv[]){
         }
     }
 
-
     if (parse.nonOptionsCount() > 0){
         projectName = parse.nonOption(0);
     }
-    
-    
+
     // ------------------------------------------------------ post parse
-    
+
     startTime = ofGetElapsedTimef();
     nProjectsUpdated = 0;
     nProjectsCreated = 0;
@@ -445,27 +436,22 @@ int main(int argc, char* argv[]){
     if (pPath != NULL) {
         ofPathEnv = string(pPath);
     }
-    
+
     if (ofPath == "" && ofPathEnv != "") {
-        busingEnvVar = true;
+        bUsingEnvVar = true;
         ofPath = ofPathEnv;
     }
-    
- 
+
     currentWorkingDirectory = Poco::Path::current();
 
     if (ofPath == "") {
 
         consoleSpace();
-        ofLogError() << "no OF path set... please use -o or --ofPath or set a PG_OF_PATH environment variable";
+        ofLogError() << "OF path not set. Please provide a valid path using the -o or --ofPath arguments, or set a PG_OF_PATH environment variable.";
         consoleSpace();
-        
-        //------------------------------------ fix me
-        //printHelp();
-        
-        //return
-		
+
         return EXIT_USAGE;
+
     } else {
 
         // let's try to resolve this path vs the current path
@@ -476,56 +462,46 @@ int main(int argc, char* argv[]){
         ofPath = cwd.resolve(ofPath).toString();   // resolve ofPath vs that.
         Path resolvedPath = Path(ofPath).absolute();    // make that new path absolute
         ofPath = resolvedPath.toString();
-        
-        
+
         if (!isGoodOFPath(ofPath)) {
-			
             return EXIT_USAGE;
         }
-        
+
         setOFRoot(ofPath);
-        
-        
+
     }
 
-    
     if(bListTemplates){
         auto ret = printTemplates();
         consoleSpace();
         if(ret){
-			
             return EXIT_OK;
         }else{
-			
             return EXIT_DATAERR;
         }
     }
-    
+
     if (projectName != ""){
         if (ofFilePath::isAbsolute(projectName)) {
             projectPath = projectName;
         } else {
             projectPath = ofFilePath::join(projectPath, projectName);
-			
+
             // this line is arturo's ninja magic to make paths with dots make sense:
             projectPath = ofFilePath::removeTrailingSlash(ofFilePath::getPathForDirectory(ofFilePath::getAbsolutePath(projectPath, false)));
-			projectPath = Path(projectPath).absolute().toString();		// make absolute...
-
-			
-		}
+            projectPath = Path(projectPath).absolute().toString();		// make absolute...
+        }
     } else {
         ofLogError() << "Missing project path";
         printHelp();
         consoleSpace();
-		
+
         return EXIT_USAGE;
     }
 
-
     if (ofDirectory(projectPath).exists()) {
         mode = PG_MODE_UPDATE;
-    }
-    else {
+    } else {
         mode = PG_MODE_CREATE;
     }
 
@@ -533,9 +509,7 @@ int main(int argc, char* argv[]){
         ofSetLogLevel(OF_LOG_VERBOSE);
     }
 
-
     if (mode == PG_MODE_CREATE) {
-
 
         nProjectsCreated += 1;
 
@@ -544,21 +518,20 @@ int main(int argc, char* argv[]){
             auto target = getTargetString(targets[i]);
 
             ofLogNotice() << "-----------------------------------------------";
-            ofLogNotice() << "setting OF path to: " << ofPath;
-            if(busingEnvVar){
+            ofLogNotice() << "Setting OF path to: " << ofPath;
+            if(bUsingEnvVar){
                 ofLogNotice() << "from PG_OF_PATH environment variable";
             }else{
-                ofLogNotice() << "from -o option";
+                ofLogNotice() << "from -o / --ofpath argument";
             }
-            ofLogNotice() << "target platform is: " << target;
-            ofLogNotice() << "project path is: " << projectPath;
-            
-            if(templateName!=""){
-                ofLogNotice() << "using additional template " << templateName;
-            }
-            
+            ofLogNotice() << "Target platform is: " << target;
+            ofLogNotice() << "Project path is: " << projectPath;
 
-            ofLogNotice() << "setting up new project " << projectPath;
+            if(templateName!=""){
+                ofLogNotice() << "Using additional template " << templateName;
+            }
+
+            ofLogNotice() << "Setting up new project " << projectPath;
             if (!bDryRun) project->create(projectPath, templateName);
 
             if (!bDryRun){
@@ -566,13 +539,12 @@ int main(int argc, char* argv[]){
                     project->addAddon(addon);
                 }
             }
+
             if (!bDryRun) project->save();
 
-            ofLogNotice() << "project created! ";
+            ofLogNotice() << "Project created! ";
             ofLogNotice() << "-----------------------------------------------";
             consoleSpace();
-
-
         }
     }
     else if (mode == PG_MODE_UPDATE) {
@@ -580,44 +552,42 @@ int main(int argc, char* argv[]){
         if (!bRecursive) {
             if (isGoodProjectPath(projectPath) || bForce) {
 
-
                 nProjectsUpdated += 1;
-
 
                 for (int i = 0; i < (int)targets.size(); i++) {
                     ofLogNotice() << "-----------------------------------------------";
-                    ofLogNotice() << "setting OF path to: " << ofPath;
-                    if(busingEnvVar){
+                    ofLogNotice() << "Setting OF path to: " << ofPath;
+                    if(bUsingEnvVar){
                         ofLogNotice() << "from PG_OF_PATH environment variable";
                     }else{
-                        ofLogNotice() << "from -o option";
+                        ofLogNotice() << "from -o / --ofPath argument";
                     }
-                    ofLogNotice() << "target platform is: " << getTargetString(targets[i]);
+                    ofLogNotice() << "Target platform is: " << getTargetString(targets[i]);
 
                     if(templateName!=""){
-                        ofLogNotice() << "using additional template " << templateName;
+                        ofLogNotice() << "Using additional template " << templateName;
                     }
                     updateProject(projectPath,targets[i]);
 
-                    ofLogNotice() << "project updated! ";
+                    ofLogNotice() << "Project updated! ";
                     ofLogNotice() << "-----------------------------------------------";
                     consoleSpace();
 
                 }
             }
             else {
-                ofLogError() << "there's no src folder in this project path to update, maybe use create instead? (or use force to force updating)";
+                ofLogError() << "The given project path does not contain a src folder to update; maybe you meant to use create instead? (or use force to force updating the folder)";
             }
         }
         else {
             for (int i = 0; i < (int)targets.size(); i++) {
                 ofLogNotice() << "-----------------------------------------------";
-                ofLogNotice() << "updating an existing project";
-                ofLogNotice() << "target platform is: " << getTargetString(targets[i]);
+                ofLogNotice() << "Updating an existing project";
+                ofLogNotice() << "Target platform is: " << getTargetString(targets[i]);
 
                 recursiveUpdate(projectPath, targets[i]);
-                
-                ofLogNotice() << "project updated! ";
+
+                ofLogNotice() << "Project updated! ";
                 ofLogNotice() << "-----------------------------------------------";
 
             }
@@ -628,13 +598,12 @@ int main(int argc, char* argv[]){
 
     consoleSpace();
     float elapsedTime = ofGetElapsedTimef() - startTime;
-    if (nProjectsCreated > 0) cout << nProjectsCreated << " project created ";
-    if (nProjectsUpdated == 1)cout << nProjectsUpdated << " project updated ";
-    if (nProjectsUpdated > 1) cout << nProjectsUpdated << " projects updated ";
+    if (nProjectsCreated > 0) cout << nProjectsCreated << " Project created ";
+    if (nProjectsUpdated == 1)cout << nProjectsUpdated << " Project updated ";
+    if (nProjectsUpdated > 1) cout << nProjectsUpdated << " Projects updated ";
     ofLogNotice() << "in " << elapsedTime << " seconds" << endl;
     consoleSpace();
 
-	
     return EXIT_OK;
 }
 
