@@ -249,7 +249,7 @@ void ofApp::setup(){
     // platform panel (not used, really, but here just in case)
     //-------------------------------------
     panelPlatforms.setup();
-    panelPlatforms.add(wincbToggle.setup("windows (codeblocks)",ofGetTargetPlatform()==OF_TARGET_WINGCC));
+    panelPlatforms.add(wincbToggle.setup("windows (codeblocks)",ofGetTargetPlatform()==OF_TARGET_MINGW));
 	panelPlatforms.add(winvsToggle.setup("windows (visual studio)", ofGetTargetPlatform()==OF_TARGET_WINVS));
 	panelPlatforms.add(linuxcbToggle.setup("linux (codeblocks)",ofGetTargetPlatform()==OF_TARGET_LINUX));
 	panelPlatforms.add(linux64cbToggle.setup("linux64 (codeblocks)",ofGetTargetPlatform()==OF_TARGET_LINUX64));
@@ -429,7 +429,7 @@ void ofApp::generateProject(){
     vector <ofTargetPlatform> targetsToMake;
 	if( osxToggle )		targetsToMake.push_back(OF_TARGET_OSX);
 	if( iosToggle )		targetsToMake.push_back(OF_TARGET_IOS);
-	if( wincbToggle )	targetsToMake.push_back(OF_TARGET_WINGCC);
+	if( wincbToggle )	targetsToMake.push_back(OF_TARGET_MINGW);
 	if( winvsToggle )	targetsToMake.push_back(OF_TARGET_WINVS);
 	if( linuxcbToggle )	targetsToMake.push_back(OF_TARGET_LINUX);
 	if( linux64cbToggle )	targetsToMake.push_back(OF_TARGET_LINUX64);

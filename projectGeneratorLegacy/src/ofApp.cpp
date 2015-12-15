@@ -58,7 +58,7 @@ void ofApp::setup(){
 
 	examplesPanel.setup("generate examples", "examples.xml", 400, 10);
 	examplesPanel.add(generateButton.setup("<--Generate"));
-	examplesPanel.add(wincbToggle.setup("win CB projects",ofGetTargetPlatform()==OF_TARGET_WINGCC));
+	examplesPanel.add(wincbToggle.setup("win CB projects",ofGetTargetPlatform()==OF_TARGET_MINGW));
 	examplesPanel.add(winvsToggle.setup("win VS projects", ofGetTargetPlatform()==OF_TARGET_WINVS));
 	examplesPanel.add(linuxcbToggle.setup("linux CB projects",ofGetTargetPlatform()==OF_TARGET_LINUX));
 	examplesPanel.add(linux64cbToggle.setup("linux64 CB projects",ofGetTargetPlatform()==OF_TARGET_LINUX64));
@@ -89,7 +89,7 @@ void ofApp::generateExamplesCB(){
 	targetsToMake.clear();
 	if( osxToggle )		targetsToMake.push_back(OF_TARGET_OSX);
 	if( iosToggle )		targetsToMake.push_back(OF_TARGET_IPHONE);
-	if( wincbToggle )	targetsToMake.push_back(OF_TARGET_WINGCC);
+	if( wincbToggle )	targetsToMake.push_back(OF_TARGET_MINGW);
 	if( winvsToggle )	targetsToMake.push_back(OF_TARGET_WINVS);
 	if( linuxcbToggle )         targetsToMake.push_back(OF_TARGET_LINUX);
 	if( linux64cbToggle )       targetsToMake.push_back(OF_TARGET_LINUX64);
@@ -173,7 +173,7 @@ ofFileDialogResult ofApp::makeNewProjectViaDialog(){
     vector <ofTargetPlatform> targetsToMake;
 	if( osxToggle )		targetsToMake.push_back(OF_TARGET_OSX);
 	if( iosToggle )		targetsToMake.push_back(OF_TARGET_IPHONE);
-	if( wincbToggle )	targetsToMake.push_back(OF_TARGET_WINGCC);
+	if( wincbToggle )	targetsToMake.push_back(OF_TARGET_MINGW);
 	if( winvsToggle )	targetsToMake.push_back(OF_TARGET_WINVS);
 	if( linuxcbToggle )	targetsToMake.push_back(OF_TARGET_LINUX);
 	if( linux64cbToggle )	targetsToMake.push_back(OF_TARGET_LINUX64);
@@ -218,7 +218,7 @@ ofFileDialogResult ofApp::updateProjectViaDialog(){
     vector <ofTargetPlatform> targetsToMake;
 	if( osxToggle )		targetsToMake.push_back(OF_TARGET_OSX);
 	if( iosToggle )		targetsToMake.push_back(OF_TARGET_IPHONE);
-	if( wincbToggle )	targetsToMake.push_back(OF_TARGET_WINGCC);
+	if( wincbToggle )	targetsToMake.push_back(OF_TARGET_MINGW);
 	if( winvsToggle )	targetsToMake.push_back(OF_TARGET_WINVS);
 	if( linuxcbToggle )	targetsToMake.push_back(OF_TARGET_LINUX);
 	if( linux64cbToggle )	targetsToMake.push_back(OF_TARGET_LINUX64);
