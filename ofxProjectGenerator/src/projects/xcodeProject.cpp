@@ -1050,7 +1050,7 @@ void xcodeProject::addLDFLAG(string ldflag, LibType libType){
 void xcodeProject::addCFLAG(string cflag, LibType libType){
 
     char query[255];
-    sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'OTHER_CPLUSPLUSFLAGS')]/following-sibling::node()[1]");
+    sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'OTHER_CFLAGS')]/following-sibling::node()[1]");
     pugi::xpath_node_set headerArray = doc.select_nodes(query);
 
 
