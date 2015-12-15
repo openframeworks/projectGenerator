@@ -35,7 +35,7 @@ int main(  int argc, char *argv[]  ){
 				}else if(arg=="linuxarmv7l"){
 					app->targetsToMake.push_back( OF_TARGET_LINUXARMV7L );
 				}else if(arg=="win_cb"){
-					app->targetsToMake.push_back( OF_TARGET_WINGCC );
+					app->targetsToMake.push_back( OF_TARGET_MINGW );
 				}else if(arg=="vs"){
 					app->targetsToMake.push_back( OF_TARGET_WINVS );
 				}else if(arg=="osx"){
@@ -50,7 +50,7 @@ int main(  int argc, char *argv[]  ){
 					app->targetsToMake.push_back( OF_TARGET_LINUX64 );
 					app->targetsToMake.push_back( OF_TARGET_LINUXARMV6L );
 					app->targetsToMake.push_back( OF_TARGET_LINUXARMV7L );
-					app->targetsToMake.push_back( OF_TARGET_WINGCC );
+					app->targetsToMake.push_back( OF_TARGET_MINGW );
 					app->targetsToMake.push_back( OF_TARGET_WINVS );
 					app->targetsToMake.push_back( OF_TARGET_OSX );
 					app->targetsToMake.push_back( OF_TARGET_IPHONE );
