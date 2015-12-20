@@ -2,7 +2,7 @@
 
 This project is a frontend for creating and updating openFrameworks projects. It provides an easy-to-use interface for the command line-based utility which does the actual work of generating project files for a variety of platforms.
 
-While the command line utility provides a number of advanced features such as using local addons specific to a project or project templates for using a specific OpenGL version, this frotend aims to expose the most frequently used features used by a majority of users. Over time it will grow to add more of these advanced features. For more info on these features, see the `commandLine` folder.
+While the command line utility provides a number of advanced features such as using local addons specific to a project or project templates for using a specific OpenGL version, this frontend aims to expose the most frequently used features used by a majority of users. Over time it will grow to add more of these advanced features. For more info on these features, see the `commandLine` folder.
 
 This project is built with [Electron](http://electron.atom.io), which provides a [node.js](https://nodejs.org/en/) backend and windowed [Chromium](http://www.chromium.org/Home) context for building cross platform apps with HTML, CSS, and JavaScript.
 
