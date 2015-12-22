@@ -33,15 +33,28 @@ Build an updated `projectGenerator` binary from the project in `openFrameworks/a
 
 ```
 cd openFrameworks/apps/projectGenerator
-cp commandLine/bin/projectGenerator projectGeneratorElectron/app
+cp commandLine/bin/projectGenerator frontend/app
 ```
+
+### Install node.js
+
+If you don't already have it, you can install node via a number of means:
+
+- Directly from the [node.js website](https://nodejs.org/en/download/)
+- Using a [package manager for your platform](https://nodejs.org/en/download/package-manager/)
+  - `brew install node`
+  - `apt-get install nodejs`
+  - etc.
+- Using a node version manager like [nvm](https://github.com/creationix/nvm)
+  - Install nvm for your platform, then:
+  - `nvm install latest`
 
 ### Install frontend dependencies
 
 Install the depencies for the electron app:
 
 ```
-cd openFrameworks/apps/projectGenerator/projectGeneratorElectron
+cd openFrameworks/apps/projectGenerator/frontend
 npm install
 ```
 
