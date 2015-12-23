@@ -564,8 +564,6 @@ function setup() {
         
         // setup the multi update list as well. 
 
-
-
         $("#ofPath").change();
 
         // enable tool tips
@@ -574,31 +572,32 @@ function setup() {
         // Open file drop zone
         $('body').on('dragenter', openDragInputModal);
 
-        //Close file drop zone
+        // Close file drop zone
         $(window).on('mouseout', closeDragInputModal );
-        $(document).on('dragend', closeDragInputModal );
+        //$(document).on('dragleave dragend', closeDragInputModal );
 
-        // prevent dropping anywhere (dropping files loads them)
-        // note: yes, dragover is also needed
+        // prevent dropping anywhere (dropping files loads their URL, unloading the PG)
+        // note: weirdly, dragover is also needed
         $(window).on('drop dragover', function(e){
-            e.preventDefault();
             e.stopPropagation();
+            e.preventDefault();
             return false;
         });
-
         
         // bind update thingy
-        // note: dragover is needed because dragleave is called pretty randomly
-        $("#dropZoneUpdate").on('dragenter dragover drop', onDragUpdateFile).on('dragleave', function(e){
-            $(this).removeClass("accept deny");
-        });
+        $("#dropZoneOverlay").on('dragenter drop', onDragUpdateFile).on('dragleave dragend', closeDragInputModal);
+
+        // this allows to close the drop zone if it ever stays open due to a bug.
+        $("#dropZoneOverlay").on('click', closeDragInputModal);
 
     });
 }
 
 function onDragUpdateFile( e ){
-    e.preventDefault();
     e.stopPropagation();
+    e.preventDefault();
+    //console.log( e.originalEvent.type );
+    //console.log( e.target );
 
     // handle file
     var files = e.originalEvent.dataTransfer.files;
@@ -612,22 +611,31 @@ function onDragUpdateFile( e ){
         var file = e.originalEvent.dataTransfer.items[0].webkitGetAsEntry();
         if( file.isDirectory ){
             rejected = false;
-            $("#dropZoneUpdate").addClass("accept").removeClass("deny");
+            $("#dropZone").addClass("accept").removeClass("deny");
 
             // drop event ? --> import it!
             if( e.type=="drop" ){
-                $("#projectName").val( files[0].name );
-                var regExp = new RegExp("\\b/"+files[0].name+"\\b","gi");
-                $("#projectPath").val( files[0].path.replace(regExp,"") ).trigger('change');
+                if( $('body').hasClass('advanced') && false ){ // todo: if (tab multiple is open)
+                    // do batch import
 
-                $("createMenuButon").trigger('click');
+                    $("updateMenuButton").triggerHandler('click');
+                }
+                else {
+                    // import single project folder
+                    $("#projectName").val( files[0].name );
+                    var regExp = new RegExp("\\b/"+files[0].name+"\\b","gi");
+                    $("#projectPath").val( files[0].path.replace(regExp,"") ).triggerHandler('change');
+
+                    $("createMenuButon").triggerHandler('click');
+                }
+                closeDragInputModal(e);
                 return true;
             }
         }
     }
 
     if(rejected) {
-        $("#dropZoneUpdate").addClass("deny").removeClass("accept");
+        $("#dropZone").addClass("deny").removeClass("accept");
 
         if( e.type=="drop" ){
             displayModal(
@@ -640,23 +648,27 @@ function onDragUpdateFile( e ){
 }
 
 function closeDragInputModal(e){
-    e.preventDefault();
     e.stopPropagation();
+    e.preventDefault();
 
-    if( $('body').hasClass('incommingFile') ){
-        $('body').removeClass('incommingFile');
+    if( $('body').hasClass('incomingFile') ){
+        $('body').removeClass('incomingFile');
         $("#fileDropModal").modal('hide');
-        $("#dropZoneUpdate").removeClass("accept deny");
+        $("#dropZone").removeClass("accept deny");
     }
+    return false;
 }
 
 function openDragInputModal(e){
-    e.preventDefault();
     e.stopPropagation();
-    if(!$('body').hasClass('incommingFile')){
-        $('body').addClass('incommingFile');
+    e.preventDefault();
+
+    if( !$('body').hasClass('incomingFile') ){
+        
+        $('body').addClass('incomingFile');
         $("#fileDropModal").modal('show');
-    } 
+    }
+    return false;
 }
 
 //----------------------------------------
