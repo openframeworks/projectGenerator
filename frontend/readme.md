@@ -58,6 +58,13 @@ cd openFrameworks/apps/projectGenerator/frontend
 npm install
 ```
 
+### Debugging
+You can open `settings.json` to enable some hidden settings, useful for debugging.  
+Moreover, Electron uses Webkit so all the Webkit developper tools are available to you. ( `Cmd/Ctrl` + `Shift` + `i` from the Electron window.)  
+
+ - Console messages from `index.js` show up in the terminal (where you did `npm start`).  
+ - Console messages from `app.js` show up in the Webkit console.
+
 ## Run
 
 ### Development
