@@ -97,4 +97,4 @@ This will created a packaged app for that platform(s) specified inside the `dist
 
 ## License
 
-MIT © [Léo Colombaro](http://openframeworks.cc)
+MIT (http://openframeworks.cc)
