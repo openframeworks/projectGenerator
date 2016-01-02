@@ -570,79 +570,116 @@ function setup() {
         $('.tooltip').popup();
         
         // Open file drop zone
-        $('body').on('dragenter', openDragInputModal);
+        $(window).on('dragenter', openDragInputModal);
 
         // Close file drop zone
         $(window).on('mouseout', closeDragInputModal );
-        //$(document).on('dragleave dragend', closeDragInputModal );
+        //$(window).on('dragend', closeDragInputModal );
+
+        $("#dropZoneOverlay").on('dragleave', function(e){
+            //console.log(e.target);
+            if( $(e.target).filter('.ui.dimmer:not(.fade.in)').length===1 ){
+                closeDragInputModal( e );
+           }
+        });
 
         // prevent dropping anywhere (dropping files loads their URL, unloading the PG)
         // note: weirdly, dragover is also needed
-        $(window).on('drop dragover', function(e){
-            e.stopPropagation();
-            e.preventDefault();
-            return false;
-        });
+        $(window).on('drop dragover', blockEvent );
         
-        // bind update thingy
-        $("#dropZoneOverlay").on('dragenter drop', onDragUpdateFile).on('dragleave dragend', closeDragInputModal);
+        //$(window).on('dragleave', blockEvent);
+
+        $("#dropZoneOverlay").on('drop', onDropFile).on('dragend', closeDragInputModal);
 
         // this allows to close the drop zone if it ever stays open due to a bug.
         $("#dropZoneOverlay").on('click', closeDragInputModal);
+        $(window).on('keypress', function(e){
+            if( e.which === 27 ){ // esc key
+                e.stopPropagation();
+                e.preventDefault();
+                closeDragInputModal( e );
+            }
+        });
 
     });
+}
+
+function blockEvent(e){
+    //console.log('blockEvent via '+e.type + ' on '+ e.target.nodeName + '#' + e.target.id);
+    e.stopPropagation();
+    e.preventDefault();
+    return false;
+};
+
+function acceptDraggedFiles( e ){
+     // handle file
+    var files = e.originalEvent.dataTransfer.files;
+    var types = e.originalEvent.dataTransfer.types;
+
+    // this first check filters out most files
+    if(files && files.length == 1 && files[0].type==="" && types[0]=="Files"){
+
+        // this folder check is more relayable
+        var file = e.originalEvent.dataTransfer.items[0].webkitGetAsEntry();
+        if( file.isDirectory ){
+            return true;
+        }
+    }
+    return false;
 }
 
 function onDragUpdateFile( e ){
     e.stopPropagation();
     e.preventDefault();
-    //console.log( e.originalEvent.type );
-    //console.log( e.target );
+    //console.log('onDragUpdateFile via '+e.type + ' on '+ e.target.nodeName + '#' + e.target.id);
 
-    // handle file
-    var files = e.originalEvent.dataTransfer.files;
-    var types = e.originalEvent.dataTransfer.types;
-
-    var rejected = true;
-    // this first check filters out most files
-    if(files.length == 1 && files[0].type==="" && types[0]=="Files"){
-
-        // this folder check is more relayable
-        var file = e.originalEvent.dataTransfer.items[0].webkitGetAsEntry();
-        if( file.isDirectory ){
-            rejected = false;
-            $("#dropZone").addClass("accept").removeClass("deny");
-
-            // drop event ? --> import it!
-            if( e.type=="drop" ){
-                if( $('body').hasClass('advanced') && false ){ // todo: if (tab multiple is open)
-                    // do batch import
-
-                    $("updateMenuButton").triggerHandler('click');
-                }
-                else {
-                    // import single project folder
-                    $("#projectName").val( files[0].name );
-                    var regExp = new RegExp("\\b/"+files[0].name+"\\b","gi");
-                    $("#projectPath").val( files[0].path.replace(regExp,"") ).triggerHandler('change');
-
-                    $("createMenuButon").triggerHandler('click');
-                }
-                closeDragInputModal(e);
-                return true;
-            }
-        }
+    if( !$('body').hasClass('incomingFile') ){
+        return false;
     }
 
-    if(rejected) {
+   if( acceptDraggedFiles( e ) ){
+        $("#dropZone").addClass("accept").removeClass("deny");
+        return true;
+    }
+    // files are rejected
+    else {
+        $("#dropZone").addClass("deny").removeClass("accept");
+    }
+    return false;
+}
+
+function onDropFile( e ){
+    e.stopPropagation();
+    e.preventDefault();
+
+   if( acceptDraggedFiles( e ) ){
+        $("#dropZone").addClass("accept").removeClass("deny");
+
+        if( $('body').hasClass('advanced') && false ){ // todo: if (tab multiple is open)
+            // do batch import
+
+            $("updateMenuButton").triggerHandler('click');
+        }
+        else {
+            var files = e.originalEvent.dataTransfer.files;
+            // import single project folder
+            $("#projectName").val( files[0].name );
+            var regExp = new RegExp("\\b/"+files[0].name+"\\b","gi");
+            $("#projectPath").val( files[0].path.replace(regExp,"") ).triggerHandler('change');
+
+            $("createMenuButon").triggerHandler('click');
+        }
+        closeDragInputModal(e);
+        return true;
+    }
+    // files are rejected
+    else {
         $("#dropZone").addClass("deny").removeClass("accept");
 
-        if( e.type=="drop" ){
-            displayModal(
+        displayModal(
                 "The file you dropped is not compatible for importing.<br>"+
                 "To import an OpenFrameworks project, drag & drop the whole project folder."
-            );
-        }
+        );
     }
     return false;
 }
@@ -651,7 +688,9 @@ function closeDragInputModal(e){
     e.stopPropagation();
     e.preventDefault();
 
-    if( $('body').hasClass('incomingFile') ){
+    //console.log('closeDragInputModal via '+e.type + ' on '+ e.target.nodeName + '#' + e.target.id);
+
+    if( $('body').hasClass('incomingFile') && $("#dropZoneOverlay:hover").length===0 ){
         $('body').removeClass('incomingFile');
         $("#fileDropModal").modal('hide');
         $("#dropZone").removeClass("accept deny");
@@ -660,6 +699,7 @@ function closeDragInputModal(e){
 }
 
 function openDragInputModal(e){
+    //console.log('openDragInputModal via '+e.type + ' on '+ e.target.nodeName + '#' + e.target.id);
     e.stopPropagation();
     e.preventDefault();
 
@@ -667,7 +707,13 @@ function openDragInputModal(e){
         
         $('body').addClass('incomingFile');
         $("#fileDropModal").modal('show');
+
     }
+
+    if( e.type==='dragenter' ){
+        onDragUpdateFile(e);
+    }
+
     return false;
 }
 
