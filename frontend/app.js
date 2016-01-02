@@ -688,13 +688,15 @@ function closeDragInputModal(e){
     e.stopPropagation();
     e.preventDefault();
 
+    if( !$('body').hasClass('incomingFile') || (e.type !== "mouseout" && $("#dropZoneOverlay:hover").length===1) ) {
+        return false;
+    }
     //console.log('closeDragInputModal via '+e.type + ' on '+ e.target.nodeName + '#' + e.target.id);
 
-    if( $('body').hasClass('incomingFile') && $("#dropZoneOverlay:hover").length===0 ){
-        $('body').removeClass('incomingFile');
-        $("#fileDropModal").modal('hide');
-        $("#dropZone").removeClass("accept deny");
-    }
+    $('body').removeClass('incomingFile');
+    $("#fileDropModal").modal('hide');
+    $("#dropZone").removeClass("accept deny");
+    
     return false;
 }
 
