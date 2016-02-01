@@ -1175,11 +1175,6 @@ void xcodeProject::addAddon(ofAddon & addon){
         ofLogVerbose() << "adding addon libs: " << addon.libs[i].path;
         addLibrary(addon.libs[i]);
     }
-    for(int i=0;i<(int)addon.dllsToCopy.size();i++){
-        ofLogVerbose() << "adding addon dlls to bin: " << addon.dllsToCopy[i];
-        string dll = ofFilePath::join("addons/" + addon.name, addon.dllsToCopy[i]);
-        ofFile(ofFilePath::join(getOFRoot(),dll)).copyTo(ofFilePath::join(projectDir,"bin/"),false,true);
-    }
     for(int i=0;i<(int)addon.cflags.size();i++){
         ofLogVerbose() << "adding addon cflags: " << addon.cflags[i];
         addCFLAG(addon.cflags[i]);
