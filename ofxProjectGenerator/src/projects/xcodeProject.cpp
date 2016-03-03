@@ -344,7 +344,7 @@ bool xcodeProject::createProjectFile(){
         ofDirectory mediaAssetsTemplateDirectory(ofFilePath::join(templatePath, "mediaAssets"));
         ofDirectory mediaAssetsProjectDirectory(ofFilePath::join(projectDir, "mediaAssets"));
         if (!mediaAssetsProjectDirectory.exists()){
-            mediaAssetsTemplateDirectory.copyTo(mediaAssetsProjectDirectory.getAbosultePath(), false, false);
+            mediaAssetsTemplateDirectory.copyTo(mediaAssetsProjectDirectory.getAbsolutePath(), false, false);
         }
     }
 
