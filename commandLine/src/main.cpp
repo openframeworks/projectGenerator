@@ -52,7 +52,6 @@ enum pgMode {
 };
 
 
-float               startTime;
 int                 nProjectsUpdated;
 int                 nProjectsCreated;
 
@@ -352,7 +351,6 @@ int main(int argc, char* argv[]){
     bHelpRequested = false;
     bListTemplates = false;
     targets.push_back(ofGetTargetPlatform());
-    startTime = 0;
     nProjectsUpdated = 0;
     nProjectsCreated = 0;
     string projectName = "";
@@ -433,7 +431,6 @@ int main(int argc, char* argv[]){
     
     // ------------------------------------------------------ post parse
     
-    startTime = ofGetElapsedTimef();
     nProjectsUpdated = 0;
     nProjectsCreated = 0;
     of::priv::initutils();
@@ -627,11 +624,10 @@ int main(int argc, char* argv[]){
     }
 
     consoleSpace();
-    float elapsedTime = ofGetElapsedTimef() - startTime;
     if (nProjectsCreated > 0) cout << nProjectsCreated << " project created ";
     if (nProjectsUpdated == 1)cout << nProjectsUpdated << " project updated ";
     if (nProjectsUpdated > 1) cout << nProjectsUpdated << " projects updated ";
-    ofLogNotice() << "in " << elapsedTime << " seconds" << endl;
+    ofLogNotice() << "in " << ofGetElapsedTimef() << " seconds" << endl;
     consoleSpace();
 
 	
