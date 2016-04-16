@@ -23,7 +23,6 @@ bool AndroidStudioProject::createProjectFile(){
     if(!gradleFile.exists()){
         if(!ofFile::copyFromTo(src,dst)){
             ofLogError(LOG_NAME) << "error copying gradle template from " << src << " to " << dst;
-            return false;
         }
     }
     
@@ -34,7 +33,6 @@ bool AndroidStudioProject::createProjectFile(){
         dst = settings.path();
         if(!ofFile::copyFromTo(src,dst)){
             ofLogError(LOG_NAME) << "error copying settings gradle template from " << src << " to " << dst;
-            return false;
         }
     }
     
@@ -46,7 +44,6 @@ bool AndroidStudioProject::createProjectFile(){
         dst = manifest.path();
         if(!ofFile::copyFromTo(src,dst)){
             ofLogError(LOG_NAME) << "error copying Android.manifest template from " << src << " to " << dst;
-            return false;
         } else {
             findandreplaceInTexfile(dst, "TEMPLATE_APP_NAME", projectName);
         }
@@ -61,7 +58,6 @@ bool AndroidStudioProject::createProjectFile(){
         dst = config.path();
         if(!ofFile::copyFromTo(src,dst)){
             ofLogError(LOG_NAME) << "error copying config.make template from " << src << " to " << dst;
-            return false;
         }
     }
 
@@ -83,7 +79,6 @@ bool AndroidStudioProject::createProjectFile(){
         dst = makefile.path();
         if(!ofFile::copyFromTo(src,dst)){
             ofLogError(LOG_NAME) << "error copying Makefile template from " << src << " to " << dst;
-            return false;
         }
     }
     
@@ -94,7 +89,6 @@ bool AndroidStudioProject::createProjectFile(){
         dst = gitignore.path();
         if(!ofFile::copyFromTo(src,dst)){
             ofLogError(LOG_NAME) << "error copying gitignore template from " << src << " to " << dst;
-            return false;
         }
     }
 
