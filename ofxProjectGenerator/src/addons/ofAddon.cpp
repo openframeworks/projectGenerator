@@ -194,7 +194,10 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 		return;
 	}
 
-	string addonRelPath = ofFilePath::addTrailingSlash(pathToOF) + "addons/" + name;
+
+	string addonRelPath;
+	if (!isLocalAddon) addonRelPath = ofFilePath::addTrailingSlash(pathToOF) + "addons/" + name;
+	else addonRelPath = addonPath;
 
 	if(variable == "ADDON_DESCRIPTION"){
 		addReplaceString(description,value,addToValue);

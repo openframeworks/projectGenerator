@@ -1,0 +1,42 @@
+{
+  "name": "projectGenerator",
+  "productName": "projectGenerator",
+  "version": "0.0.1",
+  "description": "repo for testing a gui using electron for the project generator",
+  "license": "MIT",
+  "main": "index.js",
+  "repository": "openframeworks/pgelectron",
+  "author": {
+    "name": "zach lieberman",
+    "email": "?",
+    "url": "openframeworks.cc"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --all --overwrite --version=0.30.0",
+    "build:osx": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --version=0.30.0 --platform=darwin --arch=x64",
+    "build:linux32": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --version=0.30.0 --platform=linux --arch=ia32",
+    "build:linux64": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --version=0.30.0 --platform=linux --arch=x64",
+    "build:vs": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --version=0.30.0 --platform=win32 --arch=ia32"
+  },
+  "files": [
+    "index.html",
+    "app/*",
+    "static/*"
+  ],
+  "keywords": [
+    "electron-app"
+  ],
+  "dependencies": {
+    "electron-debug": "^0.1.1",
+    "moniker": "^0.1.2",
+    "walk": "^2.3.9"
+  },
+  "devDependencies": {
+    "electron-packager": "^5.0.0",
+    "electron-prebuilt": "^0.30.0"
+  }
+}

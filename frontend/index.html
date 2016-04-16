@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>openFrameworks Project Generator</title>
+		<link rel="stylesheet" href="static/css/semantic.css">
+		<link rel="stylesheet" href="static/css/index.css">
+		<style>
+		body {
+			background-color: #ddd;
+			-webkit-user-select: none;
+		}
+		/* enable some text to be selectable */
+		.selectable, .selectable * {
+			-webkit-user-select: text;
+		}
+		
+		.draggable {
+			-webkit-app-region: drag;
+		}
+
+		.undraggable {
+			-webkit-app-region: no-drag !important;
+		}
+
+		.menuItem {
+			-webkit-app-region: no-drag !important;
+			border-top-right-radius: 0.0em !important;
+			border-top-left-radius: 0.0em !important;
+		}
+
+		#addonsList {
+			max-height: 18em !important;
+		}
+
+
+		.ui.dimmer > .content {
+			-webkit-user-select: none !important;
+		}
+
+		#uiModal {
+			word-wrap: break-word;
+		}
+
+		.monospace{
+			word-wrap: break-word !important;
+		}
+
+		.topBar{
+			background-image: url("static/img/topbar.png");
+		}
+		
+		.fixedElement {
+position: fixed;
+  z-index: 101;
+  margin: 0em;
+  width: 100%;
+
+		}
+
+		#fullConsoleOutput textarea{
+			border:0px;
+			background-color: #333;
+			width:100%;
+			min-height:10em;
+			color:#dfdfdf;
+			font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+			font-size: 9px;
+			white-space: pre;
+ 			word-wrap: break-word;
+		}
+
+		</style>
+	</head>
+	<body>
+		<!-- there is a little bit of wonkiness here to make the window draggable but also make the top bar clickable.  I basically enable drag for the menu, but disable it in divs around the text.  from a UI perspective, it's kind of weird cause the highlight is happening, but you need to click closer to the text to trigger the tab change.  I'm still thinking about how to do this well -->
+		<div class="fixedElement">
+		<div style="background-color: #3d3d3d" class="topBar">
+	
+
+		<div class="draggable" id="df" style="padding:0px; margin:0px; background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)); height:2.5em">
+		<button class="circular ui secondary mini icon button undraggable" onclick="quit()" style="margin:5px;">
+  <i class="icon remove"></i>
+</button>
+			<<!-- div class="ui container" style="padding:0px; margin:0px;">
+				<a class="item menuItem">
+					<div style="white" onclick="quit()"><i class="remove link icon white" style="color:#fff"></i>
+					</div>
+				</a>
+			</div> -->
+		</div>
+		<div class="ui borderless inverted main menu attached" id="mainMenu" style="padding:0px; margin:0px; background-color: rgba(0,0,0,0.85);">
+			<div class="ui container draggable">
+				
+				<div class="item" style="width:40px;">
+				</div>
+				<a class="item active menuItem" data-tab="create" id="createMenuButon">
+					<div style="padding:6px;">create / update</div>
+				</a>
+				<a class="item updateMultiMenuOption menuItem" data-tab="updateMulti" style="display: none" id="updateMenuButton">
+					<div style="padding:6px;">update multiple</div>
+				</a>
+				<a class="item right floated menuItem" data-tab="settings" id="settingsMenuButton">
+					<div style="-webkit-app-region: no-drag !important; padding:6px;"><i class="setting link icon"></i>
+					</div>
+				</a>
+			</div>
+		</div>
+		</div>
+		</div>
+
+		
+		<div class="main ui container" style="padding: 130px 40px 50px 40px">
+			
+			<!------------------------------- create -------------------------------->
+			<div class="ui tab active" data-tab="create">
+				<div class="ui form">
+					<div class="field">
+						<label>Project name: &nbsp; 
+							<a class="ui icon tooltip" href="#" data-toggle="external_target" data-content="Click to open your project in your default file browser." data-position="left bottom" id="revealProjectFiles">
+								<i class="external icon"></i>
+							</a>
+							<!-- <a class="ui icon tooltip" href="#randomName" onclick="getRandomSketchName()" id="nameRandomiser" data-content="Click to generate a random sketch name" data-position="right center">
+								<i class="random icon"></i>
+							</a> -->
+						</label>
+						
+
+						<div class="fields">
+							<div class="field">
+								<div class="ui icon input fluid" style="width:250px;">
+								<input type="text" placeholder="Project name..." id="projectName">
+								
+								<i class="random link icon" onclick="getRandomSketchName()" ></i>
+							
+								</div>
+							</div>
+							<div class="field" style="padding-left:20px">
+								<div class="ui grey button" onclick="browseImportProject()">import</div>
+							</div>
+						</div>
+					</div>
+					<div class="field">
+						<label>Project path:</label>
+						<div class="ui icon input fluid">
+							<input type="text" placeholder="Project path..." id="projectPath">
+							<i class="search link icon" onclick="browseProjectPath()"></i>
+						</div>
+					</div>
+					<div class="field">
+						<label>
+							<a class="tooltip" href="http://www.ofxaddons.com/" data-toggle="external_target" data-content="Get more addons at ofxAddons.com" data-position="right center" id="ofx-addons-link">Addons</a>: &nbsp; 
+							<a class="ui icon tooltip" href="#rescanAddons" onclick="rescanAddons()" data-content="Click to reload addons folder" data-position="right center" id="adons-refresh-icon">
+								<i class="refresh icon"></i>
+							</a>
+						</label>
+						<div class="ui multiple search selection dropdown" id="addonsDropdown">
+							<input name="addons" type="hidden">
+							<i class="dropdown icon"></i>
+							<div class="default text">Addons...</div>
+							<div class="menu " id="addonsList">
+							</div>
+						</div>
+					</div>
+					
+					<div class="ui red message" id="missingAddonMessage" style="display: none">
+						<p>
+							<div class="header">
+								Missing addons
+							</div>
+						</p>
+						<p>You are attempting to update a project that is missing the following addons:</p>
+						<p><div id="missingAddonList">...</div></p>
+						<p>Please download the missing addons and put them in your addons folder, then <a href="#rescanAddons" onclick="rescanAddons()">rescan it</a>.</p>
+						<p>If you choose to update this project without these addons, you may overwrite the settings on the project.</p>
+					</div>
+
+					<div class="ui yellow message" id="localAddonMessage" style="display: none">
+						<p>
+							<div class="header">
+								Local addons
+							</div>
+						</p>
+						<p>You are attempting to update a project that is using the following local addons:</p>
+						<p><div id="localAddonList">...</div></p>
+						<p>To alter these local addons, edit the addons.make file inside this project and reimport</p>
+					</div>
+
+
+
+					<div class="field">
+						<label>Platforms:</label>
+						<div class="ui multiple search selection dropdown" id="platformsDropdown">
+							<input name="platforms" type="hidden">
+							<i class="dropdown icon"></i>
+							<div class="default text">Platforms...</div>
+							<div class="menu" id="platformList">
+							</div>
+						</div>
+						<div id="test"></div>
+					</div>
+					<div class="ui hidden divider"></div>
+					<div class="field">
+						<div class="ui olive button" id="generateButton" onclick="generate()">Generate</div>
+						<div class="ui orange button" id="updateButton" style="display: none" onclick="generate()">Update</div>
+					</div>
+				</div>
+			</div>
+
+			
+			<!------------------------------- advanced -------------------------------->
+			<div class="ui tab" data-tab="updateMulti">
+				<div class="ui message">
+					<p>
+						<div class="header">
+							Warning
+						</div>
+					</p>
+					<p>This updates existing projects <em>recursively</em> in the selected directory. For example, to generate examples for a specific platform, you'd choose the examples folder as the update path. </p>
+				</div>
+				<div class="ui form">
+					<div class="field">
+						<label>Update path:</label>
+						<div class="ui icon input fluid">
+							<input type="text" placeholder="Update path..." id="updateMultiplePath">
+							<i class="search link icon" onclick="getUpdatePath()"></i>
+						</div>
+					</div>
+					<div class="ui negative message" id="updateMultipleWrongMessage" style="display: none">
+						<div class="header">
+							Update path doesn't exist
+						</div>
+						<p>Please set the path to the root of the folders you want to update. The folder needs to exists.
+						</p>
+					</div>
+					<div class="field">
+						<label>Platforms:</label>
+						<div class="ui multiple search selection dropdown" id="platformsDropdownMulti">
+							<input name="addons" type="hidden">
+							<i class="dropdown icon"></i>
+							<div class="default text">Platforms...</div>
+							<div class="menu" id="platformListMulti">
+							</div>
+						</div>
+					</div>
+					<div class="ui hidden divider"></div>
+					<div class="field">
+						<div class="ui orange button" id="updateMultipleButton" onclick="updateRecursive()">Update multiple</div>
+					</div>
+				</div>
+			</div>
+			<!------------------------------- settings -------------------------------->
+			<div class="ui tab" data-tab="settings">
+				<div class="ui form">
+					<div class="field">
+						<label>openFrameworks path:</label>
+						<div class="ui icon input fluid">
+							<input type="text" placeholder="openFrameworks path..." id="ofPath">
+							<i class="search link icon" onclick="browseOfPath()"></i>
+						</div>
+					</div>
+					<div class="ui negative message" id="ofPathWrongMessage" style="display: none">
+						<div class="header">
+							openFrameworks path is wrong
+						</div>
+						<p>Please set the OF path to root of openframeworks (ie, the folder which has "addons", "libs", in it)
+						</p>
+					</div>
+					<div class="field">
+					<div class="ui checkbox verbose">
+						<input type="checkbox" name="Verbose" id="verboseOption">
+						<label>Verbose output</label>
+					</div>
+					</div>
+					<div class="field">
+					<div class="ui checkbox advanced">
+						<input type="checkbox" name="Advanced" id="advancedOptions">
+						<label>Advanced options</label>
+					</div>
+					</div>
+
+
+				</div>
+				
+			</div>
+		</div>
+		
+		<div class="ui small modal" id="ofPathError">
+  
+  <div class="content">
+    <div class="description">
+      please fix the openFrameworks path before procceeding.
+    </div>
+  </div>
+</div>
+		
+		<!-- begin JS UI modal -->
+		<div class="ui modal" id="uiModal" tabindex="-1" role="dialog">
+			<div class="content">
+				<p>Sorry, I've got nothing to say...</p>
+			</div>
+			<div class="actions">
+				<div class="ui cancel button" id="IDEButton" style="display: none;">Open in IDE</div>
+				<div class="ui cancel button">Close</div>
+			</div>
+		</div>
+		<!-- end modal -->
+
+		<!-- begin File Drop modal -->
+		<!-- <div class="ui modal" id="fileDropModal" tabindex="-1" role="dialog">
+			<div class="content">
+				<p>Incomming! Please give me cookies!</p>
+				<div class="drop-zone" id="dropZoneUpdate">
+					<p>Update Project</p>
+				</div>
+				<div class="drop-zone" id="dropZoneBatchUpdate">
+					<p>Update Multiple</p>
+				</div>
+			</div>
+		</div> -->
+		<!-- end modal -->
+
+		<!-- console area -->
+		<section class="ui" id="consoleContainer">
+			<span id="showConsole">Show Console</span>
+			<span id="hideConsole">Hide</span>
+			<div id="console" class="selectable">
+				<p>Welcome to the console :)</p>
+			</div>
+		</section>
+		<script type="text/javascript" src="static/js/jquery.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
+		<script type="text/javascript" src="static/js/semantic.min.js"></script>
+		<script src="app.js"></script>
+	</body>
+</html>

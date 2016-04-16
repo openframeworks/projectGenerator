@@ -341,17 +341,11 @@ bool xcodeProject::createProjectFile(){
 				dataDirectory.create(false);
 			}
 		}
-        ofFile::copyFromTo(ofFilePath::join(templatePath,"bin/data/Default-568h@2x~iphone.png"),projectDir + "/bin/data/Default-568h@2x~iphone.png", true, true);
-		ofFile::copyFromTo(ofFilePath::join(templatePath,"bin/data/Default.png"),projectDir + "/bin/data/Default.png", true, true);
-        ofFile::copyFromTo(ofFilePath::join(templatePath,"bin/data/Default@2x.png"),projectDir + "/bin/data/Default@2x.png", true, true);
-        ofFile::copyFromTo(ofFilePath::join(templatePath,"bin/data/Default@2x~ipad.png"),projectDir + "/bin/data/Default@2x~ipad.png", true, true);
-        ofFile::copyFromTo(ofFilePath::join(templatePath,"bin/data/Default@2x~iphone.png"),projectDir + "/bin/data/Default@2x~iphone.png", true, true);
-        ofFile::copyFromTo(ofFilePath::join(templatePath,"bin/data/Default~ipad.png"),projectDir + "/bin/data/Default~ipad.png", true, true);
-        ofFile::copyFromTo(ofFilePath::join(templatePath,"bin/data/Default~iphone.png"),projectDir + "/bin/data/Default~iphone.png", true, true);
-        ofFile::copyFromTo(ofFilePath::join(templatePath,"bin/data/Icon-72.png"),projectDir + "/bin/data/Icon-72.png", true, true);
-        ofFile::copyFromTo(ofFilePath::join(templatePath,"bin/data/Icon-72@2x.png"),projectDir + "/bin/data/Icon-72@2x.png", true, true);
-		ofFile::copyFromTo(ofFilePath::join(templatePath,"bin/data/Icon.png"),projectDir + "/bin/data/Icon.png", true, true);
-        ofFile::copyFromTo(ofFilePath::join(templatePath,"bin/data/Icon@2x.png"),projectDir + "/bin/data/Icon@2x.png", true, true);
+        ofDirectory mediaAssetsTemplateDirectory(ofFilePath::join(templatePath, "mediaAssets"));
+        ofDirectory mediaAssetsProjectDirectory(ofFilePath::join(projectDir, "mediaAssets"));
+        if (!mediaAssetsProjectDirectory.exists()){
+            mediaAssetsTemplateDirectory.copyTo(mediaAssetsProjectDirectory.getAbsolutePath(), false, false);
+        }
     }
 
     // this is for xcode 4 scheme issues. but I'm not sure this is right.
@@ -1050,7 +1044,7 @@ void xcodeProject::addLDFLAG(string ldflag, LibType libType){
 void xcodeProject::addCFLAG(string cflag, LibType libType){
 
     char query[255];
-    sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'OTHER_CPLUSPLUSFLAGS')]/following-sibling::node()[1]");
+    sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'OTHER_CFLAGS')]/following-sibling::node()[1]");
     pugi::xpath_node_set headerArray = doc.select_nodes(query);
 
 
