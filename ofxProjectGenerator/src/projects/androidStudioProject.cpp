@@ -12,6 +12,11 @@ AndroidStudioProject::AndroidStudioProject(string target)
 }
 
 bool AndroidStudioProject::createProjectFile(){
+    
+    // Make sure project name doesn't include "-"
+    string packageName = projectName;
+    ofStringReplace(packageName, "-", "");
+    
     ofDirectory dir(projectDir);
     if(!dir.exists()) dir.create(true);
 
@@ -45,7 +50,7 @@ bool AndroidStudioProject::createProjectFile(){
         if(!ofFile::copyFromTo(src,dst)){
             ofLogError(LOG_NAME) << "error copying Android.manifest template from " << src << " to " << dst;
         } else {
-            findandreplaceInTexfile(dst, "TEMPLATE_APP_NAME", projectName);
+            findandreplaceInTexfile(dst, "TEMPLATE_PACKAGE_NAME", packageName);
         }
     }
     
