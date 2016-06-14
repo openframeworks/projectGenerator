@@ -14,6 +14,7 @@
 		93C19E76048C3DC7D9B1A13F /* xcodeProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 851AF667222EF52C8558BAAE /* xcodeProject.cpp */; };
 		9D8D62C244DFE08B13F67942 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F48CCF18A98E718E487ED699 /* Utils.cpp */; };
 		B3779BEA5981FB5F1270ACAE /* visualStudioProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B6DF1A36467F4AD999991D0 /* visualStudioProject.cpp */; };
+		DD6E25161BF0AF9100E5F547 /* androidStudioProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DD6E25141BF0AF9100E5F547 /* androidStudioProject.cpp */; };
 		DDB005FE0475131486143812 /* CBWinProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA4F9DE03C98D1A6780A3A43 /* CBWinProject.cpp */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
 		E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4B69E1D0A3A1BDC003C02F2 /* main.cpp */; };
@@ -68,6 +69,8 @@
 		CC7E9EFF5EDF044D0D60E84E /* Utils.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Utils.h; path = ../ofxProjectGenerator/src/utils/Utils.h; sourceTree = SOURCE_ROOT; };
 		D31F54C5A271FBBD54B015EB /* pugixml.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = pugixml.hpp; path = ../ofxProjectGenerator/libs/pugixml/src/pugixml.hpp; sourceTree = SOURCE_ROOT; };
 		D76644EB0E1973DB9CC96EDD /* xcodeProject.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = xcodeProject.h; path = ../ofxProjectGenerator/src/projects/xcodeProject.h; sourceTree = SOURCE_ROOT; };
+		DD6E25141BF0AF9100E5F547 /* androidStudioProject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = androidStudioProject.cpp; path = ../ofxProjectGenerator/src/projects/androidStudioProject.cpp; sourceTree = "<group>"; };
+		DD6E25151BF0AF9100E5F547 /* androidStudioProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = androidStudioProject.h; path = ../ofxProjectGenerator/src/projects/androidStudioProject.h; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E4B69B5B0A3A1756003C02F2 /* commandLineDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = commandLineDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4B69E1D0A3A1BDC003C02F2 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = SOURCE_ROOT; };
@@ -232,6 +235,8 @@
 				0B6DF1A36467F4AD999991D0 /* visualStudioProject.cpp */,
 				D76644EB0E1973DB9CC96EDD /* xcodeProject.h */,
 				4E53FCB5E7AA562E02ABC033 /* qtcreatorproject.cpp */,
+				DD6E25151BF0AF9100E5F547 /* androidStudioProject.h */,
+				DD6E25141BF0AF9100E5F547 /* androidStudioProject.cpp */,
 			);
 			name = projects;
 			sourceTree = "<group>";
@@ -343,6 +348,7 @@
 				9D8D62C244DFE08B13F67942 /* Utils.cpp in Sources */,
 				8F4438678C7D9198482E7C2A /* baseProject.cpp in Sources */,
 				93C19E76048C3DC7D9B1A13F /* xcodeProject.cpp in Sources */,
+				DD6E25161BF0AF9100E5F547 /* androidStudioProject.cpp in Sources */,
 				E6100CF42CB89BA4B2F20024 /* CBLinuxProject.cpp in Sources */,
 				DDB005FE0475131486143812 /* CBWinProject.cpp in Sources */,
 				B3779BEA5981FB5F1270ACAE /* visualStudioProject.cpp in Sources */,
