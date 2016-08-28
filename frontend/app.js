@@ -546,9 +546,20 @@ function setup() {
         // $("#hideConsole").on('click', function(){ $('body').removeClass('showConsole'); });
 
         // initialise the overall-use modal
-        $("#uiModal, #fileDropModal").modal({
+        $("#uiModal").modal({
             'show': false
         });
+
+        $("#fileDropModal").modal({
+            'show': false,
+            onHide: function () {
+                $('body').removeClass('incomingFile');
+            },
+            onShow: function () {
+                $('body').addClass('incomingFile');
+            }
+        });
+
 
         // show default platform in GUI
         $("#defaultPlatform").html(defaultSettings['defaultPlatform']);
@@ -570,24 +581,17 @@ function setup() {
         $('.tooltip').popup();
         
         // Open file drop zone
-        $(window).on('dragenter', openDragInputModal);
+        $(window).on('dragbetterenter', openDragInputModal);
+        $(window).on('dragenter', openDragInputModal);//onDragUpdateFile);
 
         // Close file drop zone
-        $(window).on('mouseout', closeDragInputModal );
-        //$(window).on('dragend', closeDragInputModal );
-
-        $("#dropZoneOverlay").on('dragleave', function(e){
-            //console.log(e.target);
-            if( $(e.target).filter('.ui.dimmer:not(.fade.in)').length===1 ){
-                closeDragInputModal( e );
-           }
-        });
+        $(window).on('dragbetterleave', closeDragInputModal );
+        $(window).on('mouseleave', closeDragInputModal );
 
         // prevent dropping anywhere (dropping files loads their URL, unloading the PG)
         // note: weirdly, dragover is also needed
-        $(window).on('drop dragover', blockEvent );
-        
-        //$(window).on('dragleave', blockEvent);
+        $(window).on('drop dragover', blockDragEvent );
+        //$(window).on('dragleave', blockDragEvent);
 
         $("#dropZoneOverlay").on('drop', onDropFile).on('dragend', closeDragInputModal);
 
@@ -604,8 +608,14 @@ function setup() {
     });
 }
 
-function blockEvent(e){
-    //console.log('blockEvent via '+e.type + ' on '+ e.target.nodeName + '#' + e.target.id);
+function blockDragEvent(e){
+    //console.log('blockDragEvent via '+e.type + ' on '+ e.target.nodeName + '#' + e.target.id);
+
+    // open drop overlay if not already open
+    if( !$('body').hasClass('incomingFile') ){
+        $(window).triggerHandler('dragbetterenter');
+    }
+
     e.stopPropagation();
     e.preventDefault();
     return false;
@@ -688,12 +698,13 @@ function closeDragInputModal(e){
     e.stopPropagation();
     e.preventDefault();
 
-    if( !$('body').hasClass('incomingFile') || (e.type !== "mouseout" && $("#dropZoneOverlay:hover").length===1) ) {
-        return false;
-    }
     //console.log('closeDragInputModal via '+e.type + ' on '+ e.target.nodeName + '#' + e.target.id);
 
-    $('body').removeClass('incomingFile');
+    // Prevent closing the modal while still fading in
+    // if( $("#fileDropModal").filter('.ui.modal:not(.fade.in)').length===0 ){
+    //     return;
+    // }
+
     $("#fileDropModal").modal('hide');
     $("#dropZone").removeClass("accept deny");
     
@@ -701,17 +712,16 @@ function closeDragInputModal(e){
 }
 
 function openDragInputModal(e){
-    //console.log('openDragInputModal via '+e.type + ' on '+ e.target.nodeName + '#' + e.target.id);
     e.stopPropagation();
     e.preventDefault();
 
-    if( !$('body').hasClass('incomingFile') ){
-        
-        $('body').addClass('incomingFile');
-        $("#fileDropModal").modal('show');
+    //console.log('openDragInputModal via '+e.type + ' on '+ e.target.nodeName + '#' + e.target.id);
 
+    if( !$('body').hasClass('incomingFile') ){
+        $("#fileDropModal").modal('show');
     }
 
+    // check filetype then entering droppable zone
     if( e.type==='dragenter' ){
         onDragUpdateFile(e);
     }
