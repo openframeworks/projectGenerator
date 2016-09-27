@@ -340,7 +340,13 @@ bool xcodeProject::createProjectFile(){
 			if (!dataDirectory.exists()){
 				dataDirectory.create(false);
 			}
-		}
+            
+            //this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
+            ofDirectory srcDataDir(ofFilePath::join(templatePath, "bin/data"));
+            if( srcDataDir.exists() ){
+                baseProject::recursiveCopyContents(srcDataDir, dataDirectory);
+            }
+        }
         ofDirectory mediaAssetsTemplateDirectory(ofFilePath::join(templatePath, "mediaAssets"));
         ofDirectory mediaAssetsProjectDirectory(ofFilePath::join(projectDir, "mediaAssets"));
         if (!mediaAssetsProjectDirectory.exists()){
