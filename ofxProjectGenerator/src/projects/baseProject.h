@@ -85,6 +85,7 @@ public:
     std::string target;
 
 protected:
+    void recursiveCopyContents(const ofDirectory & srcDir, ofDirectory & destDir);
 
     vector<ofAddon> addons;
 };
