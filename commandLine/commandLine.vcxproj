@@ -95,7 +95,7 @@
 			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
 			<RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
 			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\ofxProjectGenerator\libs;..\ofxProjectGenerator\libs\pugixml;..\ofxProjectGenerator\libs\pugixml\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils;..\..\..\addons\ofxPoco\libs\poco\include;..\..\..\addons\ofxPoco\src</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils;..\..\..\addons\ofxPoco\libs\poco\include;..\..\..\addons\ofxPoco\src</AdditionalIncludeDirectories>
 			<CompileAs>CompileAsCpp</CompileAs>
 			<AdditionalOptions>-DPOCO_STATIC</AdditionalOptions>
 		</ClCompile>
@@ -115,7 +115,7 @@
 			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
 			<RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
 			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\ofxProjectGenerator\libs;..\ofxProjectGenerator\libs\pugixml;..\ofxProjectGenerator\libs\pugixml\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils;..\..\..\addons\ofxPoco\libs\poco\include;..\..\..\addons\ofxPoco\src</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils;..\..\..\addons\ofxPoco\libs\poco\include;..\..\..\addons\ofxPoco\src</AdditionalIncludeDirectories>
 			<CompileAs>CompileAsCpp</CompileAs>
 			<MultiProcessorCompilation>true</MultiProcessorCompilation>
 			<AdditionalOptions>-DPOCO_STATIC</AdditionalOptions>
@@ -135,7 +135,7 @@
 			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
 			<RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
 			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\ofxProjectGenerator\libs;..\ofxProjectGenerator\libs\pugixml;..\ofxProjectGenerator\libs\pugixml\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils;..\..\..\addons\ofxPoco\libs\poco\include;..\..\..\addons\ofxPoco\src</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils;..\..\..\addons\ofxPoco\libs\poco\include;..\..\..\addons\ofxPoco\src</AdditionalIncludeDirectories>
 			<CompileAs>CompileAsCpp</CompileAs>
 			<MultiProcessorCompilation>true</MultiProcessorCompilation>
 			<AdditionalOptions>-DPOCO_STATIC</AdditionalOptions>
@@ -158,7 +158,7 @@
 			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
 			<RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
 			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\ofxProjectGenerator\libs;..\ofxProjectGenerator\libs\pugixml;..\ofxProjectGenerator\libs\pugixml\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils;..\..\..\addons\ofxPoco\libs\poco\include;..\..\..\addons\ofxPoco\src</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils;..\..\..\addons\ofxPoco\libs\poco\include;..\..\..\addons\ofxPoco\src</AdditionalIncludeDirectories>
 			<CompileAs>CompileAsCpp</CompileAs>
 			<AdditionalOptions>-DPOCO_STATIC</AdditionalOptions>
 		</ClCompile>
@@ -187,7 +187,6 @@
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\androidStudioProject.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBWinProject.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\libs\pugixml\src\pugixml.cpp" />
 		<ClCompile Include="..\..\..\addons\ofxPoco\src\ofxXmlPoco.cpp" />
 	</ItemGroup>
 	<ItemGroup>
@@ -203,8 +202,6 @@
 		<ClInclude Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.h" />
 		<ClInclude Include="..\ofxProjectGenerator\src\projects\baseProject.h" />
 		<ClInclude Include="..\ofxProjectGenerator\src\projects\visualStudioProject.h" />
-		<ClInclude Include="..\ofxProjectGenerator\libs\pugixml\src\pugiconfig.hpp" />
-		<ClInclude Include="..\ofxProjectGenerator\libs\pugixml\src\pugixml.hpp" />
 		<ClInclude Include="..\..\..\addons\ofxPoco\src\ofxXmlPoco.h" />
 		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ActiveResult.h" />
 		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Config.h" />
