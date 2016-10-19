@@ -1,2 +1,2 @@
-../ofxProjectGenerator
 ofxPoco
+../ofxProjectGenerator
