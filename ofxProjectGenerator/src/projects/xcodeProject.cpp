@@ -611,7 +611,7 @@ void xcodeProject::addFramework(string name, string path, string folder){
         doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child().next_sibling());   // UUID FIRST
         doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child());                  // DICT SECOND
         
-        pugi::xpath_node xpathResult = doc.select_node("//string[contains(.,'PBXCopyFilesBuildPhase')]/../array");
+		pugi::xpath_node xpathResult = doc.select_single_node("//string[contains(.,'PBXCopyFilesBuildPhase')]/../array");
         pugi::xml_node node = xpathResult.node();
         node.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID2.c_str());
     }
