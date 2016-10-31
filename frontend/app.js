@@ -537,7 +537,7 @@ function setup() {
                 //var sys = require('sys')
                 var exec = require('child_process').exec;
                 function puts(error, stdout, stderr) { console.log(stdout + " " + stderr) }
-                exec(ofpath + "/projectGenerator-osx/" + ".finish_install.sh", puts);
+                exec("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app", puts);
                 $("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
 
             }
@@ -567,7 +567,7 @@ function setup() {
                 //var sys = require('sys')
                 var exec = require('child_process').exec;
                 function puts(error, stdout, stderr) { console.log(stdout + " " + stderr) }
-                exec(ofpath + "/projectGenerator-osx/" + ".finish_install.sh", puts);
+                exec("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app", puts);
                 $("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
                 //exec("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app", puts);
             }
