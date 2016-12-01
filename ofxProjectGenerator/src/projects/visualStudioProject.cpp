@@ -397,8 +397,8 @@ void visualStudioProject::addAddon(ofAddon & addon){
 
 	for(int i=0;i<(int)addon.dllsToCopy.size();i++){
 		ofLogVerbose() << "adding addon dlls to bin: " << addon.dllsToCopy[i];
-		string dll = ofFilePath::join("addons/" + addon.name, addon.dllsToCopy[i]);
-		ofFile(ofFilePath::join(getOFRoot(),dll)).copyTo(ofFilePath::join(projectDir,"bin/"),false,true);
+		string dll = ofFilePath::join( addon.addonPath , addon.dllsToCopy[i]);
+		ofFile(dll).copyTo(ofFilePath::join(projectDir,"bin/"),false,true);
 	}
 
 	for(int i=0;i<(int)addon.cflags.size();i++){
