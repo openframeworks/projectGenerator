@@ -265,7 +265,20 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib){
     string libFolder = libraryName.substr(0,found);
     string libName = libraryName.substr(found+1);
 
-    // do the path, then the library
+	string libBaseName;
+	string libExtension;
+
+	splitFromLast( libName, ".", libBaseName, libExtension );
+
+	if ( libExtension != "lib" ){
+		// In vs, you must only link against `.lib` files, *not* `.dlls`. 
+		// corresponding `.dll` files must be named in addon_config.mk
+		// under ADDON_DLLS_TO_COPY so that they will be copied into
+		// the app bin path. Therefore we return early.
+		return;
+	}
+
+	// ---------| invariant: libExtension is `lib`
 
     // paths for libraries
 	string linkPath;
