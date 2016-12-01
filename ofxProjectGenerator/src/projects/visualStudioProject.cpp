@@ -348,16 +348,6 @@ void visualStudioProject::addAddon(ofAddon & addon){
         addInclude(addon.includePaths[i]);
     }
 
-    // divide libs into debug and release libs
-    // the most reliable would be to have seperate
-    // folders for debug and release libs
-    // i'm gonna start with a ghetto approach of just
-    // looking for duplicate names except for a d.lib
-    // at the end -> this is not great as many
-    // libs compile with the d somewhere in the middle of the name...
-
-    vector <string> possibleReleaseOrDebugOnlyLibs;
-
     for(auto & lib: addon.libs){
 		addLibrary(lib);
     }
