@@ -14,7 +14,7 @@
 		.selectable, .selectable * {
 			-webkit-user-select: text;
 		}
-		
+
 		.draggable {
 			-webkit-app-region: drag;
 		}
@@ -49,7 +49,7 @@
 		.topBar{
 			background-image: url("static/img/topbar.png");
 		}
-		
+
 		.fixedElement {
 position: fixed;
   z-index: 101;
@@ -76,7 +76,7 @@ position: fixed;
 		<!-- there is a little bit of wonkiness here to make the window draggable but also make the top bar clickable.  I basically enable drag for the menu, but disable it in divs around the text.  from a UI perspective, it's kind of weird cause the highlight is happening, but you need to click closer to the text to trigger the tab change.  I'm still thinking about how to do this well -->
 		<div class="fixedElement">
 		<div style="background-color: #3d3d3d" class="topBar">
-	
+
 
 		<div class="draggable" id="df" style="padding:0px; margin:0px; background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)); height:2.5em">
 		<button class="circular ui secondary mini icon button undraggable" onclick="quit()" style="margin:5px;">
@@ -91,7 +91,7 @@ position: fixed;
 		</div>
 		<div class="ui borderless inverted main menu attached" id="mainMenu" style="padding:0px; margin:0px; background-color: rgba(0,0,0,0.85);">
 			<div class="ui container draggable">
-				
+
 				<div class="item" style="width:40px;">
 				</div>
 				<a class="item active menuItem" data-tab="create" id="createMenuButon">
@@ -109,14 +109,14 @@ position: fixed;
 		</div>
 		</div>
 
-		
+
 		<div class="main ui container" style="padding: 130px 40px 50px 40px">
-			
+
 			<!------------------------------- create -------------------------------->
 			<div class="ui tab active" data-tab="create">
 				<div class="ui form">
 					<div class="field">
-						<label>Project name: &nbsp; 
+						<label>Project name: &nbsp;
 							<a class="ui icon tooltip" href="#" data-toggle="external_target" data-content="Click to open your project in your default file browser." data-position="left bottom" id="revealProjectFiles">
 								<i class="external icon"></i>
 							</a>
@@ -124,15 +124,15 @@ position: fixed;
 								<i class="random icon"></i>
 							</a> -->
 						</label>
-						
+
 
 						<div class="fields">
 							<div class="field">
 								<div class="ui icon input fluid" style="width:250px;">
 								<input type="text" placeholder="Project name..." id="projectName">
-								
+
 								<i class="random link icon" onclick="getRandomSketchName()" ></i>
-							
+
 								</div>
 							</div>
 							<div class="field" style="padding-left:20px">
@@ -149,7 +149,7 @@ position: fixed;
 					</div>
 					<div class="field">
 						<label>
-							<a class="tooltip" href="http://www.ofxaddons.com/" data-toggle="external_target" data-content="Get more addons at ofxAddons.com" data-position="right center" id="ofx-addons-link">Addons</a>: &nbsp; 
+							<a class="tooltip" href="http://www.ofxaddons.com/" data-toggle="external_target" data-content="Get more addons at ofxAddons.com" data-position="right center" id="ofx-addons-link">Addons</a>: &nbsp;
 							<a class="ui icon tooltip" href="#rescanAddons" onclick="rescanAddons()" data-content="Click to reload addons folder" data-position="right center" id="adons-refresh-icon">
 								<i class="refresh icon"></i>
 							</a>
@@ -162,7 +162,7 @@ position: fixed;
 							</div>
 						</div>
 					</div>
-					
+
 					<div class="ui red message" id="missingAddonMessage" style="display: none">
 						<p>
 							<div class="header">
@@ -207,7 +207,7 @@ position: fixed;
 				</div>
 			</div>
 
-			
+
 			<!------------------------------- advanced -------------------------------->
 			<div class="ui tab" data-tab="updateMulti">
 				<div class="ui message">
@@ -266,6 +266,12 @@ position: fixed;
 						<p>Please set the OF path to root of openframeworks (ie, the folder which has "addons", "libs", in it)
 						</p>
 					</div>
+					<div class="ui negative message" id="ofPathSierraMessage" style="display: none">
+						<div class="header">
+							Running on OSX Sierra or later for the first time?
+						</div>
+						<p>For security reasons, please set the OF path to root of openframeworks (ie, the folder which has "addons", "libs", in it)</p>
+					</div>
 					<div class="field">
 						<div class="ui checkbox verbose">
 							<input type="checkbox" name="Verbose" id="verboseOption">
@@ -281,10 +287,10 @@ position: fixed;
 
 
 				</div>
-				
+
 			</div>
 		</div>
-		
+
 		<div class="ui small modal" id="ofPathError">
 			<div class="content">
 				<div class="description">
@@ -292,7 +298,7 @@ position: fixed;
 				</div>
 			</div>
 		</div>
-		
+
 		<!-- begin JS UI modal -->
 		<div class="ui modal" id="uiModal" tabindex="-1" role="dialog">
 			<div class="content">

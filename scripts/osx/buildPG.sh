@@ -3,7 +3,11 @@ set -e
 cd ..
 git clone --depth=1 https://github.com/openframeworks/openFrameworks
 mv projectGenerator openFrameworks/apps/
-cd openFrameworks/apps/projectGenerator
+
+cd openFrameworks
+scripts/osx/download_libs.sh
+
+cd apps/projectGenerator
 echo "Building openFrameworks PG - OSX"
 xcodebuild -configuration Release -target commandLine -project commandLine/commandLine.xcodeproj
 ret=$?

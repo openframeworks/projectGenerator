@@ -338,3 +338,16 @@ void baseProject::parseConfigMake(){
     }
 
 }
+
+void baseProject::recursiveCopyContents(const ofDirectory & srcDir, ofDirectory & destDir){
+    for(auto & f: srcDir){
+        if(f.isDirectory()){
+            ofDirectory srcSubDir(f.path());
+            ofDirectory destSubDir(ofFilePath::join(destDir.path(),f.getFileName()));
+            recursiveTemplateCopy(srcSubDir, destSubDir);
+        }else{
+            f.copyTo(ofFilePath::join(destDir.path(),f.getFileName()),false,true);
+        }
+    }
+}
+

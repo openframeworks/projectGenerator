@@ -340,7 +340,13 @@ bool xcodeProject::createProjectFile(){
 			if (!dataDirectory.exists()){
 				dataDirectory.create(false);
 			}
-		}
+            
+            //this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
+            ofDirectory srcDataDir(ofFilePath::join(templatePath, "bin/data"));
+            if( srcDataDir.exists() ){
+                baseProject::recursiveCopyContents(srcDataDir, dataDirectory);
+            }
+        }
         ofDirectory mediaAssetsTemplateDirectory(ofFilePath::join(templatePath, "mediaAssets"));
         ofDirectory mediaAssetsProjectDirectory(ofFilePath::join(projectDir, "mediaAssets"));
         if (!mediaAssetsProjectDirectory.exists()){
@@ -605,7 +611,7 @@ void xcodeProject::addFramework(string name, string path, string folder){
         doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child().next_sibling());   // UUID FIRST
         doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child());                  // DICT SECOND
         
-        pugi::xpath_node xpathResult = doc.select_node("//string[contains(.,'PBXCopyFilesBuildPhase')]/../array");
+		pugi::xpath_node xpathResult = doc.select_single_node("//string[contains(.,'PBXCopyFilesBuildPhase')]/../array");
         pugi::xml_node node = xpathResult.node();
         node.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID2.c_str());
     }
