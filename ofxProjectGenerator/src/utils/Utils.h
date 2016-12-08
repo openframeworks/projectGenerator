@@ -37,6 +37,7 @@ void getFoldersRecursively(const string & path, vector < string > & folderNames,
 void getFilesRecursively(const string & path, vector < string > & fileNames);
 void getLibsRecursively(const string & path, vector < string > & libFiles, vector < LibraryBinary > & libLibs, string platform = "", string arch = "", string target = "");
 void getFrameworksRecursively( const string & path, vector < string > & frameworks,  string platform = "" );
+void getDllsRecursively( const string & path, vector < string > & dlls, string platform);
 
 
 void splitFromLast(string toSplit, string deliminator, string & first, string & second);

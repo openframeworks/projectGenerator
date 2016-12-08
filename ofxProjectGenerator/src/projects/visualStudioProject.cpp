@@ -270,14 +270,6 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib){
 
 	splitFromLast( libName, ".", libBaseName, libExtension );
 
-	if ( libExtension != "lib" ){
-		// In vs, you must only link against `.lib` files, *not* `.dlls`. 
-		// corresponding `.dll` files must be named in addon_config.mk
-		// under ADDON_DLLS_TO_COPY so that they will be copied into
-		// the app bin path. Therefore we return early.
-		return;
-	}
-
 	// ---------| invariant: libExtension is `lib`
 
     // paths for libraries
@@ -397,7 +389,7 @@ void visualStudioProject::addAddon(ofAddon & addon){
 
 	for(int i=0;i<(int)addon.dllsToCopy.size();i++){
 		ofLogVerbose() << "adding addon dlls to bin: " << addon.dllsToCopy[i];
-		string dll = ofFilePath::join( addon.addonPath , addon.dllsToCopy[i]);
+		string dll = std::filesystem::absolute(addon.dllsToCopy[i], addon.addonPath).string();
 		ofFile(dll).copyTo(ofFilePath::join(projectDir,"bin/"),false,true);
 	}
 

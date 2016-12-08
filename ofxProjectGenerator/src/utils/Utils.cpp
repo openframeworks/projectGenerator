@@ -287,6 +287,26 @@ void getFrameworksRecursively( const string & path, vector < string > & framewor
 
 
 
+void getDllsRecursively( const string & path, vector < string > & dlls, string platform){
+	ofDirectory dir;
+	dir.listDir(path);
+
+	for (auto & temp: dir){
+		if (temp.isDirectory()){
+			getDllsRecursively(temp.path(), dlls, platform);
+		}else{
+			string ext = "";
+			string first = "";
+			splitFromLast(temp.path(), ".", first, ext);
+			if (ext == "dll"){
+				dlls.push_back(temp.path());
+			}
+		}
+
+	}
+}
+
+
 
 void getLibsRecursively(const string & path, vector < string > & libFiles, vector < LibraryBinary > & libLibs, string platform, string arch, string target){
     ofDirectory dir;
@@ -339,7 +359,7 @@ void getLibsRecursively(const string & path, vector < string > & libFiles, vecto
             string first;
             splitFromLast(dir.getPath(i), ".", first, ext);
                 
-            if (ext == "a" || ext == "lib" || ext == "dylib" || ext == "so" || ext == "dll"){
+			if (ext == "a" || ext == "lib" || ext == "dylib" || ext == "so" || (ext == "dll" && platform != "vs")){
                 if (platformFound){
 					libLibs.push_back({ dir.getPath(i), arch, target });
 						

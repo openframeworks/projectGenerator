@@ -452,8 +452,11 @@ void ofAddon::fromFS(string path, string platform){
 
         if (platform == "osx" || platform == "ios"){
             getFrameworksRecursively(libsPath, frameworks, platform);
-
         }
+
+		if(platform == "vs" || platform == "msys2"){
+			getDllsRecursively(libsPath, dllsToCopy, platform);
+		}
 
     }
     
