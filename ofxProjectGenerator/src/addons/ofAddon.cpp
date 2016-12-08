@@ -32,6 +32,7 @@ ofAddon::ConfigParseState ofAddon::stateFromString(string name){
 	if(name=="linuxarmv7l") return LinuxARMv7;
 	if(name=="android/armeabi") return AndroidARMv5;
 	if(name=="android/armeabi-v7a") return AndroidARMv7;
+	if(name=="android/x86") return Androidx86;
 	if(name=="ios") return iOS;
 	if(name=="osx") return OSX;
 	return Unknown;
@@ -59,6 +60,8 @@ string ofAddon::stateName(ofAddon::ConfigParseState state){
 		return "android/armeabi";
 	case AndroidARMv7:
 		return "android/armeabi-v7a";
+	case Androidx86:
+		return "android/x86";
 	case iOS:
 		return "ios";
 	case OSX:
@@ -84,6 +87,7 @@ bool ofAddon::checkCorrectPlatform(ConfigParseState state){
 	case LinuxARMv7:
 	case AndroidARMv5:
 	case AndroidARMv7:
+	case Androidx86:
 	case iOS:
 	case OSX:
 		return platform==stateName(state);
@@ -107,6 +111,7 @@ bool ofAddon::checkCorrectVariable(string variable, ConfigParseState state){
 	case LinuxARMv7:
 	case AndroidARMv5:
 	case AndroidARMv7:
+	case Androidx86:
 	case iOS:
 	case OSX:
 		return (variable == "ADDON_DEPENDENCIES" || variable == "ADDON_INCLUDES" || variable == "ADDON_CFLAGS" || variable == "ADDON_CPPFLAGS" || variable == "ADDON_LDFLAGS"  || variable == "ADDON_LIBS" || variable == "ADDON_PKG_CONFIG_LIBRARIES" ||

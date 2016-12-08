@@ -74,6 +74,7 @@ private:
     	LinuxARMv7,
     	AndroidARMv5,
     	AndroidARMv7,
+		Androidx86,
     	iOS,
     	OSX,
     	Unknown
