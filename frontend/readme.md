@@ -58,6 +58,12 @@ cd openFrameworks/apps/projectGenerator/frontend
 npm install
 ```
 
+### Updating
+It's always good to update npm before generating the PG.  
+```
+npm update
+```
+
 ### Debugging
 You can open `settings.json` to enable some hidden settings, useful for debugging.  
 Moreover, Electron uses Webkit so all the Webkit developper tools are available to you. ( `Cmd/Ctrl` + `Shift` + `i` from the Electron window.)  

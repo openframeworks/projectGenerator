@@ -273,16 +273,16 @@ position: fixed;
 						<p>For security reasons, please set the OF path to root of openframeworks (ie, the folder which has "addons", "libs", in it)</p>
 					</div>
 					<div class="field">
-					<div class="ui checkbox verbose">
-						<input type="checkbox" name="Verbose" id="verboseOption">
-						<label>Verbose output</label>
-					</div>
+						<div class="ui checkbox verbose">
+							<input type="checkbox" name="Verbose" id="verboseOption">
+							<label>Verbose output</label>
+						</div>
 					</div>
 					<div class="field">
-					<div class="ui checkbox advanced">
-						<input type="checkbox" name="Advanced" id="advancedOptions">
-						<label>Advanced options</label>
-					</div>
+						<div class="ui checkbox advanced">
+							<input type="checkbox" name="Advanced" id="advancedOptions">
+							<label>Advanced options</label>
+						</div>
 					</div>
 
 
@@ -292,13 +292,12 @@ position: fixed;
 		</div>
 
 		<div class="ui small modal" id="ofPathError">
-
-  <div class="content">
-    <div class="description">
-      please fix the openFrameworks path before procceeding.
-    </div>
-  </div>
-</div>
+			<div class="content">
+				<div class="description">
+					Please fix the openFrameworks path before procceeding.
+				</div>
+			</div>
+		</div>
 
 		<!-- begin JS UI modal -->
 		<div class="ui modal" id="uiModal" tabindex="-1" role="dialog">
@@ -313,17 +312,14 @@ position: fixed;
 		<!-- end modal -->
 
 		<!-- begin File Drop modal -->
-		<!-- <div class="ui modal" id="fileDropModal" tabindex="-1" role="dialog">
+		<div class="ui modal" id="fileDropModal" tabindex="-1" role="dialog">
 			<div class="content">
-				<p>Incomming! Please give me cookies!</p>
-				<div class="drop-zone" id="dropZoneUpdate">
-					<p>Update Project</p>
-				</div>
-				<div class="drop-zone" id="dropZoneBatchUpdate">
-					<p>Update Multiple</p>
+				<div id="dropZoneOverlay"></div>
+				<div id="dropZone">
+					<p>Drop any project folder here to import it.</p>
 				</div>
 			</div>
-		</div> -->
+		</div>
 		<!-- end modal -->
 
 		<!-- console area -->
@@ -336,6 +332,7 @@ position: fixed;
 		</section>
 		<script type="text/javascript" src="static/js/jquery.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
 		<script type="text/javascript" src="static/js/semantic.min.js"></script>
+		<script type="text/javascript" src="static/js/jquery.dragbetter.js"></script>
 		<script src="app.js"></script>
 	</body>
 </html>
