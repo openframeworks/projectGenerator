@@ -265,7 +265,20 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib){
     string libFolder = libraryName.substr(0,found);
     string libName = libraryName.substr(found+1);
 
-    // do the path, then the library
+	string libBaseName;
+	string libExtension;
+
+	splitFromLast( libName, ".", libBaseName, libExtension );
+
+	if ( libExtension != "lib" ){
+		// In vs, you must only link against `.lib` files, *not* `.dlls`. 
+		// corresponding `.dll` files must be named in addon_config.mk
+		// under ADDON_DLLS_TO_COPY so that they will be copied into
+		// the app bin path. Therefore we return early.
+		return;
+	}
+
+	// ---------| invariant: libExtension is `lib`
 
     // paths for libraries
 	string linkPath;
@@ -348,16 +361,6 @@ void visualStudioProject::addAddon(ofAddon & addon){
         addInclude(addon.includePaths[i]);
     }
 
-    // divide libs into debug and release libs
-    // the most reliable would be to have seperate
-    // folders for debug and release libs
-    // i'm gonna start with a ghetto approach of just
-    // looking for duplicate names except for a d.lib
-    // at the end -> this is not great as many
-    // libs compile with the d somewhere in the middle of the name...
-
-    vector <string> possibleReleaseOrDebugOnlyLibs;
-
     for(auto & lib: addon.libs){
 		addLibrary(lib);
     }
@@ -394,8 +397,8 @@ void visualStudioProject::addAddon(ofAddon & addon){
 
 	for(int i=0;i<(int)addon.dllsToCopy.size();i++){
 		ofLogVerbose() << "adding addon dlls to bin: " << addon.dllsToCopy[i];
-		string dll = ofFilePath::join("addons/" + addon.name, addon.dllsToCopy[i]);
-		ofFile(ofFilePath::join(getOFRoot(),dll)).copyTo(ofFilePath::join(projectDir,"bin/"),false,true);
+		string dll = ofFilePath::join( addon.addonPath , addon.dllsToCopy[i]);
+		ofFile(dll).copyTo(ofFilePath::join(projectDir,"bin/"),false,true);
 	}
 
 	for(int i=0;i<(int)addon.cflags.size();i++){
