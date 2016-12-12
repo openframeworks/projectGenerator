@@ -75,6 +75,7 @@ private:
     	AndroidARMv5,
     	AndroidARMv7,
 		Androidx86,
+		Emscripten,
     	iOS,
     	OSX,
     	Unknown
