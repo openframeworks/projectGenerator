@@ -589,9 +589,20 @@ function setup() {
         // $("#hideConsole").on('click', function(){ $('body').removeClass('showConsole'); });
 
         // initialise the overall-use modal
-        $("#uiModal, #fileDropModal").modal({
+        $("#uiModal").modal({
             'show': false
         });
+
+        $("#fileDropModal").modal({
+            'show': false,
+            onHide: function () {
+                $('body').removeClass('incomingFile');
+            },
+            onShow: function () {
+                $('body').addClass('incomingFile');
+            }
+        });
+
 
         // show default platform in GUI
         $("#defaultPlatform").html(defaultSettings['defaultPlatform']);
@@ -607,30 +618,37 @@ function setup() {
 
         // setup the multi update list as well.
 
-
-
         $("#ofPath").change();
 
         // enable tool tips
         $('.tooltip').popup();
 
         // Open file drop zone
-        $('body').on('dragenter', openDragInputModal);
+        $(window).on('dragbetterenter', openDragInputModal);
+        $(window).on('dragenter', openDragInputModal);
 
-        //Close file drop zone
-        $(window).on('mouseout', closeDragInputModal );
-        $(document).on('dragend', closeDragInputModal );
+        // Close file drop zone
+        $(window).on('dragbetterleave', closeDragInputModal );
+        $(window).on('mouseleave', closeDragInputModal );
 
-        // prevent dropping anywhere (dropping files loads them)
-        // note: yes, dragover is also needed
-        $(window).on('drop dragover', function(e){
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
+        // prevent dropping anywhere (dropping files loads their URL, unloading the PG)
+        // note: weirdly, dragover is also needed
+        $(window).on('drop dragover', blockDragEvent );
+        //$(window).on('dragleave', blockDragEvent);
+
+        $("#dropZoneOverlay").on('drop', onDropFile).on('dragend', closeDragInputModal);
+
+        // this allows to close the drop zone if it ever stays open due to a bug.
+        $("#dropZoneOverlay").on('click', closeDragInputModal);
+        $(window).on('keypress', function(e){
+            if( e.which === 27 ){ // esc key
+                e.stopPropagation();
+                e.preventDefault();
+                closeDragInputModal( e );
+            }
         });
 
-
-        // bind update thingy
+        // listen for drag events
         // note: dragover is needed because dragleave is called pretty randomly
         $("#dropZoneUpdate").on('dragenter dragover drop', onDragUpdateFile).on('dragleave', function(e){
             $(this).removeClass("accept deny");
@@ -639,67 +657,125 @@ function setup() {
     });
 }
 
-function onDragUpdateFile( e ){
-    e.preventDefault();
-    e.stopPropagation();
+function blockDragEvent(e){
+    //console.log('blockDragEvent via '+e.type + ' on '+ e.target.nodeName + '#' + e.target.id);
 
-    // handle file
+    // open drop overlay if not already open
+    if( !$('body').hasClass('incomingFile') ){
+        $(window).triggerHandler('dragbetterenter');
+    }
+
+    e.stopPropagation();
+    e.preventDefault();
+    return false;
+};
+
+function acceptDraggedFiles( e ){
+     // handle file
     var files = e.originalEvent.dataTransfer.files;
     var types = e.originalEvent.dataTransfer.types;
 
-    var rejected = true;
     // this first check filters out most files
-    if(files.length == 1 && files[0].type==="" && types[0]=="Files"){
+    if(files && files.length == 1 && files[0].type==="" && types[0]=="Files"){
 
         // this folder check is more relayable
         var file = e.originalEvent.dataTransfer.items[0].webkitGetAsEntry();
         if( file.isDirectory ){
-            rejected = false;
-            $("#dropZoneUpdate").addClass("accept").removeClass("deny");
-
-            // drop event ? --> import it!
-            if( e.type=="drop" ){
-                $("#projectName").val( files[0].name );
-                var regExp = new RegExp("\\b/"+files[0].name+"\\b","gi");
-                $("#projectPath").val( files[0].path.replace(regExp,"") ).trigger('change');
-
-                $("createMenuButon").trigger('click');
-                return true;
-            }
-        }
-    }
-
-    if(rejected) {
-        $("#dropZoneUpdate").addClass("deny").removeClass("accept");
-
-        if( e.type=="drop" ){
-            displayModal(
-                "The file you dropped is not compatible for importing.<br>"+
-                "To import an OpenFrameworks project, drag & drop the whole project folder."
-            );
+            return true;
         }
     }
     return false;
 }
 
-function closeDragInputModal(e){
-    e.preventDefault();
+function onDragUpdateFile( e ){
     e.stopPropagation();
+    e.preventDefault();
+    //console.log('onDragUpdateFile via '+e.type + ' on '+ e.target.nodeName + '#' + e.target.id);
 
-    if( $('body').hasClass('incommingFile') ){
-        $('body').removeClass('incommingFile');
-        $("#fileDropModal").modal('hide');
-        $("#dropZoneUpdate").removeClass("accept deny");
+    if( !$('body').hasClass('incomingFile') ){
+        return false;
     }
+
+   if( acceptDraggedFiles( e ) ){
+        $("#dropZone").addClass("accept").removeClass("deny");
+        return true;
+    }
+    // files are rejected
+    else {
+        $("#dropZone").addClass("deny").removeClass("accept");
+    }
+    return false;
+}
+
+function onDropFile( e ){
+    e.stopPropagation();
+    e.preventDefault();
+
+   if( acceptDraggedFiles( e ) ){
+        $("#dropZone").addClass("accept").removeClass("deny");
+
+        if( $('body').hasClass('advanced') && false ){ // todo: if (tab multiple is open)
+            // do batch import
+
+            $("updateMenuButton").triggerHandler('click');
+        }
+        else {
+            var files = e.originalEvent.dataTransfer.files;
+            // import single project folder
+            $("#projectName").val( files[0].name );
+            var regExp = new RegExp("\\b/"+files[0].name+"\\b","gi");
+            $("#projectPath").val( files[0].path.replace(regExp,"") ).triggerHandler('change');
+
+            $("createMenuButon").triggerHandler('click');
+        }
+        closeDragInputModal(e);
+        return true;
+    }
+    // files are rejected
+    else {
+        $("#dropZone").addClass("deny").removeClass("accept");
+
+        displayModal(
+                "The file you dropped is not compatible for importing.<br>"+
+                "To import an OpenFrameworks project, drag & drop the whole project folder."
+        );
+    }
+    return false;
+}
+
+function closeDragInputModal(e){
+    e.stopPropagation();
+    e.preventDefault();
+
+    //console.log('closeDragInputModal via '+e.type + ' on '+ e.target.nodeName + '#' + e.target.id);
+
+    // Prevent closing the modal while still fading in
+    // if( $("#fileDropModal").filter('.ui.modal:not(.fade.in)').length===0 ){
+    //     return;
+    // }
+
+    $("#fileDropModal").modal('hide');
+    $("#dropZone").removeClass("accept deny");
+    
+    return false;
 }
 
 function openDragInputModal(e){
-    e.preventDefault();
     e.stopPropagation();
-    if(!$('body').hasClass('incommingFile')){
-        $('body').addClass('incommingFile');
+    e.preventDefault();
+
+    //console.log('openDragInputModal via '+e.type + ' on '+ e.target.nodeName + '#' + e.target.id);
+
+    if( !$('body').hasClass('incomingFile') ){
         $("#fileDropModal").modal('show');
     }
+
+    // check filetype when entering droppable zone
+    if( e.type==='dragenter' ){
+        onDragUpdateFile(e);
+    }
+
+    return false;
 }
 
 //----------------------------------------

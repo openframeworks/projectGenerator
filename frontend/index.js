@@ -768,7 +768,13 @@ ipc.on('checkMultiUpdatePath', function(event, arg) {
 
 });
 
+var dialogIsOpen = false;
 ipc.on('pickProjectImport', function(event, arg) {
+    if(dialogIsOpen){
+        return;
+    }
+
+    dialogIsOpen = true;
     path = dialog.showOpenDialog({
         title: 'Select the folder of your project, typically apps/myApps/myGeniusApp',
         properties: ['openDirectory'],
@@ -783,6 +789,7 @@ ipc.on('pickProjectImport', function(event, arg) {
             projectSettings['projectPath'] = tmpPath.dirname(filenames[0]);
             event.sender.send('importProjectSettings', projectSettings);
         }
+        dialogIsOpen = false;
     });
 });
 
