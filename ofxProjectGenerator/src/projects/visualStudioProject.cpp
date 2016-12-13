@@ -293,6 +293,9 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib){
     pugi::xpath_node_set addlDeps = doc.select_nodes((linkPath + "AdditionalDependencies").c_str());
 	addLibraryName(addlDeps, libName);
 
+	ofLogVerbose() << "adding lib path " << libFolder;
+	ofLogVerbose() << "adding lib " << libName;
+
 }
 
 void visualStudioProject::addCFLAG(string cflag, LibType libType){
