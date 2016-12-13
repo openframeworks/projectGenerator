@@ -154,7 +154,7 @@ void ofAddon::addReplaceStringVector(std::vector<std::string> & variable, std::s
                     varValue = getenv(varName.c_str());
                 }
 				ofStringReplace(values[i],"$("+varName+")",varValue);
-				cout << "addon config: substituting " << varName << " with " << varValue << " = " << values[i] << endl;
+				ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << values[i] << endl;
             }
 
 			if(prefix=="" || values[i].find(pathToOF)==0 || ofFilePath::isAbsolute(values[i])) variable.push_back(values[i]);
@@ -186,7 +186,7 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 					varValue = getenv(varName.c_str());
 				}
 				ofStringReplace(values[i], "$(" + varName + ")", varValue);
-				cout << "addon config: substituting " << varName << " with " << varValue << " = " << values[i] << endl;
+				ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << values[i];
 			}
 
 			if (prefix == "" || values[i].find(pathToOF) == 0 || ofFilePath::isAbsolute(values[i])) {
