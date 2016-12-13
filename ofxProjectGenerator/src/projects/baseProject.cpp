@@ -263,6 +263,11 @@ void baseProject::addAddon(ofAddon & addon){
 
 	addons.push_back(addon);
 
+	ofLogVerbose("baseProject") << "libs in addAddon " << addon.libs.size();
+	for(auto & lib: addon.libs){
+		ofLogVerbose("baseProject") << lib.path;
+	}
+
     for(int i=0;i<(int)addon.includePaths.size();i++){
         ofLogVerbose() << "adding addon include path: " << addon.includePaths[i];
         addInclude(addon.includePaths[i]);

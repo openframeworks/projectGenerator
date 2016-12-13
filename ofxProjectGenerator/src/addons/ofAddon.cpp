@@ -402,11 +402,6 @@ void ofAddon::parseConfig(){
 		}
 	}
 
-	ofLogVerbose("ofAddon") << "libs after parseConfig " << libs.size();
-	for(auto & lib: libs){
-		ofLogVerbose("ofAddon") << lib.path;
-	}
-
 	exclude(includePaths,excludeIncludes);
 	exclude(srcFiles,excludeSources);
 	exclude(csrcFiles,excludeSources);
