@@ -402,6 +402,11 @@ void ofAddon::parseConfig(){
 		}
 	}
 
+	ofLogVerbose("ofAddon") << "libs after parseConfig " << libs.size();
+	for(auto & lib: libs){
+		ofLogVerbose("ofAddon") << lib.path;
+	}
+
 	exclude(includePaths,excludeIncludes);
 	exclude(srcFiles,excludeSources);
 	exclude(csrcFiles,excludeSources);
@@ -409,6 +414,11 @@ void ofAddon::parseConfig(){
 	exclude(objcsrcFiles,excludeSources);
 	exclude(headersrcFiles,excludeSources);
 	exclude(libs,excludeLibs);
+
+	ofLogVerbose("ofAddon") << "libs after exclusions " << libs.size();
+	for(auto & lib: libs){
+		ofLogVerbose("ofAddon") << lib.path;
+	}
 }
 
 void ofAddon::fromFS(string path, string platform){
