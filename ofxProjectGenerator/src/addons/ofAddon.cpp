@@ -132,7 +132,7 @@ void ofAddon::addReplaceString(string & variable, string value, bool addToVariab
 	else variable = value;
 }
 
-void ofAddon::addReplaceStringVector(vector<string> & variable, string value, string prefix, bool addToVariable){
+void ofAddon::addReplaceStringVector(std::vector<std::string> & variable, std::string value, std::string prefix, bool addToVariable){
 	vector<string> values;
 	if(value.find("\"")!=string::npos){
 		values = ofSplitString(value,"\"",true,true);
@@ -148,11 +148,13 @@ void ofAddon::addReplaceStringVector(vector<string> & variable, string value, st
             if(regEX.match(values[i],match)){
                 string varName = values[i].substr(match.offset,match.length);
                 string varValue;
-                if(getenv(varName.c_str())){
+				if(varName == "OF_ROOT"){
+					varValue = pathToOF;
+				}else if(getenv(varName.c_str())){
                     varValue = getenv(varName.c_str());
                 }
-                ofStringReplace(values[i],"$("+varName+")",varValue);
-                cout << varName << endl << values[i] << endl;
+				ofStringReplace(values[i],"$("+varName+")",varValue);
+				cout << "addon config: substituting " << varName << " with " << varValue << " = " << values[i] << endl;
             }
 
 			if(prefix=="" || values[i].find(pathToOF)==0 || ofFilePath::isAbsolute(values[i])) variable.push_back(values[i]);
@@ -178,14 +180,13 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 			if (regEX.match(values[i], match)) {
 				string varName = values[i].substr(match.offset, match.length);
 				string varValue;
-				if (getenv(varName.c_str())) {
-					varValue = getenv(varName.c_str());
-				}else if(varName == "OF_ROOT"){
+				if(varName == "OF_ROOT"){
 					varValue = pathToOF;
+				}else if (getenv(varName.c_str())) {
+					varValue = getenv(varName.c_str());
 				}
-				cout << "addon config: substituting " << varName << " with " << varValue << endl;
 				ofStringReplace(values[i], "$(" + varName + ")", varValue);
-				cout << varName << endl << values[i] << endl;
+				cout << "addon config: substituting " << varName << " with " << varValue << " = " << values[i] << endl;
 			}
 
 			if (prefix == "" || values[i].find(pathToOF) == 0 || ofFilePath::isAbsolute(values[i])) {
