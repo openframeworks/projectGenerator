@@ -284,7 +284,7 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib){
 		linkPath = "//ItemDefinitionGroup[contains(@Condition,'" + lib.arch + "')]/Link/";
 	}
 	else {
-		linkPath = "//Link";
+		linkPath = "//ItemDefinitionGroup/Link/";
 	}
     
     pugi::xpath_node_set addlLibsDir = doc.select_nodes((linkPath + "AdditionalLibraryDirectories").c_str());
