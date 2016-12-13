@@ -178,13 +178,12 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 			if (regEX.match(values[i], match)) {
 				string varName = values[i].substr(match.offset, match.length);
 				string varValue;
-				cout << "addon config: substituting " << varName
 				if (getenv(varName.c_str())) {
 					varValue = getenv(varName.c_str());
 				}else if(varName == "OF_ROOT"){
 					varValue = pathToOF;
 				}
-				cout << " with " << varValue << endl;
+				cout << "addon config: substituting " << varName << " with " << varValue << endl;
 				ofStringReplace(values[i], "$(" + varName + ")", varValue);
 				cout << varName << endl << values[i] << endl;
 			}
