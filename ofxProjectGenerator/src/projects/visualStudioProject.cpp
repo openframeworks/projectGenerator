@@ -354,6 +354,7 @@ void visualStudioProject::addAddon(ofAddon & addon){
     }
 
     for(auto & lib: addon.libs){
+		ofLogVerbose() << "adding addon libs: " << lib.path;
 		addLibrary(lib);
     }
 
