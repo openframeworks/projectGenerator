@@ -7,12 +7,13 @@ mv projectGenerator openFrameworks/apps/
 cd openFrameworks
 
 sudo ./scripts/linux/ubuntu/install_dependencies.sh -y;
-
 scripts/linux/download_libs.sh
 
 export LC_ALL=C
 OF_ROOT=./
-make Release -C ${OF_ROOT}/apps/projectGenerator/commandLine
+
+cd ${OF_ROOT}/apps/projectGenerator
+make Release -C ./commandLine
 ret=$?
 if [ $ret -ne 0 ]; then
       echo "Failed building Project Generator"
