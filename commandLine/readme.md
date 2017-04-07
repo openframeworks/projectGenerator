@@ -44,20 +44,20 @@ here's the extended options if you want to experiment.  please take are that opt
 
 for example, to make a new project, you'd say: 
 
-    ./projectGenerator -o "pathToOF" pathOfNewProject
+    ./projectGenerator -o"pathToOF" pathOfNewProject
     (on windows: ./projectGenerator /ofPath="pathToOF" pathOfNewProject)
 
 to update an existing project: 
 
-    ./projectGenerator -o "pathToOF" pathToExistingProject
+    ./projectGenerator -o"pathToOF" pathToExistingProject
 
 to update a folder of projects
 
-    ./projectGenerator -o "pathToOF" -r pathToFolderOfProjects
+    ./projectGenerator -o"pathToOF" -r pathToFolderOfProjects
 
 you can also specify platforms (default platform is inferred) such as: 
 
-    ./projectGenerator -o "pathToOF" -p"ios" pathOfNewIOSProject
+    ./projectGenerator -o"pathToOF" -p"ios" pathOfNewIOSProject
 
 
 
