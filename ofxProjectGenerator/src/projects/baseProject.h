@@ -65,6 +65,7 @@ public:
     virtual void addCFLAG(std::string cflag, LibType libType = RELEASE_LIB){} // C_FLAGS
     virtual void addCPPFLAG(std::string cppflag, LibType libType = RELEASE_LIB){} // CXX_FLAGS
     virtual void addAfterRule(std::string script){}
+	virtual void addDefine(std::string define, LibType libType = RELEASE_LIB) {}
 
     virtual void addAddon(std::string addon);
 	virtual void addAddon(ofAddon & addon);

@@ -121,7 +121,7 @@ void visualStudioProject::addSrc(string srcFile, string folder, SrcType type){
 	}
 
 	if(type==DEFAULT){
-		if (ofIsStringInString(srcFile, ".h") || ofIsStringInString(srcFile, ".hpp")){
+		if (ofIsStringInString(srcFile, ".h") || ofIsStringInString(srcFile, ".hpp") || ofIsStringInString(srcFile, ".inl")){
 			appendValue(doc, "ClInclude", "Include", srcFile);
 
 			pugi::xml_node node = filterXmlDoc.select_single_node("//ItemGroup[ClInclude]").node();
@@ -129,7 +129,16 @@ void visualStudioProject::addSrc(string srcFile, string folder, SrcType type){
 			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
 			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
 
-		} else {
+		} else if (ofIsStringInString(srcFile, ".glsl") || ofIsStringInString(srcFile, ".vert") || ofIsStringInString(srcFile, ".frag")) {
+			// TODO: add to None but there's no None in the original template so this fails
+			/*appendValue(doc, "None", "Include", srcFile);
+
+			pugi::xml_node node = filterXmlDoc.select_single_node("//ItemGroup[None]").node();
+			pugi::xml_node nodeAdded = node.append_child("None");
+			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
+			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());*/
+
+		} else{
 			appendValue(doc, "ClCompile", "Include", srcFile);
 
 			pugi::xml_node nodeFilters = filterXmlDoc.select_single_node("//ItemGroup[ClCompile]").node();
@@ -344,6 +353,31 @@ void visualStudioProject::addCPPFLAG(string cppflag, LibType libType){
 
 }
 
+void visualStudioProject::addDefine(std::string define, LibType libType)
+{
+	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
+	for (int i = 0; i<items.size(); i++) {
+		pugi::xml_node additionalOptions;
+		bool found = false;
+		std::string condition(items[i].node().attribute("Condition").value());
+		if (libType == RELEASE_LIB && condition.find("Debug") != std::string::npos) {
+			additionalOptions = items[i].node().child("ClCompile").child("AdditionalOptions");
+			found = true;
+		}
+		else if (libType == DEBUG_LIB && condition.find("Release") != std::string::npos) {
+			additionalOptions = items[i].node().child("ClCompile").child("AdditionalOptions");
+			found = true;
+		}
+		if (!found) continue;
+		if (!additionalOptions) {
+			items[i].node().child("ClCompile").append_child("PreprocessorDefinitions").append_child(pugi::node_pcdata).set_value(define.c_str());
+		}
+		else {
+			additionalOptions.set_value((string(additionalOptions.value()) + " " + define).c_str());
+		}
+	}
+}
+
 void visualStudioProject::addAddon(ofAddon & addon){
     for(int i=0;i<(int)addons.size();i++){
 		if(addons[i].name==addon.name) return;
@@ -407,5 +441,11 @@ void visualStudioProject::addAddon(ofAddon & addon){
 		ofLogVerbose() << "adding addon cppflags: " << addon.cppflags[i];
 		addCPPFLAG(addon.cppflags[i],RELEASE_LIB);
 		addCPPFLAG(addon.cppflags[i],DEBUG_LIB);
+	}
+
+	for (int i = 0; i<(int)addon.defines.size(); i++) {
+		ofLogVerbose() << "adding addon define: " << addon.defines[i];
+		addDefine(addon.defines[i], RELEASE_LIB);
+		addDefine(addon.defines[i], DEBUG_LIB);
 	}
 }

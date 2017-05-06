@@ -120,7 +120,7 @@ bool ofAddon::checkCorrectVariable(string variable, ConfigParseState state){
 	case iOS:
 	case OSX:
 		return (variable == "ADDON_DEPENDENCIES" || variable == "ADDON_INCLUDES" || variable == "ADDON_CFLAGS" || variable == "ADDON_CPPFLAGS" || variable == "ADDON_LDFLAGS"  || variable == "ADDON_LIBS" || variable == "ADDON_PKG_CONFIG_LIBRARIES" ||
-				variable == "ADDON_FRAMEWORKS" || variable == "ADDON_SOURCES" || variable == "ADDON_DATA" || variable == "ADDON_LIBS_EXCLUDE" || variable == "ADDON_SOURCES_EXCLUDE" || variable == "ADDON_INCLUDES_EXCLUDE" || variable == "ADDON_DLLS_TO_COPY");
+				variable == "ADDON_FRAMEWORKS" || variable == "ADDON_SOURCES" || variable == "ADDON_DATA" || variable == "ADDON_LIBS_EXCLUDE" || variable == "ADDON_SOURCES_EXCLUDE" || variable == "ADDON_INCLUDES_EXCLUDE" || variable == "ADDON_DLLS_TO_COPY" || variable == "ADDON_DEFINES");
 	case Unknown:
 	default:
 		return false;
@@ -303,6 +303,10 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 
 	if(variable == "ADDON_INCLUDES_EXCLUDE"){
 		addReplaceStringVector(excludeIncludes,value,"",addToValue);
+	}
+
+	if (variable == "ADDON_DEFINES") {
+		addReplaceStringVector(defines, value, "", addToValue);
 	}
 }
 
