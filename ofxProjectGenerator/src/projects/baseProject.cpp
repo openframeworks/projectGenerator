@@ -11,6 +11,7 @@
 #include "ofLog.h"
 #include "Utils.h"
 #include "ofConstants.h"
+#include <list>
 using namespace std;
 
 baseProject::baseProject(string _target){
