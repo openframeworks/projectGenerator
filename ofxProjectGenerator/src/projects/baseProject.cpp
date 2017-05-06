@@ -309,6 +309,10 @@ void baseProject::addAddon(ofAddon & addon){
         ofLogVerbose() << "adding addon header srcFiles: " << addon.headersrcFiles[i];
         addSrc(addon.headersrcFiles[i],addon.filesToFolders[addon.headersrcFiles[i]],HEADER);
     }
+	for (int i = 0; i<(int)addon.defines.size(); i++) {
+		ofLogVerbose() << "adding addon defines: " << addon.defines[i];
+		addDefine(addon.defines[i]);
+	}
 }
 
 void baseProject::parseAddons(){

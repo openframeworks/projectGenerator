@@ -43,6 +43,7 @@ public:
     std::vector < std::string > pkgConfigLibs; 	// linux only
     std::vector < std::string > frameworks;		// osx only
     std::vector < std::string > data;
+	std::vector < std::string > defines;
 
     // metadata
     std::string name;
