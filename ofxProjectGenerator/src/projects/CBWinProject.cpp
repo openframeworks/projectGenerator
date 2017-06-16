@@ -10,11 +10,11 @@
 #include "ofLog.h"
 #include "Utils.h"
 
-string CBWinProject::LOG_NAME = "CBWinProject";
+std::string CBWinProject::LOG_NAME = "CBWinProject";
 bool CBWinProject::createProjectFile(){
 
-    string project = projectDir + projectName + ".cbp";
-    string workspace = projectDir + projectName + ".workspace";
+    std::string project = projectDir + projectName + ".cbp";
+    std::string workspace = projectDir + projectName + ".workspace";
 
 
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.cbp"),project, false, true);
@@ -23,11 +23,11 @@ bool CBWinProject::createProjectFile(){
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"icon.rc"), projectDir + "icon.rc", false, true);
 
     //let's do some renaming:
-    string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
+    std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
 
     if (relRoot != "../../../"){
 
-        string relRootWindows = relRoot;
+        std::string relRootWindows = relRoot;
         // let's make it windows friendly:
         for(int i = 0; i < relRootWindows.length(); i++) {
             if( relRootWindows[i] == '/' )
@@ -70,14 +70,14 @@ bool CBWinProject::saveProjectFile(){
     return doc.save_file((projectDir + projectName + ".cbp").c_str());
 }
 
-void CBWinProject::addSrc(string srcName, string folder, SrcType type){
+void CBWinProject::addSrc(std::string srcName, std::string folder, SrcType type){
 	pugi::xml_node node = appendValue(doc, "Unit", "filename", srcName);
 	if(!node.empty()){
 		node.child("Option").attribute("virtualFolder").set_value(folder.c_str());
 	}
 }
 
-void CBWinProject::addInclude(string includeName){
+void CBWinProject::addInclude(std::string includeName){
     ofLogNotice() << "adding include " << includeName;
     appendValue(doc, "Add", "directory", includeName);
 }
@@ -88,10 +88,10 @@ void CBWinProject::addLibrary(const LibraryBinary & lib){
     // this is because we might need to say libosc, then ws2_32
 }
 
-string CBWinProject::getName(){
+std::string CBWinProject::getName(){
 	return projectName;
 }
 
-string CBWinProject::getPath(){
+std::string CBWinProject::getPath(){
 	return projectDir;
 }

@@ -4,9 +4,9 @@
 #include "Utils.h"
 #include <regex>
 
-string QtCreatorProject::LOG_NAME = "QtCreatorProject";
+std::string QtCreatorProject::LOG_NAME = "QtCreatorProject";
 
-QtCreatorProject::QtCreatorProject(string target)
+QtCreatorProject::QtCreatorProject(std::string target)
     : baseProject(target){
 
 }
@@ -16,8 +16,8 @@ bool QtCreatorProject::createProjectFile(){
     if(!dir.exists()) dir.create(true);
 
     ofFile project(ofFilePath::join(projectDir, projectName + ".qbs"));
-    string src = ofFilePath::join(templatePath,"qtcreator.qbs");
-    string dst = project.path();
+    std::string src = ofFilePath::join(templatePath,"qtcreator.qbs");
+    std::string dst = project.path();
 
     if(!project.exists()){
         if(!ofFile::copyFromTo(src,dst)){
@@ -50,9 +50,9 @@ bool QtCreatorProject::createProjectFile(){
 
 
     // handle the relative roots.
-    string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
+    std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
     if (relRoot != "../../../"){
-        string relPath2 = relRoot;
+        std::string relPath2 = relRoot;
         relPath2.erase(relPath2.end()-1);
         findandreplaceInTexfile(projectDir + "qtcreator.qbs", "../../..", relPath2);
         findandreplaceInTexfile(projectDir + "Makefile", "../../..", relPath2);

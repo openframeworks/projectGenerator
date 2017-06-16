@@ -4,9 +4,9 @@
 #include "Utils.h"
 #include <regex>
 
-string AndroidStudioProject::LOG_NAME = "AndroidStudioProject";
+std::string AndroidStudioProject::LOG_NAME = "AndroidStudioProject";
 
-AndroidStudioProject::AndroidStudioProject(string target)
+AndroidStudioProject::AndroidStudioProject(std::string target)
     : baseProject(target){
 
 }
@@ -14,7 +14,7 @@ AndroidStudioProject::AndroidStudioProject(string target)
 bool AndroidStudioProject::createProjectFile(){
     
     // Make sure project name doesn't include "-"
-    string packageName = projectName;
+    std::string packageName = projectName;
     ofStringReplace(packageName, "-", "");
     
     ofDirectory dir(projectDir);
@@ -22,8 +22,8 @@ bool AndroidStudioProject::createProjectFile(){
 
     // build.gradle
     ofFile gradleFile(ofFilePath::join(projectDir, "build.gradle"));
-    string src = ofFilePath::join(templatePath,"build.gradle");
-    string dst = gradleFile.path();
+    std::string src = ofFilePath::join(templatePath,"build.gradle");
+    std::string dst = gradleFile.path();
 
     if(!gradleFile.exists()){
         if(!ofFile::copyFromTo(src,dst)){
@@ -109,8 +109,8 @@ bool AndroidStudioProject::createProjectFile(){
     // srcJava folder
     ofDirectory(ofFilePath::join(templatePath,"srcJava")).copyTo(ofFilePath::join(projectDir,"srcJava"));
     
-    string from = ofFilePath::join(projectDir,"srcJava/cc/openframeworks/APP_NAME");
-    string to = ofFilePath::join(projectDir,"srcJava/cc/openframeworks/"+projectName);
+    std::string from = ofFilePath::join(projectDir,"srcJava/cc/openFrameworks/APP_NAME");
+    std::string to = ofFilePath::join(projectDir,"srcJava/cc/openFrameworks/"+projectName);
     
     findandreplaceInTexfile(ofFilePath::join(from,"OFActivity.java"), "TEMPLATE_APP_NAME", projectName);
     ofDirectory(from).moveTo(to, true, true);
