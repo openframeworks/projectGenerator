@@ -54,7 +54,7 @@ STRINGIFY(
             <key>explicitFileType</key>
             <string>FILETYPE</string>
             <key>fileEncoding</key>
-            <string>30</string>
+            <string>4</string>
             <key>isa</key>
             <string>PBXFileReference</string>
             <key>name</key>
