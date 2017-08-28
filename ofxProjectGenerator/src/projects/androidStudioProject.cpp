@@ -109,8 +109,8 @@ bool AndroidStudioProject::createProjectFile(){
     // srcJava folder
     ofDirectory(ofFilePath::join(templatePath,"srcJava")).copyTo(ofFilePath::join(projectDir,"srcJava"));
     
-    string from = ofFilePath::join(projectDir,"srcJava/cc/openFrameworks/APP_NAME");
-    string to = ofFilePath::join(projectDir,"srcJava/cc/openFrameworks/"+projectName);
+    string from = ofFilePath::join(projectDir,"srcJava/cc/openframeworks/APP_NAME");
+    string to = ofFilePath::join(projectDir,"srcJava/cc/openframeworks/"+projectName);
     
     findandreplaceInTexfile(ofFilePath::join(from,"OFActivity.java"), "TEMPLATE_APP_NAME", projectName);
     ofDirectory(from).moveTo(to, true, true);
