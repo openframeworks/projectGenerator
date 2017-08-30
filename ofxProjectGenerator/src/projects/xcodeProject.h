@@ -27,7 +27,7 @@ public:
     void addCFLAG(std::string cflag, LibType libType = RELEASE_LIB); // Other C Flags
     void addCPPFLAG(std::string cppflag, LibType libType = RELEASE_LIB); // Other C++ Flags
     void addAfterRule(std::string script);
-	void addDefine(std::string define, LibType libType = RELEASE_LIB); // Other C Flags
+	void addDefine(std::string define, LibType libType = RELEASE_LIB);
     
     // specific to OSX
     void addFramework(std::string name, std::string path, std::string folder="");  // folder if for non system frameworks
