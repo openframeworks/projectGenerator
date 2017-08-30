@@ -1110,12 +1110,12 @@ void xcodeProject::addDefine(string define, LibType libType){
 		for (pugi::xpath_node_set::const_iterator it = headerArray.begin(); it != headerArray.end(); ++it){
 			pugi::xpath_node node = *it;
 			node.node().append_child("string").append_child(pugi::node_pcdata).set_value(define.c_str());
-			node.node().print(std::cout);
+			//node.node().print(std::cout);
 		}
 
 	} else {
 
-		printf("we don't have GCC_PREPROCESSOR_DEFINITIONS, so we're adding them... and calling this function again \n");
+		//printf("we don't have GCC_PREPROCESSOR_DEFINITIONS, so we're adding them... and calling this function again \n");
 		sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'buildSettings')]/following-sibling::node()[1]");
 
 		pugi::xpath_node_set dictArray = doc.select_nodes(query);
