@@ -355,26 +355,36 @@ void visualStudioProject::addCPPFLAG(string cppflag, LibType libType){
 
 void visualStudioProject::addDefine(std::string define, LibType libType)
 {
+	ofLogNotice() << "add define: " << define;
 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
 	for (int i = 0; i<items.size(); i++) {
 		pugi::xml_node additionalOptions;
 		bool found = false;
 		std::string condition(items[i].node().attribute("Condition").value());
+
+		ofLogNotice() << "**************************************";
+		items[i].node().print(std::cout);
+		ofLogNotice() << "**************************************";
+
+
 		if (libType == RELEASE_LIB && condition.find("Debug") != std::string::npos) {
-			additionalOptions = items[i].node().child("ClCompile").child("AdditionalOptions");
 			found = true;
 		}
 		else if (libType == DEBUG_LIB && condition.find("Release") != std::string::npos) {
-			additionalOptions = items[i].node().child("ClCompile").child("AdditionalOptions");
 			found = true;
 		}
 		if (!found) continue;
-		if (!additionalOptions) {
+		pugi::xml_node preprocessorDefinitionsNode = items[i].node().child("ClCompile").child("PreprocessorDefinitions");
+		if (!preprocessorDefinitionsNode) {
 			items[i].node().child("ClCompile").append_child("PreprocessorDefinitions").append_child(pugi::node_pcdata).set_value(define.c_str());
+		}else{
+			string accumDef = string(items[i].node().child("ClCompile").child("PreprocessorDefinitions").text().get()) + ";" + define;
+			items[i].node().child("ClCompile").child("PreprocessorDefinitions").first_child().set_value(accumDef.c_str());
 		}
-		else {
-			additionalOptions.set_value((string(additionalOptions.value()) + " " + define).c_str());
-		}
+
+		ofLogNotice() << "_______________________________________________________________________________________________________________________";
+		items[i].node().print(std::cout);
+		ofLogNotice() << "_______________________________________________________________________________________________________________________";
 	}
 }
 
