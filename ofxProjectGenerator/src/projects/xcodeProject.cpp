@@ -171,6 +171,15 @@ STRINGIFY(
 
 );
 
+//-----------------------------------------------------------------
+const char Defines[] =
+STRINGIFY(
+
+          <key>GCC_PREPROCESSOR_DEFINITIONS</key>
+          <array></array>
+
+);
+
 const char workspace[] =
 STRINGIFY(
 
@@ -1091,7 +1100,52 @@ void xcodeProject::addCFLAG(std::string cflag, LibType libType){
     //saveFile(projectDir + "/" + projectName + ".xcodeproj" + "/project.pbxproj");
 }
 
+void xcodeProject::addDefine(std::string define, LibType libType){
+
+	char query[255];
+	sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[text()='GCC_PREPROCESSOR_DEFINITIONS']/following-sibling::node()[1]");
+	pugi::xpath_node_set headerArray = doc.select_nodes(query);
+
+
+	if (headerArray.size() > 0){
+		for (pugi::xpath_node_set::const_iterator it = headerArray.begin(); it != headerArray.end(); ++it){
+			pugi::xpath_node node = *it;
+			node.node().append_child("string").append_child(pugi::node_pcdata).set_value(define.c_str());
+			//node.node().print(std::cout);
+		}
+
+	} else {
+
+		//printf("we don't have GCC_PREPROCESSOR_DEFINITIONS, so we're adding them... and calling this function again \n");
+		sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'buildSettings')]/following-sibling::node()[1]");
+
+		pugi::xpath_node_set dictArray = doc.select_nodes(query);
+
+		for (pugi::xpath_node_set::const_iterator it = dictArray.begin(); it != dictArray.end(); ++it){
+			pugi::xpath_node node = *it;
+
+			//node.node().print(std::cout);
+			std::string definesXML = std::string(Defines);
+			pugi::xml_document definesDoc;
+			pugi::xml_parse_result result = definesDoc.load_buffer(definesXML.c_str(), strlen(definesXML.c_str()));
+
+			// insert it at <plist><dict><dict>
+			node.node().prepend_copy(definesDoc.first_child().next_sibling());   // KEY FIRST
+			node.node().prepend_copy(definesDoc.first_child());                  // ARRAY SECOND
+
+			//node.node().print(std::cout);
+			//ofLogNotice() << "_____________________________________________________________________________________________________________";
+		}
+
+		// now that we have it, try again...
+		addDefine(define);
+	}
+
+	//saveFile(projectDir + "/" + projectName + ".xcodeproj" + "/project.pbxproj");
+}
+
 void xcodeProject::addAfterRule(std::string rule){
+
     char query[255];
     sprintf(query, "//key[contains(.,'objects')]/following-sibling::node()[1]");
     pugi::xpath_node_set objects = doc.select_nodes(query);
@@ -1193,7 +1247,11 @@ void xcodeProject::addAddon(ofAddon & addon){
         ofLogVerbose() << "adding addon srcFiles: " << addon.srcFiles[i];
         addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
     }
-    
+	for(int i=0;i<(int)addon.defines.size(); i++){
+		ofLogVerbose() << "adding addon defines: " << addon.srcFiles[i];
+		addDefine(addon.defines[i]);
+	}
+
     for(int i=0;i<(int)addon.frameworks.size(); i++){
         ofLogVerbose() << "adding addon frameworks: " << addon.frameworks[i];
         
