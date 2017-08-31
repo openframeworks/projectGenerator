@@ -355,17 +355,16 @@ void visualStudioProject::addCPPFLAG(string cppflag, LibType libType){
 
 void visualStudioProject::addDefine(std::string define, LibType libType)
 {
-	ofLogNotice() << "add define: " << define;
+	//ofLogNotice() << "add define: " << define;
 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
 	for (int i = 0; i<items.size(); i++) {
 		pugi::xml_node additionalOptions;
 		bool found = false;
 		std::string condition(items[i].node().attribute("Condition").value());
 
-		ofLogNotice() << "**************************************";
-		items[i].node().print(std::cout);
-		ofLogNotice() << "**************************************";
-
+		//ofLogNotice() << "**************************************";
+		//items[i].node().print(std::cout);
+		//ofLogNotice() << "**************************************";
 
 		if (libType == RELEASE_LIB && condition.find("Debug") != std::string::npos) {
 			found = true;
@@ -382,9 +381,9 @@ void visualStudioProject::addDefine(std::string define, LibType libType)
 			items[i].node().child("ClCompile").child("PreprocessorDefinitions").first_child().set_value(accumDef.c_str());
 		}
 
-		ofLogNotice() << "_______________________________________________________________________________________________________________________";
-		items[i].node().print(std::cout);
-		ofLogNotice() << "_______________________________________________________________________________________________________________________";
+		//ofLogNotice() << "_______________________________________________________________________________________________________________________";
+		//items[i].node().print(std::cout);
+		//ofLogNotice() << "_______________________________________________________________________________________________________________________";
 	}
 }
 
