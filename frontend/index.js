@@ -573,7 +573,7 @@ ipc.on('update', function(event, arg) {
 
     var wholeString = pgApp + " " + recursiveString + " " + verboseString + " " + pathString + " " + platformString + " " + updatePath;
 
-    exec(wholeString, function callback(error, stdout, stderr) {
+    exec(wholeString, {maxBuffer : Infinity}, function callback(error, stdout, stderr) {
 
         if (error === null) {
             event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
@@ -659,7 +659,7 @@ ipc.on('generate', function(event, arg) {
 
     var wholeString = pgApp + " " + verboseString + " " + pathString + " " + addonString + " " + platformString + " " + projectString;
 
-    exec(wholeString, function callback(error, stdout, stderr) {
+    exec(wholeString, {maxBuffer : Infinity}, function callback(error, stdout, stderr) {
 
         var wasError = false;
         var text = stdout; //Big text with many line breaks
