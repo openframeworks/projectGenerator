@@ -155,6 +155,8 @@ STRINGIFY(
           <array>
 		  <string>"-D__MACOSX_CORE__"</string>
 		  <string>"-mtune=native"</string>
+		  <string>"-Wreturn-type"</string>
+		  <string>"-Werror=return-type"</string>
           </array>
 
 );
