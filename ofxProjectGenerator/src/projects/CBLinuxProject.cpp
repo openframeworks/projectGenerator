@@ -10,15 +10,15 @@
 #include "ofLog.h"
 #include "Utils.h"
 
-string CBLinuxProject::LOG_NAME = "CBLinuxProject";
+std::string CBLinuxProject::LOG_NAME = "CBLinuxProject";
 
 bool CBLinuxProject::createProjectFile(){
 	ofDirectory dir(projectDir);
 	if(!dir.exists()) dir.create(true);
 
     ofFile project(ofFilePath::join(projectDir, projectName + ".cbp"));
-    string src =  ofFilePath::join(templatePath,"emptyExample_" + target + ".cbp");
-    string dst = project.path();
+    std::string src =  ofFilePath::join(templatePath,"emptyExample_" + target + ".cbp");
+    std::string dst = project.path();
     bool ret;
 
     if(!project.exists()){
@@ -68,9 +68,9 @@ bool CBLinuxProject::createProjectFile(){
 
 
     // handle the relative roots.
-    string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
+    std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
     if (relRoot != "../../../"){
-        string relPath2 = relRoot;
+        std::string relPath2 = relRoot;
         relPath2.erase(relPath2.end()-1);
         findandreplaceInTexfile(projectDir + "Makefile", "../../..", relPath2);
         findandreplaceInTexfile(projectDir + "config.make", "../../..", relPath2);

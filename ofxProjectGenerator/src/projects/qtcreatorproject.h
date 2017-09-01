@@ -1,5 +1,6 @@
 #pragma once
 #include "baseProject.h"
+#include <set>
 
 class QtCreatorProject : public baseProject
 {

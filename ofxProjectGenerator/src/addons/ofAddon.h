@@ -86,9 +86,9 @@ private:
     void parseVariableValue(std::string variable, std::string value, bool addToValue, std::string line, int lineNum);
     void addReplaceString(std::string & variable, std::string value, bool addToVariable);
     void addReplaceStringVector(std::vector<std::string> & variable, std::string value, std::string prefix, bool addToVariable);
-	void addReplaceStringVector(vector<LibraryBinary> & variable, string value, string prefix, bool addToVariable);
+	void addReplaceStringVector(std::vector<LibraryBinary> & variable, std::string value, std::string prefix, bool addToVariable);
     void exclude(std::vector<std::string> & variable, std::vector<std::string> exclusions);
-	void exclude(vector<LibraryBinary> & variable, vector<string> exclusions);
+	void exclude(std::vector<LibraryBinary> & variable, std::vector<std::string> exclusions);
     ConfigParseState stateFromString(std::string name);
     std::string stateName(ConfigParseState state);
     bool checkCorrectVariable(std::string variable, ConfigParseState state);

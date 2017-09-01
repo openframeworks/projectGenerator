@@ -29,7 +29,7 @@ public:
     void addAfterRule(std::string script);
     
     // specific to OSX
-    void addFramework(string name, string path, string folder="");  // folder if for non system frameworks
+    void addFramework(std::string name, std::string path, std::string folder="");  // folder if for non system frameworks
     
         
     
