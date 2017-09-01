@@ -1146,7 +1146,7 @@ void xcodeProject::addDefine(std::string define, LibType libType){
 
 void xcodeProject::addAfterRule(std::string rule){
 
-    char query[255];
+	char query[255];
     sprintf(query, "//key[contains(.,'objects')]/following-sibling::node()[1]");
     pugi::xpath_node_set objects = doc.select_nodes(query);
 
