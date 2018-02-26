@@ -56,15 +56,15 @@ bool AndroidStudioProject::createProjectFile(){
     
 
     
-    // config.make
-    ofFile config(ofFilePath::join(projectDir,"config.make"));
-    if(!config.exists()){
-        src = ofFilePath::join(templatePath,"config.make");
-        dst = config.path();
-        if(!ofFile::copyFromTo(src,dst)){
-            ofLogError(LOG_NAME) << "error copying config.make template from " << src << " to " << dst;
-        }
-    }
+//    // config.make
+//    ofFile config(ofFilePath::join(projectDir,"config.make"));
+//    if(!config.exists()){
+//        src = ofFilePath::join(templatePath,"config.make");
+//        dst = config.path();
+//        if(!ofFile::copyFromTo(src,dst)){
+//            ofLogError(LOG_NAME) << "error copying config.make template from " << src << " to " << dst;
+//        }
+//    }
 
     
     // launcher image
@@ -78,14 +78,14 @@ bool AndroidStudioProject::createProjectFile(){
         }
     }*/
     
-    ofFile makefile(ofFilePath::join(projectDir,"Makefile"));
-    if(!makefile.exists()){
-        src = ofFilePath::join(templatePath,"Makefile");
-        dst = makefile.path();
-        if(!ofFile::copyFromTo(src,dst)){
-            ofLogError(LOG_NAME) << "error copying Makefile template from " << src << " to " << dst;
-        }
-    }
+//    ofFile makefile(ofFilePath::join(projectDir,"Makefile"));
+//    if(!makefile.exists()){
+//        src = ofFilePath::join(templatePath,"Makefile");
+//        dst = makefile.path();
+//        if(!ofFile::copyFromTo(src,dst)){
+//            ofLogError(LOG_NAME) << "error copying Makefile template from " << src << " to " << dst;
+//        }
+//    }
     
     // gitignore
     ofFile gitignore(ofFilePath::join(projectDir,".gitignore"));
