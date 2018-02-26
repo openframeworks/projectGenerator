@@ -41,7 +41,6 @@ bool AndroidStudioProject::createProjectFile(){
         }
     }
     
-    
     // Android.manifest
     ofFile manifest(ofFilePath::join(projectDir,"AndroidManifest.xml"));
     if(!manifest.exists()){
@@ -53,40 +52,7 @@ bool AndroidStudioProject::createProjectFile(){
             findandreplaceInTexfile(dst, "TEMPLATE_PACKAGE_NAME", packageName);
         }
     }
-    
 
-    
-    // config.make
-    ofFile config(ofFilePath::join(projectDir,"config.make"));
-    if(!config.exists()){
-        src = ofFilePath::join(templatePath,"config.make");
-        dst = config.path();
-        if(!ofFile::copyFromTo(src,dst)){
-            ofLogError(LOG_NAME) << "error copying config.make template from " << src << " to " << dst;
-        }
-    }
-
-    
-    // launcher image
-   /* ofFile launcher(ofFilePath::join(projectDir,"ic_launcher-web.png"));
-    if(!launcher.exists()){
-        src = ofFilePath::join(templatePath,"ic_launcher-web.png");
-        dst = launcher.path();
-        if(!ofFile::copyFromTo(src,dst)){
-            ofLogError(LOG_NAME) << "error copying ic_launcher-web.png from " << src << " to " << dst;
-            return false;
-        }
-    }*/
-    
-    ofFile makefile(ofFilePath::join(projectDir,"Makefile"));
-    if(!makefile.exists()){
-        src = ofFilePath::join(templatePath,"Makefile");
-        dst = makefile.path();
-        if(!ofFile::copyFromTo(src,dst)){
-            ofLogError(LOG_NAME) << "error copying Makefile template from " << src << " to " << dst;
-        }
-    }
-    
     // gitignore
     ofFile gitignore(ofFilePath::join(projectDir,".gitignore"));
     if(!gitignore.exists()){
@@ -96,11 +62,6 @@ bool AndroidStudioProject::createProjectFile(){
             ofLogError(LOG_NAME) << "error copying gitignore template from " << src << " to " << dst;
         }
     }
-
-
-    
-    // jni folder
-    ofDirectory(ofFilePath::join(templatePath,"jni")).copyTo(ofFilePath::join(projectDir,"jni"));
 
     // res folder
     ofDirectory(ofFilePath::join(templatePath,"res")).copyTo(ofFilePath::join(projectDir,"res"));
@@ -114,6 +75,11 @@ bool AndroidStudioProject::createProjectFile(){
     
     findandreplaceInTexfile(ofFilePath::join(from,"OFActivity.java"), "TEMPLATE_APP_NAME", projectName);
     ofDirectory(from).moveTo(to, true, true);
+
+    // Gradle wrapper
+    ofDirectory(ofFilePath::join(templatePath,"gradle")).copyTo(ofFilePath::join(projectDir,"gradle"));
+    ofFile::copyFromTo(ofFilePath::join(templatePath,"gradlew"), ofFilePath::join(projectDir,"gradlew"));
+    ofFile::copyFromTo(ofFilePath::join(templatePath,"gradlew.bat"), ofFilePath::join(projectDir,"gradlew.bat"));
     
     return true;
 

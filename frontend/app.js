@@ -793,18 +793,11 @@ function saveDefaultSettings() {
 
 //----------------------------------------
 function generate() {
-
-
     // let's get all the info:
-    var platformsPicked = $("#platformsDropdown  .active");
+    var platformValueArray = getPlatformList();
+
     var addonsPicked = $("#addonsDropdown  .active");
-
-    var platformValueArray = [];
     var addonValueArray = [];
-
-    for (var i = 0; i < platformsPicked.length; i++){
-        platformValueArray.push($(platformsPicked[i]).attr("data-value"));
-    }
 
     for (var i = 0; i < addonsPicked.length; i++){
         addonValueArray.push($(addonsPicked[i]).attr("data-value"));
@@ -956,18 +949,13 @@ function enableConsole( showConsole ){
 }*/
 
 //----------------------------------------
-function getPlatformList(platformSelector) {
-    var selected = [];
-
-    $(platformSelector).children(".platform.platform-selected").each(function() {
-        selected.push($(this).data('value'));
-    });
-
-    if (selected.length == 0) {
-        return null;
-    } else {
-        return selected;
+function getPlatformList() {
+    var platformsPicked = $("#platformsDropdown  .active");
+    var platformValueArray = [];
+    for (var i = 0; i < platformsPicked.length; i++){
+        platformValueArray.push($(platformsPicked[i]).attr("data-value"));
     }
+    return platformValueArray;
 }
 
 //----------------------------------------
@@ -1051,11 +1039,12 @@ function getRandomSketchName(){
 }
 
 function launchInIDE(){
+    var platform = getPlatformList()[0];
 
     var project = {};
     project['projectName'] = $("#projectName").val();
     project['projectPath'] = $("#projectPath").val();
-    project['platform'] = defaultSettings['defaultPlatform']; // ignores OS selection
+    project['platform'] = platform;
     project['ofPath'] = $("#ofPath").val();
 
     ipc.send('launchProjectinIDE', project );
