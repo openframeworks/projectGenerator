@@ -10,7 +10,7 @@ var menu = require('menu');
 var moniker = require('moniker');
 var process = require('process');
 var os = require("os");
-
+var exec = require('child_process').exec;
 
 
 // Debugging: start the Electron PG from the terminal to see the messages from console.log()
@@ -796,11 +796,6 @@ ipc.on('pickProjectImport', function(event, arg) {
 
 ipc.on('launchProjectinIDE', function(event, arg) {
 
-    if( arg.platform != obj.defaultPlatform ){
-        event.sender.send('projectLaunchCompleted', false);
-        return;
-    }
-
     var pathTemp = require('path');
     var fsTemp = require('fs');
     var fullPath = pathTemp.join(arg['projectPath'], arg['projectName']);
@@ -813,28 +808,38 @@ ipc.on('launchProjectinIDE', function(event, arg) {
 
     // // launch xcode
     if( arg.platform == 'osx' ){
-        var osxPath = pathTemp.join(fullPath, arg['projectName'] + '.xcodeproj');
-        console.log( osxPath );
-        osxPath = "\"" + osxPath + "\"";
-				var exec = require('child_process').exec;
-        exec('open ' + osxPath, function callback(error, stdout, stderr){
-            return;
-        });
+        if(hostplatform == 'osx'){ 
+            var osxPath = pathTemp.join(fullPath, arg['projectName'] + '.xcodeproj');
+            console.log( osxPath );
+            osxPath = "\"" + osxPath + "\"";
+                    
+            exec('open ' + osxPath, function callback(error, stdout, stderr){
+                return;
+            });
+        }
     } else if( arg.platform == 'linux' || arg.platform == 'linux64' ){
-        var linuxPath = pathTemp.join(fullPath, arg['projectName'] + '.qbs');
-        linuxPath = linuxPath.replace(/ /g, '\\ ');
-        console.log( linuxPath );
-        var exec = require('child_process').exec;
-        exec('xdg-open ' + linuxPath, function callback(error, stdout, stderr){
-            return;
-        });
+        if(hostplatform == 'linux'){
+            var linuxPath = pathTemp.join(fullPath, arg['projectName'] + '.qbs');
+            linuxPath = linuxPath.replace(/ /g, '\\ ');
+            console.log( linuxPath );
+            exec('xdg-open ' + linuxPath, function callback(error, stdout, stderr){
+                return;
+            });
+        }
     } else if( arg.platform == 'android'){
-       // Can't find a way to open android studio using "Open existing android studio project"
-    } else {
+        console.log("Launching ", fullPath)
+        exec('studio ' + fullPath, function callback(error, stdout, stderr){
+            if(error){
+                event.sender.send('sendUIMessage',
+                '<strong>Error!</strong><br>' +
+                '<span>Could not launch Android Studio. Make sure the command-line launcher is installed by running <i>Tools -> Create Command-line Launcher...</i> inside Android Studio and try again</span>'
+            );
+            }
+        });
+    } else if( hostplatform == 'windows'){
         var windowsPath = pathTemp.join(fullPath, arg['projectName'] + '.sln');
         console.log( windowsPath );
         windowsPath = "\"" + windowsPath + "\"";
-        var exec = require('child_process').exec;
         exec('start ' + "\"\"" + " " + windowsPath, function callback(error, stdout, stderr){
             return;
         });
