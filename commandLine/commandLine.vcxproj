@@ -189,7 +189,6 @@
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\visualStudioProject.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\baseProject.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\androidStudioProject.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\androidStudioProject.cpp.orig" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBWinProject.cpp" />
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.cpp" />
 	</ItemGroup>

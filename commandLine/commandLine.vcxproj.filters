@@ -31,9 +31,6 @@
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\androidStudioProject.cpp">
 			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
 		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\androidStudioProject.cpp.orig">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClCompile>
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBWinProject.cpp">
 			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
 		</ClCompile>
