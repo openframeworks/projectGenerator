@@ -296,8 +296,10 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib){
 		linkPath = "//ItemDefinitionGroup/Link/";
 	}
     
-    pugi::xpath_node_set addlLibsDir = doc.select_nodes((linkPath + "AdditionalLibraryDirectories").c_str());
-	addLibraryPath(addlLibsDir, libFolder);
+	if (!libFolder.empty()) {
+		pugi::xpath_node_set addlLibsDir = doc.select_nodes((linkPath + "AdditionalLibraryDirectories").c_str());
+		addLibraryPath(addlLibsDir, libFolder);
+	}
     
     pugi::xpath_node_set addlDeps = doc.select_nodes((linkPath + "AdditionalDependencies").c_str());
 	addLibraryName(addlDeps, libName);

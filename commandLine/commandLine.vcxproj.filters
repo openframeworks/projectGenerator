@@ -1,34 +1,22 @@
 <?xml version="1.0"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<ItemGroup>
-		<ClCompile Include="src\ofApp.cpp">
-			<Filter>src</Filter>
-		</ClCompile>
 		<ClCompile Include="src\main.cpp">
-			<Filter>src</Filter>
-		</ClCompile>
-		<ClCompile Include="src\main.cpp">
-			<Filter>src</Filter>
-		</ClCompile>
-		<ClCompile Include="src\ofApp.cpp">
 			<Filter>src</Filter>
 		</ClCompile>
 		<ClCompile Include="..\..\..\addons\ofxPoco\src\ofxXmlPoco.cpp">
 			<Filter>addons\ofxPoco\src</Filter>
 		</ClCompile>
+		<ClCompile Include="..\ofxProjectGenerator\src\utils\LibraryBinary.cpp">
+			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
+		</ClCompile>
+		<ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp">
+			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
+		</ClCompile>
 		<ClCompile Include="..\ofxProjectGenerator\src\addons\ofAddon.cpp">
 			<Filter>local_addons\ofxProjectGenerator\src\addons</Filter>
 		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\androidStudioProject.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\baseProject.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBWinProject.cpp">
+		<ClCompile Include="..\ofxProjectGenerator\src\projects\xcodeProject.cpp">
 			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
 		</ClCompile>
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.cpp">
@@ -37,14 +25,20 @@
 		<ClCompile Include="..\ofxProjectGenerator\src\projects\visualStudioProject.cpp">
 			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
 		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\xcodeProject.cpp">
+		<ClCompile Include="..\ofxProjectGenerator\src\projects\baseProject.cpp">
 			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
 		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\utils\LibraryBinary.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
+		<ClCompile Include="..\ofxProjectGenerator\src\projects\androidStudioProject.cpp">
+			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
 		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
+		<ClCompile Include="..\ofxProjectGenerator\src\projects\androidStudioProject.cpp.orig">
+			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+		</ClCompile>
+		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBWinProject.cpp">
+			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+		</ClCompile>
+		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.cpp">
+			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
 		</ClCompile>
 	</ItemGroup>
 	<ItemGroup>
@@ -63,53 +57,14 @@
 		<Filter Include="addons\ofxPoco\libs">
 			<UniqueIdentifier>{3E8A9E9C-2DA4-7391-777F-56C5}</UniqueIdentifier>
 		</Filter>
-		<Filter Include="addons\ofxPoco\libs\poco">
-			<UniqueIdentifier>{12B05DA3-AAEB-A925-1D08-E474}</UniqueIdentifier>
+		<Filter Include="addons\ofxPoco\libs\openssl">
+			<UniqueIdentifier>{5947399C-92B2-BAE8-E58F-7024}</UniqueIdentifier>
 		</Filter>
-		<Filter Include="addons\ofxPoco\libs\poco\include">
-			<UniqueIdentifier>{1496572F-EFAF-66FC-3AE8-6E42}</UniqueIdentifier>
+		<Filter Include="addons\ofxPoco\libs\openssl\include">
+			<UniqueIdentifier>{D5DE9DB7-5574-8FBC-7336-5107}</UniqueIdentifier>
 		</Filter>
-		<Filter Include="addons\ofxPoco\libs\poco\include\Poco">
-			<UniqueIdentifier>{5744D988-DD21-04A5-3FD1-2D40}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco\libs\poco\include\Poco\Crypto">
-			<UniqueIdentifier>{3F1DE11B-79DD-A613-D66D-69ED}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco\libs\poco\include\Poco\Data">
-			<UniqueIdentifier>{F546C671-A05B-A98F-2E99-6695}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco\libs\poco\include\Poco\Data\SQLite">
-			<UniqueIdentifier>{73BD64BC-9B40-9F14-DA41-E58B}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco\libs\poco\include\Poco\DOM">
-			<UniqueIdentifier>{D7DE65BD-F8E4-D64E-A81D-89D6}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco\libs\poco\include\Poco\Dynamic">
-			<UniqueIdentifier>{FB17CB2B-6D0C-3311-6969-E392}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco\libs\poco\include\Poco\JSON">
-			<UniqueIdentifier>{268A87C8-CB6D-21A8-DC72-1243}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco\libs\poco\include\Poco\MongoDB">
-			<UniqueIdentifier>{63A4B2C4-C887-3D22-FFFF-7C43}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco\libs\poco\include\Poco\Net">
-			<UniqueIdentifier>{6EE614D8-A38F-3BCB-21F6-2291}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco\libs\poco\include\Poco\SAX">
-			<UniqueIdentifier>{419F9436-FB52-8BD9-EBF9-EC97}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco\libs\poco\include\Poco\SevenZip">
-			<UniqueIdentifier>{F1CAA7A9-C586-96AE-D9B5-7CB7}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco\libs\poco\include\Poco\Util">
-			<UniqueIdentifier>{BCC8C63B-BC7B-72E5-7102-4C48}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco\libs\poco\include\Poco\XML">
-			<UniqueIdentifier>{F628FA6E-D137-692F-A157-0E98}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco\libs\poco\include\Poco\Zip">
-			<UniqueIdentifier>{3AA7C681-EC0D-9C72-2282-5CB2}</UniqueIdentifier>
+		<Filter Include="addons\ofxPoco\libs\openssl\include\openssl">
+			<UniqueIdentifier>{C648CDF7-0C1F-4D5B-2490-7010}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="local_addons">
 			<UniqueIdentifier>{DE6745C7-E99D-D8E0-F77D-C032}</UniqueIdentifier>
@@ -120,2191 +75,280 @@
 		<Filter Include="local_addons\ofxProjectGenerator\src">
 			<UniqueIdentifier>{22BFB2DF-FDA3-838A-F39D-033B}</UniqueIdentifier>
 		</Filter>
+		<Filter Include="local_addons\ofxProjectGenerator\src\utils">
+			<UniqueIdentifier>{A62DD3D9-F18F-2AD2-EAED-2F82}</UniqueIdentifier>
+		</Filter>
 		<Filter Include="local_addons\ofxProjectGenerator\src\addons">
 			<UniqueIdentifier>{48D8BC28-D905-C666-C179-A88B}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="local_addons\ofxProjectGenerator\src\projects">
 			<UniqueIdentifier>{624EB3BE-8A01-BFBA-5112-0A69}</UniqueIdentifier>
 		</Filter>
-		<Filter Include="local_addons\ofxProjectGenerator\src\utils">
-			<UniqueIdentifier>{A62DD3D9-F18F-2AD2-EAED-2F82}</UniqueIdentifier>
-		</Filter>
 	</ItemGroup>
 	<ItemGroup>
-		<ClInclude Include="src\ofApp.h">
-			<Filter>src</Filter>
-		</ClInclude>
-		<ClInclude Include="src\ofApp.h">
-			<Filter>src</Filter>
-		</ClInclude>
 		<ClInclude Include="src\optionparser.h">
 			<Filter>src</Filter>
 		</ClInclude>
 		<ClInclude Include="..\..\..\addons\ofxPoco\src\ofxXmlPoco.h">
 			<Filter>addons\ofxPoco\src</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\AbstractCache.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\camellia.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\AbstractDelegate.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\cmac.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\AbstractEvent.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ts.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\AbstractObserver.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\obj_mac.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\AbstractPriorityDelegate.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\lhash.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\AbstractStrategy.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ssl.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\AccessExpirationDecorator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ripemd.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\AccessExpireCache.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\krb5_asn.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\AccessExpireLRUCache.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\dh.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\AccessExpireStrategy.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\pem2.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ActiveDispatcher.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\des.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ActiveMethod.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ossl_typ.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ActiveResult.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\tls1.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ActiveRunnable.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\pkcs12.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ActiveStarter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\sha.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Activity.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\hmac.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Alignment.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\blowfish.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Any.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\e_os2.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ArchiveStrategy.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\aes.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Array.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\rand.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Ascii.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\srtp.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ASCIIEncoding.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\des_old.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\AsyncChannel.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\bn.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\AtomicCounter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\md5.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\AutoPtr.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ssl23.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\AutoReleasePool.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ecdsa.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Base32Decoder.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ec.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Base32Encoder.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\x509_vfy.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Base64Decoder.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\whrlpool.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Base64Encoder.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\dso.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\BasicEvent.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ocsp.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\BinaryReader.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ssl2.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\BinaryWriter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\rc2.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Buffer.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\seed.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\BufferAllocator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\pem.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\BufferedBidirectionalStreamBuf.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\conf.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\BufferedStreamBuf.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\evp.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Bugcheck.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\crypto.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ByteOrder.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ecdh.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Channel.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\modes.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Checksum.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\srp.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ClassLibrary.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\dtls1.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ClassLoader.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ebcdic.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Clock.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ui_compat.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Condition.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\conf_api.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Config.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\opensslconf.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Configurable.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\buffer.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ConsoleChannel.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\symhacks.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\CountingStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\bio.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Crypto\Cipher.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Crypto</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\err.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Crypto\CipherFactory.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Crypto</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\mdc2.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Crypto\CipherImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Crypto</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\idea.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Crypto\CipherKey.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Crypto</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\pqueue.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Crypto\CipherKeyImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Crypto</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\x509v3.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Crypto\Crypto.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Crypto</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\stack.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Crypto\CryptoStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Crypto</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\safestack.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Crypto\CryptoTransform.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Crypto</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\opensslv.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Crypto\DigestEngine.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Crypto</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\rc4.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Crypto\OpenSSLInitializer.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Crypto</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\rsa.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Crypto\RSACipherImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Crypto</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\asn1t.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Crypto\RSADigestEngine.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Crypto</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\md4.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Crypto\RSAKey.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Crypto</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\asn1_mac.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Crypto\RSAKeyImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Crypto</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\pkcs7.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Crypto\X509Certificate.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Crypto</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\asn1.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\AbstractBinder.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\kssl.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\AbstractBinding.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\x509.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\AbstractExtraction.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\opensslconf_osx.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\AbstractExtractor.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\engine.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\AbstractPreparation.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\comp.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\AbstractPreparator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\cms.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\AbstractSessionImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\objects.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\ArchiveStrategy.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ssl3.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\AutoTransaction.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ui.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\Binding.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\dsa.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\Bulk.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\txt_db.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\BulkBinding.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\BulkExtraction.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\Column.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\Connector.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\Constants.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\Data.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\DataException.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\Date.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\DynamicDateTime.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\DynamicLOB.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\Extraction.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\Limit.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\LOB.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\LOBStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\MetaColumn.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\PooledSessionHolder.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\PooledSessionImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\Position.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\Preparation.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\Range.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\RecordSet.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\Row.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\RowFilter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\RowFormatter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\RowIterator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\Session.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\SessionFactory.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\SessionImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\SessionPool.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\SessionPoolContainer.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\SimpleRowFormatter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\SQLChannel.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\SQLite\Binder.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data\SQLite</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\SQLite\Connector.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data\SQLite</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\SQLite\Extractor.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data\SQLite</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\SQLite\Notifier.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data\SQLite</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\SQLite\SessionImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data\SQLite</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\SQLite\SQLite.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data\SQLite</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\SQLite\SQLiteException.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data\SQLite</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\SQLite\SQLiteStatementImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data\SQLite</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\SQLite\Utility.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data\SQLite</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\Statement.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\StatementCreator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\StatementImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\Time.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\Transaction.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Data\TypeHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Data</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DateTime.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DateTimeFormat.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DateTimeFormatter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DateTimeParser.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Debugger.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DefaultStrategy.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DeflatingStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Delegate.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DigestEngine.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DigestStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DirectoryIterator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DirectoryIteratorStrategy.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DirectoryIterator_UNIX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DirectoryIterator_VMS.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DirectoryIterator_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DirectoryIterator_WIN32U.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DirectoryWatcher.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\AbstractContainerNode.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\AbstractNode.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\Attr.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\AttrMap.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\AutoPtr.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\CDATASection.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\CharacterData.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\ChildNodesList.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\Comment.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\Document.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\DocumentEvent.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\DocumentFragment.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\DocumentType.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\DOMBuilder.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\DOMException.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\DOMImplementation.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\DOMObject.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\DOMParser.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\DOMSerializer.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\DOMWriter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\DTDMap.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\Element.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\ElementsByTagNameList.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\Entity.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\EntityReference.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\Event.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\EventDispatcher.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\EventException.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\EventListener.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\EventTarget.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\MutationEvent.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\NamedNodeMap.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\Node.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\NodeAppender.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\NodeFilter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\NodeIterator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\NodeList.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\Notation.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\ProcessingInstruction.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\Text.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DOM\TreeWalker.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\DOM</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Dynamic\Pair.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Dynamic</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Dynamic\Struct.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Dynamic</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Dynamic\Var.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Dynamic</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Dynamic\VarHolder.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Dynamic</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Dynamic\VarIterator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Dynamic</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DynamicAny.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DynamicAnyHolder.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DynamicFactory.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\DynamicStruct.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Environment.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Environment_UNIX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Environment_VMS.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Environment_VX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Environment_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Environment_WIN32U.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Environment_WINCE.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Error.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ErrorHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Event.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\EventArgs.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\EventChannel.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\EventLogChannel.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Event_POSIX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Event_VX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Event_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Exception.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ExpirationDecorator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Expire.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ExpireCache.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ExpireLRUCache.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ExpireStrategy.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\FIFOBuffer.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\FIFOBufferStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\FIFOEvent.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\FIFOStrategy.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\File.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\FileChannel.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\FileStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\FileStreamFactory.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\FileStream_POSIX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\FileStream_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\File_UNIX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\File_VMS.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\File_VX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\File_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\File_WIN32U.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\File_WINCE.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Format.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Formatter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\FormattingChannel.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Foundation.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\FPEnvironment.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\FPEnvironment_C99.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\FPEnvironment_DEC.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\FPEnvironment_DUMMY.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\FPEnvironment_SUN.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\FPEnvironment_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\FunctionDelegate.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\FunctionPriorityDelegate.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Glob.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Hash.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\HashFunction.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\HashMap.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\HashSet.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\HashStatistic.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\HashTable.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\HexBinaryDecoder.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\HexBinaryEncoder.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\HMACEngine.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\InflatingStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Instantiator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\JSON\Array.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\JSON</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\JSON\Handler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\JSON</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\JSON\JSON.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\JSON</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\JSON\JSONException.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\JSON</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\JSON\Object.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\JSON</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\JSON\ParseHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\JSON</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\JSON\Parser.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\JSON</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\JSON\PrintHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\JSON</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\JSON\Query.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\JSON</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\JSON\Stringifier.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\JSON</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\JSON\Template.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\JSON</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\JSON\TemplateCache.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\JSON</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\KeyValueArgs.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Latin1Encoding.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Latin2Encoding.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Latin9Encoding.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\LinearHashTable.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\LineEndingConverter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ListMap.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\LocalDateTime.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\LogFile.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\LogFile_STD.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\LogFile_VMS.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\LogFile_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\LogFile_WIN32U.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Logger.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\LoggingFactory.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\LoggingRegistry.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\LogStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\LRUCache.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\LRUStrategy.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Manifest.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MD4Engine.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MD5Engine.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MemoryPool.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MemoryStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Message.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MetaObject.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MetaProgramming.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\Array.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\Binary.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\BSONReader.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\BSONWriter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\Connection.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\Cursor.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\Database.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\DeleteRequest.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\Document.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\Element.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\GetMoreRequest.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\InsertRequest.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\JavaScriptCode.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\KillCursorsRequest.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\Message.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\MessageHeader.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\MongoDB.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\ObjectId.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\PoolableConnectionFactory.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\QueryRequest.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\RegularExpression.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\ReplicaSet.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\RequestMessage.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\ResponseMessage.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\MongoDB\UpdateRequest.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\MongoDB</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Mutex.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Mutex_POSIX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Mutex_VX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Mutex_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Mutex_WINCE.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NamedEvent.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NamedEvent_Android.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NamedEvent_UNIX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NamedEvent_VMS.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NamedEvent_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NamedEvent_WIN32U.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NamedMutex.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NamedMutex_Android.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NamedMutex_UNIX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NamedMutex_VMS.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NamedMutex_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NamedMutex_WIN32U.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NamedTuple.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NestedDiagnosticContext.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\AbstractHTTPRequestHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\AcceptCertificateHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\CertificateHandlerFactory.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\CertificateHandlerFactoryMgr.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\ConsoleCertificateHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\Context.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\DatagramSocket.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\DatagramSocketImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\DialogSocket.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\DNS.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\FilePartSource.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\FTPClientSession.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\FTPStreamFactory.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HostEntry.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTMLForm.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPAuthenticationParams.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPBasicCredentials.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPBasicStreamBuf.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPBufferAllocator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPChunkedStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPClientSession.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPCookie.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPCredentials.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPDigestCredentials.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPFixedLengthStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPHeaderStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPIOStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPMessage.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPRequest.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPRequestHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPRequestHandlerFactory.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPResponse.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPSClientSession.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPServer.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPServerConnection.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPServerConnectionFactory.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPServerParams.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPServerRequest.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPServerRequestImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPServerResponse.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPServerResponseImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPServerSession.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPSession.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPSessionFactory.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPSessionInstantiator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPSSessionInstantiator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPSStreamFactory.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\HTTPStreamFactory.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\ICMPClient.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\ICMPEventArgs.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\ICMPPacket.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\ICMPPacketImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\ICMPSocket.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\ICMPSocketImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\ICMPv4PacketImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\InvalidCertificateHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\IPAddress.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\IPAddressImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\KeyConsoleHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\KeyFileHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\MailMessage.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\MailRecipient.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\MailStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\MediaType.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\MessageHeader.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\MulticastSocket.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\MultipartReader.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\MultipartWriter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\NameValueCollection.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\Net.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\NetException.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\NetSSL.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\NetworkInterface.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\NTPClient.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\NTPEventArgs.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\NTPPacket.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\NullPartHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\OAuth10Credentials.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\OAuth20Credentials.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\ParallelSocketAcceptor.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\ParallelSocketReactor.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\PartHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\PartSource.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\PartStore.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\POP3ClientSession.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\PrivateKeyFactory.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\PrivateKeyFactoryMgr.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\PrivateKeyPassphraseHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\QuotedPrintableDecoder.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\QuotedPrintableEncoder.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\RawSocket.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\RawSocketImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\RejectCertificateHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\RemoteSyslogChannel.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\RemoteSyslogListener.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SecureServerSocket.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SecureServerSocketImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SecureSMTPClientSession.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SecureSocketImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SecureStreamSocket.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SecureStreamSocketImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\ServerSocket.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\ServerSocketImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\Session.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SMTPChannel.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SMTPClientSession.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\Socket.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SocketAcceptor.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SocketAddress.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SocketAddressImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SocketConnector.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SocketDefs.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SocketImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SocketNotification.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SocketNotifier.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SocketReactor.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SocketStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SSLException.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\SSLManager.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\StreamSocket.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\StreamSocketImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\StringPartSource.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\TCPServer.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\TCPServerConnection.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\TCPServerConnectionFactory.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\TCPServerDispatcher.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\TCPServerParams.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\Utility.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\VerificationErrorArgs.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\WebSocket.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\WebSocketImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Net\X509Certificate.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Net</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NObserver.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Notification.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NotificationCenter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NotificationQueue.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NotificationStrategy.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Nullable.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NullChannel.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NullStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NumberFormatter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NumberParser.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\NumericString.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ObjectPool.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Observer.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\OpcomChannel.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Optional.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Path.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Path_UNIX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Path_VMS.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Path_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Path_WIN32U.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Path_WINCE.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\PatternFormatter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\PBKDF2Engine.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Pipe.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\PipeImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\PipeImpl_DUMMY.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\PipeImpl_POSIX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\PipeImpl_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\PipeStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Platform.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Platform_POSIX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Platform_VMS.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Platform_VX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Platform_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Poco.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\PriorityDelegate.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\PriorityEvent.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\PriorityExpire.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\PriorityNotificationQueue.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\PriorityStrategy.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Process.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Process_UNIX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Process_VMS.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Process_VX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Process_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Process_WIN32U.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Process_WINCE.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\PurgeStrategy.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Random.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\RandomStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\RecursiveDirectoryIterator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\RecursiveDirectoryIteratorImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\RefCountedObject.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\RegularExpression.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\RotateStrategy.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Runnable.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\RunnableAdapter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\RWLock.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\RWLock_Android.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\RWLock_POSIX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\RWLock_VX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\RWLock_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\RWLock_WINCE.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\Attributes.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\AttributesImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\ContentHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\DeclHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\DefaultHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\DTDHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\EntityResolver.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\EntityResolverImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\ErrorHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\InputSource.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\LexicalHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\Locator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\LocatorImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\NamespaceSupport.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\SAXException.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\SAXParser.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\WhitespaceFilter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\XMLFilter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\XMLFilterImpl.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SAX\XMLReader.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SAX</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ScopedLock.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ScopedUnlock.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Semaphore.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Semaphore_POSIX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Semaphore_VX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Semaphore_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SevenZip\Archive.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SevenZip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SevenZip\ArchiveEntry.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SevenZip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SevenZip\SevenZip.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\SevenZip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SHA1Engine.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SharedLibrary.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SharedLibrary_HPUX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SharedLibrary_UNIX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SharedLibrary_VMS.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SharedLibrary_VX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SharedLibrary_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SharedLibrary_WIN32U.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SharedMemory.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SharedMemory_DUMMY.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SharedMemory_POSIX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SharedMemory_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SharedPtr.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SignalHandler.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SimpleFileChannel.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SimpleHashTable.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SingletonHolder.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SortedDirectoryIterator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SplitterChannel.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Stopwatch.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\StrategyCollection.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\StreamChannel.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\StreamConverter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\StreamCopier.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\StreamTokenizer.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\StreamUtil.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\String.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\StringTokenizer.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SynchronizedObject.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\SyslogChannel.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Task.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\TaskManager.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\TaskNotification.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\TeeStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\TemporaryFile.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\TextBufferIterator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\TextConverter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\TextEncoding.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\TextIterator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Thread.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ThreadLocal.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ThreadPool.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ThreadTarget.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Thread_POSIX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Thread_VX.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Thread_WIN32.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Thread_WINCE.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\TimedNotificationQueue.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Timer.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Timespan.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Timestamp.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Timezone.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Token.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Tuple.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\TypeList.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Types.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\UnbufferedStreamBuf.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Unicode.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\UnicodeConverter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\UniqueAccessExpireCache.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\UniqueAccessExpireLRUCache.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\UniqueAccessExpireStrategy.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\UniqueExpireCache.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\UniqueExpireLRUCache.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\UniqueExpireStrategy.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\UnWindows.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\URI.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\URIStreamFactory.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\URIStreamOpener.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\UTF16Encoding.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\UTF32Encoding.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\UTF8Encoding.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\UTF8String.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\UTFString.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\AbstractConfiguration.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\Application.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\ConfigurationMapper.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\ConfigurationView.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\FilesystemConfiguration.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\HelpFormatter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\IniFileConfiguration.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\IntValidator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\JSONConfiguration.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\LayeredConfiguration.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\LoggingConfigurator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\LoggingSubsystem.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\MapConfiguration.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\Option.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\OptionCallback.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\OptionException.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\OptionProcessor.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\OptionSet.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\PropertyFileConfiguration.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\RegExpValidator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\ServerApplication.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\Subsystem.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\SystemConfiguration.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\Timer.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\TimerTask.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\TimerTaskAdapter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\Units.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\Util.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\Validator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\WinRegistryConfiguration.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\WinRegistryKey.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\WinService.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Util\XMLConfiguration.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Util</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\UUID.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\UUIDGenerator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\ValidArgs.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Version.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Void.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Windows1250Encoding.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Windows1251Encoding.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Windows1252Encoding.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\WindowsConsoleChannel.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\XML\expat.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\XML</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\XML\expat_external.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\XML</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\XML\Name.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\XML</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\XML\NamePool.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\XML</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\XML\NamespaceStrategy.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\XML</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\XML\ParserEngine.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\XML</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\XML\XML.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\XML</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\XML\XMLException.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\XML</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\XML\XMLStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\XML</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\XML\XMLString.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\XML</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\XML\XMLWriter.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\XML</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\zconf.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\Add.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\AutoDetectStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\Compress.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\Decompress.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\Delete.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\Keep.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\ParseCallback.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\PartialStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\Rename.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\Replace.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\SkipCallback.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\Zip.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\ZipArchive.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\ZipArchiveInfo.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\ZipCommon.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\ZipDataInfo.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\ZipException.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\ZipFileInfo.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\ZipLocalFileHeader.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\ZipManipulator.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\ZipOperation.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\ZipStream.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\Zip\ZipUtil.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco\Zip</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\poco\include\Poco\zlib.h">
-			<Filter>addons\ofxPoco\libs\poco\include\Poco</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\addons\ofAddon.h">
-			<Filter>local_addons\ofxProjectGenerator\src\addons</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\androidStudioProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\baseProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBWinProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\visualStudioProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\xcodeProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\cast.h">
+			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
 		</ClInclude>
 		<ClInclude Include="..\ofxProjectGenerator\src\utils\LibraryBinary.h">
 			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
 		</ClInclude>
 		<ClInclude Include="..\ofxProjectGenerator\src\utils\Utils.h">
 			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
+		</ClInclude>
+		<ClInclude Include="..\ofxProjectGenerator\src\addons\ofAddon.h">
+			<Filter>local_addons\ofxProjectGenerator\src\addons</Filter>
+		</ClInclude>
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBWinProject.h">
+			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+		</ClInclude>
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\androidStudioProject.h">
+			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+		</ClInclude>
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.h">
+			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+		</ClInclude>
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\xcodeProject.h">
+			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+		</ClInclude>
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.h">
+			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+		</ClInclude>
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\baseProject.h">
+			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+		</ClInclude>
+		<ClInclude Include="..\ofxProjectGenerator\src\projects\visualStudioProject.h">
+			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
 		</ClInclude>
 	</ItemGroup>
 	<ItemGroup>

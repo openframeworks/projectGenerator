@@ -12,10 +12,8 @@ Project{
         name: { return FileInfo.baseName(path) }
 
         files: [
-            'src/main.cpp',
-            'src/ofApp.cpp',
-            'src/ofApp.h',
-            'src/optionparser.h',
+            "src/main.cpp",
+            "src/optionparser.h",
         ]
 
         of.addons: [
