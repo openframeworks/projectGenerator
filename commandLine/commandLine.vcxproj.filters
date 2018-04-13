@@ -1,354 +1,123 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<ItemGroup>
-		<ClCompile Include="src\main.cpp">
-			<Filter>src</Filter>
-		</ClCompile>
-		<ClCompile Include="..\..\..\addons\ofxPoco\src\ofxXmlPoco.cpp">
-			<Filter>addons\ofxPoco\src</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\utils\LibraryBinary.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\addons\ofAddon.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\addons</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\xcodeProject.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\visualStudioProject.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\baseProject.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\androidStudioProject.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBWinProject.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClCompile>
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.cpp">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClCompile>
-	</ItemGroup>
-	<ItemGroup>
-		<Filter Include="src">
-			<UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons">
-			<UniqueIdentifier>{71834F65-F3A9-211E-73B8-DC85}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco">
-			<UniqueIdentifier>{3256AE3E-9B29-EA27-C842-CE6B}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco\src">
-			<UniqueIdentifier>{C7D4269D-D8A9-A7BB-531B-98DA}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco\libs">
-			<UniqueIdentifier>{3E8A9E9C-2DA4-7391-777F-56C5}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco\libs\openssl">
-			<UniqueIdentifier>{5947399C-92B2-BAE8-E58F-7024}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco\libs\openssl\include">
-			<UniqueIdentifier>{D5DE9DB7-5574-8FBC-7336-5107}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="addons\ofxPoco\libs\openssl\include\openssl">
-			<UniqueIdentifier>{C648CDF7-0C1F-4D5B-2490-7010}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="local_addons">
-			<UniqueIdentifier>{DE6745C7-E99D-D8E0-F77D-C032}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="local_addons\ofxProjectGenerator">
-			<UniqueIdentifier>{04ADF8B0-AE7A-FB41-E0DF-5AB6}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="local_addons\ofxProjectGenerator\src">
-			<UniqueIdentifier>{22BFB2DF-FDA3-838A-F39D-033B}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="local_addons\ofxProjectGenerator\src\utils">
-			<UniqueIdentifier>{A62DD3D9-F18F-2AD2-EAED-2F82}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="local_addons\ofxProjectGenerator\src\addons">
-			<UniqueIdentifier>{48D8BC28-D905-C666-C179-A88B}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="local_addons\ofxProjectGenerator\src\projects">
-			<UniqueIdentifier>{624EB3BE-8A01-BFBA-5112-0A69}</UniqueIdentifier>
-		</Filter>
-	</ItemGroup>
-	<ItemGroup>
-		<ClInclude Include="src\optionparser.h">
-			<Filter>src</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\src\ofxXmlPoco.h">
-			<Filter>addons\ofxPoco\src</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\camellia.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\cmac.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ts.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\obj_mac.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\lhash.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ssl.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ripemd.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\krb5_asn.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\dh.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\pem2.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\des.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ossl_typ.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\tls1.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\pkcs12.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\sha.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\hmac.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\blowfish.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\e_os2.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\aes.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\rand.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\srtp.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\des_old.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\bn.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\md5.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ssl23.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ecdsa.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ec.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\x509_vfy.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\whrlpool.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\dso.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ocsp.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ssl2.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\rc2.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\seed.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\pem.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\conf.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\evp.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\crypto.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ecdh.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\modes.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\srp.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\dtls1.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ebcdic.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ui_compat.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\conf_api.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\opensslconf.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\buffer.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\symhacks.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\bio.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\err.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\mdc2.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\idea.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\pqueue.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\x509v3.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\stack.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\safestack.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\opensslv.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\rc4.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\rsa.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\asn1t.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\md4.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\asn1_mac.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\pkcs7.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\asn1.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\kssl.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\x509.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\opensslconf_osx.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\engine.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\comp.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\cms.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\objects.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ssl3.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ui.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\dsa.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\txt_db.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\cast.h">
-			<Filter>addons\ofxPoco\libs\openssl\include\openssl</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\utils\LibraryBinary.h">
-			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\utils\Utils.h">
-			<Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\addons\ofAddon.h">
-			<Filter>local_addons\ofxProjectGenerator\src\addons</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBWinProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\androidStudioProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\xcodeProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\baseProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\visualStudioProject.h">
-			<Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
-		</ClInclude>
-	</ItemGroup>
-	<ItemGroup>
-		<ResourceCompile Include="icon.rc" />
-	</ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ofApp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxPoco\src\ofxXmlPoco.cpp">
+      <Filter>addons\ofxPoco\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\addons\ofAddon.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\addons</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\androidStudioProject.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\baseProject.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\CBWinProject.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\visualStudioProject.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\xcodeProject.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\utils\LibraryBinary.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp">
+      <Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons">
+      <UniqueIdentifier>{71834F65-F3A9-211E-73B8-DC85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxPoco">
+      <UniqueIdentifier>{3256AE3E-9B29-EA27-C842-CE6B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxPoco\src">
+      <UniqueIdentifier>{C7D4269D-D8A9-A7BB-531B-98DA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local_addons">
+      <UniqueIdentifier>{DE6745C7-E99D-D8E0-F77D-C032}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local_addons\ofxProjectGenerator">
+      <UniqueIdentifier>{04ADF8B0-AE7A-FB41-E0DF-5AB6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local_addons\ofxProjectGenerator\src">
+      <UniqueIdentifier>{22BFB2DF-FDA3-838A-F39D-033B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local_addons\ofxProjectGenerator\src\addons">
+      <UniqueIdentifier>{48D8BC28-D905-C666-C179-A88B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local_addons\ofxProjectGenerator\src\projects">
+      <UniqueIdentifier>{624EB3BE-8A01-BFBA-5112-0A69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local_addons\ofxProjectGenerator\src\utils">
+      <UniqueIdentifier>{A62DD3D9-F18F-2AD2-EAED-2F82}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ofApp.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\optionparser.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxPoco\src\ofxXmlPoco.h">
+      <Filter>addons\ofxPoco\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\addons\ofAddon.h">
+      <Filter>local_addons\ofxProjectGenerator\src\addons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\androidStudioProject.h">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\baseProject.h">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.h">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\CBWinProject.h">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.h">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\visualStudioProject.h">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\xcodeProject.h">
+      <Filter>local_addons\ofxProjectGenerator\src\projects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\utils\LibraryBinary.h">
+      <Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ofxProjectGenerator\src\utils\Utils.h">
+      <Filter>local_addons\ofxProjectGenerator\src\utils</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="icon.rc" />
+  </ItemGroup>
 </Project>

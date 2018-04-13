@@ -1,303 +1,227 @@
-<?xml version="1.0"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<ItemGroup Label="ProjectConfigurations">
-		<ProjectConfiguration Include="Debug|Win32">
-			<Configuration>Debug</Configuration>
-			<Platform>Win32</Platform>
-		</ProjectConfiguration>
-		<ProjectConfiguration Include="Debug|x64">
-			<Configuration>Debug</Configuration>
-			<Platform>x64</Platform>
-		</ProjectConfiguration>
-		<ProjectConfiguration Include="Release|Win32">
-			<Configuration>Release</Configuration>
-			<Platform>Win32</Platform>
-		</ProjectConfiguration>
-		<ProjectConfiguration Include="Release|x64">
-			<Configuration>Release</Configuration>
-			<Platform>x64</Platform>
-		</ProjectConfiguration>
-	</ItemGroup>
-	<PropertyGroup Label="Globals">
-		<ProjectGuid>{7FD42DF7-442E-479A-BA76-D0022F99702A}</ProjectGuid>
-		<Keyword>Win32Proj</Keyword>
-		<RootNamespace>commandLine</RootNamespace>
-	</PropertyGroup>
-	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-		<ConfigurationType>Application</ConfigurationType>
-		<CharacterSet>Unicode</CharacterSet>
-		<PlatformToolset>v140</PlatformToolset>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-		<ConfigurationType>Application</ConfigurationType>
-		<CharacterSet>Unicode</CharacterSet>
-		<PlatformToolset>v140</PlatformToolset>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-		<ConfigurationType>Application</ConfigurationType>
-		<CharacterSet>Unicode</CharacterSet>
-		<WholeProgramOptimization>true</WholeProgramOptimization>
-		<PlatformToolset>v140</PlatformToolset>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-		<ConfigurationType>Application</ConfigurationType>
-		<CharacterSet>Unicode</CharacterSet>
-		<WholeProgramOptimization>true</WholeProgramOptimization>
-		<PlatformToolset>v140</PlatformToolset>
-	</PropertyGroup>
-	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-	<ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
-		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-		<Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksRelease.props" />
-	</ImportGroup>
-	<ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
-		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-		<Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksRelease.props" />
-	</ImportGroup>
-	<ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
-		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-		<Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksDebug.props" />
-	</ImportGroup>
-	<ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
-		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-		<Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksDebug.props" />
-	</ImportGroup>
-	<PropertyGroup Label="UserMacros" />
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-		<OutDir>bin\</OutDir>
-		<IntDir>obj\$(Configuration)\</IntDir>
-		<TargetName>$(ProjectName)_debug</TargetName>
-		<LinkIncremental>true</LinkIncremental>
-		<GenerateManifest>true</GenerateManifest>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-		<OutDir>bin\</OutDir>
-		<IntDir>obj\$(Configuration)\</IntDir>
-		<TargetName>$(ProjectName)_debug</TargetName>
-		<LinkIncremental>true</LinkIncremental>
-		<GenerateManifest>true</GenerateManifest>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-		<OutDir>bin\</OutDir>
-		<IntDir>obj\$(Configuration)\</IntDir>
-		<LinkIncremental>false</LinkIncremental>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-		<OutDir>bin\</OutDir>
-		<IntDir>obj\$(Configuration)\</IntDir>
-		<LinkIncremental>false</LinkIncremental>
-	</PropertyGroup>
-	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-		<ClCompile>
-			<Optimization>Disabled</Optimization>
-			<BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
-			<RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxPoco\libs\poco\include;..\..\..\addons\ofxPoco\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils</AdditionalIncludeDirectories>
-			<CompileAs>CompileAsCpp</CompileAs>
-			<ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
-			<AdditionalOptions>-DPOCO_STATIC</AdditionalOptions>
-		</ClCompile>
-		<Link>
-			<GenerateDebugInformation>true</GenerateDebugInformation>
-			<SubSystem>Console</SubSystem>
-			<RandomizedBaseAddress>false</RandomizedBaseAddress>
-			<AdditionalDependencies>%(AdditionalDependencies);PocoUtilmdd.lib;PocoCryptomdd.lib;PocoNetSSLmdd.lib;PocoNetmdd.lib;PocoDataSQLitemdd.lib;PocoZipmdd.lib;PocoDatamdd.lib;PocoPDFmdd.lib;PocoXMLmdd.lib;PocoFoundationmdd.lib;iphlpapi.lib</AdditionalDependencies>
-			<AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);..\..\..\addons\ofxPoco\libs\poco\lib\vs\Win32\Debug;..\..\..\addons\ofxPoco</AdditionalLibraryDirectories>
-		</Link>
-		<PostBuildEvent />
-	</ItemDefinitionGroup>
-	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-		<ClCompile>
-			<Optimization>Disabled</Optimization>
-			<BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
-			<RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxPoco\libs\poco\include;..\..\..\addons\ofxPoco\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils</AdditionalIncludeDirectories>
-			<CompileAs>CompileAsCpp</CompileAs>
-			<ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
-			<MultiProcessorCompilation>true</MultiProcessorCompilation>
-			<AdditionalOptions>-DPOCO_STATIC</AdditionalOptions>
-		</ClCompile>
-		<Link>
-			<GenerateDebugInformation>true</GenerateDebugInformation>
-			<SubSystem>Console</SubSystem>
-			<RandomizedBaseAddress>false</RandomizedBaseAddress>
-			<AdditionalDependencies>%(AdditionalDependencies);PocoUtilmdd.lib;PocoCryptomdd.lib;PocoNetSSLmdd.lib;PocoNetmdd.lib;PocoDataSQLitemdd.lib;PocoZipmdd.lib;PocoDatamdd.lib;PocoPDFmdd.lib;PocoXMLmdd.lib;PocoFoundationmdd.lib;iphlpapi.lib</AdditionalDependencies>
-			<AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);..\..\..\addons\ofxPoco\libs\poco\lib\vs\x64\Debug;..\..\..\addons\ofxPoco</AdditionalLibraryDirectories>
-		</Link>
-		<PostBuildEvent />
-	</ItemDefinitionGroup>
-	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-		<ClCompile>
-			<WholeProgramOptimization>false</WholeProgramOptimization>
-			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
-			<RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxPoco\libs\poco\include;..\..\..\addons\ofxPoco\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils</AdditionalIncludeDirectories>
-			<CompileAs>CompileAsCpp</CompileAs>
-			<ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
-			<MultiProcessorCompilation>true</MultiProcessorCompilation>
-			<AdditionalOptions>-DPOCO_STATIC</AdditionalOptions>
-		</ClCompile>
-		<Link>
-			<IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-			<GenerateDebugInformation>false</GenerateDebugInformation>
-			<SubSystem>Console</SubSystem>
-			<OptimizeReferences>true</OptimizeReferences>
-			<EnableCOMDATFolding>true</EnableCOMDATFolding>
-			<RandomizedBaseAddress>false</RandomizedBaseAddress>
-			<AdditionalDependencies>%(AdditionalDependencies);PocoXMLmd.lib;PocoCryptomd.lib;PocoDataSQLitemd.lib;PocoFoundationmd.lib;PocoPDFmd.lib;PocoZipmd.lib;PocoDatamd.lib;PocoNetmd.lib;PocoUtilmd.lib;PocoNetSSLmd.lib;iphlpapi.lib</AdditionalDependencies>
-			<AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);..\..\..\addons\ofxPoco\libs\poco\lib\vs\Win32\Release;..\..\..\addons\ofxPoco</AdditionalLibraryDirectories>
-		</Link>
-		<PostBuildEvent />
-	</ItemDefinitionGroup>
-	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-		<ClCompile>
-			<WholeProgramOptimization>false</WholeProgramOptimization>
-			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
-			<RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-			<WarningLevel>Level3</WarningLevel>
-			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxPoco\libs\poco\include;..\..\..\addons\ofxPoco\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils</AdditionalIncludeDirectories>
-			<CompileAs>CompileAsCpp</CompileAs>
-			<ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
-			<AdditionalOptions>-DPOCO_STATIC</AdditionalOptions>
-		</ClCompile>
-		<Link>
-			<IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-			<GenerateDebugInformation>false</GenerateDebugInformation>
-			<SubSystem>Console</SubSystem>
-			<OptimizeReferences>true</OptimizeReferences>
-			<EnableCOMDATFolding>true</EnableCOMDATFolding>
-			<RandomizedBaseAddress>false</RandomizedBaseAddress>
-			<AdditionalDependencies>%(AdditionalDependencies);PocoXMLmd.lib;PocoCryptomd.lib;PocoDataSQLitemd.lib;PocoFoundationmd.lib;PocoPDFmd.lib;PocoZipmd.lib;PocoDatamd.lib;PocoNetmd.lib;PocoUtilmd.lib;PocoNetSSLmd.lib;iphlpapi.lib</AdditionalDependencies>
-			<AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);..\..\..\addons\ofxPoco\libs\poco\lib\vs\x64\Release;..\..\..\addons\ofxPoco</AdditionalLibraryDirectories>
-		</Link>
-		<PostBuildEvent />
-	</ItemDefinitionGroup>
-	<ItemGroup>
-		<ClCompile Include="src\main.cpp" />
-		<ClCompile Include="..\..\..\addons\ofxPoco\src\ofxXmlPoco.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\utils\LibraryBinary.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\addons\ofAddon.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\xcodeProject.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\visualStudioProject.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\baseProject.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\androidStudioProject.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBWinProject.cpp" />
-		<ClCompile Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.cpp" />
-	</ItemGroup>
-	<ItemGroup>
-		<ClInclude Include="src\optionparser.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\src\ofxXmlPoco.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\camellia.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\cmac.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ts.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\obj_mac.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\lhash.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ssl.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ripemd.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\krb5_asn.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\dh.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\pem2.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\des.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ossl_typ.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\tls1.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\pkcs12.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\sha.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\hmac.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\blowfish.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\e_os2.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\aes.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\rand.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\srtp.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\des_old.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\bn.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\md5.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ssl23.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ecdsa.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ec.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\x509_vfy.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\whrlpool.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\dso.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ocsp.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ssl2.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\rc2.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\seed.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\pem.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\conf.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\evp.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\crypto.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ecdh.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\modes.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\srp.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\dtls1.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ebcdic.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ui_compat.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\conf_api.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\opensslconf.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\buffer.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\symhacks.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\bio.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\err.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\mdc2.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\idea.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\pqueue.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\x509v3.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\stack.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\safestack.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\opensslv.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\rc4.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\rsa.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\asn1t.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\md4.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\asn1_mac.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\pkcs7.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\asn1.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\kssl.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\x509.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\opensslconf_osx.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\engine.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\comp.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\cms.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\objects.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ssl3.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\ui.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\dsa.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\txt_db.h" />
-		<ClInclude Include="..\..\..\addons\ofxPoco\libs\openssl\include\openssl\cast.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\utils\LibraryBinary.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\utils\Utils.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\addons\ofAddon.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBWinProject.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\androidStudioProject.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\xcodeProject.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\baseProject.h" />
-		<ClInclude Include="..\ofxProjectGenerator\src\projects\visualStudioProject.h" />
-	</ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">
-			<Project>{5837595d-aca9-485c-8e76-729040ce4b0b}</Project>
-		</ProjectReference>
-	</ItemGroup>
-	<ItemGroup>
-		<ResourceCompile Include="icon.rc">
-			<AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/D_DEBUG %(AdditionalOptions)</AdditionalOptions>
-			<AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/D_DEBUG %(AdditionalOptions)</AdditionalOptions>
-			<AdditionalIncludeDirectories>$(OF_ROOT)\libs\openFrameworksCompiled\project\vs</AdditionalIncludeDirectories>
-		</ResourceCompile>
-	</ItemGroup>
-	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-	<ProjectExtensions>
-		<VisualStudio>
-			<UserProperties RESOURCE_FILE="icon.rc" />
-		</VisualStudio>
-	</ProjectExtensions>
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{7FD42DF7-442E-479A-BA76-D0022F99702A}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>commandLine</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksRelease.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksRelease.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksDebug.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\libs\openFrameworksCompiled\project\vs\openFrameworksDebug.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>bin\</OutDir>
+    <IntDir>obj\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)_debug</TargetName>
+    <LinkIncremental>true</LinkIncremental>
+    <GenerateManifest>true</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>bin\</OutDir>
+    <IntDir>obj\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)_debug</TargetName>
+    <LinkIncremental>true</LinkIncremental>
+    <GenerateManifest>true</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>bin\</OutDir>
+    <IntDir>obj\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>bin\</OutDir>
+    <IntDir>obj\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxPoco\libs\poco\include;..\..\..\addons\ofxPoco\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils</AdditionalIncludeDirectories>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <AdditionalOptions>-DPOCO_STATIC</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <AdditionalDependencies>%(AdditionalDependencies);PocoCryptomdd.lib;PocoDatamdd.lib;PocoDataSQLitemdd.lib;PocoFoundationmdd.lib;PocoNetmdd.lib;PocoNetSSLmdd.lib;PocoPDFmdd.lib;PocoUtilmdd.lib;PocoXMLmdd.lib;PocoZipmdd.lib;iphlpapi.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);..\..\..\addons\ofxPoco\libs\poco\lib\vs\Win32\Debug;..\..\..\addons\ofxPoco</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxPoco\libs\poco\include;..\..\..\addons\ofxPoco\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils</AdditionalIncludeDirectories>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>-DPOCO_STATIC</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <AdditionalDependencies>%(AdditionalDependencies);PocoCryptomdd.lib;PocoDatamdd.lib;PocoDataSQLitemdd.lib;PocoFoundationmdd.lib;PocoNetmdd.lib;PocoNetSSLmdd.lib;PocoPDFmdd.lib;PocoUtilmdd.lib;PocoXMLmdd.lib;PocoZipmdd.lib;iphlpapi.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);..\..\..\addons\ofxPoco\libs\poco\lib\vs\x64\Debug;..\..\..\addons\ofxPoco</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxPoco\libs\poco\include;..\..\..\addons\ofxPoco\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils</AdditionalIncludeDirectories>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>-DPOCO_STATIC</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <AdditionalDependencies>%(AdditionalDependencies);PocoCryptomd.lib;PocoDatamd.lib;PocoDataSQLitemd.lib;PocoFoundationmd.lib;PocoNetmd.lib;PocoNetSSLmd.lib;PocoPDFmd.lib;PocoUtilmd.lib;PocoXMLmd.lib;PocoZipmd.lib;iphlpapi.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);..\..\..\addons\ofxPoco\libs\poco\lib\vs\Win32\Release;..\..\..\addons\ofxPoco</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxPoco\libs\poco\include;..\..\..\addons\ofxPoco\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils</AdditionalIncludeDirectories>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <AdditionalOptions>-DPOCO_STATIC</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <AdditionalDependencies>%(AdditionalDependencies);PocoCryptomd.lib;PocoDatamd.lib;PocoDataSQLitemd.lib;PocoFoundationmd.lib;PocoNetmd.lib;PocoNetSSLmd.lib;PocoPDFmd.lib;PocoUtilmd.lib;PocoXMLmd.lib;PocoZipmd.lib;iphlpapi.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);..\..\..\addons\ofxPoco\libs\poco\lib\vs\x64\Release;..\..\..\addons\ofxPoco</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent />
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxPoco\src\ofxXmlPoco.cpp" />
+    <ClCompile Include="..\ofxProjectGenerator\src\addons\ofAddon.cpp" />
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\androidStudioProject.cpp" />
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\baseProject.cpp" />
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.cpp" />
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\CBWinProject.cpp" />
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.cpp" />
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\visualStudioProject.cpp" />
+    <ClCompile Include="..\ofxProjectGenerator\src\projects\xcodeProject.cpp" />
+    <ClCompile Include="..\ofxProjectGenerator\src\utils\LibraryBinary.cpp" />
+    <ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\optionparser.h" />
+    <ClInclude Include="..\..\..\addons\ofxPoco\src\ofxXmlPoco.h" />
+    <ClInclude Include="..\ofxProjectGenerator\src\addons\ofAddon.h" />
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\androidStudioProject.h" />
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\baseProject.h" />
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.h" />
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\CBWinProject.h" />
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.h" />
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\visualStudioProject.h" />
+    <ClInclude Include="..\ofxProjectGenerator\src\projects\xcodeProject.h" />
+    <ClInclude Include="..\ofxProjectGenerator\src\utils\LibraryBinary.h" />
+    <ClInclude Include="..\ofxProjectGenerator\src\utils\Utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">
+      <Project>{5837595d-aca9-485c-8e76-729040ce4b0b}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="icon.rc">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/D_DEBUG %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/D_DEBUG %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(OF_ROOT)\libs\openFrameworksCompiled\project\vs</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="icon.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
