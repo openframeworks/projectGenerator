@@ -9,8 +9,8 @@ pg_root=${PWD}/openFrameworks/apps/projectGenerator
 git clone --depth=1 https://github.com/openframeworks/openFrameworks
 mv projectGenerator openFrameworks/apps/
 
-cd ${of_root}
-scripts/osx/download_libs.sh
+# cd ${of_root}
+# scripts/osx/download_libs.sh
 
 # Compile commandline tool
 # cd ${pg_root}
