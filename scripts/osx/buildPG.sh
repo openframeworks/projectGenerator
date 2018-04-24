@@ -33,7 +33,7 @@ mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
 cd ${pg_root}
 # cp commandLine/bin/projectGenerator projectGenerator-osx/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
 wget http://ci.openframeworks.cc/projectGenerator/projectGenerator_osx -O projectGenerator-osx/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
-sed -i "s/osx/osx/g" projectGenerator-osx/projectGenerator.app/Contents/Resources/app/settings.json
+sed -i -e "s/osx/osx/g" projectGenerator-osx/projectGenerator.app/Contents/Resources/app/settings.json
 
 # Sign app
 # echo $CERT_OSX | base64 --decode > developerID_applicaion.cer
