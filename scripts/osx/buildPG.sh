@@ -58,15 +58,15 @@ sed -i -e "s/osx/osx/g" projectGenerator-osx/projectGenerator.app/Contents/Resou
 
 # Sign app
 echo "Creating signing certificates"
-openssl aes-256-cbc -K $encrypted_489c559678c5_key -iv $encrypted_489c559678c5_iv -in scripts/developer_ID.p12.enc -out developer_ID.p12 -d
+openssl aes-256-cbc -K $encrypted_b485a78f2982_key -iv $encrypted_b485a78f2982_iv -in scripts/developer_ID.p12.enc -out developer_ID.p12 -d
 security create-keychain -p mysecretpassword build.keychain
 security default-keychain -s build.keychain
 security unlock-keychain -p mysecretpassword build.keychain
 security import developer_ID.p12 -k build.keychain -T /usr/bin/codesign
 security find-identity -v
-sudo npm install -g electron-osx-sign
 
 echo "Signing electron .app"
+sudo npm install -g electron-osx-sign
 electron-osx-sign projectGenerator-osx/projectGenerator.app
 appsignPID=$!
 echoDots $appsignPID
