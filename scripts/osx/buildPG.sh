@@ -57,8 +57,9 @@ wget http://ci.openframeworks.cc/projectGenerator/projectGenerator_osx -O projec
 sed -i -e "s/osx/osx/g" projectGenerator-osx/projectGenerator.app/Contents/Resources/app/settings.json
 
 # Sign app
-echo "Creating signing certificates"
-openssl aes-256-cbc -K $encrypted_b485a78f2982_key -iv $encrypted_b485a78f2982_iv -in scripts/developer_ID.p12.enc -out developer_ID.p12 -d
+# echo "Decoding signing certificates"
+cd ${pg_root}/scripts
+openssl aes-256-cbc -K $encrypted_b485a78f2982_key -iv $encrypted_b485a78f2982_iv -in developer_ID.p12.enc -out developer_ID.p12 -d
 security create-keychain -p mysecretpassword build.keychain
 security default-keychain -s build.keychain
 security unlock-keychain -p mysecretpassword build.keychain
@@ -66,17 +67,18 @@ security import developer_ID.p12 -k build.keychain -T /usr/bin/codesign
 security find-identity -v
 
 echo "Signing electron .app"
+cd ${pg_root}
 sudo npm install -g electron-osx-sign
 electron-osx-sign projectGenerator-osx/projectGenerator.app
-appsignPID=$!
-echoDots $appsignPID
-wait $appsignPID
+# appsignPID=$!
+# echoDots $appsignPID
+# wait $appsignPID
 
 echo "Signing command line binary"
 codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" projectGenerator-osx/projectGenerator.app/Contents/Resources/app/app/projectGenerator
-clsignPID=$!
-echoDots $clsignPID
-wait $clsignPID
+# clsignPID=$!
+# echoDots $clsignPID
+# wait $clsignPID
 
 echo "Compressing PG app"
 zip projectGenerator-osx.zip projectGenerator-osx
