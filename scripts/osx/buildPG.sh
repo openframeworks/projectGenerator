@@ -70,7 +70,7 @@ security set-keychain-settings -t 3600 -u build.keychain
 echo "Importing signing certificates"
 sudo security import developer_ID.p12 -k build.keychain -P $CERT_PWD -T /usr/bin/codesign
 # security set-key-partition-list -S apple-tool:,apple: -s -k mysecretpassword build.keychain
-security find-identity -v
+# security find-identity -v
 
 echo "Signing electron .app"
 cd ${pg_root}
@@ -80,14 +80,14 @@ electron-osx-sign projectGenerator-osx/projectGenerator.app
 # echoDots $appsignPID
 # wait $appsignPID
 
-echo "Signing command line binary"
-codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" projectGenerator-osx/projectGenerator.app/Contents/Resources/app/app/projectGenerator
+# echo "Signing command line binary"
+# codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" projectGenerator-osx/projectGenerator.app/Contents/Resources/app/app/projectGenerator
 # clsignPID=$!
 # echoDots $clsignPID
 # wait $clsignPID
 
 echo "Compressing PG app"
-zip projectGenerator-osx.zip projectGenerator-osx
+zip -r projectGenerator-osx.zip projectGenerator-osx
 
 # Upload to OF CI server
 echo "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}";
