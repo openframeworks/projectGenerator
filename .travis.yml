@@ -19,6 +19,7 @@ matrix:
     env: NAME="linux" SCRIPT_PATH="scripts/$NAME" SCRIPT="$SCRIPT_PATH/buildPG.sh"
 
 script:
+  - if [ "$NAME" = "osx" ]; then brew install ccache; fi
   - ccache -z
   - ccache -s
   - "$SCRIPT"
