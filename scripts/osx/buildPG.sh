@@ -42,7 +42,7 @@ ls
 security create-keychain -p mysecretpassword build.keychain
 security default-keychain -s build.keychain
 security unlock-keychain -p mysecretpassword build.keychain
-security import developerID_applicaion.cer -k build.keychain -T /usr/bin/codesign
+security import developerID_application.cer -k build.keychain -T /usr/bin/codesign
 security find-identity -v
 sudo npm install -g electron-osx-sign
 electron-osx-sign projectGenerator-osx/projectGenerator.app

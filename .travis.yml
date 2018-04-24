@@ -9,12 +9,12 @@ matrix:
       compiler: clang
       env: NAME="osx" SCRIPT_PATH="scripts/$NAME" SCRIPT="$SCRIPT_PATH/buildPG.sh"
 
-    - os: linux
-      language: c++
-      compiler: gcc
-      sudo: true
-      dist: trusty
-      env: NAME="linux" SCRIPT_PATH="scripts/$NAME" SCRIPT="$SCRIPT_PATH/buildPG.sh"
+    # - os: linux
+    #   language: c++
+    #   compiler: gcc
+    #   sudo: true
+    #   dist: trusty
+    #   env: NAME="linux" SCRIPT_PATH="scripts/$NAME" SCRIPT="$SCRIPT_PATH/buildPG.sh"
 
 script: "$SCRIPT"
 git:
