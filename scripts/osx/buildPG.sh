@@ -13,14 +13,15 @@ cd ${of_root}
 scripts/osx/download_libs.sh
 
 # Compile commandline tool
-cd ${pg_root}
-echo "Building openFrameworks PG - OSX"
-xcodebuild -configuration Release -target commandLine -project commandLine/commandLine.xcodeproj
-ret=$?
-if [ $ret -ne 0 ]; then
-      echo "Failed building Project Generator"
-      exit 1
-fi
+# cd ${pg_root}
+# echo "Building openFrameworks PG - OSX"
+# xcodebuild -configuration Release -target commandLine -project commandLine/commandLine.xcodeproj
+# ret=$?
+# if [ $ret -ne 0 ]; then
+#       echo "Failed building Project Generator"
+#       exit 1
+# fi
+
 
 # Generate electron app
 cd ${pg_root}/frontend
@@ -30,11 +31,13 @@ mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
 
 # Copy commandLine into electron .app
 cd ${pg_root}
-cp commandLine/bin/projectGenerator projectGenerator-osx/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
+# cp commandLine/bin/projectGenerator projectGenerator-osx/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
+wget http://ci.openframeworks.cc/projectGenerator/projectGenerator_osx -O projectGenerator-osx/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
 sed -i "s/osx/osx/g" projectGenerator-osx/projectGenerator.app/Contents/Resources/app/settings.json
 
 # Sign app
-echo $CERT_OSX | base64 --decode > developerID_applicaion.cer
+# echo $CERT_OSX | base64 --decode > developerID_applicaion.cer
+openssl aes-256-cbc -K $encrypted_489c559678c5_key -iv $encrypted_489c559678c5_iv -in developerID_application.cer.enc -out developerID_application.cer -d
 security create-keychain -p mysecretpassword build.keychain
 security default-keychain -s build.keychain
 security unlock-keychain -p mysecretpassword build.keychain
