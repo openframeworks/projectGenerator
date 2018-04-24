@@ -57,12 +57,16 @@ wget http://ci.openframeworks.cc/projectGenerator/projectGenerator_osx -O projec
 sed -i -e "s/osx/osx/g" projectGenerator-osx/projectGenerator.app/Contents/Resources/app/settings.json
 
 # Sign app
-# echo "Decoding signing certificates"
+echo "Decoding signing certificates"
 cd ${pg_root}/scripts
 openssl aes-256-cbc -K $encrypted_b485a78f2982_key -iv $encrypted_b485a78f2982_iv -in developer_ID.p12.enc -out developer_ID.p12 -d
+echo "Creating keychain"
 security create-keychain -p mysecretpassword build.keychain
+echo "Setting keychain as default"
 security default-keychain -s build.keychain
+echo "Unlocking keychain"
 security unlock-keychain -p mysecretpassword build.keychain
+echo "Importing signing certificates"
 security import developer_ID.p12 -k build.keychain -T /usr/bin/codesign
 security find-identity -v
 
