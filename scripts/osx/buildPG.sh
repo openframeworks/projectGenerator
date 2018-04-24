@@ -1,5 +1,26 @@
 #!/bin/bash
 set -e
+
+
+
+echoDots(){
+    sleep 0.1 # Waiting for a brief period first, allowing jobs returning immediatly to finish
+    while isRunning $1; do
+        for i in $(seq 1 10); do
+            echo -ne .
+            if ! isRunning $1; then
+                printf "\r"
+                return;
+            fi
+            sleep 1
+        done
+        printf "\r                    "
+        printf "\r"
+    done
+}
+
+
+
 cd ..
 of_root=${PWD}/openFrameworks
 pg_root=${PWD}/openFrameworks/apps/projectGenerator
@@ -36,21 +57,34 @@ wget http://ci.openframeworks.cc/projectGenerator/projectGenerator_osx -O projec
 sed -i -e "s/osx/osx/g" projectGenerator-osx/projectGenerator.app/Contents/Resources/app/settings.json
 
 # Sign app
-# echo $CERT_OSX | base64 --decode > developerID_applicaion.cer
+echo "Creating signing certificates"
 openssl aes-256-cbc -K $encrypted_489c559678c5_key -iv $encrypted_489c559678c5_iv -in scripts/developer_ID.p12.enc -out developer_ID.p12 -d
-ls
 security create-keychain -p mysecretpassword build.keychain
 security default-keychain -s build.keychain
 security unlock-keychain -p mysecretpassword build.keychain
 security import developer_ID.p12 -k build.keychain -T /usr/bin/codesign
 security find-identity -v
 sudo npm install -g electron-osx-sign
+
+echo "Signing electron .app"
 electron-osx-sign projectGenerator-osx/projectGenerator.app
+appsignPID=$!
+echoDots $appsignPID
+wait $appsignPID
+
+echo "Signing command line binary"
 codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" projectGenerator-osx/projectGenerator.app/Contents/Resources/app/app/projectGenerator
+clsignPID=$!
+echoDots $clsignPID
+wait $clsignPID
+
+echo "Compressing PG app"
+zip projectGenerator-osx.zip projectGenerator-osx
 
 # Upload to OF CI server
 echo "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}";
 if [ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" = "openframeworks/projectGenerator/master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
+    echo "Uploading app to CI servers"
     openssl aes-256-cbc -K $encrypted_cd38768cbb9d_key -iv $encrypted_cd38768cbb9d_iv -in scripts/id_rsa.enc -out scripts/id_rsa -d
     cp scripts/ssh_config ~/.ssh/config
     chmod 600 scripts/id_rsa
