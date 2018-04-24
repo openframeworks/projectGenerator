@@ -68,7 +68,7 @@ echo "Unlocking keychain"
 security unlock-keychain -p mysecretpassword build.keychain
 security set-keychain-settings -t 3600 -u build.keychain
 echo "Importing signing certificates"
-sudo security import developer_ID.p12 -k build.keychain -T /usr/bin/codesign
+sudo security import developer_ID.p12 -k build.keychain -P $CERT_PWD -T /usr/bin/codesign
 security set-key-partition-list -S apple-tool:,apple: -s -k mysecretpassword build.keychain
 security find-identity -v
 
