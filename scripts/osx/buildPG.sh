@@ -37,7 +37,7 @@ sed -i -e "s/osx/osx/g" projectGenerator-osx/projectGenerator.app/Contents/Resou
 
 # Sign app
 # echo $CERT_OSX | base64 --decode > developerID_applicaion.cer
-openssl aes-256-cbc -K $encrypted_489c559678c5_key -iv $encrypted_489c559678c5_iv -in developerID_application.cer.enc -out developerID_application.cer -d
+openssl aes-256-cbc -K $encrypted_489c559678c5_key -iv $encrypted_489c559678c5_iv -in scripts/developerID_application.cer.enc -out developerID_application.cer -d
 security create-keychain -p mysecretpassword build.keychain
 security default-keychain -s build.keychain
 security unlock-keychain -p mysecretpassword build.keychain
