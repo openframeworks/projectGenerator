@@ -54,33 +54,33 @@ cp commandLine/bin/projectGenerator projectGenerator-osx/projectGenerator.app/Co
 # wget http://ci.openframeworks.cc/projectGenerator/projectGenerator_osx -O projectGenerator-osx/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
 sed -i -e "s/osx/osx/g" projectGenerator-osx/projectGenerator.app/Contents/Resources/app/settings.json
 
-# Sign app
-echo "Decoding signing certificates"
-cd ${pg_root}/scripts
-openssl aes-256-cbc -K $encrypted_b485a78f2982_key -iv $encrypted_b485a78f2982_iv -in developer_ID.p12.enc -out developer_ID.p12 -d
-echo "Creating keychain"
-security create-keychain -p mysecretpassword build.keychain
-echo "Setting keychain as default"
-security default-keychain -s build.keychain
-echo "Unlocking keychain"
-security unlock-keychain -p mysecretpassword build.keychain
-security set-keychain-settings -t 3600 -u build.keychain
-echo "Importing signing certificates"
-sudo security import developer_ID.p12 -k build.keychain -P $CERT_PWD -T /usr/bin/codesign
-# security set-key-partition-list -S apple-tool:,apple: -s -k mysecretpassword build.keychain
-# security find-identity -v
-
-echo "Signing electron .app"
-cd ${pg_root}
-sudo npm install -g electron-osx-sign
-electron-osx-sign projectGenerator-osx/projectGenerator.app
-
-echo "Compressing PG app"
-zip -r projectGenerator-osx.zip projectGenerator-osx
-
-# Upload to OF CI server
 echo "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}";
 if [ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" = "openframeworks/projectGenerator/master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
+# Sign app
+    echo "Decoding signing certificates"
+    cd ${pg_root}/scripts
+    openssl aes-256-cbc -K $encrypted_b485a78f2982_key -iv $encrypted_b485a78f2982_iv -in developer_ID.p12.enc -out developer_ID.p12 -d
+    echo "Creating keychain"
+    security create-keychain -p mysecretpassword build.keychain
+    echo "Setting keychain as default"
+    security default-keychain -s build.keychain
+    echo "Unlocking keychain"
+    security unlock-keychain -p mysecretpassword build.keychain
+    security set-keychain-settings -t 3600 -u build.keychain
+    echo "Importing signing certificates"
+    sudo security import developer_ID.p12 -k build.keychain -P $CERT_PWD -T /usr/bin/codesign
+    # security set-key-partition-list -S apple-tool:,apple: -s -k mysecretpassword build.keychain
+    # security find-identity -v
+
+    echo "Signing electron .app"
+    cd ${pg_root}
+    sudo npm install -g electron-osx-sign
+    electron-osx-sign projectGenerator-osx/projectGenerator.app
+
+    echo "Compressing PG app"
+    zip -r -q projectGenerator-osx.zip projectGenerator-osx
+
+# Upload to OF CI server
     echo "Uploading app to CI servers"
     openssl aes-256-cbc -K $encrypted_cd38768cbb9d_key -iv $encrypted_cd38768cbb9d_iv -in scripts/id_rsa.enc -out scripts/id_rsa -d
     cp scripts/ssh_config ~/.ssh/config
