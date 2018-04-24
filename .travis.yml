@@ -1,7 +1,7 @@
 env:
   global:
   - secure: LBTN8d1hS7ocrqDwxLQqU0tfK3FMCXBI8q1yASEjtkp/v5HEyFkbj22H4jXZ20SkpCTlIG2L6i/fU3d6KzJUzTFuxkQEWsnjkj4jAhxGEWRsT1RV6VcUPQDGLHapXwTy+ZYgMNxE7aAdQaBskPHdVzAhjrzlTwVuKp6KjFn+kMU=
-  - secure: oXHfetR+eH/Z/eqSRolCDyTqT8KLpdP7xnseGOJaok6V+GfIOrJ7E73hqVqS3aJoDlafvt4vyv9+joCgPo1I5WgJ602CNXQnOhQSnOOovaszgFr0htDLxqJUUg0+KP1O956J4c0XcmYd1YtvbOhmRIShGc/hUbp600QrKmVyif0=
+  - secure: UCmZzsBmus1uj1G5ZxwhBA5J0/5qPXT6qmd3A2M/8HlYszNYdF+ekSE0WIBgzkF6J4vb95VpezSVyJjqu7ZsV1BhJqUU6qvxG4b/n06NPereN55vULqpVSrim4lwNyX3KwZQAkCVjmwqqSvZNlWyo47cBgdbv8S3woZTVgq7GmQ=
 matrix:
   include:
   - os: osx
