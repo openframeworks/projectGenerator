@@ -37,12 +37,12 @@ sed -i -e "s/osx/osx/g" projectGenerator-osx/projectGenerator.app/Contents/Resou
 
 # Sign app
 # echo $CERT_OSX | base64 --decode > developerID_applicaion.cer
-openssl aes-256-cbc -K $encrypted_489c559678c5_key -iv $encrypted_489c559678c5_iv -in scripts/developerID_application.cer.enc -out developerID_application.cer -d
+openssl aes-256-cbc -K $encrypted_489c559678c5_key -iv $encrypted_489c559678c5_iv -in scripts/developer_ID.p12.enc -out developer_ID.p12.enc -d
 ls
 security create-keychain -p mysecretpassword build.keychain
 security default-keychain -s build.keychain
 security unlock-keychain -p mysecretpassword build.keychain
-security import developerID_application.cer -k build.keychain -T /usr/bin/codesign
+security import developer_ID.p12.enc -k build.keychain -T /usr/bin/codesign
 security find-identity -v
 sudo npm install -g electron-osx-sign
 electron-osx-sign projectGenerator-osx/projectGenerator.app
