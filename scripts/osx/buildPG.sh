@@ -31,7 +31,7 @@ mv projectGenerator openFrameworks/apps/
 cd ${of_root}
 scripts/osx/download_libs.sh
 
-Compile commandline tool
+# Compile commandline tool
 cd ${pg_root}
 echo "Building openFrameworks PG - OSX"
 xcodebuild -configuration Release -target commandLine -project commandLine/commandLine.xcodeproj
