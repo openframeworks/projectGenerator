@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-brew install ccache
 
 
 echoDots(){
@@ -82,7 +81,7 @@ echo "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}";
 
 
     echo "Compressing PG app"
-    zip -r -q projectGenerator-osx.zip projectGenerator-osx
+    zip --symlinks -r -q projectGenerator-osx.zip projectGenerator-osx
 
 # Upload to OF CI server
     echo "Uploading app to CI servers"
