@@ -91,13 +91,13 @@ zip projectGenerator-osx.zip projectGenerator-osx
 
 # Upload to OF CI server
 echo "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}";
-if [ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" = "openframeworks/projectGenerator/master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
+# if [ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" = "openframeworks/projectGenerator/master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
     echo "Uploading app to CI servers"
     openssl aes-256-cbc -K $encrypted_cd38768cbb9d_key -iv $encrypted_cd38768cbb9d_iv -in scripts/id_rsa.enc -out scripts/id_rsa -d
     cp scripts/ssh_config ~/.ssh/config
     chmod 600 scripts/id_rsa
-    scp -i scripts/id_rsa commandLine/bin/projectGenerator tests@198.61.170.130:projectGenerator_builds/projectGenerator_osx_new
-    ssh -i scripts/id_rsa tests@198.61.170.130 "mv projectGenerator_builds/projectGenerator_osx_new projectGenerator_builds/projectGenerator_osx"
-fi
+    scp -i scripts/id_rsa projectGenerator-osx.zip tests@198.61.170.130:projectGenerator_builds/projectGenerator-osx_new.zip
+    ssh -i scripts/id_rsa tests@198.61.170.130 "mv projectGenerator_builds/projectGenerator-osx_new.zip projectGenerator_builds/projectGenerator-osx.zip"
+# fi
 rm -rf scripts/id_rsa
 
