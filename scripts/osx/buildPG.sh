@@ -67,7 +67,7 @@ security default-keychain -s build.keychain
 echo "Unlocking keychain"
 security unlock-keychain -p mysecretpassword build.keychain
 echo "Importing signing certificates"
-security import developer_ID.p12 -k build.keychain -T /usr/bin/codesign
+sudo security import developer_ID.p12 -k build.keychain -T /usr/bin/codesign
 security find-identity -v
 
 echo "Signing electron .app"
