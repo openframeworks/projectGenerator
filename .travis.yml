@@ -1,21 +1,14 @@
 env:
   global:
-    secure: LBTN8d1hS7ocrqDwxLQqU0tfK3FMCXBI8q1yASEjtkp/v5HEyFkbj22H4jXZ20SkpCTlIG2L6i/fU3d6KzJUzTFuxkQEWsnjkj4jAhxGEWRsT1RV6VcUPQDGLHapXwTy+ZYgMNxE7aAdQaBskPHdVzAhjrzlTwVuKp6KjFn+kMU=
+  - secure: LBTN8d1hS7ocrqDwxLQqU0tfK3FMCXBI8q1yASEjtkp/v5HEyFkbj22H4jXZ20SkpCTlIG2L6i/fU3d6KzJUzTFuxkQEWsnjkj4jAhxGEWRsT1RV6VcUPQDGLHapXwTy+ZYgMNxE7aAdQaBskPHdVzAhjrzlTwVuKp6KjFn+kMU=
+  - secure: oXHfetR+eH/Z/eqSRolCDyTqT8KLpdP7xnseGOJaok6V+GfIOrJ7E73hqVqS3aJoDlafvt4vyv9+joCgPo1I5WgJ602CNXQnOhQSnOOovaszgFr0htDLxqJUUg0+KP1O956J4c0XcmYd1YtvbOhmRIShGc/hUbp600QrKmVyif0=
 matrix:
   include:
-    - os: osx
-      osx_image: xcode8
-      language: objective-c
-      compiler: clang
-      env: NAME="osx" SCRIPT_PATH="scripts/$NAME" SCRIPT="$SCRIPT_PATH/buildPG.sh"
-
-    # - os: linux
-    #   language: c++
-    #   compiler: gcc
-    #   sudo: true
-    #   dist: trusty
-    #   env: NAME="linux" SCRIPT_PATH="scripts/$NAME" SCRIPT="$SCRIPT_PATH/buildPG.sh"
-
+  - os: osx
+    osx_image: xcode8
+    language: objective-c
+    compiler: clang
+    env: NAME="osx" SCRIPT_PATH="scripts/$NAME" SCRIPT="$SCRIPT_PATH/buildPG.sh"
 script: "$SCRIPT"
 git:
   depth: 10
