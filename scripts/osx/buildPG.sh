@@ -76,8 +76,9 @@ echo "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}";
     echo "Signing electron .app"
     cd ${pg_root}
     sudo npm install -g electron-osx-sign
-    # electron-osx-sign projectGenerator-osx/projectGenerator.app --platform=darwin --type=distribution
-    codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" projectGenerator-osx/projectGenerator.app
+    xattr -cr projectGenerator-osx/projectGenerator.app
+    electron-osx-sign projectGenerator-osx/projectGenerator.app --platform=darwin --type=distribution
+    # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" projectGenerator-osx/projectGenerator.app
 
 
     echo "Compressing PG app"
