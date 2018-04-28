@@ -637,8 +637,8 @@ void xcodeProject::addFramework(std::string name, std::string path, std::string 
     }
     
     // then, we are going to add this to "FRAMEWORK_SEARCH_PATHS" -- we do this twice, once for debug once for release.
-    
-    pugi::xpath_node_set frameworkSearchPaths = doc.select_nodes("//string[contains(.,'FRAMEWORK_SEARCH_PATHS')]/..");
+	
+    pugi::xpath_node_set frameworkSearchPaths = doc.select_nodes("//key[contains(.,'FRAMEWORK_SEARCH_PATHS')]/following-sibling::node()[1]");
     
     if (frameworkSearchPaths.size() > 0){
         for (pugi::xpath_node_set::const_iterator it = frameworkSearchPaths.begin(); it != frameworkSearchPaths.end(); ++it){
