@@ -11,7 +11,7 @@ var platforms;
 
 // var platforms = {
 //     "osx": "OS X (Xcode)",
-//     "vs": "Windows (Visual Studio 2015)",
+//     "vs": "Windows (Visual Studio)",
 //     "ios": "iOS (Xcode)",
 //     "linux": "Linux 32-bit (Code::Blocks)",
 //     "linux64": "Linux 64-bit (Code::Blocks)",
@@ -756,7 +756,7 @@ function closeDragInputModal(e){
 
     $("#fileDropModal").modal('hide');
     $("#dropZone").removeClass("accept deny");
-    
+
     return false;
 }
 

@@ -90,10 +90,9 @@ var addonsToSkip = [
 
 var platforms = {
     "osx": "OS X (Xcode)",
-    "vs": "Windows (Visual Studio 2015)",
+    "vs": "Windows (Visual Studio 2017)",
     "ios": "iOS (Xcode)",
     "android": "Android (Android Studio)",
-    "linux": "Linux 32-bit (qtCreator)",
     "linux64": "Linux 64-bit (qtCreator)",
     "linuxarmv6l": "Linux ARMv6 (Makefiles)",
     "linuxarmv7l": "Linux ARMv7 (Makefiles)"
@@ -808,11 +807,11 @@ ipc.on('launchProjectinIDE', function(event, arg) {
 
     // // launch xcode
     if( arg.platform == 'osx' ){
-        if(hostplatform == 'osx'){ 
+        if(hostplatform == 'osx'){
             var osxPath = pathTemp.join(fullPath, arg['projectName'] + '.xcodeproj');
             console.log( osxPath );
             osxPath = "\"" + osxPath + "\"";
-                    
+
             exec('open ' + osxPath, function callback(error, stdout, stderr){
                 return;
             });
