@@ -429,10 +429,10 @@ int main(int argc, char* argv[]){
     
     // ------------------------------------------------------ post parse
     
-    startTime = ofGetElapsedTimef();
     nProjectsUpdated = 0;
     nProjectsCreated = 0;
     of::priv::initutils();
+    startTime = ofGetElapsedTimef();
     consoleSpace();
 
     // try to get the OF_PATH as an environt variable
