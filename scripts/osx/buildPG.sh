@@ -20,41 +20,6 @@ echoDots(){
 }
 
 
-
-cd ..
-of_root=${PWD}/openFrameworks
-pg_root=${PWD}/openFrameworks/apps/projectGenerator
-
-git clone --depth=1 https://github.com/openframeworks/openFrameworks
-mv projectGenerator openFrameworks/apps/
-
-cd ${of_root}
-scripts/osx/download_libs.sh
-
-# Compile commandline tool
-cd ${pg_root}
-echo "Building openFrameworks PG - OSX"
-xcodebuild -configuration Release -target commandLine -project commandLine/commandLine.xcodeproj
-ret=$?
-if [ $ret -ne 0 ]; then
-      echo "Failed building Project Generator"
-      exit 1
-fi
-
-
-# Generate electron app
-cd ${pg_root}/frontend
-npm install > /dev/null
-npm run build:osx > /dev/null
-cp -r dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
-sign_and_upload osx
-
-cp -r dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-ios
-sign_and_upload ios
-
-cp -r dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-android
-sign_and_upload android
-
 sign_and_upload(){
     PLATFORM=$1
     # Copy commandLine into electron .app
@@ -100,6 +65,43 @@ sign_and_upload(){
         ssh -i scripts/id_rsa tests@198.61.170.130 "mv projectGenerator_builds/projectGenerator-$PLATFORM_new.zip projectGenerator_builds/projectGenerator-$PLATFORM.zip"
     fi
 }
+
+
+
+
+cd ..
+of_root=${PWD}/openFrameworks
+pg_root=${PWD}/openFrameworks/apps/projectGenerator
+
+git clone --depth=1 https://github.com/openframeworks/openFrameworks
+mv projectGenerator openFrameworks/apps/
+
+cd ${of_root}
+scripts/osx/download_libs.sh
+
+# Compile commandline tool
+cd ${pg_root}
+echo "Building openFrameworks PG - OSX"
+xcodebuild -configuration Release -target commandLine -project commandLine/commandLine.xcodeproj
+ret=$?
+if [ $ret -ne 0 ]; then
+      echo "Failed building Project Generator"
+      exit 1
+fi
+
+# Generate electron app
+cd ${pg_root}/frontend
+npm install > /dev/null
+npm run build:osx > /dev/null
+cp -r dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
+sign_and_upload osx
+
+cp -r dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-ios
+sign_and_upload ios
+
+cp -r dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-android
+sign_and_upload android
+
 
 rm -rf scripts/id_rsa
 rm -rf scripts/developer_ID.p12
