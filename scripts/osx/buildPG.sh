@@ -49,8 +49,8 @@ sign_and_upload(){
         cd ${pg_root}
         sudo npm install -g electron-osx-sign
         xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
-        electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution
-        # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" projectGenerator-osx/projectGenerator.app
+        # electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution
+        codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" projectGenerator-$PLATFORM/projectGenerator.app
 
 
         echo "Compressing PG app"
