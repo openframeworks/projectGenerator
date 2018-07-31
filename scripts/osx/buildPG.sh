@@ -93,7 +93,7 @@ fi
 cd ${pg_root}/frontend
 npm install > /dev/null
 npm run build:osx > /dev/null
-ls -la "dist/projectGenerator-darwin-x64/projectGenerator.app/Contents/Frameworks/Electron Framework.framework"
+rm "dist/projectGenerator-darwin-x64/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Libraries"
 cp -r dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
 sign_and_upload osx
 
