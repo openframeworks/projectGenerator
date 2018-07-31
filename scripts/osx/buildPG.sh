@@ -48,9 +48,9 @@ sign_and_upload(){
         echo "Signing electron .app"
         cd ${pg_root}
         sudo npm install -g electron-osx-sign
-        xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
-        # electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution
-        codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" projectGenerator-$PLATFORM/projectGenerator.app
+        # xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
+        electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution
+        # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" projectGenerator-$PLATFORM/projectGenerator.app
 
 
         echo "Compressing PG app"
@@ -93,7 +93,6 @@ fi
 cd ${pg_root}/frontend
 npm install > /dev/null
 npm run build:osx > /dev/null
-rm "dist/projectGenerator-darwin-x64/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Libraries"
 cp -r dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
 sign_and_upload osx
 
