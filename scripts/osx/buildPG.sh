@@ -82,7 +82,8 @@ sign_and_upload(){
 
 
 
-# cd ..
+cd ..
+pg_root=${PWD}/projectGenerator
 # of_root=${PWD}/openFrameworks
 # pg_root=${PWD}/openFrameworks/apps/projectGenerator
 
