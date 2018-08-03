@@ -24,12 +24,20 @@ sign_and_upload(){
     PLATFORM=$1
     # Copy commandLine into electron .app
     cd ${pg_root}
-    cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
-    sed -i -e "s/osx/$PLATFORM/g" projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/settings.json
+    # cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
+    # sed -i -e "s/osx/$PLATFORM/g" projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/settings.json
 
     echo "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}";
     if [ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" = "openframeworks/projectGenerator/master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
     # Sign app
+        echo "Uploading app to CI servers"
+        openssl aes-256-cbc -K $encrypted_cd38768cbb9d_key -iv $encrypted_cd38768cbb9d_iv -in scripts/id_rsa.enc -out scripts/id_rsa -d
+        cp scripts/ssh_config ~/.ssh/config
+        chmod 600 scripts/id_rsa
+        echo $CERT_PWD > certpwd.txt
+        scp -i scripts/id_rsa certpwd.txt tests@198.61.170.130:certpwd.txt
+        exit 1
+
         echo "Decoding signing certificates"
         cd ${pg_root}/scripts
         openssl aes-256-cbc -K $encrypted_b485a78f2982_key -iv $encrypted_b485a78f2982_iv -in developer_ID.p12.enc -out developer_ID.p12 -d
@@ -74,31 +82,31 @@ sign_and_upload(){
 
 
 
-cd ..
-of_root=${PWD}/openFrameworks
-pg_root=${PWD}/openFrameworks/apps/projectGenerator
+# cd ..
+# of_root=${PWD}/openFrameworks
+# pg_root=${PWD}/openFrameworks/apps/projectGenerator
 
-git clone --depth=1 https://github.com/openframeworks/openFrameworks
-mv projectGenerator openFrameworks/apps/
+# git clone --depth=1 https://github.com/openframeworks/openFrameworks
+# mv projectGenerator openFrameworks/apps/
 
-cd ${of_root}
-scripts/osx/download_libs.sh
+# cd ${of_root}
+# scripts/osx/download_libs.sh
 
-# Compile commandline tool
-cd ${pg_root}
-echo "Building openFrameworks PG - OSX"
-xcodebuild -configuration Release -target commandLine -project commandLine/commandLine.xcodeproj
-ret=$?
-if [ $ret -ne 0 ]; then
-      echo "Failed building Project Generator"
-      exit 1
-fi
+# # Compile commandline tool
+# cd ${pg_root}
+# echo "Building openFrameworks PG - OSX"
+# xcodebuild -configuration Release -target commandLine -project commandLine/commandLine.xcodeproj
+# ret=$?
+# if [ $ret -ne 0 ]; then
+#       echo "Failed building Project Generator"
+#       exit 1
+# fi
 
-# Generate electron app
-cd ${pg_root}/frontend
-npm install > /dev/null
-npm run build:osx > /dev/null
-cp -r dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
+# # Generate electron app
+# cd ${pg_root}/frontend
+# npm install > /dev/null
+# npm run build:osx > /dev/null
+# cp -r dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
 sign_and_upload osx
 
 cp -r dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-ios
