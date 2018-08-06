@@ -51,13 +51,15 @@ sign_and_upload(){
         sudo npm install -g electron-osx-sign
         # xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
         echo codesign electron
-        rm "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Electron Framework"
-        rm -r "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Libraries"
-        rm -r "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Resources"
-        ln -s "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Electron Framework" "Versions/A/Electron Framework"
-        ln -s "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Libraries" "Versions/A/Libraries"
-        ln -s "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Resources" "Versions/A/Resources"
-        ls -la "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/"
+        cd "${pg_root}/projectGenerator-$PLATFORM/projectGenerator.app/Contents/Electron Framework.framework/"
+        rm "Electron Framework"
+        rm -r "Libraries"
+        rm -r "Resources"
+        ln -s "Electron Framework" "Versions/A/Electron Framework"
+        ln -s "Libraries" "Versions/A/Libraries"
+        ln -s "Resources" "Versions/A/Resources"
+        ls -la "Electron Framework.framework/"
+        cd ${pg_root}
         # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework"
         echo codesign pg
         codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app"
