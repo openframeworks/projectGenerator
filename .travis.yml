@@ -6,7 +6,7 @@ env:
 matrix:
   include:
   - os: osx
-    osx_image: xcode8
+    osx_image: xcode9.4
     language: objective-c
     compiler: clang
     env: NAME="osx" SCRIPT_PATH="scripts/$NAME" SCRIPT="$SCRIPT_PATH/buildPG.sh"
