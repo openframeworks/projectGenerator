@@ -24,7 +24,7 @@ sign_and_upload(){
     PLATFORM=$1
     # Copy commandLine into electron .app
     cd ${pg_root}
-    cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
+    #cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
     sed -i -e "s/osx/$PLATFORM/g" projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/settings.json
 
     echo "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}";
@@ -87,7 +87,7 @@ scripts/osx/download_libs.sh
 # Compile commandline tool
 cd ${pg_root}
 echo "Building openFrameworks PG - OSX"
-xcodebuild -configuration Release -target commandLine -project commandLine/commandLine.xcodeproj
+#xcodebuild -configuration Release -target commandLine -project commandLine/commandLine.xcodeproj
 ret=$?
 if [ $ret -ne 0 ]; then
       echo "Failed building Project Generator"
