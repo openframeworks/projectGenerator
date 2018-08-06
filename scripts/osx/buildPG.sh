@@ -50,7 +50,7 @@ sign_and_upload(){
         # xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
         # Somehow these should be symlinks but are created as files and directories when run in the travis servers
         echo symlinking
-        cd "${pg_root}/projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/"
+        cd "${pg_root}/projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Versions"
         rm "Electron Framework"
         rm -r "Libraries"
         rm -r "Resources"
