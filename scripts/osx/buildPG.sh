@@ -47,10 +47,8 @@ sign_and_upload(){
         # security find-identity -v
 
         echo "Signing electron .app"
-        xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
-
         cd ${pg_root}
-        ls -la "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/"
+        xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
         # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework"
         echo codesign pg
         # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app"
