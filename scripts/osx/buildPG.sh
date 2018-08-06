@@ -57,7 +57,9 @@ sign_and_upload(){
         ln -s "Versions/A/Electron Framework" "Electron Framework" 
         ln -s "Versions/A/Libraries" "Libraries" 
         ln -s "Versions/A/Resources" "Resources" 
+
         cd ${pg_root}
+        ls -la "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/"
         # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework"
         echo codesign pg
         codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app"
