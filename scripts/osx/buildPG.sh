@@ -47,11 +47,9 @@ sign_and_upload(){
         # security find-identity -v
 
         echo "Signing electron .app"
-        cd ${pg_root}
-        sudo npm install -g electron-osx-sign
         # xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
         echo codesign electron
-        cd "${pg_root}/projectGenerator-$PLATFORM/projectGenerator.app/Contents/Electron Framework.framework/"
+        cd "${pg_root}/projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/"
         rm "Electron Framework"
         rm -r "Libraries"
         rm -r "Resources"
@@ -101,6 +99,9 @@ if [ $ret -ne 0 ]; then
       echo "Failed building Project Generator"
       exit 1
 fi
+
+# install electron sign globally
+sudo npm install -g electron-osx-sign
 
 # Generate electron app
 cd ${pg_root}/frontend
