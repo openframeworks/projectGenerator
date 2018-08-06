@@ -109,13 +109,15 @@ sudo npm install -g electron-osx-sign
 cd ${pg_root}/frontend
 npm install > /dev/null
 npm run build:osx > /dev/null
-cp -r dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
+mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
 sign_and_upload osx
 
-cp -r dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-ios
+npm run build:osx > /dev/null
+mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-ios
 sign_and_upload ios
 
-cp -r dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-android
+npm run build:osx > /dev/null
+mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-android
 sign_and_upload android
 
 
