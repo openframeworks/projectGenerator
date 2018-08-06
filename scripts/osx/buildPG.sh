@@ -48,14 +48,15 @@ sign_and_upload(){
 
         echo "Signing electron .app"
         # xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
-        echo codesign electron
+        # Somehow these should be symlinks but are created as files and directories when run in the travis servers
+        echo symlinking
         cd "${pg_root}/projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/"
         rm "Electron Framework"
         rm -r "Libraries"
         rm -r "Resources"
-        ln -s "Electron Framework" "Versions/A/Electron Framework"
-        ln -s "Libraries" "Versions/A/Libraries"
-        ln -s "Resources" "Versions/A/Resources"
+        ln -s "Versions/A/Electron Framework" "Electron Framework" 
+        ln -s "Versions/A/Libraries" "Libraries" 
+        ln -s "Versions/A/Resources" "Resources" 
         ls -la "Electron Framework.framework/"
         cd ${pg_root}
         # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework"
