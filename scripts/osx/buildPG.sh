@@ -51,7 +51,7 @@ sign_and_upload(){
         sudo npm install -g electron-osx-sign
         xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
         echo codesign electron
-        ls projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework
+        ls "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework"
         codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework"
         # electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution
         echo codesign pg
@@ -82,7 +82,7 @@ git clone --depth=1 https://github.com/openframeworks/openFrameworks
 mv projectGenerator openFrameworks/apps/
 
 cd ${of_root}
-scripts/osx/download_libs.sh
+#scripts/osx/download_libs.sh
 
 # Compile commandline tool
 cd ${pg_root}
