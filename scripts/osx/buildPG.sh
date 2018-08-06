@@ -35,6 +35,7 @@ sign_and_upload(){
         openssl aes-256-cbc -K $encrypted_b485a78f2982_key -iv $encrypted_b485a78f2982_iv -in developer_ID.p12.enc -out developer_ID.p12 -d
         echo "Creating keychain"
         security create-keychain -p mysecretpassword build.keychain
+        security -v list-keychains -s build.keychain "$HOME/Library/Keychains/login.keychain"
         echo "Setting keychain as default"
         security default-keychain -s build.keychain
         echo "Unlocking keychain"
@@ -50,10 +51,8 @@ sign_and_upload(){
         sudo npm install -g electron-osx-sign
         xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
         echo codesign electron
-        ls -la "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework"
-        mv "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Electron Framework" "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Electron_Framework"
-        codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework"
-        # electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution
+        # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app"
+        electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution
         echo codesign pg
         codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app"
 
