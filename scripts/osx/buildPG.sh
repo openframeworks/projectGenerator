@@ -52,8 +52,8 @@ sign_and_upload(){
         # xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
         echo codesign electron
         rm "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Electron Framework"
-        rm "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Libraries"
-        rm "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Resources"
+        rm -r "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Libraries"
+        rm -r "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Resources"
         ln -s "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Electron Framework" "Versions/A/Electron Framework"
         ln -s "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Libraries" "Versions/A/Libraries"
         ln -s "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Resources" "Versions/A/Resources"
