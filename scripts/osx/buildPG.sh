@@ -52,7 +52,7 @@ sign_and_upload(){
         # xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
         echo codesign electron
         ls "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Versions/A"
-        codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework"
+        codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Versions/A"
         # electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution
         echo codesign pg
         codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app"
