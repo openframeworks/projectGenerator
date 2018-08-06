@@ -24,17 +24,15 @@ sign_and_upload(){
     PLATFORM=$1
     # Copy commandLine into electron .app
     cd ${pg_root}
-    # cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
+    cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
     sed -i -e "s/osx/$PLATFORM/g" projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/settings.json
 
     echo "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}";
     if [ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" = "openframeworks/projectGenerator/master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
-    # Sign app
+        # Sign app
         echo "Signing electron .app"
         cd ${pg_root}
         xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
-        # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework"
-        echo codesign pg
         # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app"
         electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution
 
@@ -42,8 +40,8 @@ sign_and_upload(){
         echo "Compressing PG app"
         zip --symlinks -r -q projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM
 
-    # Upload to OF CI server
-        echo "Uploading app to CI servers"
+        # Upload to OF CI server
+        echo "Uploading $PLATFORM PG to CI servers"
         openssl aes-256-cbc -K $encrypted_cd38768cbb9d_key -iv $encrypted_cd38768cbb9d_iv -in scripts/id_rsa.enc -out scripts/id_rsa -d
         cp scripts/ssh_config ~/.ssh/config
         chmod 600 scripts/id_rsa
@@ -80,12 +78,12 @@ git clone --depth=1 https://github.com/openframeworks/openFrameworks
 mv projectGenerator openFrameworks/apps/
 
 cd ${of_root}
-# scripts/osx/download_libs.sh
+scripts/osx/download_libs.sh
 
 # Compile commandline tool
 cd ${pg_root}
 echo "Building openFrameworks PG - OSX"
-# xcodebuild -configuration Release -target commandLine -project commandLine/commandLine.xcodeproj
+xcodebuild -configuration Release -target commandLine -project commandLine/commandLine.xcodeproj
 ret=$?
 if [ $ret -ne 0 ]; then
       echo "Failed building Project Generator"
