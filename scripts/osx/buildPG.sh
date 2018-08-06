@@ -24,7 +24,7 @@ sign_and_upload(){
     PLATFORM=$1
     # Copy commandLine into electron .app
     cd ${pg_root}
-    #cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
+    # cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
     sed -i -e "s/osx/$PLATFORM/g" projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/settings.json
 
     echo "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}";
@@ -47,14 +47,14 @@ sign_and_upload(){
         # security find-identity -v
 
         echo "Signing electron .app"
-        # xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
+        xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
 
         cd ${pg_root}
         ls -la "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/"
         # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework"
         echo codesign pg
-        codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app"
-        # electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution
+        # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app"
+        electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution
 
 
         echo "Compressing PG app"
@@ -81,12 +81,12 @@ git clone --depth=1 https://github.com/openframeworks/openFrameworks
 mv projectGenerator openFrameworks/apps/
 
 cd ${of_root}
-#scripts/osx/download_libs.sh
+# scripts/osx/download_libs.sh
 
 # Compile commandline tool
 cd ${pg_root}
 echo "Building openFrameworks PG - OSX"
-#xcodebuild -configuration Release -target commandLine -project commandLine/commandLine.xcodeproj
+# xcodebuild -configuration Release -target commandLine -project commandLine/commandLine.xcodeproj
 ret=$?
 if [ $ret -ne 0 ]; then
       echo "Failed building Project Generator"
@@ -103,10 +103,12 @@ npm run build:osx > /dev/null
 mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
 sign_and_upload osx
 
+cd ${pg_root}/frontend
 npm run build:osx > /dev/null
 mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-ios
 sign_and_upload ios
 
+cd ${pg_root}/frontend
 npm run build:osx > /dev/null
 mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-android
 sign_and_upload android
