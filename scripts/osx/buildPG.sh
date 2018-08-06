@@ -49,7 +49,7 @@ sign_and_upload(){
         echo "Signing electron .app"
         cd ${pg_root}
         sudo npm install -g electron-osx-sign
-        xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
+        # xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
         echo codesign electron
         ls "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework/Versions/A"
         codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Frameworks/Electron Framework.framework"
