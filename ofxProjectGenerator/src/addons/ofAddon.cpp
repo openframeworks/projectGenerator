@@ -14,6 +14,19 @@
 #include <list>
 using namespace std;
 
+vector<string> splitStringOnceByLeft(const string &source, const string &delimiter) {
+    size_t pos = source.find(delimiter);
+    vector<string> res;
+    if(pos == string::npos) {
+        res.push_back(source);
+        return res;
+    }
+    
+    res.push_back(source.substr(0, pos));
+    res.push_back(source.substr(pos + delimiter.length()));
+    return res;
+}
+
 ofAddon::ofAddon(){
     isLocalAddon = false;
     pathToProject = ".";
@@ -391,10 +404,10 @@ void ofAddon::parseConfig(){
 			vector<string> varValue;
 			if(line.find("+=")!=string::npos){
 				addToValue = true;
-				varValue = ofSplitString(line,"+=");
+				varValue = splitStringOnceByLeft(line,"+=");
 			}else{
 				addToValue = false;
-				varValue = ofSplitString(line,"=");
+				varValue = splitStringOnceByLeft(line,"=");
 			}
 			variable = Poco::trim(varValue[0]);
 			value = Poco::trim(varValue[1]);
