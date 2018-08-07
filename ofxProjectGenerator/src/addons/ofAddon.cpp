@@ -611,36 +611,36 @@ void ofAddon::fromFS(string path, string platform){
 
 }
 
-void ofAddon::fromXML(string installXmlName){
-	clear();
-    pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_file(ofToDataPath(installXmlName).c_str());
+//void ofAddon::fromXML(string installXmlName){
+//	clear();
+//    pugi::xml_document doc;
+//    pugi::xml_parse_result result = doc.load_file(ofToDataPath(installXmlName).c_str());
 
-    // this is src to add:
-    pugi::xpath_node_set add = doc.select_nodes("//add/src/folder/file");
-    for (pugi::xpath_node_set::const_iterator it = add.begin(); it != add.end(); ++it){
-        pugi::xpath_node node = *it;
-        //std::cout << "folder name "  << node.node().parent().attribute("name").value() << " : ";
-        //std::cout << "src: " << node.node().child_value() << endl;
-    }
-
-
-    add = doc.select_nodes("//include/path");
-    for (pugi::xpath_node_set::const_iterator it = add.begin(); it != add.end(); ++it){
-        pugi::xpath_node node = *it;
-        //std::cout << "include: " << node.node().child_value() << endl;
-    }
+//    // this is src to add:
+//    pugi::xpath_node_set add = doc.select_nodes("//add/src/folder/file");
+//    for (pugi::xpath_node_set::const_iterator it = add.begin(); it != add.end(); ++it){
+//        pugi::xpath_node node = *it;
+//        //std::cout << "folder name "  << node.node().parent().attribute("name").value() << " : ";
+//        //std::cout << "src: " << node.node().child_value() << endl;
+//    }
 
 
-    add = doc.select_nodes("//link/lib[@compiler='codeblocks']");
-    // this has to be smarter I guess...
-    for (pugi::xpath_node_set::const_iterator it = add.begin(); it != add.end(); ++it){
-        pugi::xpath_node node = *it;
-        //std::cout << "link: " << node.node().child_value() << endl;
-    }
+//    add = doc.select_nodes("//include/path");
+//    for (pugi::xpath_node_set::const_iterator it = add.begin(); it != add.end(); ++it){
+//        pugi::xpath_node node = *it;
+//        //std::cout << "include: " << node.node().child_value() << endl;
+//    }
 
 
-}
+//    add = doc.select_nodes("//link/lib[@compiler='codeblocks']");
+//    // this has to be smarter I guess...
+//    for (pugi::xpath_node_set::const_iterator it = add.begin(); it != add.end(); ++it){
+//        pugi::xpath_node node = *it;
+//        //std::cout << "link: " << node.node().child_value() << endl;
+//    }
+
+
+//}
 
 
 void ofAddon::clear(){

@@ -19,7 +19,7 @@ public:
     ofAddon();
     
 	void fromFS(std::string path, std::string platform);
-	void fromXML(std::string installXmlName);
+//	void fromXML(std::string installXmlName);
 	void clear();
 
     // this is source files:
