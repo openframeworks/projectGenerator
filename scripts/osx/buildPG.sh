@@ -51,21 +51,24 @@ sign_and_upload(){
 }
 
 import_certificate(){
-    echo "Decoding signing certificates"
-    cd ${pg_root}/scripts
-    openssl aes-256-cbc -K $encrypted_b485a78f2982_key -iv $encrypted_b485a78f2982_iv -in developer_ID.p12.enc -out developer_ID.p12 -d
-    echo "Creating keychain"
-    security create-keychain -p mysecretpassword build.keychain
-    security -v list-keychains -s build.keychain "$HOME/Library/Keychains/login.keychain"
-    echo "Setting keychain as default"
-    security default-keychain -s build.keychain
-    echo "Unlocking keychain"
-    security unlock-keychain -p mysecretpassword build.keychain
-    security set-keychain-settings -t 3600 -u build.keychain
-    echo "Importing signing certificates"
-    sudo security import developer_ID.p12 -k build.keychain -P $CERT_PWD -T /usr/bin/codesign
-    # security set-key-partition-list -S apple-tool:,apple: -s -k mysecretpassword build.keychain
-    # security find-identity -v
+    echo "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}";
+    if [ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" = "openframeworks/projectGenerator/master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
+        echo "Decoding signing certificates"
+        cd ${pg_root}/scripts
+        openssl aes-256-cbc -K $encrypted_b485a78f2982_key -iv $encrypted_b485a78f2982_iv -in developer_ID.p12.enc -out developer_ID.p12 -d
+        echo "Creating keychain"
+        security create-keychain -p mysecretpassword build.keychain
+        security -v list-keychains -s build.keychain "$HOME/Library/Keychains/login.keychain"
+        echo "Setting keychain as default"
+        security default-keychain -s build.keychain
+        echo "Unlocking keychain"
+        security unlock-keychain -p mysecretpassword build.keychain
+        security set-keychain-settings -t 3600 -u build.keychain
+        echo "Importing signing certificates"
+        sudo security import developer_ID.p12 -k build.keychain -P $CERT_PWD -T /usr/bin/codesign
+        # security set-key-partition-list -S apple-tool:,apple: -s -k mysecretpassword build.keychain
+        # security find-identity -v
+    fi
 }
 
 
