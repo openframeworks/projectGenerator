@@ -1243,6 +1243,7 @@ void xcodeProject::addAddon(ofAddon & addon){
         ofLogVerbose() << "adding addon ldflags: " << addon.ldflags[i];
         addLDFLAG(addon.ldflags[i]);
     }
+    std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), std::less<std::string>());
     for(int i=0;i<(int)addon.srcFiles.size(); i++){
         ofLogVerbose() << "adding addon srcFiles: " << addon.srcFiles[i];
         addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
