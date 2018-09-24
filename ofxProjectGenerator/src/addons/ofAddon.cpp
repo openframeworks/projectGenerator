@@ -310,7 +310,7 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 	}
 
 	if(variable == "ADDON_DATA"){
-		addReplaceStringVector(data,value,addonRelPath,addToValue);
+		addReplaceStringVector(data,value,"",addToValue);
 	}
 
 	if(variable == "ADDON_LIBS_EXCLUDE"){
