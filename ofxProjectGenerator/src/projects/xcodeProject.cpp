@@ -260,7 +260,7 @@ void xcodeProject::saveScheme(){
 	    findandreplaceInTexfile(schemeToR, "emptyExample", projectName);
      
         std::string workspaceTo = projectDir  + projectName + ".xcodeproj/project.xcworkspace";
-        ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/project.xcworkspace"), schemeTo);
+        ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/project.xcworkspace"), workspaceTo);
 	}else{
 		std::string schemeTo = projectDir  + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/" + projectName + ".xcscheme";
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme"), schemeTo);
