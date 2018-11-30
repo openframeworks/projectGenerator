@@ -427,11 +427,12 @@ void ofAddon::parseConfig(){
 	}
 
 	exclude(includePaths,excludeIncludes);
-	exclude(srcFiles,excludeSources);
+	exclude(srcFiles, excludeSources);
 	exclude(csrcFiles,excludeSources);
 	exclude(cppsrcFiles,excludeSources);
 	exclude(objcsrcFiles,excludeSources);
 	exclude(headersrcFiles,excludeSources);
+	exclude(propsFiles, excludeSources);
 	exclude(libs,excludeLibs);
 
 	ofLogVerbose("ofAddon") << "libs after exclusions " << libs.size();
@@ -481,7 +482,27 @@ void ofAddon::fromFS(string path, string platform){
     }
     
 
-    string libsPath = ofFilePath::join(path, "/libs");
+	if (platform == "vs" || platform == "msys2") {
+		getPropsRecursively(addonPath, propsFiles, platform);
+	}
+
+	for (int i = 0; i < (int)propsFiles.size(); i++) {
+		propsFiles[i].erase(propsFiles[i].begin(), propsFiles[i].begin() + containedPath.length());
+		int end = propsFiles[i].rfind(std::filesystem::path("/").make_preferred().string());
+		int init = 0;
+		string folder;
+		if (!isLocalAddon) {
+			folder = propsFiles[i].substr(init, end);
+		}
+		else {
+			init = propsFiles[i].find(name);
+			folder = ofFilePath::join("local_addons", propsFiles[i].substr(init, end - init));
+		}
+		propsFiles[i] = prefixPath + propsFiles[i];
+	}
+	
+
+	string libsPath = ofFilePath::join(path, "/libs");
     vector < string > libFiles;
 
 
@@ -659,7 +680,8 @@ void ofAddon::fromFS(string path, string platform){
 void ofAddon::clear(){
     filesToFolders.clear();
     srcFiles.clear();
-    libs.clear();
+	propsFiles.clear();
+	libs.clear();
     includePaths.clear();
     name.clear();
 }

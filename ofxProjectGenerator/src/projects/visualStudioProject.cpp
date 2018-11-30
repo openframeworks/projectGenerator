@@ -265,23 +265,31 @@ void addLibraryName(const pugi::xpath_node_set & nodes, std::string libName) {
 	}
 }
 
-void visualStudioProject::addLibrary(const LibraryBinary & lib){
+void visualStudioProject::addProps(std::string propsFile){
+	pugi::xpath_node_set items = doc.select_nodes("//ImportGroup");
+	for (int i = 0; i < items.size(); i++) {
+		pugi::xml_node additionalOptions;
+		items[i].node().append_child("Import").append_attribute("Project").set_value(propsFile.c_str());
+	}
+}
+
+void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	auto libraryName = lib.path;
-    fixSlashOrder(libraryName);
+	fixSlashOrder(libraryName);
 
-    // ok first, split path and library name.
-    size_t found = libraryName.find_last_of("\\");
-    std::string libFolder = libraryName.substr(0,found);
-    std::string libName = libraryName.substr(found+1);
+	// ok first, split path and library name.
+	size_t found = libraryName.find_last_of("\\");
+	std::string libFolder = libraryName.substr(0, found);
+	std::string libName = libraryName.substr(found + 1);
 
-    std::string libBaseName;
-    std::string libExtension;
+	std::string libBaseName;
+	std::string libExtension;
 
-	splitFromLast( libName, ".", libBaseName, libExtension );
+	splitFromLast(libName, ".", libBaseName, libExtension);
 
 	// ---------| invariant: libExtension is `lib`
 
-    // paths for libraries
+	// paths for libraries
 	std::string linkPath;
 	if (!lib.target.empty() && !lib.arch.empty()) {
 		linkPath = "//ItemDefinitionGroup[contains(@Condition,'" + lib.target + "') and contains(@Condition,'" + lib.arch + "')]/Link/";
@@ -295,13 +303,13 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib){
 	else {
 		linkPath = "//ItemDefinitionGroup/Link/";
 	}
-    
+
 	if (!libFolder.empty()) {
 		pugi::xpath_node_set addlLibsDir = doc.select_nodes((linkPath + "AdditionalLibraryDirectories").c_str());
 		addLibraryPath(addlLibsDir, libFolder);
 	}
-    
-    pugi::xpath_node_set addlDeps = doc.select_nodes((linkPath + "AdditionalDependencies").c_str());
+
+	pugi::xpath_node_set addlDeps = doc.select_nodes((linkPath + "AdditionalDependencies").c_str());
 	addLibraryName(addlDeps, libName);
 
 	ofLogVerbose() << "adding lib path " << libFolder;
@@ -391,6 +399,11 @@ void visualStudioProject::addAddon(ofAddon & addon){
         ofLogVerbose() << "adding addon include path: " << addon.includePaths[i];
         addInclude(addon.includePaths[i]);
     }
+
+	for (auto & props : addon.propsFiles) {
+		ofLogVerbose() << "adding addon props: " << props;
+		addProps(props);
+	}
 
     for(auto & lib: addon.libs){
 		ofLogVerbose() << "adding addon libs: " << lib.path;

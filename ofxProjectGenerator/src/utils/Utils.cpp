@@ -284,24 +284,47 @@ void getFrameworksRecursively( const std::string & path, std::vector < std::stri
 
 
 
-void getDllsRecursively( const std::string & path, std::vector < std::string > & dlls, std::string platform){
+void getPropsRecursively(const std::string & path, std::vector < std::string > & props, std::string platform) {
 	ofDirectory dir;
 	dir.listDir(path);
 
-	for (auto & temp: dir){
-		if (temp.isDirectory()){
-			getDllsRecursively(temp.path(), dlls, platform);
-		}else{
+	for (auto & temp : dir) {
+		if (temp.isDirectory()) {
+			getPropsRecursively(temp.path(), props, platform);
+		}
+		else {
 			std::string ext = "";
 			std::string first = "";
 			splitFromLast(temp.path(), ".", first, ext);
-			if (ext == "dll"){
+			if (ext == "props") {
+				props.push_back(temp.path());
+			}
+		}
+
+	}
+}
+
+
+void getDllsRecursively(const std::string & path, std::vector < std::string > & dlls, std::string platform) {
+	ofDirectory dir;
+	dir.listDir(path);
+
+	for (auto & temp : dir) {
+		if (temp.isDirectory()) {
+			getDllsRecursively(temp.path(), dlls, platform);
+		}
+		else {
+			std::string ext = "";
+			std::string first = "";
+			splitFromLast(temp.path(), ".", first, ext);
+			if (ext == "dll") {
 				dlls.push_back(temp.path());
 			}
 		}
 
 	}
 }
+
 
 
 
