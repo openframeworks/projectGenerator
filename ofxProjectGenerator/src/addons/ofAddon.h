@@ -31,7 +31,8 @@ public:
     std::vector < std::string > cppsrcFiles;
     std::vector < std::string > headersrcFiles;
     std::vector < std::string > objcsrcFiles;
-    std::vector < LibraryBinary > libs;
+	std::vector < std::string > propsFiles;
+	std::vector < LibraryBinary > libs;
     std::vector < std::string > dllsToCopy;
     std::vector < std::string > includePaths;
     
