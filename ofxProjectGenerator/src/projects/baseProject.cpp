@@ -323,7 +323,7 @@ void baseProject::parseAddons(){
 	    auto addon = ofTrim(line);
 	    if(addon[0] == '#') continue;
         if(addon == "") continue;
-        addAddon(addon);
+        addAddon(ofSplitString(addon, "#")[0]);
 	}
 }
 

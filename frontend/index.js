@@ -480,7 +480,12 @@ ipc.on('isOFProjectFolder', function(event, project) {
                     }
                 });
 
-                //console.log(projectAddons);
+                // remove comments
+                projectAddons.forEach(function(element, index) {
+                    this[index] = this[index].split('#')[0];
+                  }, projectAddons);
+
+                // console.log('addons', projectAddons);
 
                 event.sender.send('selectAddons', projectAddons);
             } else {
