@@ -28,7 +28,7 @@ here's the extended options if you want to experiment.  please take are that opt
 	-d, --dryrun                                         don't change files
 
 
-**note that on windows, command line flags are written with "/" not "-" and don't have abbreviations, so -r would be /recusive**
+**note that on windows, command line flags are written with "/" not "-" and don't have abbreviations, so -r would be /recursive**
 
 	/recursive                    update recursively (applies only to update)
 	/help
@@ -65,7 +65,7 @@ you can also specify platforms (default platform is inferred) such as:
 
 ## Environment variable
 
-If you want to skip using -o (for specifying the path to openframeworks) you can set an environment variable "PG_OF_PATH".  For example, on OSX, you can set this in your ~/.bash_profile: 
+If you want to skip using `-o` (for specifying the path to openframeworks) you can set an environment variable "PG_OF_PATH".  For example, on OSX, you can set this in your `~/.bash_profile`: 
 
      export PG_OF_PATH="MY_FULL_PATH_TO_OF"
      
