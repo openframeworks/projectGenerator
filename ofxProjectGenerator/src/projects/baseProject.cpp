@@ -254,7 +254,23 @@ void baseProject::addAddon(std::string addonName){
         auto standardPath = ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), addonName);
         addon.fromFS(standardPath, target);
     }
+
     addAddon(addon);
+
+    // Process values from ADDON_DATA
+    if (addon.data.size()) {
+        string dest = ofFilePath::join(projectDir, "bin/data/");
+
+        for (auto& filename : addon.data) {
+            ofFile src(ofFilePath::join(addon.addonPath, filename));
+            if (!src.exists()) {
+                ofLogWarning() << "addon data file does not exist, skipping: " << filename;
+            } else {
+                ofLogVerbose() << "adding addon data files: " << filename;
+                src.copyTo(ofFilePath::join(dest, src.getFileName()), false, true);
+            }
+        }
+    }
 }
 
 void baseProject::addAddon(ofAddon & addon){
