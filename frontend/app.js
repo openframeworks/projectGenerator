@@ -149,7 +149,7 @@ ipc.on('setAddons', function(arg) {
   $('#addonsDropdown')
         .dropdown({
             allowAdditions: false,
-            fullTextSearch: false,
+            fullTextSearch: 'exact',
             match: "text"
         });
 });
