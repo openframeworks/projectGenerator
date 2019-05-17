@@ -841,7 +841,24 @@ ipc.on('launchProjectinIDE', function(event, arg) {
             );
             }
         });
-    } else if( hostplatform == 'windows'){
+    } else if( arg.platform == 'vscode'){
+        var vscodePath = pathTemp.join(fullPath, arg['projectName'] + '.code-workspace');
+        console.log(vscodePath);
+        if(hostplatform == 'osx'){
+            exec('open ' + vscodePath, function callback(error, stdout, stderr){
+                return;
+            });                
+        }else if(hostplatform == 'linux'){
+            exec('xdg-open ' + vscodePath, function callback(error, stdout, stderr){
+                return;
+            });
+        }else if(hostplatform == 'windows'){
+            exec('start ' + "\"\"" + " " + vscodePath, function callback(error, stdout, stderr){
+                return;
+            });    
+        }
+    } 
+    else if( hostplatform == 'windows'){
         var windowsPath = pathTemp.join(fullPath, arg['projectName'] + '.sln');
         console.log( windowsPath );
         windowsPath = "\"" + windowsPath + "\"";
