@@ -11,7 +11,7 @@
                 "reveal": "always",
                 "panel": "shared"
             },
-            "command": "make -j7 -s 2>&1 && make RunRelease",
+            "command": "make -j -s 2>&1 && make RunRelease",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -36,7 +36,7 @@
                 "reveal": "always",
                 "panel": "shared"
             },
-            "command": "make Debug  -j7 -s 2>&1 || exit 1",
+            "command": "make Debug  -j -s 2>&1 || exit 1",
             "group": {
                 "kind": "build",
                 "isDefault": true
