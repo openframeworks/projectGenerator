@@ -23,7 +23,9 @@ public:
 #ifdef QUICK_TEST
     virtual std::string getPlatformTemplateDir(){
         //return ofFilePath::join(getOFRoot(),"scripts/templates/" + target);
-        return ofFilePath::join(getOFRoot(), "apps/projectGenerator/templates/" + target);
+        std::string t = ofFilePath::join(getOFRoot(), "apps/projectGenerator/templates/" + target);
+        ofLogNotice(LOG_NAME) << "QUICK_TEST is turned on, using temlate files in" << t;
+        return t;
     }
 #endif
 

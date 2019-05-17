@@ -86,13 +86,12 @@ void vscodeProject::addSrc(std::string srcFile, std::string folder, baseProject:
 }
 
 bool vscodeProject::loadProjectFile(){
-    
-    // not implemented yet
+    // noting to do?
     return false;
 }
 
 bool vscodeProject::saveProjectFile(){
-    // not implemented yet
+    // nothing to do?
     return true;
 }
 
