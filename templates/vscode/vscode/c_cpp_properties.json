@@ -34,9 +34,6 @@
                 "${workspaceRoot}/../../../libs/tess2/include",
                 "${workspaceRoot}/../../../libs/uriparser/include",
                 "${workspaceRoot}/../../../libs/utf8/include",
-                "${workspaceRoot}/../../../addons/ofxOsc/src",
-                "${workspaceRoot}/../../../addons/ofxOsc/libs/oscpack/src/osc",
-                "${workspaceRoot}/../../../addons/ofxOsc/libs/oscpack/src/ip"
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
