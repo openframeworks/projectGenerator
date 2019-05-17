@@ -95,7 +95,8 @@ var platforms = {
     "android": "Android (Android Studio)",
     "linux64": "Linux 64-bit (qtCreator)",
     "linuxarmv6l": "Linux ARMv6 (Makefiles)",
-    "linuxarmv7l": "Linux ARMv7 (Makefiles)"
+    "linuxarmv7l": "Linux ARMv7 (Makefiles)",
+    "vscode": "Visal Studio Code"
 };
 var bUseMoniker = obj["useDictionaryNameGenerator"];
 

@@ -167,6 +167,9 @@ void addPlatforms(std::string value) {
         else if (platforms[i] == "android") {
             targets.push_back(OF_TARGET_ANDROID);
         }
+        else if (platforms[i] == "vscode") {
+            targets.push_back(OF_TARGET_ALL);
+        }
         else if (platforms[i] == "allplatforms") {
             targets.push_back(OF_TARGET_LINUX);
             targets.push_back(OF_TARGET_LINUX64);

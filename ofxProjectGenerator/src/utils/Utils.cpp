@@ -21,6 +21,7 @@
 #include "xcodeProject.h"
 #include "visualStudioProject.h"
 #include "androidStudioProject.h"
+#include "vscodeProject.h"
 
 #include "Poco/String.h"
 
@@ -526,6 +527,8 @@ std::string getTargetString(ofTargetPlatform t){
         return "linuxarmv6l";
     case OF_TARGET_LINUXARMV7L:
         return "linuxarmv7l";
+    case OF_TARGET_ALL:
+        return "vscode";
     default:
         return "";
     }
@@ -554,5 +557,7 @@ unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ) {
         return unique_ptr<AndroidStudioProject>(new AndroidStudioProject(getTargetString(targ)));
     default:
         return unique_ptr<baseProject>();
+   case OF_TARGET_ALL:
+       return unique_ptr<vscodeProject>(new vscodeProject(getTargetString(targ)));
     }
 }
