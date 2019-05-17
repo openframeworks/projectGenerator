@@ -15,6 +15,9 @@ bool vscodeProject::createProjectFile(){
     ofDirectory dir(projectDir);
     if(!dir.exists()) dir.create(true);
 
+    //
+    //  copy vscode workspace file
+    //
     ofFile project(ofFilePath::join(projectDir, projectName + ".code-workspace"));
     std::string src = ofFilePath::join(templatePath,"emptyExample.code-workspace");
     std::string dst = project.path();
@@ -26,6 +29,9 @@ bool vscodeProject::createProjectFile(){
         }
     }
 
+    //
+    //  copy .vscode folder (task.json, launch.json, c_cpp_properties.json)
+    //
     ofDirectory vscodeDir(ofFilePath::join(projectDir, ".vscode"));
     if(!vscodeDir.exists()){
         src = ofFilePath::join(templatePath,"vscode");
