@@ -849,7 +849,7 @@ ipc.on('launchProjectinIDE', function(event, arg) {
                 return;
             });                
         }else if(hostplatform == 'linux'){
-            exec('xdg-open ' + vscodePath, function callback(error, stdout, stderr){
+            exec('code ' + vscodePath, function callback(error, stdout, stderr){
                 return;
             });
         }else if(hostplatform == 'windows'){
