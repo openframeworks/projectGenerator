@@ -168,7 +168,7 @@ void addPlatforms(std::string value) {
             targets.push_back(OF_TARGET_ANDROID);
         }
         else if (platforms[i] == "vscode") {
-            targets.push_back(OF_TARGET_ALL);
+            targets.push_back(OF_TARGET_VSCODE);
         }
         else if (platforms[i] == "allplatforms") {
             targets.push_back(OF_TARGET_LINUX);
@@ -180,6 +180,7 @@ void addPlatforms(std::string value) {
             targets.push_back(OF_TARGET_OSX);
             targets.push_back(OF_TARGET_IOS);
             targets.push_back(OF_TARGET_ANDROID);
+            targets.push_back(OF_TARGET_VSCODE);
         }else{
             ofLogError() << "platform " << platforms[i] << " not valid";
         }

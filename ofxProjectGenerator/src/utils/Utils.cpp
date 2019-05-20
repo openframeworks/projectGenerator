@@ -527,7 +527,7 @@ std::string getTargetString(ofTargetPlatform t){
         return "linuxarmv6l";
     case OF_TARGET_LINUXARMV7L:
         return "linuxarmv7l";
-    case OF_TARGET_ALL:
+    case OF_TARGET_VSCODE:
         return "vscode";
     default:
         return "";
@@ -555,9 +555,9 @@ unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ) {
         return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
     case OF_TARGET_ANDROID:
         return unique_ptr<AndroidStudioProject>(new AndroidStudioProject(getTargetString(targ)));
+   case OF_TARGET_VSCODE:
+       return unique_ptr<vscodeProject>(new vscodeProject(getTargetString(targ)));
     default:
         return unique_ptr<baseProject>();
-   case OF_TARGET_ALL:
-       return unique_ptr<vscodeProject>(new vscodeProject(getTargetString(targ)));
     }
 }
