@@ -556,3 +556,18 @@ unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ) {
         return unique_ptr<baseProject>();
     }
 }
+
+std::unique_ptr<baseProject> getAltanativeIDEProject(std::string ide){
+
+    if(ide == "vscode"){
+        //return unique_ptr<vscodeProject>(new vscodeProject(ide));     // no impl, just an example how code will look like
+    }else if(ide == "atom"){
+        //return unique_ptr<atomProject>(new atomProject(ide));         // no impl, just an example how code will look like
+    }else if(ide == "vim"){
+        //return unique_ptr<vimProject>(new vimProject(ide));           // no impl, just an example how code will look like
+    }else if(ide == "emacs"){
+        //return unique_ptr<emcasProject>(new emacsProject(ide));       // no impl, just an example how code will look like
+    }
+
+    return unique_ptr<baseProject>();
+}

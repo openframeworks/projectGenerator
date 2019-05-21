@@ -57,6 +57,8 @@ std::string getTargetString(ofTargetPlatform t);
 
 std::unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ);
 
+std::unique_ptr<baseProject> getAltanativeIDEProject(std::string ide);
+
 template <class T>
 inline bool isInVector(T item, std::vector<T> & vec){
     bool bIsInVector = false;

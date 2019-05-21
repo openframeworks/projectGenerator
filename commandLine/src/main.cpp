@@ -1,6 +1,6 @@
 #include "ofMain.h"
 #include "optionparser.h"
-enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN };
+enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ALTANATIVE_IDES, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN };
 constexpr option::Descriptor usage[] =
 {
     {UNKNOWN, 0, "", "",option::Arg::None, "Options:\n" },
@@ -8,6 +8,7 @@ constexpr option::Descriptor usage[] =
     {RECURSIVE, 0,"r","recursive",option::Arg::None, "  --recursive, -r  \tupdate recursively (applies only to update)" },
     {LISTTEMPLATES, 0,"l","listtemplates",option::Arg::None, "  --listtemplates, -l  \tlist templates available for the specified or current platform(s)" },
     {PLATFORMS, 0,"p","platforms",option::Arg::Optional, "  --platforms, -p  \tplatform list (such as osx, ios, winvs)" },
+    {ALTANATIVE_IDES, 0,"i","altanativeIDEs",option::Arg::Optional, "  --altanativeIDEs, -i  \taltanative IDE list (such as vscode, atom, vim, emacs)" },
     {ADDONS, 0,"a","addons",option::Arg::Optional, "  --addons, -a  \taddon list (such as ofxOpenCv, ofxGui, ofxXmlSettings)" },
     {OFPATH, 0,"o","ofPath",option::Arg::Optional, "  --ofPath, -o  \tpath to openframeworks (relative or absolute). This *must* be set, or you can also alternatively use an environment variable PG_OF_PATH and if this isn't set, it will use that value instead" },
     {VERBOSE, 0,"v","verbose",option::Arg::None, "  --verbose, -v  \trun verbose" },
@@ -61,6 +62,8 @@ std::string              ofPathEnv;
 std::string              currentWorkingDirectory;
 std::string              templateName;
 
+std::vector <std::string>     altanativeIDEs;
+
 bool busingEnvVar;
 bool bVerbose;
 bool bAddonsPassedIn;
@@ -70,7 +73,7 @@ bool bRecursive;                        // do we recurse in update mode?
 bool bHelpRequested;                    // did we request help?
 bool bListTemplates;                    // did we request help?
 bool bDryRun;                           // do dry run (useful for debugging recursive update)
-
+bool bUseAltanativeIDEs;                // do we use altanative IDE files?
 
 
 
@@ -237,15 +240,15 @@ bool isGoodOFPath(std::string path) {
 
 
 
-void updateProject(std::string path, ofTargetPlatform target, bool bConsiderParameterAddons = true) {
+void updateProject(std::string path, std::unique_ptr<baseProject> & project, bool bConsiderParameterAddons = true) {
 
     // bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
     // either we read the addons.make file, or we look at the parameter list.
     // if we are updating recursively, we *never* consider addons passed as parameters.
 
 
-    ofLogNotice() << "updating project " << path;
-    auto project = getTargetProject(target);
+    ofLogNotice() << "updating project " << path;s
+    //auto project = getTargetProject(target);
 
     if (!bDryRun) project->create(path, templateName);
 
@@ -262,10 +265,9 @@ void updateProject(std::string path, ofTargetPlatform target, bool bConsiderPara
 }
 
 
-void recursiveUpdate(std::string path, ofTargetPlatform target) {
+void recursiveUpdate(std::string path, std::unique_ptr<baseProject> & project) {
     
     ofDirectory dir(path);
-    
     
     // first, bail if it's just a file
     if (dir.isDirectory() == false) return;
@@ -273,8 +275,7 @@ void recursiveUpdate(std::string path, ofTargetPlatform target) {
     // second check if this is a folder that has src in it
     if (isGoodProjectPath(path)) {
         nProjectsUpdated++;
-        auto project = getTargetProject(target);
-        updateProject(path, target, false);
+        updateProject(path, project, false);
         return;
     }
     
@@ -283,7 +284,7 @@ void recursiveUpdate(std::string path, ofTargetPlatform target) {
     for (size_t i = 0; i < dir.size(); i++) {
         ofDirectory subDir(dir.getPath(i));
         if (subDir.isDirectory()) {
-            recursiveUpdate(dir.getPath(i), target);
+            recursiveUpdate(dir.getPath(i), project);
         }
     }
 }
@@ -347,6 +348,7 @@ int main(int argc, char* argv[]){
     bRecursive = false;
     bHelpRequested = false;
     bListTemplates = false;
+    bUseAltanativeIDEs = false;
     targets.push_back(ofGetTargetPlatform());
     startTime = 0;
     nProjectsUpdated = 0;
@@ -397,6 +399,15 @@ int main(int argc, char* argv[]){
         }
     }
     
+    if (options[ALTANATIVE_IDES].count() > 0){
+        if (options[ALTANATIVE_IDES].arg != NULL){
+	    std::string ide(options[ALTANATIVE_IDES].arg);
+            altanativeIDEs.push_back(ide);
+        }
+    }
+
+    bUseAltanativeIDEs = (altanativeIDEs.size() > 0);
+
     if (options[ADDONS].count() > 0){
         bAddonsPassedIn = true; // could be empty
         if (options[ADDONS].arg != NULL){
@@ -529,46 +540,54 @@ int main(int argc, char* argv[]){
         ofSetLogLevel(OF_LOG_VERBOSE);
     }
 
-
+    
     if (mode == PG_MODE_CREATE) {
-
 
         nProjectsCreated += 1;
 
-        for (int i = 0; i < (int)targets.size(); i++) {
-            auto project = getTargetProject(targets[i]);
-            auto target = getTargetString(targets[i]);
+        if(bUseAltanativeIDE){
+            for (int i = 0; i < (int)altanativeIDEs.size(); i++) {
+                auto ide = altanativeIDEs[i];
+                auto project = getAltanativeIDEProject(ide);
 
-            ofLogNotice() << "-----------------------------------------------";
-            ofLogNotice() << "setting OF path to: " << ofPath;
-            if(busingEnvVar){
-                ofLogNotice() << "from PG_OF_PATH environment variable";
-            }else{
-                ofLogNotice() << "from -o option";
+                // ...
+                // ...
             }
-            ofLogNotice() << "target platform is: " << target;
-            ofLogNotice() << "project path is: " << projectPath;
-            
-            if(templateName!=""){
-                ofLogNotice() << "using additional template " << templateName;
-            }
-            
 
-            ofLogNotice() << "setting up new project " << projectPath;
-            if (!bDryRun) project->create(projectPath, templateName);
+        }else{
+            for (int i = 0; i < (int)targets.size(); i++) {
+                auto project = getTargetProject(targets[i]);
+                auto target = getTargetString(targets[i]);
 
-            if (!bDryRun){
-                for(auto & addon: addons){
-                    project->addAddon(addon);
+                ofLogNotice() << "-----------------------------------------------";
+                ofLogNotice() << "setting OF path to: " << ofPath;
+                if(busingEnvVar){
+                    ofLogNotice() << "from PG_OF_PATH environment variable";
+                }else{
+                    ofLogNotice() << "from -o option";
                 }
+                ofLogNotice() << "target platform is: " << target;
+                ofLogNotice() << "project path is: " << projectPath;
+                
+                if(templateName!=""){
+                    ofLogNotice() << "using additional template " << templateName;
+                }
+                
+
+                ofLogNotice() << "setting up new project " << projectPath;
+                if (!bDryRun) project->create(projectPath, templateName);
+
+                if (!bDryRun){
+                    for(auto & addon: addons){
+                        project->addAddon(addon);
+                    }
+                }
+                if (!bDryRun) project->save();
+
+                ofLogNotice() << "project created! ";
+                ofLogNotice() << "-----------------------------------------------";
+                consoleSpace();
             }
-            if (!bDryRun) project->save();
-
-            ofLogNotice() << "project created! ";
-            ofLogNotice() << "-----------------------------------------------";
-            consoleSpace();
-
-
         }
     }
     else if (mode == PG_MODE_UPDATE) {
@@ -576,46 +595,87 @@ int main(int argc, char* argv[]){
         if (!bRecursive) {
             if (isGoodProjectPath(projectPath) || bForce) {
 
-
                 nProjectsUpdated += 1;
 
+                 if(bUseAltanativeIDE){
+                    for (int i = 0; i < (int)altanativeIDEs.size(); i++) {
+                        auto ide = altanativeIDEs[i];
+                        auto project = getAltanativeIDEProject(ide);
 
-                for (int i = 0; i < (int)targets.size(); i++) {
-                    ofLogNotice() << "-----------------------------------------------";
-                    ofLogNotice() << "setting OF path to: " << ofPath;
-                    if(busingEnvVar){
-                        ofLogNotice() << "from PG_OF_PATH environment variable";
-                    }else{
-                        ofLogNotice() << "from -o option";
+                        ofLogNotice() << "-----------------------------------------------";
+                        ofLogNotice() << "setting OF path to: " << ofPath;
+                        if(busingEnvVar){
+                            ofLogNotice() << "from PG_OF_PATH environment variable";
+                        }else{
+                            ofLogNotice() << "from -o option";
+                        }
+                        ofLogNotice() << "target platform is: " << getTargetString(targets[i]);
+
+                        if(templateName!=""){
+                            ofLogNotice() << "using additional template " << templateName;
+                        }
+
+                        updateProject(projectPath,project);
+
+                        ofLogNotice() << "project updated! ";
+                        ofLogNotice() << "-----------------------------------------------";
+                        consoleSpace();                    }
+                 }else{
+
+                    for (int i = 0; i < (int)targets.size(); i++) {
+                        ofLogNotice() << "-----------------------------------------------";
+                        ofLogNotice() << "setting OF path to: " << ofPath;
+                        if(busingEnvVar){
+                            ofLogNotice() << "from PG_OF_PATH environment variable";
+                        }else{
+                            ofLogNotice() << "from -o option";
+                        }
+                        ofLogNotice() << "target platform is: " << getTargetString(targets[i]);
+
+                        if(templateName!=""){
+                            ofLogNotice() << "using additional template " << templateName;
+                        }
+
+                        auto project = getTargetProject(targets[i]);
+                        updateProject(projectPath,project);
+
+                        ofLogNotice() << "project updated! ";
+                        ofLogNotice() << "-----------------------------------------------";
+                        consoleSpace();
+
                     }
-                    ofLogNotice() << "target platform is: " << getTargetString(targets[i]);
-
-                    if(templateName!=""){
-                        ofLogNotice() << "using additional template " << templateName;
-                    }
-                    updateProject(projectPath,targets[i]);
-
-                    ofLogNotice() << "project updated! ";
-                    ofLogNotice() << "-----------------------------------------------";
-                    consoleSpace();
-
-                }
+                 }
             }
             else {
                 ofLogError() << "there's no src folder in this project path to update, maybe use create instead? (or use force to force updating)";
             }
         }
         else {
-            for (int i = 0; i < (int)targets.size(); i++) {
-                ofLogNotice() << "-----------------------------------------------";
-                ofLogNotice() << "updating an existing project";
-                ofLogNotice() << "target platform is: " << getTargetString(targets[i]);
+            if(bUseAltanativeIDE){
+                for (int i = 0; i < (int)altanativeIDEs.size(); i++) {
+                    auto ide = altanativeIDEs[i];
+                    auto project = getAltanativeIDEProject(ide);
+                    ofLogNotice() << "-----------------------------------------------";
+                    ofLogNotice() << "updating an existing project";
+                    ofLogNotice() << "target platform is: " << ide;
 
-                recursiveUpdate(projectPath, targets[i]);
-                
-                ofLogNotice() << "project updated! ";
-                ofLogNotice() << "-----------------------------------------------";
+                    recursiveUpdate(projectPath, project);
+                    ofLogNotice() << "project updated! ";
+                    ofLogNotice() << "-----------------------------------------------";
+                }
+            }else{
+                for (int i = 0; i < (int)targets.size(); i++) {
+                    ofLogNotice() << "-----------------------------------------------";
+                    ofLogNotice() << "updating an existing project";
+                    ofLogNotice() << "target platform is: " << getTargetString(targets[i]);
 
+                    auto project = getTargetProject(targets[i]);
+                    recursiveUpdate(projectPath, project);
+                    
+                    ofLogNotice() << "project updated! ";
+                    ofLogNotice() << "-----------------------------------------------";
+
+                }
             }
         }
 
