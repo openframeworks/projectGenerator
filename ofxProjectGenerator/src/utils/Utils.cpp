@@ -208,14 +208,14 @@ void getFilesRecursively(const std::string & path, std::vector < std::string > &
 static std::vector <std::string> platforms;
 bool isFolderNotCurrentPlatform(std::string folderName, std::string platform){
 	if( platforms.size() == 0 ){
-		platforms.push_back("osx");
-        platforms.push_back("msys2");
-		platforms.push_back("vs");
-		platforms.push_back("ios");
-		platforms.push_back("linux");
-		platforms.push_back("linux64");
-		platforms.push_back("android");
-		platforms.push_back("iphone");
+		platforms.push_back(PLATFORM_TEMPLATE_OSX);
+        platforms.push_back(PLATFORM_TEMPLATE_MINGW);
+		platforms.push_back(PLATFORM_TEMPLATE_WINVS);
+		platforms.push_back(PLATFORM_TEMPLATE_IOS);
+		platforms.push_back(PLATFORM_TEMPLATE_LINUX);
+		platforms.push_back(PLATFORM_TEMPLATE_LINUX64);
+		platforms.push_back(PLATFORM_TEMPLATE_ANDROID);
+		platforms.push_back("iphone");  // ??
 	}
 
 	for(int i = 0; i < platforms.size(); i++){
@@ -379,18 +379,18 @@ void getLibsRecursively(const std::string & path, std::vector < std::string > & 
 	    std::string first;
             splitFromLast(dir.getPath(i), ".", first, ext);
                 
-			if (ext == "a" || ext == "lib" || ext == "dylib" || ext == "so" || (ext == "dll" && platform != "vs")){
+			if (ext == "a" || ext == "lib" || ext == "dylib" || ext == "so" || (ext == "dll" && platform != PLATFORM_TEMPLATE_WINVS)){
                 if (platformFound){
 					libLibs.push_back({ dir.getPath(i), arch, target });
 						
 					//TODO: THEO hack
-					if( platform == "ios" ){ //this is so we can add the osx libs for the simulator builds
+					if( platform == PLATFORM_TEMPLATE_IOS ){ //this is so we can add the osx libs for the simulator builds
 							
 						std::string currentPath = dir.getPath(i);
 							
 						//TODO: THEO double hack this is why we need install.xml - custom ignore ofxOpenCv 
 						if( currentPath.find("ofxOpenCv") == std::string::npos ){
-							ofStringReplace(currentPath, "ios", "osx");
+							ofStringReplace(currentPath, PLATFORM_TEMPLATE_IOS, PLATFORM_TEMPLATE_OSX);
 							if( ofFile::doesFileExist(currentPath) ){
 								libLibs.push_back({ currentPath,arch,target });
 							}
@@ -509,23 +509,23 @@ std::string getOFRootFromConfig(){
 std::string getTargetString(ofTargetPlatform t){
     switch (t) {
     case OF_TARGET_OSX:
-        return "osx";
+        return PLATFORM_TEMPLATE_OSX;
     case OF_TARGET_MINGW:
-        return "msys2";
+        return PLATFORM_TEMPLATE_MINGW;
     case OF_TARGET_WINVS:
-        return "vs";
+        return PLATFORM_TEMPLATE_WINVS;
     case OF_TARGET_IOS:
-        return "ios";
+        return PLATFORM_TEMPLATE_IOS;
     case OF_TARGET_ANDROID:
-        return "android";
+        return PLATFORM_TEMPLATE_ANDROID;
     case OF_TARGET_LINUX:
-        return "linux";
+        return PLATFORM_TEMPLATE_LINUX;
     case OF_TARGET_LINUX64:
-        return "linux64";
+        return PLATFORM_TEMPLATE_LINUX64;
     case OF_TARGET_LINUXARMV6L:
-        return "linuxarmv6l";
+        return PLATFORM_TEMPLATE_LINUXARMV6L;
     case OF_TARGET_LINUXARMV7L:
-        return "linuxarmv7l";
+        return PLATFORM_TEMPLATE_LINUXARMV7L;
     default:
         return "";
     }
@@ -533,23 +533,23 @@ std::string getTargetString(ofTargetPlatform t){
 
 
 unique_ptr<baseProject> getTargetProject(std::string targ) {
-    if(targ == "osx") {
+    if(targ == PLATFORM_TEMPLATE_OSX) {
         return unique_ptr<xcodeProject>(new xcodeProject(targ));
-    }else if(targ=="msys2"){
+    }else if(targ==PLATFORM_TEMPLATE_MINGW){
         return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));
-    }else if(targ == "vs"){
+    }else if(targ == PLATFORM_TEMPLATE_WINVS){
         return unique_ptr<visualStudioProject>(new visualStudioProject(targ));
-    }else if(targ == "ios"){
+    }else if(targ == PLATFORM_TEMPLATE_IOS){
         return unique_ptr<xcodeProject>(new xcodeProject(targ));
-    }else if(targ == "linux"){
+    }else if(targ == PLATFORM_TEMPLATE_LINUX){
         return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));
-    }else if(targ == "linux64"){
+    }else if(targ == PLATFORM_TEMPLATE_LINUX64){
         return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));
-    }else if(targ == "linuxarmv6l"){
+    }else if(targ == PLATFORM_TEMPLATE_LINUXARMV6L){
         return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));
-    }else if(targ == "linuxarmv7l"){
+    }else if(targ == PLATFORM_TEMPLATE_LINUXARMV7L){
         return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));
-    }else if(targ == "android"){
+    }else if(targ == PLATFORM_TEMPLATE_ANDROID){
         return unique_ptr<AndroidStudioProject>(new AndroidStudioProject(targ));
     }
     

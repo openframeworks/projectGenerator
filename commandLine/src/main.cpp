@@ -71,8 +71,18 @@ bool bHelpRequested;                    // did we request help?
 bool bListTemplates;                    // did we request help?
 bool bDryRun;                           // do dry run (useful for debugging recursive update)
 
-
-
+static const std::string PLATFORM_TEMPLATE_OSX{"osx"};
+static const std::string PLATFORM_TEMPLATE_IOS{"ios"};
+static const std::string PLATFORM_TEMPLATE_WINVS{"vs"};
+static const std::string PLATFORM_TEMPLATE_ANDROID{"android"};
+static const std::string PLATFORM_TEMPLATE_LINUX{"linux"};
+static const std::string PLATFORM_TEMPLATE_LINUX64{"linux64"};
+static const std::string PLATFORM_TEMPLATE_LINUXARMV6L{"linuxarmv6l"};
+static const std::string PLATFORM_TEMPLATE_LINUXARMV7L{"linuxarmv7l"};
+static const std::string PLATFORM_TEMPLATE_MINGW{"msys2"};
+static const std::string PLATFORM_TEMPLATE_VSCODE{"vscode"};
+static const std::string PLATFORM_TEMPLATE_EMACS{"emacs"};   // test
+static const std::string PLATFORM_TEMPLATE_VIM{"vim"};       // test
 
 //-------------------------------------------
 void consoleSpace() {
@@ -140,43 +150,46 @@ void addPlatforms(std::string value) {
     std::vector < std::string > platforms = ofSplitString(value, ",", true, true);
 
     for (size_t i = 0; i < platforms.size(); i++) {
-        if (platforms[i] == "linux") {
-            targets.push_back("linux");
+        if (platforms[i] == PLATFORM_TEMPLATE_LINUX) {
+            targets.push_back(PLATFORM_TEMPLATE_LINUX);
         }
-        else if (platforms[i] == "linux64") {
-            targets.push_back("linux64");
+        else if (platforms[i] == PLATFORM_TEMPLATE_LINUX64) {
+            targets.push_back(PLATFORM_TEMPLATE_LINUX64);
         }
-        else if (platforms[i] == "linuxarmv6l") {
-            targets.push_back("linuxarmv6l");
+        else if (platforms[i] == PLATFORM_TEMPLATE_LINUXARMV6L) {
+            targets.push_back(PLATFORM_TEMPLATE_LINUXARMV6L);
         }
-        else if (platforms[i] == "linuxarmv7l") {
-            targets.push_back("linuxarmv7l");
+        else if (platforms[i] == PLATFORM_TEMPLATE_LINUXARMV7L) {
+            targets.push_back(PLATFORM_TEMPLATE_LINUXARMV7L);
         }
-        else if (platforms[i] == "msys2") {
-            targets.push_back("msys2");
+        else if (platforms[i] == PLATFORM_TEMPLATE_MINGW) {
+            targets.push_back(PLATFORM_TEMPLATE_MINGW);
         }
-        else if (platforms[i] == "vs") {
-            targets.push_back("vs");
+        else if (platforms[i] == PLATFORM_TEMPLATE_WINVS) {
+            targets.push_back(PLATFORM_TEMPLATE_WINVS);
         }
-        else if (platforms[i] == "osx") {
-            targets.push_back("osx");
+        else if (platforms[i] == PLATFORM_TEMPLATE_OSX) {
+            targets.push_back(PLATFORM_TEMPLATE_OSX);
         }
-        else if (platforms[i] == "ios") {
-            targets.push_back("ios");
+        else if (platforms[i] == PLATFORM_TEMPLATE_IOS) {
+            targets.push_back(PLATFORM_TEMPLATE_IOS);
         }
-        else if (platforms[i] == "android") {
-            targets.push_back("android");
+        else if (platforms[i] == PLATFORM_TEMPLATE_ANDROID) {
+            targets.push_back(PLATFORM_TEMPLATE_ANDROID);
+        }
+        else if (platforms[i] == PLATFORM_TEMPLATE_VSCODE) {
+            targets.push_back(PLATFORM_TEMPLATE_VSCODE);
         }
         else if (platforms[i] == "allplatforms") {
-            targets.push_back("linux");
-            targets.push_back("linux64");
-            targets.push_back("linuxarmv6l");
-            targets.push_back("linuxarmv7l");
-            targets.push_back("msys2");
-            targets.push_back("vs");
-            targets.push_back("osx");
-            targets.push_back("ios");
-            targets.push_back("android");
+            targets.push_back(PLATFORM_TEMPLATE_LINUX);
+            targets.push_back(PLATFORM_TEMPLATE_LINUX64);
+            targets.push_back(PLATFORM_TEMPLATE_LINUXARMV6L);
+            targets.push_back(PLATFORM_TEMPLATE_LINUXARMV7L);
+            targets.push_back(PLATFORM_TEMPLATE_MINGW);
+            targets.push_back(PLATFORM_TEMPLATE_WINVS);
+            targets.push_back(PLATFORM_TEMPLATE_OSX);
+            targets.push_back(PLATFORM_TEMPLATE_IOS);
+            targets.push_back(PLATFORM_TEMPLATE_ANDROID);
         }else{
             ofLogError() << "platform " << platforms[i] << " not valid";
         }
