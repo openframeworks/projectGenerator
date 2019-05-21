@@ -131,6 +131,7 @@ bool baseProject::create(string path, std::string templateName){
 
     if(templateName!=""){
         ofDirectory templateDir(ofFilePath::join(getOFRoot(),"scripts/templates/" + templateName));
+        templateDir.setShowHidden(true);
         auto templateConfig = parseTemplate(templateDir);
         if(templateConfig){
             ofDirectory project(projectDir);
