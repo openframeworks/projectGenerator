@@ -17,7 +17,7 @@
 #include "ofSystemUtils.h"
 #include "LibraryBinary.h"
 #include "baseProject.h"
-
+#include "PlatformConstants.h"
 
 std::string generateUUID(std::string input);
 
