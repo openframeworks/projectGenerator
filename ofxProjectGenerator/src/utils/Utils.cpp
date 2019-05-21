@@ -532,27 +532,26 @@ std::string getTargetString(ofTargetPlatform t){
 }
 
 
-unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ) {
-    switch (targ) {
-    case OF_TARGET_OSX:
-        return unique_ptr<xcodeProject>(new xcodeProject(getTargetString(targ)));
-    case OF_TARGET_MINGW:
-        return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
-    case OF_TARGET_WINVS:
-        return unique_ptr<visualStudioProject>(new visualStudioProject(getTargetString(targ)));
-    case OF_TARGET_IOS:
-        return unique_ptr<xcodeProject>(new xcodeProject(getTargetString(targ)));
-    case OF_TARGET_LINUX:
-        return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
-    case OF_TARGET_LINUX64:
-        return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
-    case OF_TARGET_LINUXARMV6L:
-        return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
-    case OF_TARGET_LINUXARMV7L:
-        return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
-    case OF_TARGET_ANDROID:
-        return unique_ptr<AndroidStudioProject>(new AndroidStudioProject(getTargetString(targ)));
-    default:
-        return unique_ptr<baseProject>();
+unique_ptr<baseProject> getTargetProject(std::string targ) {
+    if(targ == "osx") {
+        return unique_ptr<xcodeProject>(new xcodeProject(targ));
+    }else if(targ=="msys2"){
+        return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));
+    }else if(targ == "vs"){
+        return unique_ptr<visualStudioProject>(new visualStudioProject(targ));
+    }else if(targ == "ios"){
+        return unique_ptr<xcodeProject>(new xcodeProject(targ));
+    }else if(targ == "linux"){
+        return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));
+    }else if(targ == "linux64"){
+        return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));
+    }else if(targ == "linuxarmv6l"){
+        return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));
+    }else if(targ == "linuxarmv7l"){
+        return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));
+    }else if(targ == "android"){
+        return unique_ptr<AndroidStudioProject>(new AndroidStudioProject(targ));
     }
+    
+    return unique_ptr<baseProject>();
 }

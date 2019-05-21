@@ -56,7 +56,7 @@ std::string              directoryForRecursion;
 std::string              projectPath;
 std::string              ofPath;
 std::vector <std::string>     addons;
-std::vector <ofTargetPlatform>        targets;
+std::vector <std::string>     targets;
 std::string              ofPathEnv;
 std::string              currentWorkingDirectory;
 std::string              templateName;
@@ -87,7 +87,7 @@ bool printTemplates() {
     if(targets.size()>1){
 	std::vector<std::vector<baseProject::Template>> allPlatformsTemplates;
         for(auto & target: targets){
-            auto templates = getTargetProject(target)->listAvailableTemplates(getTargetString(target));
+            auto templates = getTargetProject(target)->listAvailableTemplates(target);
             allPlatformsTemplates.push_back(templates);
         }
 	std::set<baseProject::Template> commonTemplates;
@@ -122,8 +122,8 @@ bool printTemplates() {
     }else{
         bool templatesFound = false;
         for(auto & target: targets){
-            ofLogNotice() << "Templates for target " << getTargetString(target);
-            auto templates = getTargetProject(target)->listAvailableTemplates(getTargetString(target));
+            ofLogNotice() << "Templates for target " << target;
+            auto templates = getTargetProject(target)->listAvailableTemplates(target);
             for(auto & templateConfig: templates){
                 ofLogNotice() << templateConfig.name << "\t\t" << templateConfig.description;
             }
@@ -141,42 +141,42 @@ void addPlatforms(std::string value) {
 
     for (size_t i = 0; i < platforms.size(); i++) {
         if (platforms[i] == "linux") {
-            targets.push_back(OF_TARGET_LINUX);
+            targets.push_back("linux");
         }
         else if (platforms[i] == "linux64") {
-            targets.push_back(OF_TARGET_LINUX64);
+            targets.push_back("linux64");
         }
         else if (platforms[i] == "linuxarmv6l") {
-            targets.push_back(OF_TARGET_LINUXARMV6L);
+            targets.push_back("linuxarmv6l");
         }
         else if (platforms[i] == "linuxarmv7l") {
-            targets.push_back(OF_TARGET_LINUXARMV7L);
+            targets.push_back("linuxarmv7l");
         }
         else if (platforms[i] == "msys2") {
-            targets.push_back(OF_TARGET_MINGW);
+            targets.push_back("msys2");
         }
         else if (platforms[i] == "vs") {
-            targets.push_back(OF_TARGET_WINVS);
+            targets.push_back("vs");
         }
         else if (platforms[i] == "osx") {
-            targets.push_back(OF_TARGET_OSX);
+            targets.push_back("osx");
         }
         else if (platforms[i] == "ios") {
-            targets.push_back(OF_TARGET_IPHONE);
+            targets.push_back("ios");
         }
         else if (platforms[i] == "android") {
-            targets.push_back(OF_TARGET_ANDROID);
+            targets.push_back("android");
         }
         else if (platforms[i] == "allplatforms") {
-            targets.push_back(OF_TARGET_LINUX);
-            targets.push_back(OF_TARGET_LINUX64);
-            targets.push_back(OF_TARGET_LINUXARMV6L);
-            targets.push_back(OF_TARGET_LINUXARMV7L);
-            targets.push_back(OF_TARGET_MINGW);
-            targets.push_back(OF_TARGET_WINVS);
-            targets.push_back(OF_TARGET_OSX);
-            targets.push_back(OF_TARGET_IOS);
-            targets.push_back(OF_TARGET_ANDROID);
+            targets.push_back("linux");
+            targets.push_back("linux64");
+            targets.push_back("linuxarmv6l");
+            targets.push_back("linuxarmv7l");
+            targets.push_back("msys2");
+            targets.push_back("vs");
+            targets.push_back("osx");
+            targets.push_back("ios");
+            targets.push_back("android");
         }else{
             ofLogError() << "platform " << platforms[i] << " not valid";
         }
@@ -237,7 +237,7 @@ bool isGoodOFPath(std::string path) {
 
 
 
-void updateProject(std::string path, ofTargetPlatform target, bool bConsiderParameterAddons = true) {
+void updateProject(std::string path, std::string target, bool bConsiderParameterAddons = true) {
 
     // bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
     // either we read the addons.make file, or we look at the parameter list.
@@ -262,7 +262,7 @@ void updateProject(std::string path, ofTargetPlatform target, bool bConsiderPara
 }
 
 
-void recursiveUpdate(std::string path, ofTargetPlatform target) {
+void recursiveUpdate(std::string path, std::string target) {
     
     ofDirectory dir(path);
     
@@ -347,7 +347,7 @@ int main(int argc, char* argv[]){
     bRecursive = false;
     bHelpRequested = false;
     bListTemplates = false;
-    targets.push_back(ofGetTargetPlatform());
+    targets.push_back( getTargetString(ofGetTargetPlatform()) );
     startTime = 0;
     nProjectsUpdated = 0;
     nProjectsCreated = 0;
@@ -537,7 +537,7 @@ int main(int argc, char* argv[]){
 
         for (int i = 0; i < (int)targets.size(); i++) {
             auto project = getTargetProject(targets[i]);
-            auto target = getTargetString(targets[i]);
+            auto target = targets[i];
 
             ofLogNotice() << "-----------------------------------------------";
             ofLogNotice() << "setting OF path to: " << ofPath;
@@ -588,7 +588,7 @@ int main(int argc, char* argv[]){
                     }else{
                         ofLogNotice() << "from -o option";
                     }
-                    ofLogNotice() << "target platform is: " << getTargetString(targets[i]);
+                    ofLogNotice() << "target platform is: " << targets[i];
 
                     if(templateName!=""){
                         ofLogNotice() << "using additional template " << templateName;
@@ -609,7 +609,7 @@ int main(int argc, char* argv[]){
             for (int i = 0; i < (int)targets.size(); i++) {
                 ofLogNotice() << "-----------------------------------------------";
                 ofLogNotice() << "updating an existing project";
-                ofLogNotice() << "target platform is: " << getTargetString(targets[i]);
+                ofLogNotice() << "target platform is: " << targets[i];
 
                 recursiveUpdate(projectPath, targets[i]);
                 

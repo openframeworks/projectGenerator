@@ -55,7 +55,7 @@ std::string getOFRootFromConfig();
 
 std::string getTargetString(ofTargetPlatform t);
 
-std::unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ);
+std::unique_ptr<baseProject> getTargetProject(std::string targ);
 
 template <class T>
 inline bool isInVector(T item, std::vector<T> & vec){
