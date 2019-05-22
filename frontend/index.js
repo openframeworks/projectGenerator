@@ -57,6 +57,7 @@ try {
         "defaultOfPath": "",
         "advancedMode": false,
         "defaultPlatform": myPlatform,
+        "defaultTemplate": "default",
         "showConsole": false,
         "showDeveloperTools": false,
         "defaultRelativeProjectPath": "apps/myApps",
@@ -99,6 +100,7 @@ var platforms = {
 };
 var bUseMoniker = obj["useDictionaryNameGenerator"];
 
+var templates = {};
 
 if (!path.isAbsolute(defaultOfPath)) {
 
@@ -320,6 +322,11 @@ function parsePlatformsAndUpdateSelect(arg) {
     console.log(folders);
 
     var platformsWeHave = {};
+    var templatesWeHave = {};
+
+    templatesWeHave["default"] = "Default";
+    templatesWeHave["gl4.1"] = "GL4.1";
+
     if (folders === undefined || folders === null) {
         //do something
     } else {
@@ -336,6 +343,7 @@ function parsePlatformsAndUpdateSelect(arg) {
     // }
     mainWindow.webContents.send('setPlatforms', platformsWeHave);
 
+   mainWindow.webContents.send('setTemplates', templatesWeHave);
 
 }
 

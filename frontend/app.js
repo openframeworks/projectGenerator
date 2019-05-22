@@ -8,6 +8,7 @@ var fs = require('fs');
 
 
 var platforms;
+var templates;
 
 // var platforms = {
 //     "osx": "OS X (Xcode)",
@@ -204,7 +205,59 @@ ipc.on('setPlatforms', function(arg) {
 });
 
 
+ipc.on('setTemplates', function(arg) {
+    console.log("----------------");
+    console.log("got set templates");
+    console.log(arg);
 
+    templates = arg;
+
+    var select = document.getElementById("templateList");
+    var option, i;
+    for (var i in templates) {
+        console.log(i);
+        var myClass = 'template';
+
+        $('<div/>', {
+            "class": 'item',
+            "data-value": i
+        }).html(templates[i]).appendTo(select);
+    }
+
+    console.log(select);
+
+    // start the template drop down.
+    $('#templatesDropdown')
+    .dropdown({
+        allowAdditions: true,
+        fullTextSearch: 'exact',
+        match: "text"
+    });
+
+    // // set the platform to default
+    $('#templatesDropdown').dropdown('set exactly', defaultSettings['defaultTemplate']);
+
+    // Multi
+    var select = document.getElementById("templateListMulti");
+    var option, i;
+    for (var i in templates) {
+        var myClass = 'template';
+
+        $('<div/>', {
+            "class": 'item',
+            "data-value": i
+        }).html(templates[i]).appendTo(select);        
+    }
+
+    // start the platform drop down.
+    $('#templatesDropdownMulti')
+        .dropdown({
+            allowAdditions: false
+        });
+
+    // // set the platform to default
+    $('#templatesDropdownMulti').dropdown('set exactly', defaultSettings['defaultTemplate']);
+});
 
 
 
@@ -606,6 +659,7 @@ function setup() {
 
         // show default platform in GUI
         $("#defaultPlatform").html(defaultSettings['defaultPlatform']);
+        $("#defaultTemplate").html(defaultSettings['defaultTemplate']);
 
         // Enable tooltips
         //$("[data-toggle='tooltip']").tooltip();
