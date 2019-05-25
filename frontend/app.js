@@ -724,7 +724,7 @@ function onDropFile( e ){
             // import single project folder
             $("#projectName").val( files[0].name );
             var projectFullPath = files[0].path;
-            var projectParentPath = path.normalize(projectFullPath+'\\..');            
+            var projectParentPath = path.normalize(projectFullPath+'/..');            
             $("#projectPath").val( projectParentPath ).triggerHandler('change');
 
             $("createMenuButon").triggerHandler('click');
