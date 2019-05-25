@@ -57,7 +57,6 @@ try {
         "defaultOfPath": "",
         "advancedMode": false,
         "defaultPlatform": myPlatform,
-        "defaultTemplate": "default",
         "showConsole": false,
         "showDeveloperTools": false,
         "defaultRelativeProjectPath": "apps/myApps",
@@ -100,7 +99,30 @@ var platforms = {
 };
 var bUseMoniker = obj["useDictionaryNameGenerator"];
 
-var templates = {};
+var templates = {
+    "emscripten": "Emscripten",
+    "gitignore": "Git Ignore",
+    "gles2": "Open GL ES 2",
+    "gl3.1": "Open GL 3.1",
+    "gl3.2": "Open GL 3.2",
+    "gl3.3": "Open GL 3.3",
+    "gl4.0": "Open GL 4.0",
+    "gl4.1": "Open GL 4.1",
+    "gl4.2": "Open GL 4.2",
+    "gl4.3": "Open GL 4.3",
+    "gl4.4": "Open GL 4.4",
+    "gl4.5": "Open GL 4.5",
+    "gles2": "Open GL ES 2",
+    "linux": "Linux",  // !!??
+    "msys2": "MSYS2/MinGW project template",
+    "nofmod": "OSX application with no FMOD linking",
+    "nowindow": "No window application",
+    "tvOS": "Apple tvOS template",
+    "unittest": "Unit test no window application",
+    "vscode": "Visual Studio Code",
+};
+
+
 
 if (!path.isAbsolute(defaultOfPath)) {
 
@@ -324,16 +346,27 @@ function parsePlatformsAndUpdateSelect(arg) {
     var platformsWeHave = {};
     var templatesWeHave = {};
 
-    templatesWeHave["default"] = "Default";
-    templatesWeHave["gl4.1"] = "GL4.1";
-
     if (folders === undefined || folders === null) {
         //do something
     } else {
-        for (var key in platforms) {
-            if (folders.indexOf(key) > -1) {
-                console.log("key " + key + " has value " + platforms[key]);
+        // check all folder name under /scripts/templates
+        for (var id in folders) {
+            var key = folders[id];
+            if (platforms[key]) {
+                // this folder is for platform
+                console.log("Found platform, key " + key + " has value " + platforms[key]);
                 platformsWeHave[key] = platforms[key];
+            }else{
+                // this folder is for template
+                if(templates[key]){
+                    console.log("Found template folder, key " + key + " has value " + templates[key]);
+                    templatesWeHave[key] = templates[key];
+                }else{
+                    // Unofficial folder name, maybe user's custom template? 
+                    // We use folder name for both of key and value
+                    console.log("Found unofficial folder, key " + key + " has value " + key);
+                    templatesWeHave[key] = key;
+                }
             }
         }
     }

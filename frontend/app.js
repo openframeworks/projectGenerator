@@ -229,13 +229,14 @@ ipc.on('setTemplates', function(arg) {
     // start the template drop down.
     $('#templatesDropdown')
     .dropdown({
-        allowAdditions: true,
+        allowAdditions: false,
         fullTextSearch: 'exact',
-        match: "text"
+        match: "text",
+        maxSelections: 1
     });
 
-    // // set the platform to default
-    $('#templatesDropdown').dropdown('set exactly', defaultSettings['defaultTemplate']);
+    // // set the template to default
+    //$('#templatesDropdown').dropdown('set exactly', defaultSettings['defaultTemplate']);
 
     // Multi
     var select = document.getElementById("templateListMulti");
@@ -252,11 +253,12 @@ ipc.on('setTemplates', function(arg) {
     // start the platform drop down.
     $('#templatesDropdownMulti')
         .dropdown({
-            allowAdditions: false
+            allowAdditions: false,
+            maxSelections: 1
         });
 
-    // // set the platform to default
-    $('#templatesDropdownMulti').dropdown('set exactly', defaultSettings['defaultTemplate']);
+    // // set the template to default
+    //$('#templatesDropdownMulti').dropdown('set exactly', defaultSettings['defaultTemplate']);
 });
 
 
@@ -659,7 +661,7 @@ function setup() {
 
         // show default platform in GUI
         $("#defaultPlatform").html(defaultSettings['defaultPlatform']);
-        $("#defaultTemplate").html(defaultSettings['defaultTemplate']);
+        //$("#defaultTemplate").html(defaultSettings['defaultTemplate']);
 
         // Enable tooltips
         //$("[data-toggle='tooltip']").tooltip();
