@@ -254,7 +254,43 @@ void baseProject::addAddon(std::string addonName){
         auto standardPath = ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), addonName);
         addon.fromFS(standardPath, target);
     }
+
     addAddon(addon);
+
+    // Process values from ADDON_DATA
+    if(addon.data.size()){
+
+        for(auto& d : addon.data){
+
+			filesystem::path path(ofFilePath::join(addon.addonPath, d));
+			
+			if(filesystem::exists(path)){
+				if (filesystem::is_regular_file(path)){
+					ofFile src(path);
+					string dest = ofFilePath::join(projectDir, "bin/data/");
+					ofStringReplace(d, "data/", ""); // avoid to copy files at /data/data/*
+					bool success = src.copyTo(ofFilePath::join(dest, d), false, true);
+					if(success){
+						ofLogVerbose() << "adding addon data file: " << d;
+					}else {
+						ofLogWarning() << "Can not add addon data file: " << d;
+					}
+				}else if(filesystem::is_directory(path)){
+					ofDirectory dir(path);
+					string dest = ofFilePath::join(projectDir, "bin/data/");
+					ofStringReplace(d, "data/", ""); // avoid to copy files at /data/data/*
+					bool success = dir.copyTo(ofFilePath::join(dest, d), false, true);
+					if(success){
+						ofLogVerbose() << "adding addon data folder: " << d;
+					}else{
+						ofLogWarning() << "Can not add addon data folder: " << d;
+					}
+				}
+			}else{
+				ofLogWarning() << "addon data file does not exist, skipping: " << d;
+			}
+        }
+    }
 }
 
 void baseProject::addAddon(ofAddon & addon){
