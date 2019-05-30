@@ -1252,7 +1252,7 @@ void xcodeProject::addAddon(ofAddon & addon){
         addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
     }
 	for(int i=0;i<(int)addon.defines.size(); i++){
-		ofLogVerbose() << "adding addon defines: " << addon.srcFiles[i];
+		ofLogVerbose() << "adding addon defines: " << addon.defines[i];
 		addDefine(addon.defines[i]);
 	}
 
