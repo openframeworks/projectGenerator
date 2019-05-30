@@ -723,8 +723,9 @@ function onDropFile( e ){
             var files = e.originalEvent.dataTransfer.files;
             // import single project folder
             $("#projectName").val( files[0].name );
-            var regExp = new RegExp("\\b/"+files[0].name+"\\b","gi");
-            $("#projectPath").val( files[0].path.replace(regExp,"") ).triggerHandler('change');
+            var projectFullPath = files[0].path;
+            var projectParentPath = path.normalize(projectFullPath+'/..');            
+            $("#projectPath").val( projectParentPath ).triggerHandler('change');
 
             $("createMenuButon").triggerHandler('click');
         }
