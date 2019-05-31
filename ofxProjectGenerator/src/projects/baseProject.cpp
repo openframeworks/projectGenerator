@@ -131,10 +131,7 @@ bool baseProject::create(string path, std::string templateName){
 
     if(templateName!=""){
         ofDirectory templateDir(ofFilePath::join(getOFRoot(),"scripts/templates/" + templateName));
-        if(templateName=="vscode"){
-            // make json files visible in /templates/vscode/.vscode
-            templateDir.setShowHidden(true);
-        }
+        templateDir.setShowHidden(true);
         auto templateConfig = parseTemplate(templateDir);
         if(templateConfig){
             ofDirectory project(projectDir);
