@@ -978,9 +978,17 @@ function enableAdvancedMode(isAdvanced) {
         $("body").addClass('advanced');
         $('a.updateMultiMenuOption').show();
 
+        $('#templatesSection').show();
+        $('#templatesSectionMulti').show();
+
     } else {
         $('#platformsDropdown').addClass("disabled");
         $('#platformsDropdown').dropdown('set exactly', defaultSettings['defaultPlatform']);
+
+        $('#templatesSection').hide();
+        $('#templatesSectionMulti').hide();
+        $('#templatesDropdown').dropdown('set exactly', '');
+        $('#templatesDropdownMulti').dropdown('set exactly', '');
 
         $("body").removeClass('advanced');
         $('a.updateMultiMenuOption').hide();
