@@ -27,7 +27,7 @@ public:
 	std::string getName();
 	std::string getPath();
 
-	static std::string LOG_NAME;
+    static std::string LOG_NAME;
 
 private:
 

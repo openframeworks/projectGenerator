@@ -2,6 +2,18 @@
 #include "baseProject.h"
 #include <set>
 
+struct QtFlagString {
+public:
+    std::string value;
+    std::string start;
+    std::string end;
+    QtFlagString(std::string v, std::string s, std::string e) {
+//        value = v;
+        start = s;
+        end = e;
+    }
+};
+
 class QtCreatorProject : public baseProject
 {
 public:
@@ -21,4 +33,5 @@ private:
     std::set<std::string> qbsProjectFiles;
     ofBuffer qbs;
     std::string originalFilesStr, originalAddonsStr;
+    std::vector<QtFlagString> flagConfig;
 };

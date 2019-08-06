@@ -59,6 +59,7 @@ bool QtCreatorProject::createProjectFile(){
         findandreplaceInTexfile(projectDir + "config.make", "../../..", relPath2);
     }
 
+
     return true;
 }
 
@@ -106,6 +107,7 @@ bool QtCreatorProject::loadProjectFile(){
             }
         }
     }
+
     return ret;
 }
 
@@ -134,18 +136,58 @@ bool QtCreatorProject::saveProjectFile(){
         filesStr += "\n\n        " + addonsStr;
     }
     if(originalFilesStr!=""){
-    	ofStringReplace(qbsStr,originalFilesStr,filesStr);
+        ofStringReplace(qbsStr,originalFilesStr,filesStr);
+    }
+    flagConfig.push_back( QtFlagString("srcFiles", "", "") );
+    flagConfig.push_back( QtFlagString("csrcFiles", "", "") );
+    flagConfig.push_back( QtFlagString("headersrcFiles", "", "") );
+    flagConfig.push_back( QtFlagString("objcsrcFiles", "", "") );
+    flagConfig.push_back( QtFlagString("includePaths", "of.includePaths: [", "]     // include search paths") );
+    flagConfig.push_back( QtFlagString("propsFiles", "", "") );
+    flagConfig.push_back( QtFlagString("dependencies", "", "") );
+    flagConfig.push_back( QtFlagString("cflags", "", "") );
+    flagConfig.push_back( QtFlagString("cppflags", "", "") );
+    flagConfig.push_back( QtFlagString("ldflags", "", "") );
+    flagConfig.push_back( QtFlagString("data", "", "") );
+    flagConfig.push_back( QtFlagString("defines", "", "") );
+    flagConfig.push_back( QtFlagString("libs", "of.dynamicLibraries: [", "] // dynamic libraries") );
+
+    for(auto & a : addons) {
+
+
+        std::vector<std::vector<std::string>> allFlags = {a.srcFiles, a.csrcFiles, a.headersrcFiles, a.objcsrcFiles, a.includePaths, a.propsFiles, a.dependencies, a.cflags, a.cppflags, a.ldflags, a.data, a.defines};
+
+        for(int i = 0; i < flagConfig.size(); i++ ) {
+            if (i < flagConfig.size() - 1) {
+                for (auto & s : allFlags[i]) flagConfig[i].value += "\"" + s + "\", "; // String array
+            } else {
+                for (auto & s : a.libs) flagConfig[i].value += "\"" + s.path + "\", "; // LibraryBinary object
+            }
+        }
+
     }
 
-    // save final project
+    for (auto & c : flagConfig) {
+        if (c.start != "" && c.end != "") {
+            std::string v = c.value.substr(0, c.value.size() - 2) + " "; // shave last comma
+            std::size_t first = qbsStr.find(c.start);
+            std::size_t last = qbsStr.find(c.end);
+            std::string originalStr = qbsStr.substr(first, last-first);
+            if(originalStr!="") {
+                ofLog() << "including libs: " << v;
+                ofStringReplace(qbsStr,originalStr, c.start + v );
+             }
+        }
+    }
+
     qbs.set(qbsStr);
     ofFile project(projectDir + projectName + ".qbs",ofFile::WriteOnly,true);
     project.writeFromBuffer(qbs);
     return true;
 }
-
 void QtCreatorProject::addAddon(ofAddon & addon){
     for(int i=0;i<(int)addons.size();i++){
+
         if(addons[i].name==addon.name) return;
     }
 
