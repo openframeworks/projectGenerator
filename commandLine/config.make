@@ -81,6 +81,9 @@ PROJECT_AFTER_OSX = cp "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PROD
 # TODO: should this be a default setting?
 # PROJECT_LDFLAGS=-Wl,-rpath=./libs
 
+#Needs the Poco libs to link
+PROJECT_LDFLAGS += -L$(OF_ROOT)/addons/ofxPoco/libs/poco/lib/$(PLATFORM_LIB_SUBPATH)
+
 ################################################################################
 # PROJECT DEFINES
 #   Create a space-delimited list of DEFINES. The list will be converted into 
