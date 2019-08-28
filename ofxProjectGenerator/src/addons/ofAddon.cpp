@@ -140,7 +140,7 @@ bool ofAddon::checkCorrectVariable(string variable, ConfigParseState state){
 				variable == "ADDON_DATA" ||
 				variable == "ADDON_LIBS_EXCLUDE" || variable == "ADDON_SOURCES_EXCLUDE" || variable == "ADDON_INCLUDES_EXCLUDE" ||
 				variable == "ADDON_DLLS_TO_COPY" ||
-				variable == "ADDON_DEFINES");
+				variable == "ADDON_DEFINES" || variable == "ADDON_PREPROCESSOR_DEFINITIONS");
 	case Unknown:
 	default:
 		return false;
@@ -261,8 +261,13 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 		addReplaceStringVector(includePaths,value,addonRelPath,addToValue);
 	}
 
+	
 	if(variable == "ADDON_CFLAGS"){
 		addReplaceStringVector(cflags,value,"",addToValue);
+	}
+
+	if (variable == "ADDON_PREPROCESSOR_DEFINITIONS") {
+		addReplaceStringVector(preprocessorDefinitions, value, "", addToValue);
 	}
 
 	if(variable == "ADDON_CPPFLAGS"){
@@ -310,7 +315,7 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 	}
 
 	if(variable == "ADDON_DATA"){
-		addReplaceStringVector(data,value,"",addToValue);
+		addReplaceStringVector(data,value,addonRelPath,addToValue);
 	}
 
 	if(variable == "ADDON_LIBS_EXCLUDE"){

@@ -388,6 +388,31 @@ void visualStudioProject::addDefine(std::string define, LibType libType)
 	}
 }
 
+void visualStudioProject::addPreprocessorDefinitions(std::string define, LibType libType)
+{
+	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
+	for (int i = 0; i < items.size(); i++) {
+		pugi::xml_node additionalOptions;
+		bool found = false;
+		std::string condition(items[i].node().attribute("Condition").value());
+		if (libType == RELEASE_LIB && condition.find("Debug") != std::string::npos) {
+			additionalOptions = items[i].node().child("ClCompile").child("PreprocessorDefinitions");
+			found = true;
+		}
+		else if (libType == DEBUG_LIB && condition.find("Release") != std::string::npos) {
+			additionalOptions = items[i].node().child("ClCompile").child("PreprocessorDefinitions");
+			found = true;
+		}
+		if (!found) continue;
+		if (!additionalOptions) {
+			items[i].node().child("ClCompile").append_child("PreprocessorDefinitions").append_child(pugi::node_pcdata).set_value(define.c_str());
+		}
+		else {
+			additionalOptions.first_child().set_value((std::string(additionalOptions.first_child().value()) + " " + define).c_str());
+		}
+	}
+}
+
 void visualStudioProject::addAddon(ofAddon & addon){
     for(int i=0;i<(int)addons.size();i++){
 		if(addons[i].name==addon.name) return;
@@ -466,4 +491,9 @@ void visualStudioProject::addAddon(ofAddon & addon){
 		addDefine(addon.defines[i], DEBUG_LIB);
 	}
 
+	for (int i = 0; i < (int)addon.preprocessorDefinitions.size(); i++) {
+		ofLogVerbose() << "adding addon preprocessorDefinitions: " << addon.preprocessorDefinitions[i];
+		addPreprocessorDefinitions(addon.preprocessorDefinitions[i], RELEASE_LIB);
+		addPreprocessorDefinitions(addon.preprocessorDefinitions[i], DEBUG_LIB);
+	}
 }

@@ -45,6 +45,7 @@ public:
     std::vector < std::string > frameworks;		// osx only
     std::vector < std::string > data;
 	std::vector < std::string > defines;
+	std::vector < std::string > preprocessorDefinitions; // vs only
 
     // metadata
     std::string name;
