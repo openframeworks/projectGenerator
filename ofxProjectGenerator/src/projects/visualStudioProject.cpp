@@ -334,7 +334,7 @@ void visualStudioProject::addCFLAG(std::string cflag, LibType libType){
 		if(!additionalOptions){
 			items[i].node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(cflag.c_str());
 		}else{
-			additionalOptions.set_value((std::string(additionalOptions.value()) + " " + cflag).c_str());
+			additionalOptions.first_child().set_value((std::string(additionalOptions.first_child().value()) + " " + cflag).c_str());
 		}
 	}
 
@@ -357,7 +357,7 @@ void visualStudioProject::addCPPFLAG(std::string cppflag, LibType libType){
 		if(!additionalOptions){
 			items[i].node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(cppflag.c_str());
 		}else{
-			additionalOptions.set_value((std::string(additionalOptions.value()) + " " + cppflag).c_str());
+			additionalOptions.first_child().set_value((std::string(additionalOptions.first_child().value()) + " " + cppflag).c_str());
 		}
 	}
 
@@ -383,7 +383,7 @@ void visualStudioProject::addDefine(std::string define, LibType libType)
 			items[i].node().child("ClCompile").append_child("PreprocessorDefinitions").append_child(pugi::node_pcdata).set_value(define.c_str());
 		}
 		else {
-			additionalOptions.set_value((std::string(additionalOptions.value()) + " " + define).c_str());
+			additionalOptions.first_child().set_value((std::string(additionalOptions.first_child().value()) + " " + define).c_str());
 		}
 	}
 }
@@ -451,6 +451,8 @@ void visualStudioProject::addAddon(ofAddon & addon){
 		addCFLAG(addon.cflags[i],RELEASE_LIB);
 		addCFLAG(addon.cflags[i],DEBUG_LIB);
 	}
+
+
 	
 	for(int i=0;i<(int)addon.cppflags.size();i++){
 		ofLogVerbose() << "adding addon cppflags: " << addon.cppflags[i];
@@ -463,4 +465,5 @@ void visualStudioProject::addAddon(ofAddon & addon){
 		addDefine(addon.defines[i], RELEASE_LIB);
 		addDefine(addon.defines[i], DEBUG_LIB);
 	}
+
 }
