@@ -22,7 +22,6 @@ public:
     void addCFLAG(std::string cflag, LibType libType = RELEASE_LIB); // C
     void addCPPFLAG(std::string cppflag, LibType libType = RELEASE_LIB); // C++
 	void addDefine(std::string define, LibType libType = RELEASE_LIB);
-	void addPreprocessorDefinitions(std::string define, LibType libType = RELEASE_LIB);
 
     void addAddon(ofAddon & addon);
 

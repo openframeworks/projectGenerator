@@ -140,7 +140,7 @@ bool ofAddon::checkCorrectVariable(string variable, ConfigParseState state){
 				variable == "ADDON_DATA" ||
 				variable == "ADDON_LIBS_EXCLUDE" || variable == "ADDON_SOURCES_EXCLUDE" || variable == "ADDON_INCLUDES_EXCLUDE" ||
 				variable == "ADDON_DLLS_TO_COPY" ||
-				variable == "ADDON_DEFINES" || variable == "ADDON_PREPROCESSOR_DEFINITIONS");
+				variable == "ADDON_DEFINES");
 	case Unknown:
 	default:
 		return false;
