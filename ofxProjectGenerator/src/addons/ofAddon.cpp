@@ -266,10 +266,6 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 		addReplaceStringVector(cflags,value,"",addToValue);
 	}
 
-	if (variable == "ADDON_PREPROCESSOR_DEFINITIONS") {
-		addReplaceStringVector(preprocessorDefinitions, value, "", addToValue);
-	}
-
 	if(variable == "ADDON_CPPFLAGS"){
 		addReplaceStringVector(cppflags,value,"",addToValue);
 	}
