@@ -209,10 +209,10 @@ function toLetters(num) {
 app.on('ready', function() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: 1920,
-        height: 1080,
-        resizable: true,
-        frame: true
+        width: 500,
+        height: 600,
+        resizable: false,
+        frame: false
     });
 
     // load jquery here:
