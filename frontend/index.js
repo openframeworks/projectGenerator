@@ -592,16 +592,16 @@ ipc.on('refreshTemplateList', function (event, arg) {
                 {
                     line_st = line_st.replace('PLATFORMS', '');
                     line_st = line_st.replace('=', '');
-                    let platforms = line_st.trim().split(' ');
+                    let supportedPlatforms = line_st.trim().split(' ');
 
-                    // platforms: array of platform suportd by this template
-                    // selectedPlatforms: array of platform user selected on dropdown ui
+                    // supportedPlatforms: array of platform supported by this template
+                    // selectedPlatforms: array of platform selected by dropdown ui
                     for (let selectedPlatform of selectedPlatforms)
                     {
                         let bSupportedTemplate = false;
-                        for (let platform of platforms)
+                        for (let supportedPlatform of supportedPlatforms)
                         {
-                            if (selectedPlatform == platform)
+                            if (selectedPlatform == supportedPlatform)
                             {
                                 bSupportedTemplate = true;
                             }
