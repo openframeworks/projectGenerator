@@ -209,10 +209,10 @@ function toLetters(num) {
 app.on('ready', function() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: 500,
-        height: 600,
-        resizable: false,
-        frame: false
+        width: 1920,
+        height: 1080,
+        resizable: true,
+        frame: true
     });
 
     // load jquery here:
@@ -565,6 +565,54 @@ ipc.on('refreshPlatformList', function(event, arg) {
 });
 
 
+ipc.on('refreshTemplateList', function (event, arg) {
+    console.log("refreshTemplateList");
+    let selectedPlatforms = arg.selectedPlatforms;
+    let ofPath = arg.ofPath;
+
+    // Everytime user select/deselect new platforms,
+    // we check each templates and disable if it is not supported by selected platforms
+    let invalidTemplateList = [];
+
+    // iterate all avairable templates and check template.config file
+    for (let template in templates)
+    {
+        let configFilePath = ofPath + "/scripts/templates/" + template + "/template.config";
+        if (fs.existsSync(configFilePath))
+        {
+            const lineByLine = require('n-readlines');
+            const liner = new lineByLine(configFilePath);
+            let line;
+
+            // read line by line and try to find PLATFORMS setting
+            while (line = liner.next())
+            {
+                let line_st = line.toString();
+                if (line_st.includes('PLATFORMS'))
+                {
+                    line_st = line_st.replace('PLATFORMS', '');
+                    line_st = line_st.replace('=', '');
+                    let platforms = line_st.trim().split(' ');
+
+                    // platforms: array of platform suportd by this template
+                    // selectedPlatforms: array of platform user selected on dropdown ui
+                    for (let platform of platforms)
+                    {
+                        for (let selectedPlatform of selectedPlatforms)
+                        {
+                            if (selectedPlatform !== platform)
+                            {
+                                console.log("Selected platform " + selectedPlatform + " does not supports template " + template);
+                                invalidTemplateList.push(template);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    mainWindow.webContents.send('enableTemplate', invalidTemplateList);
+});
 
 ipc.on('getRandomSketchName', function(event, arg) {
     var goodName = getGoodSketchName(arg);

@@ -262,6 +262,31 @@ ipc.on('setTemplates', function(arg) {
 });
 
 
+ipc.on('enableTemplate', function (arg) {
+
+    console.log('enableTemplate');
+
+    let items = $('#templatesDropdown .menu .item');
+
+    // enable all first
+    for (let i = 0; i < items.length; i++)
+    {
+        let item = $(items[i]);
+        item.removeClass("disabled");
+    }
+
+    for (let template of arg)
+    {
+        for (let i = 0; i < items.length; i++)
+        {
+            let item = $(items[i]);
+            if (item.attr('data-value') === template)
+            {
+                item.addClass("disabled");
+            }
+        }
+    }
+});
 
 //-------------------------------------------
 // select the list of addons and notify if some aren't installed
@@ -709,6 +734,18 @@ function setup() {
         $("#dropZoneUpdate").on('dragenter dragover drop', onDragUpdateFile).on('dragleave', function(e){
             $(this).removeClass("accept deny");
         });
+
+
+        // reflesh template dropdown list depends on selected platforms
+        $("#platformsDropdown").on('change', function () {
+            let selectedPlatforms = $("#platformsDropdown input").val();
+            let selectedPlatformArray = selectedPlatforms.trim().split(',');
+            let arg = {
+                ofPath: $("#ofPath").val(),
+                selectedPlatforms: selectedPlatformArray
+            }
+            ipc.send('refreshTemplateList', arg);
+        })
 
     });
 }
