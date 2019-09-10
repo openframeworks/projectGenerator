@@ -601,12 +601,12 @@ ipc.on('refreshTemplateList', function (event, arg) {
                         let bSupportedTemplate = false;
                         for (let supportedPlatform of supportedPlatforms)
                         {
-                            if (selectedPlatform == supportedPlatform)
+                            if (selectedPlatform === supportedPlatform)
                             {
                                 bSupportedTemplate = true;
                             }
                         }
-                        if (bSupportedTemplate == false)
+                        if (bSupportedTemplate === false)
                         {
                             console.log("Selected platform " + selectedPlatform + " does not support template " + template);
                             invalidTemplateList.push(template);
