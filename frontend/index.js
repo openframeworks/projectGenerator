@@ -596,15 +596,20 @@ ipc.on('refreshTemplateList', function (event, arg) {
 
                     // platforms: array of platform suportd by this template
                     // selectedPlatforms: array of platform user selected on dropdown ui
-                    for (let platform of platforms)
+                    for (let selectedPlatform of selectedPlatforms)
                     {
-                        for (let selectedPlatform of selectedPlatforms)
+                        let bSupportedTemplate = false;
+                        for (let platform of platforms)
                         {
-                            if (selectedPlatform !== platform)
+                            if (selectedPlatform == platform)
                             {
-                                console.log("Selected platform " + selectedPlatform + " does not supports template " + template);
-                                invalidTemplateList.push(template);
+                                bSupportedTemplate = true;
                             }
+                        }
+                        if (bSupportedTemplate == false)
+                        {
+                            console.log("Selected platform " + selectedPlatform + " does not support template " + template);
+                            invalidTemplateList.push(template);
                         }
                     }
                 }
