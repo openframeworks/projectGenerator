@@ -886,6 +886,12 @@ function generate() {
     // let's get all the info:
     var platformValueArray = getPlatformList();
 
+    var templatePicked = $("#templatesDropdown .active");
+    var templateValueArray = [];
+    for (var i = 0; i < templatePicked.length; i++){
+        templateValueArray.push($(templatePicked[i]).attr("data-value"));
+    }
+
     var addonsPicked = $("#addonsDropdown  .active");
     var addonValueArray = [];
 
@@ -905,6 +911,7 @@ function generate() {
     gen['projectName'] = $("#projectName").val();
     gen['projectPath'] = $("#projectPath").val();
     gen['platformList'] = platformValueArray;
+    gen['templateList'] = templateValueArray;
     gen['addonList'] = addonValueArray; //$("#addonsDropdown").val();
     gen['ofPath'] = $("#ofPath").val();
     gen['verbose'] = bVerbose;

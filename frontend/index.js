@@ -723,12 +723,17 @@ ipc.on('generate', function(event, arg) {
     var pathString = "";
     var addonString = "";
     var platformString = "";
+    var templateString = "";
     var verboseString = "";
 
 
 
     if (generate['platformList'] !== null) {
         platformString = "-p\"" + generate['platformList'].join(",") + "\"";
+    }
+
+    if (generate['templateList'] !== null) {
+        platformString = "-t\"" + generate['templateList'].join(",") + "\"";
     }
 
     if (generate['addonList'] !== null &&
@@ -764,7 +769,7 @@ ipc.on('generate', function(event, arg) {
         pgApp = pgApp = "\"" + pgApp + "\"";
     }
 
-    var wholeString = pgApp + " " + verboseString + " " + pathString + " " + addonString + " " + platformString + " " + projectString;
+    var wholeString = pgApp + " " + verboseString + " " + pathString + " " + addonString + " " + platformString + " " + templateString + " " + projectString;
 
     exec(wholeString, {maxBuffer : Infinity}, function callback(error, stdout, stderr) {
 
