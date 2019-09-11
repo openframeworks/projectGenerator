@@ -742,7 +742,7 @@ ipc.on('generate', function(event, arg) {
     }
 
     if (generate['templateList'] !== null) {
-        platformString = "-t\"" + generate['templateList'].join(",") + "\"";
+        templateString = "-t\"" + generate['templateList'].join(",") + "\"";
     }
 
     if (generate['addonList'] !== null &&
