@@ -269,19 +269,15 @@ ipc.on('enableTemplate', function (arg) {
     let items = $('#templatesDropdown .menu .item');
 
     // enable all first
-    for (let i = 0; i < items.length; i++)
-    {
+    for (let i = 0; i < items.length; i++) {
         let item = $(items[i]);
         item.removeClass("disabled");
     }
 
-    for (let template of arg)
-    {
-        for (let i = 0; i < items.length; i++)
-        {
+    for (let template of arg) {
+        for (let i = 0; i < items.length; i++) {
             let item = $(items[i]);
-            if (item.attr('data-value') === template)
-            {
+            if (item.attr('data-value') === template) {
                 item.addClass("disabled");
             }
         }

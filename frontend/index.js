@@ -575,39 +575,31 @@ ipc.on('refreshTemplateList', function (event, arg) {
     let invalidTemplateList = [];
 
     // iterate all avairable templates and check template.config file
-    for (let template in templates)
-    {
+    for (let template in templates) {
         let configFilePath = ofPath + "/scripts/templates/" + template + "/template.config";
-        if (fs.existsSync(configFilePath))
-        {
+        if (fs.existsSync(configFilePath)) {
             const lineByLine = require('n-readlines');
             const liner = new lineByLine(configFilePath);
             let line;
 
             // read line by line and try to find PLATFORMS setting
-            while (line = liner.next())
-            {
+            while (line = liner.next()) {
                 let line_st = line.toString();
-                if (line_st.includes('PLATFORMS'))
-                {
+                if (line_st.includes('PLATFORMS')) {
                     line_st = line_st.replace('PLATFORMS', '');
                     line_st = line_st.replace('=', '');
                     let supportedPlatforms = line_st.trim().split(' ');
 
                     // supportedPlatforms: array of platform supported by this template
                     // selectedPlatforms: array of platform selected by dropdown ui
-                    for (let selectedPlatform of selectedPlatforms)
-                    {
+                    for (let selectedPlatform of selectedPlatforms) {
                         let bSupportedTemplate = false;
-                        for (let supportedPlatform of supportedPlatforms)
-                        {
-                            if (selectedPlatform === supportedPlatform)
-                            {
+                        for (let supportedPlatform of supportedPlatforms) {
+                            if (selectedPlatform === supportedPlatform) {
                                 bSupportedTemplate = true;
                             }
                         }
-                        if (bSupportedTemplate === false)
-                        {
+                        if (bSupportedTemplate === false) {
                             console.log("Selected platform " + selectedPlatform + " does not support template " + template);
                             invalidTemplateList.push(template);
                         }
