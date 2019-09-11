@@ -625,7 +625,11 @@ ipc.on('refreshTemplateList', function (event, arg) {
         }
     }
 
-    mainWindow.webContents.send('enableTemplate', invalidTemplateList);
+    let returnArg = {
+        invalidTemplateList: invalidTemplateList,
+        bMulti: arg.bMulti
+    };
+    mainWindow.webContents.send('enableTemplate', returnArg);
 });
 
 ipc.on('getRandomSketchName', function(event, arg) {

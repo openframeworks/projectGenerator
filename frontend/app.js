@@ -265,8 +265,7 @@ ipc.on('setTemplates', function(arg) {
 ipc.on('enableTemplate', function (arg) {
 
     console.log('enableTemplate');
-
-    let items = $('#templatesDropdown .menu .item');
+    let items = arg.bMulti === false ? $('#templatesDropdown .menu .item') : $('#templatesDropdownMulti .menu .item');
 
     // enable all first
     for (let i = 0; i < items.length; i++) {
@@ -274,7 +273,7 @@ ipc.on('enableTemplate', function (arg) {
         item.removeClass("disabled");
     }
 
-    for (let template of arg) {
+    for (let template of arg.invalidTemplateList) {
         for (let i = 0; i < items.length; i++) {
             let item = $(items[i]);
             if (item.attr('data-value') === template) {
@@ -738,7 +737,18 @@ function setup() {
             let selectedPlatformArray = selectedPlatforms.trim().split(',');
             let arg = {
                 ofPath: $("#ofPath").val(),
-                selectedPlatforms: selectedPlatformArray
+                selectedPlatforms: selectedPlatformArray,
+                bMulti: false
+            }
+            ipc.send('refreshTemplateList', arg);
+        })
+        $("#platformsDropdownMulti").on('change', function () {
+            let selectedPlatforms = $("#platformsDropdownMulti input").val();
+            let selectedPlatformArray = selectedPlatforms.trim().split(',');
+            let arg = {
+                ofPath: $("#ofPath").val(),
+                selectedPlatforms: selectedPlatformArray,
+                bMulti: true
             }
             ipc.send('refreshTemplateList', arg);
         })
