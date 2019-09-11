@@ -649,6 +649,7 @@ ipc.on('update', function(event, arg) {
     var updatePath = "";
     var pathString = "";
     var platformString = "";
+    var templateString = "";
     var recursiveString = "";
     var verboseString = "";
 
@@ -659,6 +660,10 @@ ipc.on('update', function(event, arg) {
 
     if (update['platformList'] !== null) {
         platformString = "-p\"" + update['platformList'].join(",") + "\"";
+    }
+
+    if (update['templateList'] !== null) {
+        templateString = "-t\"" + update['templateList'].join(",") + "\"";
     }
 
     if (update['ofPath'] !== null) {
@@ -682,7 +687,7 @@ ipc.on('update', function(event, arg) {
         pgApp = "\"" + pgApp + "\"";
     }
 
-    var wholeString = pgApp + " " + recursiveString + " " + verboseString + " " + pathString + " " + platformString + " " + updatePath;
+    var wholeString = pgApp + " " + recursiveString + " " + verboseString + " " + pathString + " " + platformString + " " + templateString + " " + updatePath;
 
     exec(wholeString, {maxBuffer : Infinity}, function callback(error, stdout, stderr) {
 

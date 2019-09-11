@@ -956,11 +956,16 @@ function updateRecursive() {
         platformValueArray.push($(platformsPicked[i]).attr("data-value"));
     }
 
-
+    var templatePicked = $("#templatesDropdownMulti .active");
+    var templateValueArray = [];
+    for (var i = 0; i < templatePicked.length; i++){
+        templateValueArray.push($(templatePicked[i]).attr("data-value"));
+    }
 
     var gen = {};
     gen['updatePath'] = $("#updateMultiplePath").val();
     gen['platformList'] = platformValueArray;
+    gen['templateList'] = templateValueArray;
     gen['updateRecursive'] = true;
     gen['ofPath'] = $("#ofPath").val();
     gen['verbose'] = bVerbose;
