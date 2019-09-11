@@ -572,15 +572,17 @@ ipc.on('refreshTemplateList', function (event, arg) {
 
     // Everytime user select/deselect new platforms,
     // we check each templates and disable if it is not supported by selected platforms
-    let invalidTemplateList = [];
-
     // iterate all avairable templates and check template.config file
+
+    let supportedPlatforms = [];
+
     for (let template in templates) {
         let configFilePath = ofPath + "/scripts/templates/" + template + "/template.config";
         if (fs.existsSync(configFilePath)) {
             const lineByLine = require('n-readlines');
             const liner = new lineByLine(configFilePath);
             let line;
+            let bFindPLATOFORMS = false;
 
             // read line by line and try to find PLATFORMS setting
             while (line = liner.next()) {
@@ -588,26 +590,41 @@ ipc.on('refreshTemplateList', function (event, arg) {
                 if (line_st.includes('PLATFORMS')) {
                     line_st = line_st.replace('PLATFORMS', '');
                     line_st = line_st.replace('=', '');
-                    let supportedPlatforms = line_st.trim().split(' ');
-
-                    // supportedPlatforms: array of platform supported by this template
-                    // selectedPlatforms: array of platform selected by dropdown ui
-                    for (let selectedPlatform of selectedPlatforms) {
-                        let bSupportedTemplate = false;
-                        for (let supportedPlatform of supportedPlatforms) {
-                            if (selectedPlatform === supportedPlatform) {
-                                bSupportedTemplate = true;
-                            }
-                        }
-                        if (bSupportedTemplate === false) {
-                            console.log("Selected platform " + selectedPlatform + " does not support template " + template);
-                            invalidTemplateList.push(template);
-                        }
-                    }
+                    let platforms = line_st.trim().split(' ');
+                    supportedPlatforms[template] = platforms;
+                    bFindPLATOFORMS = true;
+                    break;
                 }
             }
+
+            // PLATFORMS parameter does not exist
+            if (!bFindPLATOFORMS) {
+                supportedPlatforms[template] = 'enable';
+            }
+        } else {
+            // config file does not exist
+            supportedPlatforms[template] = 'enable';
         }
     }
+
+    let invalidTemplateList = [];
+    for (let template in supportedPlatforms) {
+        let platforms = supportedPlatforms[template];
+        let bValidTemplate = false;
+        if (platforms === 'enable') {
+            bValidTemplate = true;
+        } else {
+            bValidTemplate = selectedPlatforms.every(function (p) { return platforms.indexOf(p) > -1; });
+            // Another option to enable template when "some" of the platforms are supported. (not every)
+            // let bValidTemplate = platforms.some(function (p) { supportedPlatforms.indexOf(p) > -1 });
+        }
+
+        if (!bValidTemplate) {
+            console.log("Selected platform [" + selectedPlatforms + "] does not support template " + template);
+            invalidTemplateList.push(template);
+        }
+    }
+
     mainWindow.webContents.send('enableTemplate', invalidTemplateList);
 });
 
