@@ -99,6 +99,30 @@ var platforms = {
 };
 var bUseMoniker = obj["useDictionaryNameGenerator"];
 
+var templates = {
+    "emscripten": "Emscripten",
+    "gitignore": "Git Ignore",
+    "gles2": "Open GL ES 2",
+    "gl3.1": "Open GL 3.1",
+    "gl3.2": "Open GL 3.2",
+    "gl3.3": "Open GL 3.3",
+    "gl4.0": "Open GL 4.0",
+    "gl4.1": "Open GL 4.1",
+    "gl4.2": "Open GL 4.2",
+    "gl4.3": "Open GL 4.3",
+    "gl4.4": "Open GL 4.4",
+    "gl4.5": "Open GL 4.5",
+    "gles2": "Open GL ES 2",
+    "linux": "Linux",  // !!??
+    "msys2": "MSYS2/MinGW project template",
+    "nofmod": "OSX application with no FMOD linking",
+    "nowindow": "No window application",
+    "tvOS": "Apple tvOS template",
+    "unittest": "Unit test no window application",
+    "vscode": "Visual Studio Code",
+};
+
+
 
 if (!path.isAbsolute(defaultOfPath)) {
 
@@ -320,13 +344,29 @@ function parsePlatformsAndUpdateSelect(arg) {
     console.log(folders);
 
     var platformsWeHave = {};
+    var templatesWeHave = {};
+
     if (folders === undefined || folders === null) {
         //do something
     } else {
-        for (var key in platforms) {
-            if (folders.indexOf(key) > -1) {
-                console.log("key " + key + " has value " + platforms[key]);
+        // check all folder name under /scripts/templates
+        for (var id in folders) {
+            var key = folders[id];
+            if (platforms[key]) {
+                // this folder is for platform
+                console.log("Found platform, key " + key + " has value " + platforms[key]);
                 platformsWeHave[key] = platforms[key];
+            }else{
+                // this folder is for template
+                if(templates[key]){
+                    console.log("Found template folder, key " + key + " has value " + templates[key]);
+                    templatesWeHave[key] = templates[key];
+                }else{
+                    // Unofficial folder name, maybe user's custom template? 
+                    // We use folder name for both of key and value
+                    console.log("Found unofficial folder, key " + key + " has value " + key);
+                    templatesWeHave[key] = key;
+                }
             }
         }
     }
@@ -336,6 +376,7 @@ function parsePlatformsAndUpdateSelect(arg) {
     // }
     mainWindow.webContents.send('setPlatforms', platformsWeHave);
 
+   mainWindow.webContents.send('setTemplates', templatesWeHave);
 
 }
 
@@ -524,6 +565,72 @@ ipc.on('refreshPlatformList', function(event, arg) {
 });
 
 
+ipc.on('refreshTemplateList', function (event, arg) {
+    console.log("refreshTemplateList");
+    let selectedPlatforms = arg.selectedPlatforms;
+    let ofPath = arg.ofPath;
+
+    // Everytime user select/deselect new platforms,
+    // we check each templates and disable if it is not supported by selected platforms
+    // iterate all avairable templates and check template.config file
+
+    let supportedPlatforms = [];
+
+    for (let template in templates) {
+        let configFilePath = ofPath + "/scripts/templates/" + template + "/template.config";
+        if (fs.existsSync(configFilePath)) {
+            const lineByLine = require('n-readlines');
+            const liner = new lineByLine(configFilePath);
+            let line;
+            let bFindPLATOFORMS = false;
+
+            // read line by line and try to find PLATFORMS setting
+            while (line = liner.next()) {
+                let line_st = line.toString();
+                if (line_st.includes('PLATFORMS')) {
+                    line_st = line_st.replace('PLATFORMS', '');
+                    line_st = line_st.replace('=', '');
+                    let platforms = line_st.trim().split(' ');
+                    supportedPlatforms[template] = platforms;
+                    bFindPLATOFORMS = true;
+                    break;
+                }
+            }
+
+            // PLATFORMS parameter does not exist
+            if (!bFindPLATOFORMS) {
+                supportedPlatforms[template] = 'enable';
+            }
+        } else {
+            // config file does not exist
+            supportedPlatforms[template] = 'enable';
+        }
+    }
+
+    let invalidTemplateList = [];
+    for (let template in supportedPlatforms) {
+        let platforms = supportedPlatforms[template];
+        let bValidTemplate = false;
+        if (platforms === 'enable') {
+            bValidTemplate = true;
+        } else {
+            bValidTemplate = selectedPlatforms.every(function (p) { return platforms.indexOf(p) > -1; });
+            // Another option to enable template when "some" of the platforms are supported. (not every)
+            // let bValidTemplate = platforms.some(function (p) { supportedPlatforms.indexOf(p) > -1 });
+        }
+
+        if (!bValidTemplate) {
+            console.log("Selected platform [" + selectedPlatforms + "] does not support template " + template);
+            invalidTemplateList.push(template);
+        }
+    }
+
+    let returnArg = {
+        invalidTemplateList: invalidTemplateList,
+        bMulti: arg.bMulti
+    };
+    mainWindow.webContents.send('enableTemplate', returnArg);
+});
 
 ipc.on('getRandomSketchName', function(event, arg) {
     var goodName = getGoodSketchName(arg);
@@ -542,6 +649,7 @@ ipc.on('update', function(event, arg) {
     var updatePath = "";
     var pathString = "";
     var platformString = "";
+    var templateString = "";
     var recursiveString = "";
     var verboseString = "";
 
@@ -552,6 +660,10 @@ ipc.on('update', function(event, arg) {
 
     if (update['platformList'] !== null) {
         platformString = "-p\"" + update['platformList'].join(",") + "\"";
+    }
+
+    if (update['templateList'] !== null) {
+        templateString = "-t\"" + update['templateList'].join(",") + "\"";
     }
 
     if (update['ofPath'] !== null) {
@@ -575,7 +687,7 @@ ipc.on('update', function(event, arg) {
         pgApp = "\"" + pgApp + "\"";
     }
 
-    var wholeString = pgApp + " " + recursiveString + " " + verboseString + " " + pathString + " " + platformString + " " + updatePath;
+    var wholeString = pgApp + " " + recursiveString + " " + verboseString + " " + pathString + " " + platformString + " " + templateString + " " + updatePath;
 
     exec(wholeString, {maxBuffer : Infinity}, function callback(error, stdout, stderr) {
 
@@ -620,12 +732,17 @@ ipc.on('generate', function(event, arg) {
     var pathString = "";
     var addonString = "";
     var platformString = "";
+    var templateString = "";
     var verboseString = "";
 
 
 
     if (generate['platformList'] !== null) {
         platformString = "-p\"" + generate['platformList'].join(",") + "\"";
+    }
+
+    if (generate['templateList'] !== null) {
+        templateString = "-t\"" + generate['templateList'].join(",") + "\"";
     }
 
     if (generate['addonList'] !== null &&
@@ -661,7 +778,7 @@ ipc.on('generate', function(event, arg) {
         pgApp = pgApp = "\"" + pgApp + "\"";
     }
 
-    var wholeString = pgApp + " " + verboseString + " " + pathString + " " + addonString + " " + platformString + " " + projectString;
+    var wholeString = pgApp + " " + verboseString + " " + pathString + " " + addonString + " " + platformString + " " + templateString + " " + projectString;
 
     exec(wholeString, {maxBuffer : Infinity}, function callback(error, stdout, stderr) {
 
