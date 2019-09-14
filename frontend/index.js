@@ -76,7 +76,7 @@ let addons;
 
 // hide some addons, per https://github.com/openframeworks/projectGenerator/issues/62
 
-let addonsToSkip = [
+const addonsToSkip = [
     "ofxiOS",
     "ofxMultiTouch",
     "ofxEmscripten",
@@ -84,7 +84,7 @@ let addonsToSkip = [
     "ofxAndroid"
 ]
 
-let platforms = {
+const platforms = {
     "osx": "OS X (Xcode)",
     "vs": "Windows (Visual Studio 2017)",
     "ios": "iOS (Xcode)",
@@ -96,7 +96,7 @@ let platforms = {
 
 let bUseMoniker = obj["useDictionaryNameGenerator"];
 
-let templates = {
+const templates = {
     "emscripten": "Emscripten",
     "gitignore": "Git Ignore",
     "gles2": "Open GL ES 2",
