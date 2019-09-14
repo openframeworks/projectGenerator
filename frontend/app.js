@@ -9,16 +9,6 @@ const fs = require('fs');
 let platforms;
 let templates;
 
-// let platforms = {
-//     "osx": "OS X (Xcode)",
-//     "vs": "Windows (Visual Studio)",
-//     "ios": "iOS (Xcode)",
-//     "linux": "Linux 32-bit (Code::Blocks)",
-//     "linux64": "Linux 64-bit (Code::Blocks)",
-//     "linuxarmv6l": "Linux ARMv6 (Makefiles)",
-//     "linuxarmv7l": "Linux ARMv7 (Makefiles)"
-// };
-
 let defaultSettings;
 let addonsInstalled;
 let currentPath;
