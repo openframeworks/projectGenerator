@@ -16,6 +16,10 @@ const exec = require('child_process').exec;
 // Example: /path/to/PG/Contents/MacOS/Electron /path/to/PG/Contents/Ressources/app
 // Note: app.js's console.log is also visible from the WebKit inspector. (look for mainWindow.openDevTools() below )
 
+//--------------------------------------------------------- hot reload
+
+
+
 //--------------------------------------------------------- load settings
 let obj;
 
@@ -125,10 +129,10 @@ if (!path.isAbsolute(defaultOfPath)) {
     // arturo, this may differ on linux, if putting ../ in settings doesn't work for the default path
     // take a look at this...
 
-    if (hostplatform=="windows" || hostplatform=="linux"){
-    	defaultOfPath = path.resolve(path.join(path.join(__dirname,"../../"), defaultOfPath));
-    } else if(hostplatform=="osx"){
-    	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../../../"), defaultOfPath));
+    if (hostplatform == "windows" || hostplatform == "linux") {
+        defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../"), defaultOfPath));
+    } else if (hostplatform == "osx") {
+        defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../../../"), defaultOfPath));
     }
 
     obj["defaultOfPath"] = defaultOfPath;
@@ -150,7 +154,7 @@ require('crash-reporter').start();
 let mainWindow = null;
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function() {
+app.on('window-all-closed', function () {
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform != 'darwin') {
@@ -158,7 +162,7 @@ app.on('window-all-closed', function() {
     }
 });
 
-function formatDate(d){
+function formatDate(d) {
     //get the month
     let month = d.getMonth();
     //get the day
@@ -166,20 +170,20 @@ function formatDate(d){
     //get the year
     let year = d.getFullYear();
     //pull the last two digits of the year
-    year = year.toString().substr(2,2);
+    year = year.toString().substr(2, 2);
     //increment month by 1 since it is 0 indexed
     month = month + 1;
     //converts month to a string
     month = month + "";
 
     //if month is 1-9 pad right with a 0 for two digits
-    if (month.length == 1){
+    if (month.length == 1) {
         month = "0" + month;
     }
     //convert day to string
     day = day + "";
     //if day is between 1-9 pad right with a 0 for two digits
-    if (day.length == 1){
+    if (day.length == 1) {
         day = "0" + day;
     }
     //return the string "MMddyy"
@@ -197,7 +201,7 @@ function toLetters(num) {
 //-------------------------------------------------------- window
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', function() {
+app.on('ready', function () {
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: 500,
@@ -217,7 +221,7 @@ app.on('ready', function() {
         mainWindow.openDevTools();
     }
     //when the window is loaded send the defaults
-    mainWindow.webContents.on('did-finish-load', function() {
+    mainWindow.webContents.on('did-finish-load', function () {
         //parseAddonsAndUpdateSelect();
 
         mainWindow.webContents.send('cwd', app.getAppPath());
@@ -233,7 +237,7 @@ app.on('ready', function() {
     //console.log();
 
     // Emitted when the window is closed.
-    mainWindow.on('closed', function() {
+    mainWindow.on('closed', function () {
 
         mainWindow = null;
         process.exit();
@@ -247,7 +251,7 @@ app.on('ready', function() {
         submenu: [{
             label: 'Quit',
             accelerator: 'Command+Q',
-            click: function() {
+            click: function () {
                 mainWindow.close();
             }
         }]
@@ -256,13 +260,13 @@ app.on('ready', function() {
         submenu: [{
             label: 'Reload',
             accelerator: 'Command+R',
-            click: function() {
+            click: function () {
                 mainWindow.reload();
             }
         }, {
             label: 'Toggle DevTools',
             accelerator: 'Alt+Command+I',
-            click: function() {
+            click: function () {
                 mainWindow.toggleDevTools();
             }
         }]
@@ -294,7 +298,7 @@ app.on('ready', function() {
             label: 'Select All',
             accelerator: 'Command+A',
             selector: 'selectAll:'
-        }, ]
+        },]
     }];
     let menuV = menu.buildFromTemplate(menuTmpl);
     menu.setApplicationMenu(menuV);
@@ -313,14 +317,14 @@ function getStartingProjectName() {
 function parseAddonsAndUpdateSelect(arg) {
     console.log("in parseAddonsAndUpdateSelect " + arg);
     //path = require('path').resolve(__dirname, defaultOfPath + "/addons");
-    addons = getDirectories(arg + "/addons","ofx");
+    addons = getDirectories(arg + "/addons", "ofx");
 
-    if (addons){
-    if (addons.length > 0){
-        addons = addons.filter( function(addon) {
-            return addonsToSkip.indexOf(addon)==-1;
-        });
-    }
+    if (addons) {
+        if (addons.length > 0) {
+            addons = addons.filter(function (addon) {
+                return addonsToSkip.indexOf(addon) == -1;
+            });
+        }
     }
 
     console.log("Reloading the addons folder, these were found:");
@@ -346,12 +350,12 @@ function parsePlatformsAndUpdateSelect(arg) {
                 // this folder is for platform
                 console.log("Found platform, key " + key + " has value " + platforms[key]);
                 platformsWeHave[key] = platforms[key];
-            }else{
+            } else {
                 // this folder is for template
-                if(templates[key]){
+                if (templates[key]) {
                     console.log("Found template folder, key " + key + " has value " + templates[key]);
                     templatesWeHave[key] = templates[key];
-                }else{
+                } else {
                     // Unofficial folder name, maybe user's custom template? 
                     // We use folder name for both of key and value
                     console.log("Found unofficial folder, key " + key + " has value " + key);
@@ -366,20 +370,20 @@ function parsePlatformsAndUpdateSelect(arg) {
     // }
     mainWindow.webContents.send('setPlatforms', platformsWeHave);
 
-   mainWindow.webContents.send('setTemplates', templatesWeHave);
+    mainWindow.webContents.send('setTemplates', templatesWeHave);
 
 }
 
-function getGoodSketchName(arg){
+function getGoodSketchName(arg) {
 
     let currentProjectPath = arg;
     let foundOne = false;
     let goodName = "mySketch";
 
-    if (bUseMoniker){
+    if (bUseMoniker) {
 
         let projectNames = new moniker.Dictionary();
-        projectNames.read( path.join(__dirname, 'static', 'data', 'sketchAdjectives.txt'));
+        projectNames.read(path.join(__dirname, 'static', 'data', 'sketchAdjectives.txt'));
         goodName = "mySketch";
 
         while (foundOne === false) {
@@ -399,7 +403,7 @@ function getGoodSketchName(arg){
         goodName = "sketch_" + formattedDate;
         let count = 1;
 
-         while (foundOne === false) {
+        while (foundOne === false) {
             if (fs.existsSync(path.join(currentProjectPath, goodName))) {
                 console.log("«" + goodName + "» already exists, generating a new name...");
                 goodName = "sketch_" + formattedDate + toLetters(count);
@@ -416,16 +420,16 @@ function getGoodSketchName(arg){
 function getDirectories(srcpath, acceptedPrefix) {
 
     try {
-        return fs.readdirSync(srcpath).filter(function(file) {
+        return fs.readdirSync(srcpath).filter(function (file) {
             //console.log(srcpath);
             //console.log(file);
-            try{
+            try {
                 let joinedPath = path.join(srcpath, file);
-                if ((acceptedPrefix==null || file.substring(0,acceptedPrefix.length)==acceptedPrefix) && joinedPath !== null) {
+                if ((acceptedPrefix == null || file.substring(0, acceptedPrefix.length) == acceptedPrefix) && joinedPath !== null) {
                     // only accept folders (potential addons)
                     return fs.statSync(joinedPath).isDirectory();
                 }
-            }catch(e){}
+            } catch (e) { }
         });
     } catch (e) {
         console.log(e);
@@ -458,7 +462,7 @@ function getDirectories(srcpath, acceptedPrefix) {
 //   });
 // }
 
-ipc.on('isOFProjectFolder', function(event, project) {
+ipc.on('isOFProjectFolder', function (event, project) {
 
     let folder;
     folder = path.join(project['projectPath'], project['projectName']);
@@ -473,7 +477,7 @@ ipc.on('isOFProjectFolder', function(event, project) {
         // todo: also check for config.make & addons.make ?
         let foundSrcFolder = false;
         let foundAddons = false;
-        tmpFiles.forEach(function(el, i) {
+        tmpFiles.forEach(function (el, i) {
             if (el == 'src') {
                 foundSrcFolder = true;
             }
@@ -488,7 +492,7 @@ ipc.on('isOFProjectFolder', function(event, project) {
             if (foundAddons) {
                 let projectAddons = fs.readFileSync(path.resolve(folder, 'addons.make')).toString().split("\n");
 
-                projectAddons = projectAddons.filter(function(el) {
+                projectAddons = projectAddons.filter(function (el) {
                     if (el === '' || el === 'addons') {
                         return false;
                     } // eleminates these items
@@ -498,9 +502,9 @@ ipc.on('isOFProjectFolder', function(event, project) {
                 });
 
                 // remove comments
-                projectAddons.forEach(function(element, index) {
+                projectAddons.forEach(function (element, index) {
                     this[index] = this[index].split('#')[0];
-                  }, projectAddons);
+                }, projectAddons);
 
                 // console.log('addons', projectAddons);
 
@@ -531,12 +535,12 @@ ipc.on('isOFProjectFolder', function(event, project) {
 
 //----------------------------------------------------------- ipc
 
-ipc.on('refreshAddonList', function(event, arg) {
+ipc.on('refreshAddonList', function (event, arg) {
     console.log("in refresh " + arg)
     parseAddonsAndUpdateSelect(arg);
 });
 
-ipc.on('refreshPlatformList', function(event, arg) {
+ipc.on('refreshPlatformList', function (event, arg) {
     parsePlatformsAndUpdateSelect(arg);
 });
 
@@ -608,13 +612,13 @@ ipc.on('refreshTemplateList', function (event, arg) {
     mainWindow.webContents.send('enableTemplate', returnArg);
 });
 
-ipc.on('getRandomSketchName', function(event, arg) {
+ipc.on('getRandomSketchName', function (event, arg) {
     let goodName = getGoodSketchName(arg);
     event.sender.send('setRandomisedSketchName', goodName);
     event.sender.send('setGenerateMode', 'createMode'); // it's a new sketch name, we are in create mode
 });
 
-ipc.on('update', function(event, arg) {
+ipc.on('update', function (event, arg) {
 
     let update = arg;
     let exec = require('child_process').exec;
@@ -656,7 +660,7 @@ ipc.on('update', function(event, arg) {
     let pgApp = path.normalize(path.join(path.join(__dirname, "app"), "projectGenerator"));
 
 
-    if( arg.platform == 'osx' || arg.platform == 'linux' || arg.platform == 'linux64' ){
+    if (arg.platform == 'osx' || arg.platform == 'linux' || arg.platform == 'linux64') {
         pgApp = pgApp.replace(/ /g, '\\ ');
     } else {
         pgApp = "\"" + pgApp + "\"";
@@ -664,7 +668,7 @@ ipc.on('update', function(event, arg) {
 
     const wholeString = pgApp + " " + recursiveString + " " + verboseString + " " + pathString + " " + platformString + " " + templateString + " " + updatePath;
 
-    exec(wholeString, {maxBuffer : Infinity}, function callback(error, stdout, stderr) {
+    exec(wholeString, { maxBuffer: Infinity }, function callback(error, stdout, stderr) {
 
         if (error === null) {
             event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
@@ -692,7 +696,7 @@ ipc.on('update', function(event, arg) {
 
 });
 
-ipc.on('generate', function(event, arg) {
+ipc.on('generate', function (event, arg) {
 
     let generate = arg;
     let exec = require('child_process').exec;
@@ -731,14 +735,14 @@ ipc.on('generate', function(event, arg) {
         projectString = "\"" + path.join(generate['projectPath'], generate['projectName']) + "\"";
     }
 
-    let pgApp= "";
-    if(hostplatform == "linux"){
+    let pgApp = "";
+    if (hostplatform == "linux") {
         pgApp = "projectGenerator";
-    }else{
+    } else {
         pgApp = path.normalize(path.join(path.join(__dirname, "app"), "projectGenerator"));
     }
 
-    if( arg.platform == 'osx' || arg.platform == 'linux' || arg.platform == 'linux64' ){
+    if (arg.platform == 'osx' || arg.platform == 'linux' || arg.platform == 'linux64') {
         pgApp = pgApp.replace(/ /g, '\\ ');
     } else {
         pgApp = pgApp = "\"" + pgApp + "\"";
@@ -746,7 +750,7 @@ ipc.on('generate', function(event, arg) {
 
     const wholeString = pgApp + " " + verboseString + " " + pathString + " " + addonString + " " + platformString + " " + templateString + " " + projectString;
 
-    exec(wholeString, {maxBuffer : Infinity}, function callback(error, stdout, stderr) {
+    exec(wholeString, { maxBuffer: Infinity }, function callback(error, stdout, stderr) {
 
         let wasError = false;
         let text = stdout; //Big text with many line breaks
@@ -797,13 +801,13 @@ ipc.on('generate', function(event, arg) {
     //console.log(arg);
 });
 
-ipc.on('pickOfPath', function(event, arg) {
+ipc.on('pickOfPath', function (event, arg) {
     dialog.showOpenDialog({
         title: 'select the root of OF, where you see libs, addons, etc',
         properties: ['openDirectory'],
         filters: [],
         defaultPath: arg
-    }, function(filenames) {
+    }, function (filenames) {
         if (filenames !== undefined && filenames.length > 0) {
             defaultOfPath = filenames[0];
             event.sender.send('setOfPath', filenames[0]);
@@ -811,13 +815,13 @@ ipc.on('pickOfPath', function(event, arg) {
     });
 });
 
-ipc.on('pickUpdatePath', function(event, arg) {
+ipc.on('pickUpdatePath', function (event, arg) {
     dialog.showOpenDialog({
         title: 'select root folder where you want to update',
         properties: ['openDirectory'],
         filters: [],
         defaultPath: arg
-    }, function(filenames) {
+    }, function (filenames) {
         if (filenames !== undefined && filenames.length > 0) {
             defaultOfPath = filenames[0];
             event.sender.send('setUpdatePath', filenames[0]);
@@ -825,20 +829,20 @@ ipc.on('pickUpdatePath', function(event, arg) {
     });
 });
 
-ipc.on('pickProjectPath', function(event, arg) {
+ipc.on('pickProjectPath', function (event, arg) {
     dialog.showOpenDialog({
         title: 'select parent folder for project, typically apps/myApps',
         properties: ['openDirectory'],
         filters: [],
         defaultPath: arg
-    }, function(filenames) {
+    }, function (filenames) {
         if (filenames !== undefined && filenames.length > 0) {
             event.sender.send('setProjectPath', filenames[0]);
         }
     });
 });
 
-ipc.on('checkMultiUpdatePath', function(event, arg) {
+ipc.on('checkMultiUpdatePath', function (event, arg) {
     if (fs.existsSync(arg)) {
         event.sender.send('isUpdateMultiplePathOk', true);
     } else {
@@ -848,8 +852,8 @@ ipc.on('checkMultiUpdatePath', function(event, arg) {
 });
 
 let dialogIsOpen = false;
-ipc.on('pickProjectImport', function(event, arg) {
-    if(dialogIsOpen){
+ipc.on('pickProjectImport', function (event, arg) {
+    if (dialogIsOpen) {
         return;
     }
 
@@ -859,7 +863,7 @@ ipc.on('pickProjectImport', function(event, arg) {
         properties: ['openDirectory'],
         filters: [],
         defaultPath: arg
-    }, function(filenames) {
+    }, function (filenames) {
         if (filenames != null) {
             // gather project information
             let projectSettings = {};
@@ -871,55 +875,55 @@ ipc.on('pickProjectImport', function(event, arg) {
     });
 });
 
-ipc.on('launchProjectinIDE', function(event, arg) {
+ipc.on('launchProjectinIDE', function (event, arg) {
     let fullPath = path.join(arg['projectPath'], arg['projectName']);
 
-    if( fs.statSync(fullPath).isDirectory() == false ){
+    if (fs.statSync(fullPath).isDirectory() == false) {
         // project doesn't exist
-        event.sender.send('projectLaunchCompleted', false );
+        event.sender.send('projectLaunchCompleted', false);
         return;
     }
 
     // // launch xcode
-    if( arg.platform == 'osx' ){
-        if(hostplatform == 'osx'){
+    if (arg.platform == 'osx') {
+        if (hostplatform == 'osx') {
             let osxPath = path.join(fullPath, arg['projectName'] + '.xcodeproj');
-            console.log( osxPath );
+            console.log(osxPath);
             osxPath = "\"" + osxPath + "\"";
 
-            exec('open ' + osxPath, function callback(error, stdout, stderr){
+            exec('open ' + osxPath, function callback(error, stdout, stderr) {
                 return;
             });
         }
-    } else if( arg.platform == 'linux' || arg.platform == 'linux64' ){
-        if(hostplatform == 'linux'){
+    } else if (arg.platform == 'linux' || arg.platform == 'linux64') {
+        if (hostplatform == 'linux') {
             let linuxPath = path.join(fullPath, arg['projectName'] + '.qbs');
             linuxPath = linuxPath.replace(/ /g, '\\ ');
-            console.log( linuxPath );
-            exec('xdg-open ' + linuxPath, function callback(error, stdout, stderr){
+            console.log(linuxPath);
+            exec('xdg-open ' + linuxPath, function callback(error, stdout, stderr) {
                 return;
             });
         }
-    } else if( arg.platform == 'android'){
+    } else if (arg.platform == 'android') {
         console.log("Launching ", fullPath)
-        exec('studio ' + fullPath, function callback(error, stdout, stderr){
-            if(error){
+        exec('studio ' + fullPath, function callback(error, stdout, stderr) {
+            if (error) {
                 event.sender.send('sendUIMessage',
-                '<strong>Error!</strong><br>' +
-                '<span>Could not launch Android Studio. Make sure the command-line launcher is installed by running <i>Tools -> Create Command-line Launcher...</i> inside Android Studio and try again</span>'
-            );
+                    '<strong>Error!</strong><br>' +
+                    '<span>Could not launch Android Studio. Make sure the command-line launcher is installed by running <i>Tools -> Create Command-line Launcher...</i> inside Android Studio and try again</span>'
+                );
             }
         });
-    } else if( hostplatform == 'windows'){
+    } else if (hostplatform == 'windows') {
         let windowsPath = path.join(fullPath, arg['projectName'] + '.sln');
-        console.log( windowsPath );
+        console.log(windowsPath);
         windowsPath = "\"" + windowsPath + "\"";
-        exec('start ' + "\"\"" + " " + windowsPath, function callback(error, stdout, stderr){
+        exec('start ' + "\"\"" + " " + windowsPath, function callback(error, stdout, stderr) {
             return;
         });
     }
 });
 
-ipc.on('quit', function(event, arg) {
+ipc.on('quit', function (event, arg) {
     app.quit();
 });
