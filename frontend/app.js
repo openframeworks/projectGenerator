@@ -11,7 +11,6 @@ let templates;
 
 let defaultSettings;
 let addonsInstalled;
-let currentPath;
 let isOfPathGood = false;
 let isFirstTimeSierra = false;
 let bVerbose = false;
