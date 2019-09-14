@@ -12,16 +12,12 @@ const process = require('process');
 const os = require("os");
 const exec = require('child_process').exec;
 
-
 // Debugging: start the Electron PG from the terminal to see the messages from console.log()
 // Example: /path/to/PG/Contents/MacOS/Electron /path/to/PG/Contents/Ressources/app
 // Note: app.js's console.log is also visible from the WebKit inspector. (look for mainWindow.openDevTools() below )
 
-
-
 //--------------------------------------------------------- load settings
 let obj;
-
 
 try {
     let settings = fs.readFileSync(path.resolve(__dirname, 'settings.json'));
@@ -123,8 +119,6 @@ let templates = {
     "vscode": "Visual Studio Code",
 };
 
-
-
 if (!path.isAbsolute(defaultOfPath)) {
 
     // todo: this needs to be PLATFORM specific b/c of where things are placed.
@@ -164,8 +158,6 @@ app.on('window-all-closed', function() {
     }
 });
 
-
-
 function formatDate(d){
     //get the month
     let month = d.getMonth();
@@ -202,8 +194,6 @@ function toLetters(num) {
     return pow ? toLetters(pow) + out : out;
 }
 
-
-
 //-------------------------------------------------------- window
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -238,7 +228,6 @@ app.on('ready', function() {
         mainWindow.webContents.send('setup', '');
         mainWindow.webContents.send('checkOfPathAfterSetup', '');
     });
-
 
     //http://electron.atom.io/docs/v0.29.0/api/dialog/
     //console.log();
@@ -423,9 +412,7 @@ function getGoodSketchName(arg){
     }
 
     return goodName;
-
 }
-
 
 function getDirectories(srcpath, acceptedPrefix) {
 
@@ -701,7 +688,6 @@ ipc.on('update', function(event, arg) {
                 '<div id="fullConsoleOutput"><br><textarea class="selectable">' + stdout + '\n\n\n(command used:' + wholeString + ')\n\n\n</textarea></div>'
             );
 
-            //
             event.sender.send('updateCompleted', true);
         } else {
             event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + error.message);
@@ -721,22 +707,15 @@ ipc.on('update', function(event, arg) {
 
 ipc.on('generate', function(event, arg) {
 
-
     let generate = arg;
-
     let exec = require('child_process').exec;
-
-
     let pathTemp = require('path');
-
     let projectString = "";
     let pathString = "";
     let addonString = "";
     let platformString = "";
     let templateString = "";
     let verboseString = "";
-
-
 
     if (generate['platformList'] !== null) {
         platformString = "-p\"" + generate['platformList'].join(",") + "\"";
@@ -766,7 +745,7 @@ ipc.on('generate', function(event, arg) {
         projectString = "\"" + pathTemp.join(generate['projectPath'], generate['projectName']) + "\"";
     }
 
-    let pgApp="";
+    let pgApp= "";
     if(hostplatform == "linux"){
         pgApp = "projectGenerator";
     }else{
@@ -823,22 +802,16 @@ ipc.on('generate', function(event, arg) {
                 '<strong>Error...</strong><br>' +
                 'There was a problem generating your project... <span class="monospace">' + fullPath + '</span>' +
                 '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stdout + '\n\n\n(command used: ' + wholeString + ')\n\n\n</textarea></div>'
-
             );
-
         }
     });
 
     console.log(wholeString);
-
     console.log(__dirname);
-
-
     //console.log(arg);
 });
 
 ipc.on('pickOfPath', function(event, arg) {
-
     path = dialog.showOpenDialog({
         title: 'select the root of OF, where you see libs, addons, etc',
         properties: ['openDirectory'],
@@ -880,8 +853,6 @@ ipc.on('pickProjectPath', function(event, arg) {
 });
 
 ipc.on('checkMultiUpdatePath', function(event, arg) {
-
-
     if (fs.existsSync(arg)) {
         event.sender.send('isUpdateMultiplePathOk', true);
     } else {
@@ -915,9 +886,7 @@ ipc.on('pickProjectImport', function(event, arg) {
     });
 });
 
-
 ipc.on('launchProjectinIDE', function(event, arg) {
-
     let pathTemp = require('path');
     let fsTemp = require('fs');
     let fullPath = pathTemp.join(arg['projectPath'], arg['projectName']);

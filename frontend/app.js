@@ -6,7 +6,6 @@ const ipc = require('ipc');
 const path = require('path');
 const fs = require('fs');
 
-
 let platforms;
 let templates;
 
@@ -28,8 +27,6 @@ let isFirstTimeSierra = false;
 let bVerbose = false;
 let localAddons = [];
 
-
-
 //-----------------------------------------------------------------------------------
 // IPC
 //-----------------------------------------------------------------------------------
@@ -40,7 +37,6 @@ ipc.on('setOfPath', function(arg) {
 });
 
 ipc.on('cwd', function(arg) {
-
     console.log(arg);
 });
 
@@ -48,18 +44,15 @@ ipc.on('setUpdatePath', function(arg) {
     let elem = document.getElementById("updateMultiplePath");
     elem.value = arg;
     $("#updateMultiplePath").change();
-
 });
 
 ipc.on('isUpdateMultiplePathOk', function(arg) {
    if (arg == true){
         $("#updateMultipleWrongMessage").hide();
         $("#updateMultipleButton").removeClass("disabled");
-
    } else {
         $("#updateMultipleWrongMessage").show();
         $("#updateMultipleButton").addClass("disabled");
-
    }
 });
 
@@ -71,11 +64,9 @@ ipc.on('setup', function(arg) {
 //-----------------------------------------
 // this is called from main when defaults are loaded in:
 ipc.on('setDefaults', function(arg) {
-
     defaultSettings = arg;
     setOFPath(defaultSettings['defaultOfPath']);
     enableAdvancedMode(defaultSettings['advancedMode']);
-
 });
 
 //-------------------------------------------
@@ -105,7 +96,6 @@ ipc.on('importProjectSettings', function(settings) {
 
 //-------------------------------------------
 ipc.on('setAddons', function(arg) {
-
     console.log("got set addons");
     console.log(arg);
 
@@ -127,10 +117,7 @@ ipc.on('setAddons', function(arg) {
         $("#ofPathSierraMessage").hide();
         $("#ofPathWrongMessage").hide();
         isOfPathGood = true;
-
-
-
-    } else {
+   } else {
         if(isFirstTimeSierra){
             $("#ofPathSierraMessage").show();
         }else{
@@ -141,23 +128,18 @@ ipc.on('setAddons', function(arg) {
 
         // bounce to settings
         //$('.main .ui').tab('change tab', 'settings')
-
-
-
     }
 
-
   $('#addonsDropdown')
-        .dropdown({
-            allowAdditions: false,
-            fullTextSearch: 'exact',
-            match: "text"
-        });
+    .dropdown({
+        allowAdditions: false,
+        fullTextSearch: 'exact',
+        match: "text"
+    });
 });
 
 
 ipc.on('setPlatforms', function(arg) {
-
     console.log("got set platforms");
     console.log(arg);
     console.log("got set platforms");
@@ -269,7 +251,6 @@ ipc.on('setTemplates', function(arg) {
     }
 });
 
-
 ipc.on('enableTemplate', function (arg) {
 
     console.log('enableTemplate');
@@ -294,8 +275,6 @@ ipc.on('enableTemplate', function (arg) {
 //-------------------------------------------
 // select the list of addons and notify if some aren't installed
 ipc.on('selectAddons', function(arg) {
-
-
     // todo : DEAL WITH LOCAL ADDONS HERE....
 
     let addonsAlreadyPicked = $("#addonsDropdown").val().split(',');
@@ -315,7 +294,6 @@ ipc.on('selectAddons', function(arg) {
         if (addonsAlreadyPicked.indexOf(arg[i]) >= 0){
             console.log("already picked"); // alread picked
         } else {
-
             // if not picked, check if have it and try to pick it
             if (addonsInstalled.indexOf(arg[i]) >= 0){
                 $('#addonsDropdown').dropdown('set selected', arg[i]);
@@ -329,12 +307,9 @@ ipc.on('selectAddons', function(arg) {
                 } else {
                     neededAddons.push(arg[i]);
                 }
-
-
             }
         }
     }
-
 
     if (neededAddons.length > 0) {
         console.log("missing addons");
@@ -343,11 +318,9 @@ ipc.on('selectAddons', function(arg) {
         $('#missingAddonList').append("<b>" + neededAddons.join(", ") + "</b>");
         $("#missingAddonMessage").show();
         $("#adons-refresh-icon").show();
-
     } else {
         $("#adons-refresh-icon").hide();
         $("#missingAddonMessage").hide();
-
         // $("#generate-mode-section").removeClass("has-missing-addons");
     }
 
@@ -361,7 +334,6 @@ ipc.on('selectAddons', function(arg) {
         $("#localAddonMessage").hide();
     }
 
-
 // <div class="ui red message" id="missingAddonMessage" style="display: none">
 //     <p>
 //         <div class="header">
@@ -374,18 +346,12 @@ ipc.on('selectAddons', function(arg) {
 //     <p>if you choose to update this project without these addons, you may overwrite the settings on the project.</p>
 // </div>
 
-
-
-
 });
 
 //-------------------------------------------
 // allow main to send UI messages
 ipc.on('sendUIMessage', function(arg) {
-
     // check if it has "success" message:
-
-
     displayModal(arg);
 });
 
@@ -413,11 +379,9 @@ ipc.on('setRandomisedSketchName', function(newName) {
     $("#projectName").val(newName);
 });
 
-
 //-----------------------------------------------------------------------------------
 // functions
 //-----------------------------------------------------------------------------------
-
 
 //----------------------------------------
 function setOFPath(arg) {
@@ -425,13 +389,9 @@ function setOFPath(arg) {
     let elem = document.getElementById("ofPath");
 
     if (!path.isAbsolute(arg)) {
-
         // if we are relative, don't do anything...
-
         elem.value = arg;
-
     } else {
-
         // else check settings for how we want this path.... make relative if we need to:
         if (defaultSettings['useRelativePath'] === true) {
             let relativePath = path.normalize(path.relative(path.resolve(__dirname), arg)) + "/";
@@ -444,10 +404,8 @@ function setOFPath(arg) {
     $("#ofPath").trigger('change');
 }
 
-
 //----------------------------------------
 function setup() {
-
     jQuery.fn.extend({
       oneTimeTooltip: function(msg) {
         return this.each(function() {
@@ -465,18 +423,15 @@ function setup() {
       }
     });
 
-
     $(document).ready(function() {
-
 
         try{
             let os = require('os');
-
             let os_release = os.release();
             let os_major_pos = os_release.indexOf(".");
             let os_major = os_release.slice(0, os_major_pos);
+            let isSierra = (os.platform() === 'darwin' && Number(os_major) >= 16);
 
-            let isSierra = (os.platform() === 'darwin' && Number(os_major)>=16);
             if(isSierra){
                 let ofpath = document.getElementById("ofPath").value;
                 let runningOnVar = false
@@ -502,7 +457,7 @@ function setup() {
                              $('#settingsMenuButton').click();
                         }
                     }).modal("show");
-               }
+                }
             }
         });
 
@@ -515,7 +470,7 @@ function setup() {
                              $('#settingsMenuButton').click();
                         }
                     }).modal("show");
-               }
+                }
             }
         });
 
@@ -525,7 +480,7 @@ function setup() {
                 $('#createMenuButon').removeClass('active');
                 $('#updateMenuButton').removeClass('active');
                 $('#settingsMenuButton').addClass('active');
-        }
+            }
         });
         // $('.main.menu .item').filter('.updateMultiMenuOption').tab({
         //     'onVisible':function(){
@@ -535,10 +490,6 @@ function setup() {
         //         // }
         //     }
         // });
-
-
-
-
 
         // bind external URLs (load it in default browser; not within Electron)
         $('*[data-toggle="external_target"]').click(function (e) {
@@ -597,7 +548,6 @@ function setup() {
             launchInIDE();
          });
 
-
          $("#verboseOption").checkbox();
          $("#verboseOption").on("change", function() {
             if ($("#verboseOption").filter(":checked").length > 0) {
@@ -611,7 +561,6 @@ function setup() {
             }
         });
 
-
         $("#ofPath").on("change", function(){
             let ofpath = $("#ofPath").val();
             defaultSettings['defaultOfPath'] =  ofpath;
@@ -622,7 +571,6 @@ function setup() {
                 function puts(error, stdout, stderr) { console.log(stdout + " " + stderr) }
                 exec("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app", puts);
                 $("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
-
             }
             saveDefaultSettings();
 
@@ -631,7 +579,6 @@ function setup() {
             ipc.send('refreshAddonList', $("#ofPath").val());
             ipc.send('refreshPlatformList', $("#ofPath").val());
         });
-
 
         if (defaultSettings['advancedMode'] === true){
         	$("#advancedOptions").attr('Checked','Checked');
@@ -661,11 +608,12 @@ function setup() {
             }
         });
 
-
-        /* Stuff for the console setting (removed from UI)
-	$("#consoleToggle").on("change", function () {
-		enableConsole( $(this).is(':checked') );
-	});*/
+        /*
+            Stuff for the console setting (removed from UI)
+            $("#consoleToggle").on("change", function () {
+                enableConsole( $(this).is(':checked') );
+            });
+        */
         // enable console? (hiddens setting)
         // if(defaultSettings['showConsole']){ $("body").addClass('enableConsole'); }
         // $("#showConsole").on('click', function(){ $('body').addClass('showConsole'); });
@@ -686,7 +634,6 @@ function setup() {
             }
         });
 
-
         // show default platform in GUI
         $("#defaultPlatform").html(defaultSettings['defaultPlatform']);
         //$("#defaultTemplate").html(defaultSettings['defaultTemplate']);
@@ -698,7 +645,6 @@ function setup() {
         // $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         //  		$('body').removeClass('page-create_update page-settings page-advanced').addClass( 'page-' + $(e.target).attr("href").replace('#', '') );
         // });
-
 
         // setup the multi update list as well.
 
@@ -738,7 +684,6 @@ function setup() {
             $(this).removeClass("accept deny");
         });
 
-
         // reflesh template dropdown list depends on selected platforms
         $("#platformsDropdown").on('change', function () {
             let selectedPlatforms = $("#platformsDropdown input").val();
@@ -750,6 +695,7 @@ function setup() {
             }
             ipc.send('refreshTemplateList', arg);
         })
+
         $("#platformsDropdownMulti").on('change', function () {
             let selectedPlatforms = $("#platformsDropdownMulti input").val();
             let selectedPlatformArray = selectedPlatforms.trim().split(',');
@@ -760,7 +706,6 @@ function setup() {
             }
             ipc.send('refreshTemplateList', arg);
         })
-
     });
 }
 
@@ -944,19 +889,14 @@ function generate() {
     } else {
         ipc.send('generate', gen);
     }
-
 }
-
 
 //----------------------------------------
 function updateRecursive() {
 
     // get the path and the platform list
 
-
     //platformsDropdownMulti
-
-
 
     let platformsPicked = $("#platformsDropdownMulti  .active");
     let platformValueArray = [];
@@ -1005,8 +945,8 @@ function switchGenerateMode(mode) {
         console.log('Switching GenerateMode to Update...');
 
         clearAddonSelection();
-
     }
+
     // [default]: switch to createMode (generate new projects)
     else {
         // if previously in update mode, deselect Addons
@@ -1021,17 +961,12 @@ function switchGenerateMode(mode) {
         $("#adons-refresh-icon").hide();
 
         console.log('Switching GenerateMode to Create...');
-
-
-
     }
 }
 
 //----------------------------------------
 function clearAddonSelection() {
-
     $('#addonsDropdown').dropdown('clear');
-
 }
 
 //----------------------------------------
