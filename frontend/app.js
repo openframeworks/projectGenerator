@@ -2,15 +2,15 @@
 // instead of ipc, maybe?
 // https://github.com/atom/electron/blob/master/docs/api/remote.md
 
-var ipc = require('ipc');
-var path = require('path');
-var fs = require('fs');
+const ipc = require('ipc');
+const path = require('path');
+const fs = require('fs');
 
 
-var platforms;
-var templates;
+let platforms;
+let templates;
 
-// var platforms = {
+// let platforms = {
 //     "osx": "OS X (Xcode)",
 //     "vs": "Windows (Visual Studio)",
 //     "ios": "iOS (Xcode)",
@@ -20,13 +20,13 @@ var templates;
 //     "linuxarmv7l": "Linux ARMv7 (Makefiles)"
 // };
 
-var defaultSettings;
-var addonsInstalled;
-var currentPath;
-var isOfPathGood = false;
-var isFirstTimeSierra = false;
-var bVerbose = false;
-var localAddons = [];
+let defaultSettings;
+let addonsInstalled;
+let currentPath;
+let isOfPathGood = false;
+let isFirstTimeSierra = false;
+let bVerbose = false;
+let localAddons = [];
 
 
 
@@ -45,7 +45,7 @@ ipc.on('cwd', function(arg) {
 });
 
 ipc.on('setUpdatePath', function(arg) {
-    var elem = document.getElementById("updateMultiplePath");
+    let elem = document.getElementById("updateMultiplePath");
     elem.value = arg;
     $("#updateMultiplePath").change();
 
@@ -111,12 +111,12 @@ ipc.on('setAddons', function(arg) {
 
     addonsInstalled = arg;
 
-    var select = document.getElementById("addonsList");
+    let select = document.getElementById("addonsList");
     select.innerHTML = "";
 
     if (arg !== null && arg.length > 0) {
         // add:
-        for (var i = 0; i < arg.length; i++) {
+        for (let i = 0; i < arg.length; i++) {
 
             $('<div/>', {
                 "class": 'item',
@@ -164,44 +164,48 @@ ipc.on('setPlatforms', function(arg) {
 
     platforms = arg;
 
+    {
+        let select = document.getElementById("platformList");
+        let option, i;
+        for (let i in platforms) {
+            let myClass = 'platform';
 
-    var select = document.getElementById("platformList");
-    var option, i;
-    for (var i in platforms) {
-        var myClass = 'platform';
+            $('<div/>', {
+                "class": 'item',
+                "data-value": i
+            }).html(platforms[i]).appendTo(select);
+        }
 
-        $('<div/>', {
-            "class": 'item',
-            "data-value": i
-        }).html(platforms[i]).appendTo(select);
+        // start the platform drop down.
+        $('#platformsDropdown').dropdown({
+            allowAdditions: false
+        });
+
+        // set the platform to default
+        $('#platformsDropdown').dropdown('set exactly', defaultSettings['defaultPlatform']);
     }
 
-    // start the platform drop down.
-    $('#platformsDropdown').dropdown({
-            allowAdditions: false
-        });
+    {
+        let select = document.getElementById("platformListMulti");
+        let option, i;
+        for (let i in platforms) {
+            let myClass = 'platform';
 
-    // set the platform to default
-    $('#platformsDropdown').dropdown('set exactly', defaultSettings['defaultPlatform']);
+            $('<div/>', {
+                "class": 'item',
+                "data-value": i
+            }).html(platforms[i]).appendTo(select);
+        }
 
-    var select = document.getElementById("platformListMulti");
-    var option, i;
-    for (var i in platforms) {
-        var myClass = 'platform';
+        // start the platform drop down.
+        $('#platformsDropdownMulti')
+            .dropdown({
+                allowAdditions: false
+            });
 
-        $('<div/>', {
-            "class": 'item',
-            "data-value": i
-        }).html(platforms[i]).appendTo(select);        }
-
-    // start the platform drop down.
-    $('#platformsDropdownMulti')
-        .dropdown({
-            allowAdditions: false
-        });
-
-    // // set the platform to default
-    $('#platformsDropdownMulti').dropdown('set exactly', defaultSettings['defaultPlatform']);
+        // // set the platform to default
+        $('#platformsDropdownMulti').dropdown('set exactly', defaultSettings['defaultPlatform']);
+    }
 });
 
 
@@ -212,53 +216,57 @@ ipc.on('setTemplates', function(arg) {
 
     templates = arg;
 
-    var select = document.getElementById("templateList");
-    var option, i;
-    for (var i in templates) {
-        console.log(i);
-        var myClass = 'template';
+    {
+        let select = document.getElementById("templateList");
+        let option, i;
+        for (let i in templates) {
+            console.log(i);
+            let myClass = 'template';
 
-        $('<div/>', {
-            "class": 'item',
-            "data-value": i
-        }).html(templates[i]).appendTo(select);
+            $('<div/>', {
+                "class": 'item',
+                "data-value": i
+            }).html(templates[i]).appendTo(select);
+        }
+
+        console.log(select);
+
+        // start the template drop down.
+        $('#templatesDropdown')
+            .dropdown({
+                allowAdditions: false,
+                fullTextSearch: 'exact',
+                match: "text",
+                maxSelections: 1
+            });
+
+        // // set the template to default
+        //$('#templatesDropdown').dropdown('set exactly', defaultSettings['defaultTemplate']);
     }
 
-    console.log(select);
+    {
+        // Multi
+        let select = document.getElementById("templateListMulti");
+        let option, i;
+        for (let i in templates) {
+            let myClass = 'template';
 
-    // start the template drop down.
-    $('#templatesDropdown')
-    .dropdown({
-        allowAdditions: false,
-        fullTextSearch: 'exact',
-        match: "text",
-        maxSelections: 1
-    });
+            $('<div/>', {
+                "class": 'item',
+                "data-value": i
+            }).html(templates[i]).appendTo(select);
+        }
 
-    // // set the template to default
-    //$('#templatesDropdown').dropdown('set exactly', defaultSettings['defaultTemplate']);
+        // start the platform drop down.
+        $('#templatesDropdownMulti')
+            .dropdown({
+                allowAdditions: false,
+                maxSelections: 1
+            });
 
-    // Multi
-    var select = document.getElementById("templateListMulti");
-    var option, i;
-    for (var i in templates) {
-        var myClass = 'template';
-
-        $('<div/>', {
-            "class": 'item',
-            "data-value": i
-        }).html(templates[i]).appendTo(select);        
+        // // set the template to default
+        //$('#templatesDropdownMulti').dropdown('set exactly', defaultSettings['defaultTemplate']);
     }
-
-    // start the platform drop down.
-    $('#templatesDropdownMulti')
-        .dropdown({
-            allowAdditions: false,
-            maxSelections: 1
-        });
-
-    // // set the template to default
-    //$('#templatesDropdownMulti').dropdown('set exactly', defaultSettings['defaultTemplate']);
 });
 
 
@@ -290,18 +298,18 @@ ipc.on('selectAddons', function(arg) {
 
     // todo : DEAL WITH LOCAL ADDONS HERE....
 
-    var addonsAlreadyPicked = $("#addonsDropdown").val().split(',');
+    let addonsAlreadyPicked = $("#addonsDropdown").val().split(',');
 
     console.log(addonsAlreadyPicked);
     console.log(arg);
     console.log(addonsInstalled);
 
-    var neededAddons = [];
+    let neededAddons = [];
     localAddons = [];
 
     //haystack.indexOf(needle) >= 0
 
-    for (var i = 0; i < arg.length; i++) {
+    for (let i = 0; i < arg.length; i++) {
         arg[i] = arg[i].trim();
         // first, check if it's already picked, then do nothing
         if (addonsAlreadyPicked.indexOf(arg[i]) >= 0){
@@ -313,7 +321,7 @@ ipc.on('selectAddons', function(arg) {
                 $('#addonsDropdown').dropdown('set selected', arg[i]);
             } else {
 
-                var neededAddonPathRel = path.join($("#projectPath").val(), $("#projectName").val(), arg[i]);
+                let neededAddonPathRel = path.join($("#projectPath").val(), $("#projectName").val(), arg[i]);
                 console.log(neededAddonPathRel);
                 if (fs.existsSync(neededAddonPathRel) ||
                     fs.existsSync(neededAddons[i])){
@@ -414,7 +422,7 @@ ipc.on('setRandomisedSketchName', function(newName) {
 //----------------------------------------
 function setOFPath(arg) {
     // get the element:
-    var elem = document.getElementById("ofPath");
+    let elem = document.getElementById("ofPath");
 
     if (!path.isAbsolute(arg)) {
 
@@ -426,7 +434,7 @@ function setOFPath(arg) {
 
         // else check settings for how we want this path.... make relative if we need to:
         if (defaultSettings['useRelativePath'] === true) {
-            var relativePath = path.normalize(path.relative(path.resolve(__dirname), arg)) + "/";
+            let relativePath = path.normalize(path.relative(path.resolve(__dirname), arg)) + "/";
             elem.value = relativePath;
         } else {
             elem.value = arg;
@@ -462,16 +470,16 @@ function setup() {
 
 
         try{
-            var os = require('os');
+            let os = require('os');
 
-            var os_release = os.release();
-            var os_major_pos = os_release.indexOf(".");
-            var os_major = os_release.slice(0, os_major_pos);
+            let os_release = os.release();
+            let os_major_pos = os_release.indexOf(".");
+            let os_major = os_release.slice(0, os_major_pos);
 
-            var isSierra = (os.platform() === 'darwin' && Number(os_major)>=16);
+            let isSierra = (os.platform() === 'darwin' && Number(os_major)>=16);
             if(isSierra){
-                var ofpath = document.getElementById("ofPath").value;
-                var runningOnVar = false
+                let ofpath = document.getElementById("ofPath").value;
+                let runningOnVar = false
                 try{
                     runningOnVar = (ofpath.length >= 8 && ofpath.substring(0,8)==='/private');
                 }catch(e){}
@@ -535,7 +543,7 @@ function setup() {
         // bind external URLs (load it in default browser; not within Electron)
         $('*[data-toggle="external_target"]').click(function (e) {
             e.preventDefault();
-            var shell = require('shell');
+            let shell = require('shell');
             shell.openExternal( $(this).prop('href') );
         });
 
@@ -551,11 +559,11 @@ function setup() {
         $("#projectName").on('change', function () {
         	if( $(this).is(":focus")===true ){ return; }
 
-        	var project = {};
+        	let project = {};
 
             // fix "non alpha numeric characters here" as we did in the old PG
-            var currentStr = $("#projectName").val()
-            var stripped = currentStr.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g,'_');
+            let currentStr = $("#projectName").val()
+            let stripped = currentStr.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g,'_');
             $("#projectName").val(stripped)
 
         	project['projectName'] = $("#projectName").val();
@@ -605,12 +613,12 @@ function setup() {
 
 
         $("#ofPath").on("change", function(){
-            var ofpath = $("#ofPath").val();
+            let ofpath = $("#ofPath").val();
             defaultSettings['defaultOfPath'] =  ofpath;
             console.log("ofPath val " + ofpath);
             if(isFirstTimeSierra){
-                //var sys = require('sys')
-                var exec = require('child_process').exec;
+                // let sys = require('sys')
+                let exec = require('child_process').exec;
                 function puts(error, stdout, stderr) { console.log(stdout + " " + stderr) }
                 exec("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app", puts);
                 $("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
@@ -636,11 +644,11 @@ function setup() {
 
         // updates ofPath when the field is manually changed
         $("#ofPath").on('blur', function(e){
-            var ofpath = $(this).val();
+            let ofpath = $(this).val();
             setOFPath(ofpath);
             if(isFirstTimeSierra){
-                //var sys = require('sys')
-                var exec = require('child_process').exec;
+                // let sys = require('sys')
+                let exec = require('child_process').exec;
                 function puts(error, stdout, stderr) { console.log(stdout + " " + stderr) }
                 exec("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app", puts);
                 $("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
@@ -771,14 +779,14 @@ function blockDragEvent(e){
 
 function acceptDraggedFiles( e ){
      // handle file
-    var files = e.originalEvent.dataTransfer.files;
-    var types = e.originalEvent.dataTransfer.types;
+    let files = e.originalEvent.dataTransfer.files;
+    let types = e.originalEvent.dataTransfer.types;
 
     // this first check filters out most files
     if(files && files.length == 1 && files[0].type==="" && types[0]=="Files"){
 
         // this folder check is more relayable
-        var file = e.originalEvent.dataTransfer.items[0].webkitGetAsEntry();
+        let file = e.originalEvent.dataTransfer.items[0].webkitGetAsEntry();
         if( file.isDirectory ){
             return true;
         }
@@ -819,11 +827,11 @@ function onDropFile( e ){
             $("updateMenuButton").triggerHandler('click');
         }
         else {
-            var files = e.originalEvent.dataTransfer.files;
+            let files = e.originalEvent.dataTransfer.files;
             // import single project folder
             $("#projectName").val( files[0].name );
-            var projectFullPath = files[0].path;
-            var projectParentPath = path.normalize(projectFullPath+'/..');            
+            let projectFullPath = files[0].path;
+            let projectParentPath = path.normalize(projectFullPath+'/..');
             $("#projectPath").val( projectParentPath ).triggerHandler('change');
 
             $("createMenuButon").triggerHandler('click');
@@ -881,7 +889,7 @@ function openDragInputModal(e){
 //----------------------------------------
 function saveDefaultSettings() {
 
-    var fs = require('fs');
+    let fs = require('fs');
     fs.writeFile(path.resolve(__dirname, 'settings.json'), JSON.stringify(defaultSettings, null, '\t'), function(err) {
         if (err) {
             console.log("Unable to save defaultSettings to settings.json... (Error=" + err.code + ")");
@@ -894,29 +902,29 @@ function saveDefaultSettings() {
 //----------------------------------------
 function generate() {
     // let's get all the info:
-    var platformValueArray = getPlatformList();
+    let platformValueArray = getPlatformList();
 
-    var templatePicked = $("#templatesDropdown .active");
-    var templateValueArray = [];
-    for (var i = 0; i < templatePicked.length; i++){
+    let templatePicked = $("#templatesDropdown .active");
+    let templateValueArray = [];
+    for (let i = 0; i < templatePicked.length; i++){
         templateValueArray.push($(templatePicked[i]).attr("data-value"));
     }
 
-    var addonsPicked = $("#addonsDropdown  .active");
-    var addonValueArray = [];
+    let addonsPicked = $("#addonsDropdown  .active");
+    let addonValueArray = [];
 
-    for (var i = 0; i < addonsPicked.length; i++){
+    for (let i = 0; i < addonsPicked.length; i++){
         addonValueArray.push($(addonsPicked[i]).attr("data-value"));
     }
 
     // add any local addons
-    for (var i = 0; i < localAddons.length; i++){
+    for (let i = 0; i < localAddons.length; i++){
         addonValueArray.push(localAddons[i]);
     }
 
-    var lengthOfPlatforms = platformValueArray.length;
+    let lengthOfPlatforms = platformValueArray.length;
 
-    var gen = {};
+    let gen = {};
 
     gen['projectName'] = $("#projectName").val();
     gen['projectPath'] = $("#projectPath").val();
@@ -950,19 +958,19 @@ function updateRecursive() {
 
 
 
-    var platformsPicked = $("#platformsDropdownMulti  .active");
-    var platformValueArray = [];
-    for (var i = 0; i < platformsPicked.length; i++){
+    let platformsPicked = $("#platformsDropdownMulti  .active");
+    let platformValueArray = [];
+    for (let i = 0; i < platformsPicked.length; i++){
         platformValueArray.push($(platformsPicked[i]).attr("data-value"));
     }
 
-    var templatePicked = $("#templatesDropdownMulti .active");
-    var templateValueArray = [];
-    for (var i = 0; i < templatePicked.length; i++){
+    let templatePicked = $("#templatesDropdownMulti .active");
+    let templateValueArray = [];
+    for (let i = 0; i < templatePicked.length; i++){
         templateValueArray.push($(templatePicked[i]).attr("data-value"));
     }
 
-    var gen = {};
+    let gen = {};
     gen['updatePath'] = $("#updateMultiplePath").val();
     gen['platformList'] = platformValueArray;
     gen['templateList'] = templateValueArray;
@@ -1070,9 +1078,9 @@ function enableConsole( showConsole ){
 
 //----------------------------------------
 function getPlatformList() {
-    var platformsPicked = $("#platformsDropdown  .active");
-    var platformValueArray = [];
-    for (var i = 0; i < platformsPicked.length; i++){
+    let platformsPicked = $("#platformsDropdown  .active");
+    let platformValueArray = [];
+    for (let i = 0; i < platformsPicked.length; i++){
         platformValueArray.push($(platformsPicked[i]).attr("data-value"));
     }
     return platformValueArray;
@@ -1082,7 +1090,7 @@ function getPlatformList() {
 function displayModal(message) {
     $("#uiModal .content").html(message).find('*[data-toggle="external_target"]').click(function (e) {
 		e.preventDefault();
-		var shell = require('shell');
+		let shell = require('shell');
 		shell.openExternal( $(this).prop("href") );
     });
 
@@ -1115,7 +1123,7 @@ function browseOfPath() {
 
 function browseProjectPath() {
 
-    var path = $("#projectPath").val();
+    let path = $("#projectPath").val();
     if (path === ''){
         path = $("#ofPath").val();
     }
@@ -1123,7 +1131,7 @@ function browseProjectPath() {
 }
 
 function browseImportProject() {
-    var path = $("#projectPath").val();
+    let path = $("#projectPath").val();
     if (path === ''){
         path = $("#ofPath").val();
     }
@@ -1132,7 +1140,7 @@ function browseImportProject() {
 
 function getUpdatePath() {
 
-    var path = $("#updateMultiplePath").val();
+    let path = $("#updateMultiplePath").val();
     if (path === ''){
         path = $("#ofPath").val();
     }
@@ -1142,14 +1150,14 @@ function getUpdatePath() {
 
 function rescanAddons() {
     ipc.send('refreshAddonList', $("#ofPath").val());
-    var projectInfo = {};
+    let projectInfo = {};
     projectInfo['projectName'] = $("#projectName").val();
     projectInfo['projectPath'] = $("#projectPath").val();
     ipc.send('isOFProjectFolder', projectInfo);     // <- this forces addon reload
 }
 
 function getRandomSketchName(){
-    var path = $("#projectPath").val();
+    let path = $("#projectPath").val();
     if (path === ''){
         $("#projectPath").oneTimeTooltip('Please specify a path first...');
     }
@@ -1159,9 +1167,9 @@ function getRandomSketchName(){
 }
 
 function launchInIDE(){
-    var platform = getPlatformList()[0];
+    let platform = getPlatformList()[0];
 
-    var project = {};
+    let project = {};
     project['projectName'] = $("#projectName").val();
     project['projectPath'] = $("#projectPath").val();
     project['platform'] = platform;

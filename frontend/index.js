@@ -1,16 +1,16 @@
 "use strict";
 
-var app = require('app'); // Module to control application life.
-var BrowserWindow = require('browser-window'); // Module to create native browser window.
-var dialog = require('dialog');
-var ipc = require('ipc');
-var fs = require('fs');
-var path = require('path');
-var menu = require('menu');
-var moniker = require('moniker');
-var process = require('process');
-var os = require("os");
-var exec = require('child_process').exec;
+const app = require('app'); // Module to control application life.
+const BrowserWindow = require('browser-window'); // Module to create native browser window.
+const dialog = require('dialog');
+const ipc = require('ipc');
+const fs = require('fs');
+let path = require('path');
+const menu = require('menu');
+const moniker = require('moniker');
+const process = require('process');
+const os = require("os");
+const exec = require('child_process').exec;
 
 
 // Debugging: start the Electron PG from the terminal to see the messages from console.log()
@@ -20,18 +20,18 @@ var exec = require('child_process').exec;
 
 
 //--------------------------------------------------------- load settings
-var obj;
+let obj;
 
 
 try {
-    var settings = fs.readFileSync(path.resolve(__dirname, 'settings.json'));
+    let settings = fs.readFileSync(path.resolve(__dirname, 'settings.json'));
     obj = JSON.parse(settings, 'utf8');
     console.log(obj);
 } catch (e) {
 
     // automatic platform detection
-    var os = require("os");
-    var myPlatform = "Unknown";
+    // let os = require("os");
+    let myPlatform = "Unknown";
     if (/^win/.test(process.platform)) {
         myPlatform = 'vs';
     }
@@ -64,7 +64,7 @@ try {
     };
 }
 
-var hostplatform = "";
+let hostplatform = "";
 if (/^win/.test(process.platform)) {
     hostplatform = 'windows';
 } else if (process.platform === "darwin") {
@@ -75,12 +75,12 @@ if (/^win/.test(process.platform)) {
 
 console.log("detected platform: " + hostplatform + " in " + __dirname);
 
-var defaultOfPath = obj["defaultOfPath"];
-var addons;
+let defaultOfPath = obj["defaultOfPath"];
+let addons;
 
 // hide some addons, per https://github.com/openframeworks/projectGenerator/issues/62
 
-var addonsToSkip = [
+let addonsToSkip = [
     "ofxiOS",
     "ofxMultiTouch",
     "ofxEmscripten",
@@ -88,7 +88,7 @@ var addonsToSkip = [
     "ofxAndroid"
 ]
 
-var platforms = {
+let platforms = {
     "osx": "OS X (Xcode)",
     "vs": "Windows (Visual Studio 2017)",
     "ios": "iOS (Xcode)",
@@ -97,9 +97,10 @@ var platforms = {
     "linuxarmv6l": "Linux ARMv6 (Makefiles)",
     "linuxarmv7l": "Linux ARMv7 (Makefiles)"
 };
-var bUseMoniker = obj["useDictionaryNameGenerator"];
 
-var templates = {
+let bUseMoniker = obj["useDictionaryNameGenerator"];
+
+let templates = {
     "emscripten": "Emscripten",
     "gitignore": "Git Ignore",
     "gles2": "Open GL ES 2",
@@ -140,7 +141,7 @@ if (!path.isAbsolute(defaultOfPath)) {
 }
 
 // now, let's look for a folder called mySketch, and keep counting until we find one that doesn't exist
-var startingProject = {};
+let startingProject = {};
 startingProject['name'] = "";
 startingProject['path'] = "";
 getStartingProjectName();
@@ -152,7 +153,7 @@ require('crash-reporter').start();
 //---------------------------------------------------------
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is GCed.
-var mainWindow = null;
+let mainWindow = null;
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
@@ -167,11 +168,11 @@ app.on('window-all-closed', function() {
 
 function formatDate(d){
     //get the month
-    var month = d.getMonth();
+    let month = d.getMonth();
     //get the day
-    var day = d.getDate();
+    let day = d.getDate();
     //get the year
-    var year = d.getFullYear();
+    let year = d.getFullYear();
     //pull the last two digits of the year
     year = year.toString().substr(2,2);
     //increment month by 1 since it is 0 indexed
@@ -195,7 +196,7 @@ function formatDate(d){
 
 // wraps over to bb no aa, why?
 function toLetters(num) {
-    var mod = num % 26,
+    let mod = num % 26,
         pow = num / 26 | 0,
         out = mod ? String.fromCharCode(96 + (num % 26)) : (--pow, 'z');
     return pow ? toLetters(pow) + out : out;
@@ -252,7 +253,7 @@ app.on('ready', function() {
         // when you should delete the corresponding element.
     });
 
-    var menuTmpl = [{
+    let menuTmpl = [{
         label: 'Atom Shell',
         submenu: [{
             label: 'Quit',
@@ -306,16 +307,16 @@ app.on('ready', function() {
             selector: 'selectAll:'
         }, ]
     }];
-    var menuV = menu.buildFromTemplate(menuTmpl);
+    let menuV = menu.buildFromTemplate(menuTmpl);
     menu.setApplicationMenu(menuV);
 
 });
 
 function getStartingProjectName() {
 
-    var defaultPathForProjects = path.join(obj["defaultOfPath"], obj["defaultRelativeProjectPath"]);
-    var foundOne = false;
-    var goodName = getGoodSketchName(defaultPathForProjects);
+    let defaultPathForProjects = path.join(obj["defaultOfPath"], obj["defaultRelativeProjectPath"]);
+    let foundOne = false;
+    let goodName = getGoodSketchName(defaultPathForProjects);
     startingProject['path'] = defaultPathForProjects;
     startingProject['name'] = goodName;
 }
@@ -339,19 +340,19 @@ function parseAddonsAndUpdateSelect(arg) {
 }
 
 function parsePlatformsAndUpdateSelect(arg) {
-    var folders = getDirectories(arg + "/scripts/templates");
+    let folders = getDirectories(arg + "/scripts/templates");
     console.log("Reloading the templates folder, these were found:");
     console.log(folders);
 
-    var platformsWeHave = {};
-    var templatesWeHave = {};
+    let platformsWeHave = {};
+    let templatesWeHave = {};
 
     if (folders === undefined || folders === null) {
         //do something
     } else {
         // check all folder name under /scripts/templates
-        for (var id in folders) {
-            var key = folders[id];
+        for (let id in folders) {
+            let key = folders[id];
             if (platforms[key]) {
                 // this folder is for platform
                 console.log("Found platform, key " + key + " has value " + platforms[key]);
@@ -371,7 +372,7 @@ function parsePlatformsAndUpdateSelect(arg) {
         }
     }
     // saninty check...
-    // for(var key in platformsWeHave){
+    // for(let key in platformsWeHave){
     // 	console.log("key " + key + " has value " + platformsWeHave[key]);
     // }
     mainWindow.webContents.send('setPlatforms', platformsWeHave);
@@ -382,21 +383,21 @@ function parsePlatformsAndUpdateSelect(arg) {
 
 function getGoodSketchName(arg){
 
-    var currentProjectPath = arg;
-    var foundOne = false;
-    var goodName = "mySketch";
+    let currentProjectPath = arg;
+    let foundOne = false;
+    let goodName = "mySketch";
 
     if (bUseMoniker){
 
-        var projectNames = new moniker.Dictionary();
-        var tmpPath = require('path');
+        let projectNames = new moniker.Dictionary();
+        let tmpPath = require('path');
         projectNames.read(  tmpPath.join(__dirname, 'static', 'data', 'sketchAdjectives.txt'));
         goodName = "mySketch";
 
         while (foundOne === false) {
             if (fs.existsSync(tmpPath.join(currentProjectPath, goodName))) {
                 console.log("«" + goodName + "» already exists, generating a new name...");
-                var adjective = projectNames.choose();
+                let adjective = projectNames.choose();
                 goodName = "my" + adjective.charAt(0).toUpperCase() + adjective.slice(1) + "Sketch";
             } else {
                 foundOne = true;
@@ -405,10 +406,10 @@ function getGoodSketchName(arg){
 
     } else {
 
-        var date = new Date();
-        var formattedDate = formatDate(date);
+        let date = new Date();
+        let formattedDate = formatDate(date);
         goodName = "sketch_" + formattedDate;
-        var count = 1;
+        let count = 1;
 
          while (foundOne === false) {
             if (fs.existsSync(path.join(currentProjectPath, goodName))) {
@@ -433,8 +434,8 @@ function getDirectories(srcpath, acceptedPrefix) {
     // that's why I am making temp ones here.
     // console.log(path);
 
-    var fsTemp = require('fs');
-    var pathTemp = require('path');
+    const fsTemp = require('fs');
+    const pathTemp = require('path');
 
     try {
 
@@ -443,7 +444,7 @@ function getDirectories(srcpath, acceptedPrefix) {
             //console.log(srcpath);
             //console.log(file);
             try{
-                var joinedPath = pathTemp.join(srcpath, file);
+                let joinedPath = pathTemp.join(srcpath, file);
                 if ((acceptedPrefix==null || file.substring(0,acceptedPrefix.length)==acceptedPrefix) && joinedPath !== null) {
                     // only accept folders (potential addons)
                     return fsTemp.statSync(joinedPath).isDirectory();
@@ -468,7 +469,7 @@ function getDirectories(srcpath, acceptedPrefix) {
 //       console.error(err);
 //       return cb([]);
 //     }
-//     var iterator = function (file, cb)  {
+//     let iterator = function (file, cb)  {
 //       fs.stat(path.join(srcpath, file), function (err, stats) {
 //         if(err) {
 //           console.error(err);
@@ -482,21 +483,21 @@ function getDirectories(srcpath, acceptedPrefix) {
 // }
 
 ipc.on('isOFProjectFolder', function(event, project) {
-    var fsTemp = require('fs');
-    var pathTemp = require('path');
-    var folder;
+    const fsTemp = require('fs');
+    const pathTemp = require('path');
+    let folder;
     folder = pathTemp.join(project['projectPath'], project['projectName']);
 
     try {
 
-        var tmpFiles = fsTemp.readdirSync(folder);
+        let tmpFiles = fsTemp.readdirSync(folder);
         if (!tmpFiles || tmpFiles.length <= 1) {
             return false;
         } // we need at least 2 files/folders within
 
         // todo: also check for config.make & addons.make ?
-        var foundSrcFolder = false;
-        var foundAddons = false;
+        let foundSrcFolder = false;
+        let foundAddons = false;
         tmpFiles.forEach(function(el, i) {
             if (el == 'src') {
                 foundSrcFolder = true;
@@ -510,7 +511,7 @@ ipc.on('isOFProjectFolder', function(event, project) {
             event.sender.send('setGenerateMode', 'updateMode');
 
             if (foundAddons) {
-                var projectAddons = fsTemp.readFileSync(pathTemp.resolve(folder, 'addons.make')).toString().split("\n");
+                let projectAddons = fsTemp.readFileSync(pathTemp.resolve(folder, 'addons.make')).toString().split("\n");
 
                 projectAddons = projectAddons.filter(function(el) {
                     if (el === '' || el === 'addons') {
@@ -633,25 +634,25 @@ ipc.on('refreshTemplateList', function (event, arg) {
 });
 
 ipc.on('getRandomSketchName', function(event, arg) {
-    var goodName = getGoodSketchName(arg);
+    let goodName = getGoodSketchName(arg);
     event.sender.send('setRandomisedSketchName', goodName);
     event.sender.send('setGenerateMode', 'createMode'); // it's a new sketch name, we are in create mode
 });
 
 ipc.on('update', function(event, arg) {
 
-    var update = arg;
-    var exec = require('child_process').exec;
-    var pathTemp = require('path');
+    let update = arg;
+    let exec = require('child_process').exec;
+    let pathTemp = require('path');
 
     console.log(update);
 
-    var updatePath = "";
-    var pathString = "";
-    var platformString = "";
-    var templateString = "";
-    var recursiveString = "";
-    var verboseString = "";
+    let updatePath = "";
+    let pathString = "";
+    let platformString = "";
+    let templateString = "";
+    let recursiveString = "";
+    let verboseString = "";
 
     if (update['updatePath'] !== null) {
         updatePath = update['updatePath'];
@@ -678,7 +679,7 @@ ipc.on('update', function(event, arg) {
         verboseString = "-v";
     }
 
-    var pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
+    let pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
 
 
     if( arg.platform == 'osx' || arg.platform == 'linux' || arg.platform == 'linux64' ){
@@ -687,7 +688,7 @@ ipc.on('update', function(event, arg) {
         pgApp = "\"" + pgApp + "\"";
     }
 
-    var wholeString = pgApp + " " + recursiveString + " " + verboseString + " " + pathString + " " + platformString + " " + templateString + " " + updatePath;
+    const wholeString = pgApp + " " + recursiveString + " " + verboseString + " " + pathString + " " + platformString + " " + templateString + " " + updatePath;
 
     exec(wholeString, {maxBuffer : Infinity}, function callback(error, stdout, stderr) {
 
@@ -721,19 +722,19 @@ ipc.on('update', function(event, arg) {
 ipc.on('generate', function(event, arg) {
 
 
-    var generate = arg;
+    let generate = arg;
 
-    var exec = require('child_process').exec;
+    let exec = require('child_process').exec;
 
 
-    var pathTemp = require('path');
+    let pathTemp = require('path');
 
-    var projectString = "";
-    var pathString = "";
-    var addonString = "";
-    var platformString = "";
-    var templateString = "";
-    var verboseString = "";
+    let projectString = "";
+    let pathString = "";
+    let addonString = "";
+    let platformString = "";
+    let templateString = "";
+    let verboseString = "";
 
 
 
@@ -765,7 +766,7 @@ ipc.on('generate', function(event, arg) {
         projectString = "\"" + pathTemp.join(generate['projectPath'], generate['projectName']) + "\"";
     }
 
-    var pgApp="";
+    let pgApp="";
     if(hostplatform == "linux"){
         pgApp = "projectGenerator";
     }else{
@@ -778,14 +779,14 @@ ipc.on('generate', function(event, arg) {
         pgApp = pgApp = "\"" + pgApp + "\"";
     }
 
-    var wholeString = pgApp + " " + verboseString + " " + pathString + " " + addonString + " " + platformString + " " + templateString + " " + projectString;
+    const wholeString = pgApp + " " + verboseString + " " + pathString + " " + addonString + " " + platformString + " " + templateString + " " + projectString;
 
     exec(wholeString, {maxBuffer : Infinity}, function callback(error, stdout, stderr) {
 
-        var wasError = false;
-        var text = stdout; //Big text with many line breaks
-        var lines = text.split(os.EOL); //Will return an array of lines on every OS node works
-        for (var i = 0; i < lines.length; i++) {
+        let wasError = false;
+        let text = stdout; //Big text with many line breaks
+        let lines = text.split(os.EOL); //Will return an array of lines on every OS node works
+        for (let i = 0; i < lines.length; i++) {
             if (lines[i].indexOf("Result:") > -1) {
                 if (lines[i].indexOf("error") > -1) {
                     wasError = true;
@@ -796,7 +797,7 @@ ipc.on('generate', function(event, arg) {
         // wasError = did the PG spit out an error (like a bad path, etc)
         // error = did node have an error running this command line app
 
-        var fullPath = pathTemp.join(generate['projectPath'], generate['projectName']);
+        let fullPath = pathTemp.join(generate['projectPath'], generate['projectName']);
         if (error === null && wasError === false) {
             event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
             event.sender.send('sendUIMessage',
@@ -889,7 +890,7 @@ ipc.on('checkMultiUpdatePath', function(event, arg) {
 
 });
 
-var dialogIsOpen = false;
+let dialogIsOpen = false;
 ipc.on('pickProjectImport', function(event, arg) {
     if(dialogIsOpen){
         return;
@@ -904,8 +905,8 @@ ipc.on('pickProjectImport', function(event, arg) {
     }, function(filenames) {
         if (filenames != null) {
             // gather project information
-            var tmpPath = require('path');
-            var projectSettings = {};
+            let tmpPath = require('path');
+            let projectSettings = {};
             projectSettings['projectName'] = tmpPath.basename(filenames[0]);
             projectSettings['projectPath'] = tmpPath.dirname(filenames[0]);
             event.sender.send('importProjectSettings', projectSettings);
@@ -917,9 +918,9 @@ ipc.on('pickProjectImport', function(event, arg) {
 
 ipc.on('launchProjectinIDE', function(event, arg) {
 
-    var pathTemp = require('path');
-    var fsTemp = require('fs');
-    var fullPath = pathTemp.join(arg['projectPath'], arg['projectName']);
+    let pathTemp = require('path');
+    let fsTemp = require('fs');
+    let fullPath = pathTemp.join(arg['projectPath'], arg['projectName']);
 
     if( fsTemp.statSync(fullPath).isDirectory() == false ){
         // project doesn't exist
@@ -930,7 +931,7 @@ ipc.on('launchProjectinIDE', function(event, arg) {
     // // launch xcode
     if( arg.platform == 'osx' ){
         if(hostplatform == 'osx'){
-            var osxPath = pathTemp.join(fullPath, arg['projectName'] + '.xcodeproj');
+            let osxPath = pathTemp.join(fullPath, arg['projectName'] + '.xcodeproj');
             console.log( osxPath );
             osxPath = "\"" + osxPath + "\"";
 
@@ -940,7 +941,7 @@ ipc.on('launchProjectinIDE', function(event, arg) {
         }
     } else if( arg.platform == 'linux' || arg.platform == 'linux64' ){
         if(hostplatform == 'linux'){
-            var linuxPath = pathTemp.join(fullPath, arg['projectName'] + '.qbs');
+            let linuxPath = pathTemp.join(fullPath, arg['projectName'] + '.qbs');
             linuxPath = linuxPath.replace(/ /g, '\\ ');
             console.log( linuxPath );
             exec('xdg-open ' + linuxPath, function callback(error, stdout, stderr){
@@ -958,7 +959,7 @@ ipc.on('launchProjectinIDE', function(event, arg) {
             }
         });
     } else if( hostplatform == 'windows'){
-        var windowsPath = pathTemp.join(fullPath, arg['projectName'] + '.sln');
+        let windowsPath = pathTemp.join(fullPath, arg['projectName'] + '.sln');
         console.log( windowsPath );
         windowsPath = "\"" + windowsPath + "\"";
         exec('start ' + "\"\"" + " " + windowsPath, function callback(error, stdout, stderr){
