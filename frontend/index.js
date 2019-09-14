@@ -5,7 +5,7 @@ const BrowserWindow = require('browser-window'); // Module to create native brow
 const dialog = require('dialog');
 const ipc = require('ipc');
 const fs = require('fs');
-let path = require('path');
+const path = require('path');
 const menu = require('menu');
 const moniker = require('moniker');
 const process = require('process');
@@ -379,12 +379,11 @@ function getGoodSketchName(arg){
     if (bUseMoniker){
 
         let projectNames = new moniker.Dictionary();
-        let tmpPath = require('path');
-        projectNames.read(  tmpPath.join(__dirname, 'static', 'data', 'sketchAdjectives.txt'));
+        projectNames.read( path.join(__dirname, 'static', 'data', 'sketchAdjectives.txt'));
         goodName = "mySketch";
 
         while (foundOne === false) {
-            if (fs.existsSync(tmpPath.join(currentProjectPath, goodName))) {
+            if (fs.existsSync(path.join(currentProjectPath, goodName))) {
                 console.log("«" + goodName + "» already exists, generating a new name...");
                 let adjective = projectNames.choose();
                 goodName = "my" + adjective.charAt(0).toUpperCase() + adjective.slice(1) + "Sketch";
@@ -416,25 +415,15 @@ function getGoodSketchName(arg){
 
 function getDirectories(srcpath, acceptedPrefix) {
 
-    // because this is called at a different time, fs and path
-    // seemed to be "bad" for some reason...
-    // that's why I am making temp ones here.
-    // console.log(path);
-
-    const fsTemp = require('fs');
-    const pathTemp = require('path');
-
     try {
-
-        return fsTemp.readdirSync(srcpath).filter(function(file) {
-
+        return fs.readdirSync(srcpath).filter(function(file) {
             //console.log(srcpath);
             //console.log(file);
             try{
-                let joinedPath = pathTemp.join(srcpath, file);
+                let joinedPath = path.join(srcpath, file);
                 if ((acceptedPrefix==null || file.substring(0,acceptedPrefix.length)==acceptedPrefix) && joinedPath !== null) {
                     // only accept folders (potential addons)
-                    return fsTemp.statSync(joinedPath).isDirectory();
+                    return fs.statSync(joinedPath).isDirectory();
                 }
             }catch(e){}
         });
@@ -470,14 +459,13 @@ function getDirectories(srcpath, acceptedPrefix) {
 // }
 
 ipc.on('isOFProjectFolder', function(event, project) {
-    const fsTemp = require('fs');
-    const pathTemp = require('path');
+
     let folder;
-    folder = pathTemp.join(project['projectPath'], project['projectName']);
+    folder = path.join(project['projectPath'], project['projectName']);
 
     try {
 
-        let tmpFiles = fsTemp.readdirSync(folder);
+        let tmpFiles = fs.readdirSync(folder);
         if (!tmpFiles || tmpFiles.length <= 1) {
             return false;
         } // we need at least 2 files/folders within
@@ -498,7 +486,7 @@ ipc.on('isOFProjectFolder', function(event, project) {
             event.sender.send('setGenerateMode', 'updateMode');
 
             if (foundAddons) {
-                let projectAddons = fsTemp.readFileSync(pathTemp.resolve(folder, 'addons.make')).toString().split("\n");
+                let projectAddons = fs.readFileSync(path.resolve(folder, 'addons.make')).toString().split("\n");
 
                 projectAddons = projectAddons.filter(function(el) {
                     if (el === '' || el === 'addons') {
@@ -526,7 +514,7 @@ ipc.on('isOFProjectFolder', function(event, project) {
 
         /*if (joinedPath != null){
 		  // only accept folders (potential addons)
-		  return fsTemp.statSync(joinedPath).isDirectory();
+		  return fs.statSync(joinedPath).isDirectory();
 		}*/
     } catch (e) { // error reading dir
         event.sender.send('setGenerateMode', 'createMode');
@@ -630,7 +618,6 @@ ipc.on('update', function(event, arg) {
 
     let update = arg;
     let exec = require('child_process').exec;
-    let pathTemp = require('path');
 
     console.log(update);
 
@@ -666,7 +653,7 @@ ipc.on('update', function(event, arg) {
         verboseString = "-v";
     }
 
-    let pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
+    let pgApp = path.normalize(path.join(path.join(__dirname, "app"), "projectGenerator"));
 
 
     if( arg.platform == 'osx' || arg.platform == 'linux' || arg.platform == 'linux64' ){
@@ -709,7 +696,6 @@ ipc.on('generate', function(event, arg) {
 
     let generate = arg;
     let exec = require('child_process').exec;
-    let pathTemp = require('path');
     let projectString = "";
     let pathString = "";
     let addonString = "";
@@ -742,14 +728,14 @@ ipc.on('generate', function(event, arg) {
 
     if (generate.projectName !== null &&
         generate.projectPath !== null) {
-        projectString = "\"" + pathTemp.join(generate['projectPath'], generate['projectName']) + "\"";
+        projectString = "\"" + path.join(generate['projectPath'], generate['projectName']) + "\"";
     }
 
     let pgApp= "";
     if(hostplatform == "linux"){
         pgApp = "projectGenerator";
     }else{
-        pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
+        pgApp = path.normalize(path.join(path.join(__dirname, "app"), "projectGenerator"));
     }
 
     if( arg.platform == 'osx' || arg.platform == 'linux' || arg.platform == 'linux64' ){
@@ -776,7 +762,7 @@ ipc.on('generate', function(event, arg) {
         // wasError = did the PG spit out an error (like a bad path, etc)
         // error = did node have an error running this command line app
 
-        let fullPath = pathTemp.join(generate['projectPath'], generate['projectName']);
+        let fullPath = path.join(generate['projectPath'], generate['projectName']);
         if (error === null && wasError === false) {
             event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
             event.sender.send('sendUIMessage',
@@ -812,7 +798,7 @@ ipc.on('generate', function(event, arg) {
 });
 
 ipc.on('pickOfPath', function(event, arg) {
-    path = dialog.showOpenDialog({
+    dialog.showOpenDialog({
         title: 'select the root of OF, where you see libs, addons, etc',
         properties: ['openDirectory'],
         filters: [],
@@ -826,7 +812,7 @@ ipc.on('pickOfPath', function(event, arg) {
 });
 
 ipc.on('pickUpdatePath', function(event, arg) {
-    path = dialog.showOpenDialog({
+    dialog.showOpenDialog({
         title: 'select root folder where you want to update',
         properties: ['openDirectory'],
         filters: [],
@@ -840,7 +826,7 @@ ipc.on('pickUpdatePath', function(event, arg) {
 });
 
 ipc.on('pickProjectPath', function(event, arg) {
-    path = dialog.showOpenDialog({
+    dialog.showOpenDialog({
         title: 'select parent folder for project, typically apps/myApps',
         properties: ['openDirectory'],
         filters: [],
@@ -868,7 +854,7 @@ ipc.on('pickProjectImport', function(event, arg) {
     }
 
     dialogIsOpen = true;
-    path = dialog.showOpenDialog({
+    dialog.showOpenDialog({
         title: 'Select the folder of your project, typically apps/myApps/myGeniusApp',
         properties: ['openDirectory'],
         filters: [],
@@ -876,10 +862,9 @@ ipc.on('pickProjectImport', function(event, arg) {
     }, function(filenames) {
         if (filenames != null) {
             // gather project information
-            let tmpPath = require('path');
             let projectSettings = {};
-            projectSettings['projectName'] = tmpPath.basename(filenames[0]);
-            projectSettings['projectPath'] = tmpPath.dirname(filenames[0]);
+            projectSettings['projectName'] = path.basename(filenames[0]);
+            projectSettings['projectPath'] = path.dirname(filenames[0]);
             event.sender.send('importProjectSettings', projectSettings);
         }
         dialogIsOpen = false;
@@ -887,11 +872,9 @@ ipc.on('pickProjectImport', function(event, arg) {
 });
 
 ipc.on('launchProjectinIDE', function(event, arg) {
-    let pathTemp = require('path');
-    let fsTemp = require('fs');
-    let fullPath = pathTemp.join(arg['projectPath'], arg['projectName']);
+    let fullPath = path.join(arg['projectPath'], arg['projectName']);
 
-    if( fsTemp.statSync(fullPath).isDirectory() == false ){
+    if( fs.statSync(fullPath).isDirectory() == false ){
         // project doesn't exist
         event.sender.send('projectLaunchCompleted', false );
         return;
@@ -900,7 +883,7 @@ ipc.on('launchProjectinIDE', function(event, arg) {
     // // launch xcode
     if( arg.platform == 'osx' ){
         if(hostplatform == 'osx'){
-            let osxPath = pathTemp.join(fullPath, arg['projectName'] + '.xcodeproj');
+            let osxPath = path.join(fullPath, arg['projectName'] + '.xcodeproj');
             console.log( osxPath );
             osxPath = "\"" + osxPath + "\"";
 
@@ -910,7 +893,7 @@ ipc.on('launchProjectinIDE', function(event, arg) {
         }
     } else if( arg.platform == 'linux' || arg.platform == 'linux64' ){
         if(hostplatform == 'linux'){
-            let linuxPath = pathTemp.join(fullPath, arg['projectName'] + '.qbs');
+            let linuxPath = path.join(fullPath, arg['projectName'] + '.qbs');
             linuxPath = linuxPath.replace(/ /g, '\\ ');
             console.log( linuxPath );
             exec('xdg-open ' + linuxPath, function callback(error, stdout, stderr){
@@ -928,7 +911,7 @@ ipc.on('launchProjectinIDE', function(event, arg) {
             }
         });
     } else if( hostplatform == 'windows'){
-        let windowsPath = pathTemp.join(fullPath, arg['projectName'] + '.sln');
+        let windowsPath = path.join(fullPath, arg['projectName'] + '.sln');
         console.log( windowsPath );
         windowsPath = "\"" + windowsPath + "\"";
         exec('start ' + "\"\"" + " " + windowsPath, function callback(error, stdout, stderr){
