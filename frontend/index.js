@@ -1,16 +1,13 @@
 "use strict";
 
-const app = require('app'); // Module to control application life.
-const BrowserWindow = require('browser-window'); // Module to create native browser window.
-const dialog = require('dialog');
-const ipc = require('ipc');
+const { app, BrowserWindow, dialog, ipcMain, Menu, crashReporter } = require('electron');
 const fs = require('fs');
 const path = require('path');
-const menu = require('menu');
 const moniker = require('moniker');
 const process = require('process');
 const os = require("os");
 const exec = require('child_process').exec;
+const url = require('url');
 
 // Debugging: start the Electron PG from the terminal to see the messages from console.log()
 // Example: /path/to/PG/Contents/MacOS/Electron /path/to/PG/Contents/Ressources/app
