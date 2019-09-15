@@ -143,7 +143,12 @@ getStartingProjectName();
 
 //---------------------------------------------------------
 // Report crashes to our server.
-require('crash-reporter').start();
+crashReporter.start({
+    productName: 'openFrameworks ProjectGenerator frontend',
+    companyName: 'openFrameworks',
+    submitURL: 'http://localhost:3000/api/app-crashes',
+    uploadToServer: false
+});
 
 //---------------------------------------------------------
 // Keep a global reference of the window object, if you don't, the window will
