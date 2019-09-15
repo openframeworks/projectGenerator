@@ -216,7 +216,11 @@ app.on('ready', function () {
     // http://stackoverflow.com/questions/30271011/electron-jquery-errors
 
     // and load the index.html of the app.
-    mainWindow.loadUrl('file://' + __dirname + '/index.html');
+    mainWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'index.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
 
     // Open the devtools.
     if (obj["showDeveloperTools"]) {
@@ -302,8 +306,8 @@ app.on('ready', function () {
             selector: 'selectAll:'
         },]
     }];
-    let menuV = menu.buildFromTemplate(menuTmpl);
-    menu.setApplicationMenu(menuV);
+    let menuV = Menu.buildFromTemplate(menuTmpl);
+    Menu.setApplicationMenu(menuV);
 
 });
 
