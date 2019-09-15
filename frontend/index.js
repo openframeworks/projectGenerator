@@ -459,7 +459,7 @@ function getDirectories(srcpath, acceptedPrefix) {
 //   });
 // }
 
-ipc.on('isOFProjectFolder', function (event, project) {
+ipcMain.on('isOFProjectFolder', function (event, project) {
 
     let folder;
     folder = path.join(project['projectPath'], project['projectName']);
@@ -532,17 +532,17 @@ ipc.on('isOFProjectFolder', function (event, project) {
 
 //----------------------------------------------------------- ipc
 
-ipc.on('refreshAddonList', function (event, arg) {
+ipcMain.on('refreshAddonList', function (event, arg) {
     console.log("in refresh " + arg)
     parseAddonsAndUpdateSelect(arg);
 });
 
-ipc.on('refreshPlatformList', function (event, arg) {
+ipcMain.on('refreshPlatformList', function (event, arg) {
     parsePlatformsAndUpdateSelect(arg);
 });
 
 
-ipc.on('refreshTemplateList', function (event, arg) {
+ipcMain.on('refreshTemplateList', function (event, arg) {
     console.log("refreshTemplateList");
     let selectedPlatforms = arg.selectedPlatforms;
     let ofPath = arg.ofPath;
@@ -609,13 +609,13 @@ ipc.on('refreshTemplateList', function (event, arg) {
     mainWindow.webContents.send('enableTemplate', returnArg);
 });
 
-ipc.on('getRandomSketchName', function (event, arg) {
+ipcMain.on('getRandomSketchName', function (event, arg) {
     let goodName = getGoodSketchName(arg);
     event.sender.send('setRandomisedSketchName', goodName);
     event.sender.send('setGenerateMode', 'createMode'); // it's a new sketch name, we are in create mode
 });
 
-ipc.on('update', function (event, arg) {
+ipcMain.on('update', function (event, arg) {
 
     let update = arg;
     let exec = require('child_process').exec;
@@ -693,7 +693,7 @@ ipc.on('update', function (event, arg) {
 
 });
 
-ipc.on('generate', function (event, arg) {
+ipcMain.on('generate', function (event, arg) {
 
     let generate = arg;
     let exec = require('child_process').exec;
@@ -798,7 +798,7 @@ ipc.on('generate', function (event, arg) {
     //console.log(arg);
 });
 
-ipc.on('pickOfPath', function (event, arg) {
+ipcMain.on('pickOfPath', function (event, arg) {
     dialog.showOpenDialog({
         title: 'select the root of OF, where you see libs, addons, etc',
         properties: ['openDirectory'],
@@ -812,7 +812,7 @@ ipc.on('pickOfPath', function (event, arg) {
     });
 });
 
-ipc.on('pickUpdatePath', function (event, arg) {
+ipcMain.on('pickUpdatePath', function (event, arg) {
     dialog.showOpenDialog({
         title: 'select root folder where you want to update',
         properties: ['openDirectory'],
@@ -826,7 +826,7 @@ ipc.on('pickUpdatePath', function (event, arg) {
     });
 });
 
-ipc.on('pickProjectPath', function (event, arg) {
+ipcMain.on('pickProjectPath', function (event, arg) {
     dialog.showOpenDialog({
         title: 'select parent folder for project, typically apps/myApps',
         properties: ['openDirectory'],
@@ -839,7 +839,7 @@ ipc.on('pickProjectPath', function (event, arg) {
     });
 });
 
-ipc.on('checkMultiUpdatePath', function (event, arg) {
+ipcMain.on('checkMultiUpdatePath', function (event, arg) {
     if (fs.existsSync(arg)) {
         event.sender.send('isUpdateMultiplePathOk', true);
     } else {
@@ -849,7 +849,7 @@ ipc.on('checkMultiUpdatePath', function (event, arg) {
 });
 
 let dialogIsOpen = false;
-ipc.on('pickProjectImport', function (event, arg) {
+ipcMain.on('pickProjectImport', function (event, arg) {
     if (dialogIsOpen) {
         return;
     }
@@ -872,7 +872,7 @@ ipc.on('pickProjectImport', function (event, arg) {
     });
 });
 
-ipc.on('launchProjectinIDE', function (event, arg) {
+ipcMain.on('launchProjectinIDE', function (event, arg) {
     let fullPath = path.join(arg['projectPath'], arg['projectName']);
 
     if (fs.statSync(fullPath).isDirectory() == false) {
@@ -921,6 +921,6 @@ ipc.on('launchProjectinIDE', function (event, arg) {
     }
 });
 
-ipc.on('quit', function (event, arg) {
+ipcMain.on('quit', function (event, arg) {
     app.quit();
 });
