@@ -14,6 +14,19 @@
 #include <list>
 using namespace std;
 
+vector<string> splitStringOnceByLeft(const string &source, const string &delimiter) {
+    size_t pos = source.find(delimiter);
+    vector<string> res;
+    if(pos == string::npos) {
+        res.push_back(source);
+        return res;
+    }
+    
+    res.push_back(source.substr(0, pos));
+    res.push_back(source.substr(pos + delimiter.length()));
+    return res;
+}
+
 ofAddon::ofAddon(){
     isLocalAddon = false;
     pathToProject = ".";
@@ -297,7 +310,7 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 	}
 
 	if(variable == "ADDON_DATA"){
-		addReplaceStringVector(data,value,addonRelPath,addToValue);
+		addReplaceStringVector(data,value,"",addToValue);
 	}
 
 	if(variable == "ADDON_LIBS_EXCLUDE"){
@@ -391,10 +404,10 @@ void ofAddon::parseConfig(){
 			vector<string> varValue;
 			if(line.find("+=")!=string::npos){
 				addToValue = true;
-				varValue = ofSplitString(line,"+=");
+				varValue = splitStringOnceByLeft(line,"+=");
 			}else{
 				addToValue = false;
-				varValue = ofSplitString(line,"=");
+				varValue = splitStringOnceByLeft(line,"=");
 			}
 			variable = Poco::trim(varValue[0]);
 			value = Poco::trim(varValue[1]);
@@ -414,11 +427,12 @@ void ofAddon::parseConfig(){
 	}
 
 	exclude(includePaths,excludeIncludes);
-	exclude(srcFiles,excludeSources);
+	exclude(srcFiles, excludeSources);
 	exclude(csrcFiles,excludeSources);
 	exclude(cppsrcFiles,excludeSources);
 	exclude(objcsrcFiles,excludeSources);
 	exclude(headersrcFiles,excludeSources);
+	exclude(propsFiles, excludeSources);
 	exclude(libs,excludeLibs);
 
 	ofLogVerbose("ofAddon") << "libs after exclusions " << libs.size();
@@ -468,7 +482,27 @@ void ofAddon::fromFS(string path, string platform){
     }
     
 
-    string libsPath = ofFilePath::join(path, "/libs");
+	if (platform == "vs" || platform == "msys2") {
+		getPropsRecursively(addonPath, propsFiles, platform);
+	}
+
+	for (int i = 0; i < (int)propsFiles.size(); i++) {
+		propsFiles[i].erase(propsFiles[i].begin(), propsFiles[i].begin() + containedPath.length());
+		int end = propsFiles[i].rfind(std::filesystem::path("/").make_preferred().string());
+		int init = 0;
+		string folder;
+		if (!isLocalAddon) {
+			folder = propsFiles[i].substr(init, end);
+		}
+		else {
+			init = propsFiles[i].find(name);
+			folder = ofFilePath::join("local_addons", propsFiles[i].substr(init, end - init));
+		}
+		propsFiles[i] = prefixPath + propsFiles[i];
+	}
+	
+
+	string libsPath = ofFilePath::join(path, "/libs");
     vector < string > libFiles;
 
 
@@ -611,42 +645,43 @@ void ofAddon::fromFS(string path, string platform){
 
 }
 
-void ofAddon::fromXML(string installXmlName){
-	clear();
-    pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_file(ofToDataPath(installXmlName).c_str());
+//void ofAddon::fromXML(string installXmlName){
+//	clear();
+//    pugi::xml_document doc;
+//    pugi::xml_parse_result result = doc.load_file(ofToDataPath(installXmlName).c_str());
 
-    // this is src to add:
-    pugi::xpath_node_set add = doc.select_nodes("//add/src/folder/file");
-    for (pugi::xpath_node_set::const_iterator it = add.begin(); it != add.end(); ++it){
-        pugi::xpath_node node = *it;
-        //std::cout << "folder name "  << node.node().parent().attribute("name").value() << " : ";
-        //std::cout << "src: " << node.node().child_value() << endl;
-    }
-
-
-    add = doc.select_nodes("//include/path");
-    for (pugi::xpath_node_set::const_iterator it = add.begin(); it != add.end(); ++it){
-        pugi::xpath_node node = *it;
-        //std::cout << "include: " << node.node().child_value() << endl;
-    }
+//    // this is src to add:
+//    pugi::xpath_node_set add = doc.select_nodes("//add/src/folder/file");
+//    for (pugi::xpath_node_set::const_iterator it = add.begin(); it != add.end(); ++it){
+//        pugi::xpath_node node = *it;
+//        //std::cout << "folder name "  << node.node().parent().attribute("name").value() << " : ";
+//        //std::cout << "src: " << node.node().child_value() << endl;
+//    }
 
 
-    add = doc.select_nodes("//link/lib[@compiler='codeblocks']");
-    // this has to be smarter I guess...
-    for (pugi::xpath_node_set::const_iterator it = add.begin(); it != add.end(); ++it){
-        pugi::xpath_node node = *it;
-        //std::cout << "link: " << node.node().child_value() << endl;
-    }
+//    add = doc.select_nodes("//include/path");
+//    for (pugi::xpath_node_set::const_iterator it = add.begin(); it != add.end(); ++it){
+//        pugi::xpath_node node = *it;
+//        //std::cout << "include: " << node.node().child_value() << endl;
+//    }
 
 
-}
+//    add = doc.select_nodes("//link/lib[@compiler='codeblocks']");
+//    // this has to be smarter I guess...
+//    for (pugi::xpath_node_set::const_iterator it = add.begin(); it != add.end(); ++it){
+//        pugi::xpath_node node = *it;
+//        //std::cout << "link: " << node.node().child_value() << endl;
+//    }
+
+
+//}
 
 
 void ofAddon::clear(){
     filesToFolders.clear();
     srcFiles.clear();
-    libs.clear();
+	propsFiles.clear();
+	libs.clear();
     includePaths.clear();
     name.clear();
 }

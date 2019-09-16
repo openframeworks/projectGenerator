@@ -258,6 +258,9 @@ void xcodeProject::saveScheme(){
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample Release.xcscheme"), schemeToR);
 	    findandreplaceInTexfile(schemeToD, "emptyExample", projectName);
 	    findandreplaceInTexfile(schemeToR, "emptyExample", projectName);
+     
+        std::string workspaceTo = projectDir  + projectName + ".xcodeproj/project.xcworkspace";
+        ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/project.xcworkspace"), workspaceTo);
 	}else{
 		std::string schemeTo = projectDir  + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/" + projectName + ".xcscheme";
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme"), schemeTo);
@@ -1243,12 +1246,13 @@ void xcodeProject::addAddon(ofAddon & addon){
         ofLogVerbose() << "adding addon ldflags: " << addon.ldflags[i];
         addLDFLAG(addon.ldflags[i]);
     }
+    std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), std::less<std::string>());
     for(int i=0;i<(int)addon.srcFiles.size(); i++){
         ofLogVerbose() << "adding addon srcFiles: " << addon.srcFiles[i];
         addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
     }
 	for(int i=0;i<(int)addon.defines.size(); i++){
-		ofLogVerbose() << "adding addon defines: " << addon.srcFiles[i];
+		ofLogVerbose() << "adding addon defines: " << addon.defines[i];
 		addDefine(addon.defines[i]);
 	}
 

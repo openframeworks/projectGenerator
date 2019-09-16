@@ -18,6 +18,9 @@ matrix:
     dist: trusty
     env: NAME="linux" SCRIPT_PATH="scripts/$NAME" SCRIPT="$SCRIPT_PATH/buildPG.sh"
 
+before_install:
+  - if [ "$NAME" = "osx" ]; then npm install -g npm@'=6.3.0'; fi
+
 script:
   - if [ "$NAME" = "osx" ]; then brew install ccache; fi
   - ccache -z

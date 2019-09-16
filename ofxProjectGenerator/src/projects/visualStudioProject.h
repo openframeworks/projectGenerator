@@ -16,8 +16,9 @@ public:
     bool saveProjectFile();
 
     void addSrc(std::string srcFile, std::string folder, SrcType type=DEFAULT);
-    void addInclude(std::string includeName);
-    void addLibrary(const LibraryBinary & lib);
+	void addInclude(std::string includeName);
+	void addProps(std::string propsFile);
+	void addLibrary(const LibraryBinary & lib);
     void addCFLAG(std::string cflag, LibType libType = RELEASE_LIB); // C
     void addCPPFLAG(std::string cppflag, LibType libType = RELEASE_LIB); // C++
 	void addDefine(std::string define, LibType libType = RELEASE_LIB);

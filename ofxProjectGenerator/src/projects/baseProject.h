@@ -66,7 +66,7 @@ public:
 	virtual void addDefine(std::string define, LibType libType = RELEASE_LIB) {}
 
     virtual void addAddon(std::string addon);
-	virtual void addAddon(ofAddon & addon);
+    virtual void addAddon(ofAddon & addon);
 
     std::string getName() { return projectName;}
     std::string getPath() { return projectDir; }

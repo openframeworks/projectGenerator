@@ -32,6 +32,9 @@
 		#addonsList {
 			max-height: 18em !important;
 		}
+		#addonsDropdown .sizer {
+			display: none;
+		}
 
 
 		.ui.dimmer > .content {
@@ -199,6 +202,18 @@ position: fixed;
 						</div>
 						<div id="test"></div>
 					</div>
+					<div id="templateSection" class="field">
+						<label>Template:</label>
+						<div class="ui multiple search selection dropdown" id="templatesDropdown">
+							<input name="templates" type="hidden">
+							<i class="dropdown icon"></i>
+							<div class="default text">Template...</div>
+							<div class="menu" id="templateList">
+							</div>
+						</div>
+						<div id="test"></div>
+					</div>
+
 					<div class="ui hidden divider"></div>
 					<div class="field">
 						<div class="ui olive button" id="generateButton" onclick="generate()">Generate</div>
@@ -242,6 +257,17 @@ position: fixed;
 							<div class="menu" id="platformListMulti">
 							</div>
 						</div>
+					</div>
+					<div id="templateSectionMulti" class="field">
+						<label>Template:</label>
+						<div class="ui multiple search selection dropdown" id="templatesDropdownMulti">
+							<input name="templates" type="hidden">
+							<i class="dropdown icon"></i>
+							<div class="default text">Template...</div>
+							<div class="menu" id="templateListMulti">
+							</div>
+						</div>
+						<div id="test"></div>
 					</div>
 					<div class="ui hidden divider"></div>
 					<div class="field">
