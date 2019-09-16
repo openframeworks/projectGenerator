@@ -1289,5 +1289,8 @@ void xcodeProject::addAddon(ofAddon & addon){
                                                                                             //
             
     }
-    
+	if(addon.afterCompileScript.length()){
+		ofLogVerbose() << "adding addon after compile script: " << addon.afterCompileScript;
+		addAfterRule(addon.afterCompileScript);
+	}
 }
