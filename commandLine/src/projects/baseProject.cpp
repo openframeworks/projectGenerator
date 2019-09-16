@@ -586,6 +586,10 @@ void baseProject::addAddon(ofAddon & addon){
 
 	addAddonDefines(addon);
 	addAddonFrameworks(addon);
+	if (!addon.afterCompileScript.empty()) {
+		ofLogVerbose() << "adding addon after compile script: " << addon.afterCompileScript;
+		addAfterRule(addon.afterCompileScript);
+	}
     copyAddonData(addon);
     addAddonProps(addon);
 }
