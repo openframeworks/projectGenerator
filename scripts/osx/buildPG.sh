@@ -25,6 +25,11 @@ sign_and_upload(){
     # Copy commandLine into electron .app
     cd ${pg_root}
     cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
+    
+    # Copy in the terminal script which fixes app translocation
+    cp scripts/osx/_macOSTranslocationFix.command projectGenerator-$PLATFORM/_runMeFirst.command
+    chmod a+x projectGenerator-$PLATFORM/_runMeFirst.command
+    
     sed -i -e "s/osx/$PLATFORM/g" projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/settings.json
 
     echo "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}";
