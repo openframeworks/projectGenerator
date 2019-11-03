@@ -12,7 +12,7 @@
     "url": "openframeworks.cc"
   },
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=6.11.0"
   },
   "scripts": {
     "start": "electron .",
