@@ -679,7 +679,10 @@ ipc.on('update', function(event, arg) {
     }
 
     var pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
-
+    
+    if( arg.platform == 'linux' || arg.platform == 'linux64' ){
+        pgApp = pathTemp.join(defaultOfPath, "apps/projectGenerator/commandLine/bin/projectGenerator");
+    }
 
     if( arg.platform == 'osx' || arg.platform == 'linux' || arg.platform == 'linux64' ){
         pgApp = pgApp.replace(/ /g, '\\ ');
@@ -766,8 +769,9 @@ ipc.on('generate', function(event, arg) {
     }
 
     var pgApp="";
-    if(hostplatform == "linux"){
-        pgApp = "projectGenerator";
+    if(hostplatform == "linux" || hostplatform == "linux64"){
+        pgApp = pathTemp.join(defaultOfPath, "apps/projectGenerator/commandLine/bin/projectGenerator");
+        //pgApp = "projectGenerator";
     }else{
         pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
     }
