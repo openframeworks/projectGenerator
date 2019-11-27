@@ -652,6 +652,7 @@ ipc.on('update', function(event, arg) {
     var templateString = "";
     var recursiveString = "";
     var verboseString = "";
+    var rootPath = defaultOfPath;
 
     if (update['updatePath'] !== null) {
         updatePath = update['updatePath'];
@@ -668,6 +669,7 @@ ipc.on('update', function(event, arg) {
 
     if (update['ofPath'] !== null) {
         pathString = "-o\"" + update['ofPath'] + "\"";
+        rootPath = update['ofPath'];
     }
 
     if (update['updateRecursive'] === true) {
@@ -679,7 +681,10 @@ ipc.on('update', function(event, arg) {
     }
 
     var pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
-
+    
+    if( hostplatform == "linux" || hostplatform == "linux64" ){
+        pgApp = pathTemp.join(rootPath, "apps/projectGenerator/commandLine/bin/projectGenerator");
+    }
 
     if( arg.platform == 'osx' || arg.platform == 'linux' || arg.platform == 'linux64' ){
         pgApp = pgApp.replace(/ /g, '\\ ');
@@ -734,7 +739,7 @@ ipc.on('generate', function(event, arg) {
     var platformString = "";
     var templateString = "";
     var verboseString = "";
-
+    var rootPath = defaultOfPath;
 
 
     if (generate['platformList'] !== null) {
@@ -754,6 +759,7 @@ ipc.on('generate', function(event, arg) {
 
     if (generate['ofPath'] !== null) {
         pathString = "-o\"" + generate['ofPath'] + "\"";
+        rootPath = generate['ofPath'];
     }
 
     if (generate['verbose'] === true) {
@@ -766,8 +772,9 @@ ipc.on('generate', function(event, arg) {
     }
 
     var pgApp="";
-    if(hostplatform == "linux"){
-        pgApp = "projectGenerator";
+    if(hostplatform == "linux" || hostplatform == "linux64"){
+        pgApp = pathTemp.join(rootPath, "apps/projectGenerator/commandLine/bin/projectGenerator");
+        //pgApp = "projectGenerator";
     }else{
         pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
     }
