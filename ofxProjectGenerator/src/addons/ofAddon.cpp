@@ -138,7 +138,7 @@ bool ofAddon::checkCorrectVariable(string variable, ConfigParseState state){
 				variable == "ADDON_FRAMEWORKS" ||
 				variable == "ADDON_SOURCES" || variable == "ADDON_OBJC_SOURCES" || variable == "ADDON_CPP_SOURCES" || variable == "ADDON_HEADER_SOURCES" ||
 				variable == "ADDON_DATA" ||
-				variable == "ADDON_LIBS_EXCLUDE" || variable == "ADDON_SOURCES_EXCLUDE" || variable == "ADDON_INCLUDES_EXCLUDE" ||
+				variable == "ADDON_LIBS_EXCLUDE" || variable == "ADDON_SOURCES_EXCLUDE" || variable == "ADDON_INCLUDES_EXCLUDE" || variable == "ADDON_FRAMEWORKS_EXCLUDE" ||
 				variable == "ADDON_DLLS_TO_COPY" ||
 				variable == "ADDON_DEFINES");
 	case Unknown:
@@ -325,6 +325,10 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 		addReplaceStringVector(excludeIncludes,value,"",addToValue);
 	}
 
+	if (variable == "ADDON_FRAMEWORKS_EXCLUDE") {
+		addReplaceStringVector(excludeFrameworks, value, "", addToValue);
+	}
+
 	if (variable == "ADDON_DEFINES") {
 		addReplaceStringVector(defines, value, "", addToValue);
 	}
@@ -433,6 +437,7 @@ void ofAddon::parseConfig(){
 	exclude(objcsrcFiles,excludeSources);
 	exclude(headersrcFiles,excludeSources);
 	exclude(propsFiles, excludeSources);
+	exclude(frameworks, excludeFrameworks);
 	exclude(libs,excludeLibs);
 
 	ofLogVerbose("ofAddon") << "libs after exclusions " << libs.size();
