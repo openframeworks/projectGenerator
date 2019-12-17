@@ -100,6 +100,7 @@ private:
     std::vector<std::string> excludeLibs;
     std::vector<std::string> excludeSources;
     std::vector<std::string> excludeIncludes;
+	std::vector<std::string> excludeFrameworks;
 };
 
 #endif /* OFADDON_H_ */
