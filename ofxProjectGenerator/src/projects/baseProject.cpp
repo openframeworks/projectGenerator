@@ -295,6 +295,7 @@ void baseProject::addAddon(std::string addonName){
 }
 
 void baseProject::addAddon(ofAddon & addon){
+
     for(int i=0;i<(int)addons.size();i++){
 		if(addons[i].name==addon.name) return;
 	}
@@ -354,6 +355,14 @@ void baseProject::addAddon(ofAddon & addon){
 		ofLogVerbose() << "adding addon defines: " << addon.defines[i];
 		addDefine(addon.defines[i]);
 	}
+}
+
+void baseProject::addAddonDefineFlags() {
+    for (auto & addon : addons ) {
+        std::string str = "OFXADDON_"+ofToUpper(addon.name);
+        ofLogVerbose() << "adding preprocessor define: " << str;
+        addDefine( str );
+    }
 }
 
 void baseProject::parseAddons(){
