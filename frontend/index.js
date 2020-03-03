@@ -60,7 +60,8 @@ try {
         "showConsole": false,
         "showDeveloperTools": false,
         "defaultRelativeProjectPath": "apps/myApps",
-        "useDictionaryNameGenerator": false
+        "useDictionaryNameGenerator": false,
+        "useAddonDefines": false
     };
 }
 
@@ -652,7 +653,12 @@ ipc.on('update', function(event, arg) {
     var templateString = "";
     var recursiveString = "";
     var verboseString = "";
+    var definesString = "";
     var rootPath = defaultOfPath;
+
+    if (update['addondefines'] !== null) {
+        definesString = "-D";
+    }
 
     if (update['updatePath'] !== null) {
         updatePath = update['updatePath'];
@@ -692,7 +698,8 @@ ipc.on('update', function(event, arg) {
         pgApp = "\"" + pgApp + "\"";
     }
 
-    var wholeString = pgApp + " " + recursiveString + " " + verboseString + " " + pathString + " " + platformString + " " + templateString + " " + updatePath;
+    console.log('WOOOOO');
+    var wholeString = pgApp + " " + recursiveString + " " + verboseString + " " + pathString + " " + platformString + " " + templateString + " " + definesString + " " + updatePath;
 
     exec(wholeString, {maxBuffer : Infinity}, function callback(error, stdout, stderr) {
 

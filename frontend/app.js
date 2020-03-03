@@ -76,6 +76,8 @@ ipc.on('setDefaults', function(arg) {
     setOFPath(defaultSettings['defaultOfPath']);
     enableAdvancedMode(defaultSettings['advancedMode']);
 
+    enableAddonFlags(defaultSettings['useAddonDefines']);
+
 });
 
 //-------------------------------------------
@@ -480,6 +482,17 @@ function setup() {
         }catch(e){
             isFirstTimeSierra = false;
         }
+
+        $("#addonDefines").checkbox();
+        $("#addonDefines").on("change", function() {
+            if ($("#addonDefines").filter(":checked").length > 0) {
+                enableAddonFlags(true);
+            } else {
+                enableAddonFlags(false);
+            }
+        });
+        $("#addonDefines").prop( "checked", defaultSettings['useAddonDefines']);
+
 
         $('.main.menu .item').tab({
             history: false
@@ -969,6 +982,7 @@ function updateRecursive() {
     gen['updateRecursive'] = true;
     gen['ofPath'] = $("#ofPath").val();
     gen['verbose'] = bVerbose;
+    gen['addondefines'] = defaultSettings['useAddonDefines'];
 
     if (gen['updatePath'] === '') {
         displayModal("Please set update path");
@@ -1027,6 +1041,13 @@ function clearAddonSelection() {
 }
 
 //----------------------------------------
+function enableAddonFlags(useAddonDefines) {
+    console.log('toggling addon flags:', useAddonDefines);
+    defaultSettings['useAddonDefines'] = useAddonDefines;
+    saveDefaultSettings();
+}
+
+//----------------------------------------
 function enableAdvancedMode(isAdvanced) {
     if (isAdvanced) {
         $('#platformsDropdown').removeClass("disabled");
@@ -1035,6 +1056,7 @@ function enableAdvancedMode(isAdvanced) {
 
         $('#templateSection').show();
         $('#templateSectionMulti').show();
+        $('#addonDefinesSection').show();
 
     } else {
         $('#platformsDropdown').addClass("disabled");
@@ -1047,6 +1069,7 @@ function enableAdvancedMode(isAdvanced) {
 
         $("body").removeClass('advanced');
         $('a.updateMultiMenuOption').hide();
+        $('#addonDefinesSection').hide();
 
     }
     defaultSettings['advancedMode'] = isAdvanced;
