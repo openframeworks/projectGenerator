@@ -1,9 +1,5 @@
 "use strict";
 
-// updated Electron >= 1.0 ES6-style requires
-try {
-    require('electron-reloader')(module);
-} catch (_) {}
 
 const {app} = require('electron'); // Module to control application life.
 const {BrowserWindow} = require('electron'); // Module to create native browser window.
@@ -390,9 +386,11 @@ app.on('ready', () => {
         width: 500,
         height: 600,
         resizable: false,
-        frame: false
+        frame: false,
+        webPreferences: {
+            nodeIntegration: true
+        }
     });
-
 
     // load jquery here:
     // http://stackoverflow.com/questions/30271011/electron-jquery-errors

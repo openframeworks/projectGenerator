@@ -31,14 +31,11 @@
     "electron-app"
   ],
   "dependencies": {
-    "electron-debug": "^0.1.1",
     "moniker": "^0.1.2",
-    "n-readlines": "^1.0.0",
-    "walk": "^2.3.9"
+    "n-readlines": "^1.0.0"
   },
   "devDependencies": {
-    "electron-packager": "^14.2.1",
-    "electron-prebuilt": "^1.4.13",
-    "electron-reloader": "^1.0.1"
+    "electron": "^8.0.3",
+    "electron-packager": "^14.2.1"
   }
 }
