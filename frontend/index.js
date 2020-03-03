@@ -25,8 +25,158 @@ const os = require("os");
 
 
 
-//--------------------------------------------------------- load settings
-let obj;
+const getStartingProjectName = () => {
+
+    let ofRoot = obj["defaultOfPath"];
+    if (!ofRoot || ofRoot === "") ofRoot = guessOFRoot()
+    let defaultPathForProjects = path.join(ofRoot, obj["defaultRelativeProjectPath"]);
+    let foundOne = false;
+    let goodName = getGoodSketchName(defaultPathForProjects);
+    startingProject['path'] = defaultPathForProjects;
+    startingProject['name'] = goodName;
+}
+
+const parseAddonsAndUpdateSelect = (arg) => {
+    console.log("in parseAddonsAndUpdateSelect " + arg);
+    //path = require('path').resolve(__dirname, defaultOfPath + "/addons");
+    addons = getDirectories(arg + "/addons","ofx");
+
+    if (addons){
+    if (addons.length > 0){
+        addons = addons.filter( function(addon) {
+            return addonsToSkip.indexOf(addon)==-1;
+        });
+    }
+    }
+
+    console.log("Reloading the addons folder, these were found:");
+    console.log(addons);
+    mainWindow.webContents.send('setAddons', addons);
+}
+
+const  parsePlatformsAndUpdateSelect = (arg) => {
+    let folders = getDirectories(arg + "/scripts/templates");
+    console.log("Reloading the templates folder, these were found:");
+    console.log(folders);
+
+    let platformsWeHave = {};
+    let templatesWeHave = {};
+
+    if (folders === undefined || folders === null) {
+        //do something
+    } else {
+        // check all folder name under /scripts/templates
+        for (let id in folders) {
+            let key = folders[id];
+            if (platforms[key]) {
+                // this folder is for platform
+                console.log("Found platform, key " + key + " has value " + platforms[key]);
+                platformsWeHave[key] = platforms[key];
+            }else{
+                // this folder is for template
+                if(templates[key]){
+                    console.log("Found template folder, key " + key + " has value " + templates[key]);
+                    templatesWeHave[key] = templates[key];
+                }else{
+                    // Unofficial folder name, maybe user's custom template? 
+                    // We use folder name for both of key and value
+                    console.log("Found unofficial folder, key " + key + " has value " + key);
+                    templatesWeHave[key] = key;
+                }
+            }
+        }
+    }
+    // saninty check...
+    // for(let key in platformsWeHave){
+    //  console.log("key " + key + " has value " + platformsWeHave[key]);
+    // }
+    mainWindow.webContents.send('setPlatforms', platformsWeHave);
+
+   mainWindow.webContents.send('setTemplates', templatesWeHave);
+
+}
+
+const  getGoodSketchName = (arg) => {
+
+    let currentProjectPath = arg;
+    let foundOne = false;
+    let goodName = "mySketch";
+
+    if (bUseMoniker){
+
+        let projectNames = new moniker.Dictionary();
+        let tmpPath = require('path');
+        projectNames.read(  tmpPath.join(__dirname, 'static', 'data', 'sketchAdjectives.txt'));
+        goodName = "mySketch";
+
+        while (foundOne === false) {
+            if (fs.existsSync(tmpPath.join(currentProjectPath, goodName))) {
+                console.log("«" + goodName + "» already exists, generating a new name...");
+                let adjective = projectNames.choose();
+                goodName = "my" + adjective.charAt(0).toUpperCase() + adjective.slice(1) + "Sketch";
+            } else {
+                foundOne = true;
+            }
+        }
+
+    } else {
+
+        let date = new Date();
+        let formattedDate = formatDate(date);
+        goodName = "sketch_" + formattedDate;
+        let count = 1;
+
+         while (foundOne === false) {
+            if (fs.existsSync(path.join(currentProjectPath, goodName))) {
+                console.log("«" + goodName + "» already exists, generating a new name...");
+                goodName = "sketch_" + formattedDate + toLetters(count);
+                count++;
+            } else {
+                foundOne = true;
+            }
+        }
+    }
+
+    return goodName;
+
+}
+
+
+const  getDirectories = (srcpath, acceptedPrefix) => {
+
+    // because this is called at a different time, fs and path
+    // seemed to be "bad" for some reason...
+    // that's why I am making temp ones here.
+    // console.log(path);
+
+    let fsTemp = require('fs');
+    let pathTemp = require('path');
+
+    try {
+
+        return fsTemp.readdirSync(srcpath).filter( (file)  => {
+
+            //console.log(srcpath);
+            //console.log(file);
+            try{
+                let joinedPath = pathTemp.join(srcpath, file);
+                if ((acceptedPrefix==null || file.substring(0,acceptedPrefix.length)==acceptedPrefix) && joinedPath !== null) {
+                    // only accept folders (potential addons)
+                    return fsTemp.statSync(joinedPath).isDirectory();
+                }
+            }catch(e){}
+        });
+    } catch (e) {
+        console.log(e);
+        return null;
+        // if (e.code === 'ENOENT') {
+        //  console.log("This doesn't seem to be a valid addons folder:\n" + srcpath);
+        //  mainWindow.webContents.send('sendUIMessage', "No addons were found in " + srcpath + ".\nIs the OF path correct?");
+        // } else {
+        //  throw e;
+        // }
+    }
+}
 
 let guessOFRoot = () => {
     console.log('[index.js] guessing of root...');
@@ -66,6 +216,11 @@ let getPlatform = () => {
     }
     return myPlatform;
 };
+
+
+//--------------------------------------------------------- load settings
+
+let obj;
 
 // load settings.json
 
@@ -334,159 +489,6 @@ app.on('ready', () => {
     Menu.setApplicationMenu(menuV);
 
 });
-
-const getStartingProjectName = () => {
-
-    let ofRoot = obj["defaultOfPath"];
-    if (!ofRoot || ofRoot === "") ofRoot = guessOFRoot()
-    let defaultPathForProjects = path.join(ofRoot, obj["defaultRelativeProjectPath"]);
-    let foundOne = false;
-    let goodName = getGoodSketchName(defaultPathForProjects);
-    startingProject['path'] = defaultPathForProjects;
-    startingProject['name'] = goodName;
-}
-
-const parseAddonsAndUpdateSelect = (arg) => {
-    console.log("in parseAddonsAndUpdateSelect " + arg);
-    //path = require('path').resolve(__dirname, defaultOfPath + "/addons");
-    addons = getDirectories(arg + "/addons","ofx");
-
-    if (addons){
-    if (addons.length > 0){
-        addons = addons.filter( function(addon) {
-            return addonsToSkip.indexOf(addon)==-1;
-        });
-    }
-    }
-
-    console.log("Reloading the addons folder, these were found:");
-    console.log(addons);
-    mainWindow.webContents.send('setAddons', addons);
-}
-
-const  parsePlatformsAndUpdateSelect = (arg) => {
-    let folders = getDirectories(arg + "/scripts/templates");
-    console.log("Reloading the templates folder, these were found:");
-    console.log(folders);
-
-    let platformsWeHave = {};
-    let templatesWeHave = {};
-
-    if (folders === undefined || folders === null) {
-        //do something
-    } else {
-        // check all folder name under /scripts/templates
-        for (let id in folders) {
-            let key = folders[id];
-            if (platforms[key]) {
-                // this folder is for platform
-                console.log("Found platform, key " + key + " has value " + platforms[key]);
-                platformsWeHave[key] = platforms[key];
-            }else{
-                // this folder is for template
-                if(templates[key]){
-                    console.log("Found template folder, key " + key + " has value " + templates[key]);
-                    templatesWeHave[key] = templates[key];
-                }else{
-                    // Unofficial folder name, maybe user's custom template? 
-                    // We use folder name for both of key and value
-                    console.log("Found unofficial folder, key " + key + " has value " + key);
-                    templatesWeHave[key] = key;
-                }
-            }
-        }
-    }
-    // saninty check...
-    // for(let key in platformsWeHave){
-    // 	console.log("key " + key + " has value " + platformsWeHave[key]);
-    // }
-    mainWindow.webContents.send('setPlatforms', platformsWeHave);
-
-   mainWindow.webContents.send('setTemplates', templatesWeHave);
-
-}
-
-const  getGoodSketchName = (arg) => {
-
-    let currentProjectPath = arg;
-    let foundOne = false;
-    let goodName = "mySketch";
-
-    if (bUseMoniker){
-
-        let projectNames = new moniker.Dictionary();
-        let tmpPath = require('path');
-        projectNames.read(  tmpPath.join(__dirname, 'static', 'data', 'sketchAdjectives.txt'));
-        goodName = "mySketch";
-
-        while (foundOne === false) {
-            if (fs.existsSync(tmpPath.join(currentProjectPath, goodName))) {
-                console.log("«" + goodName + "» already exists, generating a new name...");
-                let adjective = projectNames.choose();
-                goodName = "my" + adjective.charAt(0).toUpperCase() + adjective.slice(1) + "Sketch";
-            } else {
-                foundOne = true;
-            }
-        }
-
-    } else {
-
-        let date = new Date();
-        let formattedDate = formatDate(date);
-        goodName = "sketch_" + formattedDate;
-        let count = 1;
-
-         while (foundOne === false) {
-            if (fs.existsSync(path.join(currentProjectPath, goodName))) {
-                console.log("«" + goodName + "» already exists, generating a new name...");
-                goodName = "sketch_" + formattedDate + toLetters(count);
-                count++;
-            } else {
-                foundOne = true;
-            }
-        }
-    }
-
-    return goodName;
-
-}
-
-
-const  getDirectories = (srcpath, acceptedPrefix) => {
-
-    // because this is called at a different time, fs and path
-    // seemed to be "bad" for some reason...
-    // that's why I am making temp ones here.
-    // console.log(path);
-
-    let fsTemp = require('fs');
-    let pathTemp = require('path');
-
-    try {
-
-        return fsTemp.readdirSync(srcpath).filter( (file)  => {
-
-            //console.log(srcpath);
-            //console.log(file);
-            try{
-                let joinedPath = pathTemp.join(srcpath, file);
-                if ((acceptedPrefix==null || file.substring(0,acceptedPrefix.length)==acceptedPrefix) && joinedPath !== null) {
-                    // only accept folders (potential addons)
-                    return fsTemp.statSync(joinedPath).isDirectory();
-                }
-            }catch(e){}
-        });
-    } catch (e) {
-        console.log(e);
-        return null;
-        // if (e.code === 'ENOENT') {
-        // 	console.log("This doesn't seem to be a valid addons folder:\n" + srcpath);
-        // 	mainWindow.webContents.send('sendUIMessage', "No addons were found in " + srcpath + ".\nIs the OF path correct?");
-        // } else {
-        // 	throw e;
-        // }
-    }
-}
 
 // function getDirs(srcpath, cb) {
 //   fs.readdir(srcpath, function (err, files) {
