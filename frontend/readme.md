@@ -36,18 +36,24 @@ cd openFrameworks/apps/projectGenerator
 cp commandLine/bin/projectGenerator frontend/app
 ```
 
-### Install node.js
+### Install Node.js & yarn package manager
 
 If you don't already have it, you can install node via a number of means:
 
 - Directly from the [node.js website](https://nodejs.org/en/download/)
 - Using a [package manager for your platform](https://nodejs.org/en/download/package-manager/)
-  - `brew install node`
-  - `apt-get install nodejs`
-  - etc.
-- Using a node version manager like [nvm](https://github.com/creationix/nvm)
+  - MacOS `brew install node`
+  - Debian/Linux `apt-get install nodejs`
+  - [Windows installer](https://nodejs.org/en/download/)
+- Optionally using a node version manager like [nvm](https://github.com/creationix/nvm)
   - Install nvm for your platform, then:
   - `nvm install latest`
+
+To install yarn [follow the guide from the project website](https://classic.yarnpkg.com/en/docs/install)
+- MacOS `brew install yarn`
+- Debian/Ubuntu `sudo apt update && sudo apt install yarn`
+- [Windows installer](https://classic.yarnpkg.com/en/docs/install/#windows-stable)
+
 
 ### Install frontend dependencies
 
@@ -55,13 +61,13 @@ Install the depencies for the electron app:
 
 ```
 cd openFrameworks/apps/projectGenerator/frontend
-npm install
+yarn install
 ```
 
 ### Updating
 It's always good to update npm before generating the PG.  
 ```
-npm update
+yarn update
 ```
 
 ### Debugging
@@ -78,7 +84,7 @@ Moreover, Electron uses Webkit so all the Webkit developper tools are available 
 Run a development build with:
 
 ```
-npm start
+yarn start
 ```
 
 ### Release
@@ -86,16 +92,16 @@ npm start
 To build & package the app for OS X, Linux, and Windows, using [electron-packager](https://github.com/maxogden/electron-packager):
 
 ```
-npm run build
+yarn run build
 ```
 
 To build a platform-specific package:
 
 ```
-npm run build:osx
-npm run build:linux32
-npm run build:linux64
-npm run build:vs
+yarn run build:osx
+yarn run build:linux32
+yarn run build:linux64
+yarn run build:vs
 ```
 
 This will created a packaged app for that platform(s) specified inside the `dist` folder.
