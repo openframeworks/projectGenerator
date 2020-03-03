@@ -32,13 +32,13 @@
   ],
   "dependencies": {
     "electron-debug": "^0.1.1",
-    "global": "^4.4.0",
     "moniker": "^0.1.2",
     "n-readlines": "^1.0.0",
     "walk": "^2.3.9"
   },
   "devDependencies": {
     "electron-packager": "^14.2.1",
-    "electron-prebuilt": "^1.4.13"
+    "electron-prebuilt": "^1.4.13",
+    "electron-reloader": "^1.0.1"
   }
 }

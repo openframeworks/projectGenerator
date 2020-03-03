@@ -1,17 +1,22 @@
 "use strict";
 
-var app = require('app'); // Module to control application life.
-var BrowserWindow = require('browser-window'); // Module to create native browser window.
-var dialog = require('dialog');
-var ipc = require('ipc');
-var fs = require('fs');
-var path = require('path');
-var menu = require('menu');
-var moniker = require('moniker');
-var process = require('process');
-var os = require("os");
-var exec = require('child_process').exec;
+// updated Electron >= 1.0 ES6-style requires
+try {
+    require('electron-reloader')(module);
+} catch (_) {}
 
+const {app} = require('electron'); // Module to control application life.
+const {BrowserWindow} = require('electron'); // Module to create native browser window.
+const {dialog} = require('electron');
+const {ipcMain} = require('electron');
+const {Menu} = require('electron');
+
+// const {crashReporter} = require('electron'); // Requires server destination
+
+const fs = require('fs');
+const path = require('path');
+const moniker = require('moniker');
+const exec = require('child_process').exec;
 
 // Debugging: start the Electron PG from the terminal to see the messages from console.log()
 // Example: /path/to/PG/Contents/MacOS/Electron /path/to/PG/Contents/Ressources/app
@@ -148,7 +153,7 @@ getStartingProjectName();
 
 //---------------------------------------------------------
 // Report crashes to our server.
-require('crash-reporter').start();
+// crashReporter.start();
 
 //---------------------------------------------------------
 // Keep a global reference of the window object, if you don't, the window will
@@ -209,6 +214,9 @@ function toLetters(num) {
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
     // Create the browser window.
+
+    console.log('HUH', BrowserWindow)
+
     mainWindow = new BrowserWindow({
         width: 500,
         height: 600,
@@ -216,11 +224,12 @@ app.on('ready', function() {
         frame: false
     });
 
+
     // load jquery here:
     // http://stackoverflow.com/questions/30271011/electron-jquery-errors
 
     // and load the index.html of the app.
-    mainWindow.loadUrl('file://' + __dirname + '/index.html');
+    mainWindow.loadURL('file://' + __dirname + '/index.html');
 
     // Open the devtools.
     if (obj["showDeveloperTools"]) {
@@ -307,8 +316,8 @@ app.on('ready', function() {
             selector: 'selectAll:'
         }, ]
     }];
-    var menuV = menu.buildFromTemplate(menuTmpl);
-    menu.setApplicationMenu(menuV);
+    var menuV = Menu.buildFromTemplate(menuTmpl);
+    Menu.setApplicationMenu(menuV);
 
 });
 
@@ -482,7 +491,7 @@ function getDirectories(srcpath, acceptedPrefix) {
 //   });
 // }
 
-ipc.on('isOFProjectFolder', function(event, project) {
+ipcMain.on('isOFProjectFolder', function(event, project) {
     var fsTemp = require('fs');
     var pathTemp = require('path');
     var folder;
@@ -556,17 +565,17 @@ ipc.on('isOFProjectFolder', function(event, project) {
 
 //----------------------------------------------------------- ipc
 
-ipc.on('refreshAddonList', function(event, arg) {
+ipcMain.on('refreshAddonList', function(event, arg) {
     console.log("in refresh " + arg)
     parseAddonsAndUpdateSelect(arg);
 });
 
-ipc.on('refreshPlatformList', function(event, arg) {
+ipcMain.on('refreshPlatformList', function(event, arg) {
     parsePlatformsAndUpdateSelect(arg);
 });
 
 
-ipc.on('refreshTemplateList', function (event, arg) {
+ipcMain.on('refreshTemplateList', function (event, arg) {
     console.log("refreshTemplateList");
     let selectedPlatforms = arg.selectedPlatforms;
     let ofPath = arg.ofPath;
@@ -633,13 +642,13 @@ ipc.on('refreshTemplateList', function (event, arg) {
     mainWindow.webContents.send('enableTemplate', returnArg);
 });
 
-ipc.on('getRandomSketchName', function(event, arg) {
+ipcMain.on('getRandomSketchName', function(event, arg) {
     var goodName = getGoodSketchName(arg);
     event.sender.send('setRandomisedSketchName', goodName);
     event.sender.send('setGenerateMode', 'createMode'); // it's a new sketch name, we are in create mode
 });
 
-ipc.on('update', function(event, arg) {
+ipcMain.on('update', function(event, arg) {
 
     var update = arg;
     var exec = require('child_process').exec;
@@ -698,7 +707,6 @@ ipc.on('update', function(event, arg) {
         pgApp = "\"" + pgApp + "\"";
     }
 
-    console.log('WOOOOO');
     var wholeString = pgApp + " " + recursiveString + " " + verboseString + " " + pathString + " " + platformString + " " + templateString + " " + definesString + " " + updatePath;
 
     exec(wholeString, {maxBuffer : Infinity}, function callback(error, stdout, stderr) {
@@ -730,7 +738,7 @@ ipc.on('update', function(event, arg) {
 
 });
 
-ipc.on('generate', function(event, arg) {
+ipcMain.on('generate', function(event, arg) {
 
 
     var generate = arg;
@@ -850,7 +858,7 @@ ipc.on('generate', function(event, arg) {
     //console.log(arg);
 });
 
-ipc.on('pickOfPath', function(event, arg) {
+ipcMain.on('pickOfPath', function(event, arg) {
 
     path = dialog.showOpenDialog({
         title: 'select the root of OF, where you see libs, addons, etc',
@@ -865,7 +873,7 @@ ipc.on('pickOfPath', function(event, arg) {
     });
 });
 
-ipc.on('pickUpdatePath', function(event, arg) {
+ipcMain.on('pickUpdatePath', function(event, arg) {
     path = dialog.showOpenDialog({
         title: 'select root folder where you want to update',
         properties: ['openDirectory'],
@@ -879,7 +887,7 @@ ipc.on('pickUpdatePath', function(event, arg) {
     });
 });
 
-ipc.on('pickProjectPath', function(event, arg) {
+ipcMain.on('pickProjectPath', function(event, arg) {
     path = dialog.showOpenDialog({
         title: 'select parent folder for project, typically apps/myApps',
         properties: ['openDirectory'],
@@ -892,7 +900,7 @@ ipc.on('pickProjectPath', function(event, arg) {
     });
 });
 
-ipc.on('checkMultiUpdatePath', function(event, arg) {
+ipcMain.on('checkMultiUpdatePath', function(event, arg) {
 
 
     if (fs.existsSync(arg)) {
@@ -904,7 +912,7 @@ ipc.on('checkMultiUpdatePath', function(event, arg) {
 });
 
 var dialogIsOpen = false;
-ipc.on('pickProjectImport', function(event, arg) {
+ipcMain.on('pickProjectImport', function(event, arg) {
     if(dialogIsOpen){
         return;
     }
@@ -929,7 +937,7 @@ ipc.on('pickProjectImport', function(event, arg) {
 });
 
 
-ipc.on('launchProjectinIDE', function(event, arg) {
+ipcMain.on('launchProjectinIDE', function(event, arg) {
 
     var pathTemp = require('path');
     var fsTemp = require('fs');
@@ -981,6 +989,6 @@ ipc.on('launchProjectinIDE', function(event, arg) {
     }
 });
 
-ipc.on('quit', function(event, arg) {
+ipcMain.on('quit', function(event, arg) {
     app.quit();
 });
