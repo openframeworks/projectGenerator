@@ -17,6 +17,7 @@ const fs = require('fs');
 const path = require('path');
 const moniker = require('moniker');
 const exec = require('child_process').exec;
+const os = require("os");
 
 // Debugging: start the Electron PG from the terminal to see the messages from console.log()
 // Example: /path/to/PG/Contents/MacOS/Electron /path/to/PG/Contents/Ressources/app
@@ -25,18 +26,24 @@ const exec = require('child_process').exec;
 
 
 //--------------------------------------------------------- load settings
-var obj;
+let obj;
 
+let guessOFRoot = () => {
+    console.log('[index.js] guessing of root...');
+    const githubOFRoot = path.resolve(__dirname, '../../../');
+    const releaseOFRoot = path.resolve(__dirname, '../../');
 
-try {
-    var settings = fs.readFileSync(path.resolve(__dirname, 'settings.json'));
-    obj = JSON.parse(settings, 'utf8');
-    console.log(obj);
-} catch (e) {
+    console.log('Which root am I likely to be in?', path.basename(githubOFRoot), path.basename(releaseOFRoot) );
 
-    // automatic platform detection
-    var os = require("os");
-    var myPlatform = "Unknown";
+    let ofRoot = githubOFRoot;
+    if (path.basename(releaseOFRoot).indexOf("of_v") !== -1) ofRoot = releaseOFRoot;
+    return ofRoot;
+};
+
+let getPlatform = () => {
+
+    console.log('[index.js] getting platform...');
+    let myPlatform = "Unknown";
     if (/^win/.test(process.platform)) {
         myPlatform = 'vs';
     }
@@ -57,20 +64,29 @@ try {
             myPlatform = 'linux64';
         }
     }
+    return myPlatform;
+};
 
+// load settings.json
+
+try {
+    let settings = fs.readFileSync(path.resolve(__dirname, 'settings.json'));
+    obj = JSON.parse(settings, 'utf8');
+} catch (e) {
+    console.error("could not load settings.json");
     obj = {
-        "defaultOfPath": "",
-        "advancedMode": false,
-        "defaultPlatform": myPlatform,
-        "showConsole": false,
-        "showDeveloperTools": false,
-        "defaultRelativeProjectPath": "apps/myApps",
-        "useDictionaryNameGenerator": false,
-        "useAddonDefines": false
+        defaultOfPath : guessOFRoot(),
+        defaultPlatform : getPlatform(),
+        advancedMode : false,
+        showConsole : false,
+        showDeveloperTools : false,
+        defaultRelativeProjectPath : "apps/myApps",
+        useDictionaryNameGenerator : false,
+        useAddonDefines : false
     };
 }
 
-var hostplatform = "";
+let hostplatform = "";
 if (/^win/.test(process.platform)) {
     hostplatform = 'windows';
 } else if (process.platform === "darwin") {
@@ -81,12 +97,12 @@ if (/^win/.test(process.platform)) {
 
 console.log("detected platform: " + hostplatform + " in " + __dirname);
 
-var defaultOfPath = obj["defaultOfPath"];
-var addons;
+let defaultOfPath = obj["defaultOfPath"];
+let addons;
 
 // hide some addons, per https://github.com/openframeworks/projectGenerator/issues/62
 
-var addonsToSkip = [
+let addonsToSkip = [
     "ofxiOS",
     "ofxMultiTouch",
     "ofxEmscripten",
@@ -94,7 +110,7 @@ var addonsToSkip = [
     "ofxAndroid"
 ]
 
-var platforms = {
+let platforms = {
     "osx": "OS X (Xcode)",
     "vs": "Windows (Visual Studio 2017)",
     "ios": "iOS (Xcode)",
@@ -103,9 +119,9 @@ var platforms = {
     "linuxarmv6l": "Linux ARMv6 (Makefiles)",
     "linuxarmv7l": "Linux ARMv7 (Makefiles)"
 };
-var bUseMoniker = obj["useDictionaryNameGenerator"];
+let bUseMoniker = obj["useDictionaryNameGenerator"];
 
-var templates = {
+let templates = {
     "emscripten": "Emscripten",
     "gitignore": "Git Ignore",
     "gles2": "Open GL ES 2",
@@ -146,7 +162,7 @@ if (!path.isAbsolute(defaultOfPath)) {
 }
 
 // now, let's look for a folder called mySketch, and keep counting until we find one that doesn't exist
-var startingProject = {};
+let startingProject = {};
 startingProject['name'] = "";
 startingProject['path'] = "";
 getStartingProjectName();
@@ -158,10 +174,10 @@ getStartingProjectName();
 //---------------------------------------------------------
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is GCed.
-var mainWindow = null;
+let mainWindow = null;
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function() {
+app.on('window-all-closed', () => {
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform != 'darwin') {
@@ -173,11 +189,11 @@ app.on('window-all-closed', function() {
 
 function formatDate(d){
     //get the month
-    var month = d.getMonth();
+    let month = d.getMonth();
     //get the day
-    var day = d.getDate();
+    let day = d.getDate();
     //get the year
-    var year = d.getFullYear();
+    let year = d.getFullYear();
     //pull the last two digits of the year
     year = year.toString().substr(2,2);
     //increment month by 1 since it is 0 indexed
@@ -201,7 +217,7 @@ function formatDate(d){
 
 // wraps over to bb no aa, why?
 function toLetters(num) {
-    var mod = num % 26,
+    let mod = num % 26,
         pow = num / 26 | 0,
         out = mod ? String.fromCharCode(96 + (num % 26)) : (--pow, 'z');
     return pow ? toLetters(pow) + out : out;
@@ -212,10 +228,8 @@ function toLetters(num) {
 //-------------------------------------------------------- window
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', function() {
+app.on('ready', () => {
     // Create the browser window.
-
-    console.log('HUH', BrowserWindow)
 
     mainWindow = new BrowserWindow({
         width: 500,
@@ -236,16 +250,16 @@ app.on('ready', function() {
         mainWindow.openDevTools();
     }
     //when the window is loaded send the defaults
-    mainWindow.webContents.on('did-finish-load', function() {
+    mainWindow.webContents.on('did-finish-load', () => {
         //parseAddonsAndUpdateSelect();
 
         mainWindow.webContents.send('cwd', app.getAppPath());
         mainWindow.webContents.send('cwd', __dirname);
         mainWindow.webContents.send('cwd', process.resourcesPath);
         mainWindow.webContents.send('setStartingProject', startingProject);
+        mainWindow.webContents.send('checkOfPathAfterSetup', '');
         mainWindow.webContents.send('setDefaults', obj);
         mainWindow.webContents.send('setup', '');
-        mainWindow.webContents.send('checkOfPathAfterSetup', '');
     });
 
 
@@ -253,7 +267,7 @@ app.on('ready', function() {
     //console.log();
 
     // Emitted when the window is closed.
-    mainWindow.on('closed', function() {
+    mainWindow.on('closed', () => {
 
         mainWindow = null;
         process.exit();
@@ -262,12 +276,12 @@ app.on('ready', function() {
         // when you should delete the corresponding element.
     });
 
-    var menuTmpl = [{
+    let menuTmpl = [{
         label: 'Atom Shell',
         submenu: [{
             label: 'Quit',
             accelerator: 'Command+Q',
-            click: function() {
+            click: () => {
                 mainWindow.close();
             }
         }]
@@ -276,13 +290,13 @@ app.on('ready', function() {
         submenu: [{
             label: 'Reload',
             accelerator: 'Command+R',
-            click: function() {
+            click: () => {
                 mainWindow.reload();
             }
         }, {
             label: 'Toggle DevTools',
             accelerator: 'Alt+Command+I',
-            click: function() {
+            click: () => {
                 mainWindow.toggleDevTools();
             }
         }]
@@ -316,21 +330,23 @@ app.on('ready', function() {
             selector: 'selectAll:'
         }, ]
     }];
-    var menuV = Menu.buildFromTemplate(menuTmpl);
+    let menuV = Menu.buildFromTemplate(menuTmpl);
     Menu.setApplicationMenu(menuV);
 
 });
 
-function getStartingProjectName() {
+const getStartingProjectName = () => {
 
-    var defaultPathForProjects = path.join(obj["defaultOfPath"], obj["defaultRelativeProjectPath"]);
-    var foundOne = false;
-    var goodName = getGoodSketchName(defaultPathForProjects);
+    let ofRoot = obj["defaultOfPath"];
+    if (!ofRoot || ofRoot === "") ofRoot = guessOFRoot()
+    let defaultPathForProjects = path.join(ofRoot, obj["defaultRelativeProjectPath"]);
+    let foundOne = false;
+    let goodName = getGoodSketchName(defaultPathForProjects);
     startingProject['path'] = defaultPathForProjects;
     startingProject['name'] = goodName;
 }
 
-function parseAddonsAndUpdateSelect(arg) {
+const parseAddonsAndUpdateSelect = (arg) => {
     console.log("in parseAddonsAndUpdateSelect " + arg);
     //path = require('path').resolve(__dirname, defaultOfPath + "/addons");
     addons = getDirectories(arg + "/addons","ofx");
@@ -348,20 +364,20 @@ function parseAddonsAndUpdateSelect(arg) {
     mainWindow.webContents.send('setAddons', addons);
 }
 
-function parsePlatformsAndUpdateSelect(arg) {
-    var folders = getDirectories(arg + "/scripts/templates");
+const  parsePlatformsAndUpdateSelect = (arg) => {
+    let folders = getDirectories(arg + "/scripts/templates");
     console.log("Reloading the templates folder, these were found:");
     console.log(folders);
 
-    var platformsWeHave = {};
-    var templatesWeHave = {};
+    let platformsWeHave = {};
+    let templatesWeHave = {};
 
     if (folders === undefined || folders === null) {
         //do something
     } else {
         // check all folder name under /scripts/templates
-        for (var id in folders) {
-            var key = folders[id];
+        for (let id in folders) {
+            let key = folders[id];
             if (platforms[key]) {
                 // this folder is for platform
                 console.log("Found platform, key " + key + " has value " + platforms[key]);
@@ -381,7 +397,7 @@ function parsePlatformsAndUpdateSelect(arg) {
         }
     }
     // saninty check...
-    // for(var key in platformsWeHave){
+    // for(let key in platformsWeHave){
     // 	console.log("key " + key + " has value " + platformsWeHave[key]);
     // }
     mainWindow.webContents.send('setPlatforms', platformsWeHave);
@@ -390,23 +406,23 @@ function parsePlatformsAndUpdateSelect(arg) {
 
 }
 
-function getGoodSketchName(arg){
+const  getGoodSketchName = (arg) => {
 
-    var currentProjectPath = arg;
-    var foundOne = false;
-    var goodName = "mySketch";
+    let currentProjectPath = arg;
+    let foundOne = false;
+    let goodName = "mySketch";
 
     if (bUseMoniker){
 
-        var projectNames = new moniker.Dictionary();
-        var tmpPath = require('path');
+        let projectNames = new moniker.Dictionary();
+        let tmpPath = require('path');
         projectNames.read(  tmpPath.join(__dirname, 'static', 'data', 'sketchAdjectives.txt'));
         goodName = "mySketch";
 
         while (foundOne === false) {
             if (fs.existsSync(tmpPath.join(currentProjectPath, goodName))) {
                 console.log("«" + goodName + "» already exists, generating a new name...");
-                var adjective = projectNames.choose();
+                let adjective = projectNames.choose();
                 goodName = "my" + adjective.charAt(0).toUpperCase() + adjective.slice(1) + "Sketch";
             } else {
                 foundOne = true;
@@ -415,10 +431,10 @@ function getGoodSketchName(arg){
 
     } else {
 
-        var date = new Date();
-        var formattedDate = formatDate(date);
+        let date = new Date();
+        let formattedDate = formatDate(date);
         goodName = "sketch_" + formattedDate;
-        var count = 1;
+        let count = 1;
 
          while (foundOne === false) {
             if (fs.existsSync(path.join(currentProjectPath, goodName))) {
@@ -436,24 +452,24 @@ function getGoodSketchName(arg){
 }
 
 
-function getDirectories(srcpath, acceptedPrefix) {
+const  getDirectories = (srcpath, acceptedPrefix) => {
 
     // because this is called at a different time, fs and path
     // seemed to be "bad" for some reason...
     // that's why I am making temp ones here.
     // console.log(path);
 
-    var fsTemp = require('fs');
-    var pathTemp = require('path');
+    let fsTemp = require('fs');
+    let pathTemp = require('path');
 
     try {
 
-        return fsTemp.readdirSync(srcpath).filter(function(file) {
+        return fsTemp.readdirSync(srcpath).filter( (file)  => {
 
             //console.log(srcpath);
             //console.log(file);
             try{
-                var joinedPath = pathTemp.join(srcpath, file);
+                let joinedPath = pathTemp.join(srcpath, file);
                 if ((acceptedPrefix==null || file.substring(0,acceptedPrefix.length)==acceptedPrefix) && joinedPath !== null) {
                     // only accept folders (potential addons)
                     return fsTemp.statSync(joinedPath).isDirectory();
@@ -478,7 +494,7 @@ function getDirectories(srcpath, acceptedPrefix) {
 //       console.error(err);
 //       return cb([]);
 //     }
-//     var iterator = function (file, cb)  {
+//     let iterator = function (file, cb)  {
 //       fs.stat(path.join(srcpath, file), function (err, stats) {
 //         if(err) {
 //           console.error(err);
@@ -491,23 +507,23 @@ function getDirectories(srcpath, acceptedPrefix) {
 //   });
 // }
 
-ipcMain.on('isOFProjectFolder', function(event, project) {
-    var fsTemp = require('fs');
-    var pathTemp = require('path');
-    var folder;
+ipcMain.on('isOFProjectFolder', (event, project) => {
+    let fsTemp = require('fs');
+    let pathTemp = require('path');
+    let folder;
     folder = pathTemp.join(project['projectPath'], project['projectName']);
 
     try {
 
-        var tmpFiles = fsTemp.readdirSync(folder);
+        let tmpFiles = fsTemp.readdirSync(folder);
         if (!tmpFiles || tmpFiles.length <= 1) {
             return false;
         } // we need at least 2 files/folders within
 
         // todo: also check for config.make & addons.make ?
-        var foundSrcFolder = false;
-        var foundAddons = false;
-        tmpFiles.forEach(function(el, i) {
+        let foundSrcFolder = false;
+        let foundAddons = false;
+        tmpFiles.forEach( (el, i) => {
             if (el == 'src') {
                 foundSrcFolder = true;
             }
@@ -520,9 +536,9 @@ ipcMain.on('isOFProjectFolder', function(event, project) {
             event.sender.send('setGenerateMode', 'updateMode');
 
             if (foundAddons) {
-                var projectAddons = fsTemp.readFileSync(pathTemp.resolve(folder, 'addons.make')).toString().split("\n");
+                let projectAddons = fsTemp.readFileSync(pathTemp.resolve(folder, 'addons.make')).toString().split("\n");
 
-                projectAddons = projectAddons.filter(function(el) {
+                projectAddons = projectAddons.filter( (el) => {
                     if (el === '' || el === 'addons') {
                         return false;
                     } // eleminates these items
@@ -532,7 +548,7 @@ ipcMain.on('isOFProjectFolder', function(event, project) {
                 });
 
                 // remove comments
-                projectAddons.forEach(function(element, index) {
+                projectAddons.forEach( (element, index) => {
                     this[index] = this[index].split('#')[0];
                   }, projectAddons);
 
@@ -643,27 +659,28 @@ ipcMain.on('refreshTemplateList', function (event, arg) {
 });
 
 ipcMain.on('getRandomSketchName', function(event, arg) {
-    var goodName = getGoodSketchName(arg);
+    let goodName = getGoodSketchName(arg);
     event.sender.send('setRandomisedSketchName', goodName);
     event.sender.send('setGenerateMode', 'createMode'); // it's a new sketch name, we are in create mode
 });
 
 ipcMain.on('update', function(event, arg) {
 
-    var update = arg;
-    var exec = require('child_process').exec;
-    var pathTemp = require('path');
+    console.log('[index.js] updating...', arg);
+    let update = arg;
+    let exec = require('child_process').exec;
+    let pathTemp = require('path');
 
     console.log(update);
 
-    var updatePath = "";
-    var pathString = "";
-    var platformString = "";
-    var templateString = "";
-    var recursiveString = "";
-    var verboseString = "";
-    var definesString = "";
-    var rootPath = defaultOfPath;
+    let updatePath = "";
+    let pathString = "";
+    let platformString = "";
+    let templateString = "";
+    let recursiveString = "";
+    let verboseString = "";
+    let rootPath = defaultOfPath;
+    let definesString = "";
 
     if (update['addondefines'] !== null) {
         definesString = "-D";
@@ -695,7 +712,7 @@ ipcMain.on('update', function(event, arg) {
         verboseString = "-v";
     }
 
-    var pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
+    let pgApp = pathTemp.normalize(pathTemp.join(pathTemp.join(__dirname, "app"), "projectGenerator"));
     
     if( hostplatform == "linux" || hostplatform == "linux64" ){
         pgApp = pathTemp.join(rootPath, "apps/projectGenerator/commandLine/bin/projectGenerator");
@@ -707,7 +724,10 @@ ipcMain.on('update', function(event, arg) {
         pgApp = "\"" + pgApp + "\"";
     }
 
-    var wholeString = pgApp + " " + recursiveString + " " + verboseString + " " + pathString + " " + platformString + " " + templateString + " " + definesString + " " + updatePath;
+
+    let wholeString = pgApp + " " + recursiveString + " " + verboseString + " " + pathString + " " + platformString + " " + templateString + " " + definesString + " " + updatePath;
+
+    console.log('[index.js] sending to pg via update... ', wholeString);
 
     exec(wholeString, {maxBuffer : Infinity}, function callback(error, stdout, stderr) {
 
@@ -732,29 +752,33 @@ ipcMain.on('update', function(event, arg) {
         }
     });
 
-    console.log(wholeString);
-
     //console.log(__dirname);
 
 });
 
 ipcMain.on('generate', function(event, arg) {
 
+    console.log('[index.js] generating...', arg);
 
-    var generate = arg;
+    let generate = arg;
 
-    var exec = require('child_process').exec;
+    let exec = require('child_process').exec;
 
 
-    var pathTemp = require('path');
+    let pathTemp = require('path');
 
-    var projectString = "";
-    var pathString = "";
-    var addonString = "";
-    var platformString = "";
-    var templateString = "";
-    var verboseString = "";
-    var rootPath = defaultOfPath;
+    let projectString = "";
+    let pathString = "";
+    let addonString = "";
+    let platformString = "";
+    let templateString = "";
+    let verboseString = "";
+    let rootPath = defaultOfPath;
+    let definesString = "";
+
+    if (generate['addondefines'] !== null) {
+        definesString = "-D";
+    }
 
 
     if (generate['platformList'] !== null) {
@@ -786,7 +810,7 @@ ipcMain.on('generate', function(event, arg) {
         projectString = "\"" + pathTemp.join(generate['projectPath'], generate['projectName']) + "\"";
     }
 
-    var pgApp="";
+    let pgApp="";
     if(hostplatform == "linux" || hostplatform == "linux64"){
         pgApp = pathTemp.join(rootPath, "apps/projectGenerator/commandLine/bin/projectGenerator");
         //pgApp = "projectGenerator";
@@ -800,14 +824,16 @@ ipcMain.on('generate', function(event, arg) {
         pgApp = pgApp = "\"" + pgApp + "\"";
     }
 
-    var wholeString = pgApp + " " + verboseString + " " + pathString + " " + addonString + " " + platformString + " " + templateString + " " + projectString;
+    let wholeString = pgApp + " " + verboseString + " " + pathString + " " + addonString + " " + platformString + " " + templateString + " " + definesString + " " + projectString;
+
+    console.log('[index.js] sending to pg via generate... ', wholeString);
 
     exec(wholeString, {maxBuffer : Infinity}, function callback(error, stdout, stderr) {
 
-        var wasError = false;
-        var text = stdout; //Big text with many line breaks
-        var lines = text.split(os.EOL); //Will return an array of lines on every OS node works
-        for (var i = 0; i < lines.length; i++) {
+        let wasError = false;
+        let text = stdout; //Big text with many line breaks
+        let lines = text.split(os.EOL); //Will return an array of lines on every OS node works
+        for (let i = 0; i < lines.length; i++) {
             if (lines[i].indexOf("Result:") > -1) {
                 if (lines[i].indexOf("error") > -1) {
                     wasError = true;
@@ -818,7 +844,7 @@ ipcMain.on('generate', function(event, arg) {
         // wasError = did the PG spit out an error (like a bad path, etc)
         // error = did node have an error running this command line app
 
-        var fullPath = pathTemp.join(generate['projectPath'], generate['projectName']);
+        let fullPath = pathTemp.join(generate['projectPath'], generate['projectName']);
         if (error === null && wasError === false) {
             event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
             event.sender.send('sendUIMessage',
@@ -859,36 +885,41 @@ ipcMain.on('generate', function(event, arg) {
 });
 
 ipcMain.on('pickOfPath', function(event, arg) {
-
-    path = dialog.showOpenDialog({
+    console.log('pick OF Path');
+    console.log('found', dialog.showOpenDialog({
         title: 'select the root of OF, where you see libs, addons, etc',
         properties: ['openDirectory'],
         filters: [],
         defaultPath: arg
-    }, function(filenames) {
+    }, (filenames) => {
+        console.log('FILENAMES PICK', filenames);
         if (filenames !== undefined && filenames.length > 0) {
             defaultOfPath = filenames[0];
+            console.log('NOTIFY');
             event.sender.send('setOfPath', filenames[0]);
         }
-    });
+    }) );
 });
 
 ipcMain.on('pickUpdatePath', function(event, arg) {
-    path = dialog.showOpenDialog({
+    console.log('update OF Path');
+    console.log('found', dialog.showOpenDialog({
         title: 'select root folder where you want to update',
         properties: ['openDirectory'],
         filters: [],
         defaultPath: arg
-    }, function(filenames) {
+    }, (filenames) => {
+        console.log('FILENAMES UPDATE', filenames);
         if (filenames !== undefined && filenames.length > 0) {
             defaultOfPath = filenames[0];
             event.sender.send('setUpdatePath', filenames[0]);
         }
-    });
+    }));
 });
 
 ipcMain.on('pickProjectPath', function(event, arg) {
-    path = dialog.showOpenDialog({
+    console.log('pick Project Path');
+    console.log( dialog.showOpenDialog({
         title: 'select parent folder for project, typically apps/myApps',
         properties: ['openDirectory'],
         filters: [],
@@ -897,7 +928,7 @@ ipcMain.on('pickProjectPath', function(event, arg) {
         if (filenames !== undefined && filenames.length > 0) {
             event.sender.send('setProjectPath', filenames[0]);
         }
-    });
+    }));
 });
 
 ipcMain.on('checkMultiUpdatePath', function(event, arg) {
@@ -911,25 +942,24 @@ ipcMain.on('checkMultiUpdatePath', function(event, arg) {
 
 });
 
-var dialogIsOpen = false;
+let dialogIsOpen = false;
 ipcMain.on('pickProjectImport', function(event, arg) {
     if(dialogIsOpen){
         return;
     }
 
     dialogIsOpen = true;
-    path = dialog.showOpenDialog({
+    let currentPath = dialog.showOpenDialog({
         title: 'Select the folder of your project, typically apps/myApps/myGeniusApp',
         properties: ['openDirectory'],
         filters: [],
         defaultPath: arg
-    }, function(filenames) {
+    }, (filenames) => {
         if (filenames != null) {
             // gather project information
-            var tmpPath = require('path');
-            var projectSettings = {};
-            projectSettings['projectName'] = tmpPath.basename(filenames[0]);
-            projectSettings['projectPath'] = tmpPath.dirname(filenames[0]);
+            let projectSettings = {};
+            projectSettings['projectName'] = path.basename(filenames[0]);
+            projectSettings['projectPath'] = path.dirname(filenames[0]);
             event.sender.send('importProjectSettings', projectSettings);
         }
         dialogIsOpen = false;
@@ -939,9 +969,9 @@ ipcMain.on('pickProjectImport', function(event, arg) {
 
 ipcMain.on('launchProjectinIDE', function(event, arg) {
 
-    var pathTemp = require('path');
-    var fsTemp = require('fs');
-    var fullPath = pathTemp.join(arg['projectPath'], arg['projectName']);
+    let pathTemp = require('path');
+    let fsTemp = require('fs');
+    let fullPath = pathTemp.join(arg['projectPath'], arg['projectName']);
 
     if( fsTemp.statSync(fullPath).isDirectory() == false ){
         // project doesn't exist
@@ -952,7 +982,7 @@ ipcMain.on('launchProjectinIDE', function(event, arg) {
     // // launch xcode
     if( arg.platform == 'osx' ){
         if(hostplatform == 'osx'){
-            var osxPath = pathTemp.join(fullPath, arg['projectName'] + '.xcodeproj');
+            let osxPath = pathTemp.join(fullPath, arg['projectName'] + '.xcodeproj');
             console.log( osxPath );
             osxPath = "\"" + osxPath + "\"";
 
@@ -962,7 +992,7 @@ ipcMain.on('launchProjectinIDE', function(event, arg) {
         }
     } else if( arg.platform == 'linux' || arg.platform == 'linux64' ){
         if(hostplatform == 'linux'){
-            var linuxPath = pathTemp.join(fullPath, arg['projectName'] + '.qbs');
+            let linuxPath = pathTemp.join(fullPath, arg['projectName'] + '.qbs');
             linuxPath = linuxPath.replace(/ /g, '\\ ');
             console.log( linuxPath );
             exec('xdg-open ' + linuxPath, function callback(error, stdout, stderr){
@@ -980,7 +1010,7 @@ ipcMain.on('launchProjectinIDE', function(event, arg) {
             }
         });
     } else if( hostplatform == 'windows'){
-        var windowsPath = pathTemp.join(fullPath, arg['projectName'] + '.sln');
+        let windowsPath = pathTemp.join(fullPath, arg['projectName'] + '.sln');
         console.log( windowsPath );
         windowsPath = "\"" + windowsPath + "\"";
         exec('start ' + "\"\"" + " " + windowsPath, function callback(error, stdout, stderr){
