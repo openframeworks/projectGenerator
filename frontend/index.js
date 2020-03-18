@@ -889,49 +889,60 @@ ipcMain.on('generate', function(event, arg) {
 
 ipcMain.on('pickOfPath', function(event, arg) {
     console.log('pick OF Path');
-    console.log('found', dialog.showOpenDialog({
+    dialog.showOpenDialog({
         title: 'select the root of OF, where you see libs, addons, etc',
         properties: ['openDirectory'],
         filters: [],
         defaultPath: arg
-    }, (filenames) => {
-        console.log('FILENAMES PICK', filenames);
-        if (filenames !== undefined && filenames.length > 0) {
-            defaultOfPath = filenames[0];
-            console.log('NOTIFY');
-            event.sender.send('setOfPath', filenames[0]);
+    }).then( response => {
+
+        const filename = response.filePaths[0];
+        if (filename) {
+            defaultOfPath = filename;
+            event.sender.send('setOfPath', filename);
         }
-    }) );
+    }).catch(err => {
+        console.error('pickUpdatePath', err);
+    });
 });
 
 ipcMain.on('pickUpdatePath', function(event, arg) {
     console.log('update OF Path');
-    console.log('found', dialog.showOpenDialog({
+
+
+    dialog.showOpenDialog({
         title: 'select root folder where you want to update',
         properties: ['openDirectory'],
         filters: [],
         defaultPath: arg
-    }, (filenames) => {
-        console.log('FILENAMES UPDATE', filenames);
-        if (filenames !== undefined && filenames.length > 0) {
-            defaultOfPath = filenames[0];
-            event.sender.send('setUpdatePath', filenames[0]);
+    }).then( response => {
+
+        const filename = response.filePaths[0];
+        if (filename) {
+            event.sender.send('setUpdatePath', filename);
         }
-    }));
+    }).catch(err => {
+        console.error('pickUpdatePath', err);
+    });
 });
 
 ipcMain.on('pickProjectPath', function(event, arg) {
     console.log('pick Project Path');
-    console.log( dialog.showOpenDialog({
+
+    dialog.showOpenDialog({
         title: 'select parent folder for project, typically apps/myApps',
         properties: ['openDirectory'],
         filters: [],
         defaultPath: arg
-    }, (filenames) => {
-        if (filenames !== undefined && filenames.length > 0) {
-            event.sender.send('setProjectPath', filenames[0]);
+    }).then( response => {
+
+        const filename = response.filePaths[0];
+        if (filename) {
+            event.sender.send('setProjectPath', filename);
         }
-    }));
+    }).catch(err => {
+        console.error('pickProjectPath', err);
+    })
 });
 
 ipcMain.on('checkMultiUpdatePath', function(event, arg) {
@@ -957,8 +968,8 @@ ipcMain.on('pickProjectImport', function(event, arg) {
         properties: ['openDirectory'],
         filters: [],
         defaultPath: arg
-    }).then(  result => {
-        const filename = result.filePaths[0];
+    }).then(  response => {
+        const filename = response.filePaths[0];
         if (filename) {
             // gather project information
             let projectSettings = {};
