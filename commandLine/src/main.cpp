@@ -1,6 +1,6 @@
 #include "ofMain.h"
 #include "optionparser.h"
-enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN };
+enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, ADDONDEFINES };
 constexpr option::Descriptor usage[] =
 {
     {UNKNOWN, 0, "", "",option::Arg::None, "Options:\n" },
@@ -13,6 +13,7 @@ constexpr option::Descriptor usage[] =
     {VERBOSE, 0,"v","verbose",option::Arg::None, "  --verbose, -v  \trun verbose" },
     {TEMPLATE, 0,"t","template",option::Arg::Optional, "  --template, -t  \tproject template" },
     {DRYRUN, 0,"d","dryrun",option::Arg::None, "  --dryrun, -d  \tdry run, don't change files" },
+    {ADDONDEFINES, 0,"D","addondefines",option::Arg::None, "  --addondefines, -D  \tadd preprocessor defines for each addon" },
     {0,0,0,0,0,0}
 };
 
@@ -70,6 +71,7 @@ bool bRecursive;                        // do we recurse in update mode?
 bool bHelpRequested;                    // did we request help?
 bool bListTemplates;                    // did we request help?
 bool bDryRun;                           // do dry run (useful for debugging recursive update)
+bool bAddonDefines;                     // add preprocessor defines for addons
 
 
 
@@ -236,7 +238,6 @@ bool isGoodOFPath(std::string path) {
 }
 
 
-
 void updateProject(std::string path, ofTargetPlatform target, bool bConsiderParameterAddons = true) {
 
     // bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
@@ -257,6 +258,8 @@ void updateProject(std::string path, ofTargetPlatform target, bool bConsiderPara
         ofLogNotice() << "parsing addons.make";
         project->parseAddons();
     }
+
+    if (bAddonDefines) project->addAddonDefineFlags();
 
     if (!bDryRun) project->save();
 }
@@ -340,6 +343,7 @@ int main(int argc, char* argv[]){
     //------------------------------------------- pre-parse
     bAddonsPassedIn = false;
     bDryRun = false;
+    bAddonDefines = false;
     busingEnvVar = false;
     bVerbose = false;
     mode = PG_MODE_NONE;
@@ -384,6 +388,10 @@ int main(int argc, char* argv[]){
     
     if (options[DRYRUN].count() > 0){
         bDryRun = true;
+    }
+    
+    if (options[ADDONDEFINES].count() > 0){
+        bAddonDefines = true;
     }
     
     if (options[VERBOSE].count() > 0){

@@ -4,6 +4,7 @@
 
 #include "ofAddon.h"
 #include "ofConstants.h"
+#include "ofUtils.h"
 #include "ofFileUtils.h"
 #include "pugixml.hpp"
 
@@ -35,13 +36,14 @@ public:
         }
     };
 
-    baseProject(std::string _target);
+    baseProject(std::string _target );
 
     virtual ~baseProject(){}
 
     bool create(std::string path, std::string templateName="");
     void parseAddons();
     void parseConfigMake();
+    void addAddonDefineFlags();
     bool save();
 
     // this shouldn't be called by anyone.  call "create(...), save" etc
@@ -82,6 +84,8 @@ public:
     std::string projectName;
     std::string templatePath;
     std::string target;
+
+
 
 protected:
     void recursiveCopyContents(const ofDirectory & srcDir, ofDirectory & destDir);
