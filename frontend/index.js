@@ -15,7 +15,7 @@ const moniker = require('moniker');
 const exec = require('child_process').exec;
 const os = require("os");
 
-const debugDevTools = true;
+const debugDevTools = false;
 let dialogIsOpen = false;
 
 // Debugging: start the Electron PG from the terminal to see the messages from console.log()
