@@ -1132,6 +1132,8 @@ function browseProjectPath() {
 }
 
 function browseImportProject() {
+
+    console.log('BROWSE CLICKED');
     let projectPath = $("#projectPath").val();
     if (projectPath === ''){
         projectPath = $("#ofPath").val();

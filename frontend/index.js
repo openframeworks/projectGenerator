@@ -15,6 +15,9 @@ const moniker = require('moniker');
 const exec = require('child_process').exec;
 const os = require("os");
 
+const debugDevTools = true;
+let dialogIsOpen = false;
+
 // Debugging: start the Electron PG from the terminal to see the messages from console.log()
 // Example: /path/to/PG/Contents/MacOS/Electron /path/to/PG/Contents/Ressources/app
 // Note: app.js's console.log is also visible from the WebKit inspector. (look for mainWindow.openDevTools() below )
@@ -399,7 +402,7 @@ app.on('ready', () => {
     mainWindow.loadURL('file://' + __dirname + '/index.html');
 
     // Open the devtools.
-    if (obj["showDeveloperTools"]) {
+    if (obj["showDeveloperTools"] || debugDevTools) {
         mainWindow.openDevTools();
     }
     //when the window is loaded send the defaults
@@ -549,8 +552,8 @@ ipcMain.on('isOFProjectFolder', (event, project) => {
 
                 // remove comments
                 projectAddons.forEach( (element, index) => {
-                    this[index] = this[index].split('#')[0];
-                  }, projectAddons);
+                    projectAddons[index] = projectAddons[index].split('#')[0];
+                }, projectAddons);
 
                 // console.log('addons', projectAddons);
 
@@ -924,7 +927,7 @@ ipcMain.on('pickProjectPath', function(event, arg) {
         properties: ['openDirectory'],
         filters: [],
         defaultPath: arg
-    }, function(filenames) {
+    }, (filenames) => {
         if (filenames !== undefined && filenames.length > 0) {
             event.sender.send('setProjectPath', filenames[0]);
         }
@@ -942,26 +945,30 @@ ipcMain.on('checkMultiUpdatePath', function(event, arg) {
 
 });
 
-let dialogIsOpen = false;
 ipcMain.on('pickProjectImport', function(event, arg) {
+
     if(dialogIsOpen){
         return;
     }
 
     dialogIsOpen = true;
-    let currentPath = dialog.showOpenDialog({
+    let currentPath = dialog.showOpenDialog(mainWindow, {
         title: 'Select the folder of your project, typically apps/myApps/myGeniusApp',
         properties: ['openDirectory'],
         filters: [],
         defaultPath: arg
-    }, (filenames) => {
-        if (filenames != null) {
+    }).then(  result => {
+        const filename = result.filePaths[0];
+        if (filename) {
             // gather project information
             let projectSettings = {};
-            projectSettings['projectName'] = path.basename(filenames[0]);
-            projectSettings['projectPath'] = path.dirname(filenames[0]);
+            projectSettings['projectName'] = path.basename(filename);
+            projectSettings['projectPath'] = path.dirname(filename);
             event.sender.send('importProjectSettings', projectSettings);
         }
+        dialogIsOpen = false;
+    }).catch( err => {
+        console.error('pickProjectImport', err);
         dialogIsOpen = false;
     });
 });
