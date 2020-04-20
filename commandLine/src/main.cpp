@@ -91,7 +91,7 @@ void consoleSpace()
     std::cout << std::endl;
 }
 
-bool printVersion()
+void printVersion()
 {
     std::cout << OFPROJECTGENERATOR_MAJOR_VERSION << "." << OFPROJECTGENERATOR_MINOR_VERSION << "." << OFPROJECTGENERATOR_PATCH_VERSION << std::endl;
 }
@@ -454,7 +454,7 @@ int main(int argc, char *argv[])
     {
         bVersion = true;
         printVersion();
-        return 0;
+        return EXIT_OK;
     }
 
     if (options[VERBOSE].count() > 0)
