@@ -42,7 +42,7 @@ bool bForce;         // force even if things like ofRoot seem wrong of if update
 int mode;            // what mode are we in?
 bool bRecursive;     // do we recurse in update mode?
 bool bHelpRequested; // did we request help?
-bool bListTemplates; // did we request help?
+bool bListTemplates; // did we request printing templates?
 bool bDryRun;        // do dry run (useful for debugging recursive update)
 
 cxxopts::Options options("projectGenerator", "openFrameworks's project generator");
