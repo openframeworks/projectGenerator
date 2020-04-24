@@ -445,7 +445,7 @@ int main(int argc, char *argv[])
         // so things like ../ can work
         // see http://www.appinf.com/docs/poco/Poco.Path.html
 
-        ofPath = ofFilePath::getPathForDirectory(ofPath);  // append trailing slash
+        // ofPath = ofFilePath::getPathForDirectory(ofPath);  // append trailing slash
         Poco::Path cwd = Poco::Path::current();            // get the current path
         ofPath = cwd.resolve(ofPath).toString();           // resolve ofPath vs that.
         auto resolvedPath = Poco::Path(ofPath).absolute(); // make that new path absolute
@@ -479,7 +479,7 @@ int main(int argc, char *argv[])
     {
         if (ofFilePath::isAbsolute(projectName))
         {
-            projectPath = projectName;
+            projectPath = ofFilePath::removeTrailingSlash(projectName);
         }
         else
         {
