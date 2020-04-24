@@ -4,7 +4,7 @@ This is a command line tool for generating and updating OF projects.
 
 here's the extended options if you want to experiment.  please take are that options like recursive are very agressive, dryrun is suggested.
 <!-- (projectGenerator -h) -->
-
+```
 openFrameworks's project generator
 Usage:
   projectGenerator [OPTION...]
@@ -24,15 +24,21 @@ Usage:
 
 examples:
 
-* update the project at the current working directory: `projectGenerator -p . -o ../../..`
+update the project at the current working directory:
+        projectGenerator -p . -o ../../..
 
-* create a new project in the current working directory: `projectGenerator -p /path/to/oF/app/myApps/nonExistingDirectory -o /path/to/oF`
+create a new project:
+        projectGenerator -p /path/to/oF/app/myApps/nonExistingDirectory -o /path/to/oF
 
-* recursively update the examples folder: `projectGenerator -r -p /path/to/oF/examples -o /path/to/oF`
+recursively update the examples folder:
+        projectGenerator -r -p /path/to/oF/examples -o /path/to/oF
 
-* create or update a project with addons:
-        - `projectGenerator -a ofxOsc,ofxOpenCv -p /path/to/oF/apps/myApps/appWithAddons -o /path/to/oF`
-        - `projectGenerator -a "ofxOsc, ofxOpenCv" -p /path/to/oF/apps/myApps/appWithAddons -o /path/to/oF`
+create or update a project with addons:
+        projectGenerator -a ofxOsc,ofxOpenCv -p /path/to/oF/apps/myApps/appWithAddons -o /path/to/oF
+        projectGenerator -a "ofxOsc, ofxOpenCv" -p /path/to/oF/apps/myApps/appWithAddons -o /path/to/oF
+```
+
+
 
 
 ## Environment variable
