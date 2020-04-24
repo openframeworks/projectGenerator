@@ -3,64 +3,36 @@ This is a command line tool for generating and updating OF projects.
 ## usage
 
 here's the extended options if you want to experiment.  please take are that options like recursive are very agressive, dryrun is suggested.
+<!-- (projectGenerator -h) -->
 
-	      projectGenerator [options] pathName
-	
-	if pathName exists, project is updated
-	if pathName doesn't exist, project is created
-	
-	OPTIONS:
-	
-	lists should be comma seperated and in quotes if there are spaces
-	you can use : or = for parameter based options, such as -o=/usr/...
-	
-	-r, --recursive                                      update recursively
-	                                                     (applies only to update)
-	-h, --help
-	-l, --listtemplates                                  list templates available
-	                                                     for the specified or
-	                                                     current platform(s)
-	-p"platform list", --platforms="platform list"       platform list
-	-a"addons list", --addons="addons list"              addons list
-	-o"OF path", --ofPath="OF path"                      openframeworks path
-	-v, --verbose                                        run verbose
-	-t"project_template", --template="project_template"  project template
-	-d, --dryrun                                         don't change files
+openFrameworks's project generator
+Usage:
+  projectGenerator [OPTION...]
+
+  -p, --project arg    path to project (required)
+  -o, --ofPath arg     path to openFrameworks directory (required, unless
+                       PG_OF_PATH is set)
+  -a, --addons arg     comma separated list of addons
+  -s, --platforms arg  comma separated list of platforms
+  -t, --template arg   template
+  -h, --help           prints usage
+  -v, --verbose        verbose output
+  -d, --dryrun         do dry run (useful for debugging recursive update)
+  -r, --recursive      recursively updates projects
+  -l, --listtemplates  prints a list of available templates
 
 
-**note that on windows, command line flags are written with "/" not "-" and don't have abbreviations, so -r would be /recursive**
+examples:
 
-	/recursive                    update recursively (applies only to update)
-	/help
-	/listtemplates                list templates available for the specified or
-                              	      current platform(s)
-	/platforms="platform list"    platform list
-	/addons="addons list"         addons list
-	/ofPath="OF path"             openframeworks path
-	/verbose                      run verbose
-	/template="project_template"  project template
-	/dryrun                       don't change files
+* update the project at the current working directory: `projectGenerator -p . -o ../../..`
 
+* create a new project in the current working directory: `projectGenerator -p /path/to/oF/app/myApps/nonExistingDirectory -o /path/to/oF`
 
-for example, to make a new project, you'd say: 
+* recursively update the examples folder: `projectGenerator -r -p /path/to/oF/examples -o /path/to/oF`
 
-    ./projectGenerator -o"pathToOF" pathOfNewProject
-    (on windows: ./projectGenerator /ofPath="pathToOF" pathOfNewProject)
-
-to update an existing project: 
-
-    ./projectGenerator -o"pathToOF" pathToExistingProject
-
-to update a folder of projects
-
-    ./projectGenerator -o"pathToOF" -r pathToFolderOfProjects
-
-you can also specify platforms (default platform is inferred) such as: 
-
-    ./projectGenerator -o"pathToOF" -p"ios" pathOfNewIOSProject
-
-
-
+* create or update a project with addons:
+        - `projectGenerator -a ofxOsc,ofxOpenCv -p /path/to/oF/apps/myApps/appWithAddons -o /path/to/oF`
+        - `projectGenerator -a "ofxOsc, ofxOpenCv" -p /path/to/oF/apps/myApps/appWithAddons -o /path/to/oF`
 
 
 ## Environment variable

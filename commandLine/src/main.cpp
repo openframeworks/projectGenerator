@@ -313,7 +313,7 @@ void printHelp()
     footer += "update the project at the current working directory:\n";
     footer += "\tprojectGenerator -p . -o ../../..\n\n";
 
-    footer += "create a new project in the current working directory:\n";
+    footer += "create a new project:\n";
     footer += "\tprojectGenerator -p /path/to/oF/app/myApps/nonExistingDirectory -o /path/to/oF\n\n";
 
     footer += "recursively update the examples folder:\n";
