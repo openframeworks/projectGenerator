@@ -329,17 +329,17 @@ void printHelp()
 //-------------------------------------------
 int main(int argc, char *argv[])
 {
-    options.add_options()                                                                                                  //
-        ("p,project", "path to project (required)", cxxopts::value<std::string>())                                         //
-        ("o,ofPath", "path to openFrameworks directory (required)", cxxopts::value<std::string>())                         //
-        ("a,addons", "comma separated list of addons", cxxopts::value<std::string>())                                      //
-        ("s,platforms", "comma separated list of platforms", cxxopts::value<std::string>())                                //
-        ("t,template", "template", cxxopts::value<std::string>())                                                          //
-        ("h,help", "prints usage")                                                                                         //
-        ("v,verbose", "verbose output", cxxopts::value<bool>()->default_value("false"))                                    //
-        ("d,dryrun", "do dry run (useful for debugging recursive update)", cxxopts::value<bool>()->default_value("false")) //
-        ("r,recursive", "recursively updates projects", cxxopts::value<bool>()->default_value("false"))                    //
-        ("l,listtemplates", "prints a list of available templates")                                                        //
+    options.add_options()                                                                                                    //
+        ("p,project", "path to project (required)", cxxopts::value<std::string>())                                           //
+        ("o,ofPath", "path to openFrameworks directory (required, unless PG_OF_PATH is set)", cxxopts::value<std::string>()) //
+        ("a,addons", "comma separated list of addons", cxxopts::value<std::string>())                                        //
+        ("s,platforms", "comma separated list of platforms", cxxopts::value<std::string>())                                  //
+        ("t,template", "template", cxxopts::value<std::string>())                                                            //
+        ("h,help", "prints usage")                                                                                           //
+        ("v,verbose", "verbose output")                                                                                      //
+        ("d,dryrun", "do dry run (useful for debugging recursive update)", cxxopts::value<bool>()->default_value("false"))   //
+        ("r,recursive", "recursively updates projects")                                                                      //
+        ("l,listtemplates", "prints a list of available templates")                                                          //
         ;
     auto result = options.parse(argc, argv);
 
@@ -359,7 +359,6 @@ int main(int argc, char *argv[])
     nProjectsCreated = 0;
     std::string projectName = "";
     projectPath = "";
-    projectPath = argv[argc - 1];
     templateName = "";
 
     // ------------------------------------------------------ parse args
