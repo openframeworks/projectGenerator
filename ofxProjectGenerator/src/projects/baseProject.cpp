@@ -294,6 +294,60 @@ void baseProject::addAddon(std::string addonName){
     }
 }
 
+void baseProject::addSrcRecursively(std::string srcPath){
+    vector <std::string> srcFilesToAdd;
+    
+    //so we can just pass through the file paths
+    ofDisableDataPath();
+    getFilesRecursively(srcPath, srcFilesToAdd);
+    ofEnableDataPath();
+
+    //need this for absolute paths so we can subtract this path from each file path
+    //say we add this path: /user/person/documents/shared_of_code
+    //we want folders added for shared_of_code/ and any subfolders, but not folders added for /user/ /user/person/ etc
+    string parentFolder = ofFilePath::getEnclosingDirectory(ofFilePath::removeTrailingSlash(srcPath));
+    
+    for( auto & fileToAdd : srcFilesToAdd){
+                
+        //if it is an absolute path it is easy - add the file and enclosing folder to the project
+        if( ofFilePath::isAbsolute(fileToAdd) ){
+            string folder = ofFilePath::getEnclosingDirectory(fileToAdd,false);
+            
+            auto pos = folder.find_first_of(parentFolder);
+            
+            //just to be 100% sure - check if the parent folder path is at the beginning of the file path
+            //then remove it so we just get the folder structure of the actual src files being added and not the full path
+            if( pos == 0 ){
+                folder = folder.substr(parentFolder.size());
+            }
+            
+            ofLogVerbose() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
+            addSrc(fileToAdd, folder);
+        }else{
+        
+            //if it is a realtive path make the file relative to the project folder
+            auto absPath = ofFilePath::getAbsolutePath( ofFilePath::join(ofFilePath::getCurrentExeDir(), fileToAdd) );
+            auto canPath = std::filesystem::canonical(absPath); //resolves the ./ and ../ to be the most minamlist absolute path
+    
+            //get the file path realtive to the project
+            auto projectPath = ofFilePath::getAbsolutePath( projectDir );
+            auto relPathPathToAdd = ofFilePath::makeRelative(projectPath, canPath);
+
+            //get the folder from the path and clean it up
+            string folder = ofFilePath::getEnclosingDirectory(relPathPathToAdd,false);
+
+            ofStringReplace(folder, "../", "");
+#ifdef TARGET_WIN32
+            ofStringReplace(folder, "..\\", ""); //do both just incase someone has used linux paths on windows
+#endif
+            folder =  ofFilePath::removeTrailingSlash(folder);
+
+            ofLogVerbose() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
+            addSrc(relPathPathToAdd, folder);
+        }
+    }
+}
+
 void baseProject::addAddon(ofAddon & addon){
     for(int i=0;i<(int)addons.size();i++){
 		if(addons[i].name==addon.name) return;

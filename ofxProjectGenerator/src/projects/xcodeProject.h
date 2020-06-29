@@ -40,6 +40,7 @@ public:
     void saveScheme();
     void renameProject();
 
+    std::string projRootUUID;
     std::string srcUUID;
     std::string addonUUID;
     std::string localAddonUUID;

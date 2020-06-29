@@ -218,6 +218,7 @@ STRINGIFY(
 xcodeProject::xcodeProject(std::string target)
 :baseProject(target){
     if( target == "osx" ){
+        projRootUUID    = "E4B69B4A0A3A1720003C02F2";
         srcUUID         = "E4B69E1C0A3A1BDC003C02F2";
         addonUUID       = "BB4B014C10F69532006C3DED";
         localAddonUUID  = "6948EE371B920CB800B5AC1A";
@@ -229,6 +230,7 @@ xcodeProject::xcodeProject(std::string target)
         frameworksBuildPhaseUUID = "E4328149138ABC9F0047C5CB";
         
     }else{
+        projRootUUID    = "29B97314FDCFA39411CA2CEA";
         srcUUID         = "E4D8936A11527B74007E1F53";
         addonUUID       = "BB16F26B0F2B646B00518274";
         localAddonUUID  = "6948EE371B920CB800B5AC1A";
@@ -903,13 +905,15 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
                 nodeToAddTo.child("array").append_child("string").append_child(pugi::node_pcdata).set_value(UUID.c_str());
 
             } else {
-                std::string xmlStr = "//key[contains(.,'"+srcUUID+"')]/following-sibling::node()[1]";
+                std::string xmlStr = "//key[contains(.,'"+projRootUUID+"')]/following-sibling::node()[1]";
 
                 pugi::xml_node node = doc.select_single_node(xmlStr.c_str()).node();
+                pugi::xml_node nodeToAddTo = findOrMakeFolderSet( node, folders, "extra");
+                
+                nodeToAddTo.child("array").append_child("string").append_child(pugi::node_pcdata).set_value(UUID.c_str());
 
-                // I'm not sure the best way to proceed;
-                // we should maybe find the rootest level and add it there.
-                // TODO: fix this.
+                // This should add any files not in src/ addons/ or local_addons/
+                // to the root of the project hierarchy
             }
         };
 
