@@ -307,11 +307,13 @@ void baseProject::addSrcRecursively(std::string srcPath){
     //we want folders added for shared_of_code/ and any subfolders, but not folders added for /user/ /user/person/ etc
     string parentFolder = ofFilePath::getEnclosingDirectory(ofFilePath::removeTrailingSlash(srcPath));
     
+    std::map <std::string, std::string> uniqueIncludeFolders;
     for( auto & fileToAdd : srcFilesToAdd){
                 
         //if it is an absolute path it is easy - add the file and enclosing folder to the project
         if( ofFilePath::isAbsolute(fileToAdd) ){
             string folder = ofFilePath::getEnclosingDirectory(fileToAdd,false);
+            string absFolder = folder;
             
             auto pos = folder.find_first_of(parentFolder);
             
@@ -323,6 +325,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
             
             ofLogVerbose() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
             addSrc(fileToAdd, folder);
+            uniqueIncludeFolders[absFolder] = absFolder;
         }else{
         
             //if it is a realtive path make the file relative to the project folder
@@ -335,6 +338,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 
             //get the folder from the path and clean it up
             string folder = ofFilePath::getEnclosingDirectory(relPathPathToAdd,false);
+            string includeFolder = folder;
 
             ofStringReplace(folder, "../", "");
 #ifdef TARGET_WIN32
@@ -344,7 +348,14 @@ void baseProject::addSrcRecursively(std::string srcPath){
 
             ofLogVerbose() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
             addSrc(relPathPathToAdd, folder);
+            uniqueIncludeFolders[includeFolder] = includeFolder;
         }
+        }
+    
+    //do it this way so we don't try and add a include folder for each file ( as it checks if they are already added ) so should be faster
+    for(auto & includeFolder : uniqueIncludeFolders){
+        ofLogVerbose() << " adding search include paths for folder " << includeFolder.second;
+        addInclude(includeFolder.second);
     }
 }
 
