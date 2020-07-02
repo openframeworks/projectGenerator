@@ -740,7 +740,7 @@ ipc.on('generate', function(event, arg) {
     var templateString = "";
     var verboseString = "";
     var rootPath = defaultOfPath;
-
+    var sourceExtraString = "";
 
     if (generate['platformList'] !== null) {
         platformString = "-p\"" + generate['platformList'].join(",") + "\"";
@@ -760,6 +760,10 @@ ipc.on('generate', function(event, arg) {
     if (generate['ofPath'] !== null) {
         pathString = "-o\"" + generate['ofPath'] + "\"";
         rootPath = generate['ofPath'];
+    }
+    
+    if( generate['sourcePath'] != null && generate['sourcePath'].length >0 ){
+        sourceExtraString = " -s\"" + generate['sourcePath'] + "\"";
     }
 
     if (generate['verbose'] === true) {
@@ -785,7 +789,7 @@ ipc.on('generate', function(event, arg) {
         pgApp = pgApp = "\"" + pgApp + "\"";
     }
 
-    var wholeString = pgApp + " " + verboseString + " " + pathString + " " + addonString + " " + platformString + " " + templateString + " " + projectString;
+    var wholeString = pgApp + " " + verboseString + " " + pathString + " " + addonString + " " + platformString + sourceExtraString + " " + templateString + " " + projectString;
 
     exec(wholeString, {maxBuffer : Infinity}, function callback(error, stdout, stderr) {
 
@@ -881,6 +885,19 @@ ipc.on('pickProjectPath', function(event, arg) {
     }, function(filenames) {
         if (filenames !== undefined && filenames.length > 0) {
             event.sender.send('setProjectPath', filenames[0]);
+        }
+    });
+});
+
+ipc.on('pickSourcePath', function(event, arg, index) {
+    path = dialog.showOpenDialog({
+        title: 'select extra source or include folder paths to add to project',
+        properties: ['openDirectory'],
+        filters: [],
+        defaultPath: arg
+    }, function(filenames) {
+        if (filenames !== undefined && filenames.length > 0) {
+            event.sender.send('setSourceExtraPath', filenames[0], index);
         }
     });
 });

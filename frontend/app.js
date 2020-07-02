@@ -28,7 +28,7 @@ var isFirstTimeSierra = false;
 var bVerbose = false;
 var localAddons = [];
 
-
+var numAddedSrcPaths = 1;
 
 //-----------------------------------------------------------------------------------
 // IPC
@@ -90,6 +90,11 @@ ipc.on('setProjectPath', function(arg) {
     //defaultSettings['lastUsedProjectPath'] = arg;
     //saveDefaultSettings();
     $("#projectName").trigger('change'); // checks if we need to be in update or generate mode
+});
+
+//-------------------------------------------
+ipc.on('setSourceExtraPath', function(arg, index) {
+    $("#sourceExtra-"+index).val(arg);
 });
 
 //-------------------------------------------
@@ -914,12 +919,23 @@ function generate() {
         addonValueArray.push(localAddons[i]);
     }
 
+    // extra source locations
+    var srcExtraArr = "";
+    for(var i = 0; i < numAddedSrcPaths; i++){
+        var srcExtra = $("#sourceExtra-"+i).val();
+        if( srcExtra != '' ){
+            srcExtraArr += ", " + srcExtra;
+        }
+    }
+    
+
     var lengthOfPlatforms = platformValueArray.length;
 
     var gen = {};
 
     gen['projectName'] = $("#projectName").val();
     gen['projectPath'] = $("#projectPath").val();
+    gen['sourcePath'] = srcExtraArr;
     gen['platformList'] = platformValueArray;
     gen['templateList'] = templateValueArray;
     gen['addonList'] = addonValueArray; //$("#addonsDropdown").val();
@@ -1032,14 +1048,14 @@ function enableAdvancedMode(isAdvanced) {
         $('#platformsDropdown').removeClass("disabled");
         $("body").addClass('advanced');
         $('a.updateMultiMenuOption').show();
-
+        $('#sourceExtraSection').show();
         $('#templateSection').show();
         $('#templateSectionMulti').show();
 
     } else {
         $('#platformsDropdown').addClass("disabled");
         $('#platformsDropdown').dropdown('set exactly', defaultSettings['defaultPlatform']);
-
+        $('#sourceExtraSection').hide();
         $('#templateSection').hide();
         $('#templateSectionMulti').hide();
         $('#templateDropdown').dropdown('set exactly', '');
@@ -1121,6 +1137,27 @@ function browseProjectPath() {
     }
     ipc.send('pickProjectPath', path); // current path could go here
 }
+
+function browseSourcePath(index) {
+    
+    //if we don't have another field below us - add one
+    var nextFieldId = '#sourceExtra-'+(index+1);
+    if( $(nextFieldId).length == 0 ){
+        var nextIndex = index+1;
+        var extrafield = '<div class="field"> \
+           <div class="ui icon input fluid"> \
+               <input type="text" placeholder="Extra source path..." id="sourceExtra-'+nextIndex+'"> \
+               <i class="search link icon" onclick="browseSourcePath('+nextIndex+')"></i> \
+           </div> \
+        </div>';
+              
+        $("#sourceExtraSection").append(extrafield);
+        numAddedSrcPaths++;
+    }
+    
+    ipc.send('pickSourcePath', path, index); // current path could go here
+}
+
 
 function browseImportProject() {
     var path = $("#projectPath").val();
