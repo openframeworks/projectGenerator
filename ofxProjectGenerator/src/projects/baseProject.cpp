@@ -302,6 +302,12 @@ void baseProject::addSrcRecursively(std::string srcPath){
     getFilesRecursively(srcPath, srcFilesToAdd);
     ofEnableDataPath();
 
+    //if the files being added are inside the OF root folder, make them relative to the folder.
+    bool bMakeRelative = false;
+    if( srcPath.find_first_of(getOFRoot()) == 0 ){
+        bMakeRelative = true;
+    }
+
     //need this for absolute paths so we can subtract this path from each file path
     //say we add this path: /user/person/documents/shared_of_code
     //we want folders added for shared_of_code/ and any subfolders, but not folders added for /user/ /user/person/ etc
@@ -311,7 +317,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
     for( auto & fileToAdd : srcFilesToAdd){
                 
         //if it is an absolute path it is easy - add the file and enclosing folder to the project
-        if( ofFilePath::isAbsolute(fileToAdd) ){
+        if( ofFilePath::isAbsolute(fileToAdd) && !bMakeRelative ){
             string folder = ofFilePath::getEnclosingDirectory(fileToAdd,false);
             string absFolder = folder;
             
@@ -323,13 +329,19 @@ void baseProject::addSrcRecursively(std::string srcPath){
                 folder = folder.substr(parentFolder.size());
             }
             
+            folder = ofFilePath::removeTrailingSlash(folder);
+            
             ofLogVerbose() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
             addSrc(fileToAdd, folder);
             uniqueIncludeFolders[absFolder] = absFolder;
         }else{
         
+            auto absPath = fileToAdd;
+        
             //if it is a realtive path make the file relative to the project folder
-            auto absPath = ofFilePath::getAbsolutePath( ofFilePath::join(ofFilePath::getCurrentExeDir(), fileToAdd) );
+            if( !ofFilePath::isAbsolute(absPath) ){
+                absPath = ofFilePath::getAbsolutePath( ofFilePath::join(ofFilePath::getCurrentExeDir(), fileToAdd) );
+            }
             auto canPath = std::filesystem::canonical(absPath); //resolves the ./ and ../ to be the most minamlist absolute path
     
             //get the file path realtive to the project
