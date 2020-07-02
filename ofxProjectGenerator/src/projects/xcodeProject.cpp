@@ -877,8 +877,8 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 
         std::vector < std::string > folders = ofSplitString(folder, "/", true);
 
-        if (folders.size() > 1){
-            if (folders[0] == "src"){
+        if (folders.size()){
+            if (folders.size() > 1 && folders[0] == "src"){
                 std::string xmlStr = "//key[contains(.,'"+srcUUID+"')]/following-sibling::node()[1]";
 
                 folders.erase(folders.begin());
@@ -886,7 +886,7 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
                 pugi::xml_node nodeToAddTo = findOrMakeFolderSet( node, folders, "src");
                 nodeToAddTo.child("array").append_child("string").append_child(pugi::node_pcdata).set_value(UUID.c_str());
 
-            } else if (folders[0] == "addons"){
+            } else if (folders.size() > 1 && folders[0] == "addons"){
                 std::string xmlStr = "//key[contains(.,'"+addonUUID+"')]/following-sibling::node()[1]";
 
                 folders.erase(folders.begin());
@@ -895,7 +895,7 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 
                 nodeToAddTo.child("array").append_child("string").append_child(pugi::node_pcdata).set_value(UUID.c_str());
 
-            } else if (folders[0] == "local_addons"){
+            } else if (folders.size() > 1 && folders[0] == "local_addons"){
                 std::string xmlStr = "//key[contains(.,'"+localAddonUUID+"')]/following-sibling::node()[1]";
 
                 folders.erase(folders.begin());
@@ -908,7 +908,7 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
                 std::string xmlStr = "//key[contains(.,'"+projRootUUID+"')]/following-sibling::node()[1]";
 
                 pugi::xml_node node = doc.select_single_node(xmlStr.c_str()).node();
-                pugi::xml_node nodeToAddTo = findOrMakeFolderSet( node, folders, "extra");
+                pugi::xml_node nodeToAddTo = findOrMakeFolderSet( node, folders, folders[0]);
                 
                 nodeToAddTo.child("array").append_child("string").append_child(pugi::node_pcdata).set_value(UUID.c_str());
 

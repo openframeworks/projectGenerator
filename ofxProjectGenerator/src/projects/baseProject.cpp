@@ -319,7 +319,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
             
             //just to be 100% sure - check if the parent folder path is at the beginning of the file path
             //then remove it so we just get the folder structure of the actual src files being added and not the full path
-            if( pos == 0 ){
+            if( pos == 0 && parentFolder.size() < folder.size() ){
                 folder = folder.substr(parentFolder.size());
             }
             
