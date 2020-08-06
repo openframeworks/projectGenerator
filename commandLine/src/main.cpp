@@ -1,6 +1,6 @@
 #include "ofMain.h"
 #include "optionparser.h"
-enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTRA };
+enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTERNAL };
 constexpr option::Descriptor usage[] =
 {
     {UNKNOWN, 0, "", "",option::Arg::None, "Options:\n" },
@@ -13,7 +13,7 @@ constexpr option::Descriptor usage[] =
     {VERBOSE, 0,"v","verbose",option::Arg::None, "  --verbose, -v  \trun verbose" },
     {TEMPLATE, 0,"t","template",option::Arg::Optional, "  --template, -t  \tproject template" },
     {DRYRUN, 0,"d","dryrun",option::Arg::None, "  --dryrun, -d  \tdry run, don't change files" },
-    {SRCEXTRA, 0,"s","source",option::Arg::Optional, "  --source, -s  \trelative or absolute path to source or include folders to add (such as ../../../../common_utils/" },
+    {SRCEXTERNAL, 0,"s","source",option::Arg::Optional, "  --source, -s  \trelative or absolute path to source or include folders external to the project (such as ../../../../common_utils/" },
     {0,0,0,0,0,0}
 };
 
@@ -413,9 +413,9 @@ int main(int argc, char* argv[]){
         }
     }
     
-    if (options[SRCEXTRA].count() > 0){
-        if (options[SRCEXTRA].arg != NULL){
-            std::string srcString(options[SRCEXTRA].arg);
+    if (options[SRCEXTERNAL].count() > 0){
+        if (options[SRCEXTERNAL].arg != NULL){
+            std::string srcString(options[SRCEXTERNAL].arg);
             srcPaths = ofSplitString(srcString, ",", true, true);
         }
     }

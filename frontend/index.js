@@ -497,12 +497,16 @@ ipc.on('isOFProjectFolder', function(event, project) {
         // todo: also check for config.make & addons.make ?
         var foundSrcFolder = false;
         var foundAddons = false;
+        var foundConfig = false;
         tmpFiles.forEach(function(el, i) {
             if (el == 'src') {
                 foundSrcFolder = true;
             }
             if (el == 'addons.make') {
                 foundAddons = true;
+            }
+            if(el == 'config.make'){
+                foundConfig = true;
             }
         });
 
@@ -532,6 +536,57 @@ ipc.on('isOFProjectFolder', function(event, project) {
             } else {
                 event.sender.send('selectAddons', {});
             }
+            
+            if(foundConfig){
+                var projectExtra = fsTemp.readFileSync(pathTemp.resolve(folder, 'config.make')).toString().split("\n");
+                projectExtra = projectExtra.filter(function(el) {
+                    if (el === '' || el[0] === '#') {
+                        return false;
+                    } // eleminates these items
+                    else {
+                        console.log("got a good element " + el );
+                        return true;
+                    }
+                });
+                
+                //read the valid lines
+                var extraSrcPathsCount = 0;
+                
+                projectExtra.forEach(function(el, i) {
+                    //remove spaces
+                    var line = el.replace(/ /g, '');
+                    
+                    //split either on = or +=
+                    var splitter = "+=";
+                    var n = line.indexOf(splitter);
+                    var macro, value;
+                    
+                    if( n != -1 ){
+                        var macro = line.substr(0, n);
+                        var value = line.substr(n + splitter.length);
+                    }else{
+                        splitter = "=";
+                        n = line.indexOf(splitter);
+                        if( n != -1 ){
+                            macro = line.substr(0, n);
+                            value = line.substr(n + splitter.length);
+                        }
+                    }
+                    
+                    if( macro.length && value.length){
+                        // this is where you can do things with the macro/values from the config.make file
+
+                        console.log("Reading config pair. Macro: " + macro + " Value: " + value);
+                        
+                        if(macro.startsWith('PROJECT_EXTERNAL_SOURCE_PATHS')){
+                             event.sender.send('setSourceExtraPath', value, extraSrcPathsCount);
+                             extraSrcPathsCount++;
+                        }
+                    }
+                });
+                
+            }
+            
         } else {
             event.sender.send('setGenerateMode', 'createMode');
         }

@@ -109,6 +109,7 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(std::string ta
 bool baseProject::create(string path, std::string templateName){
     templatePath = getPlatformTemplateDir();
     addons.clear();
+    extSrcPaths.clear();
 
     if(!ofFilePath::isAbsolute(path)){
     	path = (std::filesystem::current_path() / std::filesystem::path(path)).string();
@@ -228,7 +229,34 @@ bool baseProject::save(){
             addonsMake << addons[i].name << endl;
         }
     }
+    
+    //save out params which the PG knows about to config.make
+    //we mostly use this right now for storing the external source paths
+    auto buffer = ofBufferFromFile(ofFilePath::join(projectDir,"config.make"));
+    if( buffer.size() ){
+        ofFile saveConfig(ofFilePath::join(projectDir,"config.make"), ofFile::WriteOnly);
 
+        for(auto line : buffer.getLines()){
+            string str = line;
+                        
+            //add the of root path
+            if( str.rfind("# OF_ROOT =", 0) == 0 ){
+                saveConfig << "OF_ROOT = " + getOFRoot() << endl;
+            }
+            // replace this section with our external paths
+            else if( extSrcPaths.size() && str.rfind("# PROJECT_EXTERNAL_SOURCE_PATHS =", 0) == 0 ){
+                
+                for(int d = 0; d < extSrcPaths.size(); d++){
+                    ofLog(OF_LOG_VERBOSE) << " adding PROJECT_EXTERNAL_SOURCE_PATHS to config" << extSrcPaths[d] << endl;
+                    saveConfig << "PROJECT_EXTERNAL_SOURCE_PATHS" << (d == 0 ? " = " : " += ") << extSrcPaths[d] << endl;
+                }
+                
+            }else{
+               saveConfig << str << endl;
+            }
+        }
+    }
+    
 	return saveProjectFile();
 }
 
@@ -295,6 +323,7 @@ void baseProject::addAddon(std::string addonName){
 }
 
 void baseProject::addSrcRecursively(std::string srcPath){
+    extSrcPaths.push_back(srcPath);
     vector <std::string> srcFilesToAdd;
     
     //so we can just pass through the file paths

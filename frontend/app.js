@@ -94,6 +94,7 @@ ipc.on('setProjectPath', function(arg) {
 
 //-------------------------------------------
 ipc.on('setSourceExtraPath', function(arg, index) {
+    checkAddSourcePath(index);
     $("#sourceExtra-"+index).val(arg);
 });
 
@@ -1013,12 +1014,16 @@ function switchGenerateMode(mode) {
         console.log('Switching GenerateMode to Update...');
 
         clearAddonSelection();
+        clearExtraSourceList();
 
     }
     // [default]: switch to createMode (generate new projects)
     else {
         // if previously in update mode, deselect Addons
-        if( $("#updateButton").is(":visible") ){ clearAddonSelection(); }
+        if( $("#updateButton").is(":visible") ){
+            clearAddonSelection();
+            clearExtraSourceList();
+        }
 
         $("#generateButton").show();
         $("#updateButton").hide();
@@ -1130,7 +1135,6 @@ function browseOfPath() {
 }
 
 function browseProjectPath() {
-
     var path = $("#projectPath").val();
     if (path === ''){
         path = $("#ofPath").val();
@@ -1138,8 +1142,15 @@ function browseProjectPath() {
     ipc.send('pickProjectPath', path); // current path could go here
 }
 
-function browseSourcePath(index) {
+function clearExtraSourceList(){
+    $("#sourceExtraSection").empty();
+    $("#sourceExtraSection").append("<label>Additional source folders:</label>");
     
+    checkAddSourcePath(-1);
+    numAddedSrcPaths = 1;
+}
+
+function checkAddSourcePath(index){
     //if we don't have another field below us - add one
     var nextFieldId = '#sourceExtra-'+(index+1);
     if( $(nextFieldId).length == 0 ){
@@ -1150,11 +1161,14 @@ function browseSourcePath(index) {
                <i class="search link icon" onclick="browseSourcePath('+nextIndex+')"></i> \
            </div> \
         </div>';
-              
+
         $("#sourceExtraSection").append(extrafield);
         numAddedSrcPaths++;
     }
-    
+}
+
+function browseSourcePath(index) {
+    var path = $("#ofPath").val();
     ipc.send('pickSourcePath', path, index); // current path could go here
 }
 

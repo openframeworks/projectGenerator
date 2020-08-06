@@ -88,6 +88,7 @@ protected:
     void recursiveCopyContents(const ofDirectory & srcDir, ofDirectory & destDir);
 
     std::vector<ofAddon> addons;
+    std::vector<std::string> extSrcPaths;
 };
 
 
