@@ -45,6 +45,7 @@ public:
     std::vector < std::string > frameworks;		// osx only
     std::vector < std::string > data;
 	std::vector < std::string > defines;
+	std::string afterCompileScript;
 
     // metadata
     std::string name;
@@ -88,6 +89,7 @@ private:
     void addReplaceString(std::string & variable, std::string value, bool addToVariable);
     void addReplaceStringVector(std::vector<std::string> & variable, std::string value, std::string prefix, bool addToVariable);
 	void addReplaceStringVector(std::vector<LibraryBinary> & variable, std::string value, std::string prefix, bool addToVariable);
+	void appendString(std::string & variable, std::string value, std::string delimiter, bool addToVariable);
     void exclude(std::vector<std::string> & variable, std::vector<std::string> exclusions);
 	void exclude(std::vector<LibraryBinary> & variable, std::vector<std::string> exclusions);
     ConfigParseState stateFromString(std::string name);

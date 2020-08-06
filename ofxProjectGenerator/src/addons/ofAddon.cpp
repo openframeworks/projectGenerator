@@ -140,7 +140,8 @@ bool ofAddon::checkCorrectVariable(string variable, ConfigParseState state){
 				variable == "ADDON_DATA" ||
 				variable == "ADDON_LIBS_EXCLUDE" || variable == "ADDON_SOURCES_EXCLUDE" || variable == "ADDON_INCLUDES_EXCLUDE" || variable == "ADDON_FRAMEWORKS_EXCLUDE" ||
 				variable == "ADDON_DLLS_TO_COPY" ||
-				variable == "ADDON_DEFINES");
+				variable == "ADDON_DEFINES" ||
+				variable == "ADDON_AFTER_COMPILE_SCRIPT" );
 	case Unknown:
 	default:
 		return false;
@@ -217,7 +218,14 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 		}
 	}
 }
+void ofAddon::appendString(std::string & variable, std::string value, std::string delimiter, bool addToVariable){
+	if(!addToVariable){
+		variable = value;
+	}else{
+		variable += delimiter + value;
+	}
 
+}
 void ofAddon::parseVariableValue(string variable, string value, bool addToValue, string line, int lineNum){
 	if(variable == "ADDON_NAME"){
 		if(value!=name){
@@ -332,6 +340,10 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 	if (variable == "ADDON_DEFINES") {
 		addReplaceStringVector(defines, value, "", addToValue);
 	}
+	if (variable == "ADDON_AFTER_COMPILE_SCRIPT") {
+		appendString(afterCompileScript, value, "; ", addToValue);
+	}
+	
 }
 
 void ofAddon::exclude(vector<string> & variables, vector<string> exclusions){
@@ -683,6 +695,7 @@ void ofAddon::fromFS(string path, string platform){
 
 
 void ofAddon::clear(){
+	
     filesToFolders.clear();
     srcFiles.clear();
 	propsFiles.clear();
