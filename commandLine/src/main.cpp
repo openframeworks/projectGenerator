@@ -1,6 +1,8 @@
 #include "ofMain.h"
 #include "optionparser.h"
-enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTERNAL };
+#include "defines.h"
+enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTERNAL, VERSION};
+
 constexpr option::Descriptor usage[] =
 {
     {UNKNOWN, 0, "", "",option::Arg::None, "Options:\n" },
@@ -14,6 +16,7 @@ constexpr option::Descriptor usage[] =
     {TEMPLATE, 0,"t","template",option::Arg::Optional, "  --template, -t  \tproject template" },
     {DRYRUN, 0,"d","dryrun",option::Arg::None, "  --dryrun, -d  \tdry run, don't change files" },
     {SRCEXTERNAL, 0,"s","source",option::Arg::Optional, "  --source, -s  \trelative or absolute path to source or include folders external to the project (such as ../../../../common_utils/" },
+    {VERSION, 0, "w", "version", option::Arg::None, "  --version, -w  \treturn the current version"},
     {0,0,0,0,0,0}
 };
 
@@ -81,6 +84,10 @@ void consoleSpace() {
     std::cout << std::endl;
 }
 
+void printVersion()
+{
+    std::cout << OFPROJECTGENERATOR_MAJOR_VERSION << "." << OFPROJECTGENERATOR_MINOR_VERSION << "." << OFPROJECTGENERATOR_PATCH_VERSION << std::endl;
+}
 
 bool printTemplates() {
     
@@ -392,6 +399,10 @@ int main(int argc, char* argv[]){
     
     if (options[DRYRUN].count() > 0){
         bDryRun = true;
+    }
+    if (options[VERSION].count() > 0){
+        printVersion();
+        return EXIT_OK;
     }
     
     if (options[VERBOSE].count() > 0){
