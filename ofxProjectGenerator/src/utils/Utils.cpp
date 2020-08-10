@@ -190,6 +190,7 @@ void getFilesRecursively(const std::string & path, std::vector < std::string > &
     //ofLogVerbose() << "in getFilesRecursively "<< path << endl;
 
     dir.listDir(path);
+    dir.sort();
     for (int i = 0; i < dir.size(); i++){
         ofFile temp(dir.getFile(i));
         if (dir.getName(i) == ".svn" || dir.getName(i)==".git") continue; // ignore svn and git
@@ -245,6 +246,7 @@ void getFoldersRecursively(const string & path, std::vector < std::string > & fo
     
     if (!ofIsStringInString(path, ".framework")){
         dir.listDir(path);
+        dir.sort();
         for (int i = 0; i < dir.size(); i++){
             ofFile temp(dir.getFile(i));
             if (temp.isDirectory() && isFolderNotCurrentPlatform(temp.getFileName(), platform) == false ){
@@ -262,6 +264,7 @@ void getFrameworksRecursively( const std::string & path, std::vector < std::stri
     ofDirectory dir;
     dir.listDir(path);
     
+    dir.sort();
     for (int i = 0; i < dir.size(); i++){
         
         ofFile temp(dir.getFile(i));
@@ -287,6 +290,7 @@ void getFrameworksRecursively( const std::string & path, std::vector < std::stri
 void getPropsRecursively(const std::string & path, std::vector < std::string > & props, std::string platform) {
 	ofDirectory dir;
 	dir.listDir(path);
+    dir.sort();
 
 	for (auto & temp : dir) {
 		if (temp.isDirectory()) {
@@ -308,6 +312,7 @@ void getPropsRecursively(const std::string & path, std::vector < std::string > &
 void getDllsRecursively(const std::string & path, std::vector < std::string > & dlls, std::string platform) {
 	ofDirectory dir;
 	dir.listDir(path);
+    dir.sort();
 
 	for (auto & temp : dir) {
 		if (temp.isDirectory()) {
@@ -331,6 +336,7 @@ void getDllsRecursively(const std::string & path, std::vector < std::string > & 
 void getLibsRecursively(const std::string & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform, std::string arch, std::string target){
     ofDirectory dir;
     dir.listDir(path);
+    dir.sort();
 
         
         
