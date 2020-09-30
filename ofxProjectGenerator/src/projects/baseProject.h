@@ -85,10 +85,15 @@ public:
     std::string target;
 
 protected:
+
     void recursiveCopyContents(const ofDirectory & srcDir, ofDirectory & destDir);
 
     std::vector<ofAddon> addons;
     std::vector<std::string> extSrcPaths;
+
+	//cached addons - if an addon is requested more than once, avoid loading from disk as it's quite slow
+	std::map<std::string,std::map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]
+	bool isAddonCached(const std::string & addonPath, const std::string platform); //is this addon in the mem cache?
 };
 
 

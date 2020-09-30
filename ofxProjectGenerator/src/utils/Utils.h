@@ -37,7 +37,7 @@ void getFoldersRecursively(const std::string & path, std::vector < std::string >
 void getFilesRecursively(const std::string & path, std::vector < std::string > & fileNames);
 void getLibsRecursively(const std::string & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform = "", std::string arch = "", std::string target = "");
 void getFrameworksRecursively( const std::string & path, std::vector < std::string > & frameworks,  std::string platform = "" );
-void getPropsRecursively(const std::string & path, std::vector < std::string > & props, std::string platform);
+void getPropsRecursively(const std::string & path, std::vector < std::string > & props, const std::string & platform);
 void getDllsRecursively(const std::string & path, std::vector < std::string > & dlls, std::string platform);
 
 
