@@ -232,30 +232,62 @@ bool baseProject::save(){
 	return saveProjectFile();
 }
 
+bool baseProject::isAddonCached(const std::string & addonPath, const std::string platform){
+	auto it = addonsCache.find(platform);
+	if (it == addonsCache.end()) return false;
+	auto it2 = it->second.find(addonPath);
+	return it2 != it->second.end();
+}
+
+
 void baseProject::addAddon(std::string addonName){
     ofAddon addon;
     addon.pathToOF = getOFRelPath(projectDir);
     addon.pathToProject = ofFilePath::getAbsolutePath(projectDir);
-    
 
-    
     auto localPath = ofFilePath::join(addon.pathToProject, addonName);
-    
+	bool addonOK = false;
+
+	bool inCache = isAddonCached(addonName, target);
+	//inCache = false; //uncomment to test no-cache scenario (disable cache alltogether)
+
     if (ofDirectory(addonName).exists()){
         // if it's an absolute path, convert to relative...
         string relativePath = ofFilePath::makeRelative(addon.pathToProject, addonName);
         addonName = relativePath;
         addon.isLocalAddon = true;
-        addon.fromFS(addonName, target);
+		if(!inCache){
+        		addonOK = addon.fromFS(addonName, target);
+		}else{
+			addon = addonsCache[target][addonName];
+			addonOK = true;
+		}
     } else if(ofDirectory(localPath).exists()){
         addon.isLocalAddon = true;
-        addon.fromFS(addonName, target);
+		if(!inCache){
+			addonOK = addon.fromFS(addonName, target);
+		}else{
+			addon = addonsCache[target][addonName];
+			addonOK = true;
+		}
     }else{
         addon.isLocalAddon = false;
         auto standardPath = ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), addonName);
-        addon.fromFS(standardPath, target);
+		if(!inCache){
+			addonOK = addon.fromFS(standardPath, target);
+		}else{
+			addon = addonsCache[target][addonName];
+			addonOK = true;
+		}
     }
+	if(!addonOK){
+		ofLogVerbose() << "Ignoring addon that doesn't seem to exist: " << addonName;
+		return; //if addon does not exist, stop early
+	}
 
+	if(!inCache){
+		addonsCache[target][addonName] = addon; //cache the addon so we dont have to be reading form disk all the time
+	}
     addAddon(addon);
 
     // Process values from ADDON_DATA
@@ -295,13 +327,23 @@ void baseProject::addAddon(std::string addonName){
 }
 
 void baseProject::addAddon(ofAddon & addon){
+
     for(int i=0;i<(int)addons.size();i++){
-		if(addons[i].name==addon.name) return;
+		if(addons[i].name==addon.name){
+			return;
+		}
 	}
     
     for(int i=0;i<addon.dependencies.size();i++){
-        addAddon(addon.dependencies[i]);
+		for(int j=0;j<(int)addons.size();j++){
+			if(addon.dependencies[i] != addons[j].name){ //make sure dependencies of addons arent already added to prj
+				addAddon(addon.dependencies[i]);
+			}else{
+				ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << addon.dependencies[i];
+			}
+		}
     }
+
 
 	addons.push_back(addon);
 

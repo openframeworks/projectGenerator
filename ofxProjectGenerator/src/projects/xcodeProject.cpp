@@ -1219,15 +1219,26 @@ void xcodeProject::addCPPFLAG(std::string cppflag, LibType libType){
 }
 
 void xcodeProject::addAddon(ofAddon & addon){
-	ofLogNotice() << "adding addon " << addon.name;
     for(int i=0;i<(int)addons.size();i++){
-		if(addons[i].name==addon.name) return;
+		if(addons[i].name==addon.name){
+			return;
+		}
 	}
 
     for(int i=0;i<addon.dependencies.size();i++){
         baseProject::addAddon(addon.dependencies[i]);
     }
 
+	for(int i=0;i<addon.dependencies.size();i++){
+		for(int j=0;j<(int)addons.size();j++){
+			if(addon.dependencies[i] != addons[j].name){ //make sure dependencies of addons arent already added to prj
+				baseProject::addAddon(addon.dependencies[i]);
+			}else{
+				//trying to add duplicated addon dependency... skipping!
+			}
+		}
+	}
+	ofLogNotice() << "adding addon: " << addon.name;
 	addons.push_back(addon);
 
     for(int i=0;i<(int)addon.includePaths.size();i++){
@@ -1289,9 +1300,5 @@ void xcodeProject::addAddon(ofAddon & addon){
                              addon.filesToFolders[addon.frameworks[i]]);
             }
         }
-                                                                                            
-                                                                                            //
-            
     }
-    
 }

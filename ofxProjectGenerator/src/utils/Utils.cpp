@@ -284,7 +284,7 @@ void getFrameworksRecursively( const std::string & path, std::vector < std::stri
 
 
 
-void getPropsRecursively(const std::string & path, std::vector < std::string > & props, std::string platform) {
+void getPropsRecursively(const std::string & path, std::vector < std::string > & props, const std::string & platform) {
 	ofDirectory dir;
 	dir.listDir(path);
 
