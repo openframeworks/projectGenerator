@@ -109,6 +109,7 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(std::string ta
 bool baseProject::create(string path, std::string templateName){
     templatePath = getPlatformTemplateDir();
     addons.clear();
+    extSrcPaths.clear();
 
     if(!ofFilePath::isAbsolute(path)){
     	path = (std::filesystem::current_path() / std::filesystem::path(path)).string();
@@ -228,7 +229,34 @@ bool baseProject::save(){
             addonsMake << addons[i].name << endl;
         }
     }
+    
+    //save out params which the PG knows about to config.make
+    //we mostly use this right now for storing the external source paths
+    auto buffer = ofBufferFromFile(ofFilePath::join(projectDir,"config.make"));
+    if( buffer.size() ){
+        ofFile saveConfig(ofFilePath::join(projectDir,"config.make"), ofFile::WriteOnly);
 
+        for(auto line : buffer.getLines()){
+            string str = line;
+                        
+            //add the of root path
+            if( str.rfind("# OF_ROOT =", 0) == 0 ){
+                saveConfig << "OF_ROOT = " + getOFRoot() << endl;
+            }
+            // replace this section with our external paths
+            else if( extSrcPaths.size() && str.rfind("# PROJECT_EXTERNAL_SOURCE_PATHS =", 0) == 0 ){
+                
+                for(int d = 0; d < extSrcPaths.size(); d++){
+                    ofLog(OF_LOG_VERBOSE) << " adding PROJECT_EXTERNAL_SOURCE_PATHS to config" << extSrcPaths[d] << endl;
+                    saveConfig << "PROJECT_EXTERNAL_SOURCE_PATHS" << (d == 0 ? " = " : " += ") << extSrcPaths[d] << endl;
+                }
+                
+            }else{
+               saveConfig << str << endl;
+            }
+        }
+    }
+    
 	return saveProjectFile();
 }
 
@@ -291,6 +319,84 @@ void baseProject::addAddon(std::string addonName){
 				ofLogWarning() << "addon data file does not exist, skipping: " << d;
 			}
         }
+    }
+}
+
+void baseProject::addSrcRecursively(std::string srcPath){
+    extSrcPaths.push_back(srcPath);
+    vector <std::string> srcFilesToAdd;
+    
+    //so we can just pass through the file paths
+    ofDisableDataPath();
+    getFilesRecursively(srcPath, srcFilesToAdd);
+    ofEnableDataPath();
+
+    //if the files being added are inside the OF root folder, make them relative to the folder.
+    bool bMakeRelative = false;
+    if( srcPath.find_first_of(getOFRoot()) == 0 ){
+        bMakeRelative = true;
+    }
+
+    //need this for absolute paths so we can subtract this path from each file path
+    //say we add this path: /user/person/documents/shared_of_code
+    //we want folders added for shared_of_code/ and any subfolders, but not folders added for /user/ /user/person/ etc
+    string parentFolder = ofFilePath::getEnclosingDirectory(ofFilePath::removeTrailingSlash(srcPath));
+    
+    std::map <std::string, std::string> uniqueIncludeFolders;
+    for( auto & fileToAdd : srcFilesToAdd){
+                
+        //if it is an absolute path it is easy - add the file and enclosing folder to the project
+        if( ofFilePath::isAbsolute(fileToAdd) && !bMakeRelative ){
+            string folder = ofFilePath::getEnclosingDirectory(fileToAdd,false);
+            string absFolder = folder;
+            
+            auto pos = folder.find_first_of(parentFolder);
+            
+            //just to be 100% sure - check if the parent folder path is at the beginning of the file path
+            //then remove it so we just get the folder structure of the actual src files being added and not the full path
+            if( pos == 0 && parentFolder.size() < folder.size() ){
+                folder = folder.substr(parentFolder.size());
+            }
+            
+            folder = ofFilePath::removeTrailingSlash(folder);
+            
+            ofLogVerbose() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
+            addSrc(fileToAdd, folder);
+            uniqueIncludeFolders[absFolder] = absFolder;
+        }else{
+        
+            auto absPath = fileToAdd;
+        
+            //if it is a realtive path make the file relative to the project folder
+            if( !ofFilePath::isAbsolute(absPath) ){
+                absPath = ofFilePath::getAbsolutePath( ofFilePath::join(ofFilePath::getCurrentExeDir(), fileToAdd) );
+            }
+            auto canPath = std::filesystem::canonical(absPath); //resolves the ./ and ../ to be the most minamlist absolute path
+    
+            //get the file path realtive to the project
+            auto projectPath = ofFilePath::getAbsolutePath( projectDir );
+            auto relPathPathToAdd = ofFilePath::makeRelative(projectPath, canPath);
+
+            //get the folder from the path and clean it up
+            string folder = ofFilePath::getEnclosingDirectory(relPathPathToAdd,false);
+            string includeFolder = folder;
+
+            ofStringReplace(folder, "../", "");
+#ifdef TARGET_WIN32
+            ofStringReplace(folder, "..\\", ""); //do both just incase someone has used linux paths on windows
+#endif
+            folder =  ofFilePath::removeTrailingSlash(folder);
+
+            ofLogVerbose() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
+            addSrc(relPathPathToAdd, folder);
+            uniqueIncludeFolders[includeFolder] = includeFolder;
+        }
+        }
+    
+    //do it this way so we don't try and add a include folder for each file ( as it checks if they are already added ) so should be faster
+    for(auto & includeFolder : uniqueIncludeFolders){
+        ofLogVerbose() << " adding search include paths for folder " << includeFolder.second;
+        addInclude(includeFolder.second);
     }
 }
 

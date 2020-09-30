@@ -1,7 +1,8 @@
 #include "ofMain.h"
 #include "optionparser.h"
 #include "defines.h"
-enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, VERSION };
+enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTERNAL, VERSION};
+
 constexpr option::Descriptor usage[] =
 {
     {UNKNOWN, 0, "", "",option::Arg::None, "Options:\n" },
@@ -14,7 +15,8 @@ constexpr option::Descriptor usage[] =
     {VERBOSE, 0,"v","verbose",option::Arg::None, "  --verbose, -v  \trun verbose" },
     {TEMPLATE, 0,"t","template",option::Arg::Optional, "  --template, -t  \tproject template" },
     {DRYRUN, 0,"d","dryrun",option::Arg::None, "  --dryrun, -d  \tdry run, don't change files" },
-    {VERSION, 0, "w", "version", option::Arg::None, "  --version, -d  \treturn the current version"},
+    {SRCEXTERNAL, 0,"s","source",option::Arg::Optional, "  --source, -s  \trelative or absolute path to source or include folders external to the project (such as ../../../../common_utils/" },
+    {VERSION, 0, "w", "version", option::Arg::None, "  --version, -w  \treturn the current version"},
     {0,0,0,0,0,0}
 };
 
@@ -58,6 +60,7 @@ std::string              directoryForRecursion;
 std::string              projectPath;
 std::string              ofPath;
 std::vector <std::string>     addons;
+std::vector <std::string>     srcPaths;
 std::vector <ofTargetPlatform>        targets;
 std::string              ofPathEnv;
 std::string              currentWorkingDirectory;
@@ -263,6 +266,12 @@ void updateProject(std::string path, ofTargetPlatform target, bool bConsiderPara
         ofLogNotice() << "parsing addons.make";
         project->parseAddons();
     }
+    
+    if(!bDryRun){
+        for(auto & srcPath : srcPaths){
+            project->addSrcRecursively(srcPath);
+        }
+    }
 
     if (!bDryRun) project->save();
 }
@@ -415,7 +424,12 @@ int main(int argc, char* argv[]){
         }
     }
     
-    
+    if (options[SRCEXTERNAL].count() > 0){
+        if (options[SRCEXTERNAL].arg != NULL){
+            std::string srcString(options[SRCEXTERNAL].arg);
+            srcPaths = ofSplitString(srcString, ",", true, true);
+        }
+    }
     
     if (options[OFPATH].count() > 0){
         if (options[OFPATH].arg != NULL){
@@ -570,6 +584,9 @@ int main(int argc, char* argv[]){
             if (!bDryRun){
                 for(auto & addon: addons){
                     project->addAddon(addon);
+                }
+                for(auto & srcPath : srcPaths){
+                    project->addSrcRecursively(srcPath);
                 }
             }
             if (!bDryRun) project->save();

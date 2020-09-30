@@ -497,12 +497,16 @@ ipc.on('isOFProjectFolder', function(event, project) {
         // todo: also check for config.make & addons.make ?
         var foundSrcFolder = false;
         var foundAddons = false;
+        var foundConfig = false;
         tmpFiles.forEach(function(el, i) {
             if (el == 'src') {
                 foundSrcFolder = true;
             }
             if (el == 'addons.make') {
                 foundAddons = true;
+            }
+            if(el == 'config.make'){
+                foundConfig = true;
             }
         });
 
@@ -532,6 +536,57 @@ ipc.on('isOFProjectFolder', function(event, project) {
             } else {
                 event.sender.send('selectAddons', {});
             }
+            
+            if(foundConfig){
+                var projectExtra = fsTemp.readFileSync(pathTemp.resolve(folder, 'config.make')).toString().split("\n");
+                projectExtra = projectExtra.filter(function(el) {
+                    if (el === '' || el[0] === '#') {
+                        return false;
+                    } // eleminates these items
+                    else {
+                        console.log("got a good element " + el );
+                        return true;
+                    }
+                });
+                
+                //read the valid lines
+                var extraSrcPathsCount = 0;
+                
+                projectExtra.forEach(function(el, i) {
+                    //remove spaces
+                    var line = el.replace(/ /g, '');
+                    
+                    //split either on = or +=
+                    var splitter = "+=";
+                    var n = line.indexOf(splitter);
+                    var macro, value;
+                    
+                    if( n != -1 ){
+                        var macro = line.substr(0, n);
+                        var value = line.substr(n + splitter.length);
+                    }else{
+                        splitter = "=";
+                        n = line.indexOf(splitter);
+                        if( n != -1 ){
+                            macro = line.substr(0, n);
+                            value = line.substr(n + splitter.length);
+                        }
+                    }
+                    
+                    if( macro.length && value.length){
+                        // this is where you can do things with the macro/values from the config.make file
+
+                        console.log("Reading config pair. Macro: " + macro + " Value: " + value);
+                        
+                        if(macro.startsWith('PROJECT_EXTERNAL_SOURCE_PATHS')){
+                             event.sender.send('setSourceExtraPath', value, extraSrcPathsCount);
+                             extraSrcPathsCount++;
+                        }
+                    }
+                });
+                
+            }
+            
         } else {
             event.sender.send('setGenerateMode', 'createMode');
         }
@@ -740,7 +795,7 @@ ipc.on('generate', function(event, arg) {
     var templateString = "";
     var verboseString = "";
     var rootPath = defaultOfPath;
-
+    var sourceExtraString = "";
 
     if (generate['platformList'] !== null) {
         platformString = "-p\"" + generate['platformList'].join(",") + "\"";
@@ -760,6 +815,10 @@ ipc.on('generate', function(event, arg) {
     if (generate['ofPath'] !== null) {
         pathString = "-o\"" + generate['ofPath'] + "\"";
         rootPath = generate['ofPath'];
+    }
+    
+    if( generate['sourcePath'] != null && generate['sourcePath'].length >0 ){
+        sourceExtraString = " -s\"" + generate['sourcePath'] + "\"";
     }
 
     if (generate['verbose'] === true) {
@@ -785,7 +844,7 @@ ipc.on('generate', function(event, arg) {
         pgApp = pgApp = "\"" + pgApp + "\"";
     }
 
-    var wholeString = pgApp + " " + verboseString + " " + pathString + " " + addonString + " " + platformString + " " + templateString + " " + projectString;
+    var wholeString = pgApp + " " + verboseString + " " + pathString + " " + addonString + " " + platformString + sourceExtraString + " " + templateString + " " + projectString;
 
     exec(wholeString, {maxBuffer : Infinity}, function callback(error, stdout, stderr) {
 
@@ -881,6 +940,19 @@ ipc.on('pickProjectPath', function(event, arg) {
     }, function(filenames) {
         if (filenames !== undefined && filenames.length > 0) {
             event.sender.send('setProjectPath', filenames[0]);
+        }
+    });
+});
+
+ipc.on('pickSourcePath', function(event, arg, index) {
+    path = dialog.showOpenDialog({
+        title: 'select extra source or include folder paths to add to project',
+        properties: ['openDirectory'],
+        filters: [],
+        defaultPath: arg
+    }, function(filenames) {
+        if (filenames !== undefined && filenames.length > 0) {
+            event.sender.send('setSourceExtraPath', filenames[0], index);
         }
     });
 });

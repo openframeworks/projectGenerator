@@ -290,6 +290,8 @@ void getPropsRecursively(const std::string & path, std::vector < std::string > &
 
 	for (auto & temp : dir) {
 		if (temp.isDirectory()) {
+            //skip example directories - this is needed as we are search all folders in the addons root path 
+            if( temp.getFileName().rfind("example", 0) == 0) continue;
 			getPropsRecursively(temp.path(), props, platform);
 		}
 		else {

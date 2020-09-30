@@ -67,6 +67,7 @@ public:
 
     virtual void addAddon(std::string addon);
     virtual void addAddon(ofAddon & addon);
+    virtual void addSrcRecursively(std::string srcPath);
 
     std::string getName() { return projectName;}
     std::string getPath() { return projectDir; }
@@ -87,6 +88,7 @@ protected:
     void recursiveCopyContents(const ofDirectory & srcDir, ofDirectory & destDir);
 
     std::vector<ofAddon> addons;
+    std::vector<std::string> extSrcPaths;
 };
 
 
