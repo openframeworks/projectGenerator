@@ -274,10 +274,10 @@ void baseProject::addAddon(std::string addonName){
     addon.pathToProject = ofFilePath::getAbsolutePath(projectDir);
 
     auto localPath = ofFilePath::join(addon.pathToProject, addonName);
-	bool addonOK = false;
+    bool addonOK = false;
 
-	bool inCache = isAddonInCache(addonName, target);
-	//inCache = false; //to test no-cache scenario
+    bool inCache = isAddonInCache(addonName, target);
+    //inCache = false; //to test no-cache scenario
 
     if (ofDirectory(addonName).exists()){
         // if it's an absolute path, convert to relative...
@@ -435,17 +435,17 @@ void baseProject::addSrcRecursively(std::string srcPath){
 void baseProject::addAddon(ofAddon & addon){
 
     for(int i=0;i<(int)addons.size();i++){
-		if(addons[i].name==addon.name){
-			return;
-		}
-	}
+        if(addons[i].name==addon.name){
+            return;
+        }
+    }
     
     for(int i=0;i<addon.dependencies.size();i++){
-		for(int j=0;j<(int)addons.size();j++){
-			if(addon.dependencies[i] != addons[j].name){ //make sure dependencies of addons arent already added to prj
-				addAddon(addon.dependencies[i]);
-			}else{
-				ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << addon.dependencies[i];
+        for(int j=0;j<(int)addons.size();j++){
+            if(addon.dependencies[i] != addons[j].name){ //make sure dependencies of addons arent already added to prj
+                addAddon(addon.dependencies[i]);
+            }else{
+                ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << addon.dependencies[i];
 			}
 		}
     }
