@@ -18,7 +18,7 @@ public:
 	
     ofAddon();
     
-	void fromFS(std::string path, std::string platform);
+	bool fromFS(std::string path, const std::string & platform);
 //	void fromXML(std::string installXmlName);
 	void clear();
 

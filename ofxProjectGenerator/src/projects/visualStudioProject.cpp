@@ -397,6 +397,7 @@ void visualStudioProject::addAddon(ofAddon & addon){
         baseProject::addAddon(addon.dependencies[i]);
     }
 
+	ofLogNotice() << "adding addon: " << addon.name;
 	addons.push_back(addon);
 
     for(int i=0;i<(int)addon.includePaths.size();i++){
