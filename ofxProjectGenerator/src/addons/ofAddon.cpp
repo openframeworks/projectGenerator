@@ -446,7 +446,7 @@ void ofAddon::parseConfig(){
 	}
 }
 
-void ofAddon::fromFS(string path, string platform){
+bool ofAddon::fromFS(std::string path, const std::string & platform){
     clear();
     this->platform = platform;
 	string prefixPath;
@@ -464,6 +464,9 @@ void ofAddon::fromFS(string path, string platform){
         prefixPath = pathToOF;
     }
 
+	if(!ofDirectory::doesDirectoryExist(path)){
+		return false;
+	}
 
     string srcPath = ofFilePath::join(path, "/src");
     ofLogVerbose() << "in fromFS, trying src " << srcPath;
@@ -648,6 +651,7 @@ void ofAddon::fromFS(string path, string platform){
 
     parseConfig();
 
+	return true;
 }
 
 //void ofAddon::fromXML(string installXmlName){

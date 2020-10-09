@@ -284,9 +284,11 @@ void getFrameworksRecursively( const std::string & path, std::vector < std::stri
 
 
 
-void getPropsRecursively(const std::string & path, std::vector < std::string > & props, std::string platform) {
-	ofDirectory dir;
-	dir.listDir(path);
+void getPropsRecursively(const std::string & path, std::vector < std::string > & props, const std::string & platform) {
+
+    if(!ofDirectory::doesDirectoryExist(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
+    ofDirectory dir;
+    dir.listDir(path);
 
 	for (auto & temp : dir) {
 		if (temp.isDirectory()) {
