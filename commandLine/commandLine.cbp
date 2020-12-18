@@ -48,7 +48,7 @@
 			<Add directory="..\..\..\libs\FreeImage\include" />
 			<Add directory="..\..\..\libs\quicktime\include" />
 			<Add directory="..\..\..\libs\rtAudio\include" />
-			<Add directory="..\..\..\libs\fmodex\include" />
+			<Add directory="..\..\..\libs\fmod\include" />
 			<Add directory="..\..\..\libs\videoInput\include" />
 			<Add directory="..\..\..\libs\glew\include" />
 			<Add directory="..\..\..\libs\glut\include" />
@@ -83,7 +83,7 @@
 			<Add library="..\..\..\libs\glut\lib\win_cb\libglut.a" />
 			<Add library="..\..\..\libs\glfw\lib\win_cb\libglfw3.a" />
 			<Add library="..\..\..\libs\videoInput\lib\win_cb\videoInputLib.a" />
-			<Add library="..\..\..\libs\fmodex\lib\win_cb\libfmodex.a" />
+			<Add library="..\..\..\libs\fmod\lib\win_cb\libfmod.a" />
 			<Add library="..\..\..\libs\glew\lib\win_cb\libglew32.a" />
 			<Add library="..\..\..\libs\glu\lib\win_cb\glu32.lib" />
 			<Add library="..\..\..\libs\poco\lib\win_cb\libPocoNetSSL.a" />
