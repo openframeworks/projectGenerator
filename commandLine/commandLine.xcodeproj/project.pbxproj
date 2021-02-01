@@ -1825,32 +1825,6 @@
 				<key>sourceTree</key>
 				<string>&lt;group&gt;</string>
 			</dict>
-			<key>8466F1851C04CA0E00918B1C</key>
-			<dict>
-				<key>buildActionMask</key>
-				<string>12</string>
-				<key>files</key>
-				<array />
-				<key>inputPaths</key>
-				<array />
-				<key>isa</key>
-				<string>PBXShellScriptBuildPhase</string>
-				<key>outputPaths</key>
-				<array />
-				<key>runOnlyForDeploymentPostprocessing</key>
-				<string>0</string>
-				<key>shellPath</key>
-				<string>/bin/sh</string>
-				<key>shellScript</key>
-				<string>echo "$GCC_PREPROCESSOR_DEFINITIONS";
-APPSTORE=`expr "$GCC_PREPROCESSOR_DEFINITIONS" : ".*APPSTORE=\([0-9]*\)"`
-if [ -z "$APPSTORE" ] ; then
-echo "Note: Not copying bin/data to App Package or doing App Code signing. Use AppStore target for AppStore distribution";
-else
-# Copy bin/data into App/Resources
-rsync -avz --exclude='.DS_Store' "${SRCROOT}/bin/data/" "${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/data/"
-</string>
-			</dict>
 			<key>99FA3DBB1C7456C400CFA0EE</key>
 			<dict>
 				<key>baseConfigurationReference</key>
@@ -4905,7 +4879,6 @@ rsync -avz --exclude='.DS_Store' "${SRCROOT}/bin/data/" "${TARGET_BUILD_DIR}/${U
 					<string>E4B69B590A3A1756003C02F2</string>
 					<string>E4B6FFFD0C3F9AB9008CF71C</string>
 					<string>E4C2427710CC5ABF004149E2</string>
-					<string>8466F1851C04CA0E00918B1C</string>
 					<string>928F60851B6710B200E2D791</string>
 				</array>
 				<key>buildRules</key>
