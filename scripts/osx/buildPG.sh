@@ -135,7 +135,7 @@ scripts/osx/download_libs.sh
 # Compile commandline tool
 cd ${pg_root}
 echo "Building openFrameworks PG - OSX"
-xcodebuild -configuration Release -target commandLine -project commandLine/commandLine.xcodeproj
+xcodebuild -configuration Release -target commandLine CODE_SIGN_IDENTITY="" -project commandLine/commandLine.xcodeproj
 ret=$?
 if [ $ret -ne 0 ]; then
       echo "Failed building Project Generator"
