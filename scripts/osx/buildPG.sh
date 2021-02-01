@@ -89,6 +89,9 @@ import_certificate(){
 
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k actions $KEY_CHAIN
         
+        # makes keychain not timeout
+        security set-keychain-settings keychainName
+        
         # remove certs
         rm -rf certificate.p12
         
@@ -118,10 +121,6 @@ import_certificate_travis(){
     fi
 }
 
-# install electron sign globally
-sudo npm install -g electron-osx-sign
-import_certificate
-
 cd ..
 of_root=${PWD}/openFrameworks
 pg_root=${PWD}/openFrameworks/apps/projectGenerator
@@ -141,6 +140,10 @@ if [ $ret -ne 0 ]; then
       echo "Failed building Project Generator"
       exit 1
 fi
+
+# install electron sign globally
+sudo npm install -g electron-osx-sign
+import_certificate
 
 # Generate electron app
 cd ${pg_root}/frontend
