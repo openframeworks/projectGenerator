@@ -66,7 +66,7 @@ import_certificate(){
     
     echo "import_certificate"
 
-    if [ "${GITHUB_REF##*/}" == "github-actions" &&  -z "${GITHUB_HEAD_REF}"  ]; then
+    if [[ "${GITHUB_REF##*/}" == "github-actions" && -z "${GITHUB_HEAD_REF}"  ]]; then
         echo "Decoding signing certificates"
         
         KEY_CHAIN=build.keychain
