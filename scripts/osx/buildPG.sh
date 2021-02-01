@@ -90,7 +90,7 @@ import_certificate(){
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k actions $KEY_CHAIN
         
         # makes keychain not timeout
-        security set-keychain-settings keychainName
+        security set-keychain-settings $KEY_CHAIN
         
         # remove certs
         rm -rf certificate.p12
