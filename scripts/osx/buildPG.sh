@@ -32,8 +32,7 @@ sign_and_upload(){
     
     sed -i -e "s/osx/$PLATFORM/g" projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/settings.json
 
-    echo "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}";
-    if [ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" = "openframeworks/projectGenerator/master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
+    if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" == "false" ]] || [[ "${GITHUB_REF##*/}" == "master" &&  -z "${GITHUB_HEAD_REF}" ]] ; then
         # Sign app
         echo "Signing electron .app"
         cd ${pg_root}
@@ -41,13 +40,21 @@ sign_and_upload(){
         # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app"
         electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution
 
-
         echo "Compressing PG app"
         zip --symlinks -r -q projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM
 
         # Upload to OF CI server
         echo "Uploading $PLATFORM PG to CI servers"
-        openssl aes-256-cbc -K $encrypted_cd38768cbb9d_key -iv $encrypted_cd38768cbb9d_iv -in scripts/id_rsa.enc -out scripts/id_rsa -d
+        
+        if [ "$GITHUB_ACTIONS" = true ]; then
+            echo Unencrypting key for github actions
+            openssl aes-256-cbc -salt -md md5 -a -d -in scripts/githubactions-id_rsa.enc -out scripts/id_rsa -pass env:GA_CI_SECRET
+            mkdir -p ~/.ssh
+        else
+            echo Unencrypting key for travis
+            openssl aes-256-cbc -K $encrypted_cd38768cbb9d_key -iv $encrypted_cd38768cbb9d_iv -in scripts/id_rsa.enc -out scripts/id_rsa -d
+        fi
+        
         cp scripts/ssh_config ~/.ssh/config
         chmod 600 scripts/id_rsa
         scp -i scripts/id_rsa projectGenerator-$PLATFORM.zip tests@198.61.170.130:projectGenerator_builds/projectGenerator-$PLATFORM_new.zip
@@ -56,6 +63,41 @@ sign_and_upload(){
 }
 
 import_certificate(){
+    
+    echo "import_certificate"
+
+    if [ "${GITHUB_REF##*/}" == "master" &&  -z "${GITHUB_HEAD_REF}"  ]; then
+        echo "Decoding signing certificates"
+        
+        KEY_CHAIN=build.keychain
+        CERTIFICATE_P12=certificate.p12
+        
+        # Recreate the certificate from the secure environment variable
+        echo $CERTIFICATE_OSX_APPLICATION | base64 --decode > $CERTIFICATE_P12
+
+        #create a keychain
+        security create-keychain -p actions $KEY_CHAIN
+
+        # Make the keychain the default so identities are found
+        security default-keychain -s $KEY_CHAIN
+        
+        # Unlock the keychain
+        security unlock-keychain -p actions $KEY_CHAIN
+        
+        echo "Importing signing certificates"
+        sudo security import $CERTIFICATE_P12 -k $KEY_CHAIN -P $CERTIFICATE_PASSWORD -T /usr/bin/codesign;
+
+        security set-key-partition-list -S apple-tool:,apple: -s -k actions $KEY_CHAIN
+        
+        # remove certs
+        rm -rf certificate.p12
+        
+        echo "import certificates done"
+    fi
+        
+}
+
+import_certificate_travis(){
     echo "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}";
     if [ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" = "openframeworks/projectGenerator/master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
         echo "Decoding signing certificates"
