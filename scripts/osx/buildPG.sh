@@ -118,7 +118,9 @@ import_certificate_travis(){
     fi
 }
 
-
+# install electron sign globally
+sudo npm install -g electron-osx-sign
+import_certificate
 
 cd ..
 of_root=${PWD}/openFrameworks
@@ -139,10 +141,6 @@ if [ $ret -ne 0 ]; then
       echo "Failed building Project Generator"
       exit 1
 fi
-
-# install electron sign globally
-sudo npm install -g electron-osx-sign
-import_certificate
 
 # Generate electron app
 cd ${pg_root}/frontend
