@@ -144,6 +144,7 @@ fi
 
 # Generate electron app
 cd ${pg_root}/frontend
+npm update
 npm install > /dev/null
 npm run build:osx > /dev/null
 mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
