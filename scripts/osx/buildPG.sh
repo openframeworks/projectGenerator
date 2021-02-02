@@ -123,7 +123,8 @@ of_root=${PWD}/openFrameworks
 pg_root=${PWD}/openFrameworks/apps/projectGenerator
 
 git clone --depth=1 https://github.com/openframeworks/openFrameworks
-mv projectGenerator openFrameworks/apps/
+#cp not move so github actions can do cleanup without error
+cp projectGenerator openFrameworks/apps/
 
 cd ${of_root}
 scripts/osx/download_libs.sh
@@ -159,7 +160,6 @@ cd ${pg_root}/frontend
 npm run build:osx > /dev/null
 mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-android
 sign_and_upload android
-
 
 rm -rf scripts/id_rsa
 rm -rf scripts/*.p12
