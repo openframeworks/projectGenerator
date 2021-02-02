@@ -162,6 +162,6 @@ npm run build:osx > /dev/null
 mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-android
 sign_and_upload android
 
-rm -rf scripts/id_rsa
-rm -rf scripts/*.p12
+rm -rf scripts/id_rsa 2> /dev/null
+rm -rf scripts/*.p12 2> /dev/null
 
