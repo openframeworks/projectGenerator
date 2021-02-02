@@ -124,7 +124,7 @@ pg_root=${PWD}/openFrameworks/apps/projectGenerator
 
 git clone --depth=1 https://github.com/openframeworks/openFrameworks
 #cp not move so github actions can do cleanup without error
-cp projectGenerator openFrameworks/apps/
+cp -r projectGenerator openFrameworks/apps/
 
 cd ${of_root}
 scripts/osx/download_libs.sh
