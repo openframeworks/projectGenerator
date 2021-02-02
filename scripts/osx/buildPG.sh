@@ -32,7 +32,7 @@ sign_and_upload(){
     
     sed -i -e "s/osx/$PLATFORM/g" projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/settings.json
 
-    if [[ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" = "openframeworks/projectGenerator/master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ]] || [[ "${GITHUB_REF##*/}" == "github-actions" &&  -z "${GITHUB_HEAD_REF}" ]] ; then
+    if [[ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" && "$TRAVIS_PULL_REQUEST" == "false" ]] || [[ "${GITHUB_REF##*/}" == "github-actions" &&  -z "${GITHUB_HEAD_REF}" ]] ; then
         # Sign app
         echo "Signing electron .app"
         cd ${pg_root}
