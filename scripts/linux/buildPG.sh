@@ -33,7 +33,7 @@ if [[ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator
 
     cp scripts/ssh_config ~/.ssh/config
     chmod 600 scripts/id_rsa
-    scp -i scripts/id_rsa commandLine/bin/projectGenerator tests@ci.openframeworks.cc:projectGenerator_builds/projectGenerator_linux_new
-    ssh -i scripts/id_rsa tests@ci.openframeworks.cc "mv projectGenerator_builds/projectGenerator_linux_new projectGenerator_builds/projectGenerator_linux"
+    scp -i scripts/id_rsa commandLine/bin/projectGenerator tests@198.61.170.130:projectGenerator_builds/projectGenerator_linux_new
+    ssh -i scripts/id_rsa tests@198.61.170.130 "mv projectGenerator_builds/projectGenerator_linux_new projectGenerator_builds/projectGenerator_linux"
 fi
 rm -rf scripts/id_rsa
