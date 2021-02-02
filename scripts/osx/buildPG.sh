@@ -32,7 +32,7 @@ sign_and_upload(){
     
     sed -i -e "s/osx/$PLATFORM/g" projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/settings.json
 
-    if [[ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" && "$TRAVIS_PULL_REQUEST" == "false" ]] || [[ "${GITHUB_REF##*/}" == "github-actions" &&  -z "${GITHUB_HEAD_REF}" ]] ; then
+    if [[ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" && "$TRAVIS_PULL_REQUEST" == "false" ]] || [[ "${GITHUB_REF##*/}" == "master" &&  -z "${GITHUB_HEAD_REF}" ]] ; then
         # Sign app
         echo "Signing electron .app"
         cd ${pg_root}
@@ -67,7 +67,7 @@ import_certificate(){
     
     echo "import_certificate"
 
-    if [[ "${GITHUB_REF##*/}" == "github-actions" && -z "${GITHUB_HEAD_REF}"  ]]; then
+    if [[ "${GITHUB_REF##*/}" == "master" && -z "${GITHUB_HEAD_REF}"  ]]; then
         echo "Decoding signing certificates"
         
         KEY_CHAIN=build.keychain
