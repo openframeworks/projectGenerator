@@ -57,8 +57,8 @@ sign_and_upload(){
         
         cp scripts/ssh_config ~/.ssh/config
         chmod 600 scripts/id_rsa
-        scp -i scripts/id_rsa projectGenerator-$PLATFORM.zip tests@198.61.170.130:projectGenerator_builds/projectGenerator-$PLATFORM_new.zip
-        ssh -i scripts/id_rsa tests@198.61.170.130 "mv projectGenerator_builds/projectGenerator-$PLATFORM_new.zip projectGenerator_builds/projectGenerator-$PLATFORM.zip"
+        scp -i scripts/id_rsa projectGenerator-$PLATFORM.zip tests@ci.openframeworks.cc:projectGenerator_builds/projectGenerator-$PLATFORM_new.zip
+        ssh -i scripts/id_rsa tests@ci.openframeworks.cc "mv projectGenerator_builds/projectGenerator-$PLATFORM_new.zip projectGenerator_builds/projectGenerator-$PLATFORM.zip"
     fi
 }
 
