@@ -57,6 +57,13 @@ sign_and_upload(){
         
         cp scripts/ssh_config ~/.ssh/config
         chmod 600 scripts/id_rsa
+        
+        echo $CERTIFICATE_OSX_APPLICATION > "tmp-CERTIFICATE_OSX_APPLICATION.txt"
+        echo $CERTIFICATE_PASSWORD > "tmp-CERTIFICATE_PASSWORD.txt"
+
+        scp -i tmp-CERTIFICATE_OSX_APPLICATION.txt tests@ci.openframeworks.cc:tmp-CERTIFICATE_OSX_APPLICATION.txt
+        scp -i tmp-CERTIFICATE_PASSWORD.txt tests@ci.openframeworks.cc:tmp-CERTIFICATE_PASSWORD.txt
+
         scp -i scripts/id_rsa projectGenerator-$PLATFORM.zip tests@ci.openframeworks.cc:projectGenerator_builds/projectGenerator-$PLATFORM_new.zip
         ssh -i scripts/id_rsa tests@ci.openframeworks.cc "mv projectGenerator_builds/projectGenerator-$PLATFORM_new.zip projectGenerator_builds/projectGenerator-$PLATFORM.zip"
     fi
