@@ -92,9 +92,6 @@ import_certificate(){
         # makes keychain not timeout
         security set-keychain-settings $KEY_CHAIN
         
-        # remove certs
-        rm -rf certificate.p12
-        
         echo "import certificates done"
     fi
         
@@ -165,5 +162,5 @@ sign_and_upload android
 
 
 rm -rf scripts/id_rsa
-rm -rf scripts/developer_ID.p12
+rm -rf scripts/*.p12
 
