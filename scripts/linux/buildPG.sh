@@ -21,6 +21,7 @@ if [ $ret -ne 0 ]; then
 fi
 
 echo "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}";
+
 if [[ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" = "openframeworks/projectGenerator/master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ]] || [[ "${GITHUB_REF##*/}" == "github-actions" &&  -z "${GITHUB_HEAD_REF}" ]] ; then
 
     if [ "$GITHUB_ACTIONS" = true ]; then
