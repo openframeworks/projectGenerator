@@ -25,37 +25,80 @@ sign_and_upload(){
     # Copy commandLine into electron .app
     cd ${pg_root}
     cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
-    
-    # Copy in the terminal script which fixes app translocation
-    cp scripts/osx/_macOSTranslocationFix.command projectGenerator-$PLATFORM/_runMeFirst.command
-    chmod a+x projectGenerator-$PLATFORM/_runMeFirst.command
-    
+        
     sed -i -e "s/osx/$PLATFORM/g" projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/settings.json
+    
+    if [[ -z "${GA_CI_SECRET}" ]] ; then
+        echo " Not on main repo skipping sign and upload ";
+    else
+        if [[ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" && "$TRAVIS_PULL_REQUEST" == "false" ]] || [[ "${GITHUB_REF##*/}" == "master" &&  -z "${GITHUB_HEAD_REF}" ]] ; then
+            # Sign app
+            echo "Signing electron .app"
+            cd ${pg_root}
+            xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
+            # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app"
+            electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess
 
-    echo "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}";
-    if [ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" = "openframeworks/projectGenerator/master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
-        # Sign app
-        echo "Signing electron .app"
-        cd ${pg_root}
-        xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
-        # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app"
-        electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution
+            echo "Compressing PG app"
+            zip --symlinks -r -q projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM
 
-
-        echo "Compressing PG app"
-        zip --symlinks -r -q projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM
-
-        # Upload to OF CI server
-        echo "Uploading $PLATFORM PG to CI servers"
-        openssl aes-256-cbc -K $encrypted_cd38768cbb9d_key -iv $encrypted_cd38768cbb9d_iv -in scripts/id_rsa.enc -out scripts/id_rsa -d
-        cp scripts/ssh_config ~/.ssh/config
-        chmod 600 scripts/id_rsa
-        scp -i scripts/id_rsa projectGenerator-$PLATFORM.zip tests@198.61.170.130:projectGenerator_builds/projectGenerator-$PLATFORM_new.zip
-        ssh -i scripts/id_rsa tests@198.61.170.130 "mv projectGenerator_builds/projectGenerator-$PLATFORM_new.zip projectGenerator_builds/projectGenerator-$PLATFORM.zip"
+            # Upload to OF CI server
+            echo "Uploading $PLATFORM PG to CI servers"
+            
+            if [ "$GITHUB_ACTIONS" = true ]; then
+                echo Unencrypting key for github actions
+                openssl aes-256-cbc -salt -md md5 -a -d -in scripts/githubactions-id_rsa.enc -out scripts/id_rsa -pass env:GA_CI_SECRET
+                mkdir -p ~/.ssh
+            else
+                echo Unencrypting key for travis
+                openssl aes-256-cbc -K $encrypted_cd38768cbb9d_key -iv $encrypted_cd38768cbb9d_iv -in scripts/id_rsa.enc -out scripts/id_rsa -d
+            fi
+            
+            cp scripts/ssh_config ~/.ssh/config
+            chmod 600 scripts/id_rsa
+                    
+            scp -i scripts/id_rsa projectGenerator-$PLATFORM.zip tests@198.61.170.130:projectGenerator_builds/projectGenerator-$PLATFORM_new.zip
+            ssh -i scripts/id_rsa tests@198.61.170.130 "mv projectGenerator_builds/projectGenerator-$PLATFORM_new.zip projectGenerator_builds/projectGenerator-$PLATFORM.zip"
+        fi
     fi
 }
 
 import_certificate(){
+    
+    echo "import_certificate"
+
+    if [[ "${GITHUB_REF##*/}" == "master" && -z "${GITHUB_HEAD_REF}" && -n "${CERTIFICATE_OSX_APPLICATION}" ]]; then
+        echo "Decoding signing certificates"
+        
+        KEY_CHAIN=build.keychain
+        CERTIFICATE_P12=certificate.p12
+        
+        # Recreate the certificate from the secure environment variable
+        echo $CERTIFICATE_OSX_APPLICATION | base64 --decode > $CERTIFICATE_P12
+
+        #create a keychain
+        security create-keychain -p actions $KEY_CHAIN
+
+        # Make the keychain the default so identities are found
+        security default-keychain -s $KEY_CHAIN
+        
+        # Unlock the keychain
+        security unlock-keychain -p actions $KEY_CHAIN
+        
+        echo "Importing signing certificates"
+        sudo security import $CERTIFICATE_P12 -k $KEY_CHAIN -P $CERTIFICATE_PASSWORD -T /usr/bin/codesign;
+
+        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k actions $KEY_CHAIN
+        
+        # makes keychain not timeout
+        security set-keychain-settings $KEY_CHAIN
+        
+        echo "import certificates done"
+    fi
+        
+}
+
+import_certificate_travis(){
     echo "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}";
     if [ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" = "openframeworks/projectGenerator/master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
         echo "Decoding signing certificates"
@@ -76,14 +119,13 @@ import_certificate(){
     fi
 }
 
-
-
 cd ..
 of_root=${PWD}/openFrameworks
 pg_root=${PWD}/openFrameworks/apps/projectGenerator
 
 git clone --depth=1 https://github.com/openframeworks/openFrameworks
-mv projectGenerator openFrameworks/apps/
+#cp not move so github actions can do cleanup without error
+cp -r projectGenerator openFrameworks/apps/
 
 cd ${of_root}
 scripts/osx/download_libs.sh
@@ -91,7 +133,7 @@ scripts/osx/download_libs.sh
 # Compile commandline tool
 cd ${pg_root}
 echo "Building openFrameworks PG - OSX"
-xcodebuild -configuration Release -target commandLine -project commandLine/commandLine.xcodeproj
+xcodebuild -configuration Release -target commandLine CODE_SIGN_IDENTITY="" UseModernBuildSystem=NO -project commandLine/commandLine.xcodeproj
 ret=$?
 if [ $ret -ne 0 ]; then
       echo "Failed building Project Generator"
@@ -104,6 +146,7 @@ import_certificate
 
 # Generate electron app
 cd ${pg_root}/frontend
+npm update
 npm install > /dev/null
 npm run build:osx > /dev/null
 mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
@@ -119,7 +162,6 @@ npm run build:osx > /dev/null
 mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-android
 sign_and_upload android
 
-
-rm -rf scripts/id_rsa
-rm -rf scripts/developer_ID.p12
+rm -rf scripts/id_rsa 2> /dev/null
+rm -rf scripts/*.p12 2> /dev/null
 

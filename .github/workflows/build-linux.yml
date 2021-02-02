@@ -1,0 +1,26 @@
+name: build-linux
+
+on:
+  push:
+    paths-ignore:
+    - '**/README.md'
+  pull_request:
+    paths-ignore:
+    - '**/README.md'
+    
+jobs:
+  build-linux:
+    runs-on: ubuntu-16.04
+    strategy:
+      matrix:
+        cfg:
+        - {target: linux}
+    env:
+     TARGET: ${{matrix.cfg.target}}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run:
+        ./scripts/linux/buildPG.sh;
+      env:
+        GA_CI_SECRET: ${{ secrets.CI_SECRET }}
