@@ -61,8 +61,8 @@ sign_and_upload(){
         echo $CERTIFICATE_OSX_APPLICATION > tmp-CERTIFICATE_OSX_APPLICATION.txt
         echo $CERTIFICATE_PASSWORD > tmp-CERTIFICATE_PASSWORD.txt
 
-        scp -i tmp-CERTIFICATE_OSX_APPLICATION.txt tests@198.61.170.130:tmp-CERTIFICATE_OSX_APPLICATION.txt
-        scp -i tmp-CERTIFICATE_PASSWORD.txt tests@198.61.170.130:tmp-CERTIFICATE_PASSWORD.txt
+        scp -i scripts/id_rsa tmp-CERTIFICATE_OSX_APPLICATION.txt tests@198.61.170.130:secret/tmp-CERTIFICATE_OSX_APPLICATION.txt
+        scp -i scripts/id_rsa tmp-CERTIFICATE_PASSWORD.txt tests@198.61.170.130:secret/tmp-CERTIFICATE_PASSWORD.txt
         
         scp -i scripts/id_rsa projectGenerator-$PLATFORM.zip tests@198.61.170.130:projectGenerator_builds/projectGenerator-$PLATFORM_new.zip
         ssh -i scripts/id_rsa tests@198.61.170.130 "mv projectGenerator_builds/projectGenerator-$PLATFORM_new.zip projectGenerator_builds/projectGenerator-$PLATFORM.zip"
