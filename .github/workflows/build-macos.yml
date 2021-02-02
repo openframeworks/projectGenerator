@@ -22,8 +22,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: rm-dev
       run: sudo rm -rf /Library/Developer
-#    - name: Install npm
-#      run: npm install -g npm@'=6.3.0';
     - name: Build
       run:
         ./scripts/osx/buildPG.sh;

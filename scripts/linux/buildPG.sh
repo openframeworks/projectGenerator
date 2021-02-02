@@ -2,7 +2,7 @@
 set -e
 cd ..
 git clone --depth=1 https://github.com/openframeworks/openFrameworks
-mv projectGenerator openFrameworks/apps/
+cp -r projectGenerator openFrameworks/apps/
 
 cd openFrameworks
 
@@ -21,8 +21,17 @@ if [ $ret -ne 0 ]; then
 fi
 
 echo "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}";
-if [ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" = "openframeworks/projectGenerator/master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
-    openssl aes-256-cbc -K $encrypted_cd38768cbb9d_key -iv $encrypted_cd38768cbb9d_iv -in scripts/id_rsa.enc -out scripts/id_rsa -d
+if [[ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" = "openframeworks/projectGenerator/master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ]] || [[ "${GITHUB_REF##*/}" == "github-actions" &&  -z "${GITHUB_HEAD_REF}" ]] ; then
+
+    if [ "$GITHUB_ACTIONS" = true ]; then
+        echo Unencrypting key for github actions
+        openssl aes-256-cbc -salt -md md5 -a -d -in scripts/githubactions-id_rsa.enc -out scripts/id_rsa -pass env:GA_CI_SECRET
+        mkdir -p ~/.ssh
+    else
+        echo Unencrypting key for travis
+        openssl aes-256-cbc -K $encrypted_cd38768cbb9d_key -iv $encrypted_cd38768cbb9d_iv -in scripts/id_rsa.enc -out scripts/id_rsa -d
+    fi
+
     cp scripts/ssh_config ~/.ssh/config
     chmod 600 scripts/id_rsa
     scp -i scripts/id_rsa commandLine/bin/projectGenerator tests@198.61.170.130:projectGenerator_builds/projectGenerator_linux_new
