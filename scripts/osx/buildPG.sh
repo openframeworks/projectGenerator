@@ -60,9 +60,6 @@ sign_and_upload(){
                 
         scp -i scripts/id_rsa projectGenerator-$PLATFORM.zip tests@198.61.170.130:projectGenerator_builds/projectGenerator-$PLATFORM_new.zip
         ssh -i scripts/id_rsa tests@198.61.170.130 "mv projectGenerator_builds/projectGenerator-$PLATFORM_new.zip projectGenerator_builds/projectGenerator-$PLATFORM.zip"
-        
-        rm tmp-CERTIFICATE_OSX_APPLICATION.txt
-        rm tmp-CERTIFICATE_PASSWORD.txt
     fi
 }
 
