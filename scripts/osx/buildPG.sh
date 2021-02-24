@@ -71,7 +71,7 @@ import_certificate(){
     
     echo "import_certificate"
 
-    if [[ "${GITHUB_REF##*/}" == "master" && -z "${GITHUB_HEAD_REF}" && -n "${CERTIFICATE_OSX_APPLICATION}" ]]; then
+    if [[ "${GITHUB_REF##*/}" == "notarize-pg" && -z "${GITHUB_HEAD_REF}" && -n "${CERTIFICATE_OSX_APPLICATION}" ]]; then
         echo "Decoding signing certificates"
         
         KEY_CHAIN=build.keychain
