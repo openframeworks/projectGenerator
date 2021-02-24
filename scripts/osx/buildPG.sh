@@ -31,7 +31,7 @@ sign_and_upload(){
     if [[ -z "${GA_CI_SECRET}" ]] ; then
         echo " Not on main repo skipping sign and upload ";
     else
-        if [[ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" && "$TRAVIS_PULL_REQUEST" == "false" ]] || [[ "${GITHUB_REF##*/}" == "notarize-pg" &&  -z "${GITHUB_HEAD_REF}" ]] ; then
+        if [[ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" && "$TRAVIS_PULL_REQUEST" == "false" ]] || [[ "${GITHUB_REF##*/}" == "master" &&  -z "${GITHUB_HEAD_REF}" ]] ; then
             # Sign app
             echo "Signing electron .app"
             cd ${pg_root}
@@ -71,7 +71,7 @@ import_certificate(){
     
     echo "import_certificate"
 
-    if [[ "${GITHUB_REF##*/}" == "notarize-pg" && -z "${GITHUB_HEAD_REF}" && -n "${CERTIFICATE_OSX_APPLICATION}" ]]; then
+    if [[ "${GITHUB_REF##*/}" == "master" && -z "${GITHUB_HEAD_REF}" && -n "${CERTIFICATE_OSX_APPLICATION}" ]]; then
         echo "Decoding signing certificates"
         
         KEY_CHAIN=build.keychain
