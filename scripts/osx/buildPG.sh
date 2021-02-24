@@ -31,13 +31,14 @@ sign_and_upload(){
     if [[ -z "${GA_CI_SECRET}" ]] ; then
         echo " Not on main repo skipping sign and upload ";
     else
-        if [[ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" && "$TRAVIS_PULL_REQUEST" == "false" ]] || [[ "${GITHUB_REF##*/}" == "master" &&  -z "${GITHUB_HEAD_REF}" ]] ; then
+        if [[ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" && "$TRAVIS_PULL_REQUEST" == "false" ]] || [[ "${GITHUB_REF##*/}" == "notarize-pg" &&  -z "${GITHUB_HEAD_REF}" ]] ; then
             # Sign app
             echo "Signing electron .app"
             cd ${pg_root}
             xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
             # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app"
-            electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime
+            
+            electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
 
             echo "Compressing PG app"
             zip --symlinks -r -q projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM
@@ -71,7 +72,7 @@ import_certificate(){
     
     echo "import_certificate"
 
-    if [[ "${GITHUB_REF##*/}" == "master" && -z "${GITHUB_HEAD_REF}" && -n "${CERTIFICATE_OSX_APPLICATION}" ]]; then
+    if [[ "${GITHUB_REF##*/}" == "notarize-pg" && -z "${GITHUB_HEAD_REF}" && -n "${CERTIFICATE_OSX_APPLICATION}" ]]; then
         echo "Decoding signing certificates"
         
         KEY_CHAIN=build.keychain
