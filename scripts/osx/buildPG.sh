@@ -37,10 +37,14 @@ sign_and_upload(){
             cd ${pg_root}
             xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
             # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app"
-            electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess
+            electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime
 
             echo "Compressing PG app"
             zip --symlinks -r -q projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM
+            
+            # need to upload zip of just app to apple for notarizing
+            zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator.app.zip projectGenerator-$PLATFORM/projectGenerator.app
+            xcrun altool --notarize-app --primary-bundle-id "com.electron.projectgenerator" --username "${GA_APPLE_USERNAME}" -p "${GA_APPLE_PASS}" --asc-provider "${GA_NOTARIZE_PROVIDER}" --file projectGenerator-$PLATFORM/projectGenerator.app.zip
 
             # Upload to OF CI server
             echo "Uploading $PLATFORM PG to CI servers"
