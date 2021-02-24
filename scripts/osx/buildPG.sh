@@ -37,7 +37,8 @@ sign_and_upload(){
             cd ${pg_root}
             xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
             # codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app"
-            electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime
+            
+            electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
 
             echo "Compressing PG app"
             zip --symlinks -r -q projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM
