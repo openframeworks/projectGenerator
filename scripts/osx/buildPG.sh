@@ -31,7 +31,7 @@ sign_and_upload(){
     if [[ -z "${GA_CI_SECRET}" ]] ; then
         echo " Not on main repo skipping sign and upload ";
     else
-        if [[ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" && "$TRAVIS_PULL_REQUEST" == "false" ]] || [[ "${GITHUB_REF##*/}" == "master" &&  -z "${GITHUB_HEAD_REF}" ]] ; then
+        if [[ "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" && "$TRAVIS_PULL_REQUEST" == "false" ]] || [[ "${GITHUB_REF##*/}" == "notarize-pg" &&  -z "${GITHUB_HEAD_REF}" ]] ; then
             # Sign app
             echo "Signing electron .app"
             cd ${pg_root}
@@ -41,6 +41,10 @@ sign_and_upload(){
 
             echo "Compressing PG app"
             zip --symlinks -r -q projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM
+            
+            # need to upload zip of just app to apple for notarizing
+            zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator.app.zip projectGenerator-$PLATFORM/projectGenerator.app
+            xcrun altool --verbose --notarize-app --primary-bundle-id "com.electron.projectgenerator" --username "${GA_APPLE_USERNAME}" -p "${GA_APPLE_PASS}" --asc-provider "${GA_NOTARIZE_PROVIDER}" --file projectGenerator-$PLATFORM/projectGenerator.app.zip
 
             # Upload to OF CI server
             echo "Uploading $PLATFORM PG to CI servers"
