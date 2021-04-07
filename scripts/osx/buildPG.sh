@@ -22,8 +22,6 @@ echoDots(){
 
 sign_and_upload(){
     PLATFORM=$1
-	echo " sign_and_upload ";
-
     # Copy commandLine into electron .app
     cd ${pg_root}
     cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
@@ -156,11 +154,8 @@ cd ${pg_root}/frontend
 npm update
 npm install > /dev/null
 npm run build:osx > /dev/null
-echo " pre move ";
 mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
-echo " post move ";
 sign_and_upload osx
-echo " post sign and upload ";
 
 cd ${pg_root}/frontend
 npm run build:osx > /dev/null
