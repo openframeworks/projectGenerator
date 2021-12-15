@@ -1,7 +1,0 @@
-Host 198.61.170.130
-	StrictHostKeyChecking 	no
-	PasswordAuthentication	no
-	CheckHostIP			      	no
-	BatchMode			        	yes
-
-
