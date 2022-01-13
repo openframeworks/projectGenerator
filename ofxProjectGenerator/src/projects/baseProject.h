@@ -27,7 +27,7 @@ public:
 	struct Template{
 		ofDirectory dir;
 		std::string name;
-	std::vector<std::string> platforms;
+		std::vector<std::string> platforms;
 		std::string description;
 		std::map<std::filesystem::path, std::filesystem::path> renames;
 		bool operator<(const Template & other) const{
