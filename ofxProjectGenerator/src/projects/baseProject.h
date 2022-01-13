@@ -24,12 +24,23 @@ public:
 		OBJC
 	};
 
+	struct ReplaceTemplate {
+		std::string fileName;
+		std::string from;
+		std::string to;
+		ReplaceTemplate(std::string fn, std::string f, std::string t) : fileName(fn), from(f), to(t) {
+			// std::cout << "ReplaceTemplate created!" << fileName << " : " << from << " : " << to <<  std::endl;
+		}
+//		ReplaceTemplate();
+	};
+
 	struct Template{
 		ofDirectory dir;
 		std::string name;
 		std::vector<std::string> platforms;
 		std::string description;
 		std::map<std::filesystem::path, std::filesystem::path> renames;
+		std::vector<ReplaceTemplate> replaces;
 		bool operator<(const Template & other) const{
 			return dir<other.dir;
 		}

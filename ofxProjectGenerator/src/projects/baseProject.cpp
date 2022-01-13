@@ -82,6 +82,26 @@ std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirect
 						ofStringReplace(to,"${PROJECTNAME}",projectName);
 						templateConfig->renames[from] = to;
 					}
+				}else if(var=="ADDONSTEMPLATE") {
+					ofStringReplace(value,"${PROJECTNAME}",projectName);
+					auto vals = ofSplitString(value,"|");
+					if(vals.size()==2){
+						auto fileName = ofTrim(vals[0]);
+						auto eachLine = ofTrim(vals[1]);
+						string to = "";
+						ofBuffer addonsList = ofBufferFromFile(ofFilePath::join(projectDir,"addons.make"));
+						for(auto line: addonsList.getLines()){
+							auto addon = ofTrim(line);
+							if(addon[0] == '#') continue;
+							if(addon == "") continue;
+							string addonLine = eachLine;
+							ofStringReplace(addonLine, "${addon}", addon);
+							to += addonLine + "\n";
+						}
+						string from = "${addons}";
+						string fullFileName = ofFilePath::join(projectDir, fileName);
+						templateConfig->replaces.push_back(ReplaceTemplate(fullFileName, from, to));
+					}
 				}
 			}
 			if(supported){
@@ -142,6 +162,20 @@ bool baseProject::create(string path, std::string templateName){
 				auto to = (projectDir / rename.second).string();
 				ofFile(from).moveTo(to,true,true);
 			}
+			
+			if (templateConfig->replaces.size()) {
+				for(auto & replace: templateConfig->replaces){
+					ofBuffer buffer = ofBufferFromFile(replace.fileName);
+					string content = buffer.getData();
+					ofStringReplace(content, replace.from, replace.to);
+					buffer.set(content.c_str(), content.size());
+					ofFile f;
+					f.open(replace.fileName, ofFile::WriteOnly);
+					f.writeFromBuffer(buffer);
+					f.close();
+				}
+			}
+
 		}else{
 			ofLogWarning() << "Cannot find " << templateName << " using platform template only";
 		}
