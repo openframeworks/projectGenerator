@@ -87,7 +87,7 @@ std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirect
 					auto vals = ofSplitString(value,"|");
 					if(vals.size()==2){
 						auto fileName = ofTrim(vals[0]);
-						auto eachLine = ofTrim(vals[1]);
+						auto eachLine = vals[1];
 						string to = "";
 						ofBuffer addonsList = ofBufferFromFile(ofFilePath::join(projectDir,"addons.make"));
 						for(auto line: addonsList.getLines()){
@@ -168,10 +168,11 @@ bool baseProject::create(string path, std::string templateName){
 					ofBuffer buffer = ofBufferFromFile(replace.fileName);
 					string content = buffer.getData();
 					ofStringReplace(content, replace.from, replace.to);
-					buffer.set(content.c_str(), content.size());
+					ofBuffer bufferOut;
+					bufferOut.set(content.c_str(), content.size());
 					ofFile f;
 					f.open(replace.fileName, ofFile::WriteOnly);
-					f.writeFromBuffer(buffer);
+					f.writeFromBuffer(bufferOut);
 					f.close();
 				}
 			}
