@@ -47,15 +47,15 @@ bool isPlatformName(std::string file){
 std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirectory & templateDir){
     auto name = ofFilePath::getBaseName(templateDir.getOriginalDirectory());
     if(templateDir.isDirectory() && !isPlatformName(name)){
-        ofBuffer templateconfig;
-        ofFile templateconfigFile(ofFilePath::join(templateDir.path(), "template.config"));
-        if(templateconfigFile.exists()){
-            templateconfigFile >> templateconfig;
+        ofBuffer templateConfigBuffer;
+        ofFile templateConfigFile(ofFilePath::join(templateDir.path(), "template.config"));
+        if(templateConfigFile.exists()){
+            templateConfigFile >> templateConfigBuffer;
             auto supported = false;
             auto templateConfig = std::make_unique<Template>();
             templateConfig->dir = templateDir;
             templateConfig->name = name;
-            for(auto line: templateconfig.getLines()){
+            for(auto line: templateConfigBuffer.getLines()){
                 if(ofTrim(line).front() == '#') continue;
                 auto varValue = ofSplitString(line,"+=",true,true);
                 if(varValue.size() < 2) {
