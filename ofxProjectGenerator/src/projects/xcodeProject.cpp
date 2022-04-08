@@ -3,6 +3,15 @@
 
 #define STRINGIFY(A)  #A
 
+
+// reference
+//			4. Add array
+//			add :student array
+//			add :student: string tom
+//			add :student: string may
+//			add :student: string john
+
+
 xcodeProject::xcodeProject(std::string target)
 :baseProject(target){
     if( target == "osx" ){
@@ -799,24 +808,12 @@ STRINGIFY(
 
 
 
-
-// todo: these three have very duplicate code... please fix up a bit.
-
-
-//99FA3DBB1C7456C400CFA0EE E4B69B600A3A1757003C02F2
-
 void xcodeProject::addInclude(std::string includeName){
 	std::cout << "addInclude " << includeName << std::endl;
 
-	// referencia
-//			4. Add array
-//			add :student arr
-//			add :student: string tom
-//			add :student: string may
-//			add :student: string john
 	//XAXA
 	commands.emplace_back(
-		"Add :99FA3DBB1C7456C400CFA0EE:E4B69B600A3A1757003C02F2:buildSettings:HEADER_SEARCH_PATHS string " + includeName);
+		"Add :99FA3DBB1C7456C400CFA0EE:E4B69B600A3A1757003C02F2:buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
 
 	
 //    char query[255];
@@ -1313,6 +1310,8 @@ bool xcodeProject::saveProjectFile(){
 	// AQUIII
 	{
 		std::string command = "/usr/libexec/PlistBuddy " + fileName;
+		std::cout << command << std::endl;
+
 		for (auto & c : commands) {
 			command += " -c \"" + c + "\"";
 			std::cout << c << std::endl;
