@@ -60,8 +60,8 @@ public:
                                         // /plist[1]/dict[1]/dict[2])
     bool findArrayForUUID(std::string UUID, pugi::xml_node & nodeMe);
 
+	
+	
+	std::vector<std::string> commands;
+	bool debugCommands = true;
 };
-
-
-
-
