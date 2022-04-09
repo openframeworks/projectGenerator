@@ -199,14 +199,13 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 		if( addToBuildResource ){
 			// this should work only on IOS as macOS doesn't have buildPhaseResourcesUUID set.
 			
-			
 //			std::cout << ">>>>>> buildPhaseResourcesUUID " << buildPhaseResourcesUUID << std::endl;
 //			findArrayForUUID(buildPhaseResourcesUUID, array);    // this is the build array (all build refs get added here)
 //			array.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
+			commands.emplace_back("Add :objects:"+buildPhaseResourcesUUID+":fileRef string " + buildUUID);
 		}
 		if( addToBuild ){
 			commands.emplace_back("Add :objects:"+buildPhaseUUID+":fileRef string " + buildUUID);
-
 //			std::cout << ">>>>>> buildPhaseUUID " << buildPhaseUUID << std::endl;
 //			findArrayForUUID(buildPhaseUUID, array);    // this is the build array (all build refs get added here)
 //			array.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
@@ -221,12 +220,15 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 	if (addToResources == true && resourcesUUID != ""){
 		std::string resUUID = generateUUID(srcFile + "-build");
 		
-		commands.emplace_back("Add :"+resUUID+":fileRef string "+UUID);
-		commands.emplace_back("Add :"+resUUID+":isa string PBXBuildFile");
+		commands.emplace_back("Add :objects:"+resUUID+":fileRef string "+UUID);
+		commands.emplace_back("Add :objects:"+resUUID+":isa string PBXBuildFile");
         if (debugCommands) {
-    		commands.emplace_back("Add :"+resUUID+":dimitre string kabuloso addFramework2");
+    		commands.emplace_back("Add :objects:"+resUUID+":dimitre string kabulosohowhow");
         }
 		
+		// FIXME: testar se no IOS ta indo tudo bem. este aqui deve ser equivalente ao proximo q esta comentado.
+		commands.emplace_back("Add :objects:"+resourcesUUID+": string "+resUUID);
+
 		// add it to the build array.
 		pugi::xml_node array;
 		findArrayForUUID(resourcesUUID, array);    // this is the build array (all build refs get added here)
