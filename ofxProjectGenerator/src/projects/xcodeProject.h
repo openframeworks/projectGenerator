@@ -74,4 +74,8 @@ public:
 		"E4B69B600A3A1757003C02F2",
 		"E4B69B610A3A1757003C02F2"
 	};
+	
+	void alert(std::string s) {
+		std::cout << ">>>>> " << s << std::endl;
+	}
 };

@@ -6,6 +6,8 @@
 
 xcodeProject::xcodeProject(std::string target)
 :baseProject(target){
+    alert("xcodeProject");
+
     if( target == "osx" ){
         projRootUUID    = "E4B69B4A0A3A1720003C02F2";
         srcUUID         = "E4B69E1C0A3A1BDC003C02F2";
@@ -33,9 +35,30 @@ xcodeProject::xcodeProject(std::string target)
 };
 
 
-void xcodeProject::saveScheme(){
-//	std::cout << "saveScheme" << std::endl;
 
+void xcodeProject::renameProject(){
+    alert("renameProject");
+	pugi::xpath_node_set uuidSet = doc.select_nodes("//string[contains(.,'emptyExample')]");
+	for (pugi::xpath_node_set::const_iterator it = uuidSet.begin(); it != uuidSet.end(); ++it){
+		pugi::xpath_node node = *it;
+		std::string val = it->node().first_child().value();
+		findandreplace(val, "emptyExample",  projectName);
+		it->node().first_child().set_value(val.c_str());
+	}
+}
+
+
+bool xcodeProject::loadProjectFile(){
+	alert("loadProjectFile");
+	std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
+	renameProject();
+	pugi::xml_parse_result result = doc.load_file(ofToDataPath(fileName).c_str());
+	return result.status==pugi::status_ok;
+}
+
+
+void xcodeProject::saveScheme(){
+	alert("saveScheme");
 	std::string schemeFolder = projectDir + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/";
 	if (ofDirectory::doesDirectoryExist(schemeFolder)){
 		ofDirectory::removeDirectory(schemeFolder, true);
@@ -314,6 +337,7 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 
 
 void xcodeProject::saveWorkspaceXML(){
+	alert("saveWorkspaceXML");
 
     std::string workspaceFolder = projectDir + projectName + ".xcodeproj" + "/project.xcworkspace/";
     std::string xcodeProjectWorkspace = workspaceFolder + "contents.xcworkspacedata";    
@@ -334,6 +358,8 @@ void xcodeProject::saveWorkspaceXML(){
 }
 
 void xcodeProject::saveMakefile(){
+	alert("saveMakefile");
+
     std::string makefile = ofFilePath::join(projectDir,"Makefile");
     if(!ofFile(makefile).exists()){
         ofFile::copyFromTo(ofFilePath::join(templatePath, "Makefile"), makefile, true, true);
@@ -347,6 +373,7 @@ void xcodeProject::saveMakefile(){
 
 
 bool xcodeProject::createProjectFile(){
+	alert("createProjectFile");
     // todo: some error checking.
 
     std::string xcodeProject = ofFilePath::join(projectDir , projectName + ".xcodeproj");
@@ -433,27 +460,6 @@ bool xcodeProject::createProjectFile(){
 }
 
 
-
-void xcodeProject::renameProject(){
-
-    pugi::xpath_node_set uuidSet = doc.select_nodes("//string[contains(.,'emptyExample')]");
-    for (pugi::xpath_node_set::const_iterator it = uuidSet.begin(); it != uuidSet.end(); ++it){
-        pugi::xpath_node node = *it;
-        std::string val = it->node().first_child().value();
-        findandreplace(val, "emptyExample",  projectName);
-        it->node().first_child().set_value(val.c_str());
-    }
-}
-
-
-bool xcodeProject::loadProjectFile(){
-    std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
-    renameProject();
-    pugi::xml_parse_result result = doc.load_file(ofToDataPath(fileName).c_str());
-
-    return result.status==pugi::status_ok;
-
-}
 
 
 
@@ -614,39 +620,39 @@ void xcodeProject::addFramework(std::string name, std::string path, std::string 
     
     //xaxa
     //-----------------------------------------------------------------
-const char PBXFileReferenceWithoutEncoding[] =
-STRINGIFY(
-          
-          <key>FILEUUID</key>
-          <dict>
-          <key>explicitFileType</key>
-          <string>FILETYPE</string>
-          <key>isa</key>
-          <string>PBXFileReference</string>
-          <key>name</key>
-          <string>FILENAME</string>
-          <key>path</key>
-          <string>FILEPATH</string>
-          <key>sourceTree</key>
-          <string>SOURCE_ROOT</string>
-          </dict>
-          
-          );
+//const char PBXFileReferenceWithoutEncoding[] =
+//STRINGIFY(
+//
+//          <key>FILEUUID</key>
+//          <dict>
+//          <key>explicitFileType</key>
+//          <string>FILETYPE</string>
+//          <key>isa</key>
+//          <string>PBXFileReference</string>
+//          <key>name</key>
+//          <string>FILENAME</string>
+//          <key>path</key>
+//          <string>FILEPATH</string>
+//          <key>sourceTree</key>
+//          <string>SOURCE_ROOT</string>
+//          </dict>
+//
+//          );
 
-    std::string pbxfileref = std::string(PBXFileReferenceWithoutEncoding);
+//    std::string pbxfileref = std::string(PBXFileReferenceWithoutEncoding);
     
     // make a uuid for the framework file.
     
     std::string UUID = generateUUID( name );
 
-    commands.emplace_back("Add :"+UUID+":explicitFileType string wrapper.framework");
-    commands.emplace_back("Add :"+UUID+":fileEncoding string 4");
-    commands.emplace_back("Add :"+UUID+":isa string PBXFileReference");
-    commands.emplace_back("Add :"+UUID+":name string "+name);
-    commands.emplace_back("Add :"+UUID+":path string "+path);
-    commands.emplace_back("Add :"+UUID+":sourceTree string &lt;group&gt;");
+    commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string wrapper.framework");
+    commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
+    commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
+    commands.emplace_back("Add :objects:"+UUID+":name string "+name);
+    commands.emplace_back("Add :objects:"+UUID+":path string "+path);
+    commands.emplace_back("Add :objects:"+UUID+":sourceTree string &lt;group&gt;");
     if (debugCommands) {
-        commands.emplace_back("Add :"+UUID+":dimitre string kabuloso addFramework");
+        commands.emplace_back("Add :objects:"+UUID+":dimitre string kabuloso addFramework");
     }
 
 
@@ -666,8 +672,6 @@ STRINGIFY(
 //
     // files need build refs, here we make 2....
 
-	
-	
 //	<key>BUILDUUID</key>
 // <dict>
 // <key>fileRef</key>
@@ -677,12 +681,11 @@ STRINGIFY(
 // </dict>
 	
     std::string buildUUID = generateUUID(name + "-build");
-	commands.emplace_back("Add :"+buildUUID+":fileRef string "+UUID);
-	commands.emplace_back("Add :"+buildUUID+":isa string PBXBuildFile");
+	commands.emplace_back("Add :options:"+buildUUID+":fileRef string "+UUID);
+	commands.emplace_back("Add :options:"+buildUUID+":isa string PBXBuildFile");
     if (debugCommands) {
-    	commands.emplace_back("Add :"+buildUUID+":dimitre string kabuloso addFramework2");
+    	commands.emplace_back("Add :options:"+buildUUID+":dimitre string kabuloso addFramework2");
     }
-	
 	
 //    std::string pbxbuildfile = std::string(PBXBuildFile);
 //    findandreplace( pbxbuildfile, "FILEUUID", UUID);
@@ -691,18 +694,14 @@ STRINGIFY(
 //    doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child().next_sibling());   // UUID FIRST
 //    doc.select_single_node("/plist[1]/dict[1]/dict[2]").node().prepend_copy(fileRefDoc.first_child());                  // DICT SECOND
     
-    
-    
     // we add one of the build refs to the list of frameworks
     
 	// TODO: ZAMIS
 	// aqui preciso substituir, por uma chave no frameworks UUID e testar.
 	// E7E077E715D3B6510020DFD4
 	
-    pugi::xml_node array;
-    
-    
 	// MARK: ZAMIS
+    pugi::xml_node array;
     findArrayForUUID(frameworksUUID, array);    // this is the build array (all build refs get added here)
     array.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
 
@@ -714,10 +713,10 @@ STRINGIFY(
         && target != "ios"){
         
         std::string buildUUID2 = generateUUID(name + "-build2");
-		commands.emplace_back("Add :"+buildUUID2+":fileRef string "+UUID);
-		commands.emplace_back("Add :"+buildUUID2+":isa string PBXBuildFile");
+		commands.emplace_back("Add :options:"+buildUUID2+":fileRef string "+UUID);
+		commands.emplace_back("Add :options:"+buildUUID2+":isa string PBXBuildFile");
         if (debugCommands) {
-    		commands.emplace_back("Add :"+buildUUID2+":dimitre string kabuloso addFramework3");
+    		commands.emplace_back("Add :options:"+buildUUID2+":dimitre string kabuloso addFramework3");
         }
 		
 //		pbxbuildfile = std::string(PBXBuildFile);
@@ -1292,7 +1291,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 
 bool xcodeProject::saveProjectFile(){
-	std::cout << "saveProjectFile" << std::endl;
+	alert("saveProjectFile");
 
 	// does this belong here?
 	renameProject();
