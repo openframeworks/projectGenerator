@@ -3,14 +3,12 @@
 
 #define STRINGIFY(A)  #A
 
-
 // reference
 //			4. Add array
 //			add :student array
 //			add :student: string tom
 //			add :student: string may
 //			add :student: string john
-
 
 xcodeProject::xcodeProject(std::string target)
 :baseProject(target){
@@ -70,9 +68,11 @@ void xcodeProject::saveScheme(){
 	
 	// Adding array key once before add addon include paths.
 	// insert here to execute only once
-	commands.emplace_back(
-		"Add :99FA3DBB1C7456C400CFA0EE:E4B69B600A3A1757003C02F2:buildSettings:HEADER_SEARCH_PATHS array ");
 
+	// MARK: - no need?
+//	for (auto & b : buildConfigurations) {
+//		commands.emplace_back("Add :objects:"+b+":buildSettings:HEADER_SEARCH_PATHS array ");
+//	}
 }
 
 // MARK: - Separador
@@ -187,10 +187,10 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 	if (addToBuild || addToBuildResource ){
 		buildUUID = generateUUID(srcFile + "-build");
 		
-		commands.emplace_back("Add :"+buildUUID+":fileRef string "+UUID);
-		commands.emplace_back("Add :"+buildUUID+":isa string PBXBuildFile");
+		commands.emplace_back("Add :objects:"+buildUUID+":fileRef string "+UUID);
+		commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
         if (debugCommands) {
-	    	commands.emplace_back("Add :"+buildUUID+":dimitre string kabuloso addFramework2");
+	    	commands.emplace_back("Add :objects:"+buildUUID+":dimitre string kabuloso addFramework2");
         }
 		// referencia
 //			4. Add array
@@ -811,9 +811,10 @@ STRINGIFY(
 void xcodeProject::addInclude(std::string includeName){
 	std::cout << "addInclude " << includeName << std::endl;
 
-	//XAXA
-	commands.emplace_back(
-		"Add :99FA3DBB1C7456C400CFA0EE:E4B69B600A3A1757003C02F2:buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
+	// Adding source to all three build configurations, debug release appstore
+	for (auto & b : buildConfigurations) {
+		commands.emplace_back("Add :objects:"+b+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
+	}
 
 	
 //    char query[255];
@@ -1288,26 +1289,16 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 
 
-
-
-
-
-
 bool xcodeProject::saveProjectFile(){
 	std::cout << "saveProjectFile" << std::endl;
 
-
 	// does this belong here?
-
 	renameProject();
 
 	// save the project out:
-
 	std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
 	bool bOk =  doc.save_file(ofToDataPath(fileName).c_str());
 
-	
-	// AQUIII
 	{
 		std::string command = "/usr/libexec/PlistBuddy " + fileName;
 		std::cout << command << std::endl;
@@ -1316,9 +1307,7 @@ bool xcodeProject::saveProjectFile(){
 			command += " -c \"" + c + "\"";
 			std::cout << c << std::endl;
 		}
-//		std::cout << comando << std::endl;
 		std::cout << ofSystem(command) << std::endl;
-
 	}
 	return bOk;
 }

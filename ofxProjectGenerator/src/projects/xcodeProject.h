@@ -63,5 +63,15 @@ public:
 	
 	
 	std::vector<std::string> commands;
-	bool debugCommands = true;
+//	bool debugCommands = true; //kabuloso
+	bool debugCommands = false; //kabuloso
+
+	const std::string buildConfigurations[6] = {
+		"99FA3DBB1C7456C400CFA0EE",
+		"E4B69B4E0A3A1720003C02F2",
+		"99FA3DBC1C7456C400CFA0EE",
+		"E4B69B4F0A3A1720003C02F2",
+		"E4B69B600A3A1757003C02F2",
+		"E4B69B610A3A1757003C02F2"
+	};
 };
