@@ -3,12 +3,6 @@
 
 #define STRINGIFY(A)  #A
 
-// reference
-//			4. Add array
-//			add :student array
-//			add :student: string tom
-//			add :student: string may
-//			add :student: string john
 
 xcodeProject::xcodeProject(std::string target)
 :baseProject(target){
@@ -200,6 +194,7 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 //			add :student: string john
 
 		// add it to the build array.
+		// FIXME: next
 		pugi::xml_node array;
 		if( addToBuildResource ){
 			std::cout << ">>>>>> buildPhaseResourcesUUID " << buildPhaseResourcesUUID << std::endl;
