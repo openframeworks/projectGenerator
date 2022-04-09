@@ -197,14 +197,19 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 		// FIXME: next
 		pugi::xml_node array;
 		if( addToBuildResource ){
-			std::cout << ">>>>>> buildPhaseResourcesUUID " << buildPhaseResourcesUUID << std::endl;
-			findArrayForUUID(buildPhaseResourcesUUID, array);    // this is the build array (all build refs get added here)
-			array.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
+			// this should work only on IOS as macOS doesn't have buildPhaseResourcesUUID set.
+			
+			
+//			std::cout << ">>>>>> buildPhaseResourcesUUID " << buildPhaseResourcesUUID << std::endl;
+//			findArrayForUUID(buildPhaseResourcesUUID, array);    // this is the build array (all build refs get added here)
+//			array.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
 		}
 		if( addToBuild ){
-			std::cout << ">>>>>> buildPhaseUUID " << buildPhaseUUID << std::endl;
-			findArrayForUUID(buildPhaseUUID, array);    // this is the build array (all build refs get added here)
-			array.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
+			commands.emplace_back("Add :objects:"+buildPhaseUUID+":fileRef string " + buildUUID);
+
+//			std::cout << ">>>>>> buildPhaseUUID " << buildPhaseUUID << std::endl;
+//			findArrayForUUID(buildPhaseUUID, array);    // this is the build array (all build refs get added here)
+//			array.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
 		}
 	}
 
