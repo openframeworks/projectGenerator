@@ -227,7 +227,7 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
         }
 		
 		// FIXME: testar se no IOS ta indo tudo bem. este aqui deve ser equivalente ao proximo q esta comentado.
-		commands.emplace_back("Add :objects:"+resourcesUUID+": string "+resUUID);
+//		commands.emplace_back("Add :objects:"+resourcesUUID+": string "+resUUID);
 
 		// add it to the build array.
 		pugi::xml_node array;
