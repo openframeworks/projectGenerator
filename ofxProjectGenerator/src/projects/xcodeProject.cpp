@@ -203,32 +203,48 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 
 	if (addToBuild || addToBuildResource ){
 		buildUUID = generateUUID(srcFile + "-build");
+		std::cout << "buildUUID = " << buildUUID << std::endl;
+		
 		
 		commands.emplace_back("Add :objects:"+buildUUID+":fileRef string "+UUID);
 		commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
         if (debugCommands) {
 	    	commands.emplace_back("Add :objects:"+buildUUID+":dimitre string kabuloso addFramework2");
         }
-		// referencia
-//			4. Add array
-//			add :student arr
-//			add :student: string tom
-//			add :student: string may
-//			add :student: string john
 
-		// add it to the build array.
-		// FIXME: next
-		pugi::xml_node array;
+		
+		// FIXME: checar se o insert no array ta funcionando aqui.
+//		pugi::xml_node array;
+		
+		// IOS ONLY
 		if( addToBuildResource ){
 			// this should work only on IOS as macOS doesn't have buildPhaseResourcesUUID set.
 			
 //			std::cout << ">>>>>> buildPhaseResourcesUUID " << buildPhaseResourcesUUID << std::endl;
 //			findArrayForUUID(buildPhaseResourcesUUID, array);    // this is the build array (all build refs get added here)
 //			array.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
-			commands.emplace_back("Add :objects:"+buildPhaseResourcesUUID+":fileRef string " + buildUUID);
+/*
+ <key>E4B69B580A3A1756003C02F2</key>
+ <dict>
+	 <key>buildActionMask</key>
+	 <string>2147483647</string>
+	 <key>files</key>
+	 <array>
+		 <string>E4B69E200A3A1BDC003C02F2</string>
+		 <string>E4B69E210A3A1BDC003C02F2</string>
+	 </array>
+ */
+			// this replaces completely the findArrayForUUID
+			// FIXME: achar como fazer isto aqui
+//			commands.emplace_back("Add :objects:E4B69B580A3A1756003C02F2:files: string " + buildUUID);
 		}
 		if( addToBuild ){
-			commands.emplace_back("Add :objects:"+buildPhaseUUID+":fileRef string " + buildUUID);
+			
+			//E4B69E200A3A1BDC003C02F2
+			
+			commands.emplace_back("Add :objects:E4B69B580A3A1756003C02F2:files: string " + buildUUID);
+			
+//			commands.emplace_back("Add :objects:"+buildPhaseUUID+":fileRef string " + buildUUID);
 //			std::cout << ">>>>>> buildPhaseUUID " << buildPhaseUUID << std::endl;
 //			findArrayForUUID(buildPhaseUUID, array);    // this is the build array (all build refs get added here)
 //			array.append_child("string").append_child(pugi::node_pcdata).set_value(buildUUID.c_str());
