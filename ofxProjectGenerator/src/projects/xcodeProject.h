@@ -3,7 +3,7 @@
 #pragma once
 
 #include "baseProject.h"
-#include "pugixml.hpp"
+//#include "pugixml.hpp"
 
 class xcodeProject : public baseProject {
 
@@ -52,36 +52,37 @@ public:
     std::string afterPhaseUUID;
     std::string buildPhasesUUID;                // note this UUID is in an array of *all* the build steps 
     
+	std::string buildConfigurationListUUID;                // note this UUID is in an array of *all* the build steps
+	std::string buildActionMaskUUID;
     
-	pugi::xml_node insertPoint;         // where are we inserting items (at the second dict tag,
+//	pugi::xml_node insertPoint;         // where are we inserting items (at the second dict tag,
                                         // /plist[1]/dict[1]/dict[2])
-    bool findArrayForUUID(std::string UUID, pugi::xml_node & nodeMe);
+//    bool findArrayForUUID(std::string UUID, pugi::xml_node & nodeMe);
 
 	
 	
 	std::vector<std::string> commands;
 
 	const std::string buildConfigurations[6] = {
-		"99FA3DBB1C7456C400CFA0EE",
-		"E4B69B4E0A3A1720003C02F2",
-		"99FA3DBC1C7456C400CFA0EE",
-		"E4B69B4F0A3A1720003C02F2",
-		"E4B69B600A3A1757003C02F2",
-		"E4B69B610A3A1757003C02F2"
+		"E4B69B610A3A1757003C02F2", //Release
+		"E4B69B600A3A1757003C02F2", //Debug
+		"99FA3DBC1C7456C400CFA0EE", //AppStore
+
+		"99FA3DBB1C7456C400CFA0EE", //AppStore SDKROOT macosx
+		"E4B69B4E0A3A1720003C02F2", //Debug SDKROOT macosx
+		"E4B69B4F0A3A1720003C02F2", //Release SDKROOT macosx
 	};
 	
 	const std::string buildConfigs[3] = {
-		"E4B69B610A3A1757003C02F2",
-		"99FA3DBC1C7456C400CFA0EE",
-		"E4B69B600A3A1757003C02F2"
+		"E4B69B610A3A1757003C02F2", //Release
+		"E4B69B600A3A1757003C02F2", //Debug
+		"99FA3DBC1C7456C400CFA0EE", //AppStore
 	};
 	
 	void alert(std::string s) {
-		std::cout << ">>>>> " << s << std::endl;
+//		std::cout << ">>>>> " << s << std::endl;
 	}
 	
-	
-//	std::map <std::string, std::string> folderUUID;
 	std::map <std::string, std::string> folderUUID = {
 		{ "src", "E4B69E1C0A3A1BDC003C02F2" },
 		{ "addons", "BB4B014C10F69532006C3DED" },
@@ -90,5 +91,4 @@ public:
 	};
 	
 	std::string getFolderUUID(std::string folder);
-
 };

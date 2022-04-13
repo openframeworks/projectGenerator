@@ -7,14 +7,17 @@ xcodeProject::xcodeProject(std::string target)
 :baseProject(target){
     alert("xcodeProject");
 
-	
 	// FIXME: remove unused variables
     if( target == "osx" ){
+		
+		buildConfigurationListUUID = "E4B69B5A0A3A1756003C02F2";
+		buildActionMaskUUID = "E4B69B580A3A1756003C02F2";
+
         projRootUUID    = "E4B69B4A0A3A1720003C02F2";
-        srcUUID         = "E4B69E1C0A3A1BDC003C02F2";
-        addonUUID       = "BB4B014C10F69532006C3DED";
-        localAddonUUID  = "6948EE371B920CB800B5AC1A";
-        buildPhaseUUID  = "E4B69E200A3A1BDC003C02F2";   
+//        srcUUID         = "E4B69E1C0A3A1BDC003C02F2"; // covered in map
+//        addonUUID       = "BB4B014C10F69532006C3DED"; // covered in map
+//        localAddonUUID  = "6948EE371B920CB800B5AC1A"; // covered in map
+//        buildPhaseUUID  = "E4B69E200A3A1BDC003C02F2";   // not needed anymore, we use buildactionmask UUID 
         resourcesUUID   = "";
         frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase
         afterPhaseUUID  = "928F60851B6710B200E2D791";
@@ -23,15 +26,20 @@ xcodeProject::xcodeProject(std::string target)
         
     }else{
         projRootUUID    = "29B97314FDCFA39411CA2CEA";
-        srcUUID         = "E4D8936A11527B74007E1F53";
-        addonUUID       = "BB16F26B0F2B646B00518274";
-        localAddonUUID  = "6948EE371B920CB800B5AC1A";
-        buildPhaseUUID  = "E4D8936E11527B74007E1F53";
+//        srcUUID         = "E4D8936A11527B74007E1F53";
+//        addonUUID       = "BB16F26B0F2B646B00518274";
+//        localAddonUUID  = "6948EE371B920CB800B5AC1A";
+//        buildPhaseUUID  = "E4D8936E11527B74007E1F53";
         resourcesUUID   = "BB24DD8F10DA77E000E9C588";
         buildPhaseResourcesUUID = "BB24DDCA10DA781C00E9C588";
         frameworksUUID  = "1DF5F4E00D08C38300B7A737";   //PBXFrameworksBuildPhase  // todo: check this?
         afterPhaseUUID  = "928F60851B6710B200E2D791";
         buildPhasesUUID = "9255DD331112741900D6945E";   //
+		
+		folderUUID["src"] = srcUUID;
+		folderUUID["addons"] = addonUUID;
+		folderUUID["localAddons"] = localAddonUUID;
+		folderUUID[""] = projRootUUID;
     }
 };
 
@@ -167,21 +175,23 @@ void xcodeProject::saveMakefile(){
 bool xcodeProject::loadProjectFile(){
 	alert("loadProjectFile");
 	renameProject();
-	
-	//	std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
-//	pugi::xml_parse_result result = doc.load_file(ofToDataPath(fileName).c_str());
-//	return result.status==pugi::status_ok;
+	// FIXME: provisorio
+	return true;
 }
 
 
 void xcodeProject::renameProject(){
 	alert("renameProject");
 	
-	commands.emplace_back("Delete :objects:E4B69B5A0A3A1756003C02F2:name  ");
-	commands.emplace_back("Add :objects:E4B69B5A0A3A1756003C02F2:name string " + projectName);
-
-	commands.emplace_back("Delete :objects:E4B69B5B0A3A1756003C02F2:name  ");
-	commands.emplace_back("Add :objects:E4B69B5B0A3A1756003C02F2:name string " + projectName + "Debug");
+	commands.emplace_back("Delete :objects:"+buildConfigurationListUUID+":name  ");
+	commands.emplace_back("Add :objects:"+buildConfigurationListUUID+":name string " + projectName);
+	// FIXME: only if it is Debug
+	// FIXME: review BUILT_PRODUCTS_DIR
+	
+//	E4B69B5A0A3A1756003C02F2
+//	E4B69B5B0A3A1756003C02F2
+	commands.emplace_back("Delete :objects:E4B69B5B0A3A1756003C02F2:path  ");
+	commands.emplace_back("Add :objects:E4B69B5B0A3A1756003C02F2:path string " + projectName + "Debug.app");
 
 }
 
@@ -192,7 +202,7 @@ std::string xcodeProject::getFolderUUID(std::string folder) {
 	  // not found
 		std::vector < std::string > folders = ofSplitString(folder, "/", true);
 		
-		std::string lastFolderUUID = projRootUUID; //E4B69B4A0A3A1720003C02F2
+		std::string lastFolderUUID = projRootUUID;
 		
 		if (folders.size()){
 			for (int a=0; a<folders.size(); a++) {
@@ -210,7 +220,6 @@ std::string xcodeProject::getFolderUUID(std::string folder) {
 					commands.emplace_back("Add :objects:"+thisUUID+":children array");
 					commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
 					commands.emplace_back("Add :objects:"+thisUUID+":name string "+folders[a]);
-//					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string &lt;group&gt;");
 					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string <group>");
 
 					// adicionar aqui
@@ -218,7 +227,6 @@ std::string xcodeProject::getFolderUUID(std::string folder) {
 					lastFolderUUID = thisUUID;
 				} else {
 					lastFolderUUID = folderUUID[fullPath];
-					
 //					std::cout << "path found, using : " << fullPath << " : " << lastFolderUUID << std::endl;
 				}
 //				std::cout << a << " -- " << fullPath << " -- " << folders[a] << std::endl;
@@ -349,13 +357,13 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 		// FIXME: IOS ONLY checar se o insert no array ta funcionando aqui.
 		if( addToBuildResource ){
 
-			// TODO: achar como fazer isto aqui, semelhante ao da proxima secao
-//			commands.emplace_back("Add :objects:E4B69B580A3A1756003C02F2:files: string " + buildUUID);
+			// FIXME: achar como fazer isto aqui, semelhante ao da proxima secao
+//			commands.emplace_back("Add :objects:"+buildActionMaskUUID+":files: string " + buildUUID);
 		}
 		if( addToBuild ){
 			// this replaces completely the findArrayForUUID
 			// I found the root from the array (id present already on original project so no need to query an array by a member. in fact buildPhaseUUID maybe can be removed.
-			commands.emplace_back("Add :objects:E4B69B580A3A1756003C02F2:files: string " + buildUUID);
+			commands.emplace_back("Add :objects:"+buildActionMaskUUID+":files: string " + buildUUID);
 		}
 	}
 
@@ -396,7 +404,7 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 
 
 void xcodeProject::addFramework(std::string name, std::string path, std::string folder){
-	std::cout << "addFramework name:" << name << " -- path:" << path << " -- folder:" << folder << std::endl;
+	alert ("addFramework name:" + name + " -- path:" + path + " -- folder:" + folder);
     // name = name of the framework
     // path = the full path (w name) of this framework
     // folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
@@ -460,15 +468,11 @@ void xcodeProject::addFramework(std::string name, std::string path, std::string 
     // finally, this is for making folders based on the frameworks position in the addon. so it can appear in the sidebar / file explorer
     
     if (folder.size() > 0 && !ofIsStringInString(folder, "/System/Library/Frameworks")){
-		std::cout << "this " <<  folder << std::endl;
-        
+//		std::cout << "this " <<  folder << std::endl;
 		std::string folderUUID = getFolderUUID(folder);
-
-		
-    } else { //else what?
+    } else { //FIXME: else what?
         
     }
-
     
     if (target != "ios" && folder.size() != 0){
         // add it to the linking phases...
@@ -477,308 +481,76 @@ void xcodeProject::addFramework(std::string name, std::string path, std::string 
 }
 
 
-
 void xcodeProject::addInclude(std::string includeName){
-//	std::cout << "addInclude " << includeName << std::endl;
+	alert("addInclude " + includeName);
 
-	// Adding source to all three build configurations, debug release appstore
+	// Adding source to all build configurations, debug release appstore
 	for (auto & c : buildConfigurations) {
 		commands.emplace_back("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
 	}
 }
-
 
 void xcodeProject::addLibrary(const LibraryBinary & lib){
 	// TODO: Test this
 	for (auto & c : buildConfigs) {
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + lib.path);
 	}
-
 }
 
-// libtype is unused here
+// FIXME: libtype is unused here
 void xcodeProject::addLDFLAG(std::string ldflag, LibType libType){
 	for (auto & c : buildConfigs) {
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ldflag);
 	}
-	
-//    char query[255];
-//    sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'OTHER_LDFLAGS')]/following-sibling::node()[1]");
-//    pugi::xpath_node_set headerArray = doc.select_nodes(query);
-//
-//
-//    if (headerArray.size() > 0){
-//        for (pugi::xpath_node_set::const_iterator it = headerArray.begin(); it != headerArray.end(); ++it){
-//            pugi::xpath_node node = *it;
-//            node.node().append_child("string").append_child(pugi::node_pcdata).set_value(ldflag.c_str());
-//        }
-//
-//    } else {
-//
-//        //printf("we don't have OTHER_LDFLAGS, so we're adding them... and calling this function again \n");
-//        sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'buildSettings')]/following-sibling::node()[1]");
-//
-//        pugi::xpath_node_set dictArray = doc.select_nodes(query);
-//
-//
-//
-////-----------------------------------------------------------------
-//const char LDFlags[] =
-//STRINGIFY(
-//
-//          <key>OTHER_LDFLAGS</key>
-//          <array>
-//          <string>$(OF_CORE_FRAMEWORKS) $(OF_CORE_LIBS)</string>
-//          </array>
-//
-//);
-//
-//
-//        for (pugi::xpath_node_set::const_iterator it = dictArray.begin(); it != dictArray.end(); ++it){
-//            pugi::xpath_node node = *it;
-//
-//            //node.node().print(std::cout);
-//            std::string ldXML = std::string(LDFlags);
-//            pugi::xml_document ldDoc;
-//            pugi::xml_parse_result result = ldDoc.load_buffer(ldXML.c_str(), strlen(ldXML.c_str()));
-//
-//            // insert it at <plist><dict><dict>
-//            node.node().prepend_copy(ldDoc.first_child().next_sibling());   // KEY FIRST
-//            node.node().prepend_copy(ldDoc.first_child());                  // ARRAY SECOND
-//
-//            //node.node().print(std::cout);
-//        }
-//
-//        // now that we have it, try again...
-//        addLDFLAG(ldflag);
-//    }
-
-    //saveFile(projectDir + "/" + projectName + ".xcodeproj" + "/project.pbxproj");
 }
 
+// FIXME: libtype is unused here
 void xcodeProject::addCFLAG(std::string cflag, LibType libType){
-
-    char query[255];
-    sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'OTHER_CFLAGS')]/following-sibling::node()[1]");
-    pugi::xpath_node_set headerArray = doc.select_nodes(query);
-
-
-    if (headerArray.size() > 0){
-        for (pugi::xpath_node_set::const_iterator it = headerArray.begin(); it != headerArray.end(); ++it){
-            pugi::xpath_node node = *it;
-            node.node().append_child("string").append_child(pugi::node_pcdata).set_value(cflag.c_str());
-        }
-
-    } else {
-
-        //printf("we don't have OTHER_LDFLAGS, so we're adding them... and calling this function again \n");
-        sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'buildSettings')]/following-sibling::node()[1]");
-
-        pugi::xpath_node_set dictArray = doc.select_nodes(query);
-
-
-
-
-//-----------------------------------------------------------------
-const char CFlags[] =
-STRINGIFY(
-
-          <key>OTHER_CFLAGS</key>
-          <array>
-          </array>
-
-);
-
-        for (pugi::xpath_node_set::const_iterator it = dictArray.begin(); it != dictArray.end(); ++it){
-            pugi::xpath_node node = *it;
-
-            //node.node().print(std::cout);
-            std::string ldXML = std::string(CFlags);
-            pugi::xml_document ldDoc;
-            pugi::xml_parse_result result = ldDoc.load_buffer(ldXML.c_str(), strlen(ldXML.c_str()));
-
-            // insert it at <plist><dict><dict>
-            node.node().prepend_copy(ldDoc.first_child().next_sibling());   // KEY FIRST
-            node.node().prepend_copy(ldDoc.first_child());                  // ARRAY SECOND
-
-            //node.node().print(std::cout);
-        }
-
-        // now that we have it, try again...
-        addCFLAG(cflag);
-    }
-
-    //saveFile(projectDir + "/" + projectName + ".xcodeproj" + "/project.pbxproj");
+	for (auto & c : buildConfigs) {
+		// FIXME: add array here if it doesnt exist
+		// FIXME: Test everything
+		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_CFLAGS: string " + cflag);
+	}
 }
 
+// FIXME: libtype is unused here
 void xcodeProject::addDefine(std::string define, LibType libType){
-
-	char query[255];
-	sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[text()='GCC_PREPROCESSOR_DEFINITIONS']/following-sibling::node()[1]");
-	pugi::xpath_node_set headerArray = doc.select_nodes(query);
-
-
-	if (headerArray.size() > 0){
-		for (pugi::xpath_node_set::const_iterator it = headerArray.begin(); it != headerArray.end(); ++it){
-			pugi::xpath_node node = *it;
-			node.node().append_child("string").append_child(pugi::node_pcdata).set_value(define.c_str());
-			//node.node().print(std::cout);
-		}
-
-	} else {
-
-		//printf("we don't have GCC_PREPROCESSOR_DEFINITIONS, so we're adding them... and calling this function again \n");
-		sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'buildSettings')]/following-sibling::node()[1]");
-
-		pugi::xpath_node_set dictArray = doc.select_nodes(query);
-
-
-//-----------------------------------------------------------------
-const char Defines[] =
-STRINGIFY(
-
-          <key>GCC_PREPROCESSOR_DEFINITIONS</key>
-          <array></array>
-
-);
-
-		for (pugi::xpath_node_set::const_iterator it = dictArray.begin(); it != dictArray.end(); ++it){
-			pugi::xpath_node node = *it;
-
-			//node.node().print(std::cout);
-			std::string definesXML = std::string(Defines);
-			pugi::xml_document definesDoc;
-			pugi::xml_parse_result result = definesDoc.load_buffer(definesXML.c_str(), strlen(definesXML.c_str()));
-
-			// insert it at <plist><dict><dict>
-			node.node().prepend_copy(definesDoc.first_child().next_sibling());   // KEY FIRST
-			node.node().prepend_copy(definesDoc.first_child());                  // ARRAY SECOND
-
-			//node.node().print(std::cout);
-			//ofLogNotice() << "_____________________________________________________________________________________________________________";
-		}
-
-		// now that we have it, try again...
-		addDefine(define);
+	for (auto & c : buildConfigs) {
+		// FIXME: add array here if it doesnt exist
+		// FIXME: Test everything
+		commands.emplace_back("Add :objects:"+c+":buildSettings:GCC_PREPROCESSOR_DEFINITIONS: string " + define);
 	}
+}
 
-	//saveFile(projectDir + "/" + projectName + ".xcodeproj" + "/project.pbxproj");
+// FIXME: libtype is unused here
+void xcodeProject::addCPPFLAG(std::string cppflag, LibType libType){
+	for (auto & c : buildConfigs) {
+		// FIXME: add array here if it doesnt exist
+		// FIXME: Test everything
+		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_CPLUSPLUSFLAGS: string " + cppflag);
+	}
 }
 
 void xcodeProject::addAfterRule(std::string rule){
+	commands.emplace_back("Add :objects:"+afterPhaseUUID+":buildActionMask string 2147483647");
+	commands.emplace_back("Add :objects:"+afterPhaseUUID+":files array");
+	commands.emplace_back("Add :objects:"+afterPhaseUUID+":inputPaths array");
+	commands.emplace_back("Add :objects:"+afterPhaseUUID+":isa string PBXShellScriptBuildPhase");
+	commands.emplace_back("Add :objects:"+afterPhaseUUID+":outputPaths array");
+	commands.emplace_back("Add :objects:"+afterPhaseUUID+":runOnlyForDeploymentPostprocessing string 0");
+	commands.emplace_back("Add :objects:"+afterPhaseUUID+":shellPath string /bin/sh");
+	commands.emplace_back("Add :objects:"+afterPhaseUUID+":shellScript string " + rule);
+	
+	// adding this phase to build phases array
+	commands.emplace_back("Add :objects:"+buildConfigurationListUUID+":buildPhases: string " + afterPhaseUUID);
 
-	char query[255];
-    sprintf(query, "//key[contains(.,'objects')]/following-sibling::node()[1]");
-    pugi::xpath_node_set objects = doc.select_nodes(query);
-
-
-const char afterRule[] =
-STRINGIFY(
-        <key>928F60851B6710B200E2D791</key>
-        <dict>
-            <key>buildActionMask</key>
-            <string>2147483647</string>
-            <key>files</key>
-            <array />
-            <key>inputPaths</key>
-            <array />
-            <key>isa</key>
-            <string>PBXShellScriptBuildPhase</string>
-            <key>outputPaths</key>
-            <array />
-            <key>runOnlyForDeploymentPostprocessing</key>
-            <string>0</string>
-            <key>shellPath</key>
-            <string>/bin/sh</string>
-            <key>shellScript</key>
-            <string>SHELL_SCRIPT</string>
-        </dict>
-);
-
-    if (objects.size() > 0){
-        for (auto node: objects){
-            //node.node().print(std::cout);
-            std::string ldXML = std::string(afterRule);
-            ofStringReplace(ldXML,"SHELL_SCRIPT",rule);
-            pugi::xml_document ldDoc;
-            pugi::xml_parse_result result = ldDoc.load_buffer(ldXML.c_str(), strlen(ldXML.c_str()));
-
-            // insert it at <plist><dict><dict>
-            node.node().prepend_copy(ldDoc.first_child().next_sibling());   // KEY FIRST
-            node.node().prepend_copy(ldDoc.first_child());                  // ARRAY SECOND
-            
-
-            pugi::xml_node array;
-            findArrayForUUID(buildPhasesUUID, array);    // this is the build array (all build refs get added here)
-            array.append_child("string").append_child(pugi::node_pcdata).set_value(afterPhaseUUID.c_str());
-            
-        }
-
-    }
 }
 
-void xcodeProject::addCPPFLAG(std::string cppflag, LibType libType){
-
-    char query[255];
-    sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'OTHER_CPLUSPLUSFLAGS')]/following-sibling::node()[1]");
-    pugi::xpath_node_set headerArray = doc.select_nodes(query);
-
-
-    if (headerArray.size() > 0){
-        for (pugi::xpath_node_set::const_iterator it = headerArray.begin(); it != headerArray.end(); ++it){
-            pugi::xpath_node node = *it;
-            node.node().append_child("string").append_child(pugi::node_pcdata).set_value(cppflag.c_str());
-        }
-
-    } else {
-
-        //printf("we don't have OTHER_CPLUSPLUSFLAGS, so we're adding them... and calling this function again \n");
-        sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'buildSettings')]/following-sibling::node()[1]");
-
-        pugi::xpath_node_set dictArray = doc.select_nodes(query);
-
-
-
-
-//-----------------------------------------------------------------
-const char CPPFlags[] =
-STRINGIFY(
-
-          <key>OTHER_CPLUSPLUSFLAGS</key>
-          <array>
-		  <string>"-D__MACOSX_CORE__"</string>
-		  <string>"-mtune=native"</string>
-		  <string>"-Wreturn-type"</string>
-		  <string>"-Werror=return-type"</string>
-          </array>
-
-);        
-
-        for (pugi::xpath_node_set::const_iterator it = dictArray.begin(); it != dictArray.end(); ++it){
-            pugi::xpath_node node = *it;
-
-            //node.node().print(std::cout);
-            std::string ldXML = std::string(CPPFlags);
-            pugi::xml_document ldDoc;
-            pugi::xml_parse_result result = ldDoc.load_buffer(ldXML.c_str(), strlen(ldXML.c_str()));
-
-            // insert it at <plist><dict><dict>
-            node.node().prepend_copy(ldDoc.first_child().next_sibling());   // KEY FIRST
-            node.node().prepend_copy(ldDoc.first_child());                  // ARRAY SECOND
-
-            //node.node().print(std::cout);
-        }
-
-        // now that we have it, try again...
-        addCPPFLAG(cppflag);
-    }
-
-    //saveFile(projectDir + "/" + projectName + ".xcodeproj" + "/project.pbxproj");
-}
 
 void xcodeProject::addAddon(ofAddon & addon){
-	std::cout << "addAddon : " << addon.name << std::endl;
-    for(int i=0;i<(int)addons.size();i++){
+	alert("addAddon : " + addon.name);
+
+	for(int i=0;i<(int)addons.size();i++){
         if(addons[i].name==addon.name){
             return;
 		}
@@ -797,8 +569,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 			}
 		}
 	}
-    ofLogNotice() << "adding addon: " << addon.name;
-	
+//	ofLogNotice() << "adding addon: " << addon.name;
 //	ofLogNotice() << "addon srcfiles: " <<  addon.srcFiles.size();
 	
     addons.push_back(addon);
@@ -866,42 +637,19 @@ void xcodeProject::addAddon(ofAddon & addon){
 }
 
 
-
 bool xcodeProject::saveProjectFile(){
 	alert("saveProjectFile");
 
 	std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
-
-	// save the project out:
-	// FIXME: remove
-//	bool bOk =  doc.save_file(ofToDataPath(fileName).c_str());
-
-	bool bOk = true;
-
 	std::string command = "/usr/libexec/PlistBuddy " + fileName;
-	std::cout << command << std::endl;
+//	std::cout << command << std::endl;
 	for (auto & c : commands) {
 		command += " -c \"" + c + "\"";
-		std::cout << c << std::endl;
+//		std::cout << c << std::endl;
 	}
 	std::cout << ofSystem(command) << std::endl;
+	
+	// FIXME: temporary
+	bool bOk = true;
 	return bOk;
-}
-
-
-// FIXME: - REMOVE
-
-bool xcodeProject::findArrayForUUID(std::string UUID, pugi::xml_node & nodeMe){
-	char query[255];
-	sprintf(query, "//string[contains(.,'%s')]", UUID.c_str());
-	pugi::xpath_node_set uuidSet = doc.select_nodes(query);
-	for (pugi::xpath_node_set::const_iterator it = uuidSet.begin(); it != uuidSet.end(); ++it){
-		pugi::xpath_node node = *it;
-		if (strcmp(node.node().parent().name(), "array") == 0){
-			nodeMe = node.node().parent();
-			return true;
-		} else {
-		}
-	}
-	return false;
 }
