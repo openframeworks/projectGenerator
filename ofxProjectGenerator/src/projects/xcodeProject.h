@@ -70,6 +70,12 @@ public:
 		"E4B69B610A3A1757003C02F2"
 	};
 	
+	const std::string buildConfigs[3] = {
+		"E4B69B610A3A1757003C02F2",
+		"99FA3DBC1C7456C400CFA0EE",
+		"E4B69B600A3A1757003C02F2"
+	};
+	
 	void alert(std::string s) {
 		std::cout << ">>>>> " << s << std::endl;
 	}

@@ -3,11 +3,12 @@
 
 #define STRINGIFY(A)  #A
 
-
 xcodeProject::xcodeProject(std::string target)
 :baseProject(target){
     alert("xcodeProject");
 
+	
+	// FIXME: remove unused variables
     if( target == "osx" ){
         projRootUUID    = "E4B69B4A0A3A1720003C02F2";
         srcUUID         = "E4B69E1C0A3A1BDC003C02F2";
@@ -36,6 +37,91 @@ xcodeProject::xcodeProject(std::string target)
 
 
 
+bool xcodeProject::createProjectFile(){
+	alert("createProjectFile");
+	// todo: some error checking.
+
+	std::string xcodeProject = ofFilePath::join(projectDir , projectName + ".xcodeproj");
+	
+	if (ofDirectory::doesDirectoryExist(xcodeProject)){
+		ofDirectory::removeDirectory(xcodeProject, true);
+	}
+   
+	ofDirectory xcodeDir(xcodeProject);
+	xcodeDir.create(true);
+	xcodeDir.close();
+	
+	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.xcodeproj/project.pbxproj"),
+					   ofFilePath::join(xcodeProject, "project.pbxproj"), true, true);
+
+	ofFile::copyFromTo(ofFilePath::join(templatePath,"Project.xcconfig"),projectDir, true, true);
+
+	if( target == "osx" ){
+		ofFile::copyFromTo(ofFilePath::join(templatePath,"openFrameworks-Info.plist"),projectDir, true, true);
+		
+		ofDirectory binDirectory(ofFilePath::join(projectDir, "bin"));
+		if (!binDirectory.exists()){
+			ofDirectory dataDirectory(ofFilePath::join(projectDir, "bin/data"));
+			dataDirectory.create(true);
+		}
+		if(binDirectory.exists()){
+			ofDirectory dataDirectory(ofFilePath::join(binDirectory.path(), "data"));
+			if (!dataDirectory.exists()){
+				dataDirectory.create(false);
+			}
+		}
+
+	}else{
+		ofFile::copyFromTo(ofFilePath::join(templatePath,"ofxiOS-Info.plist"),projectDir, true, true);
+		ofFile::copyFromTo(ofFilePath::join(templatePath,"ofxiOS_Prefix.pch"),projectDir, true, true);
+
+		ofDirectory binDirectory(ofFilePath::join(projectDir, "bin"));
+		if (!binDirectory.exists()){
+			ofDirectory dataDirectory(ofFilePath::join(projectDir, "bin/data"));
+			dataDirectory.create(true);
+		}
+		if(binDirectory.exists()){
+			ofDirectory dataDirectory(ofFilePath::join(binDirectory.path(), "data"));
+			if (!dataDirectory.exists()){
+				dataDirectory.create(false);
+			}
+			
+			//this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
+			ofDirectory srcDataDir(ofFilePath::join(templatePath, "bin/data"));
+			if( srcDataDir.exists() ){
+				baseProject::recursiveCopyContents(srcDataDir, dataDirectory);
+			}
+		}
+		ofDirectory mediaAssetsTemplateDirectory(ofFilePath::join(templatePath, "mediaAssets"));
+		ofDirectory mediaAssetsProjectDirectory(ofFilePath::join(projectDir, "mediaAssets"));
+		if (!mediaAssetsProjectDirectory.exists()){
+			mediaAssetsTemplateDirectory.copyTo(mediaAssetsProjectDirectory.getAbsolutePath(), false, false);
+		}
+	}
+
+	saveScheme();
+	if(target=="osx"){
+		saveMakefile();
+	}
+
+	// make everything relative the right way.
+	std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
+	if (relRoot != "../../../"){
+		std::string relPath2 = relRoot;
+		relPath2.erase(relPath2.end()-1);
+		findandreplaceInTexfile(projectDir + projectName + ".xcodeproj/project.pbxproj", "../../..", relPath2);
+		//findandreplaceInTexfile(projectDir + "Project.xcconfig", "../../../", relRoot);
+		findandreplaceInTexfile(projectDir + "Project.xcconfig", "../../..", relPath2);
+		if( target == "osx" ){
+			findandreplaceInTexfile(projectDir + "Makefile", "../../..", relPath2);
+			findandreplaceInTexfile(projectDir + "config.make", "../../..", relPath2);
+		}
+	}
+
+	return true;
+}
+
+
 void xcodeProject::saveScheme(){
 	alert("saveScheme");
 	std::string schemeFolder = projectDir + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/";
@@ -60,18 +146,46 @@ void xcodeProject::saveScheme(){
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme"), schemeTo);
 		findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
 	}
-	
-	// Adding array key once before add addon include paths.
-	// insert here to execute only once
-
-	// FIXME: - no need?
-//	for (auto & b : buildConfigurations) {
-//		commands.emplace_back("Add :objects:"+b+":buildSettings:HEADER_SEARCH_PATHS array ");
-//	}
 }
 
 
-// MARK: -
+void xcodeProject::saveMakefile(){
+	alert("saveMakefile");
+
+	std::string makefile = ofFilePath::join(projectDir,"Makefile");
+	if(!ofFile(makefile).exists()){
+		ofFile::copyFromTo(ofFilePath::join(templatePath, "Makefile"), makefile, true, true);
+	}
+
+	std::string configmake = ofFilePath::join(projectDir,"config.make");
+	if(!ofFile(configmake).exists()){
+		ofFile::copyFromTo(ofFilePath::join(templatePath, "config.make"), configmake, true, true);
+	}
+}
+
+
+bool xcodeProject::loadProjectFile(){
+	alert("loadProjectFile");
+	renameProject();
+	
+	//	std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
+//	pugi::xml_parse_result result = doc.load_file(ofToDataPath(fileName).c_str());
+//	return result.status==pugi::status_ok;
+}
+
+
+void xcodeProject::renameProject(){
+	alert("renameProject");
+	
+	commands.emplace_back("Delete :objects:E4B69B5A0A3A1756003C02F2:name  ");
+	commands.emplace_back("Add :objects:E4B69B5A0A3A1756003C02F2:name string " + projectName);
+
+	commands.emplace_back("Delete :objects:E4B69B5B0A3A1756003C02F2:name  ");
+	commands.emplace_back("Add :objects:E4B69B5B0A3A1756003C02F2:name string " + projectName + "Debug");
+
+}
+
+
 std::string xcodeProject::getFolderUUID(std::string folder) {
 	std::string UUID = "";
 	if ( folderUUID.find(folder) == folderUUID.end() ) {
@@ -232,11 +346,10 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 		commands.emplace_back("Add :objects:"+buildUUID+":fileRef string "+UUID);
 		commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
 
-		// FIXME: checar se o insert no array ta funcionando aqui.
-		// IOS ONLY
+		// FIXME: IOS ONLY checar se o insert no array ta funcionando aqui.
 		if( addToBuildResource ){
 
-			// FIXME: achar como fazer isto aqui, semelhante ao da proxima secao
+			// TODO: achar como fazer isto aqui, semelhante ao da proxima secao
 //			commands.emplace_back("Add :objects:E4B69B580A3A1756003C02F2:files: string " + buildUUID);
 		}
 		if( addToBuild ){
@@ -250,8 +363,7 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 	// (C) resrouces
 	//-----------------------------------------------------------------
 
-	// IOS ONLY
-	// HERE IOS ONLY because resourcesUUID = "" in macOs
+	// MARK: IOS ONLY HERE // because resourcesUUID = "" in macOs
 	if (addToResources == true && resourcesUUID != ""){
 		
 		std::string resUUID = generateUUID(srcFile + "-build");
@@ -281,116 +393,10 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 }
 
 
-void xcodeProject::saveMakefile(){
-	alert("saveMakefile");
-
-    std::string makefile = ofFilePath::join(projectDir,"Makefile");
-    if(!ofFile(makefile).exists()){
-        ofFile::copyFromTo(ofFilePath::join(templatePath, "Makefile"), makefile, true, true);
-    }
-
-    std::string configmake = ofFilePath::join(projectDir,"config.make");
-    if(!ofFile(configmake).exists()){
-        ofFile::copyFromTo(ofFilePath::join(templatePath, "config.make"), configmake, true, true);
-    }
-}
 
 
-bool xcodeProject::createProjectFile(){
-	alert("createProjectFile");
-    // todo: some error checking.
-
-    std::string xcodeProject = ofFilePath::join(projectDir , projectName + ".xcodeproj");
-    
-    if (ofDirectory::doesDirectoryExist(xcodeProject)){
-        ofDirectory::removeDirectory(xcodeProject, true);
-    }
-   
-	ofDirectory xcodeDir(xcodeProject);
-	xcodeDir.create(true);
-	xcodeDir.close();
-	
-    ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.xcodeproj/project.pbxproj"),
-                       ofFilePath::join(xcodeProject, "project.pbxproj"), true, true);
-
-    ofFile::copyFromTo(ofFilePath::join(templatePath,"Project.xcconfig"),projectDir, true, true);
-
-    if( target == "osx" ){
-        ofFile::copyFromTo(ofFilePath::join(templatePath,"openFrameworks-Info.plist"),projectDir, true, true);
-		
-		ofDirectory binDirectory(ofFilePath::join(projectDir, "bin"));
-		if (!binDirectory.exists()){
-			ofDirectory dataDirectory(ofFilePath::join(projectDir, "bin/data"));
-			dataDirectory.create(true);
-		}
-		if(binDirectory.exists()){
-			ofDirectory dataDirectory(ofFilePath::join(binDirectory.path(), "data"));
-			if (!dataDirectory.exists()){
-				dataDirectory.create(false);
-			}
-		}
-
-    }else{
-        ofFile::copyFromTo(ofFilePath::join(templatePath,"ofxiOS-Info.plist"),projectDir, true, true);
-        ofFile::copyFromTo(ofFilePath::join(templatePath,"ofxiOS_Prefix.pch"),projectDir, true, true);
-
-		ofDirectory binDirectory(ofFilePath::join(projectDir, "bin"));
-		if (!binDirectory.exists()){
-			ofDirectory dataDirectory(ofFilePath::join(projectDir, "bin/data"));
-			dataDirectory.create(true);
-		}
-		if(binDirectory.exists()){
-			ofDirectory dataDirectory(ofFilePath::join(binDirectory.path(), "data"));
-			if (!dataDirectory.exists()){
-				dataDirectory.create(false);
-			}
-            
-            //this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
-            ofDirectory srcDataDir(ofFilePath::join(templatePath, "bin/data"));
-            if( srcDataDir.exists() ){
-                baseProject::recursiveCopyContents(srcDataDir, dataDirectory);
-            }
-        }
-        ofDirectory mediaAssetsTemplateDirectory(ofFilePath::join(templatePath, "mediaAssets"));
-        ofDirectory mediaAssetsProjectDirectory(ofFilePath::join(projectDir, "mediaAssets"));
-        if (!mediaAssetsProjectDirectory.exists()){
-            mediaAssetsTemplateDirectory.copyTo(mediaAssetsProjectDirectory.getAbsolutePath(), false, false);
-        }
-    }
-
-    saveScheme();
-    if(target=="osx"){
-    	saveMakefile();
-    }
-
-    // make everything relative the right way.
-    std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
-    if (relRoot != "../../../"){
-        std::string relPath2 = relRoot;
-        relPath2.erase(relPath2.end()-1);
-        findandreplaceInTexfile(projectDir + projectName + ".xcodeproj/project.pbxproj", "../../..", relPath2);
-        //findandreplaceInTexfile(projectDir + "Project.xcconfig", "../../../", relRoot);
-        findandreplaceInTexfile(projectDir + "Project.xcconfig", "../../..", relPath2);
-        if( target == "osx" ){
-            findandreplaceInTexfile(projectDir + "Makefile", "../../..", relPath2);
-            findandreplaceInTexfile(projectDir + "config.make", "../../..", relPath2);
-        }
-    }
-
-    return true;
-}
-
-
-
-
-
-
-
-
-// todo: frameworks
-//
 void xcodeProject::addFramework(std::string name, std::string path, std::string folder){
-	std::cout << "addFramework " << name << std::endl;
+	std::cout << "addFramework name:" << name << " -- path:" << path << " -- folder:" << folder << std::endl;
     // name = name of the framework
     // path = the full path (w name) of this framework
     // folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
@@ -421,7 +427,6 @@ void xcodeProject::addFramework(std::string name, std::string path, std::string 
 	
 
     // we add one of the build refs to the list of frameworks
-	// MARK: ZAMIS
 	commands.emplace_back("Add :options:"+frameworksUUID+": string " + buildUUID);
 
     // we add the second to a final build phase for copying the framework into app.   we need to make sure we *don't* do this for system frameworks
@@ -448,12 +453,8 @@ void xcodeProject::addFramework(std::string name, std::string path, std::string 
     
     // then, we are going to add this to "FRAMEWORK_SEARCH_PATHS" -- we do this twice, once for debug once for release.
 	
-	for (auto & configuration : {
-		"E4B69B610A3A1757003C02F2",
-		"99FA3DBC1C7456C400CFA0EE",
-		"E4B69B600A3A1757003C02F2"
-	}) {
-		commands.emplace_back("Add :objects:"+std::string(configuration)+":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + pathWithoutName);
+	for (auto & c : buildConfigs) {
+		commands.emplace_back("Add :objects:"+c+":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + pathWithoutName);
 	}
 
     // finally, this is for making folders based on the frameworks position in the addon. so it can appear in the sidebar / file explorer
@@ -481,19 +482,27 @@ void xcodeProject::addInclude(std::string includeName){
 //	std::cout << "addInclude " << includeName << std::endl;
 
 	// Adding source to all three build configurations, debug release appstore
-	for (auto & b : buildConfigurations) {
-		commands.emplace_back("Add :objects:"+b+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
+	for (auto & c : buildConfigurations) {
+		commands.emplace_back("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
 	}
 }
 
 
 void xcodeProject::addLibrary(const LibraryBinary & lib){
+	// TODO: Test this
+	for (auto & c : buildConfigs) {
+		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + lib.path);
+	}
 
+	
+	
     char query[255];
     sprintf(query, "//key[contains(.,'baseConfigurationReference')]/parent::node()//key[contains(.,'OTHER_LDFLAGS')]/following-sibling::node()[1]");
     pugi::xpath_node_set headerArray = doc.select_nodes(query);
 
 
+
+	
     if (headerArray.size() > 0){
         for (pugi::xpath_node_set::const_iterator it = headerArray.begin(); it != headerArray.end(); ++it){
             pugi::xpath_node node = *it;
@@ -818,6 +827,7 @@ STRINGIFY(
 }
 
 void xcodeProject::addAddon(ofAddon & addon){
+	std::cout << "addAddon : " << addon.name << std::endl;
     for(int i=0;i<(int)addons.size();i++){
         if(addons[i].name==addon.name){
             return;
@@ -910,57 +920,26 @@ void xcodeProject::addAddon(ofAddon & addon){
 bool xcodeProject::saveProjectFile(){
 	alert("saveProjectFile");
 
-	// save the project out:
 	std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
-	bool bOk =  doc.save_file(ofToDataPath(fileName).c_str());
 
-	{
-		std::string command = "/usr/libexec/PlistBuddy " + fileName;
-		std::cout << command << std::endl;
+	// save the project out:
+	// FIXME: remove
+//	bool bOk =  doc.save_file(ofToDataPath(fileName).c_str());
 
-		for (auto & c : commands) {
-			command += " -c \"" + c + "\"";
-//			std::cout << c << std::endl;
-		}
-		std::cout << ofSystem(command) << std::endl;
+	bool bOk = true;
+
+	std::string command = "/usr/libexec/PlistBuddy " + fileName;
+	std::cout << command << std::endl;
+	for (auto & c : commands) {
+		command += " -c \"" + c + "\"";
+		std::cout << c << std::endl;
 	}
+	std::cout << ofSystem(command) << std::endl;
 	return bOk;
 }
 
 
-
-
-
-
-
-void xcodeProject::renameProject(){
-	alert("renameProject");
-	
-	commands.emplace_back("Delete :objects:E4B69B5A0A3A1756003C02F2:name  ");
-	commands.emplace_back("Add :objects:E4B69B5A0A3A1756003C02F2:name string " + projectName);
-
-	commands.emplace_back("Delete :objects:E4B69B5B0A3A1756003C02F2:name  ");
-	commands.emplace_back("Add :objects:E4B69B5B0A3A1756003C02F2:name string " + projectName + "Debug");
-
-//	pugi::xpath_node_set uuidSet = doc.select_nodes("//string[contains(.,'emptyExample')]");
-//	for (pugi::xpath_node_set::const_iterator it = uuidSet.begin(); it != uuidSet.end(); ++it){
-//		pugi::xpath_node node = *it;
-//		std::string val = it->node().first_child().value();
-//		findandreplace(val, "emptyExample",  projectName);
-//		it->node().first_child().set_value(val.c_str());
-//	}
-}
-
-
-bool xcodeProject::loadProjectFile(){
-	alert("loadProjectFile");
-//	std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
-	renameProject();
-//	pugi::xml_parse_result result = doc.load_file(ofToDataPath(fileName).c_str());
-//	return result.status==pugi::status_ok;
-}
-
-
+// FIXME: - REMOVE
 
 bool xcodeProject::findArrayForUUID(std::string UUID, pugi::xml_node & nodeMe){
 	char query[255];
