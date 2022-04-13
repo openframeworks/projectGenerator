@@ -36,7 +36,7 @@ public:
     
     void addAddon(ofAddon & addon);
 
-    void saveWorkspaceXML();
+//    void saveWorkspaceXML();
     void saveScheme();
     void renameProject();
 
@@ -53,9 +53,6 @@ public:
     std::string buildPhasesUUID;                // note this UUID is in an array of *all* the build steps 
     
     
-    
-
-    pugi::xml_node findOrMakeFolderSet( pugi::xml_node nodeToAddTo, std::vector < std::string > & folders, std::string pathForHash);
 	pugi::xml_node insertPoint;         // where are we inserting items (at the second dict tag,
                                         // /plist[1]/dict[1]/dict[2])
     bool findArrayForUUID(std::string UUID, pugi::xml_node & nodeMe);
@@ -63,8 +60,6 @@ public:
 	
 	
 	std::vector<std::string> commands;
-//	bool debugCommands = true; //kabuloso
-	bool debugCommands = false; //kabuloso
 
 	const std::string buildConfigurations[6] = {
 		"99FA3DBB1C7456C400CFA0EE",
@@ -78,4 +73,16 @@ public:
 	void alert(std::string s) {
 		std::cout << ">>>>> " << s << std::endl;
 	}
+	
+	
+//	std::map <std::string, std::string> folderUUID;
+	std::map <std::string, std::string> folderUUID = {
+		{ "src", "E4B69E1C0A3A1BDC003C02F2" },
+		{ "addons", "BB4B014C10F69532006C3DED" },
+		{ "localAddons", "6948EE371B920CB800B5AC1A" },
+		{ "", projRootUUID }
+	};
+	
+	std::string getFolderUUID(std::string folder);
+
 };
