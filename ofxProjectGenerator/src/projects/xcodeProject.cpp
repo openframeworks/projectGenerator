@@ -1,15 +1,13 @@
 #include "xcodeProject.h"
 #include "Utils.h"
 
-#define STRINGIFY(A)  #A
-
 xcodeProject::xcodeProject(std::string target)
 :baseProject(target){
     alert("xcodeProject");
 
 	// FIXME: remove unused variables
     if( target == "osx" ){
-		
+		// FIXME: get this UUIDs for IOS too
 		buildConfigurationListUUID = "E4B69B5A0A3A1756003C02F2";
 		buildActionMaskUUID = "E4B69B580A3A1756003C02F2";
 
@@ -125,10 +123,8 @@ bool xcodeProject::createProjectFile(){
 			findandreplaceInTexfile(projectDir + "config.make", "../../..", relPath2);
 		}
 	}
-
 	return true;
 }
-
 
 void xcodeProject::saveScheme(){
 	alert("saveScheme");
@@ -156,10 +152,8 @@ void xcodeProject::saveScheme(){
 	}
 }
 
-
 void xcodeProject::saveMakefile(){
 	alert("saveMakefile");
-
 	std::string makefile = ofFilePath::join(projectDir,"Makefile");
 	if(!ofFile(makefile).exists()){
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "Makefile"), makefile, true, true);
@@ -171,14 +165,12 @@ void xcodeProject::saveMakefile(){
 	}
 }
 
-
 bool xcodeProject::loadProjectFile(){
 	alert("loadProjectFile");
 	renameProject();
 	// FIXME: provisorio
 	return true;
 }
-
 
 void xcodeProject::renameProject(){
 	alert("renameProject");
@@ -188,6 +180,7 @@ void xcodeProject::renameProject(){
 	// FIXME: only if it is Debug
 	// FIXME: review BUILT_PRODUCTS_DIR
 	
+	// quase igual
 //	E4B69B5A0A3A1756003C02F2
 //	E4B69B5B0A3A1756003C02F2
 	commands.emplace_back("Delete :objects:E4B69B5B0A3A1756003C02F2:path  ");
@@ -198,10 +191,8 @@ void xcodeProject::renameProject(){
 
 std::string xcodeProject::getFolderUUID(std::string folder) {
 	std::string UUID = "";
-	if ( folderUUID.find(folder) == folderUUID.end() ) {
-	  // not found
+	if ( folderUUID.find(folder) == folderUUID.end() ) { // NOT FOUND
 		std::vector < std::string > folders = ofSplitString(folder, "/", true);
-		
 		std::string lastFolderUUID = projRootUUID;
 		
 		if (folders.size()){
@@ -212,24 +203,24 @@ std::string xcodeProject::getFolderUUID(std::string folder) {
 				
 				// folder is still not found here:
 				if ( folderUUID.find(fullPath) == folderUUID.end() ) {
-					std::string thisUUID = generateUUID(fullPath);
-//					std::cout << "path not found, generating " << fullPath << " : " << thisUUID << " lastfolder = " << lastFolderUUID << std::endl;
 
+					std::string thisUUID = generateUUID(fullPath);
 					folderUUID[fullPath] = thisUUID;
-					// aqui adiciona o UUID pro grupo, prepara um array pra receber recipientes.
+					
+					// here we add an UUID for the group (folder) and we initialize an array to receive children (files or folders inside)
 					commands.emplace_back("Add :objects:"+thisUUID+":children array");
 					commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
 					commands.emplace_back("Add :objects:"+thisUUID+":name string "+folders[a]);
 					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string <group>");
 
-					// adicionar aqui
+					// And this new object is cointained in parent hierarchy, or even projRootUUID
 					commands.emplace_back("Add :objects:"+lastFolderUUID+":children: string " + thisUUID);
+					
+					// keep this UUID as parent for the next folder.
 					lastFolderUUID = thisUUID;
 				} else {
 					lastFolderUUID = folderUUID[fullPath];
-//					std::cout << "path found, using : " << fullPath << " : " << lastFolderUUID << std::endl;
 				}
-//				std::cout << a << " -- " << fullPath << " -- " << folders[a] << std::endl;
 			 }
 		 }
 		UUID = lastFolderUUID;
@@ -388,9 +379,6 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 	// (D) folder
 	//-----------------------------------------------------------------
 
-
-	// TODO: Work
-
 	if (bAddFolder == true){
 		std::string folderUUID = getFolderUUID(folder);
 		commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
@@ -399,9 +387,6 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 
 	}
 }
-
-
-
 
 void xcodeProject::addFramework(std::string name, std::string path, std::string folder){
 	alert ("addFramework name:" + name + " -- path:" + path + " -- folder:" + folder);
@@ -418,7 +403,6 @@ void xcodeProject::addFramework(std::string name, std::string path, std::string 
     //-----------------------------------------------------------------
     
     // encoding may be messing up for frameworks... so I switched to a pbx file ref without encoding fields
-    
     std::string UUID = generateUUID( name );
 
     commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string wrapper.framework");
@@ -447,6 +431,7 @@ void xcodeProject::addFramework(std::string name, std::string path, std::string 
 		commands.emplace_back("Add :options:"+buildUUID2+":isa string PBXBuildFile");
 		
 		// UUID hardcoded para PBXCopyFilesBuildPhase
+		// FIXME: hardcoded
 		commands.emplace_back("Add :options:E4C2427710CC5ABF004149E2:files: string " + buildUUID2);
     }
     
@@ -476,14 +461,13 @@ void xcodeProject::addFramework(std::string name, std::string path, std::string 
     
     if (target != "ios" && folder.size() != 0){
         // add it to the linking phases...
+		// FIXME: hardcoded UUID
 		commands.emplace_back("Add :objects:E4B69B590A3A1756003C02F2:files: string "+buildUUID);
     }
 }
 
-
 void xcodeProject::addInclude(std::string includeName){
 	alert("addInclude " + includeName);
-
 	// Adding source to all build configurations, debug release appstore
 	for (auto & c : buildConfigurations) {
 		commands.emplace_back("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
@@ -491,20 +475,20 @@ void xcodeProject::addInclude(std::string includeName){
 }
 
 void xcodeProject::addLibrary(const LibraryBinary & lib){
+	alert("addInclude " + lib.path);
 	// TODO: Test this
 	for (auto & c : buildConfigs) {
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + lib.path);
 	}
 }
 
-// FIXME: libtype is unused here
+// FIXME: libtype is unused here and in the next configurations
 void xcodeProject::addLDFLAG(std::string ldflag, LibType libType){
 	for (auto & c : buildConfigs) {
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ldflag);
 	}
 }
 
-// FIXME: libtype is unused here
 void xcodeProject::addCFLAG(std::string cflag, LibType libType){
 	for (auto & c : buildConfigs) {
 		// FIXME: add array here if it doesnt exist
@@ -513,7 +497,6 @@ void xcodeProject::addCFLAG(std::string cflag, LibType libType){
 	}
 }
 
-// FIXME: libtype is unused here
 void xcodeProject::addDefine(std::string define, LibType libType){
 	for (auto & c : buildConfigs) {
 		// FIXME: add array here if it doesnt exist
@@ -546,7 +529,6 @@ void xcodeProject::addAfterRule(std::string rule){
 
 }
 
-
 void xcodeProject::addAddon(ofAddon & addon){
 	alert("addAddon : " + addon.name);
 
@@ -569,8 +551,6 @@ void xcodeProject::addAddon(ofAddon & addon){
 			}
 		}
 	}
-//	ofLogNotice() << "adding addon: " << addon.name;
-//	ofLogNotice() << "addon srcfiles: " <<  addon.srcFiles.size();
 	
     addons.push_back(addon);
 
@@ -636,13 +616,10 @@ void xcodeProject::addAddon(ofAddon & addon){
     }
 }
 
-
 bool xcodeProject::saveProjectFile(){
 	alert("saveProjectFile");
-
 	std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
 	std::string command = "/usr/libexec/PlistBuddy " + fileName;
-//	std::cout << command << std::endl;
 	for (auto & c : commands) {
 		command += " -c \"" + c + "\"";
 //		std::cout << c << std::endl;
@@ -650,6 +627,5 @@ bool xcodeProject::saveProjectFile(){
 	std::cout << ofSystem(command) << std::endl;
 	
 	// FIXME: temporary
-	bool bOk = true;
-	return bOk;
+	return true;
 }
