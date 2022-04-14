@@ -3,23 +3,18 @@
 #pragma once
 
 #include "baseProject.h"
-//#include "pugixml.hpp"
 
 class xcodeProject : public baseProject {
-
 public:
-
 	xcodeProject(std::string target);
 
 private:
-
 	bool createProjectFile();
 	bool loadProjectFile();
 	bool saveProjectFile();
 	void saveMakefile();
 
 public:
-
 	void addSrc(std::string srcFile, std::string folder, SrcType type=DEFAULT);
 	void addInclude(std::string includeName);
 	void addLibrary(const LibraryBinary & lib);
@@ -30,35 +25,29 @@ public:
 	void addDefine(std::string define, LibType libType = RELEASE_LIB);
 	
 	// specific to OSX
-	void addFramework(std::string name, std::string path, std::string folder="");  // folder if for non system frameworks
-	
-		
-	
-	void addAddon(ofAddon & addon);
+	// folder if for non system frameworks
+	void addFramework(std::string name, std::string path, std::string folder="");
 
-//    void saveWorkspaceXML();
+	void addAddon(ofAddon & addon);
 	void saveScheme();
 	void renameProject();
 
+
 	std::string projRootUUID;
-	std::string srcUUID;
-	std::string addonUUID;
-	std::string localAddonUUID;
+//	std::string srcUUID;
+//	std::string addonUUID;
+//	std::string localAddonUUID;
 	std::string resourcesUUID;
-	std::string buildPhaseUUID;                 // note this UUID keeps refs all things to build
+//	std::string buildPhaseUUID;                 // note this UUID keeps refs all things to build
 	std::string frameworksUUID;
 	std::string buildPhaseResourcesUUID;
-	std::string frameworksBuildPhaseUUID;
+//	std::string frameworksBuildPhaseUUID;
 	std::string afterPhaseUUID;
-	std::string buildPhasesUUID;                // note this UUID is in an array of *all* the build steps 
-	
-	std::string buildConfigurationListUUID;                // note this UUID is in an array of *all* the build steps
-	std::string buildActionMaskUUID;
-	
-//	pugi::xml_node insertPoint;         // where are we inserting items (at the second dict tag,
-										// /plist[1]/dict[1]/dict[2])
-//    bool findArrayForUUID(std::string UUID, pugi::xml_node & nodeMe);
+	std::string buildPhasesUUID;                // note this UUID is in an array of *all* the build steps
 
+	// new vars
+	std::string buildConfigurationListUUID;
+	std::string buildActionMaskUUID;
 	
 	
 	std::vector<std::string> commands;
@@ -71,8 +60,6 @@ public:
 		"99FA3DBB1C7456C400CFA0EE", //AppStore SDKROOT macosx
 		"E4B69B4E0A3A1720003C02F2", //Debug SDKROOT macosx
 		"E4B69B4F0A3A1720003C02F2", //Release SDKROOT macosx
-		
-		
 	};
 	
 	const std::string buildConfigs[3] = {
@@ -82,10 +69,6 @@ public:
 	};
 	
 	std::map <std::string, std::string> folderUUID = {
-		{ "src", "E4B69E1C0A3A1BDC003C02F2" },
-		{ "addons", "BB4B014C10F69532006C3DED" },
-		{ "localAddons", "6948EE371B920CB800B5AC1A" },
-		{ "", projRootUUID }
 	};
 	
 	std::string getFolderUUID(std::string folder);

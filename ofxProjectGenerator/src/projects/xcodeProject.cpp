@@ -3,10 +3,17 @@
 
 xcodeProject::xcodeProject(std::string target)
 :baseProject(target){
-	alert("xcodeProject");
-
+	alert("xcodeProject");	
+	
 	// FIXME: remove unused variables
 	if( target == "osx" ){
+		folderUUID = {
+			{ "src", "E4B69E1C0A3A1BDC003C02F2" },
+			{ "addons", "BB4B014C10F69532006C3DED" },
+			{ "localAddons", "6948EE371B920CB800B5AC1A" },
+			{ "", "E4B69B4A0A3A1720003C02F2" }
+		};
+
 		// FIXME: get this UUIDs for IOS too
 		buildConfigurationListUUID = "E4B69B5A0A3A1756003C02F2";
 		buildActionMaskUUID = "E4B69B580A3A1756003C02F2";
@@ -15,14 +22,21 @@ xcodeProject::xcodeProject(std::string target)
 //        srcUUID         = "E4B69E1C0A3A1BDC003C02F2"; // covered in map
 //        addonUUID       = "BB4B014C10F69532006C3DED"; // covered in map
 //        localAddonUUID  = "6948EE371B920CB800B5AC1A"; // covered in map
-//        buildPhaseUUID  = "E4B69E200A3A1BDC003C02F2";   // not needed anymore, we use buildactionmask UUID 
+//        buildPhaseUUID  = "E4B69E200A3A1BDC003C02F2";   // not needed, we use buildactionmask UUID
 		resourcesUUID   = "";
 		frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase
 		afterPhaseUUID  = "928F60851B6710B200E2D791";
 		buildPhasesUUID  = "E4C2427710CC5ABF004149E2";
-		frameworksBuildPhaseUUID = "E4328149138ABC9F0047C5CB";
+//		frameworksBuildPhaseUUID = "E4328149138ABC9F0047C5CB";
 		
 	}else{
+		folderUUID = {
+			{ "src", 			"E4D8936A11527B74007E1F53" },
+			{ "addons", 		"BB16F26B0F2B646B00518274" },
+			{ "localAddons", 	"6948EE371B920CB800B5AC1A" },
+			{ "", 				"29B97314FDCFA39411CA2CEA" }
+		};
+
 		projRootUUID    = "29B97314FDCFA39411CA2CEA";
 //        srcUUID         = "E4D8936A11527B74007E1F53";
 //        addonUUID       = "BB16F26B0F2B646B00518274";
@@ -32,15 +46,9 @@ xcodeProject::xcodeProject(std::string target)
 		buildPhaseResourcesUUID = "BB24DDCA10DA781C00E9C588";
 		frameworksUUID  = "1DF5F4E00D08C38300B7A737";   //PBXFrameworksBuildPhase  // todo: check this?
 		afterPhaseUUID  = "928F60851B6710B200E2D791";
-		buildPhasesUUID = "9255DD331112741900D6945E";   //
-		
-		folderUUID["src"] = srcUUID;
-		folderUUID["addons"] = addonUUID;
-		folderUUID["localAddons"] = localAddonUUID;
-		folderUUID[""] = projRootUUID;
+		buildPhasesUUID = "9255DD331112741900D6945E";
 	}
 };
-
 
 
 bool xcodeProject::createProjectFile(){
@@ -532,6 +540,7 @@ void xcodeProject::addAfterRule(std::string rule){
 	commands.emplace_back("Add :objects:"+afterPhaseUUID+":shellScript string " + rule);
 	
 	// adding this phase to build phases array
+	// TODO: Check if nit needs another buildConfigurationListUUID for debug.
 	commands.emplace_back("Add :objects:"+buildConfigurationListUUID+":buildPhases: string " + afterPhaseUUID);
 
 }
