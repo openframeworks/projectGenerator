@@ -168,7 +168,7 @@ void xcodeProject::saveMakefile(){
 bool xcodeProject::loadProjectFile(){
 	alert("loadProjectFile");
 	renameProject();
-	// FIXME: provisorio
+	// MARK: just to return something
 	return true;
 }
 
@@ -177,12 +177,8 @@ void xcodeProject::renameProject(){
 	
 	commands.emplace_back("Delete :objects:"+buildConfigurationListUUID+":name  ");
 	commands.emplace_back("Add :objects:"+buildConfigurationListUUID+":name string " + projectName);
-	// FIXME: only if it is Debug
 	// FIXME: review BUILT_PRODUCTS_DIR
-	
-	// quase igual
-//	E4B69B5A0A3A1756003C02F2
-//	E4B69B5B0A3A1756003C02F2
+	// TODO: Hardcode to variable
 	commands.emplace_back("Delete :objects:E4B69B5B0A3A1756003C02F2:path  ");
 	commands.emplace_back("Add :objects:E4B69B5B0A3A1756003C02F2:path string " + projectName + "Debug.app");
 
@@ -505,7 +501,6 @@ void xcodeProject::addCFLAG(std::string cflag, LibType libType){
 
 	for (auto & c : buildConfigurations) {
 		// FIXME: add array here if it doesnt exist
-		// FIXME: Test everything
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_CFLAGS array");
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_CFLAGS: string " + cflag);
 	}
@@ -514,7 +509,6 @@ void xcodeProject::addCFLAG(std::string cflag, LibType libType){
 void xcodeProject::addDefine(std::string define, LibType libType){
 	for (auto & c : buildConfigs) {
 		// FIXME: add array here if it doesnt exist
-		// FIXME: Test everything
 		commands.emplace_back("Add :objects:"+c+":buildSettings:GCC_PREPROCESSOR_DEFINITIONS: string " + define);
 	}
 }
@@ -523,7 +517,6 @@ void xcodeProject::addDefine(std::string define, LibType libType){
 void xcodeProject::addCPPFLAG(std::string cppflag, LibType libType){
 	for (auto & c : buildConfigs) {
 		// FIXME: add array here if it doesnt exist
-		// FIXME: Test everything
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_CPLUSPLUSFLAGS: string " + cppflag);
 	}
 }
@@ -636,7 +629,7 @@ bool xcodeProject::saveProjectFile(){
 	std::string command = "/usr/libexec/PlistBuddy " + fileName;
 	for (auto & c : commands) {
 		command += " -c \"" + c + "\"";
-		std::cout << c << std::endl;
+//		std::cout << c << std::endl;
 	}
 	std::cout << ofSystem(command) << std::endl;
 	
