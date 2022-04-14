@@ -188,7 +188,6 @@ void xcodeProject::renameProject(){
 
 }
 
-
 std::string xcodeProject::getFolderUUID(std::string folder) {
 	std::string UUID = "";
 	if ( folderUUID.find(folder) == folderUUID.end() ) { // NOT FOUND
