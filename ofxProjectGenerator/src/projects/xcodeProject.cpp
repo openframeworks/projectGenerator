@@ -423,8 +423,14 @@ void xcodeProject::addFramework(std::string name, std::string path, std::string 
 	// we add one of the build refs to the list of frameworks
 	// FIXME: removi aqui pra testar
 	// E7E077E715D3B6510020DFD4
-	commands.emplace_back("Add :objects:"+frameworksUUID+":children array");
-	commands.emplace_back("Add :objects:"+frameworksUUID+":children: string " + buildUUID);
+	
+	// TENTATIVA desesperada aqui...
+	std::string folderUUID = getFolderUUID(folder);
+	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
+
+	
+//	commands.emplace_back("Add :objects:"+frameworksUUID+":children array");
+//	commands.emplace_back("Add :objects:"+frameworksUUID+":children: string " + buildUUID);
 
 	// we add the second to a final build phase for copying the framework into app.   we need to make sure we *don't* do this for system frameworks
 	
