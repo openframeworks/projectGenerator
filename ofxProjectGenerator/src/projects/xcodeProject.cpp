@@ -1,5 +1,7 @@
 #include "xcodeProject.h"
 #include "Utils.h"
+#include "ofXml.h"
+#include <iostream>
 
 xcodeProject::xcodeProject(std::string target)
 :baseProject(target){
@@ -70,42 +72,37 @@ bool xcodeProject::createProjectFile(){
 
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"Project.xcconfig"),projectDir, true, true);
 
-	if( target == "osx" ){
-		ofFile::copyFromTo(ofFilePath::join(templatePath,"openFrameworks-Info.plist"),projectDir, true, true);
+	
+	ofDirectory binDirectory(ofFilePath::join(projectDir, "bin"));
+	if (!binDirectory.exists()){
+		ofDirectory dataDirectory(ofFilePath::join(projectDir, "bin/data"));
+		dataDirectory.create(true);
+	}
+	if(binDirectory.exists()){
+		ofDirectory dataDirectory(ofFilePath::join(binDirectory.path(), "data"));
+		if (!dataDirectory.exists()){
+			dataDirectory.create(false);
+		}
 		
-		ofDirectory binDirectory(ofFilePath::join(projectDir, "bin"));
-		if (!binDirectory.exists()){
-			ofDirectory dataDirectory(ofFilePath::join(projectDir, "bin/data"));
-			dataDirectory.create(true);
+		// originally only on IOS
+		//this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
+		ofDirectory srcDataDir(ofFilePath::join(templatePath, "bin/data"));
+		if( srcDataDir.exists() ){
+			baseProject::recursiveCopyContents(srcDataDir, dataDirectory);
 		}
-		if(binDirectory.exists()){
-			ofDirectory dataDirectory(ofFilePath::join(binDirectory.path(), "data"));
-			if (!dataDirectory.exists()){
-				dataDirectory.create(false);
-			}
+	}
+	
+	
+	if( target == "osx" ){
+		if (!ofFile::doesFileExist(ofFilePath::join(projectDir, "openFrameworks-Info.plist"))) {
+			ofFile::copyFromTo(ofFilePath::join(templatePath,"openFrameworks-Info.plist"),projectDir, true, true);
+		} else {
+			std::cout << "openFrameworks-Info.plist already exists" << std::endl;
 		}
-
 	}else{
 		ofFile::copyFromTo(ofFilePath::join(templatePath,"ofxiOS-Info.plist"),projectDir, true, true);
 		ofFile::copyFromTo(ofFilePath::join(templatePath,"ofxiOS_Prefix.pch"),projectDir, true, true);
 
-		ofDirectory binDirectory(ofFilePath::join(projectDir, "bin"));
-		if (!binDirectory.exists()){
-			ofDirectory dataDirectory(ofFilePath::join(projectDir, "bin/data"));
-			dataDirectory.create(true);
-		}
-		if(binDirectory.exists()){
-			ofDirectory dataDirectory(ofFilePath::join(binDirectory.path(), "data"));
-			if (!dataDirectory.exists()){
-				dataDirectory.create(false);
-			}
-			
-			//this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
-			ofDirectory srcDataDir(ofFilePath::join(templatePath, "bin/data"));
-			if( srcDataDir.exists() ){
-				baseProject::recursiveCopyContents(srcDataDir, dataDirectory);
-			}
-		}
 		ofDirectory mediaAssetsTemplateDirectory(ofFilePath::join(templatePath, "mediaAssets"));
 		ofDirectory mediaAssetsProjectDirectory(ofFilePath::join(projectDir, "mediaAssets"));
 		if (!mediaAssetsProjectDirectory.exists()){
@@ -120,8 +117,11 @@ bool xcodeProject::createProjectFile(){
 
 	// make everything relative the right way.
 	std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
+//	std::cout << "XXXXX " << relRoot << std::endl;
 	if (relRoot != "../../../"){
 		std::string relPath2 = relRoot;
+//		std::cout << "XXXXX " << relPath2 << std::endl;
+		
 		relPath2.erase(relPath2.end()-1);
 		findandreplaceInTexfile(projectDir + projectName + ".xcodeproj/project.pbxproj", "../../..", relPath2);
 		//findandreplaceInTexfile(projectDir + "Project.xcconfig", "../../../", relRoot);
@@ -162,15 +162,22 @@ void xcodeProject::saveScheme(){
 
 void xcodeProject::saveMakefile(){
 	alert("saveMakefile");
-	std::string makefile = ofFilePath::join(projectDir,"Makefile");
-	if(!ofFile(makefile).exists()){
-		ofFile::copyFromTo(ofFilePath::join(templatePath, "Makefile"), makefile, true, true);
+	for (auto & f : {"Makefile", "config.make" }) {
+		std::string fileName = ofFilePath::join(projectDir, f);
+		if(!ofFile(fileName).exists()){
+			ofFile::copyFromTo(ofFilePath::join(templatePath, f), fileName, true, true);
+		}
 	}
-
-	std::string configmake = ofFilePath::join(projectDir,"config.make");
-	if(!ofFile(configmake).exists()){
-		ofFile::copyFromTo(ofFilePath::join(templatePath, "config.make"), configmake, true, true);
-	}
+	
+//	std::string makefile = ofFilePath::join(projectDir,"Makefile");
+//	if(!ofFile(makefile).exists()){
+//		ofFile::copyFromTo(ofFilePath::join(templatePath, "Makefile"), makefile, true, true);
+//	}
+//
+//	std::string configmake = ofFilePath::join(projectDir,"config.make");
+//	if(!ofFile(configmake).exists()){
+//		ofFile::copyFromTo(ofFilePath::join(templatePath, "config.make"), configmake, true, true);
+//	}
 }
 
 bool xcodeProject::loadProjectFile(){
@@ -211,9 +218,9 @@ std::string xcodeProject::getFolderUUID(std::string folder) {
 					folderUUID[fullPath] = thisUUID;
 					
 					// here we add an UUID for the group (folder) and we initialize an array to receive children (files or folders inside)
-					commands.emplace_back("Add :objects:"+thisUUID+":children array");
 					commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
 					commands.emplace_back("Add :objects:"+thisUUID+":name string "+folders[a]);
+					commands.emplace_back("Add :objects:"+thisUUID+":children array");
 					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string <group>");
 
 					// And this new object is cointained in parent hierarchy, or even projRootUUID
@@ -326,16 +333,17 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 	std::string name, path;
 	splitFromLast(srcFile, "/", path, name);
 
+	commands.emplace_back("Add :objects:"+UUID+":path string "+srcFile);
+	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
+	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
 	if(ext == "xib"){
 		commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string "+fileKind);
 	} else {
 		commands.emplace_back("Add :objects:"+UUID+":explicitFileType string "+fileKind);
 	}
+	//	commands.emplace_back("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
+	commands.emplace_back("Add :objects:"+UUID+":sourceTree string <group>");
 	commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
-	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
-	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
-	commands.emplace_back("Add :objects:"+UUID+":path string "+srcFile);
-	commands.emplace_back("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
 
 	//-----------------------------------------------------------------
 	// (B) BUILD REF
@@ -410,18 +418,20 @@ void xcodeProject::addFramework(std::string name, std::string path, std::string 
 	// encoding may be messing up for frameworks... so I switched to a pbx file ref without encoding fields
 	std::string UUID = generateUUID( name );
 
-	commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string wrapper.framework");
 //	commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
+	commands.emplace_back("Add :objects:"+UUID+":path string "+path);
 	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
 	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
-	commands.emplace_back("Add :objects:"+UUID+":path string "+path);
+	commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string wrapper.framework");
 	commands.emplace_back("Add :objects:"+UUID+":sourceTree string <group>");
 	
-	
 	std::string buildUUID = generateUUID(name + "-build");
-	commands.emplace_back("Add :objects:"+buildUUID+":fileRef string "+UUID);
 	commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
+	commands.emplace_back("Add :objects:"+buildUUID+":fileRef string "+UUID);
 	
+	// new - code sign frameworks on copy
+	commands.emplace_back("Add :objects:"+buildUUID+":settings:ATTRIBUTES array");
+	commands.emplace_back("Add :objects:"+buildUUID+":settings:ATTRIBUTES: string CodeSignOnCopy");
 
 	// we add one of the build refs to the list of frameworks
 	// FIXME: removi aqui pra testar
@@ -444,8 +454,13 @@ void xcodeProject::addFramework(std::string name, std::string path, std::string 
 		commands.emplace_back("Add :objects:"+buildUUID2+":fileRef string "+UUID);
 		commands.emplace_back("Add :objects:"+buildUUID2+":isa string PBXBuildFile");
 		
+		// new - code sign frameworks on copy
+		commands.emplace_back("Add :objects:"+buildUUID2+":settings:ATTRIBUTES array");
+		commands.emplace_back("Add :objects:"+buildUUID2+":settings:ATTRIBUTES: string CodeSignOnCopy");
+
+		
 		// UUID hardcoded para PBXCopyFilesBuildPhase
-		// FIXME: hardcoded
+		// FIXME: hardcoded - this is the same for the next fixme. so maybe a clearer ident can make things better here.
 		commands.emplace_back("Add :objects:E4C2427710CC5ABF004149E2:files: string " + buildUUID2);
 	}
 	
@@ -634,14 +649,147 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 bool xcodeProject::saveProjectFile(){
 	alert("saveProjectFile");
-	std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
-	std::string command = "/usr/libexec/PlistBuddy " + fileName;
-	for (auto & c : commands) {
-		command += " -c \"" + c + "\"";
-//		std::cout << c << std::endl;
-	}
-	std::cout << ofSystem(command) << std::endl;
 	
+	static std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
+	
+
+//	if (2==3)
+	{
+		std::string command = "/usr/libexec/PlistBuddy " + fileName;
+		std::string allCommands = "";
+		for (auto & c : commands) {
+			command += " -c \"" + c + "\"";
+			allCommands += c + "\n";
+		}
+		std::cout << ofSystem(command) << std::endl;
+		std::cout << allCommands << std::endl;
+	}
+	
+
+	/*
+	http://xpather.com
+	/plist/dict/key
+	 https://www.w3.org/2005/xpath-functions/
+
+	 /plist/dict/key/
+	 /plist/dict/key[text()='objects']/following-sibling::dict/
+	 
+	 /plist/dict/dict/key[text()='6948EE371B920CB800B5AC1A']
+	 
+	 //key[text()='6948EE371B920CB800B5AC1A']
+	 //key[text()='6948EE371B920CB800B5AC1A']/following-sibling::node()[2]
+	 //key[text()='6948EE371B920CB800B5AC1A']/following-sibling::dict[1]
+	 
+	 */
+	
+	
+	pugi::xml_document doc;
+	pugi::xml_parse_result result = doc.load_file(fileName.c_str());
+
+//	doc.load(fileName);
+//	ofXml xml;
+//	xml.load(fileName);
+//	std::cout << xml << std::endl;
+	//	auto node = xml.getChild(path);
+	//	if (nodes) {
+	//		std::cout << "YESS " << std::endl;
+	//	} else {
+	//		std::cout << "node not found : " << path << " : " << nodes << std::endl;
+	//	}
+
+
+//	const std::string path = "//objects/key[text()='6948EE371B920CB800B5AC1A']/following-sibling::dict[1]"; ///following-sibling::dict[1]
+//	auto nodes = doc.select_nodes(path.c_str());
+//	std::cout << "------" << std::endl;
+//	for(auto & node: nodes)
+//	{
+//		std::cout << node.node().name() << std::endl;
+//	}
+//	std::cout << "------" << std::endl;
+		
+//	if (2==3)
+	for (auto & c : commands) {
+		
+		std::cout << c << std::endl;
+		
+		std::vector<std::string> cols = ofSplitString(c, " ");
+		std::string thispath = cols[1];
+		
+		std::vector<std::string> parts = ofSplitString(thispath, ":");
+		std::string xpath = "/";
+		
+		//	:objects:E4B69B610A3A1757003C02F2:buildSettings:HEADER_SEARCH_PATHS:
+
+			//key[text()='objects']/following-sibling::dict[1]/key[text()='E4B69B610A3A1757003C02F2']/following-sibling::dict[1]/key[text()='buildSettings']
+		bool first = true;
+		for (auto & p : parts) {
+			if (!first) {
+				xpath += "/key[text()='"+p+"']/following-sibling::dict[1]";
+			} else {
+				first = false;
+			}
+		}
+		
+		std::cout << xpath << std::endl;
+		//    xpath_node(const xml_attribute& attribute, const xml_node& parent);
+		if (cols[2] == "string") {
+			
+//			00503                 xml_node insert_child_after(const char_t* name, const xml_node& node);
+//			auto node = doc.select_node(xpath.c_str());
+//			auto inserted = node.node().insert_child_after("key", node);
+//			inserted.append_attribute("name");
+
+//			pugi::xml_attribute = pugi::xml_attribute::as_string attr(cols[3]);
+//			pugi::xpath_node(attr, );
+		}
+		auto nodes = doc.select_nodes(xpath.c_str());
+		std::cout << "------" << std::endl;
+		for(auto & node: nodes)
+		{
+			std::cout << node.node().name() << std::endl;
+		}
+//		std::cout << "------" << std::endl;
+		
+//		path = path.substr(1);
+//		ofStringReplace(path, ":", "/following-sibling::*/");
+//		path = "/dict/"+path;
+		// if the last character in path is : or / then array value is appended.
+		
+//		auto node = xml.getChild(path);
+//		if (nodes)
+		{
+			if (cols[0] == "Delete") {
+//				xml.removeChild(node);
+			}
+		
+			if (cols[0] == "Add") {
+				if (cols[2] == "string") {
+//					node.appendChild("string").set(cols[3]);
+				} else {
+					std::cout << c << std::endl;
+				}
+			} else {
+				std::cout << c << std::endl;
+			}
+		}
+	}
 	// FIXME: temporary
 	return true;
 }
+
+/*
+ 
+ Delete :objects:E4B69B5A0A3A1756003C02F2:name
+ Delete :objects:E4B69B5B0A3A1756003C02F2:path
+ Add :objects:8EFFDE8A20D0EBA60F39CD03:children array
+ Add :objects:99FA3DBC1C7456C400CFA0EE:buildSettings:OTHER_CFLAGS array
+ Add :objects:99FA3DBB1C7456C400CFA0EE:buildSettings:OTHER_CFLAGS array
+ Add :objects:7F3C04577424427D348B1425:children array
+ Add :objects:2317994671CD76BBA16927B8:children array
+ Add :objects:65F3085962B3A8825746C3C2:children array
+ Add :objects:50EAFB5FF7C5722E7B4895C7:children array
+ Add :objects:49A9E39C52C2DF4DDA1E185F:children array
+ Add :objects:398D2AD7D162CE13BF40CD4F:children array
+ Add :objects:821159A073ABA066739FD401:children array
+
+ */
