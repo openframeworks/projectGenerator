@@ -202,17 +202,15 @@ bool xcodeProject::loadProjectFile(){
 void xcodeProject::renameProject(){
 	alert("renameProject");
 	
-	std::cout << "buildConfigurationListUUID : " << buildConfigurationListUUID << std::endl;
-	
-	commands.emplace_back("Delete :objects:"+buildConfigurationListUUID+":name  ");
-	commands.emplace_back("Add :objects:"+buildConfigurationListUUID+":name string " + projectName);
+	// std::cout << "buildConfigurationListUUID : " << buildConfigurationListUUID << std::endl;
+	commands.emplace_back("Set :objects:"+buildConfigurationListUUID+":name " + projectName);
 	// FIXME: review BUILT_PRODUCTS_DIR
-	// TODO: Hardcode to variable
 
 	// APENAS OSX aqui.
-	commands.emplace_back("Delete :objects:E4B69B5B0A3A1756003C02F2:path  ");
-	commands.emplace_back("Add :objects:E4B69B5B0A3A1756003C02F2:path string " + projectName + "Debug.app");
-
+	if( target == "osx" ){	
+		// TODO: Hardcode to variable
+		commands.emplace_back("Set :objects:E4B69B5B0A3A1756003C02F2:path " + projectName + "Debug.app");
+	}
 }
 
 std::string xcodeProject::getFolderUUID(std::string folder) {
