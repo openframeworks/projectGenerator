@@ -10,10 +10,10 @@ xcodeProject::xcodeProject(std::string target)
 	// FIXME: remove unused variables
 	if( target == "osx" ){
 		folderUUID = {
-			{ "src", "E4B69E1C0A3A1BDC003C02F2" },
-			{ "addons", "BB4B014C10F69532006C3DED" },
-			{ "localAddons", "6948EE371B920CB800B5AC1A" },
-			{ "", "E4B69B4A0A3A1720003C02F2" }
+			{ "src", 			"E4B69E1C0A3A1BDC003C02F2" },
+			{ "addons", 		"BB4B014C10F69532006C3DED" },
+			{ "localAddons",	"6948EE371B920CB800B5AC1A" },
+			{ "", 				"E4B69B4A0A3A1720003C02F2" }
 		};
 
 		// FIXME: get this UUIDs for IOS too (Maybe fixed now)
@@ -21,9 +21,6 @@ xcodeProject::xcodeProject(std::string target)
 		buildActionMaskUUID = "E4B69B580A3A1756003C02F2";
 
 		projRootUUID    = "E4B69B4A0A3A1720003C02F2";
-//        srcUUID         = "E4B69E1C0A3A1BDC003C02F2"; // covered in map
-//        addonUUID       = "BB4B014C10F69532006C3DED"; // covered in map
-//        localAddonUUID  = "6948EE371B920CB800B5AC1A"; // covered in map
 //        buildPhaseUUID  = "E4B69E200A3A1BDC003C02F2";   // not needed, we use buildactionmask UUID
 		resourcesUUID   = "";
 		frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase
@@ -43,9 +40,6 @@ xcodeProject::xcodeProject(std::string target)
 		};
 
 		projRootUUID    = "29B97314FDCFA39411CA2CEA";
-//        srcUUID         = "E4D8936A11527B74007E1F53";
-//        addonUUID       = "BB16F26B0F2B646B00518274";
-//        localAddonUUID  = "6948EE371B920CB800B5AC1A";
 //        buildPhaseUUID  = "E4D8936E11527B74007E1F53";
 		resourcesUUID   = "BB24DD8F10DA77E000E9C588";
 		buildPhaseResourcesUUID = "BB24DDCA10DA781C00E9C588";
@@ -100,11 +94,7 @@ bool xcodeProject::createProjectFile(){
 	
 	
 	if( target == "osx" ){
-		if (!ofFile::doesFileExist(ofFilePath::join(projectDir, "openFrameworks-Info.plist"))) {
-			ofFile::copyFromTo(ofFilePath::join(templatePath,"openFrameworks-Info.plist"),projectDir, true, true);
-		} else {
-			std::cout << "openFrameworks-Info.plist already exists" << std::endl;
-		}
+		ofFile::copyFromTo(ofFilePath::join(templatePath,"openFrameworks-Info.plist"),projectDir, true, true);
 	}else{
 		ofFile::copyFromTo(ofFilePath::join(templatePath,"ofxiOS-Info.plist"),projectDir, true, true);
 		ofFile::copyFromTo(ofFilePath::join(templatePath,"ofxiOS_Prefix.pch"),projectDir, true, true);
@@ -153,13 +143,11 @@ void xcodeProject::saveScheme(){
 	ofDirectory::createDirectory(schemeFolder, false, true);
 	
 	if(target=="osx"){
-		std::string schemeToD = schemeFolder + projectName + " Debug.xcscheme";
-		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample Debug.xcscheme"), schemeToD);
-	
-		std::string schemeToR = schemeFolder + projectName + " Release.xcscheme";
-		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample Release.xcscheme"), schemeToR);
-		findandreplaceInTexfile(schemeToD, "emptyExample", projectName);
-		findandreplaceInTexfile(schemeToR, "emptyExample", projectName);
+		for (auto & f : { std::string("Release"), std::string("Debug"), std::string("AppStore") }) {
+			std::string schemeTo = schemeFolder + projectName + " " +f+ ".xcscheme";
+			ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample "+f+".xcscheme"), schemeTo);
+			findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
+		}	
 	 
 		std::string workspaceTo = projectDir  + projectName + ".xcodeproj/project.xcworkspace";
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/project.xcworkspace"), workspaceTo);
@@ -172,24 +160,27 @@ void xcodeProject::saveScheme(){
 	}
 }
 
+// TEST
+// void copyIfNotExists(const std::string f) {
+// 	std::string fileName = ofFilePath::join(projectDir, f);
+// 	if(!ofFile(fileName).exists()){
+// 		ofFile::copyFromTo(ofFilePath::join(templatePath, f), fileName, true, true);
+// 	}
+// }
+
 void xcodeProject::saveMakefile(){
 	alert("saveMakefile");
+
+
 	for (auto & f : {"Makefile", "config.make" }) {
 		std::string fileName = ofFilePath::join(projectDir, f);
 		if(!ofFile(fileName).exists()){
 			ofFile::copyFromTo(ofFilePath::join(templatePath, f), fileName, true, true);
+
 		}
 	}
 	
-//	std::string makefile = ofFilePath::join(projectDir,"Makefile");
-//	if(!ofFile(makefile).exists()){
-//		ofFile::copyFromTo(ofFilePath::join(templatePath, "Makefile"), makefile, true, true);
-//	}
-//
-//	std::string configmake = ofFilePath::join(projectDir,"config.make");
-//	if(!ofFile(configmake).exists()){
-//		ofFile::copyFromTo(ofFilePath::join(templatePath, "config.make"), configmake, true, true);
-//	}
+
 }
 
 bool xcodeProject::loadProjectFile(){
