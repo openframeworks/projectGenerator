@@ -16,7 +16,7 @@ xcodeProject::xcodeProject(std::string target)
 			{ "", "E4B69B4A0A3A1720003C02F2" }
 		};
 
-		// FIXME: get this UUIDs for IOS too
+		// FIXME: get this UUIDs for IOS too (Maybe fixed now)
 		buildConfigurationListUUID = "E4B69B5A0A3A1756003C02F2";
 		buildActionMaskUUID = "E4B69B580A3A1756003C02F2";
 
@@ -32,6 +32,9 @@ xcodeProject::xcodeProject(std::string target)
 //		frameworksBuildPhaseUUID = "E4328149138ABC9F0047C5CB";
 		
 	}else{
+		buildConfigurationListUUID = "1D6058900D05DD3D006BFB54";
+		buildActionMaskUUID = "1D60588D0D05DD3D006BFB54";
+
 		folderUUID = {
 			{ "src", 			"E4D8936A11527B74007E1F53" },
 			{ "addons", 		"BB16F26B0F2B646B00518274" },
@@ -73,24 +76,27 @@ bool xcodeProject::createProjectFile(){
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"Project.xcconfig"),projectDir, true, true);
 
 	
-	ofDirectory binDirectory(ofFilePath::join(projectDir, "bin"));
+	ofDirectory binDirectory(ofFilePath::join(projectDir, "b in"));
 	if (!binDirectory.exists()){
 		ofDirectory dataDirectory(ofFilePath::join(projectDir, "bin/data"));
 		dataDirectory.create(true);
+		dataDirectory.close();
 	}
 	if(binDirectory.exists()){
 		ofDirectory dataDirectory(ofFilePath::join(binDirectory.path(), "data"));
 		if (!dataDirectory.exists()){
 			dataDirectory.create(false);
 		}
-		
+		dataDirectory.close();
 		// originally only on IOS
 		//this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
 		ofDirectory srcDataDir(ofFilePath::join(templatePath, "bin/data"));
 		if( srcDataDir.exists() ){
 			baseProject::recursiveCopyContents(srcDataDir, dataDirectory);
 		}
+		srcDataDir.close();
 	}
+	binDirectory.close();
 	
 	
 	if( target == "osx" ){
@@ -108,19 +114,23 @@ bool xcodeProject::createProjectFile(){
 		if (!mediaAssetsProjectDirectory.exists()){
 			mediaAssetsTemplateDirectory.copyTo(mediaAssetsProjectDirectory.getAbsolutePath(), false, false);
 		}
+		mediaAssetsTemplateDirectory.close();
+		mediaAssetsProjectDirectory.close();
 	}
 
+	/// SAVESCHEME HERE
 	saveScheme();
+
 	if(target=="osx"){
 		saveMakefile();
 	}
 
 	// make everything relative the right way.
 	std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
-//	std::cout << "XXXXX " << relRoot << std::endl;
+	std::cout << "XXXXX Outside " << relRoot << std::endl;
 	if (relRoot != "../../../"){
 		std::string relPath2 = relRoot;
-//		std::cout << "XXXXX " << relPath2 << std::endl;
+		std::cout << "XXXXX Inside " << relPath2 << std::endl;
 		
 		relPath2.erase(relPath2.end()-1);
 		findandreplaceInTexfile(projectDir + projectName + ".xcodeproj/project.pbxproj", "../../..", relPath2);
@@ -143,10 +153,10 @@ void xcodeProject::saveScheme(){
 	ofDirectory::createDirectory(schemeFolder, false, true);
 	
 	if(target=="osx"){
-		std::string schemeToD = projectDir  + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/" + projectName + " Debug.xcscheme";
+		std::string schemeToD = schemeFolder + projectName + " Debug.xcscheme";
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample Debug.xcscheme"), schemeToD);
 	
-		std::string schemeToR = projectDir  + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/" + projectName + " Release.xcscheme";
+		std::string schemeToR = schemeFolder + projectName + " Release.xcscheme";
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample Release.xcscheme"), schemeToR);
 		findandreplaceInTexfile(schemeToD, "emptyExample", projectName);
 		findandreplaceInTexfile(schemeToR, "emptyExample", projectName);
@@ -154,7 +164,9 @@ void xcodeProject::saveScheme(){
 		std::string workspaceTo = projectDir  + projectName + ".xcodeproj/project.xcworkspace";
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/project.xcworkspace"), workspaceTo);
 	}else{
-		std::string schemeTo = projectDir  + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/" + projectName + ".xcscheme";
+
+		std::cout << "IOS sector" << std::endl;
+		std::string schemeTo = schemeFolder + projectName + ".xcscheme";
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme"), schemeTo);
 		findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
 	}
@@ -190,10 +202,14 @@ bool xcodeProject::loadProjectFile(){
 void xcodeProject::renameProject(){
 	alert("renameProject");
 	
+	std::cout << "buildConfigurationListUUID : " << buildConfigurationListUUID << std::endl;
+	
 	commands.emplace_back("Delete :objects:"+buildConfigurationListUUID+":name  ");
 	commands.emplace_back("Add :objects:"+buildConfigurationListUUID+":name string " + projectName);
 	// FIXME: review BUILT_PRODUCTS_DIR
 	// TODO: Hardcode to variable
+
+	// APENAS OSX aqui.
 	commands.emplace_back("Delete :objects:E4B69B5B0A3A1756003C02F2:path  ");
 	commands.emplace_back("Add :objects:E4B69B5B0A3A1756003C02F2:path string " + projectName + "Debug.app");
 
@@ -649,9 +665,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 bool xcodeProject::saveProjectFile(){
 	alert("saveProjectFile");
-	
 	static std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
-	
 
 //	if (2==3)
 	{
