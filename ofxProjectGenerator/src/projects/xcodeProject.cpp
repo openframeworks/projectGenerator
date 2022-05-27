@@ -95,6 +95,7 @@ bool xcodeProject::createProjectFile(){
 	
 	if( target == "osx" ){
 		ofFile::copyFromTo(ofFilePath::join(templatePath,"openFrameworks-Info.plist"),projectDir, true, true);
+		ofFile::copyFromTo(ofFilePath::join(templatePath,"of.entitlements"),projectDir, true, true);
 	}else{
 		ofFile::copyFromTo(ofFilePath::join(templatePath,"ofxiOS-Info.plist"),projectDir, true, true);
 		ofFile::copyFromTo(ofFilePath::join(templatePath,"ofxiOS_Prefix.pch"),projectDir, true, true);
@@ -170,8 +171,6 @@ void xcodeProject::saveScheme(){
 
 void xcodeProject::saveMakefile(){
 	alert("saveMakefile");
-
-
 	for (auto & f : {"Makefile", "config.make" }) {
 		std::string fileName = ofFilePath::join(projectDir, f);
 		if(!ofFile(fileName).exists()){
@@ -179,8 +178,6 @@ void xcodeProject::saveMakefile(){
 
 		}
 	}
-	
-
 }
 
 bool xcodeProject::loadProjectFile(){
