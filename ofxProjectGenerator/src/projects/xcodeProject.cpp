@@ -258,8 +258,6 @@ void xcodeProject::saveScheme(){
 			ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample "+f+".xcscheme"), schemeTo);
 			findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
 		}		
-	    findandreplaceInTexfile(schemeToD, "emptyExample", projectName);
-	    findandreplaceInTexfile(schemeToR, "emptyExample", projectName);
      
         std::string workspaceTo = projectDir  + projectName + ".xcodeproj/project.xcworkspace";
         ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/project.xcworkspace"), workspaceTo);
