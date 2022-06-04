@@ -2,6 +2,14 @@
 #include "Utils.h"
 #include "ofXml.h"
 #include <iostream>
+#include "json.hpp"
+
+using nlohmann::json;
+using nlohmann::json_pointer;
+using std::cout;
+using std::endl;
+using std::vector;
+
 
 xcodeProject::xcodeProject(std::string target)
 :baseProject(target){
@@ -148,7 +156,7 @@ void xcodeProject::saveScheme(){
 			std::string schemeTo = schemeFolder + projectName + " " +f+ ".xcscheme";
 			ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample "+f+".xcscheme"), schemeTo);
 			findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
-		}	
+		}
 	 
 		std::string workspaceTo = projectDir  + projectName + ".xcodeproj/project.xcworkspace";
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/project.xcworkspace"), workspaceTo);
@@ -288,12 +296,26 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 			addToBuild	= false;
 			addToBuildResource = true;
 			addToResources = true;
-		}else if(ext == ".metal"){
+		}
+		else if(ext == ".metal"){
 			fileKind = "file.metal";
 			addToBuild    = true;
 			addToBuildResource = true;
 			addToResources = true;
-		}else if( target == "ios" ){
+		}
+		else if(ext == ".entitlements"){
+			fileKind = "text.plist.entitlements";
+			addToBuild    = true;
+			addToBuildResource = true;
+			addToResources = true;
+		}
+		else if(ext == ".info"){
+			fileKind = "text.plist.xml";
+			addToBuild    = true;
+			addToBuildResource = true;
+			addToResources = true;
+		}
+		else if( target == "ios" ){
 			fileKind = "file";
 			addToBuild	= false;
 			addToResources = true;
@@ -623,24 +645,22 @@ void xcodeProject::addAddon(ofAddon & addon){
 		size_t found=addon.frameworks[i].find('/');
 		if (found==std::string::npos){
 			if (target == "ios"){
-				addFramework( addon.frameworks[i] + ".framework", "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/" + addon.frameworks[i] + ".framework", "addons/" + addon.name + "/frameworks");
+				addFramework( addon.frameworks[i] + ".framework", "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/" +
+					addon.frameworks[i] + ".framework", "addons/" + addon.name + "/frameworks");
 			} else {
-			 addFramework( addon.frameworks[i] + ".framework", "/System/Library/Frameworks/" + addon.frameworks[i] + ".framework", "addons/" + addon.name + "/frameworks");
+				addFramework( addon.frameworks[i] + ".framework",
+					"/System/Library/Frameworks/" +
+					addon.frameworks[i] + ".framework", "addons/" + addon.name + "/frameworks");
 			}
 		} else {
-			
 			if (ofIsStringInString(addon.frameworks[i], "/System/Library")){
-				
 				std::vector < std::string > pathSplit = ofSplitString(addon.frameworks[i], "/");
-				
 				addFramework(pathSplit[pathSplit.size()-1],
 							 addon.frameworks[i],
 							 "addons/" + addon.name + "/frameworks");
 				
 			} else {
-			
 				std::vector < std::string > pathSplit = ofSplitString(addon.frameworks[i], "/");
-				
 				addFramework(pathSplit[pathSplit.size()-1],
 							 addon.frameworks[i],
 							 addon.filesToFolders[addon.frameworks[i]]);
@@ -653,143 +673,69 @@ bool xcodeProject::saveProjectFile(){
 	alert("saveProjectFile");
 	static std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
 
-//	if (2==3)
-	{
-		std::string command = "/usr/libexec/PlistBuddy " + fileName;
-		std::string allCommands = "";
-		for (auto & c : commands) {
-			command += " -c \"" + c + "\"";
-			allCommands += c + "\n";
-		}
-		std::cout << ofSystem(command) << std::endl;
-		std::cout << allCommands << std::endl;
-	}
-	
+	std::string contents = ofBufferFromFile(fileName).getText();
+	json j = json::parse(contents);
 
-	/*
-	http://xpather.com
-	/plist/dict/key
-	 https://www.w3.org/2005/xpath-functions/
-
-	 /plist/dict/key/
-	 /plist/dict/key[text()='objects']/following-sibling::dict/
-	 
-	 /plist/dict/dict/key[text()='6948EE371B920CB800B5AC1A']
-	 
-	 //key[text()='6948EE371B920CB800B5AC1A']
-	 //key[text()='6948EE371B920CB800B5AC1A']/following-sibling::node()[2]
-	 //key[text()='6948EE371B920CB800B5AC1A']/following-sibling::dict[1]
-	 
-	 */
-	
-	
-	pugi::xml_document doc;
-	pugi::xml_parse_result result = doc.load_file(fileName.c_str());
-
-//	doc.load(fileName);
-//	ofXml xml;
-//	xml.load(fileName);
-//	std::cout << xml << std::endl;
-	//	auto node = xml.getChild(path);
-	//	if (nodes) {
-	//		std::cout << "YESS " << std::endl;
-	//	} else {
-	//		std::cout << "node not found : " << path << " : " << nodes << std::endl;
-	//	}
-
-
-//	const std::string path = "//objects/key[text()='6948EE371B920CB800B5AC1A']/following-sibling::dict[1]"; ///following-sibling::dict[1]
-//	auto nodes = doc.select_nodes(path.c_str());
-//	std::cout << "------" << std::endl;
-//	for(auto & node: nodes)
-//	{
-//		std::cout << node.node().name() << std::endl;
-//	}
-//	std::cout << "------" << std::endl;
-		
-//	if (2==3)
 	for (auto & c : commands) {
-		
-		std::cout << c << std::endl;
-		
 		std::vector<std::string> cols = ofSplitString(c, " ");
 		std::string thispath = cols[1];
-		
-		std::vector<std::string> parts = ofSplitString(thispath, ":");
-		std::string xpath = "/";
-		
-		//	:objects:E4B69B610A3A1757003C02F2:buildSettings:HEADER_SEARCH_PATHS:
+		/*
+		Set :objects:E4B69B5A0A3A1756003C02F2:name VideoPlayerNeue
+		Set :objects:E4B69B5B0A3A1756003C02F2:path VideoPlayerNeueDebug.app
+		Add :objects:E4B69B610A3A1757003C02F2:buildSettings:HEADER_SEARCH_PATHS: string src
+		Add :objects:E4B69B600A3A1757003C02F2:buildSettings:HEADER_SEARCH_PATHS: string src
+		Add :objects:99FA3DBC1C7456C400CFA0EE:buildSettings:HEADER_SEARCH_PATHS: string src
+		Add :objects:99FA3DBB1C7456C400CFA0EE:buildSettings:HEADER_SEARCH_PATHS: string src
+		Add :objects:E4B69B4E0A3A1720003C02F2:buildSettings:HEADER_SEARCH_PATHS: string src
+		Add :objects:E4B69B4F0A3A1720003C02F2:buildSettings:HEADER_SEARCH_PATHS: string src
+		*/
+		ofStringReplace(thispath, ":", "/");
 
-			//key[text()='objects']/following-sibling::dict[1]/key[text()='E4B69B610A3A1757003C02F2']/following-sibling::dict[1]/key[text()='buildSettings']
-		bool first = true;
-		for (auto & p : parts) {
-			if (!first) {
-				xpath += "/key[text()='"+p+"']/following-sibling::dict[1]";
-			} else {
-				first = false;
-			}
+		cout << c << endl;
+		cout << thispath << endl;
+		if (thispath.substr(thispath.length() -1) != "/") {
+			json::json_pointer p = json::json_pointer(thispath);
+			j[p] = cols[2];
+//			j[p] = "ARWIL";
+		} else {
+			thispath = thispath.substr(0, thispath.length() -1);
+			json::json_pointer p = json::json_pointer(thispath);
+			j[p].push_back(cols[3]);
+//			cout << ">>>>> array" << endl;
 		}
-		
-		std::cout << xpath << std::endl;
-		//    xpath_node(const xml_attribute& attribute, const xml_node& parent);
-		if (cols[2] == "string") {
-			
-//			00503                 xml_node insert_child_after(const char_t* name, const xml_node& node);
-//			auto node = doc.select_node(xpath.c_str());
-//			auto inserted = node.node().insert_child_after("key", node);
-//			inserted.append_attribute("name");
+		cout << "-------" << endl;
+		cout << endl;
 
-//			pugi::xml_attribute = pugi::xml_attribute::as_string attr(cols[3]);
-//			pugi::xpath_node(attr, );
-		}
-		auto nodes = doc.select_nodes(xpath.c_str());
-		std::cout << "------" << std::endl;
-		for(auto & node: nodes)
-		{
-			std::cout << node.node().name() << std::endl;
-		}
-//		std::cout << "------" << std::endl;
+		cout << fileName << endl;
 		
-//		path = path.substr(1);
-//		ofStringReplace(path, ":", "/following-sibling::*/");
-//		path = "/dict/"+path;
-		// if the last character in path is : or / then array value is appended.
+//		ofSaveJson(std::filesystem::path(fileName), j);
 		
-//		auto node = xml.getChild(path);
-//		if (nodes)
-		{
-			if (cols[0] == "Delete") {
-//				xml.removeChild(node);
-			}
-		
-			if (cols[0] == "Add") {
-				if (cols[2] == "string") {
-//					node.appendChild("string").set(cols[3]);
-				} else {
-					std::cout << c << std::endl;
-				}
-			} else {
-				std::cout << c << std::endl;
-			}
+		ofFile jsonFile(fileName, ofFile::WriteOnly);
+		try{
+			jsonFile << j;
+		}catch(std::exception & e){
+			ofLogError("ofSaveJson") << "Error saving json to " << fileName << ": " << e.what();
+			return false;
+		}catch(...){
+			ofLogError("ofSaveJson") << "Error saving json to " << fileName;
+			return false;
 		}
 	}
+	
+//	if (2==3)
+//	{
+//		std::string command = "/usr/libexec/PlistBuddy " + fileName;
+//		std::string allCommands = "";
+//		for (auto & c : commands) {
+//			command += " -c \"" + c + "\"";
+//			allCommands += c + "\n";
+//		}
+//		std::cout << ofSystem(command) << std::endl;
+//		std::cout << allCommands << std::endl;
+//	}
+	
+	
 	// FIXME: temporary
+	std::cout << j << std::endl;
 	return true;
 }
-
-/*
- 
- Delete :objects:E4B69B5A0A3A1756003C02F2:name
- Delete :objects:E4B69B5B0A3A1756003C02F2:path
- Add :objects:8EFFDE8A20D0EBA60F39CD03:children array
- Add :objects:99FA3DBC1C7456C400CFA0EE:buildSettings:OTHER_CFLAGS array
- Add :objects:99FA3DBB1C7456C400CFA0EE:buildSettings:OTHER_CFLAGS array
- Add :objects:7F3C04577424427D348B1425:children array
- Add :objects:2317994671CD76BBA16927B8:children array
- Add :objects:65F3085962B3A8825746C3C2:children array
- Add :objects:50EAFB5FF7C5722E7B4895C7:children array
- Add :objects:49A9E39C52C2DF4DDA1E185F:children array
- Add :objects:398D2AD7D162CE13BF40CD4F:children array
- Add :objects:821159A073ABA066739FD401:children array
-
- */
