@@ -669,73 +669,81 @@ void xcodeProject::addAddon(ofAddon & addon){
 	}
 }
 
+/*
+Set :objects:E4B69B5A0A3A1756003C02F2:name VideoPlayerNeue
+Set :objects:E4B69B5B0A3A1756003C02F2:path VideoPlayerNeueDebug.app
+Add :objects:E4B69B610A3A1757003C02F2:buildSettings:HEADER_SEARCH_PATHS: string src
+Add :objects:E4B69B600A3A1757003C02F2:buildSettings:HEADER_SEARCH_PATHS: string src
+Add :objects:99FA3DBC1C7456C400CFA0EE:buildSettings:HEADER_SEARCH_PATHS: string src
+Add :objects:99FA3DBB1C7456C400CFA0EE:buildSettings:HEADER_SEARCH_PATHS: string src
+Add :objects:E4B69B4E0A3A1720003C02F2:buildSettings:HEADER_SEARCH_PATHS: string src
+Add :objects:E4B69B4F0A3A1720003C02F2:buildSettings:HEADER_SEARCH_PATHS: string src
+*/
+
 bool xcodeProject::saveProjectFile(){
 	alert("saveProjectFile");
 	static std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
-
+//	cout << fileName << endl;
 	std::string contents = ofBufferFromFile(fileName).getText();
 	json j = json::parse(contents);
 
 	for (auto & c : commands) {
 		std::vector<std::string> cols = ofSplitString(c, " ");
 		std::string thispath = cols[1];
-		/*
-		Set :objects:E4B69B5A0A3A1756003C02F2:name VideoPlayerNeue
-		Set :objects:E4B69B5B0A3A1756003C02F2:path VideoPlayerNeueDebug.app
-		Add :objects:E4B69B610A3A1757003C02F2:buildSettings:HEADER_SEARCH_PATHS: string src
-		Add :objects:E4B69B600A3A1757003C02F2:buildSettings:HEADER_SEARCH_PATHS: string src
-		Add :objects:99FA3DBC1C7456C400CFA0EE:buildSettings:HEADER_SEARCH_PATHS: string src
-		Add :objects:99FA3DBB1C7456C400CFA0EE:buildSettings:HEADER_SEARCH_PATHS: string src
-		Add :objects:E4B69B4E0A3A1720003C02F2:buildSettings:HEADER_SEARCH_PATHS: string src
-		Add :objects:E4B69B4F0A3A1720003C02F2:buildSettings:HEADER_SEARCH_PATHS: string src
-		*/
 		ofStringReplace(thispath, ":", "/");
-
-		cout << c << endl;
-		cout << thispath << endl;
+//		cout << c << endl;
+//		cout << thispath << endl;
+		
 		if (thispath.substr(thispath.length() -1) != "/") {
+//			if (cols[0] == "Set") {
 			json::json_pointer p = json::json_pointer(thispath);
-			j[p] = cols[2];
-//			j[p] = "ARWIL";
-		} else {
+			if (cols[2] == "string") {
+				j[p] = cols[3];
+			}
+			else if (cols[2] == "array") {
+				j[p] = {};
+			}
+		}
+		else {
 			thispath = thispath.substr(0, thispath.length() -1);
 			json::json_pointer p = json::json_pointer(thispath);
-			j[p].push_back(cols[3]);
-//			cout << ">>>>> array" << endl;
+			try {
+				j[p].push_back(cols[3]);
+			} catch (std::exception e) {
+				cout << "ERROR " << endl;
+				cout << e.what() << endl;
+			}
 		}
-		cout << "-------" << endl;
-		cout << endl;
-
-		cout << fileName << endl;
-		
-//		ofSaveJson(std::filesystem::path(fileName), j);
-		
-		ofFile jsonFile(fileName, ofFile::WriteOnly);
-		try{
-			jsonFile << j;
-		}catch(std::exception & e){
-			ofLogError("ofSaveJson") << "Error saving json to " << fileName << ": " << e.what();
-			return false;
-		}catch(...){
-			ofLogError("ofSaveJson") << "Error saving json to " << fileName;
-			return false;
-		}
+//		cout << "-------" << endl;
+//		cout << endl;
 	}
 	
-//	if (2==3)
-//	{
-//		std::string command = "/usr/libexec/PlistBuddy " + fileName;
-//		std::string allCommands = "";
-//		for (auto & c : commands) {
-//			command += " -c \"" + c + "\"";
-//			allCommands += c + "\n";
-//		}
+//		ofSaveJson(std::filesystem::path(fileName), j);
+	
+	ofFile jsonFile(fileName, ofFile::WriteOnly);
+	try{
+		jsonFile << j;
+	}catch(std::exception & e){
+		ofLogError("ofSaveJson") << "Error saving json to " << fileName << ": " << e.what();
+		return false;
+	}catch(...){
+		ofLogError("ofSaveJson") << "Error saving json to " << fileName;
+		return false;
+	}
+
+	
+	// PLISTBUDDY
+	{
+		std::string command = "/usr/libexec/PlistBuddy " + fileName;
+		std::string allCommands = "";
+		for (auto & c : commands) {
+			command += " -c \"" + c + "\"";
+			allCommands += c + "\n";
+		}
 //		std::cout << ofSystem(command) << std::endl;
 //		std::cout << allCommands << std::endl;
-//	}
-	
+	}
 	
 	// FIXME: temporary
-	std::cout << j << std::endl;
 	return true;
 }
