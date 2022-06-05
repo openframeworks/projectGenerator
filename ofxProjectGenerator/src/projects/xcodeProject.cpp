@@ -415,7 +415,6 @@ bool xcodeProject::loadProjectFile(){
     pugi::xml_parse_result result = doc.load_file(ofToDataPath(fileName).c_str());
 
     return result.status==pugi::status_ok;
-
 }
 
 
