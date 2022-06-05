@@ -1,6 +1,6 @@
 #include "xcodeProject.h"
 #include "Utils.h"
-#include "ofXml.h"
+//#include "ofXml.h"
 #include <iostream>
 #include "json.hpp"
 
@@ -9,7 +9,6 @@ using nlohmann::json_pointer;
 using std::cout;
 using std::endl;
 using std::vector;
-
 
 xcodeProject::xcodeProject(std::string target)
 :baseProject(target){
@@ -60,8 +59,6 @@ xcodeProject::xcodeProject(std::string target)
 
 bool xcodeProject::createProjectFile(){
 	alert("createProjectFile");
-	// todo: some error checking.
-
 	std::string xcodeProject = ofFilePath::join(projectDir , projectName + ".xcodeproj");
 	
 	if (ofDirectory::doesDirectoryExist(xcodeProject)){
@@ -76,9 +73,8 @@ bool xcodeProject::createProjectFile(){
 					   ofFilePath::join(xcodeProject, "project.pbxproj"), true, true);
 
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"Project.xcconfig"),projectDir, true, true);
-
 	
-	ofDirectory binDirectory(ofFilePath::join(projectDir, "b in"));
+	ofDirectory binDirectory(ofFilePath::join(projectDir, "bin"));
 	if (!binDirectory.exists()){
 		ofDirectory dataDirectory(ofFilePath::join(projectDir, "bin/data"));
 		dataDirectory.create(true);
@@ -90,6 +86,7 @@ bool xcodeProject::createProjectFile(){
 			dataDirectory.create(false);
 		}
 		dataDirectory.close();
+		
 		// originally only on IOS
 		//this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
 		ofDirectory srcDataDir(ofFilePath::join(templatePath, "bin/data"));
@@ -99,7 +96,6 @@ bool xcodeProject::createProjectFile(){
 		srcDataDir.close();
 	}
 	binDirectory.close();
-	
 	
 	if( target == "osx" ){
 		ofFile::copyFromTo(ofFilePath::join(templatePath,"openFrameworks-Info.plist"),projectDir, true, true);
@@ -126,10 +122,8 @@ bool xcodeProject::createProjectFile(){
 
 	// make everything relative the right way.
 	std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
-	std::cout << "XXXXX Outside " << relRoot << std::endl;
 	if (relRoot != "../../../"){
 		std::string relPath2 = relRoot;
-		std::cout << "XXXXX Inside " << relPath2 << std::endl;
 		
 		relPath2.erase(relPath2.end()-1);
 		findandreplaceInTexfile(projectDir + projectName + ".xcodeproj/project.pbxproj", "../../..", relPath2);
@@ -162,7 +156,7 @@ void xcodeProject::saveScheme(){
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/project.xcworkspace"), workspaceTo);
 	}else{
 
-		std::cout << "IOS sector" << std::endl;
+		alert ("IOS sector");
 		std::string schemeTo = schemeFolder + projectName + ".xcscheme";
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme"), schemeTo);
 		findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
@@ -183,21 +177,19 @@ void xcodeProject::saveMakefile(){
 		std::string fileName = ofFilePath::join(projectDir, f);
 		if(!ofFile(fileName).exists()){
 			ofFile::copyFromTo(ofFilePath::join(templatePath, f), fileName, true, true);
-
 		}
 	}
 }
 
-bool xcodeProject::loadProjectFile(){
+bool xcodeProject::loadProjectFile(){ //base
 	alert("loadProjectFile");
 	renameProject();
 	// MARK: just to return something
 	return true;
 }
 
-void xcodeProject::renameProject(){
+void xcodeProject::renameProject(){ //base
 	alert("renameProject");
-	
 	// std::cout << "buildConfigurationListUUID : " << buildConfigurationListUUID << std::endl;
 	commands.emplace_back("Set :objects:"+buildConfigurationListUUID+":name " + projectName);
 	// FIXME: review BUILT_PRODUCTS_DIR
@@ -254,6 +246,8 @@ std::string xcodeProject::getFolderUUID(std::string folder) {
 
 // MARK: -
 void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type){
+	alert("addSrc " + srcFile + " : " + folder );
+
 	std::string buildUUID;
 
 	//-----------------------------------------------------------------
@@ -365,8 +359,8 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 	} else {
 		commands.emplace_back("Add :objects:"+UUID+":explicitFileType string "+fileKind);
 	}
-	//	commands.emplace_back("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
-	commands.emplace_back("Add :objects:"+UUID+":sourceTree string <group>");
+	commands.emplace_back("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
+//	commands.emplace_back("Add :objects:"+UUID+":sourceTree string <group>");
 	commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
 
 	//-----------------------------------------------------------------
@@ -416,13 +410,12 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 	// (D) folder
 	//-----------------------------------------------------------------
 
-	if (bAddFolder == true){
-		std::string folderUUID = getFolderUUID(folder);
-		commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
-
-	} else {
-
-	}
+//	if (bAddFolder == true){
+//	} else {
+//	}
+	// I've moved outside because every folder UUID even the hardcoded ones (src for ex.) are returnable by this function
+	std::string folderUUID = getFolderUUID(folder);
+	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
 }
 
 void xcodeProject::addFramework(std::string name, std::string path, std::string folder){
