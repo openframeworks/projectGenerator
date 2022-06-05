@@ -96,7 +96,7 @@ std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirect
 
 vector<baseProject::Template> baseProject::listAvailableTemplates(std::string target){
     vector<baseProject::Template> templates;
-	
+
     ofDirectory templatesDir(ofFilePath::join(getOFRoot(),templatesFolder));
     for(auto & f: templatesDir.getSorted()){
         if(f.isDirectory()){
