@@ -253,13 +253,11 @@ void xcodeProject::saveScheme(){
 	ofDirectory::createDirectory(schemeFolder, false, true);
     
 	if(target=="osx"){
-		std::string schemeToD = projectDir  + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/" + projectName + " Debug.xcscheme";
-		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample Debug.xcscheme"), schemeToD);
-	
-		std::string schemeToR = projectDir  + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/" + projectName + " Release.xcscheme";
-		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample Release.xcscheme"), schemeToR);
-	    findandreplaceInTexfile(schemeToD, "emptyExample", projectName);
-	    findandreplaceInTexfile(schemeToR, "emptyExample", projectName);
+		for (auto & f : { std::string("Release"), std::string("Debug"), std::string("AppStore") }) {
+			std::string schemeTo = schemeFolder + projectName + " " +f+ ".xcscheme";
+			ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample "+f+".xcscheme"), schemeTo);
+			findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
+		}		
      
         std::string workspaceTo = projectDir  + projectName + ".xcodeproj/project.xcworkspace";
         ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/project.xcworkspace"), workspaceTo);
@@ -329,6 +327,8 @@ bool xcodeProject::createProjectFile(){
 
     if( target == "osx" ){
         ofFile::copyFromTo(ofFilePath::join(templatePath,"openFrameworks-Info.plist"),projectDir, true, true);
+		ofFile::copyFromTo(ofFilePath::join(templatePath,"of.entitlements"),projectDir, true, true);
+	    
 		
 		ofDirectory binDirectory(ofFilePath::join(projectDir, "bin"));
 		if (!binDirectory.exists()){
