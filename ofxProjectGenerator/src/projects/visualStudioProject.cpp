@@ -448,7 +448,6 @@ void visualStudioProject::addAddon(ofAddon & addon){
 	for(int i=0;i<(int)addon.dllsToCopy.size();i++){
 		ofLogVerbose() << "adding addon dlls to bin: " << addon.dllsToCopy[i];
 		std::string dll = std::filesystem::absolute(addon.dllsToCopy[i], addon.addonPath).string();
-// 		std::string dll = std::filesystem::canonical(addon.dllsToCopy[i], addon.addonPath).string();
 		ofFile(dll).copyTo(ofFilePath::join(projectDir,"bin/"),false,true);
 	}
 
