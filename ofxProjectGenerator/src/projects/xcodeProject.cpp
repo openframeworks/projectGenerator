@@ -257,7 +257,6 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 	bool addToBuild = true;
 	bool addToBuildResource = false;
 	std::string fileKind = "file";
-//	bool bAddFolder = true;
 
 	if(type==DEFAULT){
 		if( ext == "cpp" || ext == "cc" || ext =="cxx" ){
@@ -331,10 +330,6 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 		}
 	}
 	
-//	if (folder == "src"){
-//		bAddFolder = false;
-//	}
-
 	//-----------------------------------------------------------------
 	// (A) make a FILE REF
 	//-----------------------------------------------------------------
@@ -402,10 +397,6 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 	// (D) folder
 	//-----------------------------------------------------------------
 
-//	if (bAddFolder == true){
-//	} else {
-//	}
-	// I've moved outside because every folder UUID even the hardcoded ones (src for ex.) are returnable by this function
 	std::string folderUUID = getFolderUUID(folder);
 	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
 }
