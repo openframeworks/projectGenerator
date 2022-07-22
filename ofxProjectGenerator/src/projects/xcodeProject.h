@@ -3,7 +3,6 @@
 #pragma once
 
 #include "baseProject.h"
-//#include "pugixml.hpp"
 
 class xcodeProject : public baseProject {
 public:
@@ -25,8 +24,7 @@ public:
 	void addAfterRule(std::string script);
 	void addDefine(std::string define, LibType libType = RELEASE_LIB);
 	
-	// specific to OSX
-	// folder if for non system frameworks
+	// macOS specific
 	void addFramework(std::string name, std::string path, std::string folder="");
 
 	void addAddon(ofAddon & addon);
@@ -35,21 +33,16 @@ public:
 
 
 	std::string projRootUUID;
-//	std::string srcUUID;
-//	std::string addonUUID;
-//	std::string localAddonUUID;
 	std::string resourcesUUID;
-//	std::string buildPhaseUUID;                 // note this UUID keeps refs all things to build
 	std::string frameworksUUID;
 	std::string buildPhaseResourcesUUID;
-//	std::string frameworksBuildPhaseUUID;
 	std::string afterPhaseUUID;
-	std::string buildPhasesUUID;                // note this UUID is in an array of *all* the build steps
+	std::string buildPhasesUUID;
+	// note this UUID is in an array of *all* the build steps
 
 	// new vars
 	std::string buildConfigurationListUUID;
 	std::string buildActionMaskUUID;
-	
 	
 	std::vector<std::string> commands;
 
@@ -73,8 +66,4 @@ public:
 	};
 	
 	std::string getFolderUUID(std::string folder);
-	
-	void alert(std::string s) {
-//		std::cout << ">>>>> " << s << std::endl;
-	}
 };

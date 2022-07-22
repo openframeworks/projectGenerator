@@ -12,8 +12,6 @@ using std::vector;
 
 xcodeProject::xcodeProject(std::string target)
 :baseProject(target){
-	alert("xcodeProject");	
-	
 	// FIXME: remove unused variables
 	if( target == "osx" ){
 		folderUUID = {
@@ -58,7 +56,6 @@ xcodeProject::xcodeProject(std::string target)
 
 
 bool xcodeProject::createProjectFile(){
-	alert("createProjectFile");
 	std::string xcodeProject = ofFilePath::join(projectDir , projectName + ".xcodeproj");
 	
 	if (ofDirectory::doesDirectoryExist(xcodeProject)){
@@ -138,7 +135,6 @@ bool xcodeProject::createProjectFile(){
 }
 
 void xcodeProject::saveScheme(){
-	alert("saveScheme");
 	std::string schemeFolder = projectDir + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/";
 	if (ofDirectory::doesDirectoryExist(schemeFolder)){
 		ofDirectory::removeDirectory(schemeFolder, true);
@@ -156,7 +152,7 @@ void xcodeProject::saveScheme(){
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/project.xcworkspace"), workspaceTo);
 	}else{
 
-		alert ("IOS sector");
+//		alert ("IOS sector");
 		std::string schemeTo = schemeFolder + projectName + ".xcscheme";
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme"), schemeTo);
 		findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
@@ -172,7 +168,6 @@ void xcodeProject::saveScheme(){
 // }
 
 void xcodeProject::saveMakefile(){
-	alert("saveMakefile");
 	for (auto & f : {"Makefile", "config.make" }) {
 		std::string fileName = ofFilePath::join(projectDir, f);
 		if(!ofFile(fileName).exists()){
@@ -182,14 +177,12 @@ void xcodeProject::saveMakefile(){
 }
 
 bool xcodeProject::loadProjectFile(){ //base
-	alert("loadProjectFile");
 	renameProject();
 	// MARK: just to return something
 	return true;
 }
 
 void xcodeProject::renameProject(){ //base
-	alert("renameProject");
 	// std::cout << "buildConfigurationListUUID : " << buildConfigurationListUUID << std::endl;
 	commands.emplace_back("Set :objects:"+buildConfigurationListUUID+":name " + projectName);
 	// FIXME: review BUILT_PRODUCTS_DIR
@@ -246,7 +239,6 @@ std::string xcodeProject::getFolderUUID(std::string folder) {
 
 // MARK: -
 void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type){
-	alert("addSrc " + srcFile + " : " + folder );
 
 	std::string buildUUID;
 
@@ -419,7 +411,7 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 }
 
 void xcodeProject::addFramework(std::string name, std::string path, std::string folder){
-	alert ("addFramework name:" + name + " -- path:" + path + " -- folder:" + folder);
+//	alert ("addFramework name:" + name + " -- path:" + path + " -- folder:" + folder);
 	// name = name of the framework
 	// path = the full path (w name) of this framework
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
@@ -514,7 +506,6 @@ void xcodeProject::addFramework(std::string name, std::string path, std::string 
 }
 
 void xcodeProject::addInclude(std::string includeName){
-	alert("addInclude " + includeName);
 	// Adding source to all build configurations, debug release appstore
 	for (auto & c : buildConfigurations) {
 		commands.emplace_back("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
@@ -522,7 +513,6 @@ void xcodeProject::addInclude(std::string includeName){
 }
 
 void xcodeProject::addLibrary(const LibraryBinary & lib){
-	alert("addInclude " + lib.path);
 	// TODO: Test this
 	for (auto & c : buildConfigs) {
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + lib.path);
@@ -537,8 +527,6 @@ void xcodeProject::addLDFLAG(std::string ldflag, LibType libType){
 }
 
 void xcodeProject::addCFLAG(std::string cflag, LibType libType){
-	alert("addCFLAG " + cflag);
-
 	for (auto & c : buildConfigurations) {
 		// FIXME: add array here if it doesnt exist
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_CFLAGS array");
@@ -578,8 +566,6 @@ void xcodeProject::addAfterRule(std::string rule){
 }
 
 void xcodeProject::addAddon(ofAddon & addon){
-	alert("addAddon : " + addon.name);
-
 	for(int i=0;i<(int)addons.size();i++){
 		if(addons[i].name==addon.name){
 			return;
@@ -662,21 +648,8 @@ void xcodeProject::addAddon(ofAddon & addon){
 	}
 }
 
-/*
-Set :objects:E4B69B5A0A3A1756003C02F2:name VideoPlayerNeue
-Set :objects:E4B69B5B0A3A1756003C02F2:path VideoPlayerNeueDebug.app
-Add :objects:E4B69B610A3A1757003C02F2:buildSettings:HEADER_SEARCH_PATHS: string src
-Add :objects:E4B69B600A3A1757003C02F2:buildSettings:HEADER_SEARCH_PATHS: string src
-Add :objects:99FA3DBC1C7456C400CFA0EE:buildSettings:HEADER_SEARCH_PATHS: string src
-Add :objects:99FA3DBB1C7456C400CFA0EE:buildSettings:HEADER_SEARCH_PATHS: string src
-Add :objects:E4B69B4E0A3A1720003C02F2:buildSettings:HEADER_SEARCH_PATHS: string src
-Add :objects:E4B69B4F0A3A1720003C02F2:buildSettings:HEADER_SEARCH_PATHS: string src
-*/
-
 bool xcodeProject::saveProjectFile(){
-	alert("saveProjectFile");
 	static std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
-//	cout << fileName << endl;
 	std::string contents = ofBufferFromFile(fileName).getText();
 	json j = json::parse(contents);
 
