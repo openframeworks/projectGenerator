@@ -224,15 +224,16 @@ bool baseProject::create(string path, std::string templateName){
 
 bool baseProject::save(){
     ofLog(OF_LOG_NOTICE) << "saving addons.make";
-    ofFile addonsMake(ofFilePath::join(projectDir,"addons.make"), ofFile::WriteOnly);
-    for(int i = 0; i < addons.size(); i++){
-        if(addons[i].isLocalAddon){
-            addonsMake << std::filesystem::path(addons[i].addonPath).generic_string() << endl;
-        }else{
-            addonsMake << addons[i].name << endl;
-        }
-    }
-    
+	if (addons.size()) {
+		ofFile addonsMake(ofFilePath::join(projectDir,"addons.make"), ofFile::WriteOnly);
+		for(int i = 0; i < addons.size(); i++){
+			if(addons[i].isLocalAddon){
+				addonsMake << std::filesystem::path(addons[i].addonPath).generic_string() << endl;
+			}else{
+				addonsMake << addons[i].name << endl;
+			}
+		}
+	}
     //save out params which the PG knows about to config.make
     //we mostly use this right now for storing the external source paths
     auto buffer = ofBufferFromFile(ofFilePath::join(projectDir,"config.make"));
