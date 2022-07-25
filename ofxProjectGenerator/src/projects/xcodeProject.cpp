@@ -82,7 +82,6 @@ bool xcodeProject::createProjectFile(){
 		if (!dataDirectory.exists()){
 			dataDirectory.create(false);
 		}
-		dataDirectory.close();
 		
 		// originally only on IOS
 		//this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
@@ -90,6 +89,7 @@ bool xcodeProject::createProjectFile(){
 		if( srcDataDir.exists() ){
 			baseProject::recursiveCopyContents(srcDataDir, dataDirectory);
 		}
+		dataDirectory.close();
 		srcDataDir.close();
 	}
 	binDirectory.close();
