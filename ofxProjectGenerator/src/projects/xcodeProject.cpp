@@ -637,6 +637,8 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 bool xcodeProject::saveProjectFile(){
 	static std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
+	
+	// JSON Block - Multiplatform
 	std::string contents = ofBufferFromFile(fileName).getText();
 	json j = json::parse(contents);
 
@@ -677,9 +679,8 @@ bool xcodeProject::saveProjectFile(){
 		ofLogError("ofSaveJson") << "Error saving json to " << fileName;
 		return false;
 	}
-
 	
-	// PLISTBUDDY
+//	PLISTBUDDY - Mac only
 //	{
 //		std::string command = "/usr/libexec/PlistBuddy " + fileName;
 //		std::string allCommands = "";
@@ -687,7 +688,8 @@ bool xcodeProject::saveProjectFile(){
 //			command += " -c \"" + c + "\"";
 //			allCommands += c + "\n";
 //		}
+//		std::cout << ofSystem(command) << std::endl;
+//		std::cout << allCommands << std::endl;
 //	}
-	
 	return true;
 }
