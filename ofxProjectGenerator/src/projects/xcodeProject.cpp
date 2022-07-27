@@ -69,6 +69,9 @@ bool xcodeProject::createProjectFile(){
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.xcodeproj/project.pbxproj"),
 					   ofFilePath::join(xcodeProject, "project.pbxproj"), true, true);
 
+	// FIXME: novo
+	findandreplaceInTexfile(ofFilePath::join(xcodeProject, "project.pbxproj"), "emptyExample", projectName);
+
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"Project.xcconfig"),projectDir, true, true);
 	
 	ofDirectory binDirectory(ofFilePath::join(projectDir, "bin"));
