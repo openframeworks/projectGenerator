@@ -1,14 +1,11 @@
 #include "xcodeProject.h"
 #include "Utils.h"
-//#include "ofXml.h"
 #include <iostream>
 #include "json.hpp"
 
 using nlohmann::json;
 using nlohmann::json_pointer;
-using std::cout;
-using std::endl;
-using std::vector;
+//using std::vector;
 
 xcodeProject::xcodeProject(std::string target)
 :baseProject(target){
@@ -186,7 +183,6 @@ bool xcodeProject::loadProjectFile(){ //base
 }
 
 void xcodeProject::renameProject(){ //base
-	// std::cout << "buildConfigurationListUUID : " << buildConfigurationListUUID << std::endl;
 	commands.emplace_back("Set :objects:"+buildConfigurationListUUID+":name " + projectName);
 	// FIXME: review BUILT_PRODUCTS_DIR
 
@@ -359,7 +355,6 @@ void xcodeProject::addSrc(std::string srcFile, std::string folder, SrcType type)
 
 	if (addToBuild || addToBuildResource ){
 		buildUUID = generateUUID(srcFile + "-build");
-//		std::cout << "buildUUID = " << buildUUID << std::endl;
 		
 		commands.emplace_back("Add :objects:"+buildUUID+":fileRef string "+UUID);
 		commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
@@ -486,7 +481,6 @@ void xcodeProject::addFramework(std::string name, std::string path, std::string 
 	// finally, this is for making folders based on the frameworks position in the addon. so it can appear in the sidebar / file explorer
 	
 	if (folder.size() > 0 && !ofIsStringInString(folder, "/System/Library/Frameworks")){
-//		std::cout << "this " <<  folder << std::endl;
 		std::string folderUUID = getFolderUUID(folder);
 	} else { //FIXME: else what?
 		
@@ -651,8 +645,6 @@ bool xcodeProject::saveProjectFile(){
 		std::vector<std::string> cols = ofSplitString(c, " ");
 		std::string thispath = cols[1];
 		ofStringReplace(thispath, ":", "/");
-//		cout << c << endl;
-//		cout << thispath << endl;
 		
 		if (thispath.substr(thispath.length() -1) != "/") {
 //			if (cols[0] == "Set") {
@@ -670,15 +662,11 @@ bool xcodeProject::saveProjectFile(){
 			try {
 				j[p].push_back(cols[3]);
 			} catch (std::exception e) {
-				cout << "ERROR " << endl;
-				cout << e.what() << endl;
+				std::cout << "ERROR " << std::endl;
+				std::cout << e.what() << std::endl;
 			}
 		}
-//		cout << "-------" << endl;
-//		cout << endl;
 	}
-	
-//		ofSaveJson(std::filesystem::path(fileName), j);
 	
 	ofFile jsonFile(fileName, ofFile::WriteOnly);
 	try{
@@ -693,17 +681,14 @@ bool xcodeProject::saveProjectFile(){
 
 	
 	// PLISTBUDDY
-	{
-		std::string command = "/usr/libexec/PlistBuddy " + fileName;
-		std::string allCommands = "";
-		for (auto & c : commands) {
-			command += " -c \"" + c + "\"";
-			allCommands += c + "\n";
-		}
-//		std::cout << ofSystem(command) << std::endl;
-//		std::cout << allCommands << std::endl;
-	}
+//	{
+//		std::string command = "/usr/libexec/PlistBuddy " + fileName;
+//		std::string allCommands = "";
+//		for (auto & c : commands) {
+//			command += " -c \"" + c + "\"";
+//			allCommands += c + "\n";
+//		}
+//	}
 	
-	// FIXME: temporary
 	return true;
 }
