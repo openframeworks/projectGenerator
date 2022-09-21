@@ -674,19 +674,14 @@ bool xcodeProject::saveProjectFile(){
 					auto v = j[p];
 					j[p] = json::array();
 					if (!v.is_null()) {
-						cout << c << endl;
-						cout << p << endl;
-						cout << v << endl;
 						j[p].push_back(v);
 					}
 				}
 				j[p].push_back(cols[3]);
 
 			} catch (std::exception e) {
-				cout << "ERROR " << endl;
+				cout << "json error " << endl;
 				cout << e.what() << endl;
-				cout << cols[3] << endl;
-				cout << c << endl;
 			}
 		}
 	}
