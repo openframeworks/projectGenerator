@@ -639,11 +639,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 }
 
 bool xcodeProject::saveProjectFile(){
-<<<<<<< Updated upstream
 	std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
-=======
-	static string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
->>>>>>> Stashed changes
 	
 	// JSON Block - Multiplatform
 	string contents = ofBufferFromFile(fileName).getText();
