@@ -34,9 +34,6 @@ xcodeProject::xcodeProject(string target)
 //		frameworksBuildPhaseUUID = "E4328149138ABC9F0047C5CB";
 		
 	}else{
-		buildConfigurationListUUID = "1D6058900D05DD3D006BFB54";
-		buildActionMaskUUID = "1D60588D0D05DD3D006BFB54";
-
 		folderUUID = {
 			{ "src", 			"E4D8936A11527B74007E1F53" },
 			{ "addons", 		"BB16F26B0F2B646B00518274" },
@@ -44,10 +41,17 @@ xcodeProject::xcodeProject(string target)
 			{ "", 				"29B97314FDCFA39411CA2CEA" }
 		};
 
-		projRootUUID    = "29B97314FDCFA39411CA2CEA";
+		buildConfigurationListUUID = "1D6058900D05DD3D006BFB54"; //check
+//		buildActionMaskUUID = 	"1D60588D0D05DD3D006BFB54";
+		buildActionMaskUUID =	"1D60588E0D05DD3D006BFB54";
+
+		projRootUUID    = "29B97314FDCFA39411CA2CEA"; //mainGroup — OK
 //        buildPhaseUUID  = "E4D8936E11527B74007E1F53";
-		resourcesUUID   = "BB24DD8F10DA77E000E9C588";
-		buildPhaseResourcesUUID = "BB24DDCA10DA781C00E9C588";
+		resourcesUUID   = 			"BB24DD8F10DA77E000E9C588";
+//		buildPhaseResourcesUUID = 	"BB24DDCA10DA781C00E9C588";
+									
+		buildPhaseResourcesUUID = 	"1D60588D0D05DD3D006BFB54";
+		
 		frameworksUUID  = "1DF5F4E00D08C38300B7A737";   //PBXFrameworksBuildPhase  // todo: check this?
 		afterPhaseUUID  = "928F60851B6710B200E2D791";
 		buildPhasesUUID = "9255DD331112741900D6945E";
@@ -356,17 +360,37 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 	//-----------------------------------------------------------------
 
 	if (addToBuild || addToBuildResource ){
+		
 		buildUUID = generateUUID(srcFile + "-build");
 		
 		commands.emplace_back("Add :objects:"+buildUUID+":fileRef string "+UUID);
-		commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
 
+		if (addToBuild) {
+			cout << "ADD TO BUILD" << endl;
+			cout << srcFile << endl;
+			cout << commands.back() << endl;
+			cout << "-----" << endl;
+		}
+		if (addToBuildResource) {
+			cout << "ADD TO BUILD RESOURCE" << endl;
+			cout << srcFile << endl;
+			cout << commands.back() << endl;
+			cout << "-----" << endl;
+		}
+		commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
+		
 		// FIXME: IOS ONLY checar se o insert no array ta funcionando aqui.
 		if( addToBuildResource ){
 
 			// FIXME: achar como fazer isto aqui, semelhante ao da proxima secao
 //			commands.emplace_back("Add :objects:"+buildActionMaskUUID+":files: string " + buildUUID);
+			
+			// TESTE 21092022
+			string mediaAssetsUUID = "9936F60E1BFA4DEE00891288";
+//			commands.emplace_back("Add :objects:"+mediaAssetsUUID+":files: string " + buildUUID);
+			commands.emplace_back("Add :objects:"+mediaAssetsUUID+":files: string " + UUID);
 		}
+
 		if( addToBuild ){
 			// this replaces completely the findArrayForUUID
 			// I found the root from the array (id present already on original project so no need to query an array by a member. in fact buildPhaseUUID maybe can be removed.
@@ -646,7 +670,7 @@ bool xcodeProject::saveProjectFile(){
 	json j = json::parse(contents);
 
 	for (auto & c : commands) {
-		
+//		cout << c << endl;
 		vector<string> cols = ofSplitString(c, " ");
 		string thispath = cols[1];
 		ofStringReplace(thispath, ":", "/");
