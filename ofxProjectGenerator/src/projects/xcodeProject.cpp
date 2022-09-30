@@ -3,12 +3,12 @@
 #include <iostream>
 #include "json.hpp"
 
-using nlohmann::json;
-using nlohmann::json_pointer;
 using std::vector;
 using std::string;
 using std::cout;
 using std::endl;
+using nlohmann::json;
+using nlohmann::json_pointer;
 
 xcodeProject::xcodeProject(string target)
 :baseProject(target){
@@ -21,19 +21,16 @@ xcodeProject::xcodeProject(string target)
 			{ "", 				"E4B69B4A0A3A1720003C02F2" }
 		};
 
-		// FIXME: get this UUIDs for IOS too (Maybe fixed now)
 		buildConfigurationListUUID = "E4B69B5A0A3A1756003C02F2";
 		buildActionMaskUUID = "E4B69B580A3A1756003C02F2";
 
 		projRootUUID    = "E4B69B4A0A3A1720003C02F2";
-//        buildPhaseUUID  = "E4B69E200A3A1BDC003C02F2";   // not needed, we use buildactionmask UUID
 		resourcesUUID   = "";
 		frameworksUUID  = "E7E077E715D3B6510020DFD4";   //PBXFrameworksBuildPhase
 		afterPhaseUUID  = "928F60851B6710B200E2D791";
 		buildPhasesUUID  = "E4C2427710CC5ABF004149E2";
-//		frameworksBuildPhaseUUID = "E4328149138ABC9F0047C5CB";
 		
-	}else{
+	} else {
 		folderUUID = {
 			{ "src", 			"E4D8936A11527B74007E1F53" },
 			{ "addons", 		"BB16F26B0F2B646B00518274" },
@@ -42,16 +39,10 @@ xcodeProject::xcodeProject(string target)
 		};
 
 		buildConfigurationListUUID = "1D6058900D05DD3D006BFB54"; //check
-//		buildActionMaskUUID = 	"1D60588D0D05DD3D006BFB54";
 		buildActionMaskUUID =	"1D60588E0D05DD3D006BFB54";
-
 		projRootUUID    = "29B97314FDCFA39411CA2CEA"; //mainGroup — OK
-//        buildPhaseUUID  = "E4D8936E11527B74007E1F53";
 		resourcesUUID   = 			"BB24DD8F10DA77E000E9C588";
-//		buildPhaseResourcesUUID = 	"BB24DDCA10DA781C00E9C588";
-									
 		buildPhaseResourcesUUID = 	"1D60588D0D05DD3D006BFB54";
-		
 		frameworksUUID  = "1DF5F4E00D08C38300B7A737";   //PBXFrameworksBuildPhase  // todo: check this?
 		afterPhaseUUID  = "928F60851B6710B200E2D791";
 		buildPhasesUUID = "9255DD331112741900D6945E";
@@ -158,20 +149,12 @@ void xcodeProject::saveScheme(){
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/project.xcworkspace"), workspaceTo);
 	}else{
 
-//		alert ("IOS sector");
+		// MARK:- IOS sector;
 		string schemeTo = schemeFolder + projectName + ".xcscheme";
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme"), schemeTo);
 		findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
 	}
 }
-
-// TEST
-// void copyIfNotExists(const string f) {
-// 	string fileName = ofFilePath::join(projectDir, f);
-// 	if(!ofFile(fileName).exists()){
-// 		ofFile::copyFromTo(ofFilePath::join(templatePath, f), fileName, true, true);
-// 	}
-// }
 
 void xcodeProject::saveMakefile(){
 	for (auto & f : {"Makefile", "config.make" }) {
@@ -184,15 +167,15 @@ void xcodeProject::saveMakefile(){
 
 bool xcodeProject::loadProjectFile(){ //base
 	renameProject();
-	// MARK: just to return something
+	// MARK: just to return something. 
 	return true;
 }
 
 void xcodeProject::renameProject(){ //base
-	commands.emplace_back("Set :objects:"+buildConfigurationListUUID+":name " + projectName);
 	// FIXME: review BUILT_PRODUCTS_DIR
+	commands.emplace_back("Set :objects:"+buildConfigurationListUUID+":name " + projectName);
 
-	// APENAS OSX aqui.
+	// Just OSX here, debug app naming.
 	if( target == "osx" ){	
 		// TODO: Hardcode to variable
 		commands.emplace_back("Set :objects:E4B69B5B0A3A1756003C02F2:path " + projectName + "Debug.app");
@@ -242,7 +225,6 @@ string xcodeProject::getFolderUUID(string folder) {
 }
 
 
-// MARK: -
 void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 
 	string buildUUID;
@@ -352,7 +334,6 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 		commands.emplace_back("Add :objects:"+UUID+":explicitFileType string "+fileKind);
 	}
 	commands.emplace_back("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
-//	commands.emplace_back("Add :objects:"+UUID+":sourceTree string <group>");
 	commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
 
 	//-----------------------------------------------------------------
@@ -379,13 +360,10 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 		}
 		commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
 		
-		// FIXME: IOS ONLY checar se o insert no array ta funcionando aqui.
+		// FIXME: IOS ONLY check if array insert is working here
 		if( addToBuildResource ){
 
-			// FIXME: achar como fazer isto aqui, semelhante ao da proxima secao
-//			commands.emplace_back("Add :objects:"+buildActionMaskUUID+":files: string " + buildUUID);
-			
-			// TESTE 21092022
+			// TEST 21092022
 			string mediaAssetsUUID = "9936F60E1BFA4DEE00891288";
 //			commands.emplace_back("Add :objects:"+mediaAssetsUUID+":files: string " + buildUUID);
 			commands.emplace_back("Add :objects:"+mediaAssetsUUID+":files: string " + UUID);
@@ -410,9 +388,7 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 		commands.emplace_back("Add :objects:"+resUUID+":fileRef string "+UUID);
 		commands.emplace_back("Add :objects:"+resUUID+":isa string PBXBuildFile");
 		
-		// FIXME: testar se no IOS ta indo tudo bem. este aqui deve ser equivalente ao proximo q esta comentado.
-		
-		// FIXME: XAXA
+		// FIXME: test if it is working on iOS
 		commands.emplace_back("Add :objects:"+resourcesUUID+": string "+resUUID);
 	}
 
@@ -426,7 +402,6 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 }
 
 void xcodeProject::addFramework(string name, string path, string folder){
-//	alert ("addFramework name:" + name + " -- path:" + path + " -- folder:" + folder);
 	// name = name of the framework
 	// path = the full path (w name) of this framework
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
@@ -442,7 +417,7 @@ void xcodeProject::addFramework(string name, string path, string folder){
 	// encoding may be messing up for frameworks... so I switched to a pbx file ref without encoding fields
 	string UUID = generateUUID( name );
 
-//	commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
+	//commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
 	commands.emplace_back("Add :objects:"+UUID+":path string "+path);
 	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
 	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
@@ -458,16 +433,12 @@ void xcodeProject::addFramework(string name, string path, string folder){
 	commands.emplace_back("Add :objects:"+buildUUID+":settings:ATTRIBUTES: string CodeSignOnCopy");
 
 	// we add one of the build refs to the list of frameworks
-	// FIXME: removi aqui pra testar
-	// E7E077E715D3B6510020DFD4
-	
 	// TENTATIVA desesperada aqui...
 	string folderUUID = getFolderUUID(folder);
 	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
 
-	
-//	commands.emplace_back("Add :objects:"+frameworksUUID+":children array");
-//	commands.emplace_back("Add :objects:"+frameworksUUID+":children: string " + buildUUID);
+	//commands.emplace_back("Add :objects:"+frameworksUUID+":children array");
+	//commands.emplace_back("Add :objects:"+frameworksUUID+":children: string " + buildUUID);
 
 	// we add the second to a final build phase for copying the framework into app.   we need to make sure we *don't* do this for system frameworks
 	
@@ -508,8 +479,8 @@ void xcodeProject::addFramework(string name, string path, string folder){
 	
 	if (folder.size() > 0 && !ofIsStringInString(folder, "/System/Library/Frameworks")){
 		string folderUUID = getFolderUUID(folder);
-	} else { //FIXME: else what?
-		
+	} else { 
+		//FIXME: else what?d
 	}
 	
 	if (target != "ios" && folder.size() != 0){
@@ -690,6 +661,7 @@ bool xcodeProject::saveProjectFile(){
 			json::json_pointer p = json::json_pointer(thispath);
 			try {
 				
+				// Fixing XCode one item array issue
 				if (!j[p].is_array()) {
 					auto v = j[p];
 					j[p] = json::array();
