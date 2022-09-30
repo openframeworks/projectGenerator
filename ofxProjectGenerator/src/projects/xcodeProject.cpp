@@ -346,6 +346,7 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 		
 		commands.emplace_back("Add :objects:"+buildUUID+":fileRef string "+UUID);
 
+		/*
 		if (addToBuild) {
 			cout << "ADD TO BUILD" << endl;
 			cout << srcFile << endl;
@@ -358,6 +359,7 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 			cout << commands.back() << endl;
 			cout << "-----" << endl;
 		}
+		*/
 		commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
 		
 		// FIXME: IOS ONLY check if array insert is working here
@@ -480,7 +482,7 @@ void xcodeProject::addFramework(string name, string path, string folder){
 	if (folder.size() > 0 && !ofIsStringInString(folder, "/System/Library/Frameworks")){
 		string folderUUID = getFolderUUID(folder);
 	} else { 
-		//FIXME: else what?d
+		//FIXME: else what?
 	}
 	
 	if (target != "ios" && folder.size() != 0){
@@ -641,13 +643,13 @@ bool xcodeProject::saveProjectFile(){
 	json j = json::parse(contents);
 
 	for (auto & c : commands) {
-//		cout << c << endl;
+		//cout << c << endl;
 		vector<string> cols = ofSplitString(c, " ");
 		string thispath = cols[1];
 		ofStringReplace(thispath, ":", "/");
 		
 		if (thispath.substr(thispath.length() -1) != "/") {
-//			if (cols[0] == "Set") {
+			//if (cols[0] == "Set") {
 			json::json_pointer p = json::json_pointer(thispath);
 			if (cols[2] == "string") {
 				j[p] = cols[3];
@@ -660,7 +662,6 @@ bool xcodeProject::saveProjectFile(){
 			thispath = thispath.substr(0, thispath.length() -1);
 			json::json_pointer p = json::json_pointer(thispath);
 			try {
-				
 				// Fixing XCode one item array issue
 				if (!j[p].is_array()) {
 					auto v = j[p];
