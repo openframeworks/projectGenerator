@@ -22,7 +22,7 @@ bool visualStudioProject::createProjectFile(){
 
 	ofFile filterFile(filters);
 	std::string temp = filterFile.readToBuffer();
-	pugi::xml_parse_result result = filterXmlDoc.load(temp.c_str());
+	pugi::xml_parse_result result = filterXmlDoc.load_string(temp.c_str());
 	if (result.status==pugi::status_ok) ofLogVerbose() << "loaded filter ";
 	else ofLogVerbose() << "problem loading filter ";
 
@@ -90,7 +90,7 @@ void visualStudioProject::appendFilter(std::string folderName){
 	 } else {
 
 
-		 pugi::xml_node node = filterXmlDoc.select_single_node("//ItemGroup[Filter]/Filter").node().parent();
+		 pugi::xml_node node = filterXmlDoc.select_node("//ItemGroup[Filter]/Filter").node().parent();
 		 pugi::xml_node nodeAdded = node.append_child("Filter");
 		 nodeAdded.append_attribute("Include").set_value(folderName.c_str());
 		 pugi::xml_node nodeAdded2 = nodeAdded.append_child("UniqueIdentifier");
@@ -124,7 +124,7 @@ void visualStudioProject::addSrc(std::string srcFile, std::string folder, SrcTyp
 		if (ofIsStringInString(srcFile, ".h") || ofIsStringInString(srcFile, ".hpp") || ofIsStringInString(srcFile, ".inl")){
 			appendValue(doc, "ClInclude", "Include", srcFile);
 
-			pugi::xml_node node = filterXmlDoc.select_single_node("//ItemGroup[ClInclude]").node();
+			pugi::xml_node node = filterXmlDoc.select_node("//ItemGroup[ClInclude]").node();
 			pugi::xml_node nodeAdded = node.append_child("ClInclude");
 			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
 			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
@@ -133,7 +133,7 @@ void visualStudioProject::addSrc(std::string srcFile, std::string folder, SrcTyp
 			// TODO: add to None but there's no None in the original template so this fails
 			/*appendValue(doc, "None", "Include", srcFile);
 
-			pugi::xml_node node = filterXmlDoc.select_single_node("//ItemGroup[None]").node();
+			pugi::xml_node node = filterXmlDoc.select_node("//ItemGroup[None]").node();
 			pugi::xml_node nodeAdded = node.append_child("None");
 			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
 			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());*/
@@ -141,7 +141,7 @@ void visualStudioProject::addSrc(std::string srcFile, std::string folder, SrcTyp
 		} else{
 			appendValue(doc, "ClCompile", "Include", srcFile);
 
-			pugi::xml_node nodeFilters = filterXmlDoc.select_single_node("//ItemGroup[ClCompile]").node();
+			pugi::xml_node nodeFilters = filterXmlDoc.select_node("//ItemGroup[ClCompile]").node();
 			pugi::xml_node nodeAdded = nodeFilters.append_child("ClCompile");
 			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
 			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
@@ -151,7 +151,7 @@ void visualStudioProject::addSrc(std::string srcFile, std::string folder, SrcTyp
     	case CPP:{
 			appendValue(doc, "ClCompile", "Include", srcFile);
 
-			pugi::xml_node nodeFilters = filterXmlDoc.select_single_node("//ItemGroup[ClCompile]").node();
+			pugi::xml_node nodeFilters = filterXmlDoc.select_node("//ItemGroup[ClCompile]").node();
 			pugi::xml_node nodeAdded = nodeFilters.append_child("ClCompile");
 			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
 			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
@@ -170,7 +170,7 @@ void visualStudioProject::addSrc(std::string srcFile, std::string folder, SrcTyp
 				compileAs.set_value("Default");
 			}
 
-			pugi::xml_node nodeFilters = filterXmlDoc.select_single_node("//ItemGroup[ClCompile]").node();
+			pugi::xml_node nodeFilters = filterXmlDoc.select_node("//ItemGroup[ClCompile]").node();
 			pugi::xml_node nodeAdded = nodeFilters.append_child("ClCompile");
 			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
 			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
@@ -179,7 +179,7 @@ void visualStudioProject::addSrc(std::string srcFile, std::string folder, SrcTyp
     	case HEADER:{
 			appendValue(doc, "ClInclude", "Include", srcFile);
 
-			pugi::xml_node node = filterXmlDoc.select_single_node("//ItemGroup[ClInclude]").node();
+			pugi::xml_node node = filterXmlDoc.select_node("//ItemGroup[ClInclude]").node();
 			pugi::xml_node nodeAdded = node.append_child("ClInclude");
 			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
 			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
