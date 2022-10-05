@@ -162,11 +162,11 @@ void visualStudioProject::addSrc(std::string srcFile, std::string folder, SrcTyp
 
 			if(!node.child("CompileAs")){
 				pugi::xml_node compileAs = node.append_child("CompileAs");
-				compileAs.append_attribute("Condition").set_value("'$(Configuration)|$(Platform)'=='Debug|Win32'");
+				compileAs.append_attribute("Condition").set_value("'$(Configuration)|$(Platform)'=='Debug|x64'");
 				compileAs.set_value("Default");
 
 				compileAs = node.append_child("CompileAs");
-				compileAs.append_attribute("Condition").set_value("'$(Configuration)|$(Platform)'=='Release|Win32'");
+				compileAs.append_attribute("Condition").set_value("'$(Configuration)|$(Platform)'=='Release|x64'");
 				compileAs.set_value("Default");
 			}
 
