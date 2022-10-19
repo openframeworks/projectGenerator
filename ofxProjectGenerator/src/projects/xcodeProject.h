@@ -48,20 +48,17 @@ public:
 	
 	std::vector<string> commands;
 
-	const string buildConfigurations[6] = {
+	const string buildConfigurations[4] = {
 		"E4B69B610A3A1757003C02F2", //Release
 		"E4B69B600A3A1757003C02F2", //Debug
-		"99FA3DBC1C7456C400CFA0EE", //AppStore
 		
-		"99FA3DBB1C7456C400CFA0EE", //AppStore SDKROOT macosx
 		"E4B69B4E0A3A1720003C02F2", //Debug SDKROOT macosx
 		"E4B69B4F0A3A1720003C02F2", //Release SDKROOT macosx
 	};
 	
-	const string buildConfigs[3] = {
+	const string buildConfigs[2] = {
 		"E4B69B610A3A1757003C02F2", //Release
 		"E4B69B600A3A1757003C02F2", //Debug
-		"99FA3DBC1C7456C400CFA0EE", //AppStore
 	};
 	
 	std::map <string, string> folderUUID = {

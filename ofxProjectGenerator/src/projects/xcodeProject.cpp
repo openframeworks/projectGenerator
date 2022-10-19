@@ -139,7 +139,7 @@ void xcodeProject::saveScheme(){
 	ofDirectory::createDirectory(schemeFolder, false, true);
 	
 	if(target=="osx"){
-		for (auto & f : { string("Release"), string("Debug"), string("AppStore") }) {
+		for (auto & f : { string("Release"), string("Debug") }) {
 			string schemeTo = schemeFolder + projectName + " " +f+ ".xcscheme";
 			ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample "+f+".xcscheme"), schemeTo);
 			findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
@@ -493,7 +493,7 @@ void xcodeProject::addFramework(string name, string path, string folder){
 }
 
 void xcodeProject::addInclude(string includeName){
-	// Adding source to all build configurations, debug release appstore
+	// Adding source to all build configurations, debug and release
 	for (auto & c : buildConfigurations) {
 		commands.emplace_back("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
 	}
