@@ -158,7 +158,7 @@ pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::strin
         // find the existing node...
         char xpathExpression[1024];
         sprintf(xpathExpression, "//%s[@%s='%s']", tag.c_str(), attribute.c_str(), newValue.c_str());
-        pugi::xpath_node node = doc.select_single_node(xpathExpression);
+        pugi::xpath_node node = doc.select_node(xpathExpression);
         if(std::string(node.node().attribute(attribute.c_str()).value()).size() > 0){ // for some reason we get nulls here?
             // ...delete the existing node
             cout << "DELETING: " << node.node().name() << ": " << " " << node.node().attribute(attribute.c_str()).value() << endl;
@@ -507,7 +507,7 @@ std::string getOFRootFromConfig(){
 	if(!checkConfigExists()) return "";
 	ofFile configFile(ofFilePath::join(ofFilePath::getUserHomeDir(),".ofprojectgenerator/config"),ofFile::ReadOnly);
 	ofBuffer filePath = configFile.readToBuffer();
-	return filePath.getFirstLine();
+	return filePath.getLines().begin().asString();
 }
 
 std::string getTargetString(ofTargetPlatform t){
