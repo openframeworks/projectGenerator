@@ -48,15 +48,15 @@ public:
 	
 	std::vector<string> commands;
 
-	const string buildConfigurations[4] = {
-		"E4B69B610A3A1757003C02F2", //Release
-		"E4B69B600A3A1757003C02F2", //Debug
+	string buildConfigurations[4] = {
+		"E4B69B600A3A1757003C02F2", //macOS Debug
+		"E4B69B610A3A1757003C02F2", //macOS Release
 		
-		"E4B69B4E0A3A1720003C02F2", //Debug SDKROOT macosx
-		"E4B69B4F0A3A1720003C02F2", //Release SDKROOT macosx
+		"E4B69B4E0A3A1720003C02F2", //macOS Debug SDKROOT macosx
+		"E4B69B4F0A3A1720003C02F2", //macOS Release SDKROOT macosx
 	};
 	
-	const string buildConfigs[2] = {
+	string buildConfigs[2] = {
 		"E4B69B610A3A1757003C02F2", //Release
 		"E4B69B600A3A1757003C02F2", //Debug
 	};

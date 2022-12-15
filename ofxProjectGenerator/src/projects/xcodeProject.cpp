@@ -30,7 +30,19 @@ xcodeProject::xcodeProject(string target)
 		afterPhaseUUID  = "928F60851B6710B200E2D791";
 		buildPhasesUUID  = "E4C2427710CC5ABF004149E2";
 		
-	} else {
+	} else { // IOS
+		
+		buildConfigurations[0] = "1D6058940D05DD3E006BFB54"; // iOS Debug
+		buildConfigurations[1] = "1D6058950D05DD3E006BFB54"; // iOS Release
+		buildConfigurations[2] = "C01FCF4F08A954540054247B"; // iOS Debug
+		buildConfigurations[3] = "C01FCF5008A954540054247B"; // iOS Release
+
+		buildConfigs[0] = "1D6058940D05DD3E006BFB54"; // iOS Debug
+		buildConfigs[1] = "1D6058950D05DD3E006BFB54"; // iOS Release
+
+//		buildConfigs[0] = "C01FCF4F08A954540054247B"; // iOS Debug
+//		buildConfigs[1] = "C01FCF5008A954540054247B"; // iOS Release
+
 		folderUUID = {
 			{ "src", 			"E4D8936A11527B74007E1F53" },
 			{ "addons", 		"BB16F26B0F2B646B00518274" },
