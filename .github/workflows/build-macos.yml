@@ -7,11 +7,14 @@ on:
   pull_request:
     paths-ignore:
     - '**/README.md'
-    
-jobs:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
   build-osx:
-    runs-on: macos-12
+    runs-on: macos-latest
     strategy:
         matrix:
           cfg:
@@ -19,15 +22,15 @@ jobs:
     env:
      TARGET: ${{matrix.cfg.target}}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: rm-dev
       run: sudo rm -rf /Library/Developer
     - name: Build
       run:
         ./scripts/osx/buildPG.sh;
       env:
-        DEVELOPER_DIR: "/Applications/Xcode_13.4.1.app/Contents/Developer"
-        SDKROOT: "/Applications/Xcode_13.4.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
+        DEVELOPER_DIR: "/Applications/Xcode_14.2.app/Contents/Developer"
+        SDKROOT: "/Applications/Xcode_14.2.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
         GA_CI_SECRET: ${{ secrets.CI_SECRET }}
         CERTIFICATE_OSX_APPLICATION: ${{ secrets.CERTIFICATE_OSX_APPLICATION }}
         CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
