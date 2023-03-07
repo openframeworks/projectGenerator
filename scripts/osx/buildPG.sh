@@ -152,7 +152,7 @@ if [ $ret -ne 0 ]; then
 fi
 
 # install electron sign globally
-# sudo chown -R 501:20 "/Users/runner/.npm"
+sudo chown -R 501:20 "/Users/runner/.npm"
 sudo npm install -g npm@9.6.0
 sudo npm install -g electron/osx-sign
 import_certificate
