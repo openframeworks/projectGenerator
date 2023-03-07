@@ -7,9 +7,12 @@ on:
   pull_request:
     paths-ignore:
     - '**/README.md'
-    
-jobs:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
   build-osx:
     runs-on: macos-latest
     strategy:
