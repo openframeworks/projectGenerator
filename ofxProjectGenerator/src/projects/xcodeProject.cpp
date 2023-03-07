@@ -128,7 +128,11 @@ bool xcodeProject::createProjectFile(){
 
 	// make everything relative the right way.
 	string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
+//	string relRoot = "$(OF_ROOT)" + ofFilePath::removeTrailingSlash(projectDir);
+//	std::cout << "relRoot = " << relRoot << std::endl;
+	
 	if (relRoot != "../../../"){
+		cout << "FIXING PATHS" << endl;
 		string relPath2 = relRoot;
 		
 		relPath2.erase(relPath2.end()-1);
@@ -505,8 +509,16 @@ void xcodeProject::addFramework(string name, string path, string folder){
 }
 
 void xcodeProject::addInclude(string includeName){
+	
+	//
+	cout << "-----" << endl;
+	cout << getOFRoot() << endl;
+	cout << "$(OF_PATH)" << endl;
+	ofStringReplace(includeName, getOFRoot(), "$(OF_PATH)");
 	// Adding source to all build configurations, debug and release
 	for (auto & c : buildConfigurations) {
+		string s = "Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName;
+		std::cout << s << std::endl;
 		commands.emplace_back("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
 	}
 }
@@ -565,6 +577,8 @@ void xcodeProject::addAfterRule(string rule){
 }
 
 void xcodeProject::addAddon(ofAddon & addon){
+	
+	
 	for(int i=0;i<(int)addons.size();i++){
 		if(addons[i].name==addon.name){
 			return;
@@ -573,6 +587,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 	for(int i=0;i<addon.dependencies.size();i++){
 		baseProject::addAddon(addon.dependencies[i]);
+		
 	}
 
 	for(int i=0;i<addon.dependencies.size();i++){
@@ -585,10 +600,13 @@ void xcodeProject::addAddon(ofAddon & addon){
 		}
 	}
 	
+
+	
 	addons.push_back(addon);
 
 	for(int i=0;i<(int)addon.includePaths.size();i++){
-		ofLogVerbose() << "adding addon include path: " << addon.includePaths[i];
+//		ofLogVerbose() << "adding addon include path: " << addon.includePaths[i];
+		ofLog() << "adding addon include path: " << addon.includePaths[i];
 		addInclude(addon.includePaths[i]);
 	}
 	for(int i=0;i<(int)addon.libs.size();i++){
