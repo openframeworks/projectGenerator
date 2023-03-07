@@ -128,7 +128,13 @@ cd ..
 of_root=${PWD}/openFrameworks
 pg_root=${PWD}/openFrameworks/apps/projectGenerator
 
-git clone --depth=1 https://github.com/openframeworks/openFrameworks
+if [ -d "$of_root" ]; then
+    echo ${of_root}
+    git -C ${of_root} pull
+else
+    git clone --depth=1 https://github.com/openframeworks/openFrameworks
+fi
+
 #cp not move so github actions can do cleanup without error
 cp -r projectGenerator openFrameworks/apps/
 
@@ -147,6 +153,7 @@ fi
 
 # install electron sign globally
 #npm install -g npm@9.6.0
+sudo chown -R 501:20 "/Users/runner/.npm"
 sudo npm install -g electron/osx-sign
 import_certificate
 
