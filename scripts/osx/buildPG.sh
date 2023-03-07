@@ -146,7 +146,8 @@ if [ $ret -ne 0 ]; then
 fi
 
 # install electron sign globally
-sudo npm install -g electron-osx-sign
+npm install -g npm@9.6.0
+sudo npm install -g electron/osx-sign
 import_certificate
 
 # Generate electron app
