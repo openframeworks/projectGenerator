@@ -183,7 +183,7 @@ pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::strin
 }
 
 // todo -- this doesn't use ofToDataPath -- so it's broken a bit.  can we fix?
-void getFilesRecursively(const std::string & path, std::vector < std::string > & fileNames){
+void getFilesRecursively(const of::filesystem::path & path, std::vector < std::string > & fileNames){
 
     ofDirectory dir;
 
@@ -340,7 +340,7 @@ void getLibsRecursively(const std::string & path, std::vector < std::string > & 
         
     for (int i = 0; i < dir.size(); i++){
             
-	std::vector<std::string> splittedPath = ofSplitString(dir.getPath(i), std::filesystem::path("/").make_preferred().string());
+	std::vector<std::string> splittedPath = ofSplitString(dir.getPath(i), of::filesystem::path("/").make_preferred().string());
             
         ofFile temp(dir.getFile(i));
             
@@ -350,7 +350,7 @@ void getLibsRecursively(const std::string & path, std::vector < std::string > & 
             // on osx, framework is a directory, let's not parse it....
 	    std::string ext = "";
 	    std::string first = "";
-			auto stem = std::filesystem::path(dir.getFile(i)).stem();
+			auto stem = of::filesystem::path(dir.getFile(i)).stem();
             splitFromLast(dir.getPath(i), ".", first, ext);
 			if (ext != "framework") {
 				auto archFound = std::find(LibraryBinary::archs.begin(), LibraryBinary::archs.end(), stem);
@@ -437,6 +437,7 @@ std::string getAddonsRoot(){
 }
 
 void setOFRoot(std::string path){
+	cout << "setOFRoot : " << path << endl;
 	OFRoot = path;
 }
 
