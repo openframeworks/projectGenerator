@@ -109,17 +109,15 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(std::string ta
 	return templates;
 }
 
-// FIXME: substitute to of::filesystem
-bool baseProject::create(string path, std::string templateName){
-	cout << "baseProject::create " << path << endl;
+bool baseProject::create(const of::filesystem::path & _path, std::string templateName){
 	templatePath = getPlatformTemplateDir();
 	addons.clear();
 	extSrcPaths.clear();
+	auto path = _path;
 
 	if(!ofFilePath::isAbsolute(path)){
 		path = (of::filesystem::current_path() / of::filesystem::path(path)).string();
 	}
-	// projectDir = ofFilePath::addTrailingSlash(path);
 	projectDir = path;
 
 	projectName = ofFilePath::getFileName(path);
@@ -160,12 +158,14 @@ bool baseProject::create(string path, std::string templateName){
 	parseConfigMake();
 
 	if (bDoesDirExist){
+		
 		vector < string > fileNames;
-		getFilesRecursively(ofFilePath::join(projectDir , "src"), fileNames);
+//		getFilesRecursively(ofFilePath::join(projectDir , "src"), fileNames);
+		getFilesRecursively(projectDir / "src", fileNames);
 
 		for (int i = 0; i < (int)fileNames.size(); i++){
 
-			fileNames[i].erase(fileNames[i].begin(), fileNames[i].begin() + projectDir.length());
+			fileNames[i].erase(fileNames[i].begin(), fileNames[i].begin() + projectDir.string().length());
 
 			string first, last;
 #ifdef TARGET_WIN32
@@ -277,7 +277,9 @@ bool baseProject::isAddonInCache(const std::string & addonPath, const std::strin
 
 void baseProject::addAddon(std::string addonName){
 	ofAddon addon;
-	addon.pathToOF = getOFRelPath(projectDir);
+//	cout << projectDir << endl;
+	addon.pathToOF = getOFRelPath(projectDir.string());
+//	cout << addon.pathToOF << endl;
 	addon.pathToProject = ofFilePath::getAbsolutePath(projectDir);
 
 	auto localPath = ofFilePath::join(addon.pathToProject, addonName);

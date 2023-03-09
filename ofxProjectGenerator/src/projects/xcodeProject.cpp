@@ -62,8 +62,17 @@ xcodeProject::xcodeProject(string target)
 };
 
 
+using std::cout;
+using std::endl;
 bool xcodeProject::createProjectFile(){
-	string xcodeProject = ofFilePath::join(projectDir , projectName + ".xcodeproj");
+//	cout << "createProjectFile " << endl;
+//	cout << "projectDir " << projectDir << endl;
+//	cout << "projectName " << projectName << endl;
+	
+	of::filesystem::path xcodeProject = projectDir / of::filesystem::path{ projectName + ".xcodeproj" };
+//	cout << "xcodeProject " << xcodeProject << endl;
+
+//	string xcodeProject = ofFilePath::join(projectDir , projectName + ".xcodeproj");
 	
 	if (ofDirectory::doesDirectoryExist(xcodeProject)){
 		ofDirectory::removeDirectory(xcodeProject, true);
@@ -136,19 +145,19 @@ bool xcodeProject::createProjectFile(){
 		string relPath2 = relRoot;
 		
 		relPath2.erase(relPath2.end()-1);
-		findandreplaceInTexfile(projectDir + projectName + ".xcodeproj/project.pbxproj", "../../..", relPath2);
+		findandreplaceInTexfile(projectDir / projectName / ".xcodeproj/project.pbxproj", "../../..", relPath2);
 		//findandreplaceInTexfile(projectDir + "Project.xcconfig", "../../../", relRoot);
-		findandreplaceInTexfile(projectDir + "Project.xcconfig", "../../..", relPath2);
+		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", relPath2);
 		if( target == "osx" ){
-			findandreplaceInTexfile(projectDir + "Makefile", "../../..", relPath2);
-			findandreplaceInTexfile(projectDir + "config.make", "../../..", relPath2);
+			findandreplaceInTexfile(projectDir / "Makefile", "../../..", relPath2);
+			findandreplaceInTexfile(projectDir / "config.make", "../../..", relPath2);
 		}
 	}
 	return true;
 }
 
 void xcodeProject::saveScheme(){
-	string schemeFolder = projectDir + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/";
+	auto schemeFolder = projectDir / of::filesystem::path{ projectName + ".xcodeproj" } / "xcshareddata/xcschemes";
 	if (ofDirectory::doesDirectoryExist(schemeFolder)){
 		ofDirectory::removeDirectory(schemeFolder, true);
 	}
@@ -156,17 +165,17 @@ void xcodeProject::saveScheme(){
 	
 	if(target=="osx"){
 		for (auto & f : { string("Release"), string("Debug") }) {
-			string schemeTo = schemeFolder + projectName + " " +f+ ".xcscheme";
+			auto schemeTo = schemeFolder / of::filesystem::path(projectName + " " +f+ ".xcscheme");
 			ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample "+f+".xcscheme"), schemeTo);
 			findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
 		}
 	 
-		string workspaceTo = projectDir  + projectName + ".xcodeproj/project.xcworkspace";
+		auto workspaceTo = projectDir / of::filesystem::path(projectName + ".xcodeproj/project.xcworkspace");
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/project.xcworkspace"), workspaceTo);
 	}else{
 
 		// MARK:- IOS sector;
-		string schemeTo = schemeFolder + projectName + ".xcscheme";
+		auto schemeTo = schemeFolder / of::filesystem::path(projectName + ".xcscheme");
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme"), schemeTo);
 		findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
 	}
@@ -510,15 +519,15 @@ void xcodeProject::addFramework(string name, string path, string folder){
 
 void xcodeProject::addInclude(string includeName){
 	
-	//
-	cout << "-----" << endl;
-	cout << getOFRoot() << endl;
-	cout << "$(OF_PATH)" << endl;
+//
+//	cout << "-----" << endl;
+//	cout << getOFRoot() << endl;
+//	cout << "$(OF_PATH)" << endl;
 	ofStringReplace(includeName, getOFRoot(), "$(OF_PATH)");
 	// Adding source to all build configurations, debug and release
 	for (auto & c : buildConfigurations) {
 		string s = "Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName;
-		std::cout << s << std::endl;
+//		std::cout << s << std::endl;
 		commands.emplace_back("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
 	}
 }
@@ -666,7 +675,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 }
 
 bool xcodeProject::saveProjectFile(){
-	std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
+	of::filesystem::path fileName = projectDir / of::filesystem::path(projectName + ".xcodeproj/project.pbxproj");
 	
 	// JSON Block - Multiplatform
 	string contents = ofBufferFromFile(fileName).getText();

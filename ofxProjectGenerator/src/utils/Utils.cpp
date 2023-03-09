@@ -103,7 +103,8 @@ std::string LoadFileAsString(const std::string & fn)
     return oss.str();
 }
 
-void findandreplaceInTexfile (std::string fileName, std::string tFind, std::string tReplace ){
+void findandreplaceInTexfile (const of::filesystem::path & fileName, std::string tFind, std::string tReplace ){
+//void findandreplaceInTexfile (std::string fileName, std::string tFind, std::string tReplace ){
    if( ofFile::doesFileExist(fileName) ){
 	
 	    std::ifstream t(ofToDataPath(fileName).c_str());
@@ -437,7 +438,6 @@ std::string getAddonsRoot(){
 }
 
 void setOFRoot(std::string path){
-	cout << "setOFRoot : " << path << endl;
 	OFRoot = path;
 }
 

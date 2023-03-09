@@ -39,7 +39,7 @@ public:
 
 	virtual ~baseProject(){}
 
-	bool create(std::string path, std::string templateName="");
+	bool create(const of::filesystem::path & path, std::string templateName="");
 	void parseAddons();
 	void parseConfigMake();
 	bool save();
@@ -70,7 +70,8 @@ public:
 	virtual void addSrcRecursively(std::string srcPath);
 
 	std::string getName() { return projectName;}
-	std::string getPath() { return projectDir; }
+//	std::string getPath() { return projectDir; }
+	of::filesystem::path getPath() { return projectDir; }
 
 	std::vector<Template> listAvailableTemplates(std::string target);
 	std::unique_ptr<baseProject::Template> parseTemplate(const ofDirectory & templateDir);
@@ -79,7 +80,7 @@ public:
 	pugi::xml_document doc;
 	bool bLoaded;
 
-	std::string projectDir;
+	of::filesystem::path projectDir;
 	std::string projectName;
 	std::string templatePath;
 	std::string target;

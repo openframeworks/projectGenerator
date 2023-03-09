@@ -25,8 +25,7 @@ std::string getOFRoot();
 std::string getAddonsRoot();
 void setOFRoot(std::string path);
 void findandreplace( std::string& tInput, std::string tFind, std::string tReplace );
-void findandreplaceInTexfile (std::string fileName, std::string tFind, std::string tReplace );
-
+void findandreplaceInTexfile (const of::filesystem::path & fileName, std::string tFind, std::string tReplace );
 
 bool doesTagAndAttributeExist(pugi::xml_document & doc, std::string tag, std::string attribute, std::string newValue);
 pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::string attribute, std::string newValue, bool addMultiple = false);
