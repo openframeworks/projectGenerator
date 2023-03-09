@@ -366,10 +366,8 @@ void ofAddon::exclude(vector<LibraryBinary> & variables, vector<string> exclusio
 void ofAddon::parseConfig(){
 	ofFile addonConfig;
 	if(isLocalAddon){
-		// addonConfig.open(ofFilePath::join(ofFilePath::join(pathToProject,addonPath),"addon_config.mk"));
 		addonConfig.open(pathToProject / addonPath / "addon_config.mk");
 	}else{
-		// addonConfig.open(ofFilePath::join(addonPath,"addon_config.mk"));
 		addonConfig.open(addonPath / "addon_config.mk");
 	}
 
@@ -513,7 +511,7 @@ bool ofAddon::fromFS(of::filesystem::path path, const std::string & platform){
 	}
 	
 
-	string libsPath = ofFilePath::join(path, "/libs");
+	of::filesystem::path libsPath = path / "libs";
 	vector < string > libFiles;
 
 
@@ -631,7 +629,7 @@ bool ofAddon::fromFS(of::filesystem::path path, const std::string & platform){
 
 	vector < string > srcFolders;
 	if(ofDirectory(srcPath).exists()){
-		getFoldersRecursively(ofFilePath::join(path, "/src"), srcFolders, platform);
+		getFoldersRecursively(path / "src", srcFolders, platform);
 	}
 
 	for (int i = 0; i < (int)libFolders.size(); i++){
