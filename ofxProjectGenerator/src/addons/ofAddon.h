@@ -12,6 +12,81 @@
 #include "ofConstants.h"
 #include "LibraryBinary.h"
 
+// About Metadata
+
+const std::string ADDON_NAME = "ADDON_NAME";
+const std::string ADDON_DESCRIPTION = "ADDON_DESCRIPTION";
+const std::string ADDON_AUTHOR = "ADDON_AUTHOR";
+const std::string ADDON_TAGS = "ADDON_TAGS";
+const std::string ADDON_URL = "ADDON_URL";
+
+const std::vector<std::string> AddonMetaVariables = {
+    ADDON_NAME,
+    ADDON_DESCRIPTION,
+    ADDON_AUTHOR,
+    ADDON_TAGS,
+    ADDON_URL,
+};
+
+// About Project settings
+
+// About Build Settings
+const std::string ADDON_DEPENDENCIES = "ADDON_DEPENDENCIES";
+const std::string ADDON_INCLUDES = "ADDON_INCLUDES";
+const std::string ADDON_CFLAGS = "ADDON_CFLAGS";
+const std::string ADDON_CPPFLAGS = "ADDON_CPPFLAGS";
+const std::string ADDON_LDFLAGS = "ADDON_LDFLAGS";
+const std::string ADDON_LIBS = "ADDON_LIBS";
+const std::string ADDON_DEFINES = "ADDON_DEFINES";
+
+// About Source Codes
+const std::string ADDON_SOURCES = "ADDON_SOURCES";
+const std::string ADDON_HEADER_SOURCES = "ADDON_HEADER_SOURCES";
+const std::string ADDON_C_SOURCES = "ADDON_C_SOURCES";
+const std::string ADDON_CPP_SOURCES = "ADDON_CPP_SOURCES";
+const std::string ADDON_OBJC_SOURCES = "ADDON_OBJC_SOURCES";
+
+// About Exclude
+const std::string ADDON_LIBS_EXCLUDE = "ADDON_LIBS_EXCLUDE";
+const std::string ADDON_SOURCES_EXCLUDE = "ADDON_SOURCES_EXCLUDE";
+const std::string ADDON_INCLUDES_EXCLUDE = "ADDON_INCLUDES_EXCLUDE";
+const std::string ADDON_FRAMEWORKS_EXCLUDE = "ADDON_FRAMEWORKS_EXCLUDE";
+
+const std::string ADDON_DATA = "ADDON_DATA";
+
+// About Env Specific
+const std::string ADDON_PKG_CONFIG_LIBRARIES = "ADDON_PKG_CONFIG_LIBRARIES";
+const std::string ADDON_FRAMEWORKS = "ADDON_FRAMEWORKS";
+const std::string ADDON_DLLS_TO_COPY = "ADDON_DLLS_TO_COPY";
+
+const std::vector<std::string> AddonProjectVariables = {
+    ADDON_DEPENDENCIES,
+    
+    ADDON_INCLUDES,
+    ADDON_CFLAGS,
+    ADDON_CPPFLAGS,
+    ADDON_LDFLAGS,
+    ADDON_LIBS,
+    ADDON_DEFINES,
+    
+    ADDON_SOURCES,
+    ADDON_HEADER_SOURCES,
+    ADDON_C_SOURCES,
+    ADDON_CPP_SOURCES,
+    ADDON_OBJC_SOURCES,
+    
+    ADDON_LIBS_EXCLUDE,
+    ADDON_SOURCES_EXCLUDE,
+    ADDON_INCLUDES_EXCLUDE,
+    ADDON_FRAMEWORKS_EXCLUDE,
+    
+    ADDON_DATA,
+    
+    ADDON_PKG_CONFIG_LIBRARIES,
+    ADDON_FRAMEWORKS,
+    ADDON_DLLS_TO_COPY,
+};
+
 class ofAddon {
 
 public:

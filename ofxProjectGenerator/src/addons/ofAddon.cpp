@@ -118,7 +118,9 @@ bool ofAddon::checkCorrectPlatform(ConfigParseState state){
 bool ofAddon::checkCorrectVariable(string variable, ConfigParseState state){
 	switch(state){
 	case Meta:
-		return (variable=="ADDON_NAME" || variable=="ADDON_DESCRIPTION" || variable=="ADDON_AUTHOR" || variable=="ADDON_TAGS" || variable=="ADDON_URL");
+            return std::find(AddonMetaVariables.begin(),
+                             AddonMetaVariables.end(),
+                             variable) != AddonMetaVariables.end();
 	case Common:
 	case Linux:
 	case Linux64:
@@ -132,15 +134,9 @@ bool ofAddon::checkCorrectVariable(string variable, ConfigParseState state){
 	case Emscripten:
 	case iOS:
 	case OSX:
-		return (variable == "ADDON_DEPENDENCIES" || variable == "ADDON_INCLUDES" ||
-				variable == "ADDON_CFLAGS" || variable == "ADDON_CPPFLAGS" ||
-				variable == "ADDON_LDFLAGS"  || variable == "ADDON_LIBS" || variable == "ADDON_PKG_CONFIG_LIBRARIES" ||
-				variable == "ADDON_FRAMEWORKS" ||
-				variable == "ADDON_SOURCES" || variable == "ADDON_OBJC_SOURCES" || variable == "ADDON_CPP_SOURCES" || variable == "ADDON_HEADER_SOURCES" ||
-				variable == "ADDON_DATA" ||
-				variable == "ADDON_LIBS_EXCLUDE" || variable == "ADDON_SOURCES_EXCLUDE" || variable == "ADDON_INCLUDES_EXCLUDE" || variable == "ADDON_FRAMEWORKS_EXCLUDE" ||
-				variable == "ADDON_DLLS_TO_COPY" ||
-				variable == "ADDON_DEFINES");
+            return std::find(AddonProjectVariables.begin(),
+                             AddonProjectVariables.end(),
+                             variable) != AddonProjectVariables.end();
 	case Unknown:
 	default:
 		return false;
@@ -219,7 +215,7 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 }
 
 void ofAddon::parseVariableValue(string variable, string value, bool addToValue, string line, int lineNum){
-	if(variable == "ADDON_NAME"){
+	if(variable == ADDON_NAME){
 		if(value!=name){
 			ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
 						<< "line " << lineNum << ": " << line << "\n\t\t"
@@ -236,103 +232,103 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 	}
 	else addonRelPath = addonPath;
 
-	if(variable == "ADDON_DESCRIPTION"){
+	if(variable == ADDON_DESCRIPTION){
 		addReplaceString(description,value,addToValue);
 		return;
 	}
 
-	if(variable == "ADDON_AUTHOR"){
+	if(variable == ADDON_AUTHOR){
 		addReplaceString(author,value,addToValue);
 		return;
 	}
 
-	if(variable == "ADDON_TAGS"){
+	if(variable == ADDON_TAGS){
 		addReplaceStringVector(tags,value,"",addToValue);
 		return;
 	}
 
-	if(variable == "ADDON_URL"){
+	if(variable == ADDON_URL){
 		addReplaceString(url,value,addToValue);
 		return;
 	}
 
-	if(variable == "ADDON_DEPENDENCIES"){
+	if(variable == ADDON_DEPENDENCIES){
 		addReplaceStringVector(dependencies,value,"",addToValue);
 	}
 
-	if(variable == "ADDON_INCLUDES"){
+	if(variable == ADDON_INCLUDES){
 		addReplaceStringVector(includePaths, value, addonRelPath.string(), addToValue);
 	}
 
-	if(variable == "ADDON_CFLAGS"){
+	if(variable == ADDON_CFLAGS){
 		addReplaceStringVector(cflags,value,"",addToValue);
 	}
 
-	if(variable == "ADDON_CPPFLAGS"){
+	if(variable == ADDON_CPPFLAGS){
 		addReplaceStringVector(cppflags,value,"",addToValue);
 	}
 
-	if(variable == "ADDON_LDFLAGS"){
+	if(variable == ADDON_LDFLAGS){
 		addReplaceStringVector(ldflags,value,"",addToValue);
 	}
 
-	if(variable == "ADDON_LIBS"){
+	if(variable == ADDON_LIBS){
 		addReplaceStringVector(libs, value, addonRelPath.string(), addToValue);
 	}
 
-	if(variable == "ADDON_DLLS_TO_COPY"){
+	if(variable == ADDON_DLLS_TO_COPY){
 		addReplaceStringVector(dllsToCopy,value,"",addToValue);
 	}
 
-	if(variable == "ADDON_PKG_CONFIG_LIBRARIES"){
+	if(variable == ADDON_PKG_CONFIG_LIBRARIES){
 		addReplaceStringVector(pkgConfigLibs,value,"",addToValue);
 	}
 
-	if(variable == "ADDON_FRAMEWORKS"){
+	if(variable == ADDON_FRAMEWORKS){
 		addReplaceStringVector(frameworks,value,"",addToValue);
 	}
 
-	if(variable == "ADDON_SOURCES"){
-		addReplaceStringVector(srcFiles, value, addonRelPath.string() ,addToValue);
+	if(variable == ADDON_SOURCES){
+        addReplaceStringVector(srcFiles, value, addonRelPath.string() ,addToValue);
 	}
 
-	if(variable == "ADDON_C_SOURCES"){
-		addReplaceStringVector(csrcFiles, value, addonRelPath.string() ,addToValue);
+	if(variable == ADDON_C_SOURCES){
+        addReplaceStringVector(csrcFiles, value, addonRelPath.string() ,addToValue);
 	}
 
-	if(variable == "ADDON_CPP_SOURCES"){
-		addReplaceStringVector(cppsrcFiles, value, addonRelPath.string() ,addToValue);
+	if(variable == ADDON_CPP_SOURCES){
+        addReplaceStringVector(cppsrcFiles, value, addonRelPath.string() ,addToValue);
 	}
 
-	if(variable == "ADDON_HEADER_SOURCES"){
-		addReplaceStringVector(headersrcFiles, value, addonRelPath.string() ,addToValue);
+	if(variable == ADDON_HEADER_SOURCES){
+        addReplaceStringVector(headersrcFiles, value, addonRelPath.string() ,addToValue);
 	}
 
-	if(variable == "ADDON_OBJC_SOURCES"){
-		addReplaceStringVector(objcsrcFiles, value, addonRelPath.string() ,addToValue);
+	if(variable == ADDON_OBJC_SOURCES){
+        addReplaceStringVector(objcsrcFiles, value, addonRelPath.string() ,addToValue);
 	}
 
-	if(variable == "ADDON_DATA"){
+	if(variable == ADDON_DATA){
 		addReplaceStringVector(data,value,"",addToValue);
 	}
 
-	if(variable == "ADDON_LIBS_EXCLUDE"){
+	if(variable == ADDON_LIBS_EXCLUDE){
 		addReplaceStringVector(excludeLibs,value,"",addToValue);
 	}
 
-	if(variable == "ADDON_SOURCES_EXCLUDE"){
+	if(variable == ADDON_SOURCES_EXCLUDE){
 		addReplaceStringVector(excludeSources,value,"",addToValue);
 	}
 
-	if(variable == "ADDON_INCLUDES_EXCLUDE"){
+	if(variable == ADDON_INCLUDES_EXCLUDE){
 		addReplaceStringVector(excludeIncludes,value,"",addToValue);
 	}
 
-	if (variable == "ADDON_FRAMEWORKS_EXCLUDE") {
+	if (variable == ADDON_FRAMEWORKS_EXCLUDE) {
 		addReplaceStringVector(excludeFrameworks, value, "", addToValue);
 	}
 
-	if (variable == "ADDON_DEFINES") {
+	if (variable == ADDON_DEFINES) {
 		addReplaceStringVector(defines, value, "", addToValue);
 	}
 }
