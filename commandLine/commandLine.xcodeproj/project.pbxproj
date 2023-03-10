@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0B53F62F5AB3D260CD9989DC /* LibraryBinary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85AE4BA4B2C36DE3FDEA205B /* LibraryBinary.cpp */; };
+		191688EA29BBA922001E777C /* uuidxx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 191688E829BBA18F001E777C /* uuidxx.cpp */; };
 		1C36947250DCB09A8A375C0C /* ofxXmlPoco.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9998694E5001F9CF0B13BF0 /* ofxXmlPoco.cpp */; };
 		4101A75BBA7D018EDEE29106 /* androidStudioProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60C942C97A938F245F6C9FA5 /* androidStudioProject.cpp */; };
 		4C06EAFF49DAB0A2342A6823 /* ofAddon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F4B09ECED1D13F0D76544CB1 /* ofAddon.cpp */; };
@@ -41,6 +42,8 @@
 		101E00135DD5F4A88AA3119E /* rc2.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = rc2.h; path = ../../../addons/ofxPoco/libs/openssl/include/openssl/rc2.h; sourceTree = SOURCE_ROOT; };
 		16D8E1844A44453A0C287E72 /* ssl.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = ssl.h; path = ../../../addons/ofxPoco/libs/openssl/include/openssl/ssl.h; sourceTree = SOURCE_ROOT; };
 		17006150745E007FA32014F5 /* modes.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = modes.h; path = ../../../addons/ofxPoco/libs/openssl/include/openssl/modes.h; sourceTree = SOURCE_ROOT; };
+		191688E829BBA18F001E777C /* uuidxx.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = uuidxx.cpp; sourceTree = "<group>"; };
+		191688E929BBA18F001E777C /* uuidxx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = uuidxx.h; sourceTree = "<group>"; };
 		1AEDCF9A6D7A9C81A1FFFB82 /* cmac.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = cmac.h; path = ../../../addons/ofxPoco/libs/openssl/include/openssl/cmac.h; sourceTree = SOURCE_ROOT; };
 		1C0972A2A90100E10C49938E /* rsa.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = rsa.h; path = ../../../addons/ofxPoco/libs/openssl/include/openssl/rsa.h; sourceTree = SOURCE_ROOT; };
 		1D548216CC2978215BFDAC85 /* engine.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = engine.h; path = ../../../addons/ofxPoco/libs/openssl/include/openssl/engine.h; sourceTree = SOURCE_ROOT; };
@@ -351,6 +354,24 @@
 				70E25EBAAB745F09329DDB44 /* openssl */,
 			);
 			name = include;
+			sourceTree = "<group>";
+		};
+		191688E429BBA18F001E777C /* uuidxx */ = {
+			isa = PBXGroup;
+			children = (
+				191688E729BBA18F001E777C /* src */,
+			);
+			name = uuidxx;
+			path = ../ofxProjectGenerator/src/uuidxx;
+			sourceTree = "<group>";
+		};
+		191688E729BBA18F001E777C /* src */ = {
+			isa = PBXGroup;
+			children = (
+				191688E829BBA18F001E777C /* uuidxx.cpp */,
+				191688E929BBA18F001E777C /* uuidxx.h */,
+			);
+			path = src;
 			sourceTree = "<group>";
 		};
 		1EC7C71C6A2F145CDCCA8F9A /* addons */ = {
@@ -804,6 +825,7 @@
 		E903244952694ECC7C690A10 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				191688E429BBA18F001E777C /* uuidxx */,
 				1EC7C71C6A2F145CDCCA8F9A /* addons */,
 				ECBF6BD750C89FA1831D523E /* projects */,
 				D58CADC2E0D0B22492A9A638 /* utils */,
@@ -895,7 +917,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\" \"$TARGET_BUILD_DIR/commandLinePG\";\tmv \"$TARGET_BUILD_DIR/commandLinePG\" \"$TARGET_BUILD_DIR/projectGenerator\"";
+			shellScript = "cp \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\" \"$TARGET_BUILD_DIR/commandLine\";\t\n#echo mv \"$TARGET_BUILD_DIR/commandLinePG\" \"$TARGET_BUILD_DIR/projectGenerator\"\ncp \"$TARGET_BUILD_DIR/commandLine\" \"$TARGET_BUILD_DIR/projectGenerator\"\nrm \"$TARGET_BUILD_DIR/commandLine\"\n";
 		};
 		E42962A92163ECCD00A6A9E2 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -908,7 +930,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "xcodebuild -project \"$OF_PATH/libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj\" -target openFrameworks -configuration \"${CONFIGURATION}\"";
+			shellScript = "xcodebuild -project \"$OF_PATH/libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj\" -target openFrameworks -configuration \"${CONFIGURATION}\"\n";
 		};
 		E4B6FFFD0C3F9AB9008CF71C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -921,7 +943,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mkdir -p \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/\"\n# Copy default icon file into App/Resources\nrsync -aved \"$ICON_FILE\" \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/\"\n";
+			shellScript = "mkdir -p \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/\"\n# Copy default icon file into App/Resources\necho 'icon file'\necho $ICON_FILE\necho 'target build dir'\necho $TARGET_BUILD_DIR\necho rsync -aved \"$ICON_FILE\" \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/\"\n\n#rsync -aved \"$ICON_FILE\" \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -930,6 +952,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				191688EA29BBA922001E777C /* uuidxx.cpp in Sources */,
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */,
 				1C36947250DCB09A8A375C0C /* ofxXmlPoco.cpp in Sources */,
@@ -982,7 +1005,7 @@
 					../ofxProjectGenerator/src/projects,
 					../ofxProjectGenerator/src/utils,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_CPLUSPLUSFLAGS = "-D__MACOSX_CORE__";
 				SDKROOT = macosx;
@@ -1010,12 +1033,14 @@
 					../ofxProjectGenerator/src/addons,
 					../ofxProjectGenerator/src/projects,
 					../ofxProjectGenerator/src/utils,
+					../ofxProjectGenerator/src/uuidxx/src,
 				);
 				ICON = "$(ICON_NAME_RELEASE)";
 				ICON_FILE = "$(ICON_FILE_PATH)$(ICON)";
 				INFOPLIST_FILE = "openFrameworks-Info.plist";
 				INSTALL_PATH = /Applications;
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIB_FMOD = "";
 				OTHER_LDFLAGS = (
 					"$(OF_CORE_LIBS)",
 					"$(OF_CORE_FRAMEWORKS)",
@@ -1067,7 +1092,7 @@
 					../ofxProjectGenerator/src/projects,
 					../ofxProjectGenerator/src/utils,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_CPLUSPLUSFLAGS = "-D__MACOSX_CORE__";
@@ -1107,7 +1132,7 @@
 					../ofxProjectGenerator/src/projects,
 					../ofxProjectGenerator/src/utils,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_CPLUSPLUSFLAGS = "-D__MACOSX_CORE__";
 				SDKROOT = macosx;
@@ -1135,12 +1160,14 @@
 					../ofxProjectGenerator/src/addons,
 					../ofxProjectGenerator/src/projects,
 					../ofxProjectGenerator/src/utils,
+					../ofxProjectGenerator/src/uuidxx/src,
 				);
 				ICON = "$(ICON_NAME_DEBUG)";
 				ICON_FILE = "$(ICON_FILE_PATH)$(ICON)";
 				INFOPLIST_FILE = "openFrameworks-Info.plist";
 				INSTALL_PATH = /Applications;
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIB_FMOD = "";
 				OTHER_LDFLAGS = (
 					"$(OF_CORE_LIBS)",
 					"$(OF_CORE_FRAMEWORKS)",
@@ -1180,12 +1207,14 @@
 					../ofxProjectGenerator/src/addons,
 					../ofxProjectGenerator/src/projects,
 					../ofxProjectGenerator/src/utils,
+					../ofxProjectGenerator/src/uuidxx/src,
 				);
 				ICON = "$(ICON_NAME_RELEASE)";
 				ICON_FILE = "$(ICON_FILE_PATH)$(ICON)";
 				INFOPLIST_FILE = "openFrameworks-Info.plist";
 				INSTALL_PATH = /Applications;
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIB_FMOD = "";
 				OTHER_LDFLAGS = (
 					"$(OF_CORE_LIBS)",
 					"$(OF_CORE_FRAMEWORKS)",

@@ -19,12 +19,6 @@
 #include <fstream>
 #include <string>
 
-// FIXME: this can be replaced by this one https://github.com/neosmart/uuidxx
-#include "Poco/HMACEngine.h"
-#include "Poco/MD5Engine.h"
-using Poco::DigestEngine;
-using Poco::HMACEngine;
-using Poco::MD5Engine;
 
 #ifdef TARGET_WIN32
 #include <direct.h>
@@ -39,25 +33,37 @@ using Poco::MD5Engine;
 
 using std::unique_ptr;
 
+
+
+
+// FIXME: this can be replaced by this one https://github.com/neosmart/uuidxx
+#ifdef USEPOCO
+#include "Poco/HMACEngine.h"
+#include "Poco/MD5Engine.h"
+using Poco::DigestEngine;
+using Poco::HMACEngine;
+using Poco::MD5Engine;
+
 std::string generateUUID(std::string input){
-
     std::string passphrase("openFrameworks"); // HMAC needs a passphrase
-
     HMACEngine<MD5Engine> hmac(passphrase); // we'll compute a MD5 Hash
     hmac.update(input);
-
 	const DigestEngine::Digest& digest = hmac.digest(); // finish HMAC computation and obtain digest
 	std::string digestString;
 	digestString = DigestEngine::digestToHex(digest); // convert to a string of hexadecimal numbers
-
     digestString = digestString.substr(0,24);
     digestString = ofToUpper(digestString);
-
     std::string returnStr = digestString; // make a copy to return, fixes some odd visual studio behavior
     return returnStr;
 }
 
+#else
 
+#include "uuidxx.h"
+std::string generateUUID(std::string input){
+	return uuidxx::uuid::Generate().ToString();
+}
+#endif
 
 
 
