@@ -72,8 +72,8 @@ bool CBLinuxProject::createProjectFile(){
     if (relRoot != "../../../"){
         std::string relPath2 = relRoot;
         relPath2.erase(relPath2.end()-1);
-        findandreplaceInTexfile(projectDir + "Makefile", "../../..", relPath2);
-        findandreplaceInTexfile(projectDir + "config.make", "../../..", relPath2);
+        findandreplaceInTexfile(projectDir / "Makefile", "../../..", relPath2);
+        findandreplaceInTexfile(projectDir / "config.make", "../../..", relPath2);
         findandreplaceInTexfile(ofFilePath::join(projectDir , projectName + ".workspace"), "../../../", relRoot);
         findandreplaceInTexfile(ofFilePath::join(projectDir , projectName + ".cbp"), "../../../", relRoot);
     }

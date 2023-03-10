@@ -13,14 +13,14 @@
 std::string CBWinProject::LOG_NAME = "CBWinProject";
 bool CBWinProject::createProjectFile(){
 
-    std::string project = projectDir + projectName + ".cbp";
-    std::string workspace = projectDir + projectName + ".workspace";
+	auto project = projectDir / (projectName + ".cbp");
+    auto workspace = projectDir / (projectName + ".workspace");
 
 
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.cbp"),project, false, true);
 
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.workspace"),workspace, false, true);
-	ofFile::copyFromTo(ofFilePath::join(templatePath,"icon.rc"), projectDir + "icon.rc", false, true);
+	ofFile::copyFromTo(ofFilePath::join(templatePath,"icon.rc"), projectDir / "icon.rc", false, true);
 
     //let's do some renaming:
     std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
@@ -48,7 +48,7 @@ bool CBWinProject::loadProjectFile(){
 
     //project.open(ofFilePath::join(projectDir , projectName + ".cbp"));
 
-    ofFile project(projectDir + projectName + ".cbp");
+    ofFile project(projectDir / (projectName + ".cbp"));
 	if(!project.exists()){
 		ofLogError(LOG_NAME) << "error loading" << project.path() << "doesn't exist";
 		return false;
@@ -67,7 +67,7 @@ bool CBWinProject::saveProjectFile(){
             ofLogError(LOG_NAME) << "can't set title";
         }
     }
-    return doc.save_file((projectDir + projectName + ".cbp").c_str());
+    return doc.save_file((projectDir / (projectName + ".cbp")).c_str());
 }
 
 void CBWinProject::addSrc(std::string srcName, std::string folder, SrcType type){
@@ -92,6 +92,6 @@ std::string CBWinProject::getName(){
 	return projectName;
 }
 
-std::string CBWinProject::getPath(){
+of::filesystem::path CBWinProject::getPath(){
 	return projectDir;
 }

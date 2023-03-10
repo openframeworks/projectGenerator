@@ -18,7 +18,7 @@ bool visualStudioProject::createProjectFile(){
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.vcxproj.user"),user, false, true);
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.sln"),solution, false, true);
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.vcxproj.filters"),filters, false, true);
-	ofFile::copyFromTo(ofFilePath::join(templatePath,"icon.rc"), projectDir + "icon.rc", false, true);
+	ofFile::copyFromTo(ofFilePath::join(templatePath,"icon.rc"), projectDir / "icon.rc", false, true);
 
 	ofFile filterFile(filters);
 	std::string temp = filterFile.readToBuffer();
@@ -54,7 +54,7 @@ bool visualStudioProject::createProjectFile(){
 
 bool visualStudioProject::loadProjectFile(){
 
-	ofFile project(projectDir + projectName + ".vcxproj");
+	ofFile project(projectDir / (projectName + ".vcxproj"));
 	if(!project.exists()){
 		ofLogError(LOG_NAME) << "error loading " << project.path() << " doesn't exist";
 		return false;
@@ -67,11 +67,11 @@ bool visualStudioProject::loadProjectFile(){
 
 bool visualStudioProject::saveProjectFile(){
 
-	std::string filters = projectDir + projectName + ".vcxproj.filters";
+	auto filters = projectDir / (projectName + ".vcxproj.filters");
 	filterXmlDoc.save_file(filters.c_str());
 
 
-	return doc.save_file((projectDir + projectName + ".vcxproj").c_str());
+	return doc.save_file((projectDir / (projectName + ".vcxproj")).c_str());
 }
 
 
