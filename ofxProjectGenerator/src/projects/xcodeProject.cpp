@@ -503,6 +503,57 @@ void xcodeProject::addFramework(string name, string path, string folder){
 	}
 }
 
+void xcodeProject::addDylib(string name, string path){
+	// name = name of the dylib
+	// path = the full path (w name) of this framework
+	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
+	
+	//-----------------------------------------------------------------
+	// based on the extension make some choices about what to do:
+	//-----------------------------------------------------------------
+	
+	//-----------------------------------------------------------------
+	// (A) make a FILE REF
+	//-----------------------------------------------------------------
+	
+	// encoding may be messing up for frameworks... so I switched to a pbx file ref without encoding fields
+	string UUID = generateUUID( name );
+
+	//commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
+	commands.emplace_back("Add :objects:"+UUID+":path string "+path);
+	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
+	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
+	commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string compiled.mach-o.dylib");
+	commands.emplace_back("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
+	
+	string buildUUID = generateUUID(name + "-build");
+	commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
+	commands.emplace_back("Add :objects:"+buildUUID+":fileRef string "+UUID);
+	
+	// new - code sign dylibs on copy
+	commands.emplace_back("Add :objects:"+buildUUID+":settings:ATTRIBUTES array");
+	commands.emplace_back("Add :objects:"+buildUUID+":settings:ATTRIBUTES: string CodeSignOnCopy");
+
+//	// we add one of the build refs to the list of frameworks
+//	// TENTATIVA desesperada aqui...
+//	string folderUUID = getFolderUUID(folder);
+//	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
+
+        string buildUUID2 = generateUUID(name + "-build2");
+        commands.emplace_back("Add :objects:"+buildUUID2+":fileRef string "+UUID);
+        commands.emplace_back("Add :objects:"+buildUUID2+":isa string PBXBuildFile");
+        
+        // new - code sign frameworks on copy
+        commands.emplace_back("Add :objects:"+buildUUID2+":settings:ATTRIBUTES array");
+        commands.emplace_back("Add :objects:"+buildUUID2+":settings:ATTRIBUTES: string CodeSignOnCopy");
+
+        // UUID hardcoded para PBXCopyFilesBuildPhase
+        // FIXME: hardcoded - this is the same for the next fixme. so maybe a clearer ident can make things better here.
+        commands.emplace_back("Add :objects:E4A5B60F29BAAAE400C2D356:files: string " + buildUUID2);
+
+}
+
+
 void xcodeProject::addInclude(string includeName){
 
 //	string relRoot = getOFRelPathFS(projectDir).string();
@@ -602,6 +653,9 @@ void xcodeProject::addAddon(ofAddon & addon){
 	for (auto & e : addon.libs) {
 		ofLogVerbose() << "adding addon libs: " << e.path;
 		addLibrary(e);
+		if( ofFilePath::getFileExt(e.path) == "dylib" ){
+                    addDylib(ofFilePath::getFileName(e.path), e.path);
+		}
 	}
 	
 	for (auto & e : addon.cflags) {
