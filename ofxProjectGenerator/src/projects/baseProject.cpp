@@ -160,68 +160,37 @@ bool baseProject::create(const of::filesystem::path & _path, std::string templat
 	if (bDoesDirExist){
 		
 		vector < string > fileNames;
-//		getFilesRecursively(ofFilePath::join(projectDir , "src"), fileNames);
 		getFilesRecursively(projectDir / "src", fileNames);
 
-		for (int i = 0; i < (int)fileNames.size(); i++){
-
-			fileNames[i].erase(fileNames[i].begin(), fileNames[i].begin() + projectDir.string().length());
-
-			string first, last;
-#ifdef TARGET_WIN32
-			splitFromLast(fileNames[i], "\\", first, last);
-#else
-			splitFromLast(fileNames[i], "/", first, last);
-#endif
-			if (fileNames[i] != "src/ofApp.cpp" &&
-				fileNames[i] != "src/ofApp.h" &&
-				fileNames[i] != "src/main.cpp" &&
-				fileNames[i] != "src/ofApp.mm" &&
-				fileNames[i] != "src/main.mm"){
-				addSrc(fileNames[i], first);
+		for (auto & f : fileNames) {
+			of::filesystem::path rel { of::filesystem::relative(f, projectDir) };
+			of::filesystem::path folder { rel.parent_path() };
+			
+			std::string fileName = rel.string();
+			
+			if (fileName != "src/ofApp.cpp" &&
+				fileName != "src/ofApp.h" &&
+				fileName != "src/main.cpp" &&
+				fileName != "src/ofApp.mm" &&
+				fileName != "src/main.mm") {
+//				cout << "add filename:: " << rel << " :: " << folder << endl;
+				addSrc(rel.string(), folder.string());
+			} else {
+//				cout << "not adding filename:: " << rel << " :: " << folder << endl;
 			}
 		}
 
-//		if( target == "ios" ){
-//			getFilesRecursively(ofFilePath::join(projectDir , "bin/data"), fileNames);
-//
-//	        for (int i = 0; i < (int)fileNames.size(); i++){
-//				fileNames[i].erase(fileNames[i].begin(), fileNames[i].begin() + projectDir.length());
-//
-//				string first, last;
-//				splitFromLast(fileNames[i], "/", first, last);
-//				if (fileNames[i] != "Default.png" &&
-//					fileNames[i] != "src/ofApp.h" &&
-//					fileNames[i] != "src/main.cpp" &&
-//					fileNames[i] != "src/ofApp.mm" &&
-//					fileNames[i] != "src/main.mm"){
-//					addSrc(fileNames[i], first);
-//				}
-//			}
-//		}
-
-		// get a unique list of the paths that are needed for the includes.
-		list < string > paths;
-		vector < string > includePaths;
-		for (int i = 0; i < (int)fileNames.size(); i++){
-			size_t found;
-	#ifdef TARGET_WIN32
-			found = fileNames[i].find_last_of("\\");
-	#else
-			found = fileNames[i].find_last_of("/");
-	#endif
-			paths.push_back(fileNames[i].substr(0,found));
+		// only add unique paths
+		std::vector < of::filesystem::path > paths;
+		for (auto & f : fileNames) {
+			auto dir = of::filesystem::path(f).parent_path().filename();
+			if (std::find(paths.begin(), paths.end(), dir) == paths.end()) {
+				paths.emplace_back(dir);
+//				cout << "addInclude " << dir << endl;
+				addInclude(dir.string());
+			}
 		}
-
-		paths.sort();
-		paths.unique();
-		for (list<string>::iterator it=paths.begin(); it!=paths.end(); ++it){
-			includePaths.push_back(*it);
-		}
-
-		for (int i = 0; i < includePaths.size(); i++){
-			addInclude(includePaths[i]);
-		}
+		
 	}
 	return true;
 }

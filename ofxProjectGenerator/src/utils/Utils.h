@@ -32,12 +32,12 @@ pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::strin
 
 
 
-void getFoldersRecursively(const std::string & path, std::vector < std::string > & folderNames, std::string platform);
+void getFoldersRecursively(const of::filesystem::path & path, std::vector < std::string > & folderNames, std::string platform);
 void getFilesRecursively(const of::filesystem::path & path, std::vector < std::string > & fileNames);
-void getLibsRecursively(const std::string & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform = "", std::string arch = "", std::string target = "");
-void getFrameworksRecursively( const std::string & path, std::vector < std::string > & frameworks,  std::string platform = "" );
-void getPropsRecursively(const std::string & path, std::vector < std::string > & props, const std::string & platform);
-void getDllsRecursively(const std::string & path, std::vector < std::string > & dlls, std::string platform);
+void getLibsRecursively(const of::filesystem::path & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform = "", std::string arch = "", std::string target = "");
+void getFrameworksRecursively(const of::filesystem::path & path, std::vector < std::string > & frameworks,  std::string platform = "" );
+void getPropsRecursively(const of::filesystem::path & path, std::vector < std::string > & props, const std::string & platform);
+void getDllsRecursively(const of::filesystem::path & path, std::vector < std::string > & dlls, std::string platform);
 
 
 void splitFromLast(std::string toSplit, std::string deliminator, std::string & first, std::string & second);

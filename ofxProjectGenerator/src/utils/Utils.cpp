@@ -185,11 +185,8 @@ pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::strin
 
 // todo -- this doesn't use ofToDataPath -- so it's broken a bit.  can we fix?
 void getFilesRecursively(const of::filesystem::path & path, std::vector < std::string > & fileNames){
-
+//	cout << "---- getFilesRecursively :: " << path << endl;
     ofDirectory dir;
-
-    //ofLogVerbose() << "in getFilesRecursively "<< path << endl;
-
     dir.listDir(path);
     for (int i = 0; i < dir.size(); i++){
         ofFile temp(dir.getFile(i));
@@ -197,14 +194,15 @@ void getFilesRecursively(const of::filesystem::path & path, std::vector < std::s
         if (ofIsStringInString(dir.getName(i),".framework")) continue; // ignore frameworks
         
         if (temp.isFile()){
+//			cout << dir.getPath(i) << endl;
             fileNames.push_back(dir.getPath(i));
         } else if (temp.isDirectory()){
+//			cout << "this is directory : " << dir.getPath(i) << endl;
             getFilesRecursively(dir.getPath(i), fileNames);
         }
     }
-    //folderNames.push_back(path);
-
 }
+
 
 static std::vector <std::string> platforms;
 bool isFolderNotCurrentPlatform(std::string folderName, std::string platform){
@@ -241,10 +239,10 @@ void splitFromFirst(std::string toSplit, std::string deliminator, std::string & 
 }
 
 
-void getFoldersRecursively(const string & path, std::vector < std::string > & folderNames, std::string platform){
+void getFoldersRecursively(const of::filesystem::path & path, std::vector < std::string > & folderNames, std::string platform){
     ofDirectory dir;
     
-    if (!ofIsStringInString(path, ".framework")){
+    if (!ofIsStringInString(path.string(), ".framework")){
         dir.listDir(path);
         for (int i = 0; i < dir.size(); i++){
             ofFile temp(dir.getFile(i));
@@ -252,12 +250,13 @@ void getFoldersRecursively(const string & path, std::vector < std::string > & fo
                 getFoldersRecursively(dir.getPath(i), folderNames, platform);
             }
         }
-        folderNames.push_back(path);
+		// FIXME: convert folderNames to path
+        folderNames.push_back(path.string());
     }
 }
 
 
-void getFrameworksRecursively( const std::string & path, std::vector < std::string > & frameworks, std::string platform){
+void getFrameworksRecursively(const of::filesystem::path & path, std::vector < std::string > & frameworks, std::string platform){
     
     
     ofDirectory dir;
@@ -285,7 +284,7 @@ void getFrameworksRecursively( const std::string & path, std::vector < std::stri
 
 
 
-void getPropsRecursively(const std::string & path, std::vector < std::string > & props, const std::string & platform) {
+void getPropsRecursively(const of::filesystem::path & path, std::vector < std::string > & props, const std::string & platform) {
 
     if(!ofDirectory::doesDirectoryExist(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
     ofDirectory dir;
@@ -310,7 +309,7 @@ void getPropsRecursively(const std::string & path, std::vector < std::string > &
 }
 
 
-void getDllsRecursively(const std::string & path, std::vector < std::string > & dlls, std::string platform) {
+void getDllsRecursively(const of::filesystem::path & path, std::vector < std::string > & dlls, std::string platform) {
 	ofDirectory dir;
 	dir.listDir(path);
 
@@ -333,7 +332,7 @@ void getDllsRecursively(const std::string & path, std::vector < std::string > & 
 
 
 
-void getLibsRecursively(const std::string & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform, std::string arch, std::string target){
+void getLibsRecursively(const of::filesystem::path & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform, std::string arch, std::string target){
     ofDirectory dir;
     dir.listDir(path);
 
