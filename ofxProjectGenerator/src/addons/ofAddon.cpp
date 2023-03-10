@@ -623,13 +623,12 @@ bool ofAddon::fromFS(of::filesystem::path path, const std::string & platform){
 
 
 	// get a unique list of the paths that are needed for the includes.
-	std::vector < of::filesystem::path > paths;
+	list < of::filesystem::path > paths;
 	for (auto & f : srcFiles) {
 //		cout << "ofAddon srcFile :: " << f << endl;
 		auto dir = of::filesystem::path(f).parent_path();
 		if (std::find(paths.begin(), paths.end(), dir) == paths.end()) {
 			paths.emplace_back(dir);
-			includePaths.emplace_back(dir.string());
 		}
 	}
 	
@@ -639,6 +638,11 @@ bool ofAddon::fromFS(of::filesystem::path path, const std::string & platform){
 	if(ofDirectory(libsPath).exists()){
 		getFoldersRecursively(libsPath, libFolders, platform);
 	}
+	
+//	cout << " ---- LIBFOLDERS :" << endl;
+//	for (auto & l : libFolders) {
+//		cout << l << endl;
+//	}
 
 	vector < string > srcFolders;
 	if(ofDirectory(srcPath).exists()){
@@ -647,13 +651,24 @@ bool ofAddon::fromFS(of::filesystem::path path, const std::string & platform){
 
 	for (auto & l : libFolders) {
 		of::filesystem::path folder { prefixPath / of::filesystem::relative(of::filesystem::path(l), containedPath) };
-		paths.push_back(folder);
+		paths.emplace_back(folder);
 	}
 
 	for (auto & l : srcFolders) {
 		of::filesystem::path folder { prefixPath / of::filesystem::relative(of::filesystem::path(l), containedPath) };
-		paths.push_back(folder);
+		paths.emplace_back(folder);
 	}
+	
+	paths.unique();
+	paths.sort();
+
+	for (auto & p : paths) {
+		includePaths.emplace_back(p.string());
+	}
+	
+//	for (list<string>::iterator it=paths.begin(); it!=paths.end(); ++it){
+//		includePaths.push_back(*it);
+//	}
 
 	parseConfig();
 
