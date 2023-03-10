@@ -559,29 +559,6 @@ bool ofAddon::fromFS(of::filesystem::path path, const std::string & platform){
 		filesToFolders[s] = folder.string();
 	}
 	
-	
-	// I need to add libFiles to srcFiles
-//	for (int i = 0; i < (int)libFiles.size(); i++){
-//		libFiles[i].erase (libFiles[i].begin(), libFiles[i].begin() + containedPath.string().length());
-//		//ofLogVerbose() << " libFiles " << libFiles[i];
-//		int init = 0;
-//		int end = libFiles[i].rfind(of::filesystem::path("/").make_preferred().string());
-//		if (end > 0){
-//			string folder;
-//			if (!isLocalAddon) {
-//				folder = libFiles[i].substr(init, end);
-//			}
-//			else {
-//				init = libFiles[i].find(name);
-//				folder = ofFilePath::join("local_addons", libFiles[i].substr(init, end - init));
-//			}
-//			libFiles[i] = prefixPath.string() + libFiles[i];
-//			srcFiles.push_back(libFiles[i]);
-//			filesToFolders[libFiles[i]] = folder;
-//		}
-//
-//	}
-
 
 	// changing libs folder from absolute to relative.
 	for (auto & l : libs) {
@@ -668,11 +645,8 @@ bool ofAddon::fromFS(of::filesystem::path path, const std::string & platform){
 		getFoldersRecursively(path / "src", srcFolders, platform);
 	}
 
-//	cout << "---- libFolders" << endl;
 	for (auto & l : libFolders) {
-
 		of::filesystem::path folder { prefixPath / of::filesystem::relative(of::filesystem::path(l), containedPath) };
-//		cout << folder << endl;
 		paths.push_back(folder);
 	}
 
@@ -680,25 +654,6 @@ bool ofAddon::fromFS(of::filesystem::path path, const std::string & platform){
 		of::filesystem::path folder { prefixPath / of::filesystem::relative(of::filesystem::path(l), containedPath) };
 		paths.push_back(folder);
 	}
-
-//	for (int i = 0; i < (int)libFolders.size(); i++){
-//		cout << "add libFolders before " << libFolders[i] << endl;
-//		libFolders[i].erase (libFolders[i].begin(), libFolders[i].begin() + containedPath.string().length());
-//		libFolders[i] = prefixPath.string() + libFolders[i];
-//		cout << "add libFolders " << libFolders[i] << endl;
-//		paths.push_back(libFolders[i]);
-//	}
-
-//	for (int i = 0; i < (int)srcFolders.size(); i++){
-//		cout << "add srcFolders before " << srcFolders[i] << endl;
-//
-//		srcFolders[i].erase (srcFolders[i].begin(), srcFolders[i].begin() + containedPath.string().length());
-//		srcFolders[i] = prefixPath.string() + srcFolders[i];
-//		cout << "add srcFolders " << srcFolders[i] << endl;
-//		paths.push_back(srcFolders[i]);
-//	}
-
-
 
 	parseConfig();
 
