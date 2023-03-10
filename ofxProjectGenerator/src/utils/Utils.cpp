@@ -5,33 +5,26 @@
  *      Author: arturo
  */
 
-#include "Utils.h"
+#include "ofUtils.h"
 
-#include <algorithm>
-#include <Poco/DirectoryIterator.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/LocalDateTime.h>
-#include <algorithm>
-#include <iostream>
-#include <fstream>
-#include <string>
+#include "Utils.h"
 
 #include "qtcreatorproject.h"
 #include "CBWinProject.h"
 #include "xcodeProject.h"
 #include "visualStudioProject.h"
 #include "androidStudioProject.h"
+#include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <string>
 
-#include "Poco/String.h"
-
+// FIXME: this can be replaced by this one https://github.com/neosmart/uuidxx
 #include "Poco/HMACEngine.h"
 #include "Poco/MD5Engine.h"
 using Poco::DigestEngine;
 using Poco::HMACEngine;
 using Poco::MD5Engine;
-using namespace std;
-
-
 
 #ifdef TARGET_WIN32
 #include <direct.h>
@@ -44,10 +37,7 @@ using namespace std;
 #include <limits.h>		/* PATH_MAX */
 #endif
 
-
-using namespace Poco;
-
-#include "ofUtils.h"
+using std::unique_ptr;
 
 std::string generateUUID(std::string input){
 
@@ -103,7 +93,8 @@ std::string LoadFileAsString(const std::string & fn)
     return oss.str();
 }
 
-void findandreplaceInTexfile (std::string fileName, std::string tFind, std::string tReplace ){
+void findandreplaceInTexfile (const of::filesystem::path & fileName, std::string tFind, std::string tReplace ){
+//void findandreplaceInTexfile (std::string fileName, std::string tFind, std::string tReplace ){
    if( ofFile::doesFileExist(fileName) ){
 	
 	    std::ifstream t(ofToDataPath(fileName).c_str());
@@ -161,7 +152,7 @@ pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::strin
         pugi::xpath_node node = doc.select_node(xpathExpression);
         if(std::string(node.node().attribute(attribute.c_str()).value()).size() > 0){ // for some reason we get nulls here?
             // ...delete the existing node
-            cout << "DELETING: " << node.node().name() << ": " << " " << node.node().attribute(attribute.c_str()).value() << endl;
+            std::cout << "DELETING: " << node.node().name() << ": " << " " << node.node().attribute(attribute.c_str()).value() << std::endl;
             node.node().parent().remove_child(node.node());
         }
     }
@@ -184,11 +175,8 @@ pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::strin
 
 // todo -- this doesn't use ofToDataPath -- so it's broken a bit.  can we fix?
 void getFilesRecursively(const of::filesystem::path & path, std::vector < std::string > & fileNames){
-
+//	cout << "---- getFilesRecursively :: " << path << endl;
     ofDirectory dir;
-
-    //ofLogVerbose() << "in getFilesRecursively "<< path << endl;
-
     dir.listDir(path);
     for (int i = 0; i < dir.size(); i++){
         ofFile temp(dir.getFile(i));
@@ -196,14 +184,15 @@ void getFilesRecursively(const of::filesystem::path & path, std::vector < std::s
         if (ofIsStringInString(dir.getName(i),".framework")) continue; // ignore frameworks
         
         if (temp.isFile()){
+//			cout << dir.getPath(i) << endl;
             fileNames.push_back(dir.getPath(i));
         } else if (temp.isDirectory()){
+//			cout << "this is directory : " << dir.getPath(i) << endl;
             getFilesRecursively(dir.getPath(i), fileNames);
         }
     }
-    //folderNames.push_back(path);
-
 }
+
 
 static std::vector <std::string> platforms;
 bool isFolderNotCurrentPlatform(std::string folderName, std::string platform){
@@ -240,10 +229,10 @@ void splitFromFirst(std::string toSplit, std::string deliminator, std::string & 
 }
 
 
-void getFoldersRecursively(const string & path, std::vector < std::string > & folderNames, std::string platform){
+void getFoldersRecursively(const of::filesystem::path & path, std::vector < std::string > & folderNames, std::string platform){
     ofDirectory dir;
     
-    if (!ofIsStringInString(path, ".framework")){
+    if (!ofIsStringInString(path.string(), ".framework")){
         dir.listDir(path);
         for (int i = 0; i < dir.size(); i++){
             ofFile temp(dir.getFile(i));
@@ -251,12 +240,13 @@ void getFoldersRecursively(const string & path, std::vector < std::string > & fo
                 getFoldersRecursively(dir.getPath(i), folderNames, platform);
             }
         }
-        folderNames.push_back(path);
+		// FIXME: convert folderNames to path
+        folderNames.push_back(path.string());
     }
 }
 
 
-void getFrameworksRecursively( const std::string & path, std::vector < std::string > & frameworks, std::string platform){
+void getFrameworksRecursively(const of::filesystem::path & path, std::vector < std::string > & frameworks, std::string platform){
     
     
     ofDirectory dir;
@@ -284,7 +274,7 @@ void getFrameworksRecursively( const std::string & path, std::vector < std::stri
 
 
 
-void getPropsRecursively(const std::string & path, std::vector < std::string > & props, const std::string & platform) {
+void getPropsRecursively(const of::filesystem::path & path, std::vector < std::string > & props, const std::string & platform) {
 
     if(!ofDirectory::doesDirectoryExist(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
     ofDirectory dir;
@@ -309,7 +299,7 @@ void getPropsRecursively(const std::string & path, std::vector < std::string > &
 }
 
 
-void getDllsRecursively(const std::string & path, std::vector < std::string > & dlls, std::string platform) {
+void getDllsRecursively(const of::filesystem::path & path, std::vector < std::string > & dlls, std::string platform) {
 	ofDirectory dir;
 	dir.listDir(path);
 
@@ -332,7 +322,7 @@ void getDllsRecursively(const std::string & path, std::vector < std::string > & 
 
 
 
-void getLibsRecursively(const std::string & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform, std::string arch, std::string target){
+void getLibsRecursively(const of::filesystem::path & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform, std::string arch, std::string target){
     ofDirectory dir;
     dir.listDir(path);
 
@@ -437,55 +427,16 @@ std::string getAddonsRoot(){
 }
 
 void setOFRoot(std::string path){
-	cout << "setOFRoot : " << path << endl;
 	OFRoot = path;
 }
 
-std::string getOFRelPath(std::string from){
-	from = ofFilePath::removeTrailingSlash(from);
-    Poco::Path base(true);
-    base.parse(from);
+// FIXME: - in the future this can be the getOFRelPath
+of::filesystem::path getOFRelPathFS(const of::filesystem::path & from) {
+	return of::filesystem::relative(getOFRoot(), from);
+}
 
-    Poco::Path path;
-    path.parse( getOFRoot() );
-    path.makeAbsolute();
-
-
-	std::string relPath;
-	if (path.toString() == base.toString()){
-		// do something.
-	}
-
-	int maxx = std::max(base.depth(), path.depth());
-	for (int i = 0; i <= maxx; i++){
-
-		bool bRunOut = false;
-		bool bChanged = false;
-		if (i <= base.depth() && i <= path.depth()){
-			if (base.directory(i) == path.directory(i)){
-
-			} else {
-				bChanged = true;
-			}
-		} else {
-			bRunOut = true;
-		}
-
-
-		if (bRunOut == true || bChanged == true){
-            for (int j = i; j <= base.depth(); j++){
-				relPath += "../";
-			}
-			for (int j = i; j <= path.depth(); j++){
-				relPath += path.directory(j) + "/";
-			}
-			break;
-		}
-	}
-
-	ofLogVerbose() << "returning path " << relPath << std::endl;
-
-    return relPath;
+std::string getOFRelPath(const std::string & from) {
+	return getOFRelPathFS(from).string();
 }
 
 bool checkConfigExists(){

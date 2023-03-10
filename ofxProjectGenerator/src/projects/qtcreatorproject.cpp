@@ -54,9 +54,9 @@ bool QtCreatorProject::createProjectFile(){
 	if (relRoot != "../../../"){
 		std::string relPath2 = relRoot;
 		relPath2.erase(relPath2.end()-1);
-		findandreplaceInTexfile(projectDir + "qtcreator.qbs", "../../..", relPath2);
-		findandreplaceInTexfile(projectDir + "Makefile", "../../..", relPath2);
-		findandreplaceInTexfile(projectDir + "config.make", "../../..", relPath2);
+		findandreplaceInTexfile(projectDir / "qtcreator.qbs", "../../..", relPath2);
+		findandreplaceInTexfile(projectDir / "Makefile", "../../..", relPath2);
+		findandreplaceInTexfile(projectDir / "config.make", "../../..", relPath2);
 	}
 
 	return true;
@@ -67,7 +67,7 @@ void QtCreatorProject::addSrc(std::string srcFile, std::string folder, baseProje
 }
 
 bool QtCreatorProject::loadProjectFile(){
-	ofFile project(projectDir + projectName + ".qbs",ofFile::ReadOnly,true);
+	ofFile project(projectDir / (projectName + ".qbs"),ofFile::ReadOnly,true);
 	if(!project.exists()){
 		ofLogError(LOG_NAME) << "error loading" << project.path() << "doesn't exist";
 		return false;
@@ -139,7 +139,7 @@ bool QtCreatorProject::saveProjectFile(){
 
 	// save final project
 	qbs.set(qbsStr);
-	ofFile project(projectDir + projectName + ".qbs",ofFile::WriteOnly,true);
+	ofFile project(projectDir / (projectName + ".qbs"),ofFile::WriteOnly,true);
 	project.writeFromBuffer(qbs);
 	return true;
 }

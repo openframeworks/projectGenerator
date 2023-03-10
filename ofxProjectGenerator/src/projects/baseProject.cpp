@@ -109,17 +109,15 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(std::string ta
 	return templates;
 }
 
-// FIXME: substitute to of::filesystem
-bool baseProject::create(string path, std::string templateName){
-	cout << "baseProject::create " << path << endl;
+bool baseProject::create(const of::filesystem::path & _path, std::string templateName){
 	templatePath = getPlatformTemplateDir();
 	addons.clear();
 	extSrcPaths.clear();
+	auto path = _path;
 
 	if(!ofFilePath::isAbsolute(path)){
 		path = (of::filesystem::current_path() / of::filesystem::path(path)).string();
 	}
-	// projectDir = ofFilePath::addTrailingSlash(path);
 	projectDir = path;
 
 	projectName = ofFilePath::getFileName(path);
@@ -160,68 +158,39 @@ bool baseProject::create(string path, std::string templateName){
 	parseConfigMake();
 
 	if (bDoesDirExist){
+		
 		vector < string > fileNames;
-		getFilesRecursively(ofFilePath::join(projectDir , "src"), fileNames);
+		getFilesRecursively(projectDir / "src", fileNames);
 
-		for (int i = 0; i < (int)fileNames.size(); i++){
-
-			fileNames[i].erase(fileNames[i].begin(), fileNames[i].begin() + projectDir.length());
-
-			string first, last;
-#ifdef TARGET_WIN32
-			splitFromLast(fileNames[i], "\\", first, last);
-#else
-			splitFromLast(fileNames[i], "/", first, last);
-#endif
-			if (fileNames[i] != "src/ofApp.cpp" &&
-				fileNames[i] != "src/ofApp.h" &&
-				fileNames[i] != "src/main.cpp" &&
-				fileNames[i] != "src/ofApp.mm" &&
-				fileNames[i] != "src/main.mm"){
-				addSrc(fileNames[i], first);
+		for (auto & f : fileNames) {
+			of::filesystem::path rel { of::filesystem::relative(f, projectDir) };
+			of::filesystem::path folder { rel.parent_path() };
+			
+			std::string fileName = rel.string();
+			
+			if (fileName != "src/ofApp.cpp" &&
+				fileName != "src/ofApp.h" &&
+				fileName != "src/main.cpp" &&
+				fileName != "src/ofApp.mm" &&
+				fileName != "src/main.mm") {
+//				cout << "add filename:: " << rel << " :: " << folder << endl;
+				addSrc(rel.string(), folder.string());
+			} else {
+//				cout << "not adding filename:: " << rel << " :: " << folder << endl;
 			}
 		}
 
-//		if( target == "ios" ){
-//			getFilesRecursively(ofFilePath::join(projectDir , "bin/data"), fileNames);
-//
-//	        for (int i = 0; i < (int)fileNames.size(); i++){
-//				fileNames[i].erase(fileNames[i].begin(), fileNames[i].begin() + projectDir.length());
-//
-//				string first, last;
-//				splitFromLast(fileNames[i], "/", first, last);
-//				if (fileNames[i] != "Default.png" &&
-//					fileNames[i] != "src/ofApp.h" &&
-//					fileNames[i] != "src/main.cpp" &&
-//					fileNames[i] != "src/ofApp.mm" &&
-//					fileNames[i] != "src/main.mm"){
-//					addSrc(fileNames[i], first);
-//				}
-//			}
-//		}
-
-		// get a unique list of the paths that are needed for the includes.
-		list < string > paths;
-		vector < string > includePaths;
-		for (int i = 0; i < (int)fileNames.size(); i++){
-			size_t found;
-	#ifdef TARGET_WIN32
-			found = fileNames[i].find_last_of("\\");
-	#else
-			found = fileNames[i].find_last_of("/");
-	#endif
-			paths.push_back(fileNames[i].substr(0,found));
+		// only add unique paths
+		std::vector < of::filesystem::path > paths;
+		for (auto & f : fileNames) {
+			auto dir = of::filesystem::path(f).parent_path().filename();
+			if (std::find(paths.begin(), paths.end(), dir) == paths.end()) {
+				paths.emplace_back(dir);
+//				cout << "addInclude " << dir << endl;
+				addInclude(dir.string());
+			}
 		}
-
-		paths.sort();
-		paths.unique();
-		for (list<string>::iterator it=paths.begin(); it!=paths.end(); ++it){
-			includePaths.push_back(*it);
-		}
-
-		for (int i = 0; i < includePaths.size(); i++){
-			addInclude(includePaths[i]);
-		}
+		
 	}
 	return true;
 }
@@ -277,7 +246,9 @@ bool baseProject::isAddonInCache(const std::string & addonPath, const std::strin
 
 void baseProject::addAddon(std::string addonName){
 	ofAddon addon;
-	addon.pathToOF = getOFRelPath(projectDir);
+//	cout << projectDir << endl;
+	addon.pathToOF = getOFRelPath(projectDir.string());
+//	cout << addon.pathToOF << endl;
 	addon.pathToProject = ofFilePath::getAbsolutePath(projectDir);
 
 	auto localPath = ofFilePath::join(addon.pathToProject, addonName);
@@ -383,7 +354,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 	
 	std::map <std::string, std::string> uniqueIncludeFolders;
 	for( auto & fileToAdd : srcFilesToAdd){
-				
+//		cout << "fileToAdd :: " << fileToAdd << endl;
 		//if it is an absolute path it is easy - add the file and enclosing folder to the project
 		if( ofFilePath::isAbsolute(fileToAdd) && !bMakeRelative ){
 			string folder = ofFilePath::getEnclosingDirectory(fileToAdd,false);
@@ -427,6 +398,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 			folder =  ofFilePath::removeTrailingSlash(folder);
 
 			ofLogVerbose() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
+			
 			addSrc(relPathPathToAdd, folder);
 			uniqueIncludeFolders[includeFolder] = includeFolder;
 		}
@@ -435,6 +407,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 	//do it this way so we don't try and add a include folder for each file ( as it checks if they are already added ) so should be faster
 	for(auto & includeFolder : uniqueIncludeFolders){
 		ofLogVerbose() << " adding search include paths for folder " << includeFolder.second;
+		cout << "includeFolder.second " << includeFolder.second << endl;
 		addInclude(includeFolder.second);
 	}
 }

@@ -25,7 +25,7 @@ public:
 	void addLibrary(const LibraryBinary & lib);
 
 	std::string getName();
-	std::string getPath();
+	of::filesystem::path getPath();
 
 	static std::string LOG_NAME;
 

@@ -61,9 +61,9 @@ xcodeProject::xcodeProject(string target)
 	}
 };
 
-
 bool xcodeProject::createProjectFile(){
-	string xcodeProject = ofFilePath::join(projectDir , projectName + ".xcodeproj");
+	//	cout << "createProjectFile() xcodeProject " << xcodeProject << endl;
+	of::filesystem::path xcodeProject = projectDir / ( projectName + ".xcodeproj" );
 	
 	if (ofDirectory::doesDirectoryExist(xcodeProject)){
 		ofDirectory::removeDirectory(xcodeProject, true);
@@ -127,28 +127,22 @@ bool xcodeProject::createProjectFile(){
 	}
 
 	// make everything relative the right way.
-	string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
-//	string relRoot = "$(OF_ROOT)" + ofFilePath::removeTrailingSlash(projectDir);
-//	std::cout << "relRoot = " << relRoot << std::endl;
+	string relRoot = getOFRelPathFS(projectDir).string();
 	
-	if (relRoot != "../../../"){
-		cout << "FIXING PATHS" << endl;
-		string relPath2 = relRoot;
-		
-		relPath2.erase(relPath2.end()-1);
-		findandreplaceInTexfile(projectDir + projectName + ".xcodeproj/project.pbxproj", "../../..", relPath2);
-		//findandreplaceInTexfile(projectDir + "Project.xcconfig", "../../../", relRoot);
-		findandreplaceInTexfile(projectDir + "Project.xcconfig", "../../..", relPath2);
+	if (relRoot != "../../.."){
+
+		findandreplaceInTexfile(projectDir / projectName / ".xcodeproj/project.pbxproj", "../../..", relRoot);
+		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", relRoot);
 		if( target == "osx" ){
-			findandreplaceInTexfile(projectDir + "Makefile", "../../..", relPath2);
-			findandreplaceInTexfile(projectDir + "config.make", "../../..", relPath2);
+			findandreplaceInTexfile(projectDir / "Makefile", "../../..", relRoot);
+			findandreplaceInTexfile(projectDir / "config.make", "../../..", relRoot);
 		}
 	}
 	return true;
 }
 
 void xcodeProject::saveScheme(){
-	string schemeFolder = projectDir + projectName + ".xcodeproj" + "/xcshareddata/xcschemes/";
+	auto schemeFolder = projectDir / ( projectName + ".xcodeproj" ) / "xcshareddata/xcschemes";
 	if (ofDirectory::doesDirectoryExist(schemeFolder)){
 		ofDirectory::removeDirectory(schemeFolder, true);
 	}
@@ -156,17 +150,17 @@ void xcodeProject::saveScheme(){
 	
 	if(target=="osx"){
 		for (auto & f : { string("Release"), string("Debug") }) {
-			string schemeTo = schemeFolder + projectName + " " +f+ ".xcscheme";
+			auto schemeTo = schemeFolder / (projectName + " " +f+ ".xcscheme");
 			ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample "+f+".xcscheme"), schemeTo);
 			findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
 		}
 	 
-		string workspaceTo = projectDir  + projectName + ".xcodeproj/project.xcworkspace";
+		auto workspaceTo = projectDir / (projectName + ".xcodeproj/project.xcworkspace");
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/project.xcworkspace"), workspaceTo);
 	}else{
 
 		// MARK:- IOS sector;
-		string schemeTo = schemeFolder + projectName + ".xcscheme";
+		auto schemeTo = schemeFolder / (projectName + ".xcscheme");
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme"), schemeTo);
 		findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
 	}
@@ -220,7 +214,8 @@ string xcodeProject::getFolderUUID(string folder) {
 					commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
 					commands.emplace_back("Add :objects:"+thisUUID+":name string "+folders[a]);
 					commands.emplace_back("Add :objects:"+thisUUID+":children array");
-					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string <group>");
+//					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string <group>");
+					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
 
 					// And this new object is cointained in parent hierarchy, or even projRootUUID
 					commands.emplace_back("Add :objects:"+lastFolderUUID+":children: string " + thisUUID);
@@ -560,16 +555,13 @@ void xcodeProject::addDylib(string name, string path){
 
 
 void xcodeProject::addInclude(string includeName){
+
+//	string relRoot = getOFRelPathFS(projectDir).string();
+//	ofStringReplace(includeName, relRoot, "$(OF_PATH)");
 	
-	//
-	cout << "-----" << endl;
-	cout << getOFRoot() << endl;
-	cout << "$(OF_PATH)" << endl;
-	ofStringReplace(includeName, getOFRoot(), "$(OF_PATH)");
 	// Adding source to all build configurations, debug and release
 	for (auto & c : buildConfigurations) {
 		string s = "Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName;
-		std::cout << s << std::endl;
 		commands.emplace_back("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
 	}
 }
@@ -629,7 +621,6 @@ void xcodeProject::addAfterRule(string rule){
 
 void xcodeProject::addAddon(ofAddon & addon){
 	
-	
 	for(int i=0;i<(int)addons.size();i++){
 		if(addons[i].name==addon.name){
 			return;
@@ -651,42 +642,49 @@ void xcodeProject::addAddon(ofAddon & addon){
 		}
 	}
 	
-
-	
 	addons.push_back(addon);
 
-	for(int i=0;i<(int)addon.includePaths.size();i++){
-//		ofLogVerbose() << "adding addon include path: " << addon.includePaths[i];
-		ofLog() << "adding addon include path: " << addon.includePaths[i];
-		addInclude(addon.includePaths[i]);
+	for (auto & e : addon.includePaths) {
+		ofLogVerbose() << "adding addon include path: " << e;
+//		ofLog() << "adding addon include path: " << e;
+		addInclude(e);
 	}
-	for(int i=0;i<(int)addon.libs.size();i++){
-		ofLogVerbose() << "adding addon libs: " << addon.libs[i].path;
-		addLibrary(addon.libs[i]);
-                if( ofFilePath::getFileExt(addon.libs[i].path) == "dylib" ){
-                    addDylib( ofFilePath::getFileName(addon.libs[i].path), addon.libs[i].path);
-                }
+	
+	for (auto & e : addon.libs) {
+		ofLogVerbose() << "adding addon libs: " << e.path;
+		addLibrary(e);
+		if( ofFilePath::getFileExt(e.path) == "dylib" ){
+                    addDylib(ofFilePath::getFileName(e.path), e.path);
+		}
 	}
-	for(int i=0;i<(int)addon.cflags.size();i++){
-		ofLogVerbose() << "adding addon cflags: " << addon.cflags[i];
-		addCFLAG(addon.cflags[i]);
+	
+	for (auto & e : addon.cflags) {
+		ofLogVerbose() << "adding addon cflags: " << e;
+		addCFLAG(e);
 	}
-	for(int i=0;i<(int)addon.cppflags.size();i++){
-		ofLogVerbose() << "adding addon cppflags: " << addon.cppflags[i];
-		addCPPFLAG(addon.cppflags[i]);
+
+	for (auto & e : addon.cppflags) {
+		ofLogVerbose() << "adding addon cppflags: " << e;
+		addCPPFLAG(e);
 	}
-	for(int i=0;i<(int)addon.ldflags.size();i++){
-		ofLogVerbose() << "adding addon ldflags: " << addon.ldflags[i];
-		addLDFLAG(addon.ldflags[i]);
+	
+	for (auto & e : addon.ldflags) {
+		ofLogVerbose() << "adding addon ldflags: " << e;
+		addLDFLAG(e);
 	}
+
 	std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), std::less<string>());
-	for(int i=0;i<(int)addon.srcFiles.size(); i++){
-		ofLogVerbose() << "adding addon srcFiles: " << addon.srcFiles[i];
-		addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
+	
+	for (auto & e : addon.srcFiles) {
+		ofLogVerbose() << "adding addon srcFiles: " << e;
+		// FIXME: - we can eliminate filesToFolders later with a proper function to do that.
+		// maybe even eliminate addSrc second parameter
+		addSrc(e,addon.filesToFolders[e]);
 	}
-	for(int i=0;i<(int)addon.defines.size(); i++){
-		ofLogVerbose() << "adding addon defines: " << addon.defines[i];
-		addDefine(addon.defines[i]);
+	
+	for (auto & e : addon.defines) {
+		ofLogVerbose() << "adding addon defines: " << e;
+		addDefine(e);
 	}
 
 	for(int i=0;i<(int)addon.frameworks.size(); i++){
@@ -720,14 +718,14 @@ void xcodeProject::addAddon(ofAddon & addon){
 }
 
 bool xcodeProject::saveProjectFile(){
-	std::string fileName = projectDir + projectName + ".xcodeproj/project.pbxproj";
+	of::filesystem::path fileName = projectDir / (projectName + ".xcodeproj/project.pbxproj");
 	
 	// JSON Block - Multiplatform
 	string contents = ofBufferFromFile(fileName).getText();
 	json j = json::parse(contents);
 
 	for (auto & c : commands) {
-		//cout << c << endl;
+//		cout << c << endl;
 		vector<string> cols = ofSplitString(c, " ");
 		string thispath = cols[1];
 		ofStringReplace(thispath, ":", "/");
