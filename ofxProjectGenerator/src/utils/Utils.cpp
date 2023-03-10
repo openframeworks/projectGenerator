@@ -5,10 +5,9 @@
  *      Author: arturo
  */
 
-#include "ofUtils.h"
-
 #include "Utils.h"
 
+#include "ofUtils.h"
 #include "qtcreatorproject.h"
 #include "CBWinProject.h"
 #include "xcodeProject.h"
