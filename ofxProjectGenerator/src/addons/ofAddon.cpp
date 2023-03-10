@@ -5,11 +5,11 @@
  *      Author: arturo
  */
 
-#include "ofAddon.h"
 #include "ofUtils.h"
 #include "ofFileUtils.h"
+#include "ofAddon.h"
 #include "Utils.h"
-#include "Poco/String.h"
+//#include "Poco/String.h"
 #include "Poco/RegularExpression.h"
 #include <list>
 using namespace std;
@@ -416,8 +416,8 @@ void ofAddon::parseConfig(){
 				addToValue = false;
 				varValue = splitStringOnceByLeft(line,"=");
 			}
-			variable = Poco::trim(varValue[0]);
-			value = Poco::trim(varValue[1]);
+			variable = ofTrim(varValue[0]);
+			value = ofTrim(varValue[1]);
 
 			if(!checkCorrectPlatform(currentParseState)){
 				continue;
@@ -474,12 +474,10 @@ bool ofAddon::fromFS(of::filesystem::path path, const std::string & platform){
 	}
 
 	auto srcPath = path / "src";
-//	cout << "in fromFS, trying src " << srcPath << endl;
-//	ofLogVerbose() << "in fromFS, trying src " << srcPath;
+
 	if (ofDirectory(srcPath).exists()){
 		getFilesRecursively(srcPath, srcFiles);
 	}
-
 
 	// FIXME: srcFiles to fs::path
 	for (auto & s : srcFiles) {
@@ -620,55 +618,35 @@ bool ofAddon::fromFS(of::filesystem::path path, const std::string & platform){
 		}
 	}
 
-
-
-	// get a unique list of the paths that are needed for the includes.
+	// paths that are needed for the includes.
 	list < of::filesystem::path > paths;
-	for (auto & f : srcFiles) {
-//		cout << "ofAddon srcFile :: " << f << endl;
-		auto dir = of::filesystem::path(f).parent_path();
-		if (std::find(paths.begin(), paths.end(), dir) == paths.end()) {
-			paths.emplace_back(dir);
-		}
-	}
 	
-
 	// get every folder in addon/src and addon/libs
 	vector < string > libFolders;
 	if(ofDirectory(libsPath).exists()){
 		getFoldersRecursively(libsPath, libFolders, platform);
 	}
-	
-//	cout << " ---- LIBFOLDERS :" << endl;
-//	for (auto & l : libFolders) {
-//		cout << l << endl;
-//	}
 
 	vector < string > srcFolders;
 	if(ofDirectory(srcPath).exists()){
 		getFoldersRecursively(path / "src", srcFolders, platform);
 	}
 
+	// convert paths to relative
 	for (auto & l : libFolders) {
-		of::filesystem::path folder { prefixPath / of::filesystem::relative(of::filesystem::path(l), containedPath) };
-		paths.emplace_back(folder);
+		paths.push_back({ prefixPath / of::filesystem::relative(of::filesystem::path(l), containedPath) });
 	}
 
 	for (auto & l : srcFolders) {
-		of::filesystem::path folder { prefixPath / of::filesystem::relative(of::filesystem::path(l), containedPath) };
-		paths.emplace_back(folder);
+		paths.push_back({ prefixPath / of::filesystem::relative(of::filesystem::path(l), containedPath) });
 	}
-	
-	paths.unique();
-	paths.sort();
+
+	paths.sort(); //paths.unique(); // unique not needed anymore. everything is carefully inserted now.
 
 	for (auto & p : paths) {
+		cout << p << endl;
 		includePaths.emplace_back(p.string());
 	}
-	
-//	for (list<string>::iterator it=paths.begin(); it!=paths.end(); ++it){
-//		includePaths.push_back(*it);
-//	}
 
 	parseConfig();
 

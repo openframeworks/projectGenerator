@@ -5,32 +5,30 @@
  *      Author: arturo
  */
 
-#include "Utils.h"
+#include "ofUtils.h"
 
-#include <algorithm>
-#include <Poco/DirectoryIterator.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/LocalDateTime.h>
-#include <algorithm>
-#include <iostream>
-#include <fstream>
-#include <string>
+#include "Utils.h"
 
 #include "qtcreatorproject.h"
 #include "CBWinProject.h"
 #include "xcodeProject.h"
 #include "visualStudioProject.h"
 #include "androidStudioProject.h"
+#include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <string>
 
-#include "Poco/String.h"
-
+//#include <Poco/DirectoryIterator.h>
+//#include <Poco/DateTimeFormatter.h>
+//#include <Poco/LocalDateTime.h>
+//#include "Poco/String.h"
 #include "Poco/HMACEngine.h"
 #include "Poco/MD5Engine.h"
 using Poco::DigestEngine;
 using Poco::HMACEngine;
 using Poco::MD5Engine;
-using namespace std;
-
+using namespace Poco;
 
 
 #ifdef TARGET_WIN32
@@ -44,10 +42,9 @@ using namespace std;
 #include <limits.h>		/* PATH_MAX */
 #endif
 
+using namespace std;
 
-using namespace Poco;
 
-#include "ofUtils.h"
 
 std::string generateUUID(std::string input){
 
@@ -440,6 +437,7 @@ void setOFRoot(std::string path){
 	OFRoot = path;
 }
 
+// FIXME: - in the future this can be the getOFRelPath
 of::filesystem::path getOFRelPathFS(const of::filesystem::path & from) {
 	return of::filesystem::relative(getOFRoot(), from);
 }
@@ -447,53 +445,6 @@ of::filesystem::path getOFRelPathFS(const of::filesystem::path & from) {
 std::string getOFRelPath(const std::string & from) {
 	return getOFRelPathFS(from).string();
 }
-
-//std::string getOFRelPath(std::string from){
-//	from = ofFilePath::removeTrailingSlash(from);
-//    Poco::Path base(true);
-//    base.parse(from);
-//
-//    Poco::Path path;
-//    path.parse( getOFRoot() );
-//    path.makeAbsolute();
-//
-//
-//	std::string relPath;
-//	if (path.toString() == base.toString()){
-//		// do something.
-//	}
-//
-//	int maxx = std::max(base.depth(), path.depth());
-//	for (int i = 0; i <= maxx; i++){
-//
-//		bool bRunOut = false;
-//		bool bChanged = false;
-//		if (i <= base.depth() && i <= path.depth()){
-//			if (base.directory(i) == path.directory(i)){
-//
-//			} else {
-//				bChanged = true;
-//			}
-//		} else {
-//			bRunOut = true;
-//		}
-//
-//
-//		if (bRunOut == true || bChanged == true){
-//            for (int j = i; j <= base.depth(); j++){
-//				relPath += "../";
-//			}
-//			for (int j = i; j <= path.depth(); j++){
-//				relPath += path.directory(j) + "/";
-//			}
-//			break;
-//		}
-//	}
-//
-//	ofLogVerbose() << "returning path " << relPath << std::endl;
-//
-//    return relPath;
-//}
 
 bool checkConfigExists(){
 	ofFile config(ofFilePath::join(ofFilePath::getUserHomeDir(),".ofprojectgenerator/config"));

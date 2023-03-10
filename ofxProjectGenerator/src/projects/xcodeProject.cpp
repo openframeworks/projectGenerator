@@ -61,13 +61,9 @@ xcodeProject::xcodeProject(string target)
 	}
 };
 
-
-using std::cout;
-using std::endl;
 bool xcodeProject::createProjectFile(){
+	//	cout << "createProjectFile() xcodeProject " << xcodeProject << endl;
 	of::filesystem::path xcodeProject = projectDir / ( projectName + ".xcodeproj" );
-//	cout << "xcodeProject " << xcodeProject << endl;
-
 	
 	if (ofDirectory::doesDirectoryExist(xcodeProject)){
 		ofDirectory::removeDirectory(xcodeProject, true);
@@ -515,7 +511,6 @@ void xcodeProject::addInclude(string includeName){
 	// Adding source to all build configurations, debug and release
 	for (auto & c : buildConfigurations) {
 		string s = "Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName;
-//		std::cout << s << std::endl;
 		commands.emplace_back("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
 	}
 }
@@ -575,7 +570,6 @@ void xcodeProject::addAfterRule(string rule){
 
 void xcodeProject::addAddon(ofAddon & addon){
 	
-	
 	for(int i=0;i<(int)addons.size();i++){
 		if(addons[i].name==addon.name){
 			return;
@@ -597,39 +591,46 @@ void xcodeProject::addAddon(ofAddon & addon){
 		}
 	}
 	
-
-	
 	addons.push_back(addon);
 
-	for(int i=0;i<(int)addon.includePaths.size();i++){
-//		ofLogVerbose() << "adding addon include path: " << addon.includePaths[i];
-		ofLog() << "adding addon include path: " << addon.includePaths[i];
-		addInclude(addon.includePaths[i]);
+	for (auto & e : addon.includePaths) {
+		ofLogVerbose() << "adding addon include path: " << e;
+//		ofLog() << "adding addon include path: " << e;
+		addInclude(e);
 	}
-	for(int i=0;i<(int)addon.libs.size();i++){
-		ofLogVerbose() << "adding addon libs: " << addon.libs[i].path;
-		addLibrary(addon.libs[i]);
+	
+	for (auto & e : addon.libs) {
+		ofLogVerbose() << "adding addon libs: " << e.path;
+		addLibrary(e);
 	}
-	for(int i=0;i<(int)addon.cflags.size();i++){
-		ofLogVerbose() << "adding addon cflags: " << addon.cflags[i];
-		addCFLAG(addon.cflags[i]);
+	
+	for (auto & e : addon.cflags) {
+		ofLogVerbose() << "adding addon cflags: " << e;
+		addCFLAG(e);
 	}
-	for(int i=0;i<(int)addon.cppflags.size();i++){
-		ofLogVerbose() << "adding addon cppflags: " << addon.cppflags[i];
-		addCPPFLAG(addon.cppflags[i]);
+
+	for (auto & e : addon.cppflags) {
+		ofLogVerbose() << "adding addon cppflags: " << e;
+		addCPPFLAG(e);
 	}
-	for(int i=0;i<(int)addon.ldflags.size();i++){
-		ofLogVerbose() << "adding addon ldflags: " << addon.ldflags[i];
-		addLDFLAG(addon.ldflags[i]);
+	
+	for (auto & e : addon.ldflags) {
+		ofLogVerbose() << "adding addon ldflags: " << e;
+		addLDFLAG(e);
 	}
+
 	std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), std::less<string>());
-	for(int i=0;i<(int)addon.srcFiles.size(); i++){
-		ofLogVerbose() << "adding addon srcFiles: " << addon.srcFiles[i];
-		addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
+	
+	for (auto & e : addon.srcFiles) {
+		ofLogVerbose() << "adding addon srcFiles: " << e;
+		// FIXME: - we can eliminate filesToFolders later with a proper function to do that.
+		// maybe even eliminate addSrc second parameter
+		addSrc(e,addon.filesToFolders[e]);
 	}
-	for(int i=0;i<(int)addon.defines.size(); i++){
-		ofLogVerbose() << "adding addon defines: " << addon.defines[i];
-		addDefine(addon.defines[i]);
+	
+	for (auto & e : addon.defines) {
+		ofLogVerbose() << "adding addon defines: " << e;
+		addDefine(e);
 	}
 
 	for(int i=0;i<(int)addon.frameworks.size(); i++){
