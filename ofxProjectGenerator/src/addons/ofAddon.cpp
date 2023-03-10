@@ -9,7 +9,7 @@
 #include "ofFileUtils.h"
 #include "ofAddon.h"
 #include "Utils.h"
-#include "Poco/RegularExpression.h"
+//#include "Poco/RegularExpression.h"
 #include <list>
 #include <regex>
 using namespace std;
@@ -149,15 +149,7 @@ void ofAddon::addReplaceString(string & variable, string value, bool addToVariab
 }
 
 void ofAddon::addReplaceStringVector(std::vector<std::string> & variable, std::string value, std::string prefix, bool addToVariable){
-	
-//	cout << "======= addReplaceStringVector " << endl;
-//	cout << "value : " << value << endl;
-//	cout << "prefix : " << prefix << endl;
-//	cout << "addToVariable : " << addToVariable << endl;
-//	cout << "___INPUT" << endl;
-//	for (auto & v : variable) {
-//		cout << v << endl;
-//	}
+
 	vector<string> values;
 	if(value.find("\"")!=string::npos){
 		values = ofSplitString(value,"\"",true,true);
@@ -166,8 +158,6 @@ void ofAddon::addReplaceStringVector(std::vector<std::string> & variable, std::s
 	}
 
 	if(!addToVariable) variable.clear();
-//	Poco::RegularExpression regEX("(?<=\\$\\()[^\\)]*");
-	
 	//value : -F$(OF_ROOT)/addons/ofxSyphon/libs/Syphon/lib/osx/
 
 	//\$\(.+\)
@@ -178,13 +168,9 @@ void ofAddon::addReplaceStringVector(std::vector<std::string> & variable, std::s
 	std::regex findVar("(\\$\\()(.+)(\\))");
 	for(int i=0;i<(int)values.size();i++){
 		if(values[i]!=""){
-			
-//			cout << values[i] << endl;
-//			cout << "----- VARMATCH" << endl;
 			std::smatch varMatch;
 			if(std::regex_search(values[i], varMatch, findVar)) {
 				if (varMatch.size() > 2) {
-//					cout << ">>> " << varMatch[2].str() << endl;
 					string varName = varMatch[2].str();
 					string varValue;
 					if(varName == "OF_ROOT"){
@@ -218,10 +204,6 @@ void ofAddon::addReplaceStringVector(std::vector<std::string> & variable, std::s
 			else variable.push_back(ofFilePath::join(prefix,values[i]));
 		}
 	}
-//	cout << "___OUTPUT" << endl;
-//	for (auto & v : variable) {
-//		cout << v << endl;
-//	}
 }
 
 void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string value, string prefix, bool addToVariable) {
@@ -234,21 +216,40 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 	}
 
 	if (!addToVariable) variable.clear();
-	Poco::RegularExpression regEX("(?<=\\$\\()[^\\)]*");
+//	Poco::RegularExpression regEX("(?<=\\$\\()[^\\)]*");
+	std::regex findVar("(\\$\\()(.+)(\\))");
+
+	// FIXME: iterator
 	for (int i = 0; i<(int)values.size(); i++) {
 		if (values[i] != "") {
-			Poco::RegularExpression::Match match;
-			if (regEX.match(values[i], match)) {
-				string varName = values[i].substr(match.offset, match.length);
-				string varValue;
-				if(varName == "OF_ROOT"){
-					varValue = pathToOF.string();
-				}else if (getenv(varName.c_str())) {
-					varValue = getenv(varName.c_str());
+			
+			std::smatch varMatch;
+			if(std::regex_search(values[i], varMatch, findVar)) {
+				if (varMatch.size() > 2) {
+					string varName = varMatch[2].str();
+					string varValue;
+					if(varName == "OF_ROOT"){
+						varValue = pathToOF.string();
+					}else if(getenv(varName.c_str())){
+						varValue = getenv(varName.c_str());
+					}
+					ofStringReplace(values[i],"$("+varName+")",varValue);
+					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << values[i] << endl;
 				}
-				ofStringReplace(values[i], "$(" + varName + ")", varValue);
-				ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << values[i];
 			}
+			
+//			Poco::RegularExpression::Match match;
+//			if (regEX.match(values[i], match)) {
+//				string varName = values[i].substr(match.offset, match.length);
+//				string varValue;
+//				if(varName == "OF_ROOT"){
+//					varValue = pathToOF.string();
+//				}else if (getenv(varName.c_str())) {
+//					varValue = getenv(varName.c_str());
+//				}
+//				ofStringReplace(values[i], "$(" + varName + ")", varValue);
+//				ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << values[i];
+//			}
 
 			if (prefix == "" || values[i].find(pathToOF.string()) == 0 || ofFilePath::isAbsolute(values[i])) {
 				variable.push_back({ values[i], "", "" });
@@ -388,12 +389,25 @@ void ofAddon::exclude(vector<string> & variables, vector<string> exclusions){
 		ofStringReplace(exclusion,".","\\.");
 		ofStringReplace(exclusion,"%",".*");
 		exclusion =".*"+ exclusion;
-		Poco::RegularExpression regExp(exclusion);
+		
+//		cout << "EXCLUDE " << exclusion << endl;
+//		cout << variables.size() << endl;
+//		for (auto & v : variables) {
+//			cout << v << endl;
+//		}
+		
+		std::regex findVar(exclusion);
+		std::smatch varMatch;
+//		Poco::RegularExpression regExp(exclusion);
 		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const string & variable){
 			auto forwardSlashedVariable = variable;
 			ofStringReplace(forwardSlashedVariable, "\\", "/");
-			return regExp.match(forwardSlashedVariable);
+//			return regExp.match(forwardSlashedVariable);
+
+			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
+
 		}), variables.end());
+//		cout << variables.size() << endl;
 	}
 }
 
@@ -403,12 +417,24 @@ void ofAddon::exclude(vector<LibraryBinary> & variables, vector<string> exclusio
 		ofStringReplace(exclusion,".","\\.");
 		ofStringReplace(exclusion,"%",".*");
 		exclusion =".*"+ exclusion;
-		Poco::RegularExpression regExp(exclusion);
+		
+//		cout << "EXCLUDE LibraryBinary " << exclusion << endl;
+//		cout << variables.size() << endl;
+//		for (auto & v : variables) {
+//			cout << v << endl;
+//		}
+
+		
+		std::regex findVar(exclusion);
+		std::smatch varMatch;
+//		Poco::RegularExpression regExp(exclusion);
 		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const LibraryBinary & variable){
 			auto forwardSlashedVariable = variable.path;
 			ofStringReplace(forwardSlashedVariable, "\\", "/");
-			return regExp.match(forwardSlashedVariable);
+//			return regExp.match(forwardSlashedVariable);
+			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
 		}), variables.end());
+//		cout << variables.size() << endl;
 	}
 }
 
