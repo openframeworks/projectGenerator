@@ -440,52 +440,60 @@ void setOFRoot(std::string path){
 	OFRoot = path;
 }
 
-std::string getOFRelPath(std::string from){
-	from = ofFilePath::removeTrailingSlash(from);
-    Poco::Path base(true);
-    base.parse(from);
-
-    Poco::Path path;
-    path.parse( getOFRoot() );
-    path.makeAbsolute();
-
-
-	std::string relPath;
-	if (path.toString() == base.toString()){
-		// do something.
-	}
-
-	int maxx = std::max(base.depth(), path.depth());
-	for (int i = 0; i <= maxx; i++){
-
-		bool bRunOut = false;
-		bool bChanged = false;
-		if (i <= base.depth() && i <= path.depth()){
-			if (base.directory(i) == path.directory(i)){
-
-			} else {
-				bChanged = true;
-			}
-		} else {
-			bRunOut = true;
-		}
-
-
-		if (bRunOut == true || bChanged == true){
-            for (int j = i; j <= base.depth(); j++){
-				relPath += "../";
-			}
-			for (int j = i; j <= path.depth(); j++){
-				relPath += path.directory(j) + "/";
-			}
-			break;
-		}
-	}
-
-	ofLogVerbose() << "returning path " << relPath << std::endl;
-
-    return relPath;
+of::filesystem::path getOFRelPathFS(const of::filesystem::path & from) {
+	return of::filesystem::relative(getOFRoot(), from);
 }
+
+std::string getOFRelPath(const std::string & from) {
+	return getOFRelPathFS(from).string();
+}
+
+//std::string getOFRelPath(std::string from){
+//	from = ofFilePath::removeTrailingSlash(from);
+//    Poco::Path base(true);
+//    base.parse(from);
+//
+//    Poco::Path path;
+//    path.parse( getOFRoot() );
+//    path.makeAbsolute();
+//
+//
+//	std::string relPath;
+//	if (path.toString() == base.toString()){
+//		// do something.
+//	}
+//
+//	int maxx = std::max(base.depth(), path.depth());
+//	for (int i = 0; i <= maxx; i++){
+//
+//		bool bRunOut = false;
+//		bool bChanged = false;
+//		if (i <= base.depth() && i <= path.depth()){
+//			if (base.directory(i) == path.directory(i)){
+//
+//			} else {
+//				bChanged = true;
+//			}
+//		} else {
+//			bRunOut = true;
+//		}
+//
+//
+//		if (bRunOut == true || bChanged == true){
+//            for (int j = i; j <= base.depth(); j++){
+//				relPath += "../";
+//			}
+//			for (int j = i; j <= path.depth(); j++){
+//				relPath += path.directory(j) + "/";
+//			}
+//			break;
+//		}
+//	}
+//
+//	ofLogVerbose() << "returning path " << relPath << std::endl;
+//
+//    return relPath;
+//}
 
 bool checkConfigExists(){
 	ofFile config(ofFilePath::join(ofFilePath::getUserHomeDir(),".ofprojectgenerator/config"));

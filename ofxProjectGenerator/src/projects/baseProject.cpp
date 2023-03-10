@@ -354,7 +354,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 	
 	std::map <std::string, std::string> uniqueIncludeFolders;
 	for( auto & fileToAdd : srcFilesToAdd){
-				
+//		cout << "fileToAdd :: " << fileToAdd << endl;
 		//if it is an absolute path it is easy - add the file and enclosing folder to the project
 		if( ofFilePath::isAbsolute(fileToAdd) && !bMakeRelative ){
 			string folder = ofFilePath::getEnclosingDirectory(fileToAdd,false);
@@ -398,6 +398,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 			folder =  ofFilePath::removeTrailingSlash(folder);
 
 			ofLogVerbose() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
+			
 			addSrc(relPathPathToAdd, folder);
 			uniqueIncludeFolders[includeFolder] = includeFolder;
 		}
@@ -406,6 +407,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 	//do it this way so we don't try and add a include folder for each file ( as it checks if they are already added ) so should be faster
 	for(auto & includeFolder : uniqueIncludeFolders){
 		ofLogVerbose() << " adding search include paths for folder " << includeFolder.second;
+		cout << "includeFolder.second " << includeFolder.second << endl;
 		addInclude(includeFolder.second);
 	}
 }

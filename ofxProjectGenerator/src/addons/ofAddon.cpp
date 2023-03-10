@@ -229,9 +229,9 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 	if (!isLocalAddon) {
 		// addonRelPath = ofFilePath::addTrailingSlash(pathToOF) + "addons/" + name;
 		addonRelPath = pathToOF / "addons" / name;
-		cout << "-----> this is not local addon" << endl;
-		cout << pathToOF << endl;
-		cout << addonRelPath << endl;
+//		cout << "-----> this is not local addon" << endl;
+//		cout << pathToOF << endl;
+//		cout << addonRelPath << endl;
 
 	}
 	else addonRelPath = addonPath;
@@ -474,16 +474,13 @@ bool ofAddon::fromFS(of::filesystem::path path, const std::string & platform){
 	}
 
 	auto srcPath = path / "src";
-	cout << "in fromFS, trying src " << srcPath << endl;
-	ofLogVerbose() << "in fromFS, trying src " << srcPath;
+//	cout << "in fromFS, trying src " << srcPath << endl;
+//	ofLogVerbose() << "in fromFS, trying src " << srcPath;
 	if (ofDirectory(srcPath).exists()){
 		getFilesRecursively(srcPath, srcFiles);
 	}
 
-	
-//	cout << "getOFRoot :: " <<  getOFRoot() << endl;
-	cout << "containedPath :: " <<  containedPath << endl;
-//	cout << "---- fs relative" << endl;
+
 	// FIXME: srcFiles to fs::path
 	for (auto & s : srcFiles) {
 		of::filesystem::path folder;
@@ -494,57 +491,46 @@ bool ofAddon::fromFS(of::filesystem::path path, const std::string & platform){
 			folder = of::filesystem::path(s).parent_path();
 			folder = of::filesystem::relative(folder, containedPath);
 		}
-//		cout << "s before " << s << endl;
 		s = of::filesystem::path(prefixPath / of::filesystem::relative(s, containedPath)).string();
-//		cout << "s after " << s << endl;
-//		cout << "folder after " << folder << endl;
 		filesToFolders[s] = folder.string();
 	}
 	
-//	cout << "---- first srcFiles" << endl;
-//	for(int i=0;i<(int)srcFiles.size();i++){
-//		srcFiles[i].erase(srcFiles[i].begin(), srcFiles[i].begin() + containedPath.string().length());
-//		int end = srcFiles[i].rfind(of::filesystem::path("/").make_preferred().string());
-//		int init = 0;
-//		string folder;
-//		if(!isLocalAddon){
-//			folder = srcFiles[i].substr(init,end);
-//		}else{
-//			init = srcFiles[i].find(name);
-//			folder = ofFilePath::join("local_addons", srcFiles[i].substr(init,end-init));
-//		}
-//		srcFiles[i] = prefixPath.string() + srcFiles[i];
-//		filesToFolders[srcFiles[i]] = folder;
-//	}
-//	cout << "---- second srcFiles" << endl;
-//	for (auto s : srcFiles) {
-//		cout << s << endl;
-//	}
-
 
 	if (platform == "vs" || platform == "msys2") {
 		getPropsRecursively(addonPath.string(), propsFiles, platform);
 	}
-
-	for (int i = 0; i < (int)propsFiles.size(); i++) {
-		propsFiles[i].erase(propsFiles[i].begin(), propsFiles[i].begin() + containedPath.string().length());
-		int end = propsFiles[i].rfind(of::filesystem::path("/").make_preferred().string());
-		int init = 0;
-		string folder;
-		if (!isLocalAddon) {
-			folder = propsFiles[i].substr(init, end);
+	
+	// FIXME: propsFiles to fs::path
+	for (auto & s : propsFiles) {
+		of::filesystem::path folder;
+		if (isLocalAddon) {
+			// FIXME: test if local addons is working ok
+			folder = of::filesystem::path("local_addons") / of::filesystem::path(s).parent_path();
+		} else {
+			folder = of::filesystem::path(s).parent_path();
+			folder = of::filesystem::relative(folder, containedPath);
 		}
-		else {
-			init = propsFiles[i].find(name);
-			folder = ofFilePath::join("local_addons", propsFiles[i].substr(init, end - init));
-		}
-		propsFiles[i] = prefixPath.string() + propsFiles[i];
+		s = of::filesystem::path(prefixPath / of::filesystem::relative(s, containedPath)).string();
 	}
+
+//	for (int i = 0; i < (int)propsFiles.size(); i++) {
+//		propsFiles[i].erase(propsFiles[i].begin(), propsFiles[i].begin() + containedPath.string().length());
+//		int end = propsFiles[i].rfind(of::filesystem::path("/").make_preferred().string());
+//		int init = 0;
+//		string folder;
+//		if (!isLocalAddon) {
+//			folder = propsFiles[i].substr(init, end);
+//		}
+//		else {
+//			init = propsFiles[i].find(name);
+//			folder = ofFilePath::join("local_addons", propsFiles[i].substr(init, end - init));
+//		}
+//		propsFiles[i] = prefixPath.string() + propsFiles[i];
+//	}
 	
 
 	of::filesystem::path libsPath = path / "libs";
 	vector < string > libFiles;
-
 
 	if (ofDirectory(libsPath).exists()){
 		getLibsRecursively(libsPath, libFiles, libs, platform);
@@ -556,44 +542,65 @@ bool ofAddon::fromFS(of::filesystem::path path, const std::string & platform){
 		if(platform == "vs" || platform == "msys2"){
 			getDllsRecursively(libsPath, dllsToCopy, platform);
 		}
-
 	}
 	
-
+	
+	for (auto & s : libFiles) {
+		of::filesystem::path folder;
+		if (isLocalAddon) {
+			// FIXME: test if local addons is working ok
+			folder = of::filesystem::path("local_addons") / of::filesystem::path(s).parent_path();
+		} else {
+			folder = of::filesystem::path(s).parent_path();
+			folder = of::filesystem::relative(folder, containedPath);
+		}
+		s = of::filesystem::path(prefixPath / of::filesystem::relative(s, containedPath)).string();
+		srcFiles.emplace_back(s);
+		filesToFolders[s] = folder.string();
+	}
+	
+	
 	// I need to add libFiles to srcFiles
-	for (int i = 0; i < (int)libFiles.size(); i++){
-		libFiles[i].erase (libFiles[i].begin(), libFiles[i].begin() + containedPath.string().length());
-		//ofLogVerbose() << " libFiles " << libFiles[i];
-		int init = 0;
-		int end = libFiles[i].rfind(of::filesystem::path("/").make_preferred().string());
-		if (end > 0){
-			string folder;
-			if (!isLocalAddon) {
-				folder = libFiles[i].substr(init, end);
-			}
-			else {
-				init = libFiles[i].find(name);
-				folder = ofFilePath::join("local_addons", libFiles[i].substr(init, end - init));
-			}
-			libFiles[i] = prefixPath.string() + libFiles[i];
-			srcFiles.push_back(libFiles[i]);
-			filesToFolders[libFiles[i]] = folder;
-		}
+//	for (int i = 0; i < (int)libFiles.size(); i++){
+//		libFiles[i].erase (libFiles[i].begin(), libFiles[i].begin() + containedPath.string().length());
+//		//ofLogVerbose() << " libFiles " << libFiles[i];
+//		int init = 0;
+//		int end = libFiles[i].rfind(of::filesystem::path("/").make_preferred().string());
+//		if (end > 0){
+//			string folder;
+//			if (!isLocalAddon) {
+//				folder = libFiles[i].substr(init, end);
+//			}
+//			else {
+//				init = libFiles[i].find(name);
+//				folder = ofFilePath::join("local_addons", libFiles[i].substr(init, end - init));
+//			}
+//			libFiles[i] = prefixPath.string() + libFiles[i];
+//			srcFiles.push_back(libFiles[i]);
+//			filesToFolders[libFiles[i]] = folder;
+//		}
+//
+//	}
 
+
+	// changing libs folder from absolute to relative.
+	for (auto & l : libs) {
+		l.path = of::filesystem::path(prefixPath / of::filesystem::relative(l.path, containedPath)).string();
 	}
-
 	
 	
-	for (int i = 0; i < (int)libs.size(); i++){
-
-		// does libs[] have any path ? let's fix if so.
-		int end = libs[i].path.rfind(of::filesystem::path("/").make_preferred().string());
-		if (end > 0){
-			libs[i].path.erase (libs[i].path.begin(), libs[i].path.begin() + containedPath.string().length());
-			libs[i].path = prefixPath.string() + libs[i].path;
-		}
-
-	}
+//	for (int i = 0; i < (int)libs.size(); i++){
+//
+//		cout << "libs path before " <<  libs[i].path << endl;
+//		// does libs[] have any path ? let's fix if so.
+//		int end = libs[i].path.rfind(of::filesystem::path("/").make_preferred().string());
+//		if (end > 0){
+//			libs[i].path.erase (libs[i].path.begin(), libs[i].path.begin() + containedPath.string().length());
+//			libs[i].path = prefixPath.string() + libs[i].path;
+//		}
+//		cout << "libs path after " <<  libs[i].path << endl;
+//
+//	}
 
 	for (int i = 0; i < (int)frameworks.size(); i++){
 
@@ -634,59 +641,21 @@ bool ofAddon::fromFS(of::filesystem::path path, const std::string & platform){
 			filesToFolders[frameworks[i]] = folder;
 
 		}
-		
-	   
-
 	}
-
-
-
 
 
 
 	// get a unique list of the paths that are needed for the includes.
 	std::vector < of::filesystem::path > paths;
 	for (auto & f : srcFiles) {
-//		cout << "src file : " << f << endl;
+//		cout << "ofAddon srcFile :: " << f << endl;
 		auto dir = of::filesystem::path(f).parent_path();
 		if (std::find(paths.begin(), paths.end(), dir) == paths.end()) {
-//			cout << "adding include paths " << dir.string() << " : " << f << endl;
 			paths.emplace_back(dir);
 			includePaths.emplace_back(dir.string());
 		}
 	}
-
-//	list < string > paths;
-//	cout << "files size " << srcFiles.size() << endl;
-//	for (auto & f : srcFiles) {
-//		auto dir = of::filesystem::path(f).parent_path().filename();
-//		if (std::find(paths.begin(), paths.end(), dir) == paths.end()) {
-//			paths.emplace_back(dir);
-//			includePaths.emplace_back(dir.string());
-//		}
-//	}
-
-//	paths.sort();
-//	paths.unique();
-//
-//	for (auto & p : paths) {
-//		includePaths.emplace_back(p);
-//	}
 	
-//	for (list<string>::iterator it=paths.begin(); it!=paths.end(); ++it){
-//		includePaths.push_back(*it);
-//	}
-	
-	
-//	for (int i = 0; i < (int)srcFiles.size(); i++){
-//
-//		size_t found;
-//		found = srcFiles[i].find_last_of(of::filesystem::path("/").make_preferred().string());
-//		cout << "-----" << endl;
-//		cout << srcFiles[i] << endl;
-//		cout << srcFiles[i].substr(0,found) << endl;
-//		paths.push_back(srcFiles[i].substr(0,found));
-//	}
 
 	// get every folder in addon/src and addon/libs
 	vector < string > libFolders;
@@ -699,17 +668,35 @@ bool ofAddon::fromFS(of::filesystem::path path, const std::string & platform){
 		getFoldersRecursively(path / "src", srcFolders, platform);
 	}
 
-	for (int i = 0; i < (int)libFolders.size(); i++){
-		libFolders[i].erase (libFolders[i].begin(), libFolders[i].begin() + containedPath.string().length());
-		libFolders[i] = prefixPath.string() + libFolders[i];
-		paths.push_back(libFolders[i]);
+//	cout << "---- libFolders" << endl;
+	for (auto & l : libFolders) {
+
+		of::filesystem::path folder { prefixPath / of::filesystem::relative(of::filesystem::path(l), containedPath) };
+//		cout << folder << endl;
+		paths.push_back(folder);
 	}
 
-	for (int i = 0; i < (int)srcFolders.size(); i++){
-		srcFolders[i].erase (srcFolders[i].begin(), srcFolders[i].begin() + containedPath.string().length());
-		srcFolders[i] = prefixPath.string() + srcFolders[i];
-		paths.push_back(srcFolders[i]);
+	for (auto & l : srcFolders) {
+		of::filesystem::path folder { prefixPath / of::filesystem::relative(of::filesystem::path(l), containedPath) };
+		paths.push_back(folder);
 	}
+
+//	for (int i = 0; i < (int)libFolders.size(); i++){
+//		cout << "add libFolders before " << libFolders[i] << endl;
+//		libFolders[i].erase (libFolders[i].begin(), libFolders[i].begin() + containedPath.string().length());
+//		libFolders[i] = prefixPath.string() + libFolders[i];
+//		cout << "add libFolders " << libFolders[i] << endl;
+//		paths.push_back(libFolders[i]);
+//	}
+
+//	for (int i = 0; i < (int)srcFolders.size(); i++){
+//		cout << "add srcFolders before " << srcFolders[i] << endl;
+//
+//		srcFolders[i].erase (srcFolders[i].begin(), srcFolders[i].begin() + containedPath.string().length());
+//		srcFolders[i] = prefixPath.string() + srcFolders[i];
+//		cout << "add srcFolders " << srcFolders[i] << endl;
+//		paths.push_back(srcFolders[i]);
+//	}
 
 
 
@@ -717,37 +704,6 @@ bool ofAddon::fromFS(of::filesystem::path path, const std::string & platform){
 
 	return true;
 }
-
-//void ofAddon::fromXML(string installXmlName){
-//	clear();
-//    pugi::xml_document doc;
-//    pugi::xml_parse_result result = doc.load_file(ofToDataPath(installXmlName).c_str());
-
-//    // this is src to add:
-//    pugi::xpath_node_set add = doc.select_nodes("//add/src/folder/file");
-//    for (pugi::xpath_node_set::const_iterator it = add.begin(); it != add.end(); ++it){
-//        pugi::xpath_node node = *it;
-//        //std::cout << "folder name "  << node.node().parent().attribute("name").value() << " : ";
-//        //std::cout << "src: " << node.node().child_value() << endl;
-//    }
-
-
-//    add = doc.select_nodes("//include/path");
-//    for (pugi::xpath_node_set::const_iterator it = add.begin(); it != add.end(); ++it){
-//        pugi::xpath_node node = *it;
-//        //std::cout << "include: " << node.node().child_value() << endl;
-//    }
-
-
-//    add = doc.select_nodes("//link/lib[@compiler='codeblocks']");
-//    // this has to be smarter I guess...
-//    for (pugi::xpath_node_set::const_iterator it = add.begin(); it != add.end(); ++it){
-//        pugi::xpath_node node = *it;
-//        //std::cout << "link: " << node.node().child_value() << endl;
-//    }
-
-
-//}
 
 
 void ofAddon::clear(){

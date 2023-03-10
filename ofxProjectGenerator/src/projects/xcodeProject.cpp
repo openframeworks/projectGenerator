@@ -65,14 +65,9 @@ xcodeProject::xcodeProject(string target)
 using std::cout;
 using std::endl;
 bool xcodeProject::createProjectFile(){
-//	cout << "createProjectFile " << endl;
-//	cout << "projectDir " << projectDir << endl;
-//	cout << "projectName " << projectName << endl;
-	
 	of::filesystem::path xcodeProject = projectDir / ( projectName + ".xcodeproj" );
 //	cout << "xcodeProject " << xcodeProject << endl;
 
-//	string xcodeProject = ofFilePath::join(projectDir , projectName + ".xcodeproj");
 	
 	if (ofDirectory::doesDirectoryExist(xcodeProject)){
 		ofDirectory::removeDirectory(xcodeProject, true);
@@ -136,21 +131,15 @@ bool xcodeProject::createProjectFile(){
 	}
 
 	// make everything relative the right way.
-	string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
-//	string relRoot = "$(OF_ROOT)" + ofFilePath::removeTrailingSlash(projectDir);
-//	std::cout << "relRoot = " << relRoot << std::endl;
+	string relRoot = getOFRelPathFS(projectDir).string();
 	
-	if (relRoot != "../../../"){
-		cout << "FIXING PATHS" << endl;
-		string relPath2 = relRoot;
-		
-		relPath2.erase(relPath2.end()-1);
-		findandreplaceInTexfile(projectDir / projectName / ".xcodeproj/project.pbxproj", "../../..", relPath2);
-		//findandreplaceInTexfile(projectDir + "Project.xcconfig", "../../../", relRoot);
-		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", relPath2);
+	if (relRoot != "../../.."){
+
+		findandreplaceInTexfile(projectDir / projectName / ".xcodeproj/project.pbxproj", "../../..", relRoot);
+		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", relRoot);
 		if( target == "osx" ){
-			findandreplaceInTexfile(projectDir / "Makefile", "../../..", relPath2);
-			findandreplaceInTexfile(projectDir / "config.make", "../../..", relPath2);
+			findandreplaceInTexfile(projectDir / "Makefile", "../../..", relRoot);
+			findandreplaceInTexfile(projectDir / "config.make", "../../..", relRoot);
 		}
 	}
 	return true;
@@ -229,7 +218,8 @@ string xcodeProject::getFolderUUID(string folder) {
 					commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
 					commands.emplace_back("Add :objects:"+thisUUID+":name string "+folders[a]);
 					commands.emplace_back("Add :objects:"+thisUUID+":children array");
-					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string <group>");
+//					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string <group>");
+					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
 
 					// And this new object is cointained in parent hierarchy, or even projRootUUID
 					commands.emplace_back("Add :objects:"+lastFolderUUID+":children: string " + thisUUID);
@@ -518,12 +508,10 @@ void xcodeProject::addFramework(string name, string path, string folder){
 }
 
 void xcodeProject::addInclude(string includeName){
+
+	string relRoot = getOFRelPathFS(projectDir).string();
+	ofStringReplace(includeName, relRoot, "$(OF_PATH)");
 	
-//
-//	cout << "-----" << endl;
-//	cout << getOFRoot() << endl;
-//	cout << "$(OF_PATH)" << endl;
-	ofStringReplace(includeName, getOFRoot(), "$(OF_PATH)");
 	// Adding source to all build configurations, debug and release
 	for (auto & c : buildConfigurations) {
 		string s = "Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName;
@@ -682,7 +670,7 @@ bool xcodeProject::saveProjectFile(){
 	json j = json::parse(contents);
 
 	for (auto & c : commands) {
-		//cout << c << endl;
+//		cout << c << endl;
 		vector<string> cols = ofSplitString(c, " ");
 		string thispath = cols[1];
 		ofStringReplace(thispath, ":", "/");
