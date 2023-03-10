@@ -458,9 +458,7 @@ int main(int argc, char* argv[]){
         ofPath = ofPathEnv;
     }
     
- 
-//    currentWorkingDirectory = Poco::Path::current();
-	currentWorkingDirectory = of::filesystem::current_path().string();
+ 	currentWorkingDirectory = of::filesystem::current_path().string();
 
     if (ofPath == "") {
 

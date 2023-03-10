@@ -182,23 +182,6 @@ void ofAddon::addReplaceStringVector(std::vector<std::string> & variable, std::s
 					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << values[i] << endl;
 				}
 			}
-				
-//			cout << "----- POCO" << endl;
-//			Poco::RegularExpression::Match match;
-//			if(regEX.match(values[i],match)){
-//				string varName = values[i].substr(match.offset,match.length);
-//				cout << "values[i] :: " << values[i] << endl;
-//				cout << "varName :: " << varName << endl;
-//
-//				string varValue;
-//				if(varName == "OF_ROOT"){
-//					varValue = pathToOF.string();
-//				}else if(getenv(varName.c_str())){
-//					varValue = getenv(varName.c_str());
-//				}
-//				ofStringReplace(values[i],"$("+varName+")",varValue);
-//				ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << values[i] << endl;
-//			}
 
 			if(prefix=="" || values[i].find(pathToOF.string())==0 || ofFilePath::isAbsolute(values[i])) variable.push_back(values[i]);
 			else variable.push_back(ofFilePath::join(prefix,values[i]));
@@ -216,7 +199,6 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 	}
 
 	if (!addToVariable) variable.clear();
-//	Poco::RegularExpression regEX("(?<=\\$\\()[^\\)]*");
 	std::regex findVar("(\\$\\()(.+)(\\))");
 
 	// FIXME: iterator
@@ -237,19 +219,6 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << values[i] << endl;
 				}
 			}
-			
-//			Poco::RegularExpression::Match match;
-//			if (regEX.match(values[i], match)) {
-//				string varName = values[i].substr(match.offset, match.length);
-//				string varValue;
-//				if(varName == "OF_ROOT"){
-//					varValue = pathToOF.string();
-//				}else if (getenv(varName.c_str())) {
-//					varValue = getenv(varName.c_str());
-//				}
-//				ofStringReplace(values[i], "$(" + varName + ")", varValue);
-//				ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << values[i];
-//			}
 
 			if (prefix == "" || values[i].find(pathToOF.string()) == 0 || ofFilePath::isAbsolute(values[i])) {
 				variable.push_back({ values[i], "", "" });
@@ -398,16 +367,11 @@ void ofAddon::exclude(vector<string> & variables, vector<string> exclusions){
 		
 		std::regex findVar(exclusion);
 		std::smatch varMatch;
-//		Poco::RegularExpression regExp(exclusion);
 		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const string & variable){
 			auto forwardSlashedVariable = variable;
 			ofStringReplace(forwardSlashedVariable, "\\", "/");
-//			return regExp.match(forwardSlashedVariable);
-
 			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
-
 		}), variables.end());
-//		cout << variables.size() << endl;
 	}
 }
 
@@ -418,23 +382,13 @@ void ofAddon::exclude(vector<LibraryBinary> & variables, vector<string> exclusio
 		ofStringReplace(exclusion,"%",".*");
 		exclusion =".*"+ exclusion;
 		
-//		cout << "EXCLUDE LibraryBinary " << exclusion << endl;
-//		cout << variables.size() << endl;
-//		for (auto & v : variables) {
-//			cout << v << endl;
-//		}
-
-		
 		std::regex findVar(exclusion);
 		std::smatch varMatch;
-//		Poco::RegularExpression regExp(exclusion);
 		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const LibraryBinary & variable){
 			auto forwardSlashedVariable = variable.path;
 			ofStringReplace(forwardSlashedVariable, "\\", "/");
-//			return regExp.match(forwardSlashedVariable);
 			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
 		}), variables.end());
-//		cout << variables.size() << endl;
 	}
 }
 
