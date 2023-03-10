@@ -69,7 +69,7 @@ bool xcodeProject::createProjectFile(){
 //	cout << "projectDir " << projectDir << endl;
 //	cout << "projectName " << projectName << endl;
 	
-	of::filesystem::path xcodeProject = projectDir / of::filesystem::path{ projectName + ".xcodeproj" };
+	of::filesystem::path xcodeProject = projectDir / ( projectName + ".xcodeproj" );
 //	cout << "xcodeProject " << xcodeProject << endl;
 
 //	string xcodeProject = ofFilePath::join(projectDir , projectName + ".xcodeproj");
@@ -157,7 +157,7 @@ bool xcodeProject::createProjectFile(){
 }
 
 void xcodeProject::saveScheme(){
-	auto schemeFolder = projectDir / of::filesystem::path{ projectName + ".xcodeproj" } / "xcshareddata/xcschemes";
+	auto schemeFolder = projectDir / ( projectName + ".xcodeproj" ) / "xcshareddata/xcschemes";
 	if (ofDirectory::doesDirectoryExist(schemeFolder)){
 		ofDirectory::removeDirectory(schemeFolder, true);
 	}
@@ -165,17 +165,17 @@ void xcodeProject::saveScheme(){
 	
 	if(target=="osx"){
 		for (auto & f : { string("Release"), string("Debug") }) {
-			auto schemeTo = schemeFolder / of::filesystem::path(projectName + " " +f+ ".xcscheme");
+			auto schemeTo = schemeFolder / (projectName + " " +f+ ".xcscheme");
 			ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample "+f+".xcscheme"), schemeTo);
 			findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
 		}
 	 
-		auto workspaceTo = projectDir / of::filesystem::path(projectName + ".xcodeproj/project.xcworkspace");
+		auto workspaceTo = projectDir / (projectName + ".xcodeproj/project.xcworkspace");
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/project.xcworkspace"), workspaceTo);
 	}else{
 
 		// MARK:- IOS sector;
-		auto schemeTo = schemeFolder / of::filesystem::path(projectName + ".xcscheme");
+		auto schemeTo = schemeFolder / (projectName + ".xcscheme");
 		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme"), schemeTo);
 		findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
 	}
@@ -675,7 +675,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 }
 
 bool xcodeProject::saveProjectFile(){
-	of::filesystem::path fileName = projectDir / of::filesystem::path(projectName + ".xcodeproj/project.pbxproj");
+	of::filesystem::path fileName = projectDir / (projectName + ".xcodeproj/project.pbxproj");
 	
 	// JSON Block - Multiplatform
 	string contents = ofBufferFromFile(fileName).getText();
