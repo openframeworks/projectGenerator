@@ -360,7 +360,7 @@
 				F528BDA35834104A3F0862F6 /* ofAddon.h */,
 			);
 			name = addons;
-			sourceTree = SOURCE_ROOT;
+			sourceTree = "<group>";
 		};
 		6948EE371B920CB800B5AC1A /* local_addons */ = {
 			isa = PBXGroup;
