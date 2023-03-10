@@ -59,14 +59,14 @@ std::unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ);
 
 template <class T>
 inline bool isInVector(T item, std::vector<T> & vec){
-    bool bIsInVector = false;
-    for(int i=0;i<vec.size();i++){
-        if(vec[i] == item){
-            bIsInVector = true;
-            break;
-        }
-    }
-    return bIsInVector;
+	bool bIsInVector = false;
+	for(int i=0;i<vec.size();i++){
+		if(vec[i] == item){
+			bIsInVector = true;
+			break;
+		}
+	}
+	return bIsInVector;
 }
 
 #endif /* UTILS_H_ */
