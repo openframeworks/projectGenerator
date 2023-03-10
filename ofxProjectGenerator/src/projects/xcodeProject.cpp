@@ -505,8 +505,8 @@ void xcodeProject::addFramework(string name, string path, string folder){
 
 void xcodeProject::addInclude(string includeName){
 
-	string relRoot = getOFRelPathFS(projectDir).string();
-	ofStringReplace(includeName, relRoot, "$(OF_PATH)");
+//	string relRoot = getOFRelPathFS(projectDir).string();
+//	ofStringReplace(includeName, relRoot, "$(OF_PATH)");
 	
 	// Adding source to all build configurations, debug and release
 	for (auto & c : buildConfigurations) {

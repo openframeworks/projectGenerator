@@ -9,9 +9,9 @@
 #include "ofFileUtils.h"
 #include "ofAddon.h"
 #include "Utils.h"
-//#include "Poco/String.h"
 #include "Poco/RegularExpression.h"
 #include <list>
+#include <regex>
 using namespace std;
 
 vector<string> splitStringOnceByLeft(const string &source, const string &delimiter) {
@@ -149,6 +149,15 @@ void ofAddon::addReplaceString(string & variable, string value, bool addToVariab
 }
 
 void ofAddon::addReplaceStringVector(std::vector<std::string> & variable, std::string value, std::string prefix, bool addToVariable){
+	
+//	cout << "======= addReplaceStringVector " << endl;
+//	cout << "value : " << value << endl;
+//	cout << "prefix : " << prefix << endl;
+//	cout << "addToVariable : " << addToVariable << endl;
+//	cout << "___INPUT" << endl;
+//	for (auto & v : variable) {
+//		cout << v << endl;
+//	}
 	vector<string> values;
 	if(value.find("\"")!=string::npos){
 		values = ofSplitString(value,"\"",true,true);
@@ -157,26 +166,62 @@ void ofAddon::addReplaceStringVector(std::vector<std::string> & variable, std::s
 	}
 
 	if(!addToVariable) variable.clear();
-	Poco::RegularExpression regEX("(?<=\\$\\()[^\\)]*");
+//	Poco::RegularExpression regEX("(?<=\\$\\()[^\\)]*");
+	
+	//value : -F$(OF_ROOT)/addons/ofxSyphon/libs/Syphon/lib/osx/
+
+	//\$\(.+\)
+	//(?<=\$\().+(?=\)) // now with positive look behind and look ahead to get rid of $( and )
+//	std::regex findVar("(?<=\\$\().+(?=\\))");
+//	std::regex findVar("\\$\\(.+\\)");
+//	(\$\()(.+)(\)) // now three capture groups here. we use only the second
+	std::regex findVar("(\\$\\()(.+)(\\))");
 	for(int i=0;i<(int)values.size();i++){
 		if(values[i]!=""){
-			Poco::RegularExpression::Match match;
-			if(regEX.match(values[i],match)){
-				string varName = values[i].substr(match.offset,match.length);
-				string varValue;
-				if(varName == "OF_ROOT"){
-					varValue = pathToOF.string();
-				}else if(getenv(varName.c_str())){
-					varValue = getenv(varName.c_str());
+			
+//			cout << values[i] << endl;
+//			cout << "----- VARMATCH" << endl;
+			std::smatch varMatch;
+			if(std::regex_search(values[i], varMatch, findVar)) {
+				if (varMatch.size() > 2) {
+//					cout << ">>> " << varMatch[2].str() << endl;
+					string varName = varMatch[2].str();
+					string varValue;
+					if(varName == "OF_ROOT"){
+						varValue = pathToOF.string();
+					}else if(getenv(varName.c_str())){
+						varValue = getenv(varName.c_str());
+					}
+					ofStringReplace(values[i],"$("+varName+")",varValue);
+					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << values[i] << endl;
 				}
-				ofStringReplace(values[i],"$("+varName+")",varValue);
-				ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << values[i] << endl;
 			}
+				
+//			cout << "----- POCO" << endl;
+//			Poco::RegularExpression::Match match;
+//			if(regEX.match(values[i],match)){
+//				string varName = values[i].substr(match.offset,match.length);
+//				cout << "values[i] :: " << values[i] << endl;
+//				cout << "varName :: " << varName << endl;
+//
+//				string varValue;
+//				if(varName == "OF_ROOT"){
+//					varValue = pathToOF.string();
+//				}else if(getenv(varName.c_str())){
+//					varValue = getenv(varName.c_str());
+//				}
+//				ofStringReplace(values[i],"$("+varName+")",varValue);
+//				ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << values[i] << endl;
+//			}
 
 			if(prefix=="" || values[i].find(pathToOF.string())==0 || ofFilePath::isAbsolute(values[i])) variable.push_back(values[i]);
 			else variable.push_back(ofFilePath::join(prefix,values[i]));
 		}
 	}
+//	cout << "___OUTPUT" << endl;
+//	for (auto & v : variable) {
+//		cout << v << endl;
+//	}
 }
 
 void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string value, string prefix, bool addToVariable) {
@@ -644,7 +689,7 @@ bool ofAddon::fromFS(of::filesystem::path path, const std::string & platform){
 	paths.sort(); //paths.unique(); // unique not needed anymore. everything is carefully inserted now.
 
 	for (auto & p : paths) {
-		cout << p << endl;
+//		cout << p << endl;
 		includePaths.emplace_back(p.string());
 	}
 

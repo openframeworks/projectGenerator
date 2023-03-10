@@ -19,17 +19,12 @@
 #include <fstream>
 #include <string>
 
-//#include <Poco/DirectoryIterator.h>
-//#include <Poco/DateTimeFormatter.h>
-//#include <Poco/LocalDateTime.h>
-//#include "Poco/String.h"
+// FIXME: this can be replaced by this one https://github.com/neosmart/uuidxx
 #include "Poco/HMACEngine.h"
 #include "Poco/MD5Engine.h"
 using Poco::DigestEngine;
 using Poco::HMACEngine;
 using Poco::MD5Engine;
-using namespace Poco;
-
 
 #ifdef TARGET_WIN32
 #include <direct.h>
@@ -42,9 +37,7 @@ using namespace Poco;
 #include <limits.h>		/* PATH_MAX */
 #endif
 
-using namespace std;
-
-
+using std::unique_ptr;
 
 std::string generateUUID(std::string input){
 
@@ -159,7 +152,7 @@ pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::strin
         pugi::xpath_node node = doc.select_node(xpathExpression);
         if(std::string(node.node().attribute(attribute.c_str()).value()).size() > 0){ // for some reason we get nulls here?
             // ...delete the existing node
-            cout << "DELETING: " << node.node().name() << ": " << " " << node.node().attribute(attribute.c_str()).value() << endl;
+            std::cout << "DELETING: " << node.node().name() << ": " << " " << node.node().attribute(attribute.c_str()).value() << std::endl;
             node.node().parent().remove_child(node.node());
         }
     }
