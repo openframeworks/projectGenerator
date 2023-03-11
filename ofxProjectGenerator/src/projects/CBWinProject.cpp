@@ -14,7 +14,7 @@ std::string CBWinProject::LOG_NAME = "CBWinProject";
 bool CBWinProject::createProjectFile(){
 
 	auto project = projectDir / (projectName + ".cbp");
-    auto workspace = projectDir / (projectName + ".workspace");
+	auto workspace = projectDir / (projectName + ".workspace");
 
 
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.cbp"),project, false, true);
@@ -22,33 +22,33 @@ bool CBWinProject::createProjectFile(){
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.workspace"),workspace, false, true);
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"icon.rc"), projectDir / "icon.rc", false, true);
 
-    //let's do some renaming:
-    std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
+	//let's do some renaming:
+	std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
 
-    if (relRoot != "../../../"){
+	if (relRoot != "../../../"){
 
-        std::string relRootWindows = relRoot;
-        // let's make it windows friendly:
-        for(int i = 0; i < relRootWindows.length(); i++) {
-            if( relRootWindows[i] == '/' )
-                relRootWindows[i] = '\\';
-        }
+		std::string relRootWindows = relRoot;
+		// let's make it windows friendly:
+		for(int i = 0; i < relRootWindows.length(); i++) {
+			if( relRootWindows[i] == '/' )
+				relRootWindows[i] = '\\';
+		}
 
-        findandreplaceInTexfile(workspace, "../../../", relRoot);
-        findandreplaceInTexfile(project, "../../../", relRoot);
+		findandreplaceInTexfile(workspace, "../../../", relRoot);
+		findandreplaceInTexfile(project, "../../../", relRoot);
 
-        findandreplaceInTexfile(workspace, "..\\..\\..\\", relRootWindows);
-        findandreplaceInTexfile(project, "..\\..\\..\\", relRootWindows);
-    }
+		findandreplaceInTexfile(workspace, "..\\..\\..\\", relRootWindows);
+		findandreplaceInTexfile(project, "..\\..\\..\\", relRootWindows);
+	}
 
-    return true;
+	return true;
 }
 
 bool CBWinProject::loadProjectFile(){
 
-    //project.open(ofFilePath::join(projectDir , projectName + ".cbp"));
+	//project.open(ofFilePath::join(projectDir , projectName + ".cbp"));
 
-    ofFile project(projectDir / (projectName + ".cbp"));
+	ofFile project(projectDir / (projectName + ".cbp"));
 	if(!project.exists()){
 		ofLogError(LOG_NAME) << "error loading" << project.path() << "doesn't exist";
 		return false;
@@ -60,14 +60,14 @@ bool CBWinProject::loadProjectFile(){
 
 bool CBWinProject::saveProjectFile(){
 
-    findandreplaceInTexfile(ofFilePath::join(projectDir , projectName + ".workspace"),"emptyExample",projectName);
-    pugi::xpath_node_set title = doc.select_nodes("//Option[@title]");
-    if(!title.empty()){
-        if(!title[0].node().attribute("title").set_value(projectName.c_str())){
-            ofLogError(LOG_NAME) << "can't set title";
-        }
-    }
-    return doc.save_file((projectDir / (projectName + ".cbp")).c_str());
+	findandreplaceInTexfile(ofFilePath::join(projectDir , projectName + ".workspace"),"emptyExample",projectName);
+	pugi::xpath_node_set title = doc.select_nodes("//Option[@title]");
+	if(!title.empty()){
+		if(!title[0].node().attribute("title").set_value(projectName.c_str())){
+			ofLogError(LOG_NAME) << "can't set title";
+		}
+	}
+	return doc.save_file((projectDir / (projectName + ".cbp")).c_str());
 }
 
 void CBWinProject::addSrc(std::string srcName, std::string folder, SrcType type){
@@ -78,14 +78,14 @@ void CBWinProject::addSrc(std::string srcName, std::string folder, SrcType type)
 }
 
 void CBWinProject::addInclude(std::string includeName){
-    ofLogNotice() << "adding include " << includeName;
-    appendValue(doc, "Add", "directory", includeName);
+	ofLogNotice() << "adding include " << includeName;
+	appendValue(doc, "Add", "directory", includeName);
 }
 
 void CBWinProject::addLibrary(const LibraryBinary & lib){
-    appendValue(doc, "Add", "library", lib.path, true);
-    // overwriteMultiple for a lib if it's there (so libsorder.make will work)
-    // this is because we might need to say libosc, then ws2_32
+	appendValue(doc, "Add", "library", lib.path, true);
+	// overwriteMultiple for a lib if it's there (so libsorder.make will work)
+	// this is because we might need to say libosc, then ws2_32
 }
 
 std::string CBWinProject::getName(){
