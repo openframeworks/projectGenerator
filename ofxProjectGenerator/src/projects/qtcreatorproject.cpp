@@ -94,7 +94,7 @@ bool QtCreatorProject::loadProjectFile(){
 		while(std::regex_search(fullmatch, matches, std::regex("[ \t\r\n]*[\"']([^\\]\"']*)[\"'][ \t\r\n]*,?"))){
 			bool alreadyExists=false;
 			for(auto & a: addons){
-				auto addonStr = a.isLocalAddon?a.addonPath:a.name;
+				auto addonStr = a.isLocalAddon ? a.addonPath.string() : a.name;
 				if(addonStr==matches[1]){
 					alreadyExists = true;
 					break;

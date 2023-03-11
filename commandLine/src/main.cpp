@@ -20,15 +20,6 @@ constexpr option::Descriptor usage[] =
     {0,0,0,0,0,0}
 };
 
-
-#include "Poco/Util/Application.h"
-#include "Poco/Util/Option.h"
-#include "Poco/Util/OptionSet.h"
-#include "Poco/Util/HelpFormatter.h"
-#include "Poco/Util/AbstractConfiguration.h"
-#include "Poco/AutoPtr.h"
-#include <Poco/Path.h>
-
 #include "qtcreatorproject.h"
 #include "visualStudioProject.h"
 #include "xcodeProject.h"
@@ -39,8 +30,6 @@ constexpr option::Descriptor usage[] =
 #define EXIT_OK 0
 #define EXIT_USAGE 64
 #define EXIT_DATAERR 65
-
-using Poco::Path;
 
 #define STRINGIFY(A)  #A
 
@@ -214,8 +203,6 @@ bool isGoodProjectPath(std::string path) {
     else {
         return false;
     }
-
-
 }
 
 bool isGoodOFPath(std::string path) {
@@ -471,8 +458,7 @@ int main(int argc, char* argv[]){
         ofPath = ofPathEnv;
     }
     
- 
-    currentWorkingDirectory = Poco::Path::current();
+ 	currentWorkingDirectory = of::filesystem::current_path().string();
 
     if (ofPath == "") {
 
@@ -488,15 +474,9 @@ int main(int argc, char* argv[]){
         return EXIT_USAGE;
     } else {
 
-        // let's try to resolve this path vs the current path
-        // so things like ../ can work
-        // see http://www.appinf.com/docs/poco/Poco.Path.html
-
-        Path cwd = Path::current();                  // get the current path
-        ofPath = cwd.resolve(ofPath).toString();   // resolve ofPath vs that.
-        Path resolvedPath = Path(ofPath).absolute();    // make that new path absolute
-        ofPath = resolvedPath.toString();
-        
+		// convert ofpath from relative to absolute by appending this to current path and calculating .. by canonical.
+		ofPath = of::filesystem::canonical(of::filesystem::current_path() / of::filesystem::path(ofPath)).string();
+		
         
         if (!isGoodOFPath(ofPath)) {
 			
@@ -525,13 +505,7 @@ int main(int argc, char* argv[]){
         if (ofFilePath::isAbsolute(projectName)) {
             projectPath = projectName;
         } else {
-            projectPath = ofFilePath::join(projectPath, projectName);
-			
-            // this line is arturo's ninja magic to make paths with dots make sense:
-            projectPath = ofFilePath::removeTrailingSlash(ofFilePath::getPathForDirectory(ofFilePath::getAbsolutePath(projectPath, false)));
-			projectPath = Path(projectPath).absolute().toString();		// make absolute...
-
-			
+			projectPath = of::filesystem::absolute(projectPath).string();
 		}
     } else {
         ofLogError() << "Missing project path";

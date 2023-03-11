@@ -5,10 +5,9 @@
  *      Author: arturo
  */
 
-#include "ofUtils.h"
-
 #include "Utils.h"
 
+#include "ofUtils.h"
 #include "qtcreatorproject.h"
 #include "CBWinProject.h"
 #include "xcodeProject.h"
@@ -19,12 +18,6 @@
 #include <fstream>
 #include <string>
 
-// FIXME: this can be replaced by this one https://github.com/neosmart/uuidxx
-#include "Poco/HMACEngine.h"
-#include "Poco/MD5Engine.h"
-using Poco::DigestEngine;
-using Poco::HMACEngine;
-using Poco::MD5Engine;
 
 #ifdef TARGET_WIN32
 #include <direct.h>
@@ -39,25 +32,37 @@ using Poco::MD5Engine;
 
 using std::unique_ptr;
 
+
+
+
+// FIXME: this can be replaced by this one https://github.com/neosmart/uuidxx
+#ifdef USEPOCO
+#include "Poco/HMACEngine.h"
+#include "Poco/MD5Engine.h"
+using Poco::DigestEngine;
+using Poco::HMACEngine;
+using Poco::MD5Engine;
+
 std::string generateUUID(std::string input){
-
-    std::string passphrase("openFrameworks"); // HMAC needs a passphrase
-
-    HMACEngine<MD5Engine> hmac(passphrase); // we'll compute a MD5 Hash
-    hmac.update(input);
-
+	std::string passphrase("openFrameworks"); // HMAC needs a passphrase
+	HMACEngine<MD5Engine> hmac(passphrase); // we'll compute a MD5 Hash
+	hmac.update(input);
 	const DigestEngine::Digest& digest = hmac.digest(); // finish HMAC computation and obtain digest
 	std::string digestString;
 	digestString = DigestEngine::digestToHex(digest); // convert to a string of hexadecimal numbers
-
-    digestString = digestString.substr(0,24);
-    digestString = ofToUpper(digestString);
-
-    std::string returnStr = digestString; // make a copy to return, fixes some odd visual studio behavior
-    return returnStr;
+	digestString = digestString.substr(0,24);
+	digestString = ofToUpper(digestString);
+	std::string returnStr = digestString; // make a copy to return, fixes some odd visual studio behavior
+	return returnStr;
 }
 
+#else
 
+#include "uuidxx.h"
+std::string generateUUID(std::string input){
+	return uuidxx::uuid::Generate().ToString();
+}
+#endif
 
 
 
@@ -80,32 +85,31 @@ void findandreplace( std::string& tInput, std::string tFind, std::string tReplac
 
 std::string LoadFileAsString(const std::string & fn)
 {
-    std::ifstream fin(fn.c_str());
+	std::ifstream fin(fn.c_str());
 
-    if(!fin)
-    {
-        // throw exception
-    }
+	if(!fin)
+	{
+		// throw exception
+	}
 
-    std::ostringstream oss;
-    oss << fin.rdbuf();
+	std::ostringstream oss;
+	oss << fin.rdbuf();
 
-    return oss.str();
+	return oss.str();
 }
 
 void findandreplaceInTexfile (const of::filesystem::path & fileName, std::string tFind, std::string tReplace ){
 //void findandreplaceInTexfile (std::string fileName, std::string tFind, std::string tReplace ){
-   if( ofFile::doesFileExist(fileName) ){
-	
-	    std::ifstream t(ofToDataPath(fileName).c_str());
-	    std::stringstream buffer;
-	    buffer << t.rdbuf();
-	    std::string bufferStr = buffer.str();
+	if (of::filesystem::exists( fileName )) {
+		std::ifstream t(ofToDataPath(fileName).c_str());
+		std::stringstream buffer;
+		buffer << t.rdbuf();
+		std::string bufferStr = buffer.str();
 		t.close();
-	    findandreplace(bufferStr, tFind, tReplace);
-	    std::ofstream myfile;
-        myfile.open (ofToDataPath(fileName).c_str());
-        myfile << bufferStr;
+		findandreplace(bufferStr, tFind, tReplace);
+		std::ofstream myfile;
+		myfile.open (ofToDataPath(fileName).c_str());
+		myfile << bufferStr;
 		myfile.close();
 
 	/*
@@ -121,10 +125,10 @@ void findandreplaceInTexfile (const of::filesystem::path & fileName, std::string
 	findandreplace(txt, tFind, tReplace);
 	std::ofstream ofile(ofToDataPath(fileName).c_str());
 	ofile.write(txt.c_str(),txt.size());
-	*/  
+	*/
 		//return 0;
    } else {
-       ; // some error checking here would be good.
+	   ; // some error checking here would be good.
    }
 }
 
@@ -132,65 +136,65 @@ void findandreplaceInTexfile (const of::filesystem::path & fileName, std::string
 
 
 bool doesTagAndAttributeExist(pugi::xml_document & doc, std::string tag, std::string attribute, std::string newValue){
-    char xpathExpressionExists[1024];
-    sprintf(xpathExpressionExists, "//%s[@%s='%s']", tag.c_str(), attribute.c_str(), newValue.c_str());
-    //cout <<xpathExpressionExists <<endl;
-    pugi::xpath_node_set set = doc.select_nodes(xpathExpressionExists);
-    if (set.size() != 0){
-        return true;
-    } else {
-        return false;
-    }
+	char xpathExpressionExists[1024];
+	sprintf(xpathExpressionExists, "//%s[@%s='%s']", tag.c_str(), attribute.c_str(), newValue.c_str());
+	//cout <<xpathExpressionExists <<endl;
+	pugi::xpath_node_set set = doc.select_nodes(xpathExpressionExists);
+	if (set.size() != 0){
+		return true;
+	} else {
+		return false;
+	}
 }
 
 pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::string attribute, std::string newValue, bool overwriteMultiple){
 
-    if (overwriteMultiple == true){
-        // find the existing node...
-        char xpathExpression[1024];
-        sprintf(xpathExpression, "//%s[@%s='%s']", tag.c_str(), attribute.c_str(), newValue.c_str());
-        pugi::xpath_node node = doc.select_node(xpathExpression);
-        if(std::string(node.node().attribute(attribute.c_str()).value()).size() > 0){ // for some reason we get nulls here?
-            // ...delete the existing node
-            std::cout << "DELETING: " << node.node().name() << ": " << " " << node.node().attribute(attribute.c_str()).value() << std::endl;
-            node.node().parent().remove_child(node.node());
-        }
-    }
+	if (overwriteMultiple == true){
+		// find the existing node...
+		char xpathExpression[1024];
+		sprintf(xpathExpression, "//%s[@%s='%s']", tag.c_str(), attribute.c_str(), newValue.c_str());
+		pugi::xpath_node node = doc.select_node(xpathExpression);
+		if(std::string(node.node().attribute(attribute.c_str()).value()).size() > 0){ // for some reason we get nulls here?
+			// ...delete the existing node
+			std::cout << "DELETING: " << node.node().name() << ": " << " " << node.node().attribute(attribute.c_str()).value() << std::endl;
+			node.node().parent().remove_child(node.node());
+		}
+	}
 
-    if (!doesTagAndAttributeExist(doc, tag, attribute, newValue)){
-        // otherwise, add it please:
-        char xpathExpression[1024];
-        sprintf(xpathExpression, "//%s[@%s]", tag.c_str(), attribute.c_str());
-        //cout << xpathExpression << endl;
-        pugi::xpath_node_set add = doc.select_nodes(xpathExpression);
-        pugi::xml_node node = add[add.size()-1].node();
-        pugi::xml_node nodeAdded = node.parent().append_copy(node);
-        nodeAdded.attribute(attribute.c_str()).set_value(newValue.c_str());
-        return nodeAdded;
-    }else{
-    	return pugi::xml_node();
-    }
+	if (!doesTagAndAttributeExist(doc, tag, attribute, newValue)){
+		// otherwise, add it please:
+		char xpathExpression[1024];
+		sprintf(xpathExpression, "//%s[@%s]", tag.c_str(), attribute.c_str());
+		//cout << xpathExpression << endl;
+		pugi::xpath_node_set add = doc.select_nodes(xpathExpression);
+		pugi::xml_node node = add[add.size()-1].node();
+		pugi::xml_node nodeAdded = node.parent().append_copy(node);
+		nodeAdded.attribute(attribute.c_str()).set_value(newValue.c_str());
+		return nodeAdded;
+	}else{
+		return pugi::xml_node();
+	}
 
 }
 
 // todo -- this doesn't use ofToDataPath -- so it's broken a bit.  can we fix?
 void getFilesRecursively(const of::filesystem::path & path, std::vector < std::string > & fileNames){
 //	cout << "---- getFilesRecursively :: " << path << endl;
-    ofDirectory dir;
-    dir.listDir(path);
-    for (int i = 0; i < dir.size(); i++){
-        ofFile temp(dir.getFile(i));
-        if (dir.getName(i) == ".svn" || dir.getName(i)==".git") continue; // ignore svn and git
-        if (ofIsStringInString(dir.getName(i),".framework")) continue; // ignore frameworks
-        
-        if (temp.isFile()){
+	ofDirectory dir;
+	dir.listDir(path);
+	for (int i = 0; i < dir.size(); i++){
+		ofFile temp(dir.getFile(i));
+		if (dir.getName(i) == ".svn" || dir.getName(i)==".git") continue; // ignore svn and git
+		if (ofIsStringInString(dir.getName(i),".framework")) continue; // ignore frameworks
+
+		if (temp.isFile()){
 //			cout << dir.getPath(i) << endl;
-            fileNames.push_back(dir.getPath(i));
-        } else if (temp.isDirectory()){
+			fileNames.push_back(dir.getPath(i));
+		} else if (temp.isDirectory()){
 //			cout << "this is directory : " << dir.getPath(i) << endl;
-            getFilesRecursively(dir.getPath(i), fileNames);
-        }
-    }
+			getFilesRecursively(dir.getPath(i), fileNames);
+		}
+	}
 }
 
 
@@ -198,7 +202,7 @@ static std::vector <std::string> platforms;
 bool isFolderNotCurrentPlatform(std::string folderName, std::string platform){
 	if( platforms.size() == 0 ){
 		platforms.push_back("osx");
-        platforms.push_back("msys2");
+		platforms.push_back("msys2");
 		platforms.push_back("vs");
 		platforms.push_back("ios");
 		platforms.push_back("linux");
@@ -217,73 +221,73 @@ bool isFolderNotCurrentPlatform(std::string folderName, std::string platform){
 }
 
 void splitFromLast(std::string toSplit, std::string deliminator, std::string & first, std::string & second){
-    size_t found = toSplit.find_last_of(deliminator.c_str());
-    first = toSplit.substr(0,found);
-    second = toSplit.substr(found+1);
+	size_t found = toSplit.find_last_of(deliminator.c_str());
+	first = toSplit.substr(0,found);
+	second = toSplit.substr(found+1);
 }
 
 void splitFromFirst(std::string toSplit, std::string deliminator, std::string & first, std::string & second){
-    size_t found = toSplit.find(deliminator.c_str());
-    first = toSplit.substr(0,found );
-    second = toSplit.substr(found+deliminator.size());
+	size_t found = toSplit.find(deliminator.c_str());
+	first = toSplit.substr(0,found );
+	second = toSplit.substr(found+deliminator.size());
 }
 
 
 void getFoldersRecursively(const of::filesystem::path & path, std::vector < std::string > & folderNames, std::string platform){
-    ofDirectory dir;
-    
-    if (!ofIsStringInString(path.string(), ".framework")){
-        dir.listDir(path);
-        for (int i = 0; i < dir.size(); i++){
-            ofFile temp(dir.getFile(i));
-            if (temp.isDirectory() && isFolderNotCurrentPlatform(temp.getFileName(), platform) == false ){
-                getFoldersRecursively(dir.getPath(i), folderNames, platform);
-            }
-        }
+	ofDirectory dir;
+
+	if (!ofIsStringInString(path.string(), ".framework")){
+		dir.listDir(path);
+		for (int i = 0; i < dir.size(); i++){
+			ofFile temp(dir.getFile(i));
+			if (temp.isDirectory() && isFolderNotCurrentPlatform(temp.getFileName(), platform) == false ){
+				getFoldersRecursively(dir.getPath(i), folderNames, platform);
+			}
+		}
 		// FIXME: convert folderNames to path
-        folderNames.push_back(path.string());
-    }
+		folderNames.push_back(path.string());
+	}
 }
 
 
 void getFrameworksRecursively(const of::filesystem::path & path, std::vector < std::string > & frameworks, std::string platform){
-    
-    
-    ofDirectory dir;
-    dir.listDir(path);
-    
-    for (int i = 0; i < dir.size(); i++){
-        
-        ofFile temp(dir.getFile(i));
-        
-        if (temp.isDirectory()){
-            //getLibsRecursively(dir.getPath(i), folderNames);
-            
-            // on osx, framework is a directory, let's not parse it....
-	    std::string ext = "";
-	    std::string first = "";
-            splitFromLast(dir.getPath(i), ".", first, ext);
-            if (ext != "framework")
-                getFrameworksRecursively(dir.getPath(i), frameworks, platform);
-            else
-                frameworks.push_back(dir.getPath(i));
-        }
-        
-    }
+
+
+	ofDirectory dir;
+	dir.listDir(path);
+
+	for (int i = 0; i < dir.size(); i++){
+
+		ofFile temp(dir.getFile(i));
+
+		if (temp.isDirectory()){
+			//getLibsRecursively(dir.getPath(i), folderNames);
+
+			// on osx, framework is a directory, let's not parse it....
+		std::string ext = "";
+		std::string first = "";
+			splitFromLast(dir.getPath(i), ".", first, ext);
+			if (ext != "framework")
+				getFrameworksRecursively(dir.getPath(i), frameworks, platform);
+			else
+				frameworks.push_back(dir.getPath(i));
+		}
+
+	}
 }
 
 
 
 void getPropsRecursively(const of::filesystem::path & path, std::vector < std::string > & props, const std::string & platform) {
 
-    if(!ofDirectory::doesDirectoryExist(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
-    ofDirectory dir;
-    dir.listDir(path);
+	if(!ofDirectory::doesDirectoryExist(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
+	ofDirectory dir;
+	dir.listDir(path);
 
 	for (auto & temp : dir) {
 		if (temp.isDirectory()) {
-            //skip example directories - this is needed as we are search all folders in the addons root path 
-            if( temp.getFileName().rfind("example", 0) == 0) continue;
+			//skip example directories - this is needed as we are search all folders in the addons root path
+			if( temp.getFileName().rfind("example", 0) == 0) continue;
 			getPropsRecursively(temp.path(), props, platform);
 		}
 		else {
@@ -323,25 +327,25 @@ void getDllsRecursively(const of::filesystem::path & path, std::vector < std::st
 
 
 void getLibsRecursively(const of::filesystem::path & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform, std::string arch, std::string target){
-    ofDirectory dir;
-    dir.listDir(path);
+	ofDirectory dir;
+	dir.listDir(path);
 
-        
-        
-    for (int i = 0; i < dir.size(); i++){
-            
+
+
+	for (int i = 0; i < dir.size(); i++){
+
 	std::vector<std::string> splittedPath = ofSplitString(dir.getPath(i), of::filesystem::path("/").make_preferred().string());
-            
-        ofFile temp(dir.getFile(i));
-            
-        if (temp.isDirectory()){
-            //getLibsRecursively(dir.getPath(i), folderNames);
-                
-            // on osx, framework is a directory, let's not parse it....
-	    std::string ext = "";
-	    std::string first = "";
+
+		ofFile temp(dir.getFile(i));
+
+		if (temp.isDirectory()){
+			//getLibsRecursively(dir.getPath(i), folderNames);
+
+			// on osx, framework is a directory, let's not parse it....
+		std::string ext = "";
+		std::string first = "";
 			auto stem = of::filesystem::path(dir.getFile(i)).stem();
-            splitFromLast(dir.getPath(i), ".", first, ext);
+			splitFromLast(dir.getPath(i), ".", first, ext);
 			if (ext != "framework") {
 				auto archFound = std::find(LibraryBinary::archs.begin(), LibraryBinary::archs.end(), stem);
 				if (archFound != LibraryBinary::archs.end()) {
@@ -354,65 +358,65 @@ void getLibsRecursively(const of::filesystem::path & path, std::vector < std::st
 				}
 				getLibsRecursively(dir.getPath(i), libFiles, libLibs, platform, arch, target);
 			}
-                
-        } else {
-                
-                
-            bool platformFound = false;
-                
-            if(platform!=""){
-                for(int j=0;j<(int)splittedPath.size();j++){
-                    if(splittedPath[j]==platform){
-                        platformFound = true;
-                    }
-                }
-            }              
-                
-            //std::string ext = ofFilePath::getFileExt(temp.getFile(i));
-	    std::string ext;
-	    std::string first;
-            splitFromLast(dir.getPath(i), ".", first, ext);
-                
+
+		} else {
+
+
+			bool platformFound = false;
+
+			if(platform!=""){
+				for(int j=0;j<(int)splittedPath.size();j++){
+					if(splittedPath[j]==platform){
+						platformFound = true;
+					}
+				}
+			}
+
+			//std::string ext = ofFilePath::getFileExt(temp.getFile(i));
+		std::string ext;
+		std::string first;
+			splitFromLast(dir.getPath(i), ".", first, ext);
+
 			if (ext == "a" || ext == "lib" || ext == "dylib" || ext == "so" || (ext == "dll" && platform != "vs")){
-                if (platformFound){
+				if (platformFound){
 					libLibs.push_back({ dir.getPath(i), arch, target });
-						
+
 					//TODO: THEO hack
 					if( platform == "ios" ){ //this is so we can add the osx libs for the simulator builds
-							
+
 						std::string currentPath = dir.getPath(i);
-							
-						//TODO: THEO double hack this is why we need install.xml - custom ignore ofxOpenCv 
+
+						//TODO: THEO double hack this is why we need install.xml - custom ignore ofxOpenCv
 						if( currentPath.find("ofxOpenCv") == std::string::npos ){
 							ofStringReplace(currentPath, "ios", "osx");
-							if( ofFile::doesFileExist(currentPath) ){
+							if( of::filesystem::exists(currentPath) ){
 								libLibs.push_back({ currentPath,arch,target });
 							}
 						}
 					}
 				}
-            } else if (ext == "h" || ext == "hpp" || ext == "c" || ext == "cpp" || ext == "cc" || ext == "cxx" || ext == "m" || ext == "mm"){
-                libFiles.push_back(dir.getPath(i));
-            }
-                
-        }
-        
-    }
-    
+			} else if (ext == "h" || ext == "hpp" || ext == "c" || ext == "cpp" || ext == "cc" || ext == "cxx" || ext == "m" || ext == "mm"){
+				libFiles.push_back(dir.getPath(i));
+			}
+
+		}
+
+	}
+
 }
 
 void fixSlashOrder(std::string & toFix){
-    std::replace(toFix.begin(), toFix.end(),'/', '\\');
+	std::replace(toFix.begin(), toFix.end(),'/', '\\');
 }
 
 
 std::string unsplitString (std::vector < std::string > strings, std::string deliminator ){
-    std::string result;
-    for (int i = 0; i < (int)strings.size(); i++){
-        if (i != 0) result += deliminator;
-        result += strings[i];
-    }
-    return result;
+	std::string result;
+	for (int i = 0; i < (int)strings.size(); i++){
+		if (i != 0) result += deliminator;
+		result += strings[i];
+	}
+	return result;
 }
 
 
@@ -463,52 +467,52 @@ std::string getOFRootFromConfig(){
 }
 
 std::string getTargetString(ofTargetPlatform t){
-    switch (t) {
-    case OF_TARGET_OSX:
-        return "osx";
-    case OF_TARGET_MINGW:
-        return "msys2";
-    case OF_TARGET_WINVS:
-        return "vs";
-    case OF_TARGET_IOS:
-        return "ios";
-    case OF_TARGET_ANDROID:
-        return "android";
-    case OF_TARGET_LINUX:
-        return "linux";
-    case OF_TARGET_LINUX64:
-        return "linux64";
-    case OF_TARGET_LINUXARMV6L:
-        return "linuxarmv6l";
-    case OF_TARGET_LINUXARMV7L:
-        return "linuxarmv7l";
-    default:
-        return "";
-    }
+	switch (t) {
+	case OF_TARGET_OSX:
+		return "osx";
+	case OF_TARGET_MINGW:
+		return "msys2";
+	case OF_TARGET_WINVS:
+		return "vs";
+	case OF_TARGET_IOS:
+		return "ios";
+	case OF_TARGET_ANDROID:
+		return "android";
+	case OF_TARGET_LINUX:
+		return "linux";
+	case OF_TARGET_LINUX64:
+		return "linux64";
+	case OF_TARGET_LINUXARMV6L:
+		return "linuxarmv6l";
+	case OF_TARGET_LINUXARMV7L:
+		return "linuxarmv7l";
+	default:
+		return "";
+	}
 }
 
 
 unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ) {
-    switch (targ) {
-    case OF_TARGET_OSX:
-        return unique_ptr<xcodeProject>(new xcodeProject(getTargetString(targ)));
-    case OF_TARGET_MINGW:
-        return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
-    case OF_TARGET_WINVS:
-        return unique_ptr<visualStudioProject>(new visualStudioProject(getTargetString(targ)));
-    case OF_TARGET_IOS:
-        return unique_ptr<xcodeProject>(new xcodeProject(getTargetString(targ)));
-    case OF_TARGET_LINUX:
-        return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
-    case OF_TARGET_LINUX64:
-        return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
-    case OF_TARGET_LINUXARMV6L:
-        return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
-    case OF_TARGET_LINUXARMV7L:
-        return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
-    case OF_TARGET_ANDROID:
-        return unique_ptr<AndroidStudioProject>(new AndroidStudioProject(getTargetString(targ)));
-    default:
-        return unique_ptr<baseProject>();
-    }
+	switch (targ) {
+	case OF_TARGET_OSX:
+		return unique_ptr<xcodeProject>(new xcodeProject(getTargetString(targ)));
+	case OF_TARGET_MINGW:
+		return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
+	case OF_TARGET_WINVS:
+		return unique_ptr<visualStudioProject>(new visualStudioProject(getTargetString(targ)));
+	case OF_TARGET_IOS:
+		return unique_ptr<xcodeProject>(new xcodeProject(getTargetString(targ)));
+	case OF_TARGET_LINUX:
+		return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
+	case OF_TARGET_LINUX64:
+		return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
+	case OF_TARGET_LINUXARMV6L:
+		return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
+	case OF_TARGET_LINUXARMV7L:
+		return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
+	case OF_TARGET_ANDROID:
+		return unique_ptr<AndroidStudioProject>(new AndroidStudioProject(getTargetString(targ)));
+	default:
+		return unique_ptr<baseProject>();
+	}
 }
