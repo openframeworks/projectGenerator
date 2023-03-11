@@ -456,7 +456,7 @@ void visualStudioProject::addAddon(ofAddon & addon){
 		addCFLAG(addon.cflags[i],RELEASE_LIB);
 		addCFLAG(addon.cflags[i],DEBUG_LIB);
 	}
-	
+
 	for(int i=0;i<(int)addon.cppflags.size();i++){
 		ofLogVerbose() << "adding addon cppflags: " << addon.cppflags[i];
 		addCPPFLAG(addon.cppflags[i],RELEASE_LIB);

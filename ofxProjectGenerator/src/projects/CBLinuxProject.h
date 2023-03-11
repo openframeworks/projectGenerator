@@ -17,9 +17,9 @@ class CBLinuxProject: public CBWinProject {
 public:
 	CBLinuxProject(std::string target):CBWinProject(target){};
 
-    bool createProjectFile();
-    void addInclude(std::string includeName){};
-    void addLibrary(const LibraryBinary & lib){};
+	bool createProjectFile();
+	void addInclude(std::string includeName){};
+	void addLibrary(const LibraryBinary & lib){};
 
 	static std::string LOG_NAME;
 };

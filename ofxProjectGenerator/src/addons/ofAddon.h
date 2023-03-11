@@ -21,11 +21,11 @@ const std::string ADDON_TAGS = "ADDON_TAGS";
 const std::string ADDON_URL = "ADDON_URL";
 
 const std::vector<std::string> AddonMetaVariables = {
-    ADDON_NAME,
-    ADDON_DESCRIPTION,
-    ADDON_AUTHOR,
-    ADDON_TAGS,
-    ADDON_URL,
+	ADDON_NAME,
+	ADDON_DESCRIPTION,
+	ADDON_AUTHOR,
+	ADDON_TAGS,
+	ADDON_URL,
 };
 
 // About Project settings
@@ -60,39 +60,39 @@ const std::string ADDON_FRAMEWORKS = "ADDON_FRAMEWORKS";
 const std::string ADDON_DLLS_TO_COPY = "ADDON_DLLS_TO_COPY";
 
 const std::vector<std::string> AddonProjectVariables = {
-    ADDON_DEPENDENCIES,
-    
-    ADDON_INCLUDES,
-    ADDON_CFLAGS,
-    ADDON_CPPFLAGS,
-    ADDON_LDFLAGS,
-    ADDON_LIBS,
-    ADDON_DEFINES,
-    
-    ADDON_SOURCES,
-    ADDON_HEADER_SOURCES,
-    ADDON_C_SOURCES,
-    ADDON_CPP_SOURCES,
-    ADDON_OBJC_SOURCES,
-    
-    ADDON_LIBS_EXCLUDE,
-    ADDON_SOURCES_EXCLUDE,
-    ADDON_INCLUDES_EXCLUDE,
-    ADDON_FRAMEWORKS_EXCLUDE,
-    
-    ADDON_DATA,
-    
-    ADDON_PKG_CONFIG_LIBRARIES,
-    ADDON_FRAMEWORKS,
-    ADDON_DLLS_TO_COPY,
+	ADDON_DEPENDENCIES,
+
+	ADDON_INCLUDES,
+	ADDON_CFLAGS,
+	ADDON_CPPFLAGS,
+	ADDON_LDFLAGS,
+	ADDON_LIBS,
+	ADDON_DEFINES,
+
+	ADDON_SOURCES,
+	ADDON_HEADER_SOURCES,
+	ADDON_C_SOURCES,
+	ADDON_CPP_SOURCES,
+	ADDON_OBJC_SOURCES,
+
+	ADDON_LIBS_EXCLUDE,
+	ADDON_SOURCES_EXCLUDE,
+	ADDON_INCLUDES_EXCLUDE,
+	ADDON_FRAMEWORKS_EXCLUDE,
+
+	ADDON_DATA,
+
+	ADDON_PKG_CONFIG_LIBRARIES,
+	ADDON_FRAMEWORKS,
+	ADDON_DLLS_TO_COPY,
 };
 
 class ofAddon {
 
 public:
-	
+
 	ofAddon();
-	
+
 	bool fromFS(of::filesystem::path path, const std::string & platform);
 //	void fromXML(std::string installXmlName);
 	void clear();
@@ -110,7 +110,7 @@ public:
 	std::vector < LibraryBinary > libs;
 	std::vector < std::string > dllsToCopy;
 	std::vector < std::string > includePaths;
-	
+
 	// From addon_config.mk
 	std::vector < std::string > dependencies;
 	std::vector < std::string > cflags;   // C_FLAGS
@@ -128,8 +128,8 @@ public:
 	std::string author;
 	std::vector<std::string> tags;
 	std::string url;
-	
-	
+
+
 	of::filesystem::path pathToOF;
 	of::filesystem::path pathToProject;
 	bool isLocalAddon; // set to true if the addon path is realtive to the project instead of in OF/addons/

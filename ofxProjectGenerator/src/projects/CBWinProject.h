@@ -14,11 +14,11 @@
 
 class CBWinProject: public baseProject  {
 public:
-    CBWinProject(std::string target):baseProject(target){};
+	CBWinProject(std::string target):baseProject(target){};
 
-    bool createProjectFile();
-    bool loadProjectFile();
-    bool saveProjectFile();
+	bool createProjectFile();
+	bool loadProjectFile();
+	bool saveProjectFile();
 
 	void addSrc(std::string srcName, std::string folder, SrcType type=DEFAULT);
 	void addInclude(std::string includeName);

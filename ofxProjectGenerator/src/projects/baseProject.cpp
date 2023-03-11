@@ -96,7 +96,7 @@ std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirect
 
 vector<baseProject::Template> baseProject::listAvailableTemplates(std::string target){
 	vector<baseProject::Template> templates;
-	
+
 	ofDirectory templatesDir(ofFilePath::join(getOFRoot(),templatesFolder));
 	for(auto & f: templatesDir.getSorted()){
 		if(f.isDirectory()){
@@ -158,16 +158,16 @@ bool baseProject::create(const of::filesystem::path & _path, std::string templat
 	parseConfigMake();
 
 	if (bDoesDirExist){
-		
+
 		vector < string > fileNames;
 		getFilesRecursively(projectDir / "src", fileNames);
 
 		for (auto & f : fileNames) {
 			of::filesystem::path rel { of::filesystem::relative(f, projectDir) };
 			of::filesystem::path folder { rel.parent_path() };
-			
+
 			std::string fileName = rel.string();
-			
+
 			if (fileName != "src/ofApp.cpp" &&
 				fileName != "src/ofApp.h" &&
 				fileName != "src/main.cpp" &&
@@ -190,7 +190,7 @@ bool baseProject::create(const of::filesystem::path & _path, std::string templat
 				addInclude(dir.string());
 			}
 		}
-		
+
 	}
 	return true;
 }
@@ -205,7 +205,7 @@ bool baseProject::save(){
 			addonsMake << addons[i].name << endl;
 		}
 	}
-	
+
 	//save out params which the PG knows about to config.make
 	//we mostly use this right now for storing the external source paths
 	auto buffer = ofBufferFromFile(ofFilePath::join(projectDir,"config.make"));
@@ -214,25 +214,25 @@ bool baseProject::save(){
 
 		for(auto line : buffer.getLines()){
 			string str = line;
-						
+
 			//add the of root path
 			if( str.rfind("# OF_ROOT =", 0) == 0 ){
 				saveConfig << "OF_ROOT = " + getOFRoot() << endl;
 			}
 			// replace this section with our external paths
 			else if( extSrcPaths.size() && str.rfind("# PROJECT_EXTERNAL_SOURCE_PATHS =", 0) == 0 ){
-				
+
 				for(int d = 0; d < extSrcPaths.size(); d++){
 					ofLog(OF_LOG_VERBOSE) << " adding PROJECT_EXTERNAL_SOURCE_PATHS to config" << extSrcPaths[d] << endl;
 					saveConfig << "PROJECT_EXTERNAL_SOURCE_PATHS" << (d == 0 ? " = " : " += ") << extSrcPaths[d] << endl;
 				}
-				
+
 			}else{
 			   saveConfig << str << endl;
 			}
 		}
 	}
-	
+
 	return saveProjectFile();
 }
 
@@ -302,7 +302,7 @@ void baseProject::addAddon(std::string addonName){
 		for(auto& d : addon.data){
 
 			of::filesystem::path path(ofFilePath::join(addon.addonPath, d));
-			
+
 			if(of::filesystem::exists(path)){
 				if (of::filesystem::is_regular_file(path)){
 					ofFile src({path});
@@ -335,7 +335,7 @@ void baseProject::addAddon(std::string addonName){
 void baseProject::addSrcRecursively(std::string srcPath){
 	extSrcPaths.push_back(srcPath);
 	vector <std::string> srcFilesToAdd;
-	
+
 	//so we can just pass through the file paths
 	ofDisableDataPath();
 	getFilesRecursively(srcPath, srcFilesToAdd);
@@ -351,7 +351,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 	//say we add this path: /user/person/documents/shared_of_code
 	//we want folders added for shared_of_code/ and any subfolders, but not folders added for /user/ /user/person/ etc
 	string parentFolder = ofFilePath::getEnclosingDirectory(ofFilePath::removeTrailingSlash(srcPath));
-	
+
 	std::map <std::string, std::string> uniqueIncludeFolders;
 	for( auto & fileToAdd : srcFilesToAdd){
 //		cout << "fileToAdd :: " << fileToAdd << endl;
@@ -359,30 +359,30 @@ void baseProject::addSrcRecursively(std::string srcPath){
 		if( ofFilePath::isAbsolute(fileToAdd) && !bMakeRelative ){
 			string folder = ofFilePath::getEnclosingDirectory(fileToAdd,false);
 			string absFolder = folder;
-			
+
 			auto pos = folder.find_first_of(parentFolder);
-			
+
 			//just to be 100% sure - check if the parent folder path is at the beginning of the file path
 			//then remove it so we just get the folder structure of the actual src files being added and not the full path
 			if( pos == 0 && parentFolder.size() < folder.size() ){
 				folder = folder.substr(parentFolder.size());
 			}
-			
+
 			folder = ofFilePath::removeTrailingSlash(folder);
-			
+
 			ofLogVerbose() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
 			addSrc(fileToAdd, folder);
 			uniqueIncludeFolders[absFolder] = absFolder;
 		}else{
-		
+
 			auto absPath = fileToAdd;
-		
+
 			//if it is a realtive path make the file relative to the project folder
 			if( !ofFilePath::isAbsolute(absPath) ){
 				absPath = ofFilePath::getAbsolutePath( ofFilePath::join(ofFilePath::getCurrentExeDir(), fileToAdd) );
 			}
 			auto canPath = of::filesystem::canonical(absPath); //resolves the ./ and ../ to be the most minamlist absolute path
-	
+
 			//get the file path realtive to the project
 			auto projectPath = ofFilePath::getAbsolutePath( projectDir );
 			auto relPathPathToAdd = ofFilePath::makeRelative(projectPath, canPath);
@@ -398,12 +398,12 @@ void baseProject::addSrcRecursively(std::string srcPath){
 			folder =  ofFilePath::removeTrailingSlash(folder);
 
 			ofLogVerbose() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
-			
+
 			addSrc(relPathPathToAdd, folder);
 			uniqueIncludeFolders[includeFolder] = includeFolder;
 		}
 		}
-	
+
 	//do it this way so we don't try and add a include folder for each file ( as it checks if they are already added ) so should be faster
 	for(auto & includeFolder : uniqueIncludeFolders){
 		ofLogVerbose() << " adding search include paths for folder " << includeFolder.second;
@@ -419,7 +419,7 @@ void baseProject::addAddon(ofAddon & addon){
 			return;
 		}
 	}
-	
+
 	for(int i=0;i<addon.dependencies.size();i++){
 		for(int j=0;j<(int)addons.size();j++){
 			if(addon.dependencies[i] != addons[j].name){ //make sure dependencies of addons arent already added to prj

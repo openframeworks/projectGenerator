@@ -25,7 +25,7 @@ public:
 	void addCPPFLAG(string cppflag, LibType libType = RELEASE_LIB); // Other C++ Flags
 	void addAfterRule(string script);
 	void addDefine(string define, LibType libType = RELEASE_LIB);
-	
+
 	// macOS specific
 	void addFramework(string name, string path, string folder="");
 	void addDylib(string name, string path);
@@ -46,24 +46,24 @@ public:
 	// new vars
 	string buildConfigurationListUUID;
 	string buildActionMaskUUID;
-	
+
 	std::vector<string> commands;
 
 	string buildConfigurations[4] = {
 		"E4B69B600A3A1757003C02F2", //macOS Debug
 		"E4B69B610A3A1757003C02F2", //macOS Release
-		
+
 		"E4B69B4E0A3A1720003C02F2", //macOS Debug SDKROOT macosx
 		"E4B69B4F0A3A1720003C02F2", //macOS Release SDKROOT macosx
 	};
-	
+
 	string buildConfigs[2] = {
 		"E4B69B610A3A1757003C02F2", //Release
 		"E4B69B600A3A1757003C02F2", //Debug
 	};
-	
+
 	std::map <string, string> folderUUID = {
 	};
-	
+
 	string getFolderUUID(string folder);
 };

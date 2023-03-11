@@ -9,21 +9,21 @@
 class visualStudioProject : public baseProject {
 
 public:
-    visualStudioProject(std::string target):baseProject(target){};
+	visualStudioProject(std::string target):baseProject(target){};
 
-    bool createProjectFile();
-    bool loadProjectFile();
-    bool saveProjectFile();
+	bool createProjectFile();
+	bool loadProjectFile();
+	bool saveProjectFile();
 
-    void addSrc(std::string srcFile, std::string folder, SrcType type=DEFAULT);
+	void addSrc(std::string srcFile, std::string folder, SrcType type=DEFAULT);
 	void addInclude(std::string includeName);
 	void addProps(std::string propsFile);
 	void addLibrary(const LibraryBinary & lib);
-    void addCFLAG(std::string cflag, LibType libType = RELEASE_LIB); // C
-    void addCPPFLAG(std::string cppflag, LibType libType = RELEASE_LIB); // C++
+	void addCFLAG(std::string cflag, LibType libType = RELEASE_LIB); // C
+	void addCPPFLAG(std::string cppflag, LibType libType = RELEASE_LIB); // C++
 	void addDefine(std::string define, LibType libType = RELEASE_LIB);
 
-    void addAddon(ofAddon & addon);
+	void addAddon(ofAddon & addon);
 
 	static std::string LOG_NAME;
 
@@ -31,7 +31,7 @@ public:
 
 
 	void appendFilter(std::string folderName);
-    
+
 
 private:
 

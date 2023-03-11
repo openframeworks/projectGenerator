@@ -95,5 +95,3 @@ protected:
 	std::map<std::string,std::map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]
 	bool isAddonInCache(const std::string & addonPath, const std::string platform); //is this addon in the mem cache?
 };
-
-
