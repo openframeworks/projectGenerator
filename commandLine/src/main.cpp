@@ -475,7 +475,10 @@ int main(int argc, char* argv[]){
     } else {
 
 		// convert ofpath from relative to absolute by appending this to current path and calculating .. by canonical.
-		ofPath = of::filesystem::canonical(of::filesystem::current_path() / of::filesystem::path(ofPath)).string();
+		// FIXME: convert ofPath and functions to of::filesystem::path
+		if (!of::filesystem::path(ofPath).is_absolute()) {
+			ofPath = of::filesystem::canonical(of::filesystem::current_path() / of::filesystem::path(ofPath)).string();
+		}
 		
         
         if (!isGoodOFPath(ofPath)) {
