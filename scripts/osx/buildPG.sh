@@ -151,7 +151,6 @@ if [ $ret -ne 0 ]; then
       exit 1
 fi
 
-# install electron sign globally
 sudo npm install -g npm@9.6.1
 sudo chown -R 501:20 "/Users/runner/.npm"
 import_certificate
@@ -159,6 +158,8 @@ import_certificate
 # Generate electron app
 cd ${pg_root}/frontend
 npm update
+# install electron sign globally
+sudo npm install -g @electron/osx-sign
 npm install > /dev/null
 npm run build:osx > /dev/null
 mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
