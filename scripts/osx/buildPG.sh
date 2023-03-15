@@ -147,6 +147,7 @@ fi
 
 # install electron sign globally
 sudo npm install -g electron-osx-sign
+sudo chown -R 501:20 "/Users/runner/.npm"
 import_certificate
 
 # Generate electron app
