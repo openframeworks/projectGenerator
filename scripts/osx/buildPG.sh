@@ -151,7 +151,7 @@ if [ $ret -ne 0 ]; then
       exit 1
 fi
 
-sudo npm install -g npm@9.6.1
+sudo npm install -g npm@9.6.0
 sudo chown -R 501:20 "/Users/runner/.npm"
 import_certificate
 
