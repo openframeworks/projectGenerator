@@ -30,7 +30,7 @@ bool visualStudioProject::createProjectFile(){
 	findandreplaceInTexfile(user,"emptyExample",projectName);
 	findandreplaceInTexfile(project,"emptyExample",projectName);
 
-	std::string relRoot = getOFRelPath(projectDir);
+	std::string relRoot = getOFRelPath(projectDir.string());
 	
 	if (relRoot != "../../.."){
 
