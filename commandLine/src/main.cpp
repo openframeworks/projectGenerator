@@ -508,8 +508,8 @@ int main(int argc, char* argv[]){
         if (ofFilePath::isAbsolute(projectName)) {
             projectPath = projectName;
         } else {
-			projectPath = of::filesystem::absolute(projectPath).string();
-		}
+            projectPath = of::filesystem::absolute(projectName).string();
+        }
     } else {
         ofLogError() << "Missing project path";
         printHelp();
