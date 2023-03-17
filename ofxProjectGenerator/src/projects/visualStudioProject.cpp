@@ -31,7 +31,15 @@ bool visualStudioProject::createProjectFile(){
 	findandreplaceInTexfile(project,"emptyExample",projectName);
 
 	std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
-	if (relRoot != "../../../"){
+	
+	using std::cout;
+	using std::endl;
+	
+	cout << "projectDir = " << projectDir << endl;
+	cout << "relRoot = " << relRoot << endl;
+	cout << "getOFRelPath " << getOFRelPath(projectDir.string()) << endl;
+	
+	if (relRoot != "../../.."){
 
 	std::string relRootWindows = relRoot;
 		// let's make it windows friendly:
