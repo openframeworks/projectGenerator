@@ -32,13 +32,6 @@ bool visualStudioProject::createProjectFile(){
 
 	std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
 	
-	using std::cout;
-	using std::endl;
-	
-	cout << "projectDir = " << projectDir << endl;
-	cout << "relRoot = " << relRoot << endl;
-	cout << "getOFRelPath " << getOFRelPath(projectDir.string()) << endl;
-	
 	if (relRoot != "../../.."){
 
 	std::string relRootWindows = relRoot;
