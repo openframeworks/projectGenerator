@@ -32,7 +32,7 @@ bool visualStudioProject::createProjectFile(){
 
 	std::string relRoot = getOFRelPath(projectDir.string());
 	
-	if (relRoot != "../../.."){
+	if (relRoot != "../../../"){
 
 	std::string relRootWindows = relRoot;
 		// let's make it windows friendly:

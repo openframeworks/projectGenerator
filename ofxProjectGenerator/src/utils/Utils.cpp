@@ -412,7 +412,7 @@ of::filesystem::path getOFRelPathFS(const of::filesystem::path & from) {
 }
 
 std::string getOFRelPath(const std::string & from) {
-	return getOFRelPathFS(from).string();
+	return ofFilePath::addTrailingSlash(getOFRelPathFS(from).string());
 }
 
 bool checkConfigExists(){
