@@ -10,14 +10,10 @@
 
 #include "pugixml.hpp"
 
-//#include "ofConstants.h"
-//#include "ofFileUtils.h"
 #include "ofLog.h"
-//#include "ofUtils.h"
 #include "ofSystemUtils.h"
-#include "LibraryBinary.h"
 #include "baseProject.h"
-
+struct LibraryBinary;
 
 std::string generateUUID(std::string input);
 

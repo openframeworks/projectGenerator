@@ -1,8 +1,6 @@
 #ifndef VSWINPROJECT_H_
 #define VSWINPROJECT_H_
 
-//#include "ofConstants.h"
-//#include "ofAddon.h"
 #include "baseProject.h"
 
 class visualStudioProject : public baseProject {
