@@ -133,7 +133,6 @@ bool xcodeProject::createProjectFile(){
 		relRoot = getOFRoot();
 	}
 	if (relRoot != "../../.."){
-		
 		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", relRoot);
 		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", relRoot);
 		if( target == "osx" ){
