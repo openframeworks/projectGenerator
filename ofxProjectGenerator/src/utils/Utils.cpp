@@ -70,9 +70,14 @@ std::string LoadFileAsString(const std::string & fn)
 	return oss.str();
 }
 
+using std::cout;
+using std::endl;
+
 void findandreplaceInTexfile (const of::filesystem::path & fileName, std::string tFind, std::string tReplace ){
 //void findandreplaceInTexfile (std::string fileName, std::string tFind, std::string tReplace ){
+	cout << "findandreplaceInTexfile " << fileName << endl;
 	if (of::filesystem::exists( fileName )) {
+		cout << "exists!" << endl;
 		std::ifstream t(ofToDataPath(fileName).c_str());
 		std::stringstream buffer;
 		buffer << t.rdbuf();
