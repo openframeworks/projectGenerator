@@ -217,7 +217,13 @@ bool baseProject::save(){
 
 			//add the of root path
 			if( str.rfind("# OF_ROOT =", 0) == 0 ){
-				saveConfig << "OF_ROOT = " + getOFRoot() << endl;
+   
+                            auto path = getOFRoot();
+                            if( projectDir.string().rfind(getOFRoot(),0) == 0 ){
+                                path = getOFRelPath(projectDir);
+                            }
+                            
+                            saveConfig << "OF_ROOT = " << path << endl;
 			}
 			// replace this section with our external paths
 			else if( extSrcPaths.size() && str.rfind("# PROJECT_EXTERNAL_SOURCE_PATHS =", 0) == 0 ){
