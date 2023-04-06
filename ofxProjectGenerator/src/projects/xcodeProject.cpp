@@ -128,10 +128,15 @@ bool xcodeProject::createProjectFile(){
 
 	// make everything relative the right way.
 	string relRoot = getOFRelPathFS(projectDir).string();
-
+	projectDir = projectDir.lexically_normal();
+        
+        //projectDir is always absolute at the moment
+        //so lets check if the projectDir is inside the OF folder - if it is not make the OF path absolute
+	if( projectDir.string().rfind(getOFRoot(),0) != 0 ){
+            relRoot = getOFRoot();
+	}
 	if (relRoot != "../../.."){
-
-		findandreplaceInTexfile(projectDir / projectName / ".xcodeproj/project.pbxproj", "../../..", relRoot);
+		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", relRoot);
 		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", relRoot);
 		if( target == "osx" ){
 			findandreplaceInTexfile(projectDir / "Makefile", "../../..", relRoot);
