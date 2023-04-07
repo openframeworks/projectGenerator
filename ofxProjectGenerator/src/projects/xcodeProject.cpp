@@ -127,7 +127,7 @@ bool xcodeProject::createProjectFile(){
 	}
 
 	// make everything relative the right way.
-	string relRoot = getOFRelPathFS(projectDir).string();
+	relRoot = getOFRelPathFS(projectDir).string();
 	projectDir = projectDir.lexically_normal();
         
         //projectDir is always absolute at the moment
@@ -197,7 +197,7 @@ void xcodeProject::renameProject(){ //base
 	}
 }
 
-string xcodeProject::getFolderUUID(string folder) {
+string xcodeProject::getFolderUUID(string folder, bool isFolder) {
 	string UUID = "";
 	if ( folderUUID.find(folder) == folderUUID.end() ) { // NOT FOUND
 		vector < string > folders = ofSplitString(folder, "/", true);
@@ -217,7 +217,10 @@ string xcodeProject::getFolderUUID(string folder) {
 
 					// here we add an UUID for the group (folder) and we initialize an array to receive children (files or folders inside)
 					commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
-					commands.emplace_back("Add :objects:"+thisUUID+":name string "+folders[a]);
+					if (isFolder) {
+						commands.emplace_back("Add :objects:"+thisUUID+":path string " + relRoot + "/" + fullPath);
+					}
+					commands.emplace_back("Add :objects:"+thisUUID+":name string " + folders[a]);
 					commands.emplace_back("Add :objects:"+thisUUID+":children array");
 //					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string <group>");
 					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
@@ -452,7 +455,7 @@ void xcodeProject::addFramework(string name, string path, string folder){
 
 	// we add one of the build refs to the list of frameworks
 	// TENTATIVA desesperada aqui...
-	string folderUUID = getFolderUUID(folder);
+	string folderUUID = getFolderUUID(folder, false);
 	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
 
 	//commands.emplace_back("Add :objects:"+frameworksUUID+":children array");
@@ -496,7 +499,7 @@ void xcodeProject::addFramework(string name, string path, string folder){
 	// finally, this is for making folders based on the frameworks position in the addon. so it can appear in the sidebar / file explorer
 
 	if (folder.size() > 0 && !ofIsStringInString(folder, "/System/Library/Frameworks")){
-		string folderUUID = getFolderUUID(folder);
+		string folderUUID = getFolderUUID(folder, false);
 	} else {
 		//FIXME: else what?
 	}

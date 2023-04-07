@@ -65,5 +65,7 @@ public:
 	std::map <string, string> folderUUID = {
 	};
 
-	string getFolderUUID(string folder);
+	string getFolderUUID(string folder, bool isFolder = true);
+	
+	string relRoot = "../../..";
 };
