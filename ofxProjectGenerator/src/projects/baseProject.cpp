@@ -136,9 +136,11 @@ bool baseProject::create(const of::filesystem::path & _path, std::string templat
 	if(!ret) return false;
 
 	if(templateName!=""){
+		auto name = ofFilePath::join(getOFRoot(),templatesFolder + templateName);
 		ofDirectory templateDir(ofFilePath::join(getOFRoot(),templatesFolder + templateName));
 		templateDir.setShowHidden(true);
 		auto templateConfig = parseTemplate(templateDir);
+		cout << ">>> TEMPLATE " << name << endl;
 		if(templateConfig){
 			ofDirectory project(projectDir);
 			recursiveTemplateCopy(templateDir,project);
