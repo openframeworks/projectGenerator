@@ -127,7 +127,7 @@ bool xcodeProject::createProjectFile(){
 	}
 
 	// make everything relative the right way.
-	string relRoot = getOFRelPathFS(projectDir).string();
+	relRoot = getOFRelPathFS(projectDir).string();
 	projectDir = projectDir.lexically_normal();
         
         //projectDir is always absolute at the moment
@@ -217,7 +217,8 @@ string xcodeProject::getFolderUUID(string folder) {
 
 					// here we add an UUID for the group (folder) and we initialize an array to receive children (files or folders inside)
 					commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
-					commands.emplace_back("Add :objects:"+thisUUID+":name string "+folders[a]);
+					commands.emplace_back("Add :objects:"+thisUUID+":path string " + relRoot + "/" + fullPath);
+					commands.emplace_back("Add :objects:"+thisUUID+":name string " + folders[a]);
 					commands.emplace_back("Add :objects:"+thisUUID+":children array");
 //					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string <group>");
 					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
@@ -452,7 +453,8 @@ void xcodeProject::addFramework(string name, string path, string folder){
 
 	// we add one of the build refs to the list of frameworks
 	// TENTATIVA desesperada aqui...
-	string folderUUID = getFolderUUID(folder);
+	string folderUUID = generateUUID(folder);
+//	string folderUUID = getFolderUUID(folder);
 	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
 
 	//commands.emplace_back("Add :objects:"+frameworksUUID+":children array");

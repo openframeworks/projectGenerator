@@ -66,4 +66,6 @@ public:
 	};
 
 	string getFolderUUID(string folder);
+	
+	string relRoot = "../../..";
 };
