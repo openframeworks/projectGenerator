@@ -264,7 +264,7 @@ void baseProject::addAddon(std::string addonName){
 	bool inCache = isAddonInCache(addonName, target);
 	//inCache = false; //to test no-cache scenario
 
-	if (ofDirectory(addonName).exists()){
+	if (of::filesystem::exists(addonName)) {
 		// if it's an absolute path, convert to relative...
 		string relativePath = ofFilePath::makeRelative(addon.pathToProject, addonName);
 		addonName = relativePath;
