@@ -6,18 +6,17 @@
  */
 
 #include "Utils.h"
-
 #include "ofUtils.h"
 #include "qtcreatorproject.h"
 #include "CBWinProject.h"
 #include "xcodeProject.h"
 #include "visualStudioProject.h"
 #include "androidStudioProject.h"
+#include "uuidxx.h"
 #include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <string>
-
 
 #ifdef TARGET_WIN32
 #include <direct.h>
@@ -31,8 +30,7 @@
 #endif
 
 using std::unique_ptr;
-
-#include "uuidxx.h"
+namespace fs = of::filesystem;
 
 std::string generateUUID(std::string input){
 	return uuidxx::uuid::Generate().ToString();
@@ -70,9 +68,9 @@ std::string LoadFileAsString(const std::string & fn)
 	return oss.str();
 }
 
-void findandreplaceInTexfile (const of::filesystem::path & fileName, std::string tFind, std::string tReplace ){
+void findandreplaceInTexfile (const fs::path & fileName, std::string tFind, std::string tReplace ){
 //void findandreplaceInTexfile (std::string fileName, std::string tFind, std::string tReplace ){
-	if (of::filesystem::exists( fileName )) {
+	if (fs::exists( fileName )) {
 		std::ifstream t(ofToDataPath(fileName).c_str());
 		std::stringstream buffer;
 		buffer << t.rdbuf();
@@ -150,7 +148,7 @@ pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::strin
 }
 
 // todo -- this doesn't use ofToDataPath -- so it's broken a bit.  can we fix?
-void getFilesRecursively(const of::filesystem::path & path, std::vector < std::string > & fileNames){
+void getFilesRecursively(const fs::path & path, std::vector < std::string > & fileNames){
 //	cout << "---- getFilesRecursively :: " << path << endl;
 	ofDirectory dir;
 	dir.listDir(path);
@@ -205,7 +203,7 @@ void splitFromFirst(std::string toSplit, std::string deliminator, std::string & 
 }
 
 
-void getFoldersRecursively(const of::filesystem::path & path, std::vector < std::string > & folderNames, std::string platform){
+void getFoldersRecursively(const fs::path & path, std::vector < std::string > & folderNames, std::string platform){
 	ofDirectory dir;
 
 	if (!ofIsStringInString(path.string(), ".framework")){
@@ -222,7 +220,7 @@ void getFoldersRecursively(const of::filesystem::path & path, std::vector < std:
 }
 
 
-void getFrameworksRecursively(const of::filesystem::path & path, std::vector < std::string > & frameworks, std::string platform){
+void getFrameworksRecursively(const fs::path & path, std::vector < std::string > & frameworks, std::string platform){
 
 
 	ofDirectory dir;
@@ -250,7 +248,7 @@ void getFrameworksRecursively(const of::filesystem::path & path, std::vector < s
 
 
 
-void getPropsRecursively(const of::filesystem::path & path, std::vector < std::string > & props, const std::string & platform) {
+void getPropsRecursively(const fs::path & path, std::vector < std::string > & props, const std::string & platform) {
 
 	if(!ofDirectory::doesDirectoryExist(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
 	ofDirectory dir;
@@ -275,7 +273,7 @@ void getPropsRecursively(const of::filesystem::path & path, std::vector < std::s
 }
 
 
-void getDllsRecursively(const of::filesystem::path & path, std::vector < std::string > & dlls, std::string platform) {
+void getDllsRecursively(const fs::path & path, std::vector < std::string > & dlls, std::string platform) {
 	ofDirectory dir;
 	dir.listDir(path);
 
@@ -298,7 +296,7 @@ void getDllsRecursively(const of::filesystem::path & path, std::vector < std::st
 
 
 
-void getLibsRecursively(const of::filesystem::path & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform, std::string arch, std::string target){
+void getLibsRecursively(const fs::path & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform, std::string arch, std::string target){
 	ofDirectory dir;
 	dir.listDir(path);
 
@@ -306,7 +304,7 @@ void getLibsRecursively(const of::filesystem::path & path, std::vector < std::st
 
 	for (int i = 0; i < dir.size(); i++){
 
-	std::vector<std::string> splittedPath = ofSplitString(dir.getPath(i), of::filesystem::path("/").make_preferred().string());
+	std::vector<std::string> splittedPath = ofSplitString(dir.getPath(i), fs::path("/").make_preferred().string());
 
 		ofFile temp(dir.getFile(i));
 
@@ -316,7 +314,7 @@ void getLibsRecursively(const of::filesystem::path & path, std::vector < std::st
 			// on osx, framework is a directory, let's not parse it....
 		std::string ext = "";
 		std::string first = "";
-			auto stem = of::filesystem::path(dir.getFile(i)).stem();
+			auto stem = fs::path(dir.getFile(i)).stem();
 			splitFromLast(dir.getPath(i), ".", first, ext);
 			if (ext != "framework") {
 				auto archFound = std::find(LibraryBinary::archs.begin(), LibraryBinary::archs.end(), stem);
@@ -361,7 +359,7 @@ void getLibsRecursively(const of::filesystem::path & path, std::vector < std::st
 						//TODO: THEO double hack this is why we need install.xml - custom ignore ofxOpenCv
 						if( currentPath.find("ofxOpenCv") == std::string::npos ){
 							ofStringReplace(currentPath, "ios", "osx");
-							if( of::filesystem::exists(currentPath) ){
+							if( fs::exists(currentPath) ){
 								libLibs.push_back({ currentPath,arch,target });
 							}
 						}
@@ -407,8 +405,8 @@ void setOFRoot(std::string path){
 }
 
 // FIXME: - in the future this can be the getOFRelPath
-of::filesystem::path getOFRelPathFS(const of::filesystem::path & from) {
-	return of::filesystem::relative(getOFRoot(), from);
+fs::path getOFRelPathFS(const fs::path & from) {
+	return fs::relative(getOFRoot(), from);
 }
 
 std::string getOFRelPath(const std::string & from) {
