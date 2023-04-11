@@ -11,8 +11,14 @@
 #include "ofLog.h"
 #include "Utils.h"
 #include "ofConstants.h"
-#include <list>
-using namespace std;
+// #include <list>
+
+using std::cout;
+using std::endl;
+using std::string;
+using std::vector;
+
+namespace fs = of::filesystem;
 
 baseProject::baseProject(string _target){
 	bLoaded = false;
@@ -47,7 +53,7 @@ bool isPlatformName(std::string file){
 }
 
 std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirectory & templateDir){
-	auto name = of::filesystem::path(templateDir.getOriginalDirectory()).parent_path().filename();
+	auto name = fs::path(templateDir.getOriginalDirectory()).parent_path().filename();
 	if(templateDir.isDirectory() && !isPlatformName(name)){
 		ofBuffer templateconfig;
 		ofFile templateconfigFile(ofFilePath::join(templateDir.path(), "template.config"));
@@ -109,14 +115,14 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(std::string ta
 	return templates;
 }
 
-bool baseProject::create(const of::filesystem::path & _path, std::string templateName){
+bool baseProject::create(const fs::path & _path, std::string templateName){
 	templatePath = getPlatformTemplateDir();
 	addons.clear();
 	extSrcPaths.clear();
 	auto path = _path;
 
 	if(!ofFilePath::isAbsolute(path)){
-		path = (of::filesystem::current_path() / of::filesystem::path(path)).string();
+		path = (of::filesystem::current_path() / fs::path(path)).string();
 	}
 	projectDir = path;
 
@@ -164,8 +170,8 @@ bool baseProject::create(const of::filesystem::path & _path, std::string templat
 		getFilesRecursively(projectDir / "src", fileNames);
 
 		for (auto & f : fileNames) {
-			of::filesystem::path rel { of::filesystem::relative(f, projectDir) };
-			of::filesystem::path folder { rel.parent_path() };
+			fs::path rel { of::filesystem::relative(f, projectDir) };
+			fs::path folder { rel.parent_path() };
 
 			std::string fileName = rel.string();
 
@@ -182,9 +188,9 @@ bool baseProject::create(const of::filesystem::path & _path, std::string templat
 		}
 
 		// only add unique paths
-		std::vector < of::filesystem::path > paths;
+		std::vector < fs::path > paths;
 		for (auto & f : fileNames) {
-			auto dir = of::filesystem::path(f).parent_path().filename();
+			auto dir = fs::path(f).parent_path().filename();
 			if (std::find(paths.begin(), paths.end(), dir) == paths.end()) {
 				paths.emplace_back(dir);
 //				cout << "addInclude " << dir << endl;
@@ -201,7 +207,7 @@ bool baseProject::save(){
 	ofFile addonsMake(ofFilePath::join(projectDir,"addons.make"), ofFile::WriteOnly);
 	for(int i = 0; i < addons.size(); i++){
 		if(addons[i].isLocalAddon){
-			addonsMake << of::filesystem::path(addons[i].addonPath).generic_string() << endl;
+			addonsMake << fs::path(addons[i].addonPath).generic_string() << endl;
 		}else{
 			addonsMake << addons[i].name << endl;
 		}
@@ -253,6 +259,7 @@ bool baseProject::isAddonInCache(const std::string & addonPath, const std::strin
 
 void baseProject::addAddon(std::string addonName){
 	ofAddon addon;
+	cout << ">>>> addAddon " << addonName << endl;
 //	cout << projectDir << endl;
 	addon.pathToOF = getOFRelPath(projectDir.string());
 //	cout << addon.pathToOF << endl;
@@ -264,10 +271,36 @@ void baseProject::addAddon(std::string addonName){
 	bool inCache = isAddonInCache(addonName, target);
 	//inCache = false; //to test no-cache scenario
 
-	if (of::filesystem::exists(addonName)) {
+	namespace fs = of::filesystem;
+	if (addonName.find('/') != std::string::npos) {
+		; // found
+	}
+	else {
+		; // not found
+	}
+		
+//	if (fs::exists(addonName)) {
+//		cout << ">>>>> isLocalAddon true !! " << addonName << endl;
+//	}
+//	if (fs::exists(localPath)) {
+//		cout << ">>>>> localPath true !! " << localPath << endl;
+//	}
+
+	cout << ofDirectory(addonName).path() << endl;
+	cout << ofDirectory(localPath).path() << endl;
+		cout << "addon.pathToProject" << addon.pathToProject << endl;
+		cout << "addonName" << addonName << endl;
+	
+	if (fs::exists(addonName)) {
+	// if (ofDirectory(addonName).exists()){
+		cout << ">>>>> isLocalAddon true !!!!!" << addonName<< endl;
 		// if it's an absolute path, convert to relative...
-		string relativePath = ofFilePath::makeRelative(addon.pathToProject, addonName);
-		addonName = relativePath;
+
+		// TODO:  parse path. forgot what
+		// fs::path relativePath = fs::path(addon.pathToProject / addonName).lexically_normal(); 
+		// string relativePath = ofFilePath::makeRelative(addon.pathToProject, addonName);
+		// cout << "relativePath : " << relativePath << endl; 
+		// addonName = relativePath;
 		addon.isLocalAddon = true;
 		if(!inCache){
 			addonOK = addon.fromFS(addonName, target);
@@ -276,6 +309,8 @@ void baseProject::addAddon(std::string addonName){
 			addonOK = true;
 		}
 	} else if(ofDirectory(localPath).exists()){
+		cout << ">>>>> isLocalAddon true (localPath)" << localPath <<  endl;
+
 		addon.isLocalAddon = true;
 		if(!inCache){
 			addonOK = addon.fromFS(addonName, target);
@@ -308,7 +343,7 @@ void baseProject::addAddon(std::string addonName){
 
 		for(auto& d : addon.data){
 
-			of::filesystem::path path(ofFilePath::join(addon.addonPath, d));
+			fs::path path(ofFilePath::join(addon.addonPath, d));
 
 			if(of::filesystem::exists(path)){
 				if (of::filesystem::is_regular_file(path)){
@@ -406,6 +441,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 
 			ofLogVerbose() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
 
+			cout << "addSrc relPathPathToAdd = " << relPathPathToAdd << " , folder= " << folder << endl;
 			addSrc(relPathPathToAdd, folder);
 			uniqueIncludeFolders[includeFolder] = includeFolder;
 		}

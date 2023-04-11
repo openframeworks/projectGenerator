@@ -12,7 +12,14 @@
 //#include "Poco/RegularExpression.h"
 #include <list>
 #include <regex>
-using namespace std;
+
+using std::cout;
+using std::endl;
+using std::string;
+using std::vector;
+using std::list;
+
+namespace fs = of::filesystem;
 
 vector<string> splitStringOnceByLeft(const string &source, const string &delimiter) {
 	size_t pos = source.find(delimiter);

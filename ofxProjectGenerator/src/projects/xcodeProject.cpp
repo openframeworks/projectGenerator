@@ -10,6 +10,8 @@ using std::endl;
 using nlohmann::json;
 using nlohmann::json_pointer;
 
+namespace fs = of::filesystem;
+
 xcodeProject::xcodeProject(string target)
 :baseProject(target){
 	// FIXME: remove unused variables
@@ -203,11 +205,40 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder) {
 		vector < string > folders = ofSplitString(folder, "/", true);
 		string lastFolderUUID = projRootUUID;
 
-		if (folders.size()){
+		of::filesystem::path folderFS(folder);
+		//xaxa
+		cout << "-------------" << endl;
+		cout << "this is folder" << endl;
+		cout << folder << endl;
+
+		bool folderIsAbs = false;
+		if (isFolder) {
+			if (folderFS.is_absolute()) {
+
+				folderIsAbs = true;
+				string thisUUID = generateUUID(folder);
+				folderUUID[folder] = thisUUID;
+
+				commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
+				commands.emplace_back("Add :objects:"+thisUUID+":path string " + folder);
+				commands.emplace_back("Add :objects:"+thisUUID+":name string " + folder);
+				commands.emplace_back("Add :objects:"+thisUUID+":children array");
+				commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
+				// And this new object is cointained in parent hierarchy, or even projRootUUID
+				commands.emplace_back("Add :objects:"+lastFolderUUID+":children: string " + thisUUID);
+				cout << "ABS " << folder << endl;
+			} else {
+				cout << "NOT Abs " << folder << endl;
+			}
+		}
+
+		if (folders.size() && !folderIsAbs){
 			for (int a=0; a<folders.size(); a++) {
 				 vector <string> joinFolders;
 				 joinFolders.assign(folders.begin(), folders.begin() + (a+1));
 				 string fullPath = ofJoinString(joinFolders, "/");
+
+				 cout << "-----> fullPath = " << fullPath << endl;
 
 				// folder is still not found here:
 				if ( folderUUID.find(fullPath) == folderUUID.end() ) {
@@ -218,6 +249,7 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder) {
 					// here we add an UUID for the group (folder) and we initialize an array to receive children (files or folders inside)
 					commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
 					if (isFolder) {
+						// commands.emplace_back("Add :objects:"+thisUUID+":path string " +  fullPath);
 						commands.emplace_back("Add :objects:"+thisUUID+":path string " + relRoot + "/" + fullPath);
 					}
 					commands.emplace_back("Add :objects:"+thisUUID+":name string " + folders[a]);
@@ -245,7 +277,7 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder) {
 
 
 void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
-
+	cout << "addSrc " << srcFile << " : "  << folder << endl;
 	string buildUUID;
 
 	//-----------------------------------------------------------------
@@ -685,9 +717,16 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 	for (auto & e : addon.srcFiles) {
 		ofLogVerbose() << "adding addon srcFiles: " << e;
+
+
+		fs::path folder = fs::path(e).parent_path();
+				
+		// ofLog() << "adding addon srcFiles: " << e << " folder = " << addon.filesToFolders[e];
+		ofLog() << "adding addon srcFiles: " << e << " folder = " << folder;
 		// FIXME: - we can eliminate filesToFolders later with a proper function to do that.
 		// maybe even eliminate addSrc second parameter
-		addSrc(e,addon.filesToFolders[e]);
+		// addSrc(e,addon. filesToFolders[e]);
+		addSrc(e, folder.string());
 	}
 
 	for (auto & e : addon.defines) {
@@ -778,6 +817,10 @@ bool xcodeProject::saveProjectFile(){
 	}catch(...){
 		ofLogError("ofSaveJson") << "Error saving json to " << fileName;
 		return false;
+	}
+	
+	for (auto & c : commands) {
+		cout << c << endl;
 	}
 
 //	PLISTBUDDY - Mac only
