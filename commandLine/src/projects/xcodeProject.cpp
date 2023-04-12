@@ -219,7 +219,11 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder) {
 					// here we add an UUID for the group (folder) and we initialize an array to receive children (files or folders inside)
 					commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
 					if (isFolder) {
-						commands.emplace_back("Add :objects:"+thisUUID+":path string " + relRoot + "/" + fullPath);
+						if (fs::exists(fullPath)) {
+							commands.emplace_back("Add :objects:"+thisUUID+":path string " + fullPath);
+						} else {
+							commands.emplace_back("Add :objects:"+thisUUID+":path string " + relRoot + "/" + fullPath);
+						}
 					}
 					commands.emplace_back("Add :objects:"+thisUUID+":name string " + folders[a]);
 					commands.emplace_back("Add :objects:"+thisUUID+":children array");
@@ -424,6 +428,7 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 }
 
 void xcodeProject::addFramework(string name, string path, string folder){
+//	cout << "addFramework " << name << " path = " << path << " folder = " << folder << endl;
 	// name = name of the framework
 	// path = the full path (w name) of this framework
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
@@ -703,11 +708,18 @@ void xcodeProject::addAddon(ofAddon & addon){
 		if (found==string::npos){
 			if (target == "ios"){
 				addFramework( addon.frameworks[i] + ".framework", "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/" +
-					addon.frameworks[i] + ".framework", "addons/" + addon.name + "/frameworks");
+					addon.frameworks[i] + ".framework",
+					"addons/" + addon.name + "/frameworks");
 			} else {
+				string folder = "addons/" + addon.name + "/frameworks";
+				if (addon.isLocalAddon) {
+					// XAXA
+					folder = (addon.addonPath / "frameworks").string();
+				}
 				addFramework( addon.frameworks[i] + ".framework",
 					"/System/Library/Frameworks/" +
-					addon.frameworks[i] + ".framework", "addons/" + addon.name + "/frameworks");
+					addon.frameworks[i] + ".framework",
+					folder);
 			}
 		} else {
 			if (ofIsStringInString(addon.frameworks[i], "/System/Library")){
@@ -781,7 +793,12 @@ bool xcodeProject::saveProjectFile(){
 		return false;
 	}
 
-//	PLISTBUDDY - Mac only
+//	for (auto & c : commands) {
+//		cout << c << endl;
+//	}
+
+	
+	//	PLISTBUDDY - Mac only
 //	{
 //		string command = "/usr/libexec/PlistBuddy " + fileName;
 //		string allCommands = "";

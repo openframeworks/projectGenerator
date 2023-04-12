@@ -255,40 +255,32 @@ bool baseProject::isAddonInCache(const std::string & addonPath, const std::strin
 	return it2 != it->second.end();
 }
 
-
+using std::cout;
+using std::endl;
 void baseProject::addAddon(std::string addonName){
 	ofAddon addon;
 //	cout << projectDir << endl;
 	addon.pathToOF = getOFRelPath(projectDir.string());
-//	cout << addon.pathToOF << endl;
 	addon.pathToProject = ofFilePath::getAbsolutePath(projectDir);
 
-	auto localPath = ofFilePath::join(addon.pathToProject, addonName);
 	bool addonOK = false;
 
 	bool inCache = isAddonInCache(addonName, target);
 	//inCache = false; //to test no-cache scenario
 
-	if (ofDirectory(addonName).exists()){
-		// if it's an absolute path, convert to relative...
-		string relativePath = ofFilePath::makeRelative(addon.pathToProject, addonName);
-		addonName = relativePath;
+	if (fs::exists(addonName)) {
 		addon.isLocalAddon = true;
 		if(!inCache){
+
 			addonOK = addon.fromFS(addonName, target);
 		}else{
 			addon = addonsCache[target][addonName];
 			addonOK = true;
 		}
-	} else if(ofDirectory(localPath).exists()){
-		addon.isLocalAddon = true;
-		if(!inCache){
-			addonOK = addon.fromFS(addonName, target);
-		}else{
-			addon = addonsCache[target][addonName];
-			addonOK = true;
-		}
-	}else{
+	}
+	
+	
+	else{
 		addon.isLocalAddon = false;
 		auto standardPath = ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), addonName);
 		if(!inCache){
@@ -346,7 +338,7 @@ void baseProject::addAddon(std::string addonName){
 
 void baseProject::addSrcRecursively(std::string srcPath){
 	extSrcPaths.push_back(srcPath);
-	vector <std::string> srcFilesToAdd;
+	vector < string > srcFilesToAdd;
 
 	//so we can just pass through the file paths
 	ofDisableDataPath();

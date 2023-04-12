@@ -477,18 +477,20 @@ void ofAddon::parseConfig(){
 	}
 }
 
+using std::cout;
+using std::endl;
+
 bool ofAddon::fromFS(fs::path path, const std::string & platform){
 	clear();
 	this->platform = platform;
 
 	fs::path prefixPath;
-	fs::path containedPath;
+	// FIXME: remove this
+	fs::path containedPath { "" };
 
 	if(isLocalAddon){
 		name = path.stem().string();
 		addonPath = path;
-		// containedPath = ofFilePath::addTrailingSlash(pathToProject); //we need to add a trailing slash for the erase to work properly
-		containedPath = pathToProject; //we need to add a trailing slash for the erase to work properly
 		path = pathToProject / path;
 	}else{
 		name = ofFilePath::getFileName(path);
@@ -497,27 +499,27 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 		prefixPath = pathToOF;
 	}
 
-	if(!ofDirectory::doesDirectoryExist(path)){
+	if (!fs::exists(path)) {
 		return false;
 	}
 
 	auto srcPath = path / "src";
 
-	if (ofDirectory(srcPath).exists()){
+	if (fs::exists(srcPath)) {
 		getFilesRecursively(srcPath, srcFiles);
 	}
 
 	// FIXME: srcFiles to fs::path
 	for (auto & s : srcFiles) {
 		fs::path folder;
+		auto srcFS = fs::path(prefixPath / fs::relative(s, containedPath));
 		if (isLocalAddon) {
-			// FIXME: test if local addons is working ok
-			folder = fs::path("local_addons") / fs::path(s).parent_path();
+			folder = srcFS.parent_path();
 		} else {
 			folder = fs::path(s).parent_path();
 			folder = fs::relative(folder, containedPath);
 		}
-		s = fs::path(prefixPath / fs::relative(s, containedPath)).string();
+		s = srcFS.string();
 		filesToFolders[s] = folder.string();
 	}
 
@@ -527,7 +529,10 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 	}
 
 	// FIXME: propsFiles to fs::path
+	
 	for (auto & s : propsFiles) {
+		
+		
 		fs::path folder;
 		if (isLocalAddon) {
 			// FIXME: test if local addons is working ok
@@ -536,6 +541,7 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 			folder = fs::path(s).parent_path();
 			folder = fs::relative(folder, containedPath);
 		}
+		
 		s = fs::path(prefixPath / fs::relative(s, containedPath)).string();
 	}
 
@@ -558,7 +564,7 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 	fs::path libsPath = path / "libs";
 	vector < string > libFiles;
 
-	if (ofDirectory(libsPath).exists()){
+	if (fs::exists(libsPath)) {
 		getLibsRecursively(libsPath, libFiles, libs, platform);
 
 		if (platform == "osx" || platform == "ios"){
@@ -569,18 +575,25 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 			getDllsRecursively(libsPath, dllsToCopy, platform);
 		}
 	}
+	else {
+//		cout << "NO " << fs::current_path() << endl;
+	}
 
-
+//	cout << "libFiles " << endl;
 	for (auto & s : libFiles) {
 		fs::path folder;
+		auto srcFS = fs::path(prefixPath / fs::relative(s, containedPath));
+
 		if (isLocalAddon) {
 			// FIXME: test if local addons is working ok
 			folder = fs::path("local_addons") / fs::path(s).parent_path();
+			folder = srcFS.parent_path();
 		} else {
 			folder = fs::path(s).parent_path();
 			folder = fs::relative(folder, containedPath);
 		}
-		s = fs::path(prefixPath / fs::relative(s, containedPath)).string();
+		
+		s = srcFS.string();
 		srcFiles.emplace_back(s);
 		filesToFolders[s] = folder.string();
 	}
@@ -604,8 +617,10 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 //		cout << "libs path after " <<  libs[i].path << endl;
 //
 //	}
+	
 
 	for (int i = 0; i < (int)frameworks.size(); i++){
+		cout << frameworks[i] << endl;
 
 		// knowing if we are system framework or not is important....
 
@@ -640,7 +655,9 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 
 			frameworks[i] = prefixPath.string() + frameworks[i];
 
-
+			cout << frameworks[i]  << endl;
+			cout << folder << endl;
+			cout << "----" << endl;
 			filesToFolders[frameworks[i]] = folder;
 
 		}
@@ -672,7 +689,6 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 	paths.sort(); //paths.unique(); // unique not needed anymore. everything is carefully inserted now.
 
 	for (auto & p : paths) {
-//		cout << p << endl;
 		includePaths.emplace_back(p.string());
 	}
 

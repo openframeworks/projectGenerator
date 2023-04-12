@@ -46,15 +46,15 @@ float               startTime;
 int                 nProjectsUpdated;
 int                 nProjectsCreated;
 
-std::string              directoryForRecursion;
-std::string              projectPath;
-std::string              ofPath;
-std::vector <std::string>     addons;
-std::vector <std::string>     srcPaths;
-std::vector <ofTargetPlatform>        targets;
-std::string              ofPathEnv;
-std::string              currentWorkingDirectory;
-std::string              templateName;
+std::string directoryForRecursion;
+std::string projectPath;
+std::string ofPath;
+std::vector <std::string> addons;
+std::vector <std::string> srcPaths;
+std::vector <ofTargetPlatform> targets;
+std::string ofPathEnv;
+std::string currentWorkingDirectory;
+std::string templateName;
 
 bool busingEnvVar;
 bool bVerbose;
@@ -235,7 +235,6 @@ bool isGoodOFPath(std::string path) {
 
 
 void updateProject(std::string path, ofTargetPlatform target, bool bConsiderParameterAddons = true) {
-
     // bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
     // either we read the addons.make file, or we look at the parameter list.
     // if we are updating recursively, we *never* consider addons passed as parameters.
