@@ -8,7 +8,6 @@
 #include <inttypes.h>
 #include <string.h>
 
-//using namespace std;
 using namespace uuidxx;
 
 bool uuid::operator == (const uuid & guid2) const
