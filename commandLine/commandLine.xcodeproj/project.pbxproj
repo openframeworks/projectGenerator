@@ -179,10 +179,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E4B69B5F0A3A1757003C02F2 /* Build configuration list for PBXNativeTarget "commandLine" */;
 			buildPhases = (
-				E42962A92163ECCD00A6A9E2 /* ShellScript */,
+				E42962A92163ECCD00A6A9E2 /* Run Script - Compile OF */,
 				E4B69B580A3A1756003C02F2 /* Sources */,
 				E4B69B590A3A1756003C02F2 /* Frameworks */,
-				E4B6FFFD0C3F9AB9008CF71C /* ShellScript */,
 				E4C2427710CC5ABF004149E2 /* CopyFiles */,
 				928F60851B6710B200E2D791 /* ShellScript */,
 			);
@@ -236,10 +235,10 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\" \"$TARGET_BUILD_DIR/commandLine\";\t\n#echo mv \"$TARGET_BUILD_DIR/commandLinePG\" \"$TARGET_BUILD_DIR/projectGenerator\"\ncp \"$TARGET_BUILD_DIR/commandLine\" \"$TARGET_BUILD_DIR/projectGenerator\"\nrm \"$TARGET_BUILD_DIR/commandLine\"\n";
+			shellScript = "cp \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\" \"$TARGET_BUILD_DIR/projectGenerator\";\t\n";
 			showEnvVarsInLog = 0;
 		};
-		E42962A92163ECCD00A6A9E2 /* ShellScript */ = {
+		E42962A92163ECCD00A6A9E2 /* Run Script - Compile OF */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -247,27 +246,14 @@
 			);
 			inputPaths = (
 			);
+			name = "Run Script - Compile OF";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "xcodebuild -project \"$OF_PATH/libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj\" -target openFrameworks -configuration \"${CONFIGURATION}\"  CLANG_CXX_LANGUAGE_STANDARD=$CLANG_CXX_LANGUAGE_STANDARD MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET\n";
 		};
-		E4B6FFFD0C3F9AB9008CF71C /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "mkdir -p \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/\"\n# Copy default icon file into App/Resources\necho 'icon file'\necho $ICON_FILE\necho 'target build dir'\necho $TARGET_BUILD_DIR\necho rsync -aved \"$ICON_FILE\" \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/\"\n\n#rsync -aved \"$ICON_FILE\" \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/\"\n";
-			showEnvVarsInLog = 0;
-		};
+
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */

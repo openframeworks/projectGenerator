@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-
-
 echoDots(){
     sleep 0.1 # Waiting for a brief period first, allowing jobs returning immediatly to finish
     while isRunning $1; do
@@ -128,12 +126,24 @@ cd ..
 of_root=${PWD}/openFrameworks
 pg_root=${PWD}/openFrameworks/apps/projectGenerator
 
-git clone --depth=1 https://github.com/openframeworks/openFrameworks
+if [ -d "openframeworks/.git" ]; then
+    echo 'OF already cloned, using it'
+    # cd openframeworks 
+    # git pull
+  # Control will enter here if $DIRECTORY exists.
+else  
+    git clone --depth=1 https://github.com/openframeworks/openFrameworks
+fi
 #cp not move so github actions can do cleanup without error
 cp -r projectGenerator openFrameworks/apps/
 
 cd ${of_root}
-scripts/osx/download_libs.sh
+if [ -d "libs/glfw" ]; then
+    echo 'libs installed, using them'
+else
+    scripts/osx/download_libs.sh
+fi
+
 
 # Compile commandline tool
 cd ${pg_root}
@@ -145,9 +155,15 @@ if [ $ret -ne 0 ]; then
       exit 1
 fi
 
+
+
 # install electron sign globally
 sudo npm install -g electron-osx-sign
-sudo chown -R 501:20 "/Users/runner/.npm"
+
+if [ -d "/Users/runner/" ]; then
+    sudo chown -R 501:20 "/Users/runner/.npm"
+fi    
+
 import_certificate
 
 # Generate electron app
@@ -171,3 +187,8 @@ sign_and_upload android
 rm -rf scripts/id_rsa 2> /dev/null
 rm -rf scripts/*.p12 2> /dev/null
 
+
+# pwd 
+# ls -alfR
+# cd ..
+# pwd 
