@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-
+pwd
 
 echoDots(){
     sleep 0.1 # Waiting for a brief period first, allowing jobs returning immediatly to finish
@@ -193,3 +193,5 @@ fi
 
 pwd 
 ls -alfR
+cd ..
+pwd 
