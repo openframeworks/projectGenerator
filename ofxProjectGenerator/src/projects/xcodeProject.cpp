@@ -9,6 +9,7 @@ using std::cout;
 using std::endl;
 using nlohmann::json;
 using nlohmann::json_pointer;
+namespace fs = of::filesystem;
 
 xcodeProject::xcodeProject(string target)
 :baseProject(target){
@@ -63,7 +64,7 @@ xcodeProject::xcodeProject(string target)
 
 bool xcodeProject::createProjectFile(){
 	//	cout << "createProjectFile() xcodeProject " << xcodeProject << endl;
-	of::filesystem::path xcodeProject = projectDir / ( projectName + ".xcodeproj" );
+	fs::path xcodeProject = projectDir / ( projectName + ".xcodeproj" );
 
 	if (ofDirectory::doesDirectoryExist(xcodeProject)){
 		ofDirectory::removeDirectory(xcodeProject, true);
@@ -726,7 +727,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 }
 
 bool xcodeProject::saveProjectFile(){
-	of::filesystem::path fileName = projectDir / (projectName + ".xcodeproj/project.pbxproj");
+	fs::path fileName = projectDir / (projectName + ".xcodeproj/project.pbxproj");
 
 	// JSON Block - Multiplatform
 	string contents = ofBufferFromFile(fileName).getText();

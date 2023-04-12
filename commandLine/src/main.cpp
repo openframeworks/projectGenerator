@@ -26,6 +26,7 @@ constexpr option::Descriptor usage[] =
 #include "androidStudioProject.h"
 #include "Utils.h"
 
+namespace fs = of::filesystem;
 
 #define EXIT_OK 0
 #define EXIT_USAGE 64
@@ -458,7 +459,7 @@ int main(int argc, char* argv[]){
         ofPath = ofPathEnv;
     }
     
- 	currentWorkingDirectory = of::filesystem::current_path().string();
+ 	currentWorkingDirectory = fs::current_path().string();
 
     if (ofPath == "") {
 
@@ -475,9 +476,9 @@ int main(int argc, char* argv[]){
     } else {
 
 		// convert ofpath from relative to absolute by appending this to current path and calculating .. by canonical.
-		// FIXME: convert ofPath and functions to of::filesystem::path
-		if (!of::filesystem::path(ofPath).is_absolute()) {
-			ofPath = of::filesystem::canonical(of::filesystem::current_path() / of::filesystem::path(ofPath)).string();
+		// FIXME: convert ofPath and functions to fs::path
+		if (!fs::path(ofPath).is_absolute()) {
+			ofPath = fs::canonical(fs::current_path() / fs::path(ofPath)).string();
 		}
 		
         
@@ -508,7 +509,7 @@ int main(int argc, char* argv[]){
         if (ofFilePath::isAbsolute(projectName)) {
             projectPath = projectName;
         } else {
-            projectPath = of::filesystem::absolute(projectName).string();
+            projectPath = fs::absolute(projectName).string();
         }
     } else {
         ofLogError() << "Missing project path";

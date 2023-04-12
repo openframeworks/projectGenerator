@@ -12,14 +12,19 @@
 #include "Utils.h"
 #include "ofConstants.h"
 #include <list>
-using namespace std;
 
-baseProject::baseProject(string _target){
+using std::string;
+using std::vector;
+//using std::cout;
+//using std::endl;
+namespace fs = of::filesystem;
+
+const std::string templatesFolder = "scripts/templates/";
+
+baseProject::baseProject(std::string _target){
 	bLoaded = false;
 	target = _target;
 }
-
-const std::string templatesFolder = "scripts/templates/";
 
 std::string baseProject::getPlatformTemplateDir(){
 	return ofFilePath::join(getOFRoot(),templatesFolder + target);
@@ -47,7 +52,7 @@ bool isPlatformName(std::string file){
 }
 
 std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirectory & templateDir){
-	auto name = of::filesystem::path(templateDir.getOriginalDirectory()).parent_path().filename();
+	auto name = fs::path(templateDir.getOriginalDirectory()).parent_path().filename();
 	if(templateDir.isDirectory() && !isPlatformName(name)){
 		ofBuffer templateconfig;
 		ofFile templateconfigFile(ofFilePath::join(templateDir.path(), "template.config"));
@@ -94,8 +99,8 @@ std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirect
 	return std::unique_ptr<baseProject::Template>();
 }
 
-vector<baseProject::Template> baseProject::listAvailableTemplates(std::string target){
-	vector<baseProject::Template> templates;
+std::vector<baseProject::Template> baseProject::listAvailableTemplates(std::string target){
+	std::vector<baseProject::Template> templates;
 
 	ofDirectory templatesDir(ofFilePath::join(getOFRoot(),templatesFolder));
 	for(auto & f: templatesDir.getSorted()){
@@ -109,14 +114,14 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(std::string ta
 	return templates;
 }
 
-bool baseProject::create(const of::filesystem::path & _path, std::string templateName){
+bool baseProject::create(const fs::path & _path, std::string templateName){
 	templatePath = getPlatformTemplateDir();
 	addons.clear();
 	extSrcPaths.clear();
 	auto path = _path;
 
 	if(!ofFilePath::isAbsolute(path)){
-		path = (of::filesystem::current_path() / of::filesystem::path(path)).string();
+		path = (fs::current_path() / fs::path(path)).string();
 	}
 	projectDir = path;
 
@@ -160,12 +165,12 @@ bool baseProject::create(const of::filesystem::path & _path, std::string templat
 
 	if (bDoesDirExist){
 
-		vector < string > fileNames;
+		std::vector < string > fileNames;
 		getFilesRecursively(projectDir / "src", fileNames);
 
 		for (auto & f : fileNames) {
-			of::filesystem::path rel { of::filesystem::relative(f, projectDir) };
-			of::filesystem::path folder { rel.parent_path() };
+			fs::path rel { fs::relative(f, projectDir) };
+			fs::path folder { rel.parent_path() };
 
 			std::string fileName = rel.string();
 
@@ -182,9 +187,9 @@ bool baseProject::create(const of::filesystem::path & _path, std::string templat
 		}
 
 		// only add unique paths
-		std::vector < of::filesystem::path > paths;
+		std::vector < fs::path > paths;
 		for (auto & f : fileNames) {
-			auto dir = of::filesystem::path(f).parent_path().filename();
+			auto dir = fs::path(f).parent_path().filename();
 			if (std::find(paths.begin(), paths.end(), dir) == paths.end()) {
 				paths.emplace_back(dir);
 //				cout << "addInclude " << dir << endl;
@@ -201,9 +206,9 @@ bool baseProject::save(){
 	ofFile addonsMake(ofFilePath::join(projectDir,"addons.make"), ofFile::WriteOnly);
 	for(int i = 0; i < addons.size(); i++){
 		if(addons[i].isLocalAddon){
-			addonsMake << of::filesystem::path(addons[i].addonPath).generic_string() << endl;
+			addonsMake << fs::path(addons[i].addonPath).generic_string() << std::endl;
 		}else{
-			addonsMake << addons[i].name << endl;
+			addonsMake << addons[i].name << std::endl;
 		}
 	}
 
@@ -224,18 +229,18 @@ bool baseProject::save(){
                                 path = getOFRelPath(projectDir);
                             }
                             
-                            saveConfig << "OF_ROOT = " << path << endl;
+                            saveConfig << "OF_ROOT = " << path << std::endl;
 			}
 			// replace this section with our external paths
 			else if( extSrcPaths.size() && str.rfind("# PROJECT_EXTERNAL_SOURCE_PATHS =", 0) == 0 ){
 
 				for(int d = 0; d < extSrcPaths.size(); d++){
-					ofLog(OF_LOG_VERBOSE) << " adding PROJECT_EXTERNAL_SOURCE_PATHS to config" << extSrcPaths[d] << endl;
-					saveConfig << "PROJECT_EXTERNAL_SOURCE_PATHS" << (d == 0 ? " = " : " += ") << extSrcPaths[d] << endl;
+					ofLog(OF_LOG_VERBOSE) << " adding PROJECT_EXTERNAL_SOURCE_PATHS to config" << extSrcPaths[d] << std::endl;
+					saveConfig << "PROJECT_EXTERNAL_SOURCE_PATHS" << (d == 0 ? " = " : " += ") << extSrcPaths[d] << std::endl;
 				}
 
 			}else{
-			   saveConfig << str << endl;
+			   saveConfig << str << std::endl;
 			}
 		}
 	}
@@ -308,10 +313,10 @@ void baseProject::addAddon(std::string addonName){
 
 		for(auto& d : addon.data){
 
-			of::filesystem::path path(ofFilePath::join(addon.addonPath, d));
+			fs::path path(ofFilePath::join(addon.addonPath, d));
 
-			if(of::filesystem::exists(path)){
-				if (of::filesystem::is_regular_file(path)){
+			if(fs::exists(path)){
+				if (fs::is_regular_file(path)){
 					ofFile src({path});
 					string dest = ofFilePath::join(projectDir, "bin/data/");
 					ofStringReplace(d, "data/", ""); // avoid to copy files at /data/data/*
@@ -321,7 +326,7 @@ void baseProject::addAddon(std::string addonName){
 					}else {
 						ofLogWarning() << "Can not add addon data file: " << d;
 					}
-				}else if(of::filesystem::is_directory(path)){
+				}else if(fs::is_directory(path)){
 					ofDirectory dir({path});
 					string dest = ofFilePath::join(projectDir, "bin/data/");
 					ofStringReplace(d, "data/", ""); // avoid to copy files at /data/data/*
@@ -388,7 +393,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 			if( !ofFilePath::isAbsolute(absPath) ){
 				absPath = ofFilePath::getAbsolutePath( ofFilePath::join(ofFilePath::getCurrentExeDir(), fileToAdd) );
 			}
-			auto canPath = of::filesystem::canonical(absPath); //resolves the ./ and ../ to be the most minamlist absolute path
+			auto canPath = fs::canonical(absPath); //resolves the ./ and ../ to be the most minamlist absolute path
 
 			//get the file path realtive to the project
 			auto projectPath = ofFilePath::getAbsolutePath( projectDir );
@@ -414,7 +419,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 	//do it this way so we don't try and add a include folder for each file ( as it checks if they are already added ) so should be faster
 	for(auto & includeFolder : uniqueIncludeFolders){
 		ofLogVerbose() << " adding search include paths for folder " << includeFolder.second;
-		cout << "includeFolder.second " << includeFolder.second << endl;
+//		cout << "includeFolder.second " << includeFolder.second << endl;
 		addInclude(includeFolder.second);
 	}
 }
