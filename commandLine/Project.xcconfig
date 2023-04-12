@@ -5,6 +5,15 @@ OF_PATH = ../../..
 //THIS HAS ALL THE HEADER AND LIBS FOR OF CORE
 #include "../../../libs/openFrameworksCompiled/project/osx/CoreOF.xcconfig"
 
+HEADER_OF = "$(OF_PATH)/libs/openFrameworks/{ofMain.h}"
+
+
+OF_CORE_LIBS = $(LIB_GLEW) $(LIB_PUGIXML)
+
+OF_CORE_HEADERS = $(HEADER_OF) $(HEADER_GLEW) $(HEADER_TESS2) $(HEADER_GLFW) $(HEADER_UTF8) $(HEADER_JSON) $(HEADER_GLM) $(HEADER_PUGIXML)
+
+OF_CORE_FRAMEWORKS = -framework Accelerate -framework Cocoa -framework CoreFoundation -framework CoreServices -framework CoreVideo -framework IOKit -framework OpenGL -framework QuartzCore -framework Security
+
 //UNCOMMENT BELOW TO ENABLE C++ 17 and std::filesystem
 CLANG_CXX_LANGUAGE_STANDARD = c++17
 MACOSX_DEPLOYMENT_TARGET = 10.15
