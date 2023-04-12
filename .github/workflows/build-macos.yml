@@ -31,7 +31,7 @@ jobs:
       with:
         path: |
           openFrameworks
-        key: ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-${{ hashFiles('**/*.cpp') }}
+        key: ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-${{ hashFiles('openFrameworks/**/*.cpp') }}
         restore-keys: |
           ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-          
     - name: rm-dev
