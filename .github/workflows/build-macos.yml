@@ -31,8 +31,8 @@ jobs:
       with:
         path: |
           openFrameworks
-      key: ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-${{ hashFiles('**/*.cpp') }}
-      restore-keys: |
+        key: ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-${{ hashFiles('**/*.cpp') }}
+        restore-keys: |
           ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-          
     - name: rm-dev
       run: sudo rm -rf /Library/Developer
