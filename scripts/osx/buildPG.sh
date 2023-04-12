@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-pwd
-
 echoDots(){
     sleep 0.1 # Waiting for a brief period first, allowing jobs returning immediatly to finish
     while isRunning $1; do
@@ -146,49 +144,48 @@ else
     scripts/osx/download_libs.sh
 fi
 
+
 # Compile commandline tool
-# cd ${pg_root}
-# echo "Building openFrameworks PG - OSX"
-# xcodebuild -configuration Release -target commandLine CODE_SIGN_IDENTITY="" UseModernBuildSystem=NO -project commandLine/commandLine.xcodeproj
-# ret=$?
-# if [ $ret -ne 0 ]; then
-#       echo "Failed building Project Generator"
-#       exit 1
-# fi
+cd ${pg_root}
+echo "Building openFrameworks PG - OSX"
+xcodebuild -configuration Release -target commandLine CODE_SIGN_IDENTITY="" UseModernBuildSystem=NO -project commandLine/commandLine.xcodeproj
+ret=$?
+if [ $ret -ne 0 ]; then
+      echo "Failed building Project Generator"
+      exit 1
+fi
 
 
 
+# install electron sign globally
+sudo npm install -g electron-osx-sign
 
+if [ -d "/Users/runner/" ]; then
+    sudo chown -R 501:20 "/Users/runner/.npm"
+fi    
 
-# # install electron sign globally
-# sudo npm install -g electron-osx-sign
+import_certificate
 
-# if [ -d "/Users/runner/" ]; then
-#     sudo chown -R 501:20 "/Users/runner/.npm"
-# fi    
+# Generate electron app
+cd ${pg_root}/frontend
+npm update
+npm install > /dev/null
+npm run build:osx > /dev/null
+mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
+sign_and_upload osx
 
-# import_certificate
+cd ${pg_root}/frontend
+npm run build:osx > /dev/null
+mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-ios
+sign_and_upload ios
 
-# # Generate electron app
-# cd ${pg_root}/frontend
-# npm update
-# npm install > /dev/null
-# npm run build:osx > /dev/null
-# mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
-# sign_and_upload osx
+cd ${pg_root}/frontend
+npm run build:osx > /dev/null
+mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-android
+sign_and_upload android
 
-# cd ${pg_root}/frontend
-# npm run build:osx > /dev/null
-# mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-ios
-# sign_and_upload ios
-
-# cd ${pg_root}/frontend
-# npm run build:osx > /dev/null
-# mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-android
-# sign_and_upload android
-
-# rm -rf scripts/id_rsa 2> /dev/null
-# rm -rf scripts/*.p12 2> /dev/null
+rm -rf scripts/id_rsa 2> /dev/null
+rm -rf scripts/*.p12 2> /dev/null
 
 
 pwd 
