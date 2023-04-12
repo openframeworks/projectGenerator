@@ -130,6 +130,8 @@ pg_root=${PWD}/openFrameworks/apps/projectGenerator
 
 if [ -d "openframeworks/.git" ]; then
     echo 'OF already cloned, using it'
+    # cd openframeworks 
+    # git pull
   # Control will enter here if $DIRECTORY exists.
 else  
     git clone --depth=1 https://github.com/openframeworks/openFrameworks
@@ -157,7 +159,7 @@ fi
 # install electron sign globally
 sudo npm install -g electron-osx-sign
 
-if [ -d "l/Users/runner/" ]; then
+if [ -d "/Users/runner/" ]; then
     sudo chown -R 501:20 "/Users/runner/.npm"
 fi    
 
