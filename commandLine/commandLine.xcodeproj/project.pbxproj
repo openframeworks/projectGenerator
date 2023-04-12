@@ -82,15 +82,15 @@
 		19A3790729E697D900D6501F /* src */ = {
 			isa = PBXGroup;
 			children = (
-				19A3790829E697D900D6501F /* optionparser.h */,
-				19A3790929E697D900D6501F /* projects */,
 				19A3791829E697D900D6501F /* addons */,
-				19A3791B29E697D900D6501F /* utils */,
 				19A3792029E697D900D6501F /* defines.h */,
+				19A3792929E697D900D6501F /* main.cpp */,
 				19A3792129E697D900D6501F /* ofApp.cpp */,
 				19A3792229E697D900D6501F /* ofApp.h */,
+				19A3790829E697D900D6501F /* optionparser.h */,
+				19A3790929E697D900D6501F /* projects */,
+				19A3791B29E697D900D6501F /* utils */,
 				19A3792329E697D900D6501F /* uuidxx */,
-				19A3792929E697D900D6501F /* main.cpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -98,20 +98,20 @@
 		19A3790929E697D900D6501F /* projects */ = {
 			isa = PBXGroup;
 			children = (
-				19A3790A29E697D900D6501F /* visualStudioProject.cpp */,
-				19A3790B29E697D900D6501F /* baseProject.h */,
-				19A3790C29E697D900D6501F /* xcodeProject.h */,
-				19A3790D29E697D900D6501F /* qtcreatorproject.cpp */,
 				19A3790E29E697D900D6501F /* androidStudioProject.cpp */,
-				19A3790F29E697D900D6501F /* CBWinProject.cpp */,
-				19A3791029E697D900D6501F /* CBLinuxProject.h */,
-				19A3791129E697D900D6501F /* qtcreatorproject.h */,
-				19A3791229E697D900D6501F /* xcodeProject.cpp */,
-				19A3791329E697D900D6501F /* baseProject.cpp */,
-				19A3791429E697D900D6501F /* visualStudioProject.h */,
 				19A3791529E697D900D6501F /* androidStudioProject.h */,
-				19A3791629E697D900D6501F /* CBWinProject.h */,
+				19A3791329E697D900D6501F /* baseProject.cpp */,
+				19A3790B29E697D900D6501F /* baseProject.h */,
 				19A3791729E697D900D6501F /* CBLinuxProject.cpp */,
+				19A3791029E697D900D6501F /* CBLinuxProject.h */,
+				19A3790F29E697D900D6501F /* CBWinProject.cpp */,
+				19A3791629E697D900D6501F /* CBWinProject.h */,
+				19A3790D29E697D900D6501F /* qtcreatorproject.cpp */,
+				19A3791129E697D900D6501F /* qtcreatorproject.h */,
+				19A3790A29E697D900D6501F /* visualStudioProject.cpp */,
+				19A3791429E697D900D6501F /* visualStudioProject.h */,
+				19A3791229E697D900D6501F /* xcodeProject.cpp */,
+				19A3790C29E697D900D6501F /* xcodeProject.h */,
 			);
 			path = projects;
 			sourceTree = "<group>";
@@ -253,7 +253,6 @@
 			shellPath = /bin/sh;
 			shellScript = "xcodebuild -project \"$OF_PATH/libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj\" -target openFrameworks -configuration \"${CONFIGURATION}\"  CLANG_CXX_LANGUAGE_STANDARD=$CLANG_CXX_LANGUAGE_STANDARD MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET\n";
 		};
-
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -307,7 +306,7 @@
 					src/addons,
 					src/projects,
 					src/utils,
-					src/uuidxx
+					src/uuidxx,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				OTHER_CODE_SIGN_FLAGS = "--deep";

@@ -5,7 +5,7 @@ OF_PATH = ../../..
 //THIS HAS ALL THE HEADER AND LIBS FOR OF CORE
 #include "../../../libs/openFrameworksCompiled/project/osx/CoreOF.xcconfig"
 
-HEADER_OF = "$(OF_PATH)/libs/openFrameworks/{ofMain.h}"
+HEADER_OF = "$(OF_PATH)/libs/openFrameworks/{ofMain.h,utils}"
 
 
 OF_CORE_LIBS = $(LIB_GLEW) $(LIB_PUGIXML)
