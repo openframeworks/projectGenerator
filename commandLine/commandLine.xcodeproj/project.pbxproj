@@ -6,22 +6,6 @@
 	objectVersion = 46;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		0B53F62F5AB3D260CD9989DC /* LibraryBinary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85AE4BA4B2C36DE3FDEA205B /* LibraryBinary.cpp */; };
-		191688EA29BBA922001E777C /* uuidxx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 191688E829BBA18F001E777C /* uuidxx.cpp */; };
-		4101A75BBA7D018EDEE29106 /* androidStudioProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60C942C97A938F245F6C9FA5 /* androidStudioProject.cpp */; };
-		4C06EAFF49DAB0A2342A6823 /* ofAddon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F4B09ECED1D13F0D76544CB1 /* ofAddon.cpp */; };
-		8F4438678C7D9198482E7C2A /* baseProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9F3E7A5103CD741ED442779 /* baseProject.cpp */; };
-		93C19E76048C3DC7D9B1A13F /* xcodeProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 851AF667222EF52C8558BAAE /* xcodeProject.cpp */; };
-		9D8D62C244DFE08B13F67942 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F48CCF18A98E718E487ED699 /* Utils.cpp */; };
-		B3779BEA5981FB5F1270ACAE /* visualStudioProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0B6DF1A36467F4AD999991D0 /* visualStudioProject.cpp */; };
-		DDB005FE0475131486143812 /* CBWinProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA4F9DE03C98D1A6780A3A43 /* CBWinProject.cpp */; };
-		E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4B69E1D0A3A1BDC003C02F2 /* main.cpp */; };
-		E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */; };
-		E6100CF42CB89BA4B2F20024 /* CBLinuxProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 803C4742042031C3E87B29F9 /* CBLinuxProject.cpp */; };
-		F748F59011CFED6B10193AF4 /* qtcreatorproject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E53FCB5E7AA562E02ABC033 /* qtcreatorproject.cpp */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXCopyFilesBuildPhase section */
 		E4C2427710CC5ABF004149E2 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -35,23 +19,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0B6DF1A36467F4AD999991D0 /* visualStudioProject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = visualStudioProject.cpp; path = ../ofxProjectGenerator/src/projects/visualStudioProject.cpp; sourceTree = SOURCE_ROOT; };
-		191688E829BBA18F001E777C /* uuidxx.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = uuidxx.cpp; sourceTree = "<group>"; };
-		191688E929BBA18F001E777C /* uuidxx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = uuidxx.h; sourceTree = "<group>"; };
-		456CA2B4C9B2F06809B2BFFA /* LibraryBinary.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = LibraryBinary.h; path = ../ofxProjectGenerator/src/utils/LibraryBinary.h; sourceTree = SOURCE_ROOT; };
-		4593D109B0918A50B53C389D /* qtcreatorproject.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = qtcreatorproject.h; path = ../ofxProjectGenerator/src/projects/qtcreatorproject.h; sourceTree = SOURCE_ROOT; };
-		4E53FCB5E7AA562E02ABC033 /* qtcreatorproject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = qtcreatorproject.cpp; path = ../ofxProjectGenerator/src/projects/qtcreatorproject.cpp; sourceTree = SOURCE_ROOT; };
-		60C942C97A938F245F6C9FA5 /* androidStudioProject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = androidStudioProject.cpp; path = ../ofxProjectGenerator/src/projects/androidStudioProject.cpp; sourceTree = SOURCE_ROOT; };
-		803C4742042031C3E87B29F9 /* CBLinuxProject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = CBLinuxProject.cpp; path = ../ofxProjectGenerator/src/projects/CBLinuxProject.cpp; sourceTree = SOURCE_ROOT; };
-		851AF667222EF52C8558BAAE /* xcodeProject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = xcodeProject.cpp; path = ../ofxProjectGenerator/src/projects/xcodeProject.cpp; sourceTree = SOURCE_ROOT; };
-		85AE4BA4B2C36DE3FDEA205B /* LibraryBinary.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = LibraryBinary.cpp; path = ../ofxProjectGenerator/src/utils/LibraryBinary.cpp; sourceTree = SOURCE_ROOT; };
-		A3A1A17CA417A08C2C2CBB65 /* visualStudioProject.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = visualStudioProject.h; path = ../ofxProjectGenerator/src/projects/visualStudioProject.h; sourceTree = SOURCE_ROOT; };
-		B9F3E7A5103CD741ED442779 /* baseProject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = baseProject.cpp; path = ../ofxProjectGenerator/src/projects/baseProject.cpp; sourceTree = SOURCE_ROOT; };
-		C47F6FDA9CA2AD85298B06D8 /* baseProject.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = baseProject.h; path = ../ofxProjectGenerator/src/projects/baseProject.h; sourceTree = SOURCE_ROOT; };
-		CBC114F51E6DAF8C2200203D /* CBWinProject.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = CBWinProject.h; path = ../ofxProjectGenerator/src/projects/CBWinProject.h; sourceTree = SOURCE_ROOT; };
-		CC7E9EFF5EDF044D0D60E84E /* Utils.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = Utils.h; path = ../ofxProjectGenerator/src/utils/Utils.h; sourceTree = SOURCE_ROOT; };
-		D34662DCCBAA284593CDF234 /* defines.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = defines.h; path = src/defines.h; sourceTree = SOURCE_ROOT; };
-		D76644EB0E1973DB9CC96EDD /* xcodeProject.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = xcodeProject.h; path = ../ofxProjectGenerator/src/projects/xcodeProject.h; sourceTree = SOURCE_ROOT; };
+		193F202A29E6641A004531F3 /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
 		E42962AC2163EDD300A6A9E2 /* ofCamera.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ofCamera.cpp; path = ../../../libs/openFrameworks/3d/ofCamera.cpp; sourceTree = SOURCE_ROOT; };
 		E42962AD2163EDD300A6A9E2 /* ofMesh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ofMesh.h; path = ../../../libs/openFrameworks/3d/ofMesh.h; sourceTree = SOURCE_ROOT; };
 		E42962AE2163EDD300A6A9E2 /* ofNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ofNode.h; path = ../../../libs/openFrameworks/3d/ofNode.h; sourceTree = SOURCE_ROOT; };
@@ -228,18 +196,8 @@
 		E42963722163EDD300A6A9E2 /* ofSoundBuffer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ofSoundBuffer.cpp; path = ../../../libs/openFrameworks/sound/ofSoundBuffer.cpp; sourceTree = SOURCE_ROOT; };
 		E42963732163EDD300A6A9E2 /* ofSoundBaseTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ofSoundBaseTypes.h; path = ../../../libs/openFrameworks/sound/ofSoundBaseTypes.h; sourceTree = SOURCE_ROOT; };
 		E4B69B5B0A3A1756003C02F2 /* commandLineDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = commandLineDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E4B69E1D0A3A1BDC003C02F2 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = SOURCE_ROOT; };
-		E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = ofApp.cpp; path = src/ofApp.cpp; sourceTree = SOURCE_ROOT; };
-		E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofApp.h; path = src/ofApp.h; sourceTree = SOURCE_ROOT; };
 		E4B6FCAD0C3E899E008CF71C /* openFrameworks-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "openFrameworks-Info.plist"; sourceTree = "<group>"; };
 		E4EB6923138AFD0F00A09F29 /* Project.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Project.xcconfig; sourceTree = "<group>"; };
-		EE4968879E321EE44D61A69C /* CBLinuxProject.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = CBLinuxProject.h; path = ../ofxProjectGenerator/src/projects/CBLinuxProject.h; sourceTree = SOURCE_ROOT; };
-		F44B5BA46BA86BC81688534B /* androidStudioProject.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = androidStudioProject.h; path = ../ofxProjectGenerator/src/projects/androidStudioProject.h; sourceTree = SOURCE_ROOT; };
-		F48CCF18A98E718E487ED699 /* Utils.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = Utils.cpp; path = ../ofxProjectGenerator/src/utils/Utils.cpp; sourceTree = SOURCE_ROOT; };
-		F4B09ECED1D13F0D76544CB1 /* ofAddon.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = ofAddon.cpp; path = ../ofxProjectGenerator/src/addons/ofAddon.cpp; sourceTree = SOURCE_ROOT; };
-		F528BDA35834104A3F0862F6 /* ofAddon.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = ofAddon.h; path = ../ofxProjectGenerator/src/addons/ofAddon.h; sourceTree = SOURCE_ROOT; };
-		FA4F9DE03C98D1A6780A3A43 /* CBWinProject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = CBWinProject.cpp; path = ../ofxProjectGenerator/src/projects/CBWinProject.cpp; sourceTree = SOURCE_ROOT; };
-		FFA036CAA103ECC0927C892E /* optionparser.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = optionparser.h; path = src/optionparser.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -253,65 +211,11 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		191688E429BBA18F001E777C /* uuidxx */ = {
-			isa = PBXGroup;
-			children = (
-				191688E729BBA18F001E777C /* src */,
-			);
-			name = uuidxx;
-			path = ../ofxProjectGenerator/src/uuidxx;
-			sourceTree = "<group>";
-		};
-		191688E729BBA18F001E777C /* src */ = {
-			isa = PBXGroup;
-			children = (
-				191688E829BBA18F001E777C /* uuidxx.cpp */,
-				191688E929BBA18F001E777C /* uuidxx.h */,
-			);
-			path = src;
-			sourceTree = "<group>";
-		};
-		1EC7C71C6A2F145CDCCA8F9A /* addons */ = {
-			isa = PBXGroup;
-			children = (
-				F4B09ECED1D13F0D76544CB1 /* ofAddon.cpp */,
-				F528BDA35834104A3F0862F6 /* ofAddon.h */,
-			);
-			name = addons;
-			sourceTree = "<group>";
-		};
-		6948EE371B920CB800B5AC1A /* local_addons */ = {
-			isa = PBXGroup;
-			children = (
-				8D8BB035A756F20E9A485A8C /* ofxProjectGenerator */,
-			);
-			name = local_addons;
-			sourceTree = "<group>";
-		};
-		8D8BB035A756F20E9A485A8C /* ofxProjectGenerator */ = {
-			isa = PBXGroup;
-			children = (
-				E903244952694ECC7C690A10 /* src */,
-			);
-			name = ofxProjectGenerator;
-			sourceTree = "<group>";
-		};
 		BB4B014C10F69532006C3DED /* addons */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			name = addons;
-			sourceTree = "<group>";
-		};
-		D58CADC2E0D0B22492A9A638 /* utils */ = {
-			isa = PBXGroup;
-			children = (
-				85AE4BA4B2C36DE3FDEA205B /* LibraryBinary.cpp */,
-				456CA2B4C9B2F06809B2BFFA /* LibraryBinary.h */,
-				F48CCF18A98E718E487ED699 /* Utils.cpp */,
-				CC7E9EFF5EDF044D0D60E84E /* Utils.h */,
-			);
-			name = utils;
 			sourceTree = "<group>";
 		};
 		E42962AA2163EDD300A6A9E2 /* openFrameworks */ = {
@@ -601,56 +505,11 @@
 			children = (
 				E4B6FCAD0C3E899E008CF71C /* openFrameworks-Info.plist */,
 				E4EB6923138AFD0F00A09F29 /* Project.xcconfig */,
-				E4B69E1C0A3A1BDC003C02F2 /* src */,
+				193F202A29E6641A004531F3 /* src */,
 				E42962AA2163EDD300A6A9E2 /* openFrameworks */,
 				BB4B014C10F69532006C3DED /* addons */,
-				6948EE371B920CB800B5AC1A /* local_addons */,
 				E4B69B5B0A3A1756003C02F2 /* commandLineDebug.app */,
 			);
-			sourceTree = "<group>";
-		};
-		E4B69E1C0A3A1BDC003C02F2 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
-				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
-				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
-				FFA036CAA103ECC0927C892E /* optionparser.h */,
-				D34662DCCBAA284593CDF234 /* defines.h */,
-			);
-			path = src;
-			sourceTree = SOURCE_ROOT;
-		};
-		E903244952694ECC7C690A10 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				191688E429BBA18F001E777C /* uuidxx */,
-				1EC7C71C6A2F145CDCCA8F9A /* addons */,
-				ECBF6BD750C89FA1831D523E /* projects */,
-				D58CADC2E0D0B22492A9A638 /* utils */,
-			);
-			name = src;
-			sourceTree = "<group>";
-		};
-		ECBF6BD750C89FA1831D523E /* projects */ = {
-			isa = PBXGroup;
-			children = (
-				803C4742042031C3E87B29F9 /* CBLinuxProject.cpp */,
-				EE4968879E321EE44D61A69C /* CBLinuxProject.h */,
-				FA4F9DE03C98D1A6780A3A43 /* CBWinProject.cpp */,
-				CBC114F51E6DAF8C2200203D /* CBWinProject.h */,
-				60C942C97A938F245F6C9FA5 /* androidStudioProject.cpp */,
-				F44B5BA46BA86BC81688534B /* androidStudioProject.h */,
-				B9F3E7A5103CD741ED442779 /* baseProject.cpp */,
-				C47F6FDA9CA2AD85298B06D8 /* baseProject.h */,
-				4E53FCB5E7AA562E02ABC033 /* qtcreatorproject.cpp */,
-				4593D109B0918A50B53C389D /* qtcreatorproject.h */,
-				0B6DF1A36467F4AD999991D0 /* visualStudioProject.cpp */,
-				A3A1A17CA417A08C2C2CBB65 /* visualStudioProject.h */,
-				851AF667222EF52C8558BAAE /* xcodeProject.cpp */,
-				D76644EB0E1973DB9CC96EDD /* xcodeProject.h */,
-			);
-			name = projects;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -751,19 +610,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				191688EA29BBA922001E777C /* uuidxx.cpp in Sources */,
-				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
-				E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */,
-				4C06EAFF49DAB0A2342A6823 /* ofAddon.cpp in Sources */,
-				E6100CF42CB89BA4B2F20024 /* CBLinuxProject.cpp in Sources */,
-				DDB005FE0475131486143812 /* CBWinProject.cpp in Sources */,
-				4101A75BBA7D018EDEE29106 /* androidStudioProject.cpp in Sources */,
-				8F4438678C7D9198482E7C2A /* baseProject.cpp in Sources */,
-				F748F59011CFED6B10193AF4 /* qtcreatorproject.cpp in Sources */,
-				B3779BEA5981FB5F1270ACAE /* visualStudioProject.cpp in Sources */,
-				93C19E76048C3DC7D9B1A13F /* xcodeProject.cpp in Sources */,
-				0B53F62F5AB3D260CD9989DC /* LibraryBinary.cpp in Sources */,
-				9D8D62C244DFE08B13F67942 /* Utils.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
