@@ -147,14 +147,14 @@ else
 fi
 
 # Compile commandline tool
-cd ${pg_root}
-echo "Building openFrameworks PG - OSX"
-xcodebuild -configuration Release -target commandLine CODE_SIGN_IDENTITY="" UseModernBuildSystem=NO -project commandLine/commandLine.xcodeproj
-ret=$?
-if [ $ret -ne 0 ]; then
-      echo "Failed building Project Generator"
-      exit 1
-fi
+# cd ${pg_root}
+# echo "Building openFrameworks PG - OSX"
+# xcodebuild -configuration Release -target commandLine CODE_SIGN_IDENTITY="" UseModernBuildSystem=NO -project commandLine/commandLine.xcodeproj
+# ret=$?
+# if [ $ret -ne 0 ]; then
+#       echo "Failed building Project Generator"
+#       exit 1
+# fi
 
 
 
