@@ -9,7 +9,6 @@
 #include "ofFileUtils.h"
 #include "ofAddon.h"
 #include "Utils.h"
-//#include "Poco/RegularExpression.h"
 #include <list>
 #include <regex>
 

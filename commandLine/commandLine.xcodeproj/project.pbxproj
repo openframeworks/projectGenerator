@@ -304,14 +304,10 @@
 				HEADER_SEARCH_PATHS = (
 					"$(OF_CORE_HEADERS)",
 					src,
-					src,
-					../../../addons/ofxPoco/libs/poco/include,
-					../../../addons/ofxPoco/src,
-					../../../addons/ofxPoco/libs/openssl/include,
-					../ofxProjectGenerator/src,
-					../ofxProjectGenerator/src/addons,
-					../ofxProjectGenerator/src/projects,
-					../ofxProjectGenerator/src/utils,
+					src/addons,
+					src/projects,
+					src/utils,
+					src/uuidxx
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
