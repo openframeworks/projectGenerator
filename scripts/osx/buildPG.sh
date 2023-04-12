@@ -156,33 +156,37 @@ if [ $ret -ne 0 ]; then
       exit 1
 fi
 
-# install electron sign globally
-sudo npm install -g electron-osx-sign
 
-if [ -d "/Users/runner/" ]; then
-    sudo chown -R 501:20 "/Users/runner/.npm"
-fi    
 
-import_certificate
 
-# Generate electron app
-cd ${pg_root}/frontend
-npm update
-npm install > /dev/null
-npm run build:osx > /dev/null
-mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
-sign_and_upload osx
 
-cd ${pg_root}/frontend
-npm run build:osx > /dev/null
-mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-ios
-sign_and_upload ios
+# # install electron sign globally
+# sudo npm install -g electron-osx-sign
 
-cd ${pg_root}/frontend
-npm run build:osx > /dev/null
-mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-android
-sign_and_upload android
+# if [ -d "/Users/runner/" ]; then
+#     sudo chown -R 501:20 "/Users/runner/.npm"
+# fi    
 
-rm -rf scripts/id_rsa 2> /dev/null
-rm -rf scripts/*.p12 2> /dev/null
+# import_certificate
+
+# # Generate electron app
+# cd ${pg_root}/frontend
+# npm update
+# npm install > /dev/null
+# npm run build:osx > /dev/null
+# mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
+# sign_and_upload osx
+
+# cd ${pg_root}/frontend
+# npm run build:osx > /dev/null
+# mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-ios
+# sign_and_upload ios
+
+# cd ${pg_root}/frontend
+# npm run build:osx > /dev/null
+# mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-android
+# sign_and_upload android
+
+# rm -rf scripts/id_rsa 2> /dev/null
+# rm -rf scripts/*.p12 2> /dev/null
 
