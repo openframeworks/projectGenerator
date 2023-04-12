@@ -190,3 +190,6 @@ fi
 # rm -rf scripts/id_rsa 2> /dev/null
 # rm -rf scripts/*.p12 2> /dev/null
 
+
+pwd 
+ls -alfR
