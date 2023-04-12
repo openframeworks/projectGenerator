@@ -30,7 +30,7 @@ jobs:
         cache-name: cache-keep-of
       with:
         path: |
-          openFrameworks/**
+          /Users/runner/work/projectGenerator/openFrameworks/**
         key: ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-${{ hashFiles('openFrameworks/**/*.cpp') }}
         restore-keys: |
           ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-          
