@@ -56,18 +56,18 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxPoco\libs\poco\include;..\..\..\addons\ofxPoco\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;src\addons;src\projects;src\utils;src\uuidxx</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalOptions>-DPOCO_STATIC</AdditionalOptions>
+      <AdditionalOptions></AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <AdditionalDependencies>%(AdditionalDependencies);PocoCryptomdd.lib;PocoDatamdd.lib;PocoDataSQLitemdd.lib;PocoFoundationmdd.lib;PocoNetmdd.lib;PocoNetSSLmdd.lib;PocoPDFmdd.lib;PocoUtilmdd.lib;PocoXMLmdd.lib;PocoZipmdd.lib;iphlpapi.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);..\..\..\addons\ofxPoco\libs\poco\lib\vs\x64\Debug;..\..\..\addons\ofxPoco</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -77,10 +77,10 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;..\..\..\addons\ofxPoco\libs\poco\include;..\..\..\addons\ofxPoco\src;..\ofxProjectGenerator\src;..\ofxProjectGenerator\src\addons;..\ofxProjectGenerator\src\projects;..\ofxProjectGenerator\src\utils</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;src\addons;src\projects;src\utils;src\uuidxx</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
-      <AdditionalOptions>-DPOCO_STATIC</AdditionalOptions>
+      <AdditionalOptions></AdditionalOptions>
     </ClCompile>
     <Link>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -89,38 +89,38 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <AdditionalDependencies>%(AdditionalDependencies);PocoCryptomd.lib;PocoDatamd.lib;PocoDataSQLitemd.lib;PocoFoundationmd.lib;PocoNetmd.lib;PocoNetSSLmd.lib;PocoPDFmd.lib;PocoUtilmd.lib;PocoXMLmd.lib;PocoZipmd.lib;iphlpapi.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);..\..\..\addons\ofxPoco\libs\poco\lib\vs\x64\Release;..\..\..\addons\ofxPoco</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="..\..\..\addons\ofxPoco\src\ofxXmlPoco.cpp" />
-    <ClCompile Include="..\ofxProjectGenerator\src\addons\ofAddon.cpp" />
-    <ClCompile Include="..\ofxProjectGenerator\src\projects\androidStudioProject.cpp" />
-    <ClCompile Include="..\ofxProjectGenerator\src\projects\baseProject.cpp" />
-    <ClCompile Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.cpp" />
-    <ClCompile Include="..\ofxProjectGenerator\src\projects\CBWinProject.cpp" />
-    <ClCompile Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.cpp" />
-    <ClCompile Include="..\ofxProjectGenerator\src\projects\visualStudioProject.cpp" />
-    <ClCompile Include="..\ofxProjectGenerator\src\projects\xcodeProject.cpp" />
-    <ClCompile Include="..\ofxProjectGenerator\src\utils\LibraryBinary.cpp" />
-    <ClCompile Include="..\ofxProjectGenerator\src\utils\Utils.cpp" />
+    <ClCompile Include="src\addons\ofAddon.cpp" />
+    <ClCompile Include="src\projects\androidStudioProject.cpp" />
+    <ClCompile Include="src\projects\baseProject.cpp" />
+    <ClCompile Include="src\projects\CBLinuxProject.cpp" />
+    <ClCompile Include="src\projects\CBWinProject.cpp" />
+    <ClCompile Include="src\projects\qtcreatorproject.cpp" />
+    <ClCompile Include="src\projects\visualStudioProject.cpp" />
+    <ClCompile Include="src\projects\xcodeProject.cpp" />
+    <ClCompile Include="src\utils\LibraryBinary.cpp" />
+    <ClCompile Include="src\utils\Utils.cpp" />
+    <ClCompile Include="src\uuidxx\src\uuidxx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\optionparser.h" />
-    <ClInclude Include="..\..\..\addons\ofxPoco\src\ofxXmlPoco.h" />
-    <ClInclude Include="..\ofxProjectGenerator\src\addons\ofAddon.h" />
-    <ClInclude Include="..\ofxProjectGenerator\src\projects\androidStudioProject.h" />
-    <ClInclude Include="..\ofxProjectGenerator\src\projects\baseProject.h" />
-    <ClInclude Include="..\ofxProjectGenerator\src\projects\CBLinuxProject.h" />
-    <ClInclude Include="..\ofxProjectGenerator\src\projects\CBWinProject.h" />
-    <ClInclude Include="..\ofxProjectGenerator\src\projects\qtcreatorproject.h" />
-    <ClInclude Include="..\ofxProjectGenerator\src\projects\visualStudioProject.h" />
-    <ClInclude Include="..\ofxProjectGenerator\src\projects\xcodeProject.h" />
-    <ClInclude Include="..\ofxProjectGenerator\src\utils\LibraryBinary.h" />
-    <ClInclude Include="..\ofxProjectGenerator\src\utils\Utils.h" />
+    <ClInclude Include="src\addons\ofAddon.h" />
+    <ClInclude Include="src\projects\androidStudioProject.h" />
+    <ClInclude Include="src\projects\baseProject.h" />
+    <ClInclude Include="src\projects\CBLinuxProject.h" />
+    <ClInclude Include="src\projects\CBWinProject.h" />
+    <ClInclude Include="src\projects\qtcreatorproject.h" />
+    <ClInclude Include="src\projects\visualStudioProject.h" />
+    <ClInclude Include="src\projects\xcodeProject.h" />
+    <ClInclude Include="src\utils\LibraryBinary.h" />
+    <ClInclude Include="src\utils\Utils.h" />
+    <ClCompile Include="src\uuidxx\src\uuidxx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">

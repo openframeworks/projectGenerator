@@ -148,21 +148,37 @@ pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::strin
 }
 
 // todo -- this doesn't use ofToDataPath -- so it's broken a bit.  can we fix?
-void getFilesRecursively(const fs::path & path, std::vector < std::string > & fileNames){
-//	cout << "---- getFilesRecursively :: " << path << endl;
-	ofDirectory dir;
-	dir.listDir(path);
-	for (int i = 0; i < dir.size(); i++){
-		ofFile temp(dir.getFile(i));
-		if (dir.getName(i) == ".svn" || dir.getName(i)==".git") continue; // ignore svn and git
-		if (ofIsStringInString(dir.getName(i),".framework")) continue; // ignore frameworks
+void getFilesRecursively(const fs::path & path, std::vector < string > & fileNames){
+	//	cout << "---- getFilesRecursively :: " << path << endl;
+	
+	for (const auto & entry : fs::directory_iterator(path)) {
+		auto f = entry.path();
+		if (ofIsStringInString(f.filename().string(),".framework")) continue; // ignore frameworks
+		
+		if (fs::is_directory(f)) {
+			if (f.filename() != fs::path(".git")) { // ignore git dir
+				getFilesRecursively(f, fileNames);
+			}
+		}
+		else {
+			// FIXME - update someday to fs::path
+			fileNames.emplace_back(f.string());
+		}
+	}
+}
 
-		if (temp.isFile()){
-//			cout << dir.getPath(i) << endl;
-			fileNames.push_back(dir.getPath(i));
-		} else if (temp.isDirectory()){
-//			cout << "this is directory : " << dir.getPath(i) << endl;
-			getFilesRecursively(dir.getPath(i), fileNames);
+void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileNames){
+	for (const auto & entry : fs::directory_iterator(path)) {
+		auto f = entry.path();
+		if (ofIsStringInString(f.filename().string(),".framework")) continue; // ignore frameworks
+		
+		if (fs::is_directory(f)) {
+			if (f.filename() != fs::path(".git")) { // ignore git dir
+				getFilesRecursively(f, fileNames);
+			}
+		}
+		else {
+			fileNames.emplace_back(f);
 		}
 	}
 }
@@ -293,29 +309,45 @@ void getDllsRecursively(const fs::path & path, std::vector < std::string > & dll
 	}
 }
 
+//
+//
+//	if (ofIsStringInString(f.filename().string(),".framework")) continue; // ignore frameworks
+//
+//	if (fs::is_directory(f)) {
+//		if (f.filename() != fs::path(".git")) { // ignore git dir
+//			getFilesRecursively(f, fileNames);
+//		}
+//	}
+//	else {
+//		fileNames.emplace_back(f);
+//	}
+//}
 
 
-
+using std::cout;
+using std::endl;
 void getLibsRecursively(const fs::path & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform, std::string arch, std::string target){
-	ofDirectory dir;
-	dir.listDir(path);
+//	cout << "getLibsRecursively " << path << endl;
+//	ofDirectory dir;
+//	dir.listDir(path);
 
 
 
-	for (int i = 0; i < dir.size(); i++){
+//	for (int i = 0; i < dir.size(); i++){
+	for (const auto & entry : fs::directory_iterator(path)) {
+		auto f = entry.path();
 
-	std::vector<std::string> splittedPath = ofSplitString(dir.getPath(i), fs::path("/").make_preferred().string());
+		std::vector<std::string> splittedPath = ofSplitString(f, fs::path("/").make_preferred().string());
 
-		ofFile temp(dir.getFile(i));
-
-		if (temp.isDirectory()){
-			//getLibsRecursively(dir.getPath(i), folderNames);
-
-			// on osx, framework is a directory, let's not parse it....
+//		ofFile temp(dir.getFile(i));
 		std::string ext = "";
 		std::string first = "";
-			auto stem = fs::path(dir.getFile(i)).stem();
-			splitFromLast(dir.getPath(i), ".", first, ext);
+		splitFromLast(f.string(), ".", first, ext);
+		
+		if (fs::is_directory(f)) {
+
+			// on osx, framework is a directory, let's not parse it....
+			auto stem = f.stem();
 			if (ext != "framework") {
 				auto archFound = std::find(LibraryBinary::archs.begin(), LibraryBinary::archs.end(), stem);
 				if (archFound != LibraryBinary::archs.end()) {
@@ -326,11 +358,10 @@ void getLibsRecursively(const fs::path & path, std::vector < std::string > & lib
 						target = *targetFound;
 					}
 				}
-				getLibsRecursively(dir.getPath(i), libFiles, libLibs, platform, arch, target);
+				getLibsRecursively(f, libFiles, libLibs, platform, arch, target);
 			}
 
 		} else {
-
 
 			bool platformFound = false;
 
@@ -342,37 +373,29 @@ void getLibsRecursively(const fs::path & path, std::vector < std::string > & lib
 				}
 			}
 
-			//std::string ext = ofFilePath::getFileExt(temp.getFile(i));
-		std::string ext;
-		std::string first;
-			splitFromLast(dir.getPath(i), ".", first, ext);
-
 			if (ext == "a" || ext == "lib" || ext == "dylib" || ext == "so" || (ext == "dll" && platform != "vs")){
 				if (platformFound){
-					libLibs.push_back({ dir.getPath(i), arch, target });
+					libLibs.push_back({ f, arch, target });
 
 					//TODO: THEO hack
 					if( platform == "ios" ){ //this is so we can add the osx libs for the simulator builds
 
-						std::string currentPath = dir.getPath(i);
+						std::string currentPath = f;
 
 						//TODO: THEO double hack this is why we need install.xml - custom ignore ofxOpenCv
 						if( currentPath.find("ofxOpenCv") == std::string::npos ){
 							ofStringReplace(currentPath, "ios", "osx");
 							if( fs::exists(currentPath) ){
-								libLibs.push_back({ currentPath,arch,target });
+								libLibs.push_back({ currentPath, arch, target });
 							}
 						}
 					}
 				}
 			} else if (ext == "h" || ext == "hpp" || ext == "c" || ext == "cpp" || ext == "cc" || ext == "cxx" || ext == "m" || ext == "mm"){
-				libFiles.push_back(dir.getPath(i));
+				libFiles.push_back(f);
 			}
-
 		}
-
 	}
-
 }
 
 void fixSlashOrder(std::string & toFix){

@@ -17,8 +17,6 @@ Project{
         ]
 
         of.addons: [
-            '../ofxProjectGenerator',
-            'ofxPoco',
         ]
 
         // This project is using addons.make to include the addons
