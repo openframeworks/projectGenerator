@@ -15,7 +15,7 @@ constexpr option::Descriptor usage[] =
     {LISTTEMPLATES, 0,"l","listtemplates",option::Arg::None, "  --listtemplates, -l  \tlist templates available for the specified or current platform(s)" },
     {PLATFORMS, 0,"p","platforms",option::Arg::None, "  --platforms, -p  \tplatform list (such as osx, ios, winvs)" },
     {ADDONS, 0,"a","addons",option::Arg::None, "  --addons, -a  \taddon list (such as ofxOpenCv, ofxGui, ofxXmlSettings)" },
-    {OFPATH, 0,"o","ofPath",option::Arg::None, "  --ofPath, -o  \tpath to openframeworks (relative or absolute). This *must* be set, or you can also alternatively use an environment variable PG_OF_PATH and if this isn't set, it will use that value instead" },
+    {OFPATH, 0,"o","ofPath",option::Arg::Optional, "  --ofPath, -o  \tpath to openframeworks (relative or absolute). This *must* be set, or you can also alternatively use an environment variable PG_OF_PATH and if this isn't set, it will use that value instead" },
     {VERBOSE, 0,"v","verbose",option::Arg::None, "  --verbose, -v  \trun verbose" },
     {TEMPLATE, 0,"t","template",option::Arg::None, "  --template, -t  \tproject template" },
     {DRYRUN, 0,"d","dryrun",option::Arg::None, "  --dryrun, -d  \tdry run, don't change files" },
@@ -382,9 +382,9 @@ int main(int argc, char** argv){
 //	  exit(0);
 //	}
 	
-	if (result.count("ofPath")) {
-		cout << result["ofPath"].as<std::string>() << endl;
-	}
+//	if (result.count("ofPath")) {
+//		cout << result["ofPath"].as<std::string>() << endl;
+//	}
 	
 	cout << 1 << endl;
     // ------------------------------------------------------ parse args
