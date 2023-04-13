@@ -224,6 +224,11 @@ void getFrameworksRecursively(const fs::path & path, std::vector < std::string >
 			if (f.extension() == ".framework") {
 				frameworks.emplace_back(f.string());
 			} else {
+				if (f.filename() == fs::path(".git")) continue;
+				if (f.filename() == fs::path("mediaAssets")) continue;
+				if (f.extension() == ".xcodeproj") continue;
+				if( f.string().rfind("example", 0) == 0) continue;
+
 				getFrameworksRecursively(f, frameworks, platform);
 			}
 		}
@@ -233,34 +238,19 @@ void getFrameworksRecursively(const fs::path & path, std::vector < std::string >
 
 
 void getPropsRecursively(const fs::path & path, std::vector < std::string > & props, const std::string & platform) {
-//	if(!ofDirectory::doesDirectoryExist(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
-//	ofDirectory dir;
-//	dir.listDir(path);
-//	for (auto & temp : dir) {
-//		if (temp.isDirectory()) {
-//			//skip example directories - this is needed as we are search all folders in the addons root path
-//			if( temp.getFileName().rfind("example", 0) == 0) continue;
-//			getPropsRecursively(temp.path(), props, platform);
-//		}
-//		else {
-//			std::string ext = "";
-//			std::string first = "";
-//			splitFromLast(temp.path(), ".", first, ext);
-//			if (ext == "props") {
-//				props.push_back(temp.path());
-//			}
-//		}
-//	}
-	
 	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
 	for (const auto & entry : fs::directory_iterator(path)) {
 		auto f = entry.path();
 		if (fs::is_directory(f)) {
-			// FIXME: update to fs::path check;
+			if (f.filename() == fs::path(".git")) continue;
+			if (f.filename() == fs::path("mediaAssets")) continue;
+			if (f.extension() == ".xcodeproj") continue;
 			if( f.string().rfind("example", 0) == 0) continue;
+			
 			getPropsRecursively(f, props, platform);
 		} else {
 			if (f.extension() == ".props") {
+//				cout << f << endl;
 				props.emplace_back(f);
 			}
 		}

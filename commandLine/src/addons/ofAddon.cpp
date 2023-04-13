@@ -14,6 +14,10 @@
 
 using std::vector;
 using std::string;
+
+using std::cout;
+using std::endl;
+
 namespace fs = of::filesystem;
 
 vector<string> splitStringOnceByLeft(const string &source, const string &delimiter) {
@@ -476,8 +480,6 @@ void ofAddon::parseConfig(){
 	}
 }
 
-using std::cout;
-using std::endl;
 
 bool ofAddon::fromFS(fs::path path, const std::string & platform){
 	clear();
@@ -515,8 +517,7 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 		if (isLocalAddon) {
 			folder = srcFS.parent_path();
 		} else {
-			folder = fs::path(s).parent_path();
-			folder = fs::relative(folder, containedPath);
+			folder = fs::relative(fs::path(s).parent_path(), containedPath);
 		}
 		s = srcFS.string();
 		filesToFolders[s] = folder.string();
@@ -527,19 +528,20 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 		getPropsRecursively(addonPath.string(), propsFiles, platform);
 	}
 
-	// FIXME: propsFiles to fs::path
+	int i = 0;
 	for (auto & s : propsFiles) {
 		fs::path folder;
+		auto srcFS = fs::path(prefixPath / fs::relative(s, containedPath));
 		if (isLocalAddon) {
-			// FIXME: test if local addons is working ok
-			folder = fs::path("local_addons") / fs::path(s).parent_path();
+//			folder = fs::path("local_addons") / fs::path(s).parent_path();
+			folder = srcFS.parent_path();
 		} else {
-			folder = fs::path(s).parent_path();
-			folder = fs::relative(folder, containedPath);
+			folder = fs::relative(fs::path(s).parent_path(), containedPath);
 		}
-		s = fs::path(prefixPath / fs::relative(s, containedPath)).string();
+		s = srcFS.string();
+		propsFiles[i] = folder.string();
+		i++;
 	}
-
 
 	fs::path libsPath = path / "libs";
 	vector < string > libFiles;
@@ -560,7 +562,7 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 		if (isLocalAddon) {
 			folder = srcFS.parent_path();
 		} else {
-			folder = fs::relative(folder, containedPath);
+			folder = fs::relative(fs::path(s).parent_path(), containedPath);
 		}
 		s = srcFS.string();
 		srcFiles.emplace_back(s);

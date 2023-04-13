@@ -656,6 +656,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 		}
 	}
 
+	ofLogNotice() << "adding addon: " << addon.name;
 	addons.push_back(addon);
 
 	for (auto & e : addon.includePaths) {
