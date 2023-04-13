@@ -343,7 +343,7 @@ void printHelp(){
 
 
 //-------------------------------------------
-int main(int argc, char* argv[]){
+int main(int argc, char** argv){
     //------------------------------------------- pre-parse
     bAddonsPassedIn = false;
     bDryRun = false;
@@ -363,21 +363,28 @@ int main(int argc, char* argv[]){
     templateName = "";
 	ofPath = "";
     
-	
-	options
-		.allow_unrecognised_options()
-		.add_options()
-			("o,ofPath", "path to openframeworks (relative or absolute). This *must* be set, or you can also alternatively use an environment variable PG_OF_PATH and if this isn't set, it will use that value instead") // a bool parameter
-			("i,integer", "Int param", cxxopts::value<int>())
-			("f,file", "File name", cxxopts::value<std::string>())
-			("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
-			;
 	std::cout << "Have " << argc << " arguments:" << std::endl;
 	for (int i = 0; i < argc; ++i) {
 		std::cout << argv[i] << std::endl;
 	}
-//	auto result = options.parse(argc, argv);
-//	cout << result["ofPath"].as<string>() << endl;
+	
+	options
+		.allow_unrecognised_options()
+		.add_options()
+			("h,help", "Print usage")
+			("o,ofPath", "path to openframeworks (relative or absolute). This *must* be set, or you can also alternatively use an environment variable PG_OF_PATH and if this isn't set, it will use that value instead") // a bool parameter
+			;
+
+	auto result = options.parse(argc, argv);
+	
+//	if (result.count("ofPath")) {
+//	  std::cout << options.help() << std::endl;
+//	  exit(0);
+//	}
+	
+	if (result.count("ofPath")) {
+		cout << result["ofPath"].as<std::string>() << endl;
+	}
 	
 	cout << 1 << endl;
     // ------------------------------------------------------ parse args
@@ -387,13 +394,9 @@ int main(int argc, char* argv[]){
     std::vector<option::Option> buffer(stats.buffer_max);
     option::Parser parse(usage, argc, argv, &options[0], &buffer[0]);
 	
-	cout << 2 << endl;
-	
 	if (parse.error()) {
-		
 		return 1;
 	}
-	cout << 3 << endl;
 
     if (options[HELP] || argc == 0) {
 		ofLogError() << "No arguments";
@@ -401,7 +404,6 @@ int main(int argc, char* argv[]){
 		
         return EXIT_OK;
     }
-	cout << 4 << endl;
 
     // templates:
     if (options[LISTTEMPLATES].count() > 0){

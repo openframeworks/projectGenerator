@@ -237,7 +237,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\" \"$TARGET_BUILD_DIR/projectGenerator\";\t\n";
+			shellScript = "rm \"$TARGET_BUILD_DIR/projectGenerator\"\ncp \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\" \"$TARGET_BUILD_DIR/projectGenerator\";\t\n";
 		};
 		E42962A92163ECCD00A6A9E2 /* Run Script - Compile OF */ = {
 			isa = PBXShellScriptBuildPhase;
