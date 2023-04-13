@@ -531,7 +531,6 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 	
 	for (auto & s : propsFiles) {
 		
-		
 		fs::path folder;
 		if (isLocalAddon) {
 			// FIXME: test if local addons is working ok
@@ -543,21 +542,6 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 		
 		s = fs::path(prefixPath / fs::relative(s, containedPath)).string();
 	}
-
-//	for (int i = 0; i < (int)propsFiles.size(); i++) {
-//		propsFiles[i].erase(propsFiles[i].begin(), propsFiles[i].begin() + containedPath.string().length());
-//		int end = propsFiles[i].rfind(fs::path("/").make_preferred().string());
-//		int init = 0;
-//		string folder;
-//		if (!isLocalAddon) {
-//			folder = propsFiles[i].substr(init, end);
-//		}
-//		else {
-//			init = propsFiles[i].find(name);
-//			folder = ofFilePath::join("local_addons", propsFiles[i].substr(init, end - init));
-//		}
-//		propsFiles[i] = prefixPath.string() + propsFiles[i];
-//	}
 
 
 	fs::path libsPath = path / "libs";
@@ -578,7 +562,7 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 //		cout << "NO " << fs::current_path() << endl;
 	}
 
-//	cout << "libFiles " << endl;
+
 	for (auto & s : libFiles) {
 		fs::path folder;
 		auto srcFS = fs::path(prefixPath / fs::relative(s, containedPath));

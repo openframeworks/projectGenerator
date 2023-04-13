@@ -1,6 +1,10 @@
 //#include "ofMain.h"
+#include "cxxopts.hpp"
+
 #include "optionparser.h"
 #include "defines.h"
+
+cxxopts::Options options("Project Generator", "OpenFrameworks tool to generate projects");
 enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTERNAL, VERSION};
 
 constexpr option::Descriptor usage[] =
@@ -9,13 +13,13 @@ constexpr option::Descriptor usage[] =
     {HELP, 0,"h", "help",option::Arg::None, "  --help  \tPrint usage and exit." },
     {RECURSIVE, 0,"r","recursive",option::Arg::None, "  --recursive, -r  \tupdate recursively (applies only to update)" },
     {LISTTEMPLATES, 0,"l","listtemplates",option::Arg::None, "  --listtemplates, -l  \tlist templates available for the specified or current platform(s)" },
-    {PLATFORMS, 0,"p","platforms",option::Arg::Optional, "  --platforms, -p  \tplatform list (such as osx, ios, winvs)" },
-    {ADDONS, 0,"a","addons",option::Arg::Optional, "  --addons, -a  \taddon list (such as ofxOpenCv, ofxGui, ofxXmlSettings)" },
-    {OFPATH, 0,"o","ofPath",option::Arg::Optional, "  --ofPath, -o  \tpath to openframeworks (relative or absolute). This *must* be set, or you can also alternatively use an environment variable PG_OF_PATH and if this isn't set, it will use that value instead" },
+    {PLATFORMS, 0,"p","platforms",option::Arg::None, "  --platforms, -p  \tplatform list (such as osx, ios, winvs)" },
+    {ADDONS, 0,"a","addons",option::Arg::None, "  --addons, -a  \taddon list (such as ofxOpenCv, ofxGui, ofxXmlSettings)" },
+    {OFPATH, 0,"o","ofPath",option::Arg::None, "  --ofPath, -o  \tpath to openframeworks (relative or absolute). This *must* be set, or you can also alternatively use an environment variable PG_OF_PATH and if this isn't set, it will use that value instead" },
     {VERBOSE, 0,"v","verbose",option::Arg::None, "  --verbose, -v  \trun verbose" },
-    {TEMPLATE, 0,"t","template",option::Arg::Optional, "  --template, -t  \tproject template" },
+    {TEMPLATE, 0,"t","template",option::Arg::None, "  --template, -t  \tproject template" },
     {DRYRUN, 0,"d","dryrun",option::Arg::None, "  --dryrun, -d  \tdry run, don't change files" },
-    {SRCEXTERNAL, 0,"s","source",option::Arg::Optional, "  --source, -s  \trelative or absolute path to source or include folders external to the project (such as ../../../../common_utils/" },
+    {SRCEXTERNAL, 0,"s","source",option::Arg::None, "  --source, -s  \trelative or absolute path to source or include folders external to the project (such as ../../../../common_utils/" },
     {VERSION, 0, "w", "version", option::Arg::None, "  --version, -w  \treturn the current version"},
     {0,0,0,0,0,0}
 };
@@ -25,6 +29,9 @@ constexpr option::Descriptor usage[] =
 #include "xcodeProject.h"
 #include "androidStudioProject.h"
 #include "Utils.h"
+
+using std::cout;
+using std::endl;
 
 namespace fs = of::filesystem;
 
@@ -337,8 +344,6 @@ void printHelp(){
 
 //-------------------------------------------
 int main(int argc, char* argv[]){
-    
-    
     //------------------------------------------- pre-parse
     bAddonsPassedIn = false;
     bDryRun = false;
@@ -356,24 +361,45 @@ int main(int argc, char* argv[]){
     std::string projectName = "";
     projectPath = "";
     templateName = "";
+	ofPath = "";
     
-    
+//	std::exit(0);
+	
+	options
+		.allow_unrecognised_options()
+		.add_options()
+			("o,ofPath", "path to openframeworks (relative or absolute). This *must* be set, or you can also alternatively use an environment variable PG_OF_PATH and if this isn't set, it will use that value instead") // a bool parameter
+			("i,integer", "Int param", cxxopts::value<int>())
+			("f,file", "File name", cxxopts::value<std::string>())
+			("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
+			;
+
+//	auto result = options.parse(argc, argv);
+//	cout << result["ofPath"].as<string>() << endl;
+	
+	cout << 1 << endl;
     // ------------------------------------------------------ parse args
     argc-=(argc>0); argv+=(argc>0); // skip program name argv[0] if present
     option::Stats  stats(usage, argc, argv);
     std::vector<option::Option> options(stats.options_max);
     std::vector<option::Option> buffer(stats.buffer_max);
     option::Parser parse(usage, argc, argv, &options[0], &buffer[0]);
+	
+	cout << 2 << endl;
+	
 	if (parse.error()) {
 		
 		return 1;
 	}
+	cout << 3 << endl;
+
     if (options[HELP] || argc == 0) {
 		ofLogError() << "No arguments";
         printHelp();
 		
         return EXIT_OK;
     }
+	cout << 4 << endl;
 
     // templates:
     if (options[LISTTEMPLATES].count() > 0){
@@ -391,7 +417,7 @@ int main(int argc, char* argv[]){
         printVersion();
         return EXIT_OK;
     }
-    
+	cout << 5 << endl;
     if (options[VERBOSE].count() > 0){
         bVerbose = true;
     }
@@ -433,13 +459,14 @@ int main(int argc, char* argv[]){
     }
 
 
+
     if (parse.nonOptionsCount() > 0){
         projectName = parse.nonOption(0);
     }
     
-    
     // ------------------------------------------------------ post parse
-    
+	
+	cout << "start" << endl;
     nProjectsUpdated = 0;
     nProjectsCreated = 0;
     of::priv::initutils();
@@ -457,9 +484,11 @@ int main(int argc, char* argv[]){
         busingEnvVar = true;
         ofPath = ofPathEnv;
     }
+	
+
     
  	currentWorkingDirectory = fs::current_path().string();
-
+	
     if (ofPath == "") {
 
         consoleSpace();
@@ -476,8 +505,12 @@ int main(int argc, char* argv[]){
 
 		// convert ofpath from relative to absolute by appending this to current path and calculating .. by canonical.
 		// FIXME: convert ofPath and functions to fs::path
+
+		cout << "cwd = " << fs::current_path() << endl;
+		
 		if (!fs::path(ofPath).is_absolute()) {
-			ofPath = fs::canonical(fs::current_path() / fs::path(ofPath)).string();
+			ofPath = (fs::current_path() / fs::path(ofPath)).lexically_normal().string();
+//			ofPath = fs::canonical(fs::current_path() / fs::path(ofPath)).string();
 		}
 		
         
@@ -486,6 +519,7 @@ int main(int argc, char* argv[]){
             return EXIT_USAGE;
         }
         
+
         setOFRoot(ofPath);
         
         

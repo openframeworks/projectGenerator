@@ -235,10 +235,12 @@ void getFoldersRecursively(const fs::path & path, std::vector < std::string > & 
 	}
 }
 
+using std::cout;
+using std::endl;
 
 void getFrameworksRecursively(const fs::path & path, std::vector < std::string > & frameworks, std::string platform){
 
-
+	cout << "getFrameworksRecursively" << endl;
 	ofDirectory dir;
 	dir.listDir(path);
 
@@ -260,6 +262,7 @@ void getFrameworksRecursively(const fs::path & path, std::vector < std::string >
 		}
 
 	}
+	cout << frameworks.size() << endl;
 }
 
 
