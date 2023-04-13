@@ -240,29 +240,16 @@ using std::endl;
 
 void getFrameworksRecursively(const fs::path & path, std::vector < std::string > & frameworks, std::string platform){
 
-	cout << "getFrameworksRecursively" << endl;
-	ofDirectory dir;
-	dir.listDir(path);
-
-	for (int i = 0; i < dir.size(); i++){
-
-		ofFile temp(dir.getFile(i));
-
-		if (temp.isDirectory()){
-			//getLibsRecursively(dir.getPath(i), folderNames);
-
-			// on osx, framework is a directory, let's not parse it....
-		std::string ext = "";
-		std::string first = "";
-			splitFromLast(dir.getPath(i), ".", first, ext);
-			if (ext != "framework")
-				getFrameworksRecursively(dir.getPath(i), frameworks, platform);
-			else
-				frameworks.push_back(dir.getPath(i));
+	for (const auto & entry : fs::directory_iterator(path)) {
+		auto f = entry.path();
+		if (fs::is_directory(f)) {
+			if (f.extension() == ".framework") {
+				frameworks.emplace_back(f.string());
+			} else {
+				getFrameworksRecursively(f, frameworks, platform);
+			}
 		}
-
 	}
-	cout << frameworks.size() << endl;
 }
 
 

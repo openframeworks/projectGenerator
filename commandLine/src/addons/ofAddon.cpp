@@ -587,61 +587,56 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 		l.path = fs::path(prefixPath / fs::relative(l.path, containedPath)).string();
 	}
 
-
-//	for (int i = 0; i < (int)libs.size(); i++){
-//
-//		cout << "libs path before " <<  libs[i].path << endl;
-//		// does libs[] have any path ? let's fix if so.
-//		int end = libs[i].path.rfind(fs::path("/").make_preferred().string());
-//		if (end > 0){
-//			libs[i].path.erase (libs[i].path.begin(), libs[i].path.begin() + containedPath.string().length());
-//			libs[i].path = prefixPath.string() + libs[i].path;
-//		}
-//		cout << "libs path after " <<  libs[i].path << endl;
-//
-//	}
 	
-
-	for (int i = 0; i < (int)frameworks.size(); i++){
-		cout << frameworks[i] << endl;
+	for (auto & f : frameworks) {
+		cout << f << endl;
 
 		// knowing if we are system framework or not is important....
-
 		bool bIsSystemFramework = false;
-		size_t foundUnixPath = frameworks[i].find('/');
-		size_t foundWindowsPath = frameworks[i].find('\\');
+		size_t foundUnixPath = f.find('/');
+		size_t foundWindowsPath = f.find('\\');
 		if (foundUnixPath==std::string::npos &&
 			foundWindowsPath==std::string::npos){
 			bIsSystemFramework = true;                  // we have no "path" so we are system
 		}
 
 		if (bIsSystemFramework){
-
 			; // do we need to do anything here?
-
 		} else {
+//			f.erase (f.begin(), f.begin() + containedPath.string().length());
+//
+//			int init = 0;
+//			int end = f.rfind(fs::path("/").make_preferred().string());
+//
+//			string folder;
+//			if (!isLocalAddon) {
+//				folder = f.substr(init, end);
+//			}
+//			else {
+//				init = f.find(name);
+//				folder = ofFilePath::join("local_addons", f.substr(init, end - init));
+//			}
 
+//			f = prefixPath.string() + f;
+//			filesToFolders[f] = folder;
+//			cout << "prefixPath = " << prefixPath << endl;
+//			cout << "containedPath = " << containedPath << endl;
+//			cout << "f = " << f  << endl;
+//			cout << "folder = " <<folder << endl;
 
-			frameworks[i].erase (frameworks[i].begin(), frameworks[i].begin() + containedPath.string().length());
+			
+			fs::path fPath { f };
+			fs::path rel = fs::relative (f, pathToProject);
+			fs::path folderFS = rel.parent_path();
+			filesToFolders[f] = folderFS.string();
 
-			int init = 0;
-			int end = frameworks[i].rfind(fs::path("/").make_preferred().string());
-
-			string folder;
-			if (!isLocalAddon) {
-				folder = frameworks[i].substr(init, end);
-			}
-			else {
-				init = frameworks[i].find(name);
-				folder = ofFilePath::join("local_addons", frameworks[i].substr(init, end - init));
-			}
-
-			frameworks[i] = prefixPath.string() + frameworks[i];
-
-			cout << frameworks[i]  << endl;
-			cout << folder << endl;
+			
+			cout << "pathToProject = " << pathToProject << endl;
+			cout << "rel " << rel << endl;
+			cout << "folderFS " << folderFS << endl;
+			
 			cout << "----" << endl;
-			filesToFolders[frameworks[i]] = folder;
+
 
 		}
 	}
