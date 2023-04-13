@@ -566,13 +566,9 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 	for (auto & s : libFiles) {
 		fs::path folder;
 		auto srcFS = fs::path(prefixPath / fs::relative(s, containedPath));
-
 		if (isLocalAddon) {
-			// FIXME: test if local addons is working ok
-			folder = fs::path("local_addons") / fs::path(s).parent_path();
 			folder = srcFS.parent_path();
 		} else {
-			folder = fs::path(s).parent_path();
 			folder = fs::relative(folder, containedPath);
 		}
 		
@@ -581,7 +577,7 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 		filesToFolders[s] = folder.string();
 	}
 
-
+	
 	// changing libs folder from absolute to relative.
 	for (auto & l : libs) {
 		l.path = fs::path(prefixPath / fs::relative(l.path, containedPath)).string();
@@ -589,7 +585,7 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 
 	
 	for (auto & f : frameworks) {
-		cout << f << endl;
+//		cout << f << endl;
 
 		// knowing if we are system framework or not is important....
 		bool bIsSystemFramework = false;
@@ -603,41 +599,16 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 		if (bIsSystemFramework){
 			; // do we need to do anything here?
 		} else {
-//			f.erase (f.begin(), f.begin() + containedPath.string().length());
-//
-//			int init = 0;
-//			int end = f.rfind(fs::path("/").make_preferred().string());
-//
-//			string folder;
-//			if (!isLocalAddon) {
-//				folder = f.substr(init, end);
-//			}
-//			else {
-//				init = f.find(name);
-//				folder = ofFilePath::join("local_addons", f.substr(init, end - init));
-//			}
 
-//			f = prefixPath.string() + f;
-//			filesToFolders[f] = folder;
-//			cout << "prefixPath = " << prefixPath << endl;
-//			cout << "containedPath = " << containedPath << endl;
-//			cout << "f = " << f  << endl;
-//			cout << "folder = " <<folder << endl;
-
-			
 			fs::path fPath { f };
 			fs::path rel = fs::relative (f, pathToProject);
 			fs::path folderFS = rel.parent_path();
 			filesToFolders[f] = folderFS.string();
 
-			
-			cout << "pathToProject = " << pathToProject << endl;
-			cout << "rel " << rel << endl;
-			cout << "folderFS " << folderFS << endl;
-			
-			cout << "----" << endl;
-
-
+			//			cout << "pathToProject = " << pathToProject << endl;
+//			cout << "rel " << rel << endl;
+//			cout << "folderFS " << folderFS << endl;
+//			cout << "----" << endl;
 		}
 	}
 

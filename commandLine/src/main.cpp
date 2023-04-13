@@ -363,19 +363,19 @@ int main(int argc, char** argv){
     templateName = "";
 	ofPath = "";
     
-	std::cout << "Have " << argc << " arguments:" << std::endl;
-	for (int i = 0; i < argc; ++i) {
-		std::cout << argv[i] << std::endl;
-	}
-	
-	options
-		.allow_unrecognised_options()
-		.add_options()
-			("h,help", "Print usage")
-			("o,ofPath", "path to openframeworks (relative or absolute). This *must* be set, or you can also alternatively use an environment variable PG_OF_PATH and if this isn't set, it will use that value instead") // a bool parameter
-			;
-
-	auto result = options.parse(argc, argv);
+//	std::cout << "Have " << argc << " arguments:" << std::endl;
+//	for (int i = 0; i < argc; ++i) {
+//		std::cout << argv[i] << std::endl;
+//	}
+//
+//	options
+//		.allow_unrecognised_options()
+//		.add_options()
+//			("h,help", "Print usage")
+//			("o,ofPath", "path to openframeworks (relative or absolute). This *must* be set, or you can also alternatively use an environment variable PG_OF_PATH and if this isn't set, it will use that value instead") // a bool parameter
+//			;
+//
+//	auto result = options.parse(argc, argv);
 	
 //	if (result.count("ofPath")) {
 //	  std::cout << options.help() << std::endl;
@@ -386,7 +386,6 @@ int main(int argc, char** argv){
 //		cout << result["ofPath"].as<std::string>() << endl;
 //	}
 	
-	cout << 1 << endl;
     // ------------------------------------------------------ parse args
     argc-=(argc>0); argv+=(argc>0); // skip program name argv[0] if present
     option::Stats  stats(usage, argc, argv);
@@ -417,12 +416,12 @@ int main(int argc, char** argv){
     if (options[DRYRUN].count() > 0){
         bDryRun = true;
     }
-//    if (options[VERSION].count() > 0){
-//        printVersion();
-//        return EXIT_OK;
-//    }
-	cout << 5 << endl;
-    if (options[VERBOSE].count() > 0){
+    if (options[VERSION].count() > 0){
+        printVersion();
+        return EXIT_OK;
+    }
+
+	if (options[VERBOSE].count() > 0){
         bVerbose = true;
     }
     
@@ -470,7 +469,6 @@ int main(int argc, char** argv){
     
     // ------------------------------------------------------ post parse
 	
-	cout << "start" << endl;
     nProjectsUpdated = 0;
     nProjectsCreated = 0;
     of::priv::initutils();
@@ -509,8 +507,6 @@ int main(int argc, char** argv){
 
 		// convert ofpath from relative to absolute by appending this to current path and calculating .. by canonical.
 		// FIXME: convert ofPath and functions to fs::path
-
-		cout << "cwd = " << fs::current_path() << endl;
 		
 		if (!fs::path(ofPath).is_absolute()) {
 			ofPath = (fs::current_path() / fs::path(ofPath)).lexically_normal().string();
