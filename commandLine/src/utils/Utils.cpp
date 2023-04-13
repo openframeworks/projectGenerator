@@ -53,12 +53,10 @@ void findandreplace( std::string& tInput, std::string tFind, std::string tReplac
 }
 
 
-std::string LoadFileAsString(const std::string & fn)
-{
+std::string LoadFileAsString(const std::string & fn) {
 	std::ifstream fin(fn.c_str());
 
-	if(!fin)
-	{
+	if(!fin) {
 		// throw exception
 	}
 
@@ -82,22 +80,7 @@ void findandreplaceInTexfile (const fs::path & fileName, std::string tFind, std:
 		myfile << bufferStr;
 		myfile.close();
 
-	/*
-	std::ifstream ifile(ofToDataPath(fileName).c_str(),std::ios::binary);
-	ifile.seekg(0,std::ios_base::end);
-	long s=ifile.tellg();
-	char *buffer=new char[s];
- 	ifile.seekg(0);
-	ifile.read(buffer,s);
-	ifile.close();
-	std::string txt(buffer,s);
-	delete[] buffer;
-	findandreplace(txt, tFind, tReplace);
-	std::ofstream ofile(ofToDataPath(fileName).c_str());
-	ofile.write(txt.c_str(),txt.size());
-	*/
-		//return 0;
-   } else {
+	} else {
 	   ; // some error checking here would be good.
    }
 }
@@ -147,10 +130,8 @@ pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::strin
 
 }
 
-// todo -- this doesn't use ofToDataPath -- so it's broken a bit.  can we fix?
+
 void getFilesRecursively(const fs::path & path, std::vector < string > & fileNames){
-	//	cout << "---- getFilesRecursively :: " << path << endl;
-	
 	for (const auto & entry : fs::directory_iterator(path)) {
 		auto f = entry.path();
 		if (ofIsStringInString(f.filename().string(),".framework")) continue; // ignore frameworks
@@ -159,13 +140,13 @@ void getFilesRecursively(const fs::path & path, std::vector < string > & fileNam
 			if (f.filename() != fs::path(".git")) { // ignore git dir
 				getFilesRecursively(f, fileNames);
 			}
-		}
-		else {
+		} else {
 			// FIXME - update someday to fs::path
-			fileNames.emplace_back(f.string());
+			fileNames.emplace_back(f);
 		}
 	}
 }
+
 
 void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileNames){
 	for (const auto & entry : fs::directory_iterator(path)) {
@@ -176,8 +157,7 @@ void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileN
 			if (f.filename() != fs::path(".git")) { // ignore git dir
 				getFilesRecursively(f, fileNames);
 			}
-		}
-		else {
+		} else {
 			fileNames.emplace_back(f);
 		}
 	}
@@ -230,7 +210,6 @@ void getFoldersRecursively(const fs::path & path, std::vector < std::string > & 
 				getFoldersRecursively(dir.getPath(i), folderNames, platform);
 			}
 		}
-		// FIXME: convert folderNames to path
 		folderNames.push_back(path.string());
 	}
 }
@@ -238,8 +217,7 @@ void getFoldersRecursively(const fs::path & path, std::vector < std::string > & 
 using std::cout;
 using std::endl;
 
-void getFrameworksRecursively(const fs::path & path, std::vector < std::string > & frameworks, std::string platform){
-
+void getFrameworksRecursively(const fs::path & path, std::vector < std::string > & frameworks, std::string platform) {
 	for (const auto & entry : fs::directory_iterator(path)) {
 		auto f = entry.path();
 		if (fs::is_directory(f)) {
@@ -255,26 +233,37 @@ void getFrameworksRecursively(const fs::path & path, std::vector < std::string >
 
 
 void getPropsRecursively(const fs::path & path, std::vector < std::string > & props, const std::string & platform) {
-
-	if(!ofDirectory::doesDirectoryExist(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
-	ofDirectory dir;
-	dir.listDir(path);
-
-	for (auto & temp : dir) {
-		if (temp.isDirectory()) {
-			//skip example directories - this is needed as we are search all folders in the addons root path
-			if( temp.getFileName().rfind("example", 0) == 0) continue;
-			getPropsRecursively(temp.path(), props, platform);
-		}
-		else {
-			std::string ext = "";
-			std::string first = "";
-			splitFromLast(temp.path(), ".", first, ext);
-			if (ext == "props") {
-				props.push_back(temp.path());
+//	if(!ofDirectory::doesDirectoryExist(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
+//	ofDirectory dir;
+//	dir.listDir(path);
+//	for (auto & temp : dir) {
+//		if (temp.isDirectory()) {
+//			//skip example directories - this is needed as we are search all folders in the addons root path
+//			if( temp.getFileName().rfind("example", 0) == 0) continue;
+//			getPropsRecursively(temp.path(), props, platform);
+//		}
+//		else {
+//			std::string ext = "";
+//			std::string first = "";
+//			splitFromLast(temp.path(), ".", first, ext);
+//			if (ext == "props") {
+//				props.push_back(temp.path());
+//			}
+//		}
+//	}
+	
+	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
+	for (const auto & entry : fs::directory_iterator(path)) {
+		auto f = entry.path();
+		if (fs::is_directory(f)) {
+			// FIXME: update to fs::path check;
+			if( f.string().rfind("example", 0) == 0) continue;
+			getPropsRecursively(f, props, platform);
+		} else {
+			if (f.extension() == ".props") {
+				props.emplace_back(f);
 			}
 		}
-
 	}
 }
 
@@ -318,12 +307,7 @@ using std::cout;
 using std::endl;
 void getLibsRecursively(const fs::path & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform, std::string arch, std::string target){
 //	cout << "getLibsRecursively " << path << endl;
-//	ofDirectory dir;
-//	dir.listDir(path);
 
-
-
-//	for (int i = 0; i < dir.size(); i++){
 	for (const auto & entry : fs::directory_iterator(path)) {
 		auto f = entry.path();
 

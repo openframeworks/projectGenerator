@@ -528,9 +528,7 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 	}
 
 	// FIXME: propsFiles to fs::path
-	
 	for (auto & s : propsFiles) {
-		
 		fs::path folder;
 		if (isLocalAddon) {
 			// FIXME: test if local addons is working ok
@@ -539,7 +537,6 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 			folder = fs::path(s).parent_path();
 			folder = fs::relative(folder, containedPath);
 		}
-		
 		s = fs::path(prefixPath / fs::relative(s, containedPath)).string();
 	}
 
@@ -549,19 +546,13 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 
 	if (fs::exists(libsPath)) {
 		getLibsRecursively(libsPath, libFiles, libs, platform);
-
 		if (platform == "osx" || platform == "ios"){
 			getFrameworksRecursively(libsPath, frameworks, platform);
 		}
-
 		if(platform == "vs" || platform == "msys2"){
 			getDllsRecursively(libsPath, dllsToCopy, platform);
 		}
 	}
-	else {
-//		cout << "NO " << fs::current_path() << endl;
-	}
-
 
 	for (auto & s : libFiles) {
 		fs::path folder;
@@ -571,7 +562,6 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 		} else {
 			folder = fs::relative(folder, containedPath);
 		}
-		
 		s = srcFS.string();
 		srcFiles.emplace_back(s);
 		filesToFolders[s] = folder.string();
