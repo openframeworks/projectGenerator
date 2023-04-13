@@ -363,7 +363,6 @@ int main(int argc, char* argv[]){
     templateName = "";
 	ofPath = "";
     
-//	std::exit(0);
 	
 	options
 		.allow_unrecognised_options()
@@ -373,7 +372,10 @@ int main(int argc, char* argv[]){
 			("f,file", "File name", cxxopts::value<std::string>())
 			("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
 			;
-
+	std::cout << "Have " << argc << " arguments:" << std::endl;
+	for (int i = 0; i < argc; ++i) {
+		std::cout << argv[i] << std::endl;
+	}
 //	auto result = options.parse(argc, argv);
 //	cout << result["ofPath"].as<string>() << endl;
 	
@@ -413,10 +415,10 @@ int main(int argc, char* argv[]){
     if (options[DRYRUN].count() > 0){
         bDryRun = true;
     }
-    if (options[VERSION].count() > 0){
-        printVersion();
-        return EXIT_OK;
-    }
+//    if (options[VERSION].count() > 0){
+//        printVersion();
+//        return EXIT_OK;
+//    }
 	cout << 5 << endl;
     if (options[VERBOSE].count() > 0){
         bVerbose = true;
