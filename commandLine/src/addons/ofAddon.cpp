@@ -504,7 +504,7 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 		return false;
 	}
 
-	auto srcPath = path / "src";
+	fs::path srcPath = path / "src";
 
 	if (fs::exists(srcPath)) {
 		getFilesRecursively(srcPath, srcFiles);
@@ -609,13 +609,13 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 
 	// get every folder in addon/src and addon/libs
 	vector < string > libFolders;
-	if(ofDirectory(libsPath).exists()){
+	if (fs::exists(libsPath)) {
 		getFoldersRecursively(libsPath, libFolders, platform);
 	}
 
 	vector < string > srcFolders;
-	if(ofDirectory(srcPath).exists()){
-		getFoldersRecursively(path / "src", srcFolders, platform);
+	if (fs::exists(srcPath)) {
+		getFoldersRecursively(srcPath, srcFolders, platform);
 	}
 
 	// convert paths to relative

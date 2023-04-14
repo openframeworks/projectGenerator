@@ -302,27 +302,30 @@ void baseProject::addAddon(std::string addonName){
 
 	// Process values from ADDON_DATA
 	if(addon.data.size()){
+		for(auto & data : addon.data){
+//			cout << "data = " << data << endl;
+			std::string d = data;
+			ofStringReplace(d, "data/", ""); // avoid to copy files at /data/data/*
 
-		for(auto& d : addon.data){
-
-			fs::path path(ofFilePath::join(addon.addonPath, d));
-
+			fs::path path { addon.addonPath / data };
+			fs::path dest { projectDir / "bin" / "data" };
+			
+			if (addon.isLocalAddon) {
+				path = addon.pathToProject / path;
+			}
+			
 			if(fs::exists(path)){
 				if (fs::is_regular_file(path)){
-					ofFile src({path});
-					string dest = ofFilePath::join(projectDir, "bin/data/");
-					ofStringReplace(d, "data/", ""); // avoid to copy files at /data/data/*
-					bool success = src.copyTo(ofFilePath::join(dest, d), false, true);
+					ofFile src(path);
+					bool success = src.copyTo(dest / d, false, true);
 					if(success){
 						ofLogVerbose() << "adding addon data file: " << d;
 					}else {
 						ofLogWarning() << "Can not add addon data file: " << d;
 					}
 				}else if(fs::is_directory(path)){
-					ofDirectory dir({path});
-					string dest = ofFilePath::join(projectDir, "bin/data/");
-					ofStringReplace(d, "data/", ""); // avoid to copy files at /data/data/*
-					bool success = dir.copyTo(ofFilePath::join(dest, d), false, true);
+					ofDirectory dir(path);
+					bool success = dir.copyTo(dest / d, false, true);
 					if(success){
 						ofLogVerbose() << "adding addon data folder: " << d;
 					}else{

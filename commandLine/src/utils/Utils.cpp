@@ -32,6 +32,9 @@
 using std::unique_ptr;
 namespace fs = of::filesystem;
 
+using std::cout;
+using std::endl;
+
 std::string generateUUID(std::string input){
 	return uuidxx::uuid::Generate().ToString();
 }
@@ -132,14 +135,15 @@ pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::strin
 
 
 void getFilesRecursively(const fs::path & path, std::vector < string > & fileNames){
+	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
+	if (!fs::is_directory(path)) return;
 	for (const auto & entry : fs::directory_iterator(path)) {
 		auto f = entry.path();
+		if (f.filename().c_str()[0] == '.') continue; // avoid hidden files .DS_Store .vscode .git etc
 		if (ofIsStringInString(f.filename().string(),".framework")) continue; // ignore frameworks
 		
 		if (fs::is_directory(f)) {
-			if (f.filename() != fs::path(".git")) { // ignore git dir
-				getFilesRecursively(f, fileNames);
-			}
+			getFilesRecursively(f, fileNames);
 		} else {
 			// FIXME - update someday to fs::path
 			fileNames.emplace_back(f);
@@ -149,8 +153,11 @@ void getFilesRecursively(const fs::path & path, std::vector < string > & fileNam
 
 
 void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileNames){
+	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
+	if (!fs::is_directory(path)) return;
 	for (const auto & entry : fs::directory_iterator(path)) {
 		auto f = entry.path();
+		if (f.filename().c_str()[0] == '.') continue; // avoid hidden files .DS_Store .vscode .git etc
 		if (ofIsStringInString(f.filename().string(),".framework")) continue; // ignore frameworks
 		
 		if (fs::is_directory(f)) {
@@ -200,34 +207,48 @@ void splitFromFirst(std::string toSplit, std::string deliminator, std::string & 
 
 
 void getFoldersRecursively(const fs::path & path, std::vector < std::string > & folderNames, std::string platform){
-	ofDirectory dir;
-
-	if (!ofIsStringInString(path.string(), ".framework")){
-		dir.listDir(path);
-		for (int i = 0; i < dir.size(); i++){
-			ofFile temp(dir.getFile(i));
-			if (temp.isDirectory() && isFolderNotCurrentPlatform(temp.getFileName(), platform) == false ){
-				getFoldersRecursively(dir.getPath(i), folderNames, platform);
+	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
+	if (!fs::is_directory(path)) return;
+	if (path.extension() != ".framework") {
+		for (const auto & entry : fs::directory_iterator(path)) {
+			auto f = entry.path();
+			if (f.filename().c_str()[0] == '.') continue; // avoid hidden files .DS_Store .vscode .git etc
+			if (fs::is_directory(f)  && isFolderNotCurrentPlatform(f.string(), platform) == false ) {
+				getFoldersRecursively(f, folderNames, platform);
 			}
 		}
-		folderNames.push_back(path.string());
+		folderNames.emplace_back(path.string());
 	}
+	
+//	ofDirectory dir;
+//
+//	if (!ofIsStringInString(path.string(), ".framework")){
+//		dir.listDir(path);
+//		for (int i = 0; i < dir.size(); i++){
+//			ofFile temp(dir.getFile(i));
+//			if (temp.isDirectory() && isFolderNotCurrentPlatform(temp.getFileName(), platform) == false ){
+//				getFoldersRecursively(dir.getPath(i), folderNames, platform);
+//			}
+//		}
+//		folderNames.push_back(path.string());
+//	}
 }
 
-using std::cout;
-using std::endl;
-
 void getFrameworksRecursively(const fs::path & path, std::vector < std::string > & frameworks, std::string platform) {
+	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
+	if (!fs::is_directory(path)) return;
 	for (const auto & entry : fs::directory_iterator(path)) {
 		auto f = entry.path();
+		if (f.filename().c_str()[0] == '.') continue; // avoid hidden files .DS_Store .vscode .git etc
+		
 		if (fs::is_directory(f)) {
 			if (f.extension() == ".framework") {
 				frameworks.emplace_back(f.string());
 			} else {
-				if (f.filename() == fs::path(".git")) continue;
 				if (f.filename() == fs::path("mediaAssets")) continue;
 				if (f.extension() == ".xcodeproj") continue;
 				if( f.string().rfind("example", 0) == 0) continue;
+				//				if (f.filename() == fs::path(".git")) continue;
 
 				getFrameworksRecursively(f, frameworks, platform);
 			}
@@ -239,14 +260,17 @@ void getFrameworksRecursively(const fs::path & path, std::vector < std::string >
 
 void getPropsRecursively(const fs::path & path, std::vector < std::string > & props, const std::string & platform) {
 	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
+	if (!fs::is_directory(path)) return;
 	for (const auto & entry : fs::directory_iterator(path)) {
 		auto f = entry.path();
+		if (f.filename().c_str()[0] == '.') continue; // avoid hidden files .DS_Store .vscode .git etc
+
 		if (fs::is_directory(f)) {
-			if (f.filename() == fs::path(".git")) continue;
 			if (f.filename() == fs::path("mediaAssets")) continue;
 			if (f.extension() == ".xcodeproj") continue;
 			if( f.string().rfind("example", 0) == 0) continue;
-			
+//			if (f.filename() == fs::path(".git")) continue;
+
 			getPropsRecursively(f, props, platform);
 		} else {
 			if (f.extension() == ".props") {
@@ -278,19 +302,6 @@ void getDllsRecursively(const fs::path & path, std::vector < std::string > & dll
 	}
 }
 
-//
-//
-//	if (ofIsStringInString(f.filename().string(),".framework")) continue; // ignore frameworks
-//
-//	if (fs::is_directory(f)) {
-//		if (f.filename() != fs::path(".git")) { // ignore git dir
-//			getFilesRecursively(f, fileNames);
-//		}
-//	}
-//	else {
-//		fileNames.emplace_back(f);
-//	}
-//}
 
 
 using std::cout;
@@ -298,6 +309,8 @@ using std::endl;
 void getLibsRecursively(const fs::path & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform, std::string arch, std::string target){
 //	cout << "getLibsRecursively " << path << endl;
 
+	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
+	if (!fs::is_directory(path)) return;
 	for (const auto & entry : fs::directory_iterator(path)) {
 		auto f = entry.path();
 
