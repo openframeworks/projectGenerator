@@ -144,11 +144,13 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 //		templateDir.setShowHidden(true);
 		auto templateConfig = parseTemplate(templateDir);
 		if(templateConfig){
-			// FIXME: FS - temporary placeholder to make it work.
 			recursiveTemplateCopy(templateDir, projectDir);
 			for(auto & rename: templateConfig->renames){
+				
 				auto from = projectDir / rename.first;
 				auto to = projectDir / rename.second;
+//				auto to = projectDir / templateConfig->renames[rename.first];
+
 //				moveTo(const of::filesystem::path& path, bool bRelativeToData = true, bool overwrite = false);
 				ofFile(from).moveTo(to,true,true);
 			}
@@ -250,9 +252,7 @@ bool baseProject::isAddonInCache(const std::string & addonPath, const std::strin
 	return addonsCache[platform].find(addonPath) != addonsCache[platform].end();
 }
 
-// FIXME: What? there are wto addAddon functions, one with string, another with addon.
 void baseProject::addAddon(std::string addonName){
-//	alert("addAddon string :: " + addonName, 31);
 	ofAddon addon;
 	addon.pathToOF = getOFRelPath(projectDir.string());
 	addon.pathToProject = ofFilePath::getAbsolutePath(projectDir);
@@ -301,8 +301,9 @@ void baseProject::addAddon(std::string addonName){
 			
 			if(fs::exists(path)){
 				if (fs::is_regular_file(path)){
-					// FIXME: FS
+					// TODO: FS
 					ofFile src(path);
+					//	bool copyTo(const of::filesystem::path& path, bool bRelativeToData = true, bool overwrite = false) const;
 					bool success = src.copyTo(dest / d, false, true);
 					if(success){
 						ofLogVerbose() << "adding addon data file: " << d;
@@ -310,8 +311,9 @@ void baseProject::addAddon(std::string addonName){
 						ofLogWarning() << "Can not add addon data file: " << d;
 					}
 				}else if(fs::is_directory(path)){
-					// FIXME: FS
+					// TODO: FS
 					ofDirectory dir(path);
+//					bool copyTo(const of::filesystem::path& path, bool bRelativeToData = true, bool overwrite = false);
 					bool success = dir.copyTo(dest / d, false, true);
 					if(success){
 						ofLogVerbose() << "adding addon data folder: " << d;
@@ -406,7 +408,6 @@ void baseProject::addSrcRecursively(std::string srcPath){
 	}
 }
 
-	// FIXME: I think this one is not being invoked
 void baseProject::addAddon(ofAddon & addon){
 	for(int i=0;i<(int)addons.size();i++){
 		if(addons[i].name==addon.name){
@@ -414,6 +415,9 @@ void baseProject::addAddon(ofAddon & addon){
 		}
 	}
 
+	// FIXME: Test this, I suppose this is only invoked when an addon is added
+	// from a dependency of another addon, and it has its own dependencies too.
+	
 	cout << "---> dependencies" << endl;
 	for (auto & d : addon.dependencies) {
 		bool found = false;
