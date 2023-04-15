@@ -50,6 +50,7 @@ bool QtCreatorProject::createProjectFile(){
 
 
 	// handle the relative roots.
+	// FIXME: FS
 	std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
 	if (relRoot != "../../../"){
 		std::string relPath2 = relRoot;
@@ -149,5 +150,5 @@ void QtCreatorProject::addAddon(ofAddon & addon){
 		if(addons[i].name==addon.name) return;
 	}
 
-	addons.push_back(addon);
+	addons.emplace_back(addon);
 }

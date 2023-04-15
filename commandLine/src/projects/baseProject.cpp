@@ -12,34 +12,24 @@
 #include "Utils.h"
 #include "ofConstants.h"
 #include <list>
+#include <set>
 
 using std::string;
 using std::vector;
-//using std::cout;
-//using std::endl;
 namespace fs = of::filesystem;
+// Temporary
+using std::cout;
+using std::endl;
 
-const std::string templatesFolder = "scripts/templates/";
+const fs::path templatesFolder = "scripts/templates";
 
 baseProject::baseProject(std::string _target){
 	bLoaded = false;
 	target = _target;
 }
 
-std::string baseProject::getPlatformTemplateDir(){
-	return ofFilePath::join(getOFRoot(),templatesFolder + target);
-}
-
-void recursiveTemplateCopy(const ofDirectory & templateDir, ofDirectory & projectDir){
-	for(auto & f: templateDir){
-		if(f.isDirectory()){
-			ofDirectory templateSubDir(f.path());
-			ofDirectory projectSubDir(ofFilePath::join(projectDir.path(),f.getFileName()));
-			recursiveTemplateCopy(templateSubDir, projectSubDir);
-		}else if(f.getFileName()!="template.config"){
-			f.copyTo(ofFilePath::join(projectDir.path(),f.getFileName()),false,true);
-		}
-	}
+fs::path baseProject::getPlatformTemplateDir(){
+	return getOFRoot() / templatesFolder / target;
 }
 
 bool isPlatformName(std::string file){
@@ -77,7 +67,7 @@ std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirect
 						if(platform==target){
 							supported = true;
 						}
-						templateConfig->platforms.push_back(platform);
+						templateConfig->platforms.emplace_back(platform);
 					}
 				}else if(var=="DESCRIPTION"){
 					templateConfig->description = value;
@@ -102,55 +92,68 @@ std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirect
 std::vector<baseProject::Template> baseProject::listAvailableTemplates(std::string target){
 	std::vector<baseProject::Template> templates;
 
-	ofDirectory templatesDir(ofFilePath::join(getOFRoot(),templatesFolder));
-	for(auto & f: templatesDir.getSorted()){
-		if(f.isDirectory()){
-			auto templateConfig = parseTemplate(ofDirectory(f));
-			if(templateConfig){
-				templates.push_back(*templateConfig);
-			}
+	std::set<fs::path> sorted;
+	for (const auto & entry : fs::directory_iterator(getOFRoot() / templatesFolder)) {
+		auto f = entry.path();
+		if (fs::is_directory(f)) {
+			sorted.insert(f);
 		}
 	}
+	
+	for (auto & s : sorted) {
+		auto templateConfig = parseTemplate(s);
+		if(templateConfig){
+			templates.emplace_back(*templateConfig);
+		}
+	}
+
 	return templates;
 }
 
 bool baseProject::create(const fs::path & _path, std::string templateName){
+	auto path = _path; // just because it is const
+	
 	templatePath = getPlatformTemplateDir();
 	addons.clear();
 	extSrcPaths.clear();
-	auto path = _path;
 
-	if(!ofFilePath::isAbsolute(path)){
-		path = (fs::current_path() / fs::path(path)).string();
+	if(!path.is_absolute()){
+		path = fs::current_path() / path;
 	}
 	projectDir = path;
-
-	projectName = ofFilePath::getFileName(path);
+	projectName = path.parent_path().filename();
 	bool bDoesDirExist = false;
 
-	ofDirectory project(ofFilePath::join(projectDir,"src"));    // this is a directory, really?
-	if(project.exists()){
+	fs::path project { projectDir / "src" };
+	if (fs::exists(project) && fs::is_directory(project)) {
 		bDoesDirExist = true;
 	}else{
-		ofDirectory project(projectDir);
-		ofDirectory(ofFilePath::join(templatePath,"src")).copyTo(ofFilePath::join(projectDir,"src"));
-		ofDirectory(ofFilePath::join(templatePath,"bin")).copyTo(ofFilePath::join(projectDir,"bin"));
+		// MARK: ofDirectory?
+//		bool copyTo(const of::filesystem::path& path, bool bRelativeToData = true, bool overwrite = false);
+		ofDirectory(templatePath / "src").copyTo(projectDir / "src");
+		ofDirectory(templatePath / "bin").copyTo(projectDir / "bin");
 	}
 
 	bool ret = createProjectFile();
 	if(!ret) return false;
 
+	//MARK: -
 	if(templateName!=""){
-		auto name = ofFilePath::join(getOFRoot(),templatesFolder + templateName);
-		ofDirectory templateDir(ofFilePath::join(getOFRoot(),templatesFolder + templateName));
-		templateDir.setShowHidden(true);
+		fs::path templateDir = getOFRoot() / templatesFolder / templateName;
+
+		// TODO: PORT
+// !!!: asdf
+//		templateDir.setShowHidden(true);
 		auto templateConfig = parseTemplate(templateDir);
 		if(templateConfig){
-			ofDirectory project(projectDir);
-			recursiveTemplateCopy(templateDir,project);
+			recursiveTemplateCopy(templateDir, projectDir);
 			for(auto & rename: templateConfig->renames){
-				auto from = (projectDir / rename.first).string();
-				auto to = (projectDir / rename.second).string();
+				
+				auto from = projectDir / rename.first;
+				auto to = projectDir / rename.second;
+//				auto to = projectDir / templateConfig->renames[rename.first];
+
+//				moveTo(const of::filesystem::path& path, bool bRelativeToData = true, bool overwrite = false);
 				ofFile(from).moveTo(to,true,true);
 			}
 		}else{
@@ -179,10 +182,8 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 				fileName != "src/main.cpp" &&
 				fileName != "src/ofApp.mm" &&
 				fileName != "src/main.mm") {
-//				cout << "add filename:: " << rel << " :: " << folder << endl;
 				addSrc(rel.string(), folder.string());
 			} else {
-//				cout << "not adding filename:: " << rel << " :: " << folder << endl;
 			}
 		}
 
@@ -249,47 +250,33 @@ bool baseProject::save(){
 }
 
 bool baseProject::isAddonInCache(const std::string & addonPath, const std::string platform){
-	auto it = addonsCache.find(platform);
-	if (it == addonsCache.end()) return false;
-	auto it2 = it->second.find(addonPath);
-	return it2 != it->second.end();
+	if (addonsCache.find(platform) == addonsCache.end()) return false;
+	return addonsCache[platform].find(addonPath) != addonsCache[platform].end();
 }
 
-using std::cout;
-using std::endl;
 void baseProject::addAddon(std::string addonName){
 	ofAddon addon;
-//	cout << projectDir << endl;
 	addon.pathToOF = getOFRelPath(projectDir.string());
 	addon.pathToProject = ofFilePath::getAbsolutePath(projectDir);
 
 	bool addonOK = false;
-
 	bool inCache = isAddonInCache(addonName, target);
-	//inCache = false; //to test no-cache scenario
-
-	if (fs::exists(addonName)) {
+	
+	fs::path addonPath { addonName };
+	if (fs::exists(addonPath)) {
 		addon.isLocalAddon = true;
-		if(!inCache){
-
-			addonOK = addon.fromFS(addonName, target);
-		}else{
-			addon = addonsCache[target][addonName];
-			addonOK = true;
-		}
-	}
-	
-	
-	else{
+	} else {
+		addonPath = fs::path(getOFRoot()) / "addons" / addonName;
 		addon.isLocalAddon = false;
-		auto standardPath = ofFilePath::join(ofFilePath::join(getOFRoot(), "addons"), addonName);
-		if(!inCache){
-			addonOK = addon.fromFS(standardPath, target);
-		}else{
-			addon = addonsCache[target][addonName];
-			addonOK = true;
-		}
 	}
+	
+	if(!inCache){
+		addonOK = addon.fromFS(addonPath, target);
+	}else{
+		addon = addonsCache[target][addonName];
+		addonOK = true;
+	}
+
 	if(!addonOK){
 		ofLogVerbose() << "Ignoring addon that doesn't seem to exist: " << addonName;
 		return; //if addon does not exist, stop early
@@ -298,31 +285,38 @@ void baseProject::addAddon(std::string addonName){
 	if(!inCache){
 		addonsCache[target][addonName] = addon; //cache the addon so we dont have to be reading form disk all the time
 	}
+	
 	addAddon(addon);
 
 	// Process values from ADDON_DATA
 	if(addon.data.size()){
+		for(auto & data : addon.data){
+			std::string d = data;
+			ofStringReplace(d, "data/", ""); // avoid to copy files at /data/data/*
 
-		for(auto& d : addon.data){
-
-			fs::path path(ofFilePath::join(addon.addonPath, d));
-
+			fs::path path { addon.addonPath / data };
+			fs::path dest { projectDir / "bin" / "data" };
+			
+			if (addon.isLocalAddon) {
+				path = addon.pathToProject / path;
+			}
+			
 			if(fs::exists(path)){
 				if (fs::is_regular_file(path)){
-					ofFile src({path});
-					string dest = ofFilePath::join(projectDir, "bin/data/");
-					ofStringReplace(d, "data/", ""); // avoid to copy files at /data/data/*
-					bool success = src.copyTo(ofFilePath::join(dest, d), false, true);
+					// TODO: FS
+					ofFile src(path);
+					//	bool copyTo(const of::filesystem::path& path, bool bRelativeToData = true, bool overwrite = false) const;
+					bool success = src.copyTo(dest / d, false, true);
 					if(success){
 						ofLogVerbose() << "adding addon data file: " << d;
 					}else {
 						ofLogWarning() << "Can not add addon data file: " << d;
 					}
 				}else if(fs::is_directory(path)){
-					ofDirectory dir({path});
-					string dest = ofFilePath::join(projectDir, "bin/data/");
-					ofStringReplace(d, "data/", ""); // avoid to copy files at /data/data/*
-					bool success = dir.copyTo(ofFilePath::join(dest, d), false, true);
+					// TODO: FS
+					ofDirectory dir(path);
+//					bool copyTo(const of::filesystem::path& path, bool bRelativeToData = true, bool overwrite = false);
+					bool success = dir.copyTo(dest / d, false, true);
 					if(success){
 						ofLogVerbose() << "adding addon data folder: " << d;
 					}else{
@@ -336,8 +330,9 @@ void baseProject::addAddon(std::string addonName){
 	}
 }
 
+// FIXME: FS parameter
 void baseProject::addSrcRecursively(std::string srcPath){
-	extSrcPaths.push_back(srcPath);
+	extSrcPaths.emplace_back(srcPath);
 	vector < string > srcFilesToAdd;
 
 	//so we can just pass through the file paths
@@ -356,7 +351,8 @@ void baseProject::addSrcRecursively(std::string srcPath){
 	//we want folders added for shared_of_code/ and any subfolders, but not folders added for /user/ /user/person/ etc
 	string parentFolder = ofFilePath::getEnclosingDirectory(ofFilePath::removeTrailingSlash(srcPath));
 
-	std::map <std::string, std::string> uniqueIncludeFolders;
+	// FIXME: - I've inspected this map and it is kinda silly because the key is always equal to the value (first = second)
+	std::unordered_map <std::string, std::string> uniqueIncludeFolders;
 	for( auto & fileToAdd : srcFilesToAdd){
 //		cout << "fileToAdd :: " << fileToAdd << endl;
 		//if it is an absolute path it is easy - add the file and enclosing folder to the project
@@ -378,7 +374,6 @@ void baseProject::addSrcRecursively(std::string srcPath){
 			addSrc(fileToAdd, folder);
 			uniqueIncludeFolders[absFolder] = absFolder;
 		}else{
-
 			auto absPath = fileToAdd;
 
 			//if it is a realtive path make the file relative to the project folder
@@ -406,7 +401,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 			addSrc(relPathPathToAdd, folder);
 			uniqueIncludeFolders[includeFolder] = includeFolder;
 		}
-		}
+	}
 
 	//do it this way so we don't try and add a include folder for each file ( as it checks if they are already added ) so should be faster
 	for(auto & includeFolder : uniqueIncludeFolders){
@@ -417,25 +412,34 @@ void baseProject::addSrcRecursively(std::string srcPath){
 }
 
 void baseProject::addAddon(ofAddon & addon){
-
 	for(int i=0;i<(int)addons.size();i++){
 		if(addons[i].name==addon.name){
 			return;
 		}
 	}
 
-	for(int i=0;i<addon.dependencies.size();i++){
-		for(int j=0;j<(int)addons.size();j++){
-			if(addon.dependencies[i] != addons[j].name){ //make sure dependencies of addons arent already added to prj
-				addAddon(addon.dependencies[i]);
-			}else{
-				ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << addon.dependencies[i];
+	// FIXME: Test this, I suppose this is only invoked when an addon is added
+	// from a dependency of another addon, and it has its own dependencies too.
+	
+	cout << "---> dependencies" << endl;
+	for (auto & d : addon.dependencies) {
+		bool found = false;
+		for (auto & a : addons) {
+			if (a.name == d) {
+				found = true;
+				break;
 			}
 		}
+		if (!found) {
+			alert(">>>> addaddon :: " + d, 35);
+			addAddon(d);
+		} else {
+			ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << d;
+		}
 	}
+	cout << "---> " << endl;
 
-
-	addons.push_back(addon);
+	addons.emplace_back(addon);
 
 	ofLogVerbose("baseProject") << "libs in addAddon " << addon.libs.size();
 	for(auto & lib: addon.libs){
@@ -464,23 +468,23 @@ void baseProject::addAddon(ofAddon & addon){
 	}
 	for(int i=0;i<(int)addon.srcFiles.size(); i++){
 		ofLogVerbose() << "adding addon srcFiles: " << addon.srcFiles[i];
-		addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
+		addSrc(addon.srcFiles[i], addon.filesToFolders[addon.srcFiles[i]]);
 	}
 	for(int i=0;i<(int)addon.csrcFiles.size(); i++){
 		ofLogVerbose() << "adding addon c srcFiles: " << addon.csrcFiles[i];
-		addSrc(addon.csrcFiles[i],addon.filesToFolders[addon.csrcFiles[i]],C);
+		addSrc(addon.csrcFiles[i], addon.filesToFolders[addon.csrcFiles[i]],C);
 	}
 	for(int i=0;i<(int)addon.cppsrcFiles.size(); i++){
 		ofLogVerbose() << "adding addon cpp srcFiles: " << addon.cppsrcFiles[i];
-		addSrc(addon.cppsrcFiles[i],addon.filesToFolders[addon.cppsrcFiles[i]],CPP);
+		addSrc(addon.cppsrcFiles[i], addon.filesToFolders[addon.cppsrcFiles[i]],CPP);
 	}
 	for(int i=0;i<(int)addon.objcsrcFiles.size(); i++){
 		ofLogVerbose() << "adding addon objc srcFiles: " << addon.objcsrcFiles[i];
-		addSrc(addon.objcsrcFiles[i],addon.filesToFolders[addon.objcsrcFiles[i]],OBJC);
+		addSrc(addon.objcsrcFiles[i], addon.filesToFolders[addon.objcsrcFiles[i]],OBJC);
 	}
 	for(int i=0;i<(int)addon.headersrcFiles.size(); i++){
 		ofLogVerbose() << "adding addon header srcFiles: " << addon.headersrcFiles[i];
-		addSrc(addon.headersrcFiles[i],addon.filesToFolders[addon.headersrcFiles[i]],HEADER);
+		addSrc(addon.headersrcFiles[i], addon.filesToFolders[addon.headersrcFiles[i]],HEADER);
 	}
 	for (int i = 0; i<(int)addon.defines.size(); i++) {
 		ofLogVerbose() << "adding addon defines: " << addon.defines[i];
@@ -489,6 +493,8 @@ void baseProject::addAddon(ofAddon & addon){
 }
 
 void baseProject::parseAddons(){
+	alert("--- parseAddons");
+	
 	ofFile addonsMake(ofFilePath::join(projectDir,"addons.make"));
 	ofBuffer addonsMakeMem;
 	addonsMake >> addonsMakeMem;
@@ -498,6 +504,8 @@ void baseProject::parseAddons(){
 		if(addon == "") continue;
 		addAddon(ofSplitString(addon, "#")[0]);
 	}
+	alert("--- end parseAddons");
+
 }
 
 void baseProject::parseConfigMake(){
@@ -519,18 +527,44 @@ void baseProject::parseConfigMake(){
 			}
 		}
 	}
-
 }
 
-void baseProject::recursiveCopyContents(const ofDirectory & srcDir, ofDirectory & destDir){
-	for(auto & f: srcDir){
-		if(f.isDirectory()){
-			ofDirectory srcSubDir(f.path());
-			ofDirectory destSubDir(ofFilePath::join(destDir.path(),f.getFileName()));
-			recursiveTemplateCopy(srcSubDir, destSubDir);
-		}else{
-			f.copyTo(ofFilePath::join(destDir.path(),f.getFileName()),false,true);
+void baseProject::recursiveTemplateCopy(const fs::path & srcDir, const fs::path & destDir){
+	for (const auto & entry : fs::directory_iterator(srcDir)) {
+		auto f = entry.path();
+		auto destFile = destDir / f.filename();
+		if (fs::is_directory(f)) {
+			recursiveTemplateCopy(f, destFile);
+		}
+		else if (f.filename() != "template.config") {
+			if (!fs::exists(destFile)) {
+				fs::copy_file(f, destFile); // from, to
+			}
 		}
 	}
 }
 
+void baseProject::recursiveCopyContents(const fs::path & srcDir, const fs::path & destDir){
+	for (const auto & entry : fs::directory_iterator(srcDir)) {
+		auto f = entry.path();
+		auto destFile = destDir / f.filename();
+		if (fs::is_directory(f)) {
+			recursiveTemplateCopy(f, destFile);
+		} else {
+			if (!fs::exists(destFile)) {
+				fs::copy_file(f, destFile);
+			}
+		}
+	}
+			
+//void baseProject::recursiveCopyContents(const ofDirectory & srcDir, ofDirectory & destDir){
+//	for(auto & f: srcDir){
+//		if(f.isDirectory()){
+//			ofDirectory srcSubDir(f.path());
+//			ofDirectory destSubDir(ofFilePath::join(destDir.path(),f.getFileName()));
+//			recursiveTemplateCopy(srcSubDir, destSubDir);
+//		}else{
+//			f.copyTo(ofFilePath::join(destDir.path(),f.getFileName()),false,true);
+//		}
+//	}
+}

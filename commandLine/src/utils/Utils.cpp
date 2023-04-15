@@ -32,6 +32,9 @@
 using std::unique_ptr;
 namespace fs = of::filesystem;
 
+using std::cout;
+using std::endl;
+
 std::string generateUUID(std::string input){
 	return uuidxx::uuid::Generate().ToString();
 }
@@ -53,12 +56,10 @@ void findandreplace( std::string& tInput, std::string tFind, std::string tReplac
 }
 
 
-std::string LoadFileAsString(const std::string & fn)
-{
+std::string LoadFileAsString(const std::string & fn) {
 	std::ifstream fin(fn.c_str());
 
-	if(!fin)
-	{
+	if(!fin) {
 		// throw exception
 	}
 
@@ -82,22 +83,7 @@ void findandreplaceInTexfile (const fs::path & fileName, std::string tFind, std:
 		myfile << bufferStr;
 		myfile.close();
 
-	/*
-	std::ifstream ifile(ofToDataPath(fileName).c_str(),std::ios::binary);
-	ifile.seekg(0,std::ios_base::end);
-	long s=ifile.tellg();
-	char *buffer=new char[s];
- 	ifile.seekg(0);
-	ifile.read(buffer,s);
-	ifile.close();
-	std::string txt(buffer,s);
-	delete[] buffer;
-	findandreplace(txt, tFind, tReplace);
-	std::ofstream ofile(ofToDataPath(fileName).c_str());
-	ofile.write(txt.c_str(),txt.size());
-	*/
-		//return 0;
-   } else {
+	} else {
 	   ; // some error checking here would be good.
    }
 }
@@ -147,37 +133,38 @@ pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::strin
 
 }
 
-// todo -- this doesn't use ofToDataPath -- so it's broken a bit.  can we fix?
+
 void getFilesRecursively(const fs::path & path, std::vector < string > & fileNames){
-	//	cout << "---- getFilesRecursively :: " << path << endl;
-	
+	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
+	if (!fs::is_directory(path)) return;
 	for (const auto & entry : fs::directory_iterator(path)) {
 		auto f = entry.path();
+		if (f.filename().c_str()[0] == '.') continue; // avoid hidden files .DS_Store .vscode .git etc
 		if (ofIsStringInString(f.filename().string(),".framework")) continue; // ignore frameworks
 		
 		if (fs::is_directory(f)) {
-			if (f.filename() != fs::path(".git")) { // ignore git dir
-				getFilesRecursively(f, fileNames);
-			}
-		}
-		else {
+			getFilesRecursively(f, fileNames);
+		} else {
 			// FIXME - update someday to fs::path
-			fileNames.emplace_back(f.string());
+			fileNames.emplace_back(f);
 		}
 	}
 }
 
+
 void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileNames){
+	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
+	if (!fs::is_directory(path)) return;
 	for (const auto & entry : fs::directory_iterator(path)) {
 		auto f = entry.path();
+		if (f.filename().c_str()[0] == '.') continue; // avoid hidden files .DS_Store .vscode .git etc
 		if (ofIsStringInString(f.filename().string(),".framework")) continue; // ignore frameworks
 		
 		if (fs::is_directory(f)) {
 			if (f.filename() != fs::path(".git")) { // ignore git dir
 				getFilesRecursively(f, fileNames);
 			}
-		}
-		else {
+		} else {
 			fileNames.emplace_back(f);
 		}
 	}
@@ -187,14 +174,16 @@ void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileN
 static std::vector <std::string> platforms;
 bool isFolderNotCurrentPlatform(std::string folderName, std::string platform){
 	if( platforms.size() == 0 ){
-		platforms.push_back("osx");
-		platforms.push_back("msys2");
-		platforms.push_back("vs");
-		platforms.push_back("ios");
-		platforms.push_back("linux");
-		platforms.push_back("linux64");
-		platforms.push_back("android");
-		platforms.push_back("iphone");
+		platforms = {
+			"osx",
+			"msys2",
+			"vs",
+			"ios",
+			"linux",
+			"linux64",
+			"android",
+			"iphone",
+		};
 	}
 
 	for(int i = 0; i < platforms.size(); i++){
@@ -220,123 +209,92 @@ void splitFromFirst(std::string toSplit, std::string deliminator, std::string & 
 
 
 void getFoldersRecursively(const fs::path & path, std::vector < std::string > & folderNames, std::string platform){
-	ofDirectory dir;
-
-	if (!ofIsStringInString(path.string(), ".framework")){
-		dir.listDir(path);
-		for (int i = 0; i < dir.size(); i++){
-			ofFile temp(dir.getFile(i));
-			if (temp.isDirectory() && isFolderNotCurrentPlatform(temp.getFileName(), platform) == false ){
-				getFoldersRecursively(dir.getPath(i), folderNames, platform);
+	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
+	if (!fs::is_directory(path)) return;
+	if (path.extension() != ".framework") {
+		for (const auto & entry : fs::directory_iterator(path)) {
+			auto f = entry.path();
+			if (f.filename().c_str()[0] == '.') continue; // avoid hidden files .DS_Store .vscode .git etc
+			if (fs::is_directory(f)  && isFolderNotCurrentPlatform(f.string(), platform) == false ) {
+				getFoldersRecursively(f, folderNames, platform);
 			}
 		}
-		// FIXME: convert folderNames to path
-		folderNames.push_back(path.string());
+		folderNames.emplace_back(path.string());
 	}
 }
 
+void getFrameworksRecursively(const fs::path & path, std::vector < std::string > & frameworks, std::string platform) {
+	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
+	if (!fs::is_directory(path)) return;
+	for (const auto & entry : fs::directory_iterator(path)) {
+		auto f = entry.path();
+		if (f.filename().c_str()[0] == '.') continue; // avoid hidden files .DS_Store .vscode .git etc
+		
+		if (fs::is_directory(f)) {
+			if (f.extension() == ".framework") {
+				frameworks.emplace_back(f.string());
+			} else {
+				if (f.filename() == fs::path("mediaAssets")) continue;
+				if (f.extension() == ".xcodeproj") continue;
+				if( f.string().rfind("example", 0) == 0) continue;
+				//				if (f.filename() == fs::path(".git")) continue;
 
-void getFrameworksRecursively(const fs::path & path, std::vector < std::string > & frameworks, std::string platform){
-
-
-	ofDirectory dir;
-	dir.listDir(path);
-
-	for (int i = 0; i < dir.size(); i++){
-
-		ofFile temp(dir.getFile(i));
-
-		if (temp.isDirectory()){
-			//getLibsRecursively(dir.getPath(i), folderNames);
-
-			// on osx, framework is a directory, let's not parse it....
-		std::string ext = "";
-		std::string first = "";
-			splitFromLast(dir.getPath(i), ".", first, ext);
-			if (ext != "framework")
-				getFrameworksRecursively(dir.getPath(i), frameworks, platform);
-			else
-				frameworks.push_back(dir.getPath(i));
+				getFrameworksRecursively(f, frameworks, platform);
+			}
 		}
-
 	}
 }
 
 
 
 void getPropsRecursively(const fs::path & path, std::vector < std::string > & props, const std::string & platform) {
+	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
+	if (!fs::is_directory(path)) return;
+	for (const auto & entry : fs::directory_iterator(path)) {
+		auto f = entry.path();
+		if (f.filename().c_str()[0] == '.') continue; // avoid hidden files .DS_Store .vscode .git etc
 
-	if(!ofDirectory::doesDirectoryExist(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
-	ofDirectory dir;
-	dir.listDir(path);
+		if (fs::is_directory(f)) {
+			if (f.filename() == fs::path("mediaAssets")) continue;
+			if (f.extension() == ".xcodeproj") continue;
+			if( f.string().rfind("example", 0) == 0) continue;
+//			if (f.filename() == fs::path(".git")) continue;
 
-	for (auto & temp : dir) {
-		if (temp.isDirectory()) {
-			//skip example directories - this is needed as we are search all folders in the addons root path
-			if( temp.getFileName().rfind("example", 0) == 0) continue;
-			getPropsRecursively(temp.path(), props, platform);
-		}
-		else {
-			std::string ext = "";
-			std::string first = "";
-			splitFromLast(temp.path(), ".", first, ext);
-			if (ext == "props") {
-				props.push_back(temp.path());
+			getPropsRecursively(f, props, platform);
+		} else {
+			if (f.extension() == ".props") {
+//				cout << f << endl;
+				props.emplace_back(f);
 			}
 		}
-
 	}
 }
 
 
 void getDllsRecursively(const fs::path & path, std::vector < std::string > & dlls, std::string platform) {
-	ofDirectory dir;
-	dir.listDir(path);
+	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
+	if (!fs::is_directory(path)) return;
+	if (path.filename().c_str()[0] == '.') return; // avoid hidden files .DS_Store .vscode .git etc
+	for (const auto & entry : fs::directory_iterator(path)) {
+		auto f = entry.path();
+		if (fs::is_directory(f)) {
+			getDllsRecursively(f, dlls, platform);
+		} else {
+			if (f.extension() == ".dll") {
+				cout << "---->> getDLLs " << f << endl;;
 
-	for (auto & temp : dir) {
-		if (temp.isDirectory()) {
-			getDllsRecursively(temp.path(), dlls, platform);
-		}
-		else {
-			std::string ext = "";
-			std::string first = "";
-			splitFromLast(temp.path(), ".", first, ext);
-			if (ext == "dll") {
-				dlls.push_back(temp.path());
+				dlls.emplace_back(f);
 			}
 		}
-
 	}
 }
 
-//
-//
-//	if (ofIsStringInString(f.filename().string(),".framework")) continue; // ignore frameworks
-//
-//	if (fs::is_directory(f)) {
-//		if (f.filename() != fs::path(".git")) { // ignore git dir
-//			getFilesRecursively(f, fileNames);
-//		}
-//	}
-//	else {
-//		fileNames.emplace_back(f);
-//	}
-//}
 
-
-using std::cout;
-using std::endl;
 void getLibsRecursively(const fs::path & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform, std::string arch, std::string target){
-//	cout << "getLibsRecursively " << path << endl;
-//	ofDirectory dir;
-//	dir.listDir(path);
-
-
-
-//	for (int i = 0; i < dir.size(); i++){
+	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
+	if (!fs::is_directory(path)) return;
 	for (const auto & entry : fs::directory_iterator(path)) {
 		auto f = entry.path();
-
 		std::vector<std::string> splittedPath = ofSplitString(f, fs::path("/").make_preferred().string());
 
 //		ofFile temp(dir.getFile(i));
@@ -375,6 +333,7 @@ void getLibsRecursively(const fs::path & path, std::vector < std::string > & lib
 
 			if (ext == "a" || ext == "lib" || ext == "dylib" || ext == "so" || (ext == "dll" && platform != "vs")){
 				if (platformFound){
+//					libLibs.emplace_back( f, arch, target );
 					libLibs.push_back({ f, arch, target });
 
 					//TODO: THEO hack
@@ -386,13 +345,14 @@ void getLibsRecursively(const fs::path & path, std::vector < std::string > & lib
 						if( currentPath.find("ofxOpenCv") == std::string::npos ){
 							ofStringReplace(currentPath, "ios", "osx");
 							if( fs::exists(currentPath) ){
+//								libLibs.emplace_back( currentPath, arch, target );
 								libLibs.push_back({ currentPath, arch, target });
 							}
 						}
 					}
 				}
 			} else if (ext == "h" || ext == "hpp" || ext == "c" || ext == "cpp" || ext == "cc" || ext == "cxx" || ext == "m" || ext == "mm"){
-				libFiles.push_back(f);
+				libFiles.emplace_back(f);
 			}
 		}
 	}
@@ -413,17 +373,13 @@ std::string unsplitString (std::vector < std::string > strings, std::string deli
 }
 
 
-static std::string OFRoot = "../../..";
+static fs::path OFRoot { "../../.." };
 
-std::string getOFRoot(){
-	return ofFilePath::removeTrailingSlash(OFRoot);
+fs::path getOFRoot(){
+	return OFRoot;
 }
 
-std::string getAddonsRoot(){
-	return ofFilePath::join(getOFRoot(), "addons");
-}
-
-void setOFRoot(std::string path){
+void setOFRoot(const fs::path & path){
 	OFRoot = path;
 }
 
@@ -509,3 +465,13 @@ unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ) {
 		return unique_ptr<baseProject>();
 	}
 }
+
+std::string colorText(const std::string & s, int color) {
+	std::string c = std::to_string(color);
+	return "\033[1;"+c+"m" + s + "\033[0m";
+}
+
+void alert(std::string msg, int color) {
+	std::cout << colorText(msg, color) << std::endl;
+}
+

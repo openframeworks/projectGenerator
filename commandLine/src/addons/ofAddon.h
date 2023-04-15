@@ -8,9 +8,9 @@
 #ifndef OFADDON_H_
 #define OFADDON_H_
 
-#include <map>
 #include "ofConstants.h"
 #include "LibraryBinary.h"
+#include <unordered_map>
 
 // About Metadata
 
@@ -98,7 +98,7 @@ public:
 	void clear();
 
 	// this is source files:
-	std::map < std::string, std::string > filesToFolders;      //the addons has had, for each file,
+	std::unordered_map < std::string, std::string > filesToFolders;      //the addons has had, for each file,
 												//sometimes a listing of what folder to put it in, such as "addons/ofxOsc/src"
 
 	std::vector < std::string > srcFiles;

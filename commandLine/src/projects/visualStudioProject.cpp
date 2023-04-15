@@ -30,6 +30,7 @@ bool visualStudioProject::createProjectFile(){
 	findandreplaceInTexfile(user,"emptyExample",projectName);
 	findandreplaceInTexfile(project,"emptyExample",projectName);
 
+	// FIXME: FS
 	std::string relRoot = getOFRelPath(projectDir.string());
 	
 	if (relRoot != "../../../"){
@@ -218,7 +219,7 @@ void visualStudioProject::addInclude(std::string includeName){
 			}
 		}
 		if (bAdd == true){
-			strings.push_back(includeName);
+			strings.emplace_back(includeName);
 			std::string includesNew = unsplitString(strings, ";");
 			node.node().first_child().set_value(includesNew.c_str());
 		}
@@ -238,7 +239,7 @@ void addLibraryPath(const pugi::xpath_node_set & nodes, std::string libFolder) {
 			}
 		}
 		if (bAdd == true) {
-			strings.push_back(libFolder);
+			strings.emplace_back(libFolder);
 			std::string libPathsNew = unsplitString(strings, ";");
 			node.node().first_child().set_value(libPathsNew.c_str());
 		}
@@ -259,7 +260,7 @@ void addLibraryName(const pugi::xpath_node_set & nodes, std::string libName) {
 		}
 
 		if (bAdd == true) {
-			strings.push_back(libName);
+			strings.emplace_back(libName);
 			std::string libsNew = unsplitString(strings, ";");
 			node.node().first_child().set_value(libsNew.c_str());
 		}
@@ -399,7 +400,7 @@ void visualStudioProject::addAddon(ofAddon & addon){
 	}
 
 	ofLogNotice() << "adding addon: " << addon.name;
-	addons.push_back(addon);
+	addons.emplace_back(addon);
 
 	for(int i=0;i<(int)addon.includePaths.size();i++){
 		ofLogVerbose() << "adding addon include path: " << addon.includePaths[i];

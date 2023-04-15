@@ -49,6 +49,8 @@ public:
 
 	std::vector<string> commands;
 
+	// MARK: now this is not being used anymore, only buildConfigs
+	// TODO: test in iOS and clean if OK
 	string buildConfigurations[4] = {
 		"E4B69B600A3A1757003C02F2", //macOS Debug
 		"E4B69B610A3A1757003C02F2", //macOS Release

@@ -21,9 +21,8 @@
 
 std::string generateUUID(std::string input);
 
-std::string getOFRoot();
-std::string getAddonsRoot();
-void setOFRoot(std::string path);
+fs::path getOFRoot();
+void setOFRoot(const fs::path & path);
 void findandreplace( std::string& tInput, std::string tFind, std::string tReplace );
 void findandreplaceInTexfile (const of::filesystem::path & fileName, std::string tFind, std::string tReplace );
 
@@ -47,6 +46,7 @@ void splitFromFirst(std::string toSplit, std::string deliminator, std::string & 
 void fixSlashOrder(std::string & toFix);
 std::string unsplitString (std::vector < std::string > strings, std::string deliminator );
 
+// FIXME: FS
 std::string getOFRelPath(const std::string & from);
 of::filesystem::path getOFRelPathFS(const of::filesystem::path & from);
 
@@ -69,5 +69,10 @@ inline bool isInVector(T item, std::vector<T> & vec){
 	}
 	return bIsInVector;
 }
+
+std::string colorText(const std::string & s, int color = 32);
+void alert(std::string msg, int color=32);
+
+
 
 #endif /* UTILS_H_ */

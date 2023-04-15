@@ -23,6 +23,7 @@ bool CBWinProject::createProjectFile(){
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"icon.rc"), projectDir / "icon.rc", false, true);
 
 	//let's do some renaming:
+	// FIXME: FS
 	std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
 
 	if (relRoot != "../../../"){
