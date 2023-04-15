@@ -801,10 +801,10 @@ bool xcodeProject::saveProjectFile(){
 						auto v = j[p];
 						j[p] = json::array();
 						if (!v.is_null()) {
-							j[p].push_back(v);
+							j[p].emplace_back(v);
 						}
 					}
-					j[p].push_back(cols[3]);
+					j[p].emplace_back(cols[3]);
 					
 				} catch (std::exception e) {
 					cout << "json error " << endl;

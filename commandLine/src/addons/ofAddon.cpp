@@ -24,12 +24,12 @@ vector<string> splitStringOnceByLeft(const string &source, const string &delimit
 	size_t pos = source.find(delimiter);
 	vector<string> res;
 	if(pos == string::npos) {
-		res.push_back(source);
+		res.emplace_back(source);
 		return res;
 	}
 
-	res.push_back(source.substr(0, pos));
-	res.push_back(source.substr(pos + delimiter.length()));
+	res.emplace_back(source.substr(0, pos));
+	res.emplace_back(source.substr(pos + delimiter.length()));
 	return res;
 }
 
@@ -188,8 +188,8 @@ void ofAddon::addReplaceStringVector(std::vector<std::string> & variable, std::s
 				}
 			}
 
-			if(prefix=="" || values[i].find(pathToOF.string())==0 || ofFilePath::isAbsolute(values[i])) variable.push_back(values[i]);
-			else variable.push_back(ofFilePath::join(prefix,values[i]));
+			if(prefix=="" || values[i].find(pathToOF.string())==0 || ofFilePath::isAbsolute(values[i])) variable.emplace_back(values[i]);
+			else variable.emplace_back(ofFilePath::join(prefix,values[i]));
 		}
 	}
 }
@@ -226,7 +226,7 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 			if (prefix == "" || v.find(pathToOF.string()) == 0 || ofFilePath::isAbsolute(v)) {
 				variable.push_back({ v, "", "" });
 			} else {
-				variable.push_back({ ofFilePath::join(prefix, v), "", "" });
+				variable.push_back( { ofFilePath::join(prefix, v), "", "" } );
 			}
 		}
 	}
@@ -619,11 +619,11 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 
 	// convert paths to relative
 	for (auto & l : libFolders) {
-		paths.push_back({ prefixPath / fs::relative(fs::path(l), containedPath) });
+		paths.emplace_back( prefixPath / fs::relative(fs::path(l), containedPath) );
 	}
 
 	for (auto & l : srcFolders) {
-		paths.push_back({ prefixPath / fs::relative(fs::path(l), containedPath) });
+		paths.emplace_back( prefixPath / fs::relative(fs::path(l), containedPath) );
 	}
 
 	paths.sort(); //paths.unique(); // unique not needed anymore. everything is carefully inserted now.

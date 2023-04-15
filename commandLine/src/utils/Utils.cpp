@@ -174,14 +174,16 @@ void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileN
 static std::vector <std::string> platforms;
 bool isFolderNotCurrentPlatform(std::string folderName, std::string platform){
 	if( platforms.size() == 0 ){
-		platforms.push_back("osx");
-		platforms.push_back("msys2");
-		platforms.push_back("vs");
-		platforms.push_back("ios");
-		platforms.push_back("linux");
-		platforms.push_back("linux64");
-		platforms.push_back("android");
-		platforms.push_back("iphone");
+		platforms = {
+			"osx",
+			"msys2",
+			"vs",
+			"ios",
+			"linux",
+			"linux64",
+			"android",
+			"iphone",
+		};
 	}
 
 	for(int i = 0; i < platforms.size(); i++){
@@ -331,6 +333,7 @@ void getLibsRecursively(const fs::path & path, std::vector < std::string > & lib
 
 			if (ext == "a" || ext == "lib" || ext == "dylib" || ext == "so" || (ext == "dll" && platform != "vs")){
 				if (platformFound){
+//					libLibs.emplace_back( f, arch, target );
 					libLibs.push_back({ f, arch, target });
 
 					//TODO: THEO hack
@@ -342,13 +345,14 @@ void getLibsRecursively(const fs::path & path, std::vector < std::string > & lib
 						if( currentPath.find("ofxOpenCv") == std::string::npos ){
 							ofStringReplace(currentPath, "ios", "osx");
 							if( fs::exists(currentPath) ){
+//								libLibs.emplace_back( currentPath, arch, target );
 								libLibs.push_back({ currentPath, arch, target });
 							}
 						}
 					}
 				}
 			} else if (ext == "h" || ext == "hpp" || ext == "c" || ext == "cpp" || ext == "cc" || ext == "cxx" || ext == "m" || ext == "mm"){
-				libFiles.push_back(f);
+				libFiles.emplace_back(f);
 			}
 		}
 	}

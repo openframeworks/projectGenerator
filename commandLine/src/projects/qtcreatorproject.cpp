@@ -150,5 +150,5 @@ void QtCreatorProject::addAddon(ofAddon & addon){
 		if(addons[i].name==addon.name) return;
 	}
 
-	addons.push_back(addon);
+	addons.emplace_back(addon);
 }

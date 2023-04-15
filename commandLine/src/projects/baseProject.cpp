@@ -67,7 +67,7 @@ std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirect
 						if(platform==target){
 							supported = true;
 						}
-						templateConfig->platforms.push_back(platform);
+						templateConfig->platforms.emplace_back(platform);
 					}
 				}else if(var=="DESCRIPTION"){
 					templateConfig->description = value;
@@ -137,10 +137,12 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 	bool ret = createProjectFile();
 	if(!ret) return false;
 
+	//MARK: -
 	if(templateName!=""){
 		fs::path templateDir = getOFRoot() / templatesFolder / templateName;
 
 		// TODO: PORT
+// !!!: asdf
 //		templateDir.setShowHidden(true);
 		auto templateConfig = parseTemplate(templateDir);
 		if(templateConfig){
@@ -328,8 +330,9 @@ void baseProject::addAddon(std::string addonName){
 	}
 }
 
+// FIXME: FS parameter
 void baseProject::addSrcRecursively(std::string srcPath){
-	extSrcPaths.push_back(srcPath);
+	extSrcPaths.emplace_back(srcPath);
 	vector < string > srcFilesToAdd;
 
 	//so we can just pass through the file paths
@@ -436,7 +439,7 @@ void baseProject::addAddon(ofAddon & addon){
 	}
 	cout << "---> " << endl;
 
-	addons.push_back(addon);
+	addons.emplace_back(addon);
 
 	ofLogVerbose("baseProject") << "libs in addAddon " << addon.libs.size();
 	for(auto & lib: addon.libs){

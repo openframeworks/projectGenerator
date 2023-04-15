@@ -90,7 +90,7 @@ bool printTemplates() {
 	std::vector<std::vector<baseProject::Template>> allPlatformsTemplates;
 		for(auto & target: targets){
 			auto templates = getTargetProject(target)->listAvailableTemplates(getTargetString(target));
-			allPlatformsTemplates.push_back(templates);
+			allPlatformsTemplates.emplace_back(templates);
 		}
 	std::set<baseProject::Template> commonTemplates;
 		for(auto & templates: allPlatformsTemplates){
@@ -169,15 +169,17 @@ void addPlatforms(const std::string & value) {
 			targets.emplace_back(OF_TARGET_ANDROID);
 		}
 		else if (p == "allplatforms") {
-			targets.emplace_back(OF_TARGET_LINUX);
-			targets.emplace_back(OF_TARGET_LINUX64);
-			targets.emplace_back(OF_TARGET_LINUXARMV6L);
-			targets.emplace_back(OF_TARGET_LINUXARMV7L);
-			targets.emplace_back(OF_TARGET_MINGW);
-			targets.emplace_back(OF_TARGET_WINVS);
-			targets.emplace_back(OF_TARGET_OSX);
-			targets.emplace_back(OF_TARGET_IOS);
-			targets.emplace_back(OF_TARGET_ANDROID);
+			targets = {
+				OF_TARGET_LINUX,
+				OF_TARGET_LINUX64,
+				OF_TARGET_LINUXARMV6L,
+				OF_TARGET_LINUXARMV7L,
+				OF_TARGET_MINGW,
+				OF_TARGET_WINVS,
+				OF_TARGET_OSX,
+				OF_TARGET_IOS,
+				OF_TARGET_ANDROID,
+			};
 		}else{
 			ofLogError() << "platform " << p << " not valid";
 		}
@@ -324,7 +326,7 @@ int main(int argc, char** argv){
 	bRecursive = false;
 	bHelpRequested = false;
 	bListTemplates = false;
-	targets.push_back(ofGetTargetPlatform());
+	targets.emplace_back(ofGetTargetPlatform());
 	startTime = 0;
 	nProjectsUpdated = 0;
 	nProjectsCreated = 0;
