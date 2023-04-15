@@ -35,7 +35,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		19186B9529E8694F001D118A /* cxxopts.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cxxopts.hpp; sourceTree = "<group>"; };
 		19A3790829E697D900D6501F /* optionparser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = optionparser.h; sourceTree = "<group>"; };
 		19A3790A29E697D900D6501F /* visualStudioProject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = visualStudioProject.cpp; sourceTree = "<group>"; };
 		19A3790B29E697D900D6501F /* baseProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = baseProject.h; sourceTree = "<group>"; };
@@ -88,7 +87,6 @@
 				19A3792929E697D900D6501F /* main.cpp */,
 				19A3792129E697D900D6501F /* ofApp.cpp */,
 				19A3792229E697D900D6501F /* ofApp.h */,
-				19186B9529E8694F001D118A /* cxxopts.hpp */,
 				19A3790829E697D900D6501F /* optionparser.h */,
 				19A3790929E697D900D6501F /* projects */,
 				19A3791B29E697D900D6501F /* utils */,
