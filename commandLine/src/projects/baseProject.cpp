@@ -27,9 +27,9 @@ baseProject::baseProject(std::string _target){
 	target = _target;
 }
 
-// FIXME: FS
-std::string baseProject::getPlatformTemplateDir(){
-	return ofFilePath::join(getOFRoot(),templatesFolder + target);
+fs::path baseProject::getPlatformTemplateDir(){
+	// FIXME: FS getOFRoot
+	return fs::path(getOFRoot()) / templatesFolder / target;
 }
 
 bool isPlatformName(std::string file){
@@ -118,14 +118,13 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 	projectName = path.parent_path().filename();
 	bool bDoesDirExist = false;
 
-	// FIXME: FS
 	fs::path project { projectDir / "src" };
 	if (fs::exists(project) && fs::is_directory(project)) {
 		bDoesDirExist = true;
 	}else{
-		// FIXME: temporarly templatePath is string, port to fs::path
-		ofDirectory(fs::path(templatePath) / "src").copyTo(projectDir / "src");
-		ofDirectory(fs::path(templatePath) / "bin").copyTo(projectDir / "bin");
+		// FIXME: ofDirectory?
+		ofDirectory(templatePath / "src").copyTo(projectDir / "src");
+		ofDirectory(templatePath / "bin").copyTo(projectDir / "bin");
 	}
 
 	bool ret = createProjectFile();
@@ -141,9 +140,9 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 			// FIXME: FS - temporary placeholder to make it work.
 			recursiveTemplateCopy(templateDir, projectDir);
 			for(auto & rename: templateConfig->renames){
-				// FIXME: FS
-				auto from = (projectDir / rename.first).string();
-				auto to = (projectDir / rename.second).string();
+				auto from = projectDir / rename.first;
+				auto to = projectDir / rename.second;
+//				moveTo(const of::filesystem::path& path, bool bRelativeToData = true, bool overwrite = false);
 				ofFile(from).moveTo(to,true,true);
 			}
 		}else{
