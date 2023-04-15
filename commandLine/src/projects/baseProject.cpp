@@ -20,7 +20,7 @@ namespace fs = of::filesystem;
 using std::cout;
 using std::endl;
 
-const std::string templatesFolder = "scripts/templates/";
+const fs::path templatesFolder = "scripts/templates";
 
 baseProject::baseProject(std::string _target){
 	bLoaded = false;
@@ -91,7 +91,8 @@ std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirect
 std::vector<baseProject::Template> baseProject::listAvailableTemplates(std::string target){
 	std::vector<baseProject::Template> templates;
 
-	ofDirectory templatesDir(ofFilePath::join(getOFRoot(),templatesFolder));
+	// FIXME: dirlist to FS
+	ofDirectory templatesDir(getOFRoot() / templatesFolder);
 	for(auto & f: templatesDir.getSorted()){
 		if(f.isDirectory()){
 			auto templateConfig = parseTemplate(ofDirectory(f));
@@ -121,7 +122,8 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 	if (fs::exists(project) && fs::is_directory(project)) {
 		bDoesDirExist = true;
 	}else{
-		// FIXME: ofDirectory?
+		// MARK: ofDirectory?
+//		bool copyTo(const of::filesystem::path& path, bool bRelativeToData = true, bool overwrite = false);
 		ofDirectory(templatePath / "src").copyTo(projectDir / "src");
 		ofDirectory(templatePath / "bin").copyTo(projectDir / "bin");
 	}
@@ -130,8 +132,8 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 	if(!ret) return false;
 
 	if(templateName!=""){
-		// FIXME: FS getOFRoot()
-		fs::path templateDir = fs::path(getOFRoot()) / (templatesFolder + templateName);
+		fs::path templateDir = getOFRoot() / templatesFolder / templateName;
+
 		// TODO: PORT
 //		templateDir.setShowHidden(true);
 		auto templateConfig = parseTemplate(templateDir);
