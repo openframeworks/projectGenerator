@@ -3,8 +3,7 @@
 #include "optionparser.h"
 #include "defines.h"
 
-// TODO: remove, temporary
-#include "Utils.h"
+#include "Utils.h" // TODO: remove, temporary, only for alert function
 
 //cxxopts::Options options("Project Generator", "OpenFrameworks tool to generate projects");
 enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTERNAL, VERSION};
@@ -553,18 +552,13 @@ int main(int argc, char** argv){
 			ofLogNotice() << "project created! ";
 			ofLogNotice() << "-----------------------------------------------";
 			consoleSpace();
-
-
 		}
 	}
-	else if (mode == PG_MODE_UPDATE) {
 
+	else if (mode == PG_MODE_UPDATE) {
 		if (!bRecursive) {
 			if (isGoodProjectPath(projectPath) || bForce) {
-
-
 				nProjectsUpdated += 1;
-
 
 				for (int i = 0; i < (int)targets.size(); i++) {
 					ofLogNotice() << "-----------------------------------------------";
@@ -584,7 +578,6 @@ int main(int argc, char** argv){
 					ofLogNotice() << "project updated! ";
 					ofLogNotice() << "-----------------------------------------------";
 					consoleSpace();
-
 				}
 			}
 			else {
@@ -601,7 +594,6 @@ int main(int argc, char** argv){
 
 				ofLogNotice() << "project updated! ";
 				ofLogNotice() << "-----------------------------------------------";
-
 			}
 		}
 	}
@@ -616,10 +608,3 @@ int main(int argc, char** argv){
 
 	return EXIT_OK;
 }
-
-
-
-
-
-
-
