@@ -63,9 +63,8 @@ xcodeProject::xcodeProject(string target)
 };
 
 bool xcodeProject::createProjectFile(){
-	//	cout << "createProjectFile() xcodeProject " << xcodeProject << endl;
 	fs::path xcodeProject = projectDir / ( projectName + ".xcodeproj" );
-
+	
 	if (ofDirectory::doesDirectoryExist(xcodeProject)){
 		ofDirectory::removeDirectory(xcodeProject, true);
 	}
@@ -139,7 +138,7 @@ bool xcodeProject::createProjectFile(){
 	// make everything relative the right way.
 	relRoot = getOFRelPathFS(projectDir).string();
 	projectDir = projectDir.lexically_normal();
-        
+	
         //projectDir is always absolute at the moment
         //so lets check if the projectDir is inside the OF folder - if it is not make the OF path absolute
 	if( projectDir.string().rfind(getOFRoot(),0) != 0 ){
@@ -152,7 +151,7 @@ bool xcodeProject::createProjectFile(){
 			findandreplaceInTexfile(projectDir / "Makefile", "../../..", relRoot);
 			findandreplaceInTexfile(projectDir / "config.make", "../../..", relRoot);
 		}
-	}
+	} 
 	return true;
 }
 
@@ -203,6 +202,7 @@ void xcodeProject::renameProject(){ //base
 	// Just OSX here, debug app naming.
 	if( target == "osx" ){
 		// TODO: Hardcode to variable
+		// FIXME: Debug needed in name?
 		commands.emplace_back("Set :objects:E4B69B5B0A3A1756003C02F2:path " + projectName + "Debug.app");
 	}
 }
@@ -643,31 +643,30 @@ void xcodeProject::addAfterRule(string rule){
 }
 
 void xcodeProject::addAddon(ofAddon & addon){
-	alert("xcodeProject addAddon string :: " + addon.name, 31);
-
-	for(int i=0;i<(int)addons.size();i++){
-		if(addons[i].name==addon.name){
-			return;
-		}
+//	alert("xcodeProject addAddon string :: " + addon.name, 31);
+	for (auto & a : addons) {
+		if (a.name == addon.name) return;
 	}
 
-	for(int i=0;i<addon.dependencies.size();i++){
-		baseProject::addAddon(addon.dependencies[i]);
-
-	}
-
-	for(int i=0;i<addon.dependencies.size();i++){
-		for(int j=0;j<(int)addons.size();j++){
-			if(addon.dependencies[i] != addons[j].name){ //make sure dependencies of addons arent already added to prj
-				baseProject::addAddon(addon.dependencies[i]);
-			}else{
-				//trying to add duplicated addon dependency... skipping!
+	
+	for (auto & d : addon.dependencies) {
+		bool found = false;
+		for (auto & a : addons) {
+			if (a.name == d) {
+				found = true;
+				break;
 			}
 		}
+		if (!found) {
+			baseProject::addAddon(d);
+		} else {
+			ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << d;
+		}
 	}
+	
 
 	ofLogNotice() << "adding addon: " << addon.name;
-	addons.push_back(addon);
+	addons.emplace_back(addon);
 
 	for (auto & e : addon.includePaths) {
 		ofLogVerbose() << "adding addon include path: " << e;

@@ -222,7 +222,6 @@ bool isGoodOFPath(fs::path path) {
 
 
 void updateProject(const fs::path & path, ofTargetPlatform target, bool bConsiderParameterAddons = true) {
-//	alert("updateProject " + path.string());
 	// bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
 	// either we read the addons.make file, or we look at the parameter list.
 	// if we are updating recursively, we *never* consider addons passed as parameters.
@@ -259,8 +258,6 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 }
 
 void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
-
-//	alert("recursiveUpdate" + path.string());
 	// first, bail if it's just a file
 	if (!fs::is_directory(path)) return;
 
@@ -492,7 +489,6 @@ int main(int argc, char** argv){
 	}
 
 	if (projectName != ""){
-//		alert(">>> " + projectName, 31);
 		fs::path projectNameFS { projectName };
 		if (projectNameFS.is_absolute()) {
 			projectPath = projectNameFS;
@@ -515,6 +511,9 @@ int main(int argc, char** argv){
 	else {
 		mode = PG_MODE_CREATE;
 	}
+	//XAXA TEMP
+	mode = PG_MODE_CREATE;
+
 
 	if (bVerbose){
 		ofSetLogLevel(OF_LOG_VERBOSE);
@@ -527,7 +526,6 @@ int main(int argc, char** argv){
 	}
 
 	if (mode == PG_MODE_CREATE) {
-
 		nProjectsCreated += 1;
 
 
@@ -553,6 +551,7 @@ int main(int argc, char** argv){
 
 			ofLogNotice() << "setting up new project " << projectPath;
 			if (!bDryRun) project->create(projectPath, templateName);
+
 
 			if (!bDryRun){
 				for(auto & addon: addons){

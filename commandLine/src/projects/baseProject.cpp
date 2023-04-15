@@ -105,24 +105,26 @@ std::vector<baseProject::Template> baseProject::listAvailableTemplates(std::stri
 }
 
 bool baseProject::create(const fs::path & _path, std::string templateName){
-	alert("baseProject::create " + _path.string(), 33 );
+//	alert("baseProject::create " + _path.string(), 33 );
 	auto path = _path; // just because it is const
 	
 	templatePath = getPlatformTemplateDir();
 	addons.clear();
 	extSrcPaths.clear();
 
-	if(!ofFilePath::isAbsolute(path)){
-		path = (fs::current_path() / fs::path(path)).string();
+	if(!path.is_absolute()){
+		path = fs::current_path() / path;
 	}
 	projectDir = path;
-
-	projectName = ofFilePath::getFileName(path);
+	projectName = path.parent_path().filename();
+	cout << "projectDir " << projectDir << endl;
+	cout << "projectName " << projectName << endl;
+	
 	bool bDoesDirExist = false;
 
 	// FIXME: FS
-	ofDirectory project(ofFilePath::join(projectDir,"src"));    // this is a directory, really?
-	if(project.exists()){
+	fs::path project { projectDir / "src" };
+	if (fs::exists(project) && fs::is_directory(project)) {
 		bDoesDirExist = true;
 	}else{
 //		ofDirectory project(projectDir);
@@ -130,6 +132,7 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 		ofDirectory(fs::path(templatePath) / "src").copyTo(projectDir / "src");
 		ofDirectory(fs::path(templatePath) / "bin").copyTo(projectDir / "bin");
 	}
+	cout << "bDoesDirExist " << bDoesDirExist << endl;
 
 	bool ret = createProjectFile();
 	if(!ret) return false;
@@ -138,6 +141,7 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 //		auto name = ofFilePath::join(getOFRoot(),templatesFolder + templateName);
 		// FIXME: FS getOFRoot()
 		fs::path templateDir = fs::path(getOFRoot()) / (templatesFolder + templateName);
+//		cout << "templateDir " << templateDir << endl;
 //		ofDirectory templateDir(ofFilePath::join(getOFRoot(),templatesFolder + templateName));
 		// TODO: PORT
 //		templateDir.setShowHidden(true);
@@ -266,16 +270,18 @@ void baseProject::addAddon(std::string addonName){
 	//inCache = false; //to test no-cache scenario
 	
 	
-	fs::path addonPath = fs::path(addonName);
-	addon.isLocalAddon = false;
-
-	if (fs::exists(addonName)) {
+	fs::path addonPath { addonName };
+	if (fs::exists(addonPath)) {
 		addon.isLocalAddon = true;
+	} else {
 		addonPath = fs::path(getOFRoot()) / "addons" / addonName;
+		addon.isLocalAddon = false;
 	}
 	
 	if(!inCache){
 		addonOK = addon.fromFS(addonPath, target);
+//		if (!addonOK) alert("not addonOK",33);
+
 	}else{
 		addon = addonsCache[target][addonName];
 		addonOK = true;
@@ -289,12 +295,12 @@ void baseProject::addAddon(std::string addonName){
 	if(!inCache){
 		addonsCache[target][addonName] = addon; //cache the addon so we dont have to be reading form disk all the time
 	}
+	
 	addAddon(addon);
 
 	// Process values from ADDON_DATA
 	if(addon.data.size()){
 		for(auto & data : addon.data){
-//			cout << "data = " << data << endl;
 			std::string d = data;
 			ofStringReplace(d, "data/", ""); // avoid to copy files at /data/data/*
 
@@ -422,18 +428,35 @@ void baseProject::addAddon(ofAddon & addon){
 		}
 	}
 
-//	cout << "---> dependencies" << endl;
-	for(int i=0;i<addon.dependencies.size();i++){
-		cout << addon.dependencies[i] << endl;
-		for(int j=0;j<(int)addons.size();j++){
-			if(addon.dependencies[i] != addons[j].name){ //make sure dependencies of addons arent already added to prj
-				addAddon(addon.dependencies[i]);
-			}else{
-				ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << addon.dependencies[i];
+	cout << "---> dependencies" << endl;
+	for (auto & d : addon.dependencies) {
+		bool found = false;
+		for (auto & a : addons) {
+			if (a.name == d) {
+				found = true;
+				break;
 			}
 		}
+		if (!found) {
+			alert(">>>> addaddon :: " + d, 35);
+			addAddon(d);
+		} else {
+			ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << d;
+		}
 	}
-//	cout << "---> " << endl;
+	cout << "---> " << endl;
+
+	// This was real flawed logic, was adding lots of times the same addon
+//	for(int i=0;i<addon.dependencies.size();i++){
+//		cout << addon.dependencies[i] << endl;
+//		for(int j=0;j<(int)addons.size();j++){
+//			if(addon.dependencies[i] != addons[j].name){ //make sure dependencies of addons arent already added to prj
+//				addAddon(addon.dependencies[i]);
+//			}else{
+//				ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << addon.dependencies[i];
+//			}
+//		}
+//	}
 
 	addons.push_back(addon);
 
@@ -489,7 +512,7 @@ void baseProject::addAddon(ofAddon & addon){
 }
 
 void baseProject::parseAddons(){
-//	alert("--- parseAddons");
+	alert("--- parseAddons");
 	
 	ofFile addonsMake(ofFilePath::join(projectDir,"addons.make"));
 	ofBuffer addonsMakeMem;
@@ -500,7 +523,7 @@ void baseProject::parseAddons(){
 		if(addon == "") continue;
 		addAddon(ofSplitString(addon, "#")[0]);
 	}
-//	alert("--- end parseAddons");
+	alert("--- end parseAddons");
 
 }
 

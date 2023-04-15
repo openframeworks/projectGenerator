@@ -482,11 +482,13 @@ void ofAddon::parseConfig(){
 
 
 bool ofAddon::fromFS(fs::path path, const std::string & platform){
+	
+	cout << "fromFS path : " << path << endl;
+
 	clear();
 	this->platform = platform;
 
 	fs::path prefixPath;
-	// FIXME: remove this
 	fs::path containedPath { "" };
 
 	if(isLocalAddon){
