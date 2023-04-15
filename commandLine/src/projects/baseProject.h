@@ -6,6 +6,9 @@
 #include "ofConstants.h"
 #include "ofFileUtils.h"
 #include "pugixml.hpp"
+// TODO: - Remove
+#include <map>
+namespace fs = of::filesystem;
 
 class baseProject {
 
@@ -27,7 +30,7 @@ public:
 	struct Template{
 		ofDirectory dir;
 		std::string name;
-	std::vector<std::string> platforms;
+		std::vector<std::string> platforms;
 		std::string description;
 		std::map<of::filesystem::path, of::filesystem::path> renames;
 		bool operator<(const Template & other) const{
@@ -70,7 +73,6 @@ public:
 	virtual void addSrcRecursively(std::string srcPath);
 
 	std::string getName() { return projectName;}
-//	std::string getPath() { return projectDir; }
 	of::filesystem::path getPath() { return projectDir; }
 
 	std::vector<Template> listAvailableTemplates(std::string target);
@@ -86,12 +88,15 @@ public:
 	std::string target;
 
 protected:
-	void recursiveCopyContents(const ofDirectory & srcDir, ofDirectory & destDir);
-
+//	void recursiveCopyContents(const ofDirectory & srcDir, ofDirectory & destDir);
+	void recursiveCopyContents(const fs::path & srcDir, const fs::path & destDir);
+	void recursiveTemplateCopy(const fs::path & srcDir, const fs::path & destDir);
+	
 	std::vector<ofAddon> addons;
 	std::vector<std::string> extSrcPaths;
 
 	//cached addons - if an addon is requested more than once, avoid loading from disk as it's quite slow
+//	std::unordered_map<std::string,std::unordered_map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]
 	std::map<std::string,std::map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]
 	bool isAddonInCache(const std::string & addonPath, const std::string platform); //is this addon in the mem cache?
 };

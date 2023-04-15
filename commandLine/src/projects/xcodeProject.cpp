@@ -88,19 +88,28 @@ bool xcodeProject::createProjectFile(){
 		dataDirectory.close();
 	}
 	if(binDirectory.exists()){
-		ofDirectory dataDirectory(ofFilePath::join(binDirectory.path(), "data"));
-		if (!dataDirectory.exists()){
-			dataDirectory.create(false);
+		fs::path dataDirectory { fs::path(binDirectory.path()) / "data" };
+		if (!fs::exists(dataDirectory)) {
+			fs::create_directory(dataDirectory);
 		}
 
 		// originally only on IOS
 		//this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
-		ofDirectory srcDataDir(ofFilePath::join(templatePath, "bin/data"));
-		if( srcDataDir.exists() ){
+		fs::path srcDataDir { fs::path{ templatePath } / "bin" / "data" };
+		if (fs::exists(srcDataDir) && fs::is_directory(srcDataDir)) {
 			baseProject::recursiveCopyContents(srcDataDir, dataDirectory);
 		}
-		dataDirectory.close();
-		srcDataDir.close();
+		//		ofDirectory dataDirectory(ofFilePath::join(binDirectory.path(), "data"));
+		//		if (!dataDirectory.exists()){
+		//			dataDirectory.create(false);
+		//		}
+
+//		ofDirectory srcDataDir(ofFilePath::join(templatePath, "bin/data"));
+//		if( srcDataDir.exists() ){
+//			baseProject::recursiveCopyContents(srcDataDir, dataDirectory);
+//		}
+//		dataDirectory.close();
+//		srcDataDir.close();
 	}
 	binDirectory.close();
 
@@ -692,8 +701,6 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 	for (auto & e : addon.srcFiles) {
 		ofLogVerbose() << "adding addon srcFiles: " << e;
-		// FIXME: - we can eliminate filesToFolders later with a proper function to do that.
-		// maybe even eliminate addSrc second parameter
 		addSrc(e,addon.filesToFolders[e]);
 	}
 

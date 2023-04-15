@@ -4,6 +4,9 @@
 #include "optionparser.h"
 #include "defines.h"
 
+// TODO: remove, temporary
+#include "Utils.h"
+
 cxxopts::Options options("Project Generator", "OpenFrameworks tool to generate projects");
 enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTERNAL, VERSION};
 
@@ -189,63 +192,41 @@ void addPlatforms(std::string value) {
     }
 }
 
-
-bool isGoodProjectPath(std::string path) {
-
-    ofDirectory dir(path);
-    if (!dir.isDirectory()) {
-        return false;
-    }
-
-    dir.listDir();
-    bool bHasSrc = false;
-    for (size_t i = 0; i < dir.size(); i++) {
-        if (dir.getName(i) == "src") {
-            bHasSrc = true;
-        }
-    }
-
-    if (bHasSrc == true) {
-        return true;
-    }
-    else {
-        return false;
-    }
+bool containsFolder(fs::path path, std::string folderName) {
+	bool contains = false;
+	for (const auto & entry : fs::directory_iterator(path)) {
+		auto f = entry.path();
+		if (f.filename() == folderName) {
+			contains = true;
+			break;
+		}
+	}
+	return contains;
 }
 
-bool isGoodOFPath(std::string path) {
+bool isGoodProjectPath(fs::path path) {
+	if (!fs::is_directory(path)) return false;
+	return containsFolder(path, "src");
+}
 
-    ofDirectory dir(path);
-    if (!dir.isDirectory()) {
-        ofLogError() << "ofPath seems wrong... not a directory";
-        return false;
-    }
-
-    dir.listDir();
-    bool bHasTemplates = false;
-    for (size_t i = 0; i < dir.size(); i++) {
-        if (dir.getName(i) == "scripts") {
-            bHasTemplates = true;
-        }
-    }
-
-    if (bHasTemplates == true) {
-        return true;
-    }
-    else {
-        ofLogError() << "ofPath seems wrong... no scripts / templates directory";
-        return false;
-    }
-
+bool isGoodOFPath(fs::path path) {
+	if (!fs::is_directory(path)) {
+		ofLogError() << "ofPath seems wrong... not a directory";
+		return false;
+	}
+    bool bHasTemplates = containsFolder(path, "scripts");
+	if (!bHasTemplates) ofLogError() << "ofPath seems wrong... no scripts / templates directory";
+	return bHasTemplates;
 }
 
 
-
+// FIXME: FS
 void updateProject(std::string path, ofTargetPlatform target, bool bConsiderParameterAddons = true) {
     // bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
     // either we read the addons.make file, or we look at the parameter list.
     // if we are updating recursively, we *never* consider addons passed as parameters.
-
+	
+	
 
     ofLogNotice() << "updating project " << path;
     auto project = getTargetProject(target);
@@ -253,6 +234,12 @@ void updateProject(std::string path, ofTargetPlatform target, bool bConsiderPara
     if (!bDryRun) project->create(path, templateName);
 
     if(bConsiderParameterAddons && bAddonsPassedIn){
+		
+		cout << "---->> addons.size " << addons.size() << endl;
+		for (auto & a : addons) {
+			cout << a << endl;
+		}
+		
         for(auto & addon: addons){
             project->addAddon(addon);
         }
@@ -270,31 +257,28 @@ void updateProject(std::string path, ofTargetPlatform target, bool bConsiderPara
     if (!bDryRun) project->save();
 }
 
-
-void recursiveUpdate(std::string path, ofTargetPlatform target) {
-    
-    ofDirectory dir(path);
-    
-    
-    // first, bail if it's just a file
-    if (dir.isDirectory() == false) return;
+void recursiveUpdate(fs::path path, ofTargetPlatform target) {
+	
+	alert("recursiveUpdate" + path.string());
+	// first, bail if it's just a file
+	if (!fs::is_directory(path)) return;
     
     // second check if this is a folder that has src in it
     if (isGoodProjectPath(path)) {
         nProjectsUpdated++;
         auto project = getTargetProject(target);
+		// FIXME: FS
         updateProject(path, target, false);
         return;
     }
     
-    // finally, recursively look at this
-    dir.listDir();
-    for (size_t i = 0; i < dir.size(); i++) {
-        ofDirectory subDir(dir.getPath(i));
-        if (subDir.isDirectory()) {
-            recursiveUpdate(dir.getPath(i), target);
-        }
-    }
+	// finally, recursively look at this
+	for (const auto & entry : fs::directory_iterator(path)) {
+		auto f = entry.path();
+		if (fs::is_directory(f)) {
+			recursiveUpdate(f, target);
+		}
+	}
 }
 
 void printHelp(){
