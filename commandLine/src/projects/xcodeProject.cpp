@@ -136,6 +136,7 @@ bool xcodeProject::createProjectFile(){
 	}
 
 	// make everything relative the right way.
+	// FIXME: FS
 	relRoot = getOFRelPathFS(projectDir).string();
 	projectDir = projectDir.lexically_normal();
 	
