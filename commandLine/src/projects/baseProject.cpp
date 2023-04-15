@@ -28,8 +28,7 @@ baseProject::baseProject(std::string _target){
 }
 
 fs::path baseProject::getPlatformTemplateDir(){
-	// FIXME: FS getOFRoot
-	return fs::path(getOFRoot()) / templatesFolder / target;
+	return getOFRoot() / templatesFolder / target;
 }
 
 bool isPlatformName(std::string file){

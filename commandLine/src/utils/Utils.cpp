@@ -369,17 +369,17 @@ std::string unsplitString (std::vector < std::string > strings, std::string deli
 }
 
 
-static std::string OFRoot = "../../..";
+static fs::path OFRoot { "../../.." };
 
-std::string getOFRoot(){
-	return ofFilePath::removeTrailingSlash(OFRoot);
+fs::path getOFRoot(){
+	return OFRoot;
 }
 
 std::string getAddonsRoot(){
 	return ofFilePath::join(getOFRoot(), "addons");
 }
 
-void setOFRoot(std::string path){
+void setOFRoot(const fs::path & path){
 	OFRoot = path;
 }
 

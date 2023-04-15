@@ -21,9 +21,10 @@
 
 std::string generateUUID(std::string input);
 
-std::string getOFRoot();
+fs::path getOFRoot();
+void setOFRoot(const fs::path & path);
+// FIXME: FS
 std::string getAddonsRoot();
-void setOFRoot(std::string path);
 void findandreplace( std::string& tInput, std::string tFind, std::string tReplace );
 void findandreplaceInTexfile (const of::filesystem::path & fileName, std::string tFind, std::string tReplace );
 
