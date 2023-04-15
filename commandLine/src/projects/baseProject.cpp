@@ -105,6 +105,7 @@ std::vector<baseProject::Template> baseProject::listAvailableTemplates(std::stri
 }
 
 bool baseProject::create(const fs::path & _path, std::string templateName){
+	alert("baseProject::create " + _path.string(), 33 );
 	auto path = _path; // just because it is const
 	
 	templatePath = getPlatformTemplateDir();
@@ -253,7 +254,7 @@ bool baseProject::isAddonInCache(const std::string & addonPath, const std::strin
 
 // FIXME: What? there are wto addAddon functions, one with string, another with addon.
 void baseProject::addAddon(std::string addonName){
-//	alert("addAddon string :: " + addonName);
+	alert("addAddon string :: " + addonName, 31);
 	ofAddon addon;
 //	cout << projectDir << endl;
 	addon.pathToOF = getOFRelPath(projectDir.string());
