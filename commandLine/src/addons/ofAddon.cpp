@@ -206,12 +206,10 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 	if (!addToVariable) variable.clear();
 	std::regex findVar("(\\$\\()(.+)(\\))");
 
-	// FIXME: iterator
-	for (int i = 0; i<(int)values.size(); i++) {
-		if (values[i] != "") {
-
+	for (auto & v : values) {
+		if (v != "") {
 			std::smatch varMatch;
-			if(std::regex_search(values[i], varMatch, findVar)) {
+			if(std::regex_search(v, varMatch, findVar)) {
 				if (varMatch.size() > 2) {
 					string varName = varMatch[2].str();
 					string varValue;
@@ -220,15 +218,15 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 					}else if(getenv(varName.c_str())){
 						varValue = getenv(varName.c_str());
 					}
-					ofStringReplace(values[i],"$("+varName+")",varValue);
-					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << values[i] << std::endl;
+					ofStringReplace(v,"$("+varName+")",varValue);
+					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << v << std::endl;
 				}
 			}
 
-			if (prefix == "" || values[i].find(pathToOF.string()) == 0 || ofFilePath::isAbsolute(values[i])) {
-				variable.push_back({ values[i], "", "" });
+			if (prefix == "" || v.find(pathToOF.string()) == 0 || ofFilePath::isAbsolute(v)) {
+				variable.push_back({ v, "", "" });
 			} else {
-				variable.push_back({ ofFilePath::join(prefix, values[i]), "", "" });
+				variable.push_back({ ofFilePath::join(prefix, v), "", "" });
 			}
 		}
 	}
@@ -510,7 +508,8 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 		getFilesRecursively(srcPath, srcFiles);
 	}
 
-	// FIXME: srcFiles to fs::path
+	// MARK: srcFiles to fs::path
+	// not possible today because there are string based exclusion functions
 	for (auto & s : srcFiles) {
 		fs::path folder;
 		auto srcFS = fs::path(prefixPath / fs::relative(s, containedPath));

@@ -82,9 +82,9 @@ public:
 	pugi::xml_document doc;
 	bool bLoaded;
 
-	of::filesystem::path projectDir;
+	fs::path projectDir;
+	fs::path templatePath;
 	std::string projectName;
-	std::string templatePath;
 	std::string target;
 
 protected:

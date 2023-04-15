@@ -263,7 +263,6 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 	if (isGoodProjectPath(path)) {
 		nProjectsUpdated++;
 		auto project = getTargetProject(target);
-		// FIXME: FS
 		updateProject(path, target, false);
 		return;
 	}
@@ -458,8 +457,7 @@ int main(int argc, char** argv){
 	} else {
 
 		// convert ofpath from relative to absolute by appending this to current path and calculating .. by canonical.
-		// FIXME: convert ofPath and functions to fs::path
-
+		// FIXME: test generating projects from pg executing from other directories
 		if (!fs::path(ofPath).is_absolute()) {
 			ofPath = (fs::current_path() / fs::path(ofPath)).lexically_normal();
 		}
