@@ -436,18 +436,6 @@ void baseProject::addAddon(ofAddon & addon){
 	}
 	cout << "---> " << endl;
 
-	// This was real flawed logic, was adding lots of times the same addon
-//	for(int i=0;i<addon.dependencies.size();i++){
-//		cout << addon.dependencies[i] << endl;
-//		for(int j=0;j<(int)addons.size();j++){
-//			if(addon.dependencies[i] != addons[j].name){ //make sure dependencies of addons arent already added to prj
-//				addAddon(addon.dependencies[i]);
-//			}else{
-//				ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << addon.dependencies[i];
-//			}
-//		}
-//	}
-
 	addons.push_back(addon);
 
 	ofLogVerbose("baseProject") << "libs in addAddon " << addon.libs.size();

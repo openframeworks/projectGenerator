@@ -375,10 +375,6 @@ fs::path getOFRoot(){
 	return OFRoot;
 }
 
-std::string getAddonsRoot(){
-	return ofFilePath::join(getOFRoot(), "addons");
-}
-
 void setOFRoot(const fs::path & path){
 	OFRoot = path;
 }
