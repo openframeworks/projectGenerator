@@ -437,7 +437,7 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 }
 
 void xcodeProject::addFramework(string name, string path, string folder){
-//	cout << "addFramework " << name << " path = " << path << " folder = " << folder << endl;
+	cout << "addFramework " << name << " path = " << path << " folder = " << folder << endl;
 	// name = name of the framework
 	// path = the full path (w name) of this framework
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
@@ -468,8 +468,7 @@ void xcodeProject::addFramework(string name, string path, string folder){
 	commands.emplace_back("Add :objects:"+buildUUID+":settings:ATTRIBUTES array");
 	commands.emplace_back("Add :objects:"+buildUUID+":settings:ATTRIBUTES: string CodeSignOnCopy");
 
-	// we add one of the build refs to the list of frameworks
-	// TENTATIVA desesperada aqui...
+	//	this now adds the recently created object UUID to its parent folder
 	string folderUUID = getFolderUUID(folder, false);
 	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
 
@@ -527,6 +526,7 @@ void xcodeProject::addFramework(string name, string path, string folder){
 }
 
 void xcodeProject::addDylib(string name, string path){
+//	alert("addDylib " + name + " : " + path);
 	// name = name of the dylib
 	// path = the full path (w name) of this framework
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
@@ -549,6 +549,13 @@ void xcodeProject::addDylib(string name, string path){
 	commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string compiled.mach-o.dylib");
 	commands.emplace_back("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
 
+
+	fs::path fsPath { path };
+	fs::path folder = fsPath.parent_path();
+	string folderUUID = getFolderUUID(folder.string(), false);
+	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
+
+	
 	string buildUUID = generateUUID(name + "-build");
 	commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
 	commands.emplace_back("Add :objects:"+buildUUID+":fileRef string "+UUID);
@@ -561,6 +568,10 @@ void xcodeProject::addDylib(string name, string path){
 //	// TENTATIVA desesperada aqui...
 //	string folderUUID = getFolderUUID(folder);
 //	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
+	
+//	string folderUUID = getFolderUUID(folder, false);
+//	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
+
 
 	string buildUUID2 = generateUUID(name + "-build2");
 	commands.emplace_back("Add :objects:"+buildUUID2+":fileRef string "+UUID);
@@ -573,17 +584,15 @@ void xcodeProject::addDylib(string name, string path){
 	// UUID hardcoded para PBXCopyFilesBuildPhase
 	// FIXME: hardcoded - this is the same for the next fixme. so maybe a clearer ident can make things better here.
 	commands.emplace_back("Add :objects:E4A5B60F29BAAAE400C2D356:files: string " + buildUUID2);
-
 }
 
 
 void xcodeProject::addInclude(string includeName){
+//	alert("addInclude " + includeName);
 
-//	string relRoot = getOFRelPathFS(projectDir).string();
-//	ofStringReplace(includeName, relRoot, "$(OF_PATH)");
-
-	// Adding source to all build configurations, debug and release
-	for (auto & c : buildConfigurations) {
+	// Adding to all build configurations, debug and release
+//	for (auto & c : buildConfigurations) {
+	for (auto & c : buildConfigs) {
 		string s = "Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName;
 		commands.emplace_back("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
 	}
@@ -604,7 +613,8 @@ void xcodeProject::addLDFLAG(string ldflag, LibType libType){
 }
 
 void xcodeProject::addCFLAG(string cflag, LibType libType){
-	for (auto & c : buildConfigurations) {
+//	for (auto & c : buildConfigurations) {
+	for (auto & c : buildConfigs) {
 		// FIXME: add array here if it doesnt exist
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_CFLAGS array");
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_CFLAGS: string " + cflag);
@@ -749,73 +759,74 @@ void xcodeProject::addAddon(ofAddon & addon){
 bool xcodeProject::saveProjectFile(){
 	fs::path fileName = projectDir / (projectName + ".xcodeproj/project.pbxproj");
 
-	// JSON Block - Multiplatform
-	string contents = ofBufferFromFile(fileName).getText();
-	json j = json::parse(contents);
-
-	for (auto & c : commands) {
-//		cout << c << endl;
-		vector<string> cols = ofSplitString(c, " ");
-		string thispath = cols[1];
-		ofStringReplace(thispath, ":", "/");
-
-		if (thispath.substr(thispath.length() -1) != "/") {
-			//if (cols[0] == "Set") {
-			json::json_pointer p = json::json_pointer(thispath);
-			if (cols[2] == "string") {
-				j[p] = cols[3];
-			}
-			else if (cols[2] == "array") {
-				j[p] = {};
-			}
+	bool usePlistBuddy = false;
+	
+	if (usePlistBuddy) {
+		//	PLISTBUDDY - Mac only
+		string command = "/usr/libexec/PlistBuddy " + fileName.string();
+		string allCommands = "";
+		for (auto & c : commands) {
+			command += " -c \"" + c + "\"";
+			allCommands += c + "\n";
 		}
-		else {
-			thispath = thispath.substr(0, thispath.length() -1);
-			json::json_pointer p = json::json_pointer(thispath);
-			try {
-				// Fixing XCode one item array issue
-				if (!j[p].is_array()) {
-					auto v = j[p];
-					j[p] = json::array();
-					if (!v.is_null()) {
-						j[p].push_back(v);
-					}
+		cout << ofSystem(command) << endl;
+	} else {
+		// JSON Block - Multiplatform
+		string contents = ofBufferFromFile(fileName).getText();
+		json j = json::parse(contents);
+		
+		for (auto & c : commands) {
+			//		cout << c << endl;
+			vector<string> cols = ofSplitString(c, " ");
+			string thispath = cols[1];
+			ofStringReplace(thispath, ":", "/");
+			
+			if (thispath.substr(thispath.length() -1) != "/") {
+				//if (cols[0] == "Set") {
+				json::json_pointer p = json::json_pointer(thispath);
+				if (cols[2] == "string") {
+					j[p] = cols[3];
 				}
-				j[p].push_back(cols[3]);
-
-			} catch (std::exception e) {
-				cout << "json error " << endl;
-				cout << e.what() << endl;
+				else if (cols[2] == "array") {
+					j[p] = {};
+				}
+			}
+			else {
+				thispath = thispath.substr(0, thispath.length() -1);
+				json::json_pointer p = json::json_pointer(thispath);
+				try {
+					// Fixing XCode one item array issue
+					if (!j[p].is_array()) {
+						auto v = j[p];
+						j[p] = json::array();
+						if (!v.is_null()) {
+							j[p].push_back(v);
+						}
+					}
+					j[p].push_back(cols[3]);
+					
+				} catch (std::exception e) {
+					cout << "json error " << endl;
+					cout << e.what() << endl;
+				}
 			}
 		}
-	}
-
-	ofFile jsonFile(fileName, ofFile::WriteOnly);
-	try{
-		jsonFile << j.dump(1, '	');
-	}catch(std::exception & e){
-		ofLogError("ofSaveJson") << "Error saving json to " << fileName << ": " << e.what();
-		return false;
-	}catch(...){
-		ofLogError("ofSaveJson") << "Error saving json to " << fileName;
-		return false;
+		
+		ofFile jsonFile(fileName, ofFile::WriteOnly);
+		try{
+			jsonFile << j.dump(1, '	');
+		}catch(std::exception & e){
+			ofLogError("ofSaveJson") << "Error saving json to " << fileName << ": " << e.what();
+			return false;
+		}catch(...){
+			ofLogError("ofSaveJson") << "Error saving json to " << fileName;
+			return false;
+		}
 	}
 
 //	for (auto & c : commands) {
 //		cout << c << endl;
 //	}
 
-	
-	//	PLISTBUDDY - Mac only
-//	{
-//		string command = "/usr/libexec/PlistBuddy " + fileName;
-//		string allCommands = "";
-//		for (auto & c : commands) {
-//			command += " -c \"" + c + "\"";
-//			allCommands += c + "\n";
-//		}
-//		cout << ofSystem(command) << endl;
-//		cout << allCommands << endl;
-//	}
 	return true;
 }

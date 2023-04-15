@@ -1,5 +1,4 @@
 //#include "ofMain.h"
-#include "cxxopts.hpp"
 
 #include "optionparser.h"
 #include "defines.h"
@@ -7,7 +6,7 @@
 // TODO: remove, temporary
 #include "Utils.h"
 
-cxxopts::Options options("Project Generator", "OpenFrameworks tool to generate projects");
+//cxxopts::Options options("Project Generator", "OpenFrameworks tool to generate projects");
 enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTERNAL, VERSION};
 
 constexpr option::Descriptor usage[] =
@@ -324,13 +323,8 @@ void printHelp(){
 }
 
 
-#include <iostream>
-#include <chrono>
-
 //-------------------------------------------
 int main(int argc, char** argv){
-
-	auto start = std::chrono::high_resolution_clock::now();
 
 	//------------------------------------------- pre-parse
 	bAddonsPassedIn = false;
@@ -519,15 +513,8 @@ int main(int argc, char** argv){
 		ofSetLogLevel(OF_LOG_VERBOSE);
 	}
 
-	{
-		auto diff = std::chrono::high_resolution_clock::now() - start;
-		auto t1 = std::chrono::duration_cast<std::chrono::nanoseconds>(diff);
-		std::cout << "Loop1: " << t1.count() << std::endl;
-	}
-
 	if (mode == PG_MODE_CREATE) {
 		nProjectsCreated += 1;
-
 
 		for (int i = 0; i < (int)targets.size(); i++) {
 			auto project = getTargetProject(targets[i]);

@@ -49,6 +49,7 @@ public:
 
 	std::vector<string> commands;
 
+	// FIXME: reduce to two
 	string buildConfigurations[4] = {
 		"E4B69B600A3A1757003C02F2", //macOS Debug
 		"E4B69B610A3A1757003C02F2", //macOS Release

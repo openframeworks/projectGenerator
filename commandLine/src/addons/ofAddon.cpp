@@ -92,7 +92,6 @@ string ofAddon::stateName(ofAddon::ConfigParseState state){
 	default:
 		return "unknown";
 	}
-
 }
 
 bool ofAddon::checkCorrectPlatform(ConfigParseState state){
@@ -482,8 +481,7 @@ void ofAddon::parseConfig(){
 
 
 bool ofAddon::fromFS(fs::path path, const std::string & platform){
-	
-	cout << "fromFS path : " << path << endl;
+//	cout << "ofAddon::fromFS path : " << path << endl;
 
 	clear();
 	this->platform = platform;

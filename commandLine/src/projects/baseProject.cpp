@@ -105,7 +105,6 @@ std::vector<baseProject::Template> baseProject::listAvailableTemplates(std::stri
 }
 
 bool baseProject::create(const fs::path & _path, std::string templateName){
-//	alert("baseProject::create " + _path.string(), 33 );
 	auto path = _path; // just because it is const
 	
 	templatePath = getPlatformTemplateDir();
@@ -117,9 +116,6 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 	}
 	projectDir = path;
 	projectName = path.parent_path().filename();
-	cout << "projectDir " << projectDir << endl;
-	cout << "projectName " << projectName << endl;
-	
 	bool bDoesDirExist = false;
 
 	// FIXME: FS
@@ -127,27 +123,21 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 	if (fs::exists(project) && fs::is_directory(project)) {
 		bDoesDirExist = true;
 	}else{
-//		ofDirectory project(projectDir);
 		// FIXME: temporarly templatePath is string, port to fs::path
 		ofDirectory(fs::path(templatePath) / "src").copyTo(projectDir / "src");
 		ofDirectory(fs::path(templatePath) / "bin").copyTo(projectDir / "bin");
 	}
-	cout << "bDoesDirExist " << bDoesDirExist << endl;
 
 	bool ret = createProjectFile();
 	if(!ret) return false;
 
 	if(templateName!=""){
-//		auto name = ofFilePath::join(getOFRoot(),templatesFolder + templateName);
 		// FIXME: FS getOFRoot()
 		fs::path templateDir = fs::path(getOFRoot()) / (templatesFolder + templateName);
-//		cout << "templateDir " << templateDir << endl;
-//		ofDirectory templateDir(ofFilePath::join(getOFRoot(),templatesFolder + templateName));
 		// TODO: PORT
 //		templateDir.setShowHidden(true);
 		auto templateConfig = parseTemplate(templateDir);
 		if(templateConfig){
-//			ofDirectory project(projectDir);
 			// FIXME: FS - temporary placeholder to make it work.
 			recursiveTemplateCopy(templateDir, projectDir);
 			for(auto & rename: templateConfig->renames){
@@ -182,10 +172,8 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 				fileName != "src/main.cpp" &&
 				fileName != "src/ofApp.mm" &&
 				fileName != "src/main.mm") {
-//				cout << "add filename:: " << rel << " :: " << folder << endl;
 				addSrc(rel.string(), folder.string());
 			} else {
-//				cout << "not adding filename:: " << rel << " :: " << folder << endl;
 			}
 		}
 
@@ -258,17 +246,13 @@ bool baseProject::isAddonInCache(const std::string & addonPath, const std::strin
 
 // FIXME: What? there are wto addAddon functions, one with string, another with addon.
 void baseProject::addAddon(std::string addonName){
-	alert("addAddon string :: " + addonName, 31);
+//	alert("addAddon string :: " + addonName, 31);
 	ofAddon addon;
-//	cout << projectDir << endl;
 	addon.pathToOF = getOFRelPath(projectDir.string());
 	addon.pathToProject = ofFilePath::getAbsolutePath(projectDir);
 
 	bool addonOK = false;
-
 	bool inCache = isAddonInCache(addonName, target);
-	//inCache = false; //to test no-cache scenario
-	
 	
 	fs::path addonPath { addonName };
 	if (fs::exists(addonPath)) {
@@ -280,8 +264,6 @@ void baseProject::addAddon(std::string addonName){
 	
 	if(!inCache){
 		addonOK = addon.fromFS(addonPath, target);
-//		if (!addonOK) alert("not addonOK",33);
-
 	}else{
 		addon = addonsCache[target][addonName];
 		addonOK = true;
@@ -381,7 +363,6 @@ void baseProject::addSrcRecursively(std::string srcPath){
 			addSrc(fileToAdd, folder);
 			uniqueIncludeFolders[absFolder] = absFolder;
 		}else{
-
 			auto absPath = fileToAdd;
 
 			//if it is a realtive path make the file relative to the project folder
@@ -419,9 +400,8 @@ void baseProject::addSrcRecursively(std::string srcPath){
 	}
 }
 
+	// FIXME: I think this one is not being invoked
 void baseProject::addAddon(ofAddon & addon){
-//	alert("addAddon addon :: " + addon.name, 31);
-
 	for(int i=0;i<(int)addons.size();i++){
 		if(addons[i].name==addon.name){
 			return;
