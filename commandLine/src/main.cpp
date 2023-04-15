@@ -58,8 +58,8 @@ int                 nProjectsCreated;
 //std::string projectPath;
 fs::path projectPath;
 fs::path ofPath;
-std::string directoryForRecursion;
 std::vector <std::string> addons;
+// FIXME: FS
 std::vector <std::string> srcPaths;
 std::vector <ofTargetPlatform> targets;
 std::string ofPathEnv;
@@ -76,22 +76,16 @@ bool bListTemplates;                    // did we request help?
 bool bDryRun;                           // do dry run (useful for debugging recursive update)
 
 
-
-
 //-------------------------------------------
 void consoleSpace() {
 	std::cout << std::endl;
 }
 
-void printVersion()
-{
+void printVersion() {
 	std::cout << OFPROJECTGENERATOR_MAJOR_VERSION << "." << OFPROJECTGENERATOR_MINOR_VERSION << "." << OFPROJECTGENERATOR_PATCH_VERSION << std::endl;
 }
 
 bool printTemplates() {
-
-	std::cout << "getOFRoot() " << getOFRoot() << std::endl;
-
 	if(targets.size()>1){
 	std::vector<std::vector<baseProject::Template>> allPlatformsTemplates;
 		for(auto & target: targets){
@@ -143,7 +137,6 @@ bool printTemplates() {
 }
 
 void addPlatforms(const std::string & value) {
-
 	targets.clear();
 	std::vector < std::string > platforms = ofSplitString(value, ",", true, true);
 
@@ -224,8 +217,6 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 	// either we read the addons.make file, or we look at the parameter list.
 	// if we are updating recursively, we *never* consider addons passed as parameters.
 
-
-
 	ofLogNotice() << "updating project " << path;
 	auto project = getTargetProject(target);
 
@@ -277,7 +268,6 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 }
 
 void printHelp(){
-
 	consoleSpace();
 
 	std::string header = "";
@@ -457,7 +447,7 @@ int main(int argc, char** argv){
 	} else {
 
 		// convert ofpath from relative to absolute by appending this to current path and calculating .. by canonical.
-		// FIXME: test generating projects from pg executing from other directories
+		// TODO: test generating projects from pg executing from other directories
 		if (!fs::path(ofPath).is_absolute()) {
 			ofPath = (fs::current_path() / fs::path(ofPath)).lexically_normal();
 		}

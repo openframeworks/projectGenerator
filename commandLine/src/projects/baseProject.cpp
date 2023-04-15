@@ -12,6 +12,7 @@
 #include "Utils.h"
 #include "ofConstants.h"
 #include <list>
+#include <set>
 
 using std::string;
 using std::vector;
@@ -91,16 +92,21 @@ std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirect
 std::vector<baseProject::Template> baseProject::listAvailableTemplates(std::string target){
 	std::vector<baseProject::Template> templates;
 
-	// FIXME: dirlist to FS
-	ofDirectory templatesDir(getOFRoot() / templatesFolder);
-	for(auto & f: templatesDir.getSorted()){
-		if(f.isDirectory()){
-			auto templateConfig = parseTemplate(ofDirectory(f));
-			if(templateConfig){
-				templates.push_back(*templateConfig);
-			}
+	std::set<fs::path> sorted;
+	for (const auto & entry : fs::directory_iterator(getOFRoot() / templatesFolder)) {
+		auto f = entry.path();
+		if (fs::is_directory(f)) {
+			sorted.insert(f);
 		}
 	}
+	
+	for (auto & s : sorted) {
+		auto templateConfig = parseTemplate(s);
+		if(templateConfig){
+			templates.emplace_back(*templateConfig);
+		}
+	}
+
 	return templates;
 }
 

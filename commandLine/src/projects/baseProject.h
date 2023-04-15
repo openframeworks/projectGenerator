@@ -93,6 +93,7 @@ protected:
 	void recursiveTemplateCopy(const fs::path & srcDir, const fs::path & destDir);
 	
 	std::vector<ofAddon> addons;
+	// FIXME: FS
 	std::vector<std::string> extSrcPaths;
 
 	//cached addons - if an addon is requested more than once, avoid loading from disk as it's quite slow
