@@ -253,7 +253,7 @@ bool baseProject::isAddonInCache(const std::string & addonPath, const std::strin
 
 // FIXME: What? there are wto addAddon functions, one with string, another with addon.
 void baseProject::addAddon(std::string addonName){
-	alert("addAddon string :: " + addonName);
+//	alert("addAddon string :: " + addonName);
 	ofAddon addon;
 //	cout << projectDir << endl;
 	addon.pathToOF = getOFRelPath(projectDir.string());
@@ -413,7 +413,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 }
 
 void baseProject::addAddon(ofAddon & addon){
-	alert("addAddon addon :: " + addon.name, 31);
+//	alert("addAddon addon :: " + addon.name, 31);
 
 	for(int i=0;i<(int)addons.size();i++){
 		if(addons[i].name==addon.name){
@@ -421,7 +421,7 @@ void baseProject::addAddon(ofAddon & addon){
 		}
 	}
 
-	cout << "---> dependencies" << endl;
+//	cout << "---> dependencies" << endl;
 	for(int i=0;i<addon.dependencies.size();i++){
 		cout << addon.dependencies[i] << endl;
 		for(int j=0;j<(int)addons.size();j++){
@@ -432,8 +432,7 @@ void baseProject::addAddon(ofAddon & addon){
 			}
 		}
 	}
-	cout << "---> " << endl;
-
+//	cout << "---> " << endl;
 
 	addons.push_back(addon);
 
@@ -489,7 +488,7 @@ void baseProject::addAddon(ofAddon & addon){
 }
 
 void baseProject::parseAddons(){
-	alert("--- parseAddons");
+//	alert("--- parseAddons");
 	
 	ofFile addonsMake(ofFilePath::join(projectDir,"addons.make"));
 	ofBuffer addonsMakeMem;
@@ -500,7 +499,7 @@ void baseProject::parseAddons(){
 		if(addon == "") continue;
 		addAddon(ofSplitString(addon, "#")[0]);
 	}
-	alert("--- end parseAddons");
+//	alert("--- end parseAddons");
 
 }
 
