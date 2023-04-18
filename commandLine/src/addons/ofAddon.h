@@ -8,16 +8,11 @@
 #ifndef OFADDON_H_
 #define OFADDON_H_
 
-<<<<<<< HEAD:commandLine/src/addons/ofAddon.h
-#include "ofConstants.h"
-#include "LibraryBinary.h"
-#include <unordered_map>
-=======
 // FIXME: of::filesystem only
 #include "ofConstants.h"
 #include "LibraryBinary.h"
-#include <map>
->>>>>>> 4f16f91 (removing unneded paths):ofxProjectGenerator/src/addons/ofAddon.h
+#include <unordered_map>
+// #include <map>
 
 // About Metadata
 
