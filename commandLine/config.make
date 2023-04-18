@@ -143,3 +143,28 @@ PROJECT_OPTIMIZATION_CFLAGS_RELEASE = -O3
 # PROJECT_CXX = 
 # PROJECT_CC = 
 
+
+#PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/utils
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/sound
+
+
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/3d
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/communication
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/events
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/gl
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/graphics
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/math
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/types
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/video
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/boost%
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/cairo%
+#PLATFORM_CORE_EXCLUSIONS += ../../../libs/curl%
+#PLATFORM_CORE_EXCLUSIONS += ../../../libs/fmod%
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/rtAudio%
+#PLATFORM_CORE_EXCLUSIONS += ../../../libs/freetype%
+#PLATFORM_CORE_EXCLUSIONS += ../../../libs/FreeImage%
+#PLATFORM_CORE_EXCLUSIONS += ../../../libs/glew%
+#PLATFORM_CORE_EXCLUSIONS += ../../../libs/glfw%
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/glm%
+#PLATFORM_CORE_EXCLUSIONS += ../../../libs/tess2%
+#PLATFORM_CORE_EXCLUSIONS += ../../../libs/uriparser%

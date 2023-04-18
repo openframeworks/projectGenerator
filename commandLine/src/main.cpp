@@ -1,5 +1,3 @@
-//#include "ofMain.h"
-
 #include "optionparser.h"
 #include "defines.h"
 
