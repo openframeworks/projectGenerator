@@ -200,7 +200,7 @@ bool containsFolder(fs::path path, std::string folderName) {
 
 bool isGoodProjectPath(fs::path path) {
 	if (!fs::is_directory(path)) return false;
-	return containsFolder(path, "src");
+	return fs::exists(path / "src");
 }
 
 bool isGoodOFPath(fs::path path) {
@@ -249,6 +249,7 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 }
 
 void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
+//	cout << "recursiveUpdate path=" << path << " target=" << target << endl;
 	// first, bail if it's just a file
 	if (!fs::is_directory(path)) return;
 
@@ -257,7 +258,10 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 		nProjectsUpdated++;
 		auto project = getTargetProject(target);
 		updateProject(path, target, false);
+//		cout << "isGoodProjectPath is true " << path << endl;
 		return;
+	} else {
+//		cout << "isGoodProjectPath is false " << path << endl;
 	}
 
 	// finally, recursively look at this
@@ -495,7 +499,7 @@ int main(int argc, char** argv){
 		mode = PG_MODE_CREATE;
 	}
 	//XAXA TEMP
-	mode = PG_MODE_CREATE;
+//	mode = PG_MODE_CREATE;
 
 
 	if (bVerbose){
