@@ -195,7 +195,7 @@ bool containsFolder(fs::path path, std::string folderName) {
 
 bool isGoodProjectPath(fs::path path) {
 	if (!fs::is_directory(path)) return false;
-	return containsFolder(path, "src");
+	return fs::exists(path / "src");
 }
 
 bool isGoodOFPath(fs::path path) {
@@ -220,12 +220,6 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 	if (!bDryRun) project->create(path, templateName);
 
 	if(bConsiderParameterAddons && bAddonsPassedIn){
-
-		//cout << "---->> addons.size " << addons.size() << endl;
-		for (auto & a : addons) {
-			cout << a << endl;
-		}
-
 		for(auto & addon: addons){
 			project->addAddon(addon);
 		}
@@ -253,6 +247,7 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 		auto project = getTargetProject(target);
 		updateProject(path, target, false);
 		return;
+	} else {
 	}
 
 	// finally, recursively look at this
@@ -490,7 +485,7 @@ int main(int argc, char** argv){
 		mode = PG_MODE_CREATE;
 	}
 	//XAXA TEMP
-	mode = PG_MODE_CREATE;
+//	mode = PG_MODE_CREATE;
 
 
 	if (bVerbose){
