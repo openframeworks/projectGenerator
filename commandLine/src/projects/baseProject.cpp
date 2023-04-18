@@ -534,7 +534,7 @@ void baseProject::recursiveTemplateCopy(const fs::path & srcDir, const fs::path 
 		}
 		else if (f.filename() != "template.config") {
 			if (!fs::exists(destFile)) {
-				fs::copy_file(f, destFile); // from, to
+				ofFile::copyFromTo(f, destFile, false, true); // from, to
 			}
 		}
 	}
@@ -548,7 +548,7 @@ void baseProject::recursiveCopyContents(const fs::path & srcDir, const fs::path 
 			recursiveCopyContents(f, destFile);
 		} else {
 			if (!fs::exists(destFile)) {
-				fs::copy_file(f, destFile);
+				ofFile::copyFromTo(f, destFile, false, true);
 			}
 		}
 	}
