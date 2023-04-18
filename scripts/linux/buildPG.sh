@@ -20,10 +20,8 @@ if [ $ret -ne 0 ]; then
       exit 1
 fi
 
-pwd
 cd commandLine/bin/
-pwd
-ls -la
+
 echo "Testing project generation linux 64";
 chmod +x projectGenerator
 ./projectGenerator --recursive -plinux64 -tvscode -o../../../../ ../../../../examples/
