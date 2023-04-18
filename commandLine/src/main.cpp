@@ -225,12 +225,6 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 	if (!bDryRun) project->create(path, templateName);
 
 	if(bConsiderParameterAddons && bAddonsPassedIn){
-
-		//cout << "---->> addons.size " << addons.size() << endl;
-		for (auto & a : addons) {
-			cout << a << endl;
-		}
-
 		for(auto & addon: addons){
 			project->addAddon(addon);
 		}
@@ -249,7 +243,6 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 }
 
 void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
-//	cout << "recursiveUpdate path=" << path << " target=" << target << endl;
 	// first, bail if it's just a file
 	if (!fs::is_directory(path)) return;
 
@@ -258,10 +251,8 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 		nProjectsUpdated++;
 		auto project = getTargetProject(target);
 		updateProject(path, target, false);
-//		cout << "isGoodProjectPath is true " << path << endl;
 		return;
 	} else {
-//		cout << "isGoodProjectPath is false " << path << endl;
 	}
 
 	// finally, recursively look at this

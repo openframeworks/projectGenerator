@@ -493,8 +493,6 @@ void baseProject::addAddon(ofAddon & addon){
 }
 
 void baseProject::parseAddons(){
-//	alert("--- parseAddons");
-	
 	ofFile addonsMake(ofFilePath::join(projectDir,"addons.make"));
 	ofBuffer addonsMakeMem;
 	addonsMake >> addonsMakeMem;
@@ -504,8 +502,6 @@ void baseProject::parseAddons(){
 		if(addon == "") continue;
 		addAddon(ofSplitString(addon, "#")[0]);
 	}
-//	alert("--- end parseAddons");
-
 }
 
 void baseProject::parseConfigMake(){
@@ -530,12 +526,9 @@ void baseProject::parseConfigMake(){
 }
 
 void baseProject::recursiveTemplateCopy(const fs::path & srcDir, const fs::path & destDir){
-//	cout << "recursiveTemplateCopy src:" << srcDir << " : dest:" << destDir << endl;
 	for (const auto & entry : fs::directory_iterator(srcDir)) {
 		auto f = entry.path();
 		auto destFile = destDir / f.filename();
-		cout << "	f = " << f << endl;
-		cout << "	destFile = " << destFile << endl;
 		if (fs::is_directory(f)) {
 			recursiveTemplateCopy(f, destFile);
 		}
