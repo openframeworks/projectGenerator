@@ -158,9 +158,10 @@ fi
 pwd
 cd commandLine/bin/
 pwd
-ls -la 
+ls -la
 echo "Testing project generation osx";
-projectGenerator --recursive -posx -o../../../../ ../../../../examples/
+chmod +x projectGenerator
+./projectGenerator --recursive -posx -o../../../../ ../../../../examples/
 errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
         exit $errorcode

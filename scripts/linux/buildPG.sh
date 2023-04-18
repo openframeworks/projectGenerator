@@ -25,7 +25,8 @@ cd commandLine/bin/
 pwd
 ls -la
 echo "Testing project generation linux 64";
-projectGenerator --recursive -plinux64 -tvscode -o../../../../ ../../../../examples/
+chmod +x projectGenerator
+./projectGenerator --recursive -plinux64 -tvscode -o../../../../ ../../../../examples/
 errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
         exit $errorcode
