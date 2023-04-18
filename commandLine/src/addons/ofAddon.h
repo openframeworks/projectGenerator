@@ -8,9 +8,11 @@
 #ifndef OFADDON_H_
 #define OFADDON_H_
 
+// FIXME: of::filesystem only
 #include "ofConstants.h"
 #include "LibraryBinary.h"
 #include <unordered_map>
+// #include <map>
 
 // About Metadata
 

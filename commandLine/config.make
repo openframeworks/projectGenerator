@@ -143,3 +143,42 @@ PROJECT_OPTIMIZATION_CFLAGS_RELEASE = -O3
 # PROJECT_CXX = 
 # PROJECT_CC = 
 
+
+#PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/utils
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/sound
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/3d
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/communication
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/events
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/gl
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/graphics
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/math
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/types
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/video
+
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/boost%
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/cairo%
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/rtAudio%
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/glm%
+
+# unable to remove because ofURLFileLoaderImpl is being used by ofImage, which is being used by ofUtils
+#PLATFORM_CORE_EXCLUSIONS += ../../../libs/curl%
+
+#PLATFORM_CORE_EXCLUSIONS += ../../../libs/fmod%
+#PLATFORM_CORE_EXCLUSIONS += ../../../libs/freetype%
+#PLATFORM_CORE_EXCLUSIONS += ../../../libs/FreeImage%
+
+# ../../../libs/openFrameworks/utils/ofConstants.h:192:11: fatal error: 'GL/glew.h' file not found
+#PLATFORM_CORE_EXCLUSIONS += ../../../libs/glew%
+
+# not possible to remove yet
+#PLATFORM_CORE_EXCLUSIONS += ../../../libs/glfw%
+
+# ../../../libs/openFrameworks/utils/ofConstants.h:287:10: fatal error: 'tesselator.h' file not found
+#PLATFORM_CORE_EXCLUSIONS += ../../../libs/tess2%
+
+# inside ofImage inside ofUtils
+#PLATFORM_CORE_EXCLUSIONS += ../../../libs/uriparser%
+
+# FIXME: REMOVE
+#PROJECT_CXX = include-what-you-use
+#PROJECT_CC = include-what-you-use

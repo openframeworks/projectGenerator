@@ -1,11 +1,11 @@
-//#include "ofMain.h"
+#define TARGET_NO_SOUND
+#define TARGET_NODISPLAY
 
 #include "optionparser.h"
 #include "defines.h"
+#include "Utils.h"
+#include <set>
 
-#include "Utils.h" // TODO: remove, temporary, only for alert function
-
-//cxxopts::Options options("Project Generator", "OpenFrameworks tool to generate projects");
 enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTERNAL, VERSION};
 
 constexpr option::Descriptor usage[] =
@@ -25,11 +25,6 @@ constexpr option::Descriptor usage[] =
 	{0,0,0,0,0,0}
 };
 
-#include "qtcreatorproject.h"
-#include "visualStudioProject.h"
-#include "xcodeProject.h"
-#include "androidStudioProject.h"
-#include "Utils.h"
 
 using std::cout;
 using std::endl;
