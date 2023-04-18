@@ -20,6 +20,14 @@ if [ $ret -ne 0 ]; then
       exit 1
 fi
 
+cd commandLine/bin/
+echo "Testing project generation linux 64";
+projectGenerator --recursive -plinux64 -tvscode -o../../../../ ../../../../examples/
+errorcode=$?
+if [[ $errorcode -ne 0 ]]; then
+        exit $errorcode
+fi
+
 if [[ -z "${GA_CI_SECRET}" ]] ; then
     echo "Not on main repo skipping sign and upload";
 else
