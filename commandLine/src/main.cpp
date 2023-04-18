@@ -1,9 +1,6 @@
 #include "optionparser.h"
 #include "defines.h"
 
-#include "Utils.h" // TODO: remove, temporary, only for alert function
-
-//cxxopts::Options options("Project Generator", "OpenFrameworks tool to generate projects");
 enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTERNAL, VERSION};
 
 constexpr option::Descriptor usage[] =

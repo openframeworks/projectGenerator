@@ -1,9 +1,8 @@
-
 #ifndef VSWINPROJECT_H_
 #define VSWINPROJECT_H_
 
-#include "ofConstants.h"
-#include "ofAddon.h"
+//#include "ofConstants.h"
+//#include "ofAddon.h"
 #include "baseProject.h"
 
 class visualStudioProject : public baseProject {
@@ -29,12 +28,9 @@ public:
 
 	pugi::xml_document filterXmlDoc;
 
-
 	void appendFilter(std::string folderName);
-
 
 private:
 
 };
-
 #endif

@@ -1,9 +1,7 @@
-
-
 #pragma once
 
 #include "ofAddon.h"
-#include "ofConstants.h"
+//#include "ofConstants.h"
 #include "ofFileUtils.h"
 #include "pugixml.hpp"
 // TODO: - Remove
