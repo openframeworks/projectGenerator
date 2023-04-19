@@ -121,7 +121,7 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 		path = fs::current_path() / path;
 	}
 	projectDir = path;
-	projectName = path.parent_path().filename();
+	projectName = path.filename();
 	bool bDoesDirExist = false;
 
 	fs::path project { projectDir / "src" };

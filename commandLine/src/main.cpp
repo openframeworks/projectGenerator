@@ -325,7 +325,6 @@ int main(int argc, char** argv){
 //	ofPath = "";
 	templateName = "";
 
-
 	// ------------------------------------------------------ parse args
 	argc-=(argc>0); argv+=(argc>0); // skip program name argv[0] if present
 	option::Stats  stats(usage, argc, argv);
@@ -484,7 +483,7 @@ int main(int argc, char** argv){
 	else {
 		mode = PG_MODE_CREATE;
 	}
-	//XAXA TEMP
+
 //	mode = PG_MODE_CREATE;
 
 
