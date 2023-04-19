@@ -444,6 +444,7 @@ std::string getTargetString(ofTargetPlatform t){
 
 
 unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ) {
+//	cout << "getTargetProject :" << getTargetString(targ) << endl;
 	switch (targ) {
 	case OF_TARGET_OSX:
 		return unique_ptr<xcodeProject>(new xcodeProject(getTargetString(targ)));
@@ -460,6 +461,8 @@ unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ) {
 	case OF_TARGET_LINUXARMV6L:
 		return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
 	case OF_TARGET_LINUXARMV7L:
+		return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
+	case OF_TARGET_LINUXAARCH64:
 		return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
 	case OF_TARGET_ANDROID:
 		return unique_ptr<AndroidStudioProject>(new AndroidStudioProject(getTargetString(targ)));

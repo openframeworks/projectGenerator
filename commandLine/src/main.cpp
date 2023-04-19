@@ -216,28 +216,27 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 	// bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
 	// either we read the addons.make file, or we look at the parameter list.
 	// if we are updating recursively, we *never* consider addons passed as parameters.
-
 	ofLogNotice() << "updating project " << path;
-	auto project = getTargetProject(target);
 
-	if (!bDryRun) project->create(path, templateName);
+	if (!bDryRun) {
+		auto project = getTargetProject(target);
 
-	if(bConsiderParameterAddons && bAddonsPassedIn){
-		for(auto & addon: addons){
-			project->addAddon(addon);
+		project->create(path, templateName);
+
+		if(bConsiderParameterAddons && bAddonsPassedIn){
+			for(auto & addon: addons){
+				project->addAddon(addon);
+			}
+		}else{
+			ofLogNotice() << "parsing addons.make";
+			project->parseAddons();
 		}
-	}else{
-		ofLogNotice() << "parsing addons.make";
-		project->parseAddons();
-	}
 
-	if(!bDryRun){
 		for(auto & srcPath : srcPaths){
 			project->addSrcRecursively(srcPath);
 		}
+		project->save();
 	}
-
-	if (!bDryRun) project->save();
 }
 
 void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
@@ -247,7 +246,7 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 	// second check if this is a folder that has src in it
 	if (isGoodProjectPath(path)) {
 		nProjectsUpdated++;
-		auto project = getTargetProject(target);
+//		auto project = getTargetProject(target);
 		updateProject(path, target, false);
 		return;
 	} else {
@@ -527,11 +526,13 @@ int main(int argc, char** argv){
 
 				ofLogNotice() << "setting up new project " << projectPath;
 
-
 				if (mode == PG_MODE_UPDATE) {
+					
 					updateProject(projectPath, t);
 					ofLogNotice() << "project updated! ";
+					
 				} else {
+					
 					if (!bDryRun){
 						auto project = getTargetProject(t);
 						project->create(projectPath, templateName);
