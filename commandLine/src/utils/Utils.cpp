@@ -417,26 +417,28 @@ std::string getOFRootFromConfig(){
 
 std::string getTargetString(ofTargetPlatform t){
 	switch (t) {
-	case OF_TARGET_OSX:
-		return "osx";
-	case OF_TARGET_MINGW:
-		return "msys2";
-	case OF_TARGET_WINVS:
-		return "vs";
-	case OF_TARGET_IOS:
-		return "ios";
-	case OF_TARGET_ANDROID:
-		return "android";
-	case OF_TARGET_LINUX:
-		return "linux";
-	case OF_TARGET_LINUX64:
-		return "linux64";
-	case OF_TARGET_LINUXARMV6L:
-		return "linuxarmv6l";
-	case OF_TARGET_LINUXARMV7L:
-		return "linuxarmv7l";
-	default:
-		return "";
+		case OF_TARGET_OSX:
+			return "osx";
+		case OF_TARGET_MINGW:
+			return "msys2";
+		case OF_TARGET_WINVS:
+			return "vs";
+		case OF_TARGET_IOS:
+			return "ios";
+		case OF_TARGET_ANDROID:
+			return "android";
+		case OF_TARGET_LINUX:
+			return "linux";
+		case OF_TARGET_LINUX64:
+			return "linux64";
+		case OF_TARGET_LINUXARMV6L:
+			return "linuxarmv6l";
+		case OF_TARGET_LINUXARMV7L:
+			return "linuxarmv7l";
+		case OF_TARGET_LINUXAARCH64:
+			return "linuxaarch64";
+		default:
+			return "";
 	}
 }
 

@@ -55,6 +55,7 @@ ofAddon::ConfigParseState ofAddon::stateFromString(string name){
 	if(name=="emscripten") return Emscripten;
 	if(name=="ios") return iOS;
 	if(name=="osx") return OSX;
+	if(name=="linuxaarch64") return LinuxAArch64;
 	return Unknown;
 }
 
