@@ -151,6 +151,7 @@ private:
 		VS,
 		LinuxARMv6,
 		LinuxARMv7,
+		LinuxAArch64,
 		AndroidARMv5,
 		AndroidARMv7,
 		Androidx86,

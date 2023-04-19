@@ -148,6 +148,9 @@ void addPlatforms(const std::string & value) {
 		else if (p == "linuxarmv7l") {
 			targets.emplace_back(OF_TARGET_LINUXARMV7L);
 		}
+		else if (p == "linuxaarch64") {
+			targets.emplace_back(OF_TARGET_LINUXAARCH64);
+		}
 		else if (p == "msys2") {
 			targets.emplace_back(OF_TARGET_MINGW);
 		}
@@ -213,28 +216,27 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 	// bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
 	// either we read the addons.make file, or we look at the parameter list.
 	// if we are updating recursively, we *never* consider addons passed as parameters.
-
 	ofLogNotice() << "updating project " << path;
-	auto project = getTargetProject(target);
 
-	if (!bDryRun) project->create(path, templateName);
+	if (!bDryRun) {
+		auto project = getTargetProject(target);
 
-	if(bConsiderParameterAddons && bAddonsPassedIn){
-		for(auto & addon: addons){
-			project->addAddon(addon);
+		project->create(path, templateName);
+
+		if(bConsiderParameterAddons && bAddonsPassedIn){
+			for(auto & addon: addons){
+				project->addAddon(addon);
+			}
+		}else{
+			ofLogNotice() << "parsing addons.make";
+			project->parseAddons();
 		}
-	}else{
-		ofLogNotice() << "parsing addons.make";
-		project->parseAddons();
-	}
 
-	if(!bDryRun){
 		for(auto & srcPath : srcPaths){
 			project->addSrcRecursively(srcPath);
 		}
+		project->save();
 	}
-
-	if (!bDryRun) project->save();
 }
 
 void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
@@ -244,7 +246,7 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 	// second check if this is a folder that has src in it
 	if (isGoodProjectPath(path)) {
 		nProjectsUpdated++;
-		auto project = getTargetProject(target);
+//		auto project = getTargetProject(target);
 		updateProject(path, target, false);
 		return;
 	} else {
@@ -483,99 +485,76 @@ int main(int argc, char** argv){
 	else {
 		mode = PG_MODE_CREATE;
 	}
-
-//	mode = PG_MODE_CREATE;
+	mode = PG_MODE_CREATE;
 
 
 	if (bVerbose){
 		ofSetLogLevel(OF_LOG_VERBOSE);
 	}
 
-	if (mode == PG_MODE_CREATE) {
-		nProjectsCreated += 1;
-
-		for (int i = 0; i < (int)targets.size(); i++) {
-			auto project = getTargetProject(targets[i]);
-			auto target = getTargetString(targets[i]);
-
-
+	if (bRecursive) {
+		for (auto & t : targets) {
 			ofLogNotice() << "-----------------------------------------------";
-			ofLogNotice() << "setting OF path to: " << ofPath;
-			if(busingEnvVar){
-				ofLogNotice() << "from PG_OF_PATH environment variable";
-			}else{
-				ofLogNotice() << "from -o option";
-			}
-			ofLogNotice() << "target platform is: " << target;
-			ofLogNotice() << "project path is: " << projectPath;
+			ofLogNotice() << "updating an existing project";
+			ofLogNotice() << "target platform is: " << getTargetString(t);
 
-			if(templateName!=""){
-				ofLogNotice() << "using additional template " << templateName;
-			}
+			recursiveUpdate(projectPath, t);
 
-
-			ofLogNotice() << "setting up new project " << projectPath;
-			if (!bDryRun) project->create(projectPath, templateName);
-
-
-			if (!bDryRun){
-				for(auto & addon: addons){
-					project->addAddon(addon);
-				}
-				for(auto & srcPath : srcPaths){
-					project->addSrcRecursively(srcPath);
-				}
-			}
-			if (!bDryRun) project->save();
-
-			ofLogNotice() << "project created! ";
+			ofLogNotice() << "project updated! ";
 			ofLogNotice() << "-----------------------------------------------";
-			consoleSpace();
 		}
-	}
+	} else {
+		if (mode == PG_MODE_UPDATE && !isGoodProjectPath(projectPath)) {
+			ofLogError() << "there's no src folder in this project path to update, maybe use create instead? (or use force to force updating)";
+		} else {
+			nProjectsCreated += 1;
 
-	else if (mode == PG_MODE_UPDATE) {
-		if (!bRecursive) {
-			if (isGoodProjectPath(projectPath) || bForce) {
-				nProjectsUpdated += 1;
+			for (auto & t : targets) {
+				ofLogNotice() << "-----------------------------------------------";
+				ofLogNotice() << "setting OF path to: " << ofPath;
+				if(busingEnvVar){
+					ofLogNotice() << "from PG_OF_PATH environment variable";
+				}else{
+					ofLogNotice() << "from -o option";
+				}
+				ofLogNotice() << "target platform is: " << getTargetString(t);
+				ofLogNotice() << "project path is: " << projectPath;
 
-				for (int i = 0; i < (int)targets.size(); i++) {
-					ofLogNotice() << "-----------------------------------------------";
-					ofLogNotice() << "setting OF path to: " << ofPath;
-					if(busingEnvVar){
-						ofLogNotice() << "from PG_OF_PATH environment variable";
-					}else{
-						ofLogNotice() << "from -o option";
-					}
-					ofLogNotice() << "target platform is: " << getTargetString(targets[i]);
+				if(templateName != ""){
+					ofLogNotice() << "using additional template " << templateName;
+				}
 
-					if(templateName!=""){
-						ofLogNotice() << "using additional template " << templateName;
-					}
-					updateProject(projectPath,targets[i]);
+				ofLogNotice() << "setting up new project " << projectPath;
 
+				if (mode == PG_MODE_UPDATE) {
+					
+					updateProject(projectPath, t);
 					ofLogNotice() << "project updated! ";
-					ofLogNotice() << "-----------------------------------------------";
-					consoleSpace();
+					
+				} else {
+					
+					if (!bDryRun){
+						auto project = getTargetProject(t);
+						project->create(projectPath, templateName);
+						for(auto & addon: addons){
+							project->addAddon(addon);
+						}
+						for(auto & srcPath : srcPaths){
+							project->addSrcRecursively(srcPath);
+						}
+						project->save();
+					}
+
+					ofLogNotice() << "project created! ";
 				}
-			}
-			else {
-				ofLogError() << "there's no src folder in this project path to update, maybe use create instead? (or use force to force updating)";
+				ofLogNotice() << "-----------------------------------------------";
+				consoleSpace();
 			}
 		}
-		else {
-			for (int i = 0; i < (int)targets.size(); i++) {
-				ofLogNotice() << "-----------------------------------------------";
-				ofLogNotice() << "updating an existing project";
-				ofLogNotice() << "target platform is: " << getTargetString(targets[i]);
 
-				recursiveUpdate(projectPath, targets[i]);
-
-				ofLogNotice() << "project updated! ";
-				ofLogNotice() << "-----------------------------------------------";
-			}
-		}
 	}
+
+
 
 	consoleSpace();
 	float elapsedTime = ofGetElapsedTimef() - startTime;

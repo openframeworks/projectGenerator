@@ -112,7 +112,7 @@ std::vector<baseProject::Template> baseProject::listAvailableTemplates(std::stri
 
 bool baseProject::create(const fs::path & _path, std::string templateName){
 	auto path = _path; // just because it is const
-	
+
 	templatePath = getPlatformTemplateDir();
 	addons.clear();
 	extSrcPaths.clear();
@@ -122,6 +122,11 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 	}
 	projectDir = path;
 	projectName = path.filename();
+	if (projectName == "") {
+		projectName = path.parent_path().filename();
+	}
+//	cout << "path = " << path << endl;
+//	cout << "projectName = " << projectName << endl;
 	bool bDoesDirExist = false;
 
 	fs::path project { projectDir / "src" };
@@ -137,13 +142,9 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 	bool ret = createProjectFile();
 	if(!ret) return false;
 
-	//MARK: -
 	if(templateName!=""){
 		fs::path templateDir = getOFRoot() / templatesFolder / templateName;
 
-		// TODO: PORT
-// !!!: asdf
-//		templateDir.setShowHidden(true);
 		auto templateConfig = parseTemplate(templateDir);
 		if(templateConfig){
 			recursiveTemplateCopy(templateDir, projectDir);
@@ -152,8 +153,7 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 				auto from = projectDir / rename.first;
 				auto to = projectDir / rename.second;
 //				auto to = projectDir / templateConfig->renames[rename.first];
-
-//				moveTo(const of::filesystem::path& path, bool bRelativeToData = true, bool overwrite = false);
+				// Reference: moveTo(const of::filesystem::path& path, bool bRelativeToData = true, bool overwrite = false);
 				ofFile(from).moveTo(to,true,true);
 			}
 		}else{
@@ -223,14 +223,14 @@ bool baseProject::save(){
 			string str = line;
 
 			//add the of root path
-			if( str.rfind("# OF_ROOT =", 0) == 0 ){
-   
-                            auto path = getOFRoot();
-                            if( projectDir.string().rfind(getOFRoot(),0) == 0 ){
-                                path = getOFRelPath(projectDir);
-                            }
-                            
-                            saveConfig << "OF_ROOT = " << path << std::endl;
+			if( str.rfind("# OF_ROOT =", 0) == 0 || str.rfind("OF_ROOT =", 0) == 0){
+				auto path = getOFRoot().string();
+		
+				if( projectDir.string().rfind(getOFRoot(),0) == 0 ){
+					path = getOFRelPath(projectDir);
+				}
+				
+				saveConfig << "OF_ROOT = " << path << std::endl;
 			}
 			// replace this section with our external paths
 			else if( extSrcPaths.size() && str.rfind("# PROJECT_EXTERNAL_SOURCE_PATHS =", 0) == 0 ){

@@ -49,6 +49,7 @@ ofAddon::ConfigParseState ofAddon::stateFromString(string name){
 	if(name=="vs") return VS;
 	if(name=="linuxarmv6l") return LinuxARMv6;
 	if(name=="linuxarmv7l") return LinuxARMv7;
+	if(name=="linuxaarch64") return LinuxAArch64;
 	if(name=="android/armeabi") return AndroidARMv5;
 	if(name=="android/armeabi-v7a") return AndroidARMv7;
 	if(name=="android/x86") return Androidx86;
@@ -76,6 +77,8 @@ string ofAddon::stateName(ofAddon::ConfigParseState state){
 		return "linuxarmv6";
 	case LinuxARMv7:
 		return "linuxarmv7";
+	case LinuxAArch64:
+		return "linuxaarch64";
 	case AndroidARMv5:
 		return "android/armeabi";
 	case AndroidARMv7:

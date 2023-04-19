@@ -64,7 +64,7 @@ xcodeProject::xcodeProject(string target)
 
 bool xcodeProject::createProjectFile(){
 	fs::path xcodeProject = projectDir / ( projectName + ".xcodeproj" );
-	
+//	cout << "createProjectFile " << xcodeProject << endl;
 	if (ofDirectory::doesDirectoryExist(xcodeProject)){
 		ofDirectory::removeDirectory(xcodeProject, true);
 	}
@@ -438,7 +438,7 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 }
 
 void xcodeProject::addFramework(string name, string path, string folder){
-	cout << "addFramework " << name << " path = " << path << " folder = " << folder << endl;
+//	cout << "addFramework " << name << " path = " << path << " folder = " << folder << endl;
 	// name = name of the framework
 	// path = the full path (w name) of this framework
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
