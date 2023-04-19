@@ -155,7 +155,15 @@ if [ $ret -ne 0 ]; then
       exit 1
 fi
 
+cd commandLine/bin/
 
+echo "Testing project generation osx";
+chmod +x projectGenerator
+./projectGenerator --recursive -posx -o../../../../ ../../../../examples/
+errorcode=$?
+if [[ $errorcode -ne 0 ]]; then
+        exit $errorcode
+fi
 
 # install electron sign globally
 sudo npm install -g electron-osx-sign
