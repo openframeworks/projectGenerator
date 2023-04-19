@@ -16,12 +16,15 @@ jobs:
   build-osx:
     runs-on: macos-12
     strategy:
-        matrix:
-          cfg:
-          - {target: osx}
+      matrix:
+        cfg:
+        - {target: osx}
     env:
      TARGET: ${{matrix.cfg.target}}
     steps:
+    - name: pwd
+      run: pwd
+
     - uses: actions/checkout@v3
     - name: Cache OF
       id: cache-of
@@ -33,7 +36,7 @@ jobs:
           /Users/runner/work/projectGenerator/openFrameworks/**
         key: ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-${{ hashFiles('openFrameworks/**/*.cpp') }}
         restore-keys: |
-          ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-          
+          ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-
     - name: rm-dev
       run: sudo rm -rf /Library/Developer
     - name: Build
@@ -50,5 +53,6 @@ jobs:
         GA_APPLE_USERNAME: ${{ secrets.GA_APPLE_USERNAME }}
         GA_APPLE_PASS: ${{ secrets.GA_APPLE_PASS }}
         GA_NOTARIZE_PROVIDER: ${{ secrets.GA_NOTARIZE_PROVIDER }}
-
-
+        
+    - name: LIST
+      run: ls -alFR
