@@ -25,22 +25,26 @@ jobs:
     - name: pwd
       run: pwd
 
-    # - name: Install libunwind
-    #   run:  sudo apt-get install libunwind-dev
-    # - uses: actions/checkout@v3
-    # - name: Cache OF
-    #   id: cache-of
-    #   uses: actions/cache@v3
-    #   env:
-    #     cache-name: cache-keep-of
-    #   with:
-    #     path: |
-    #       /Users/runner/work/projectGenerator/openFrameworks/**
-    #     key: ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-${{ hashFiles('openFrameworks/**/*.cpp') }}
-    #     restore-keys: |
-    #       ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-    
-    # - name: Build
-    #   run:
-    #     ./scripts/linux/buildPG.sh;
-    #   env:
-    #     GA_CI_SECRET: ${{ secrets.CI_SECRET }}
+    - name: Install libunwind
+      run:  sudo apt-get install libunwind-dev
+    - uses: actions/checkout@v3
+    - name: Cache OF
+      id: cache-of
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-keep-of
+      with:
+        path: |
+          /home/runner/work/projectGenerator/openFrameworks/**
+        key: ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-${{ hashFiles('openFrameworks/**/*.cpp') }}
+        restore-keys: |
+          ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-    
+    - name: Build
+      run:
+        ./scripts/linux/buildPG.sh;
+      env:
+        GA_CI_SECRET: ${{ secrets.CI_SECRET }}
+
+
+    - name: LIST
+      run: ls -alFR
