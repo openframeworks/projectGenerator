@@ -485,7 +485,8 @@ int main(int argc, char** argv){
 	else {
 		mode = PG_MODE_CREATE;
 	}
-	mode = PG_MODE_CREATE;
+        
+        //mode = PG_MODE_CREATE;
 
 
 	if (bVerbose){
