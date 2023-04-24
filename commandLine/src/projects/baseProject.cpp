@@ -43,7 +43,7 @@ bool isPlatformName(std::string file){
 
 std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirectory & templateDir){
 	auto name = fs::path(templateDir.getOriginalDirectory()).parent_path().filename();
-	if(templateDir.isDirectory() && !isPlatformName(name)){
+	if(templateDir.isDirectory() && !isPlatformName(name.string())){
 		ofBuffer templateconfig;
 		ofFile templateconfigFile(ofFilePath::join(templateDir.path(), "template.config"));
 		if(templateconfigFile.exists()){
@@ -51,7 +51,7 @@ std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirect
 			auto supported = false;
 			auto templateConfig = std::make_unique<Template>();
 			templateConfig->dir = templateDir;
-			templateConfig->name = name;
+			templateConfig->name = name.string();
 			for(auto line: templateconfig.getLines()){
 				if(ofTrim(line).front() == '#') continue;
 				auto varValue = ofSplitString(line,"+=",true,true);
@@ -121,9 +121,9 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 		path = fs::current_path() / path;
 	}
 	projectDir = path;
-	projectName = path.filename();
+	projectName = path.filename().string();
 	if (projectName == "") {
-		projectName = path.parent_path().filename();
+		projectName = path.parent_path().filename().string();
 	}
 //	cout << "path = " << path << endl;
 //	cout << "projectName = " << projectName << endl;
@@ -226,8 +226,8 @@ bool baseProject::save(){
 			if( str.rfind("# OF_ROOT =", 0) == 0 || str.rfind("OF_ROOT =", 0) == 0){
 				auto path = getOFRoot().string();
 		
-				if( projectDir.string().rfind(getOFRoot(),0) == 0 ){
-					path = getOFRelPath(projectDir);
+				if( projectDir.string().rfind(getOFRoot().string(), 0) == 0) {
+					path = getOFRelPath(projectDir.string());
 				}
 				
 				saveConfig << "OF_ROOT = " << path << std::endl;
@@ -342,7 +342,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 
 	//if the files being added are inside the OF root folder, make them relative to the folder.
 	bool bMakeRelative = false;
-	if( srcPath.find_first_of(getOFRoot()) == 0 ){
+	if( srcPath.find_first_of(getOFRoot().string()) == 0 ){
 		bMakeRelative = true;
 	}
 
