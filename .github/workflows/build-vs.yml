@@ -48,3 +48,16 @@ jobs:
         working-directory: ${{env.GITHUB_WORKSPACE}}
         run:
           msbuild ../openFrameworks/apps/projectGenerator/commandLine/commandLine.vcxproj /p:configuration=release /p:platform=${{ matrix.platform }} /p:PlatformToolset=v142
+      - name: Create zip
+        shell: msys2 {0}
+        run:
+          ./scripts/vs/create_package.sh
+      - name: Update Release
+        uses: IsaacShelton/update-existing-release@v1.3.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: nightly
+          release: nightly
+          prerelease: false
+          replace: true
+          files: ../openFrameworks/apps/projectGenerator/commandLine/bin/projectGenerator-vs.zip
