@@ -36,6 +36,7 @@ jobs:
           install: >-
             git
             unzip
+            zip
             rsync
             wget
       - name: Install dependencies
