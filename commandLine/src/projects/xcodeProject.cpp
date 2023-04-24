@@ -142,8 +142,8 @@ bool xcodeProject::createProjectFile(){
 	
         //projectDir is always absolute at the moment
         //so lets check if the projectDir is inside the OF folder - if it is not make the OF path absolute
-	if( projectDir.string().rfind(getOFRoot(),0) != 0 ){
-            relRoot = getOFRoot();
+	if( projectDir.string().rfind(getOFRoot().string(), 0) != 0) {
+            relRoot = getOFRoot().string();
 	}
 	if (relRoot != "../../.."){
 		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", relRoot);

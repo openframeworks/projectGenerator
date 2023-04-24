@@ -146,7 +146,7 @@ void getFilesRecursively(const fs::path & path, std::vector < string > & fileNam
 			getFilesRecursively(f, fileNames);
 		} else {
 			// FIXME - update someday to fs::path
-			fileNames.emplace_back(f);
+			fileNames.emplace_back(f.string());
 		}
 	}
 }
@@ -165,7 +165,7 @@ void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileN
 				getFilesRecursively(f, fileNames);
 			}
 		} else {
-			fileNames.emplace_back(f);
+			fileNames.emplace_back(f.string());
 		}
 	}
 }
@@ -264,7 +264,7 @@ void getPropsRecursively(const fs::path & path, std::vector < std::string > & pr
 		} else {
 			if (f.extension() == ".props") {
 //				cout << f << endl;
-				props.emplace_back(f);
+				props.emplace_back(f.string());
 			}
 		}
 	}
@@ -283,7 +283,7 @@ void getDllsRecursively(const fs::path & path, std::vector < std::string > & dll
 			if (f.extension() == ".dll") {
 				cout << "---->> getDLLs " << f << endl;;
 
-				dlls.emplace_back(f);
+				dlls.emplace_back(f.string());
 			}
 		}
 	}
@@ -295,7 +295,7 @@ void getLibsRecursively(const fs::path & path, std::vector < std::string > & lib
 	if (!fs::is_directory(path)) return;
 	for (const auto & entry : fs::directory_iterator(path)) {
 		auto f = entry.path();
-		std::vector<std::string> splittedPath = ofSplitString(f, fs::path("/").make_preferred().string());
+		std::vector<std::string> splittedPath = ofSplitString(f.string(), fs::path("/").make_preferred().string());
 
 //		ofFile temp(dir.getFile(i));
 		std::string ext = "";
@@ -334,12 +334,12 @@ void getLibsRecursively(const fs::path & path, std::vector < std::string > & lib
 			if (ext == "a" || ext == "lib" || ext == "dylib" || ext == "so" || (ext == "dll" && platform != "vs")){
 				if (platformFound){
 //					libLibs.emplace_back( f, arch, target );
-					libLibs.push_back({ f, arch, target });
+					libLibs.push_back({ f.string(), arch, target});
 
 					//TODO: THEO hack
 					if( platform == "ios" ){ //this is so we can add the osx libs for the simulator builds
 
-						std::string currentPath = f;
+						std::string currentPath = f.string();
 
 						//TODO: THEO double hack this is why we need install.xml - custom ignore ofxOpenCv
 						if( currentPath.find("ofxOpenCv") == std::string::npos ){
@@ -352,7 +352,7 @@ void getLibsRecursively(const fs::path & path, std::vector < std::string > & lib
 					}
 				}
 			} else if (ext == "h" || ext == "hpp" || ext == "c" || ext == "cpp" || ext == "cc" || ext == "cxx" || ext == "m" || ext == "mm"){
-				libFiles.emplace_back(f);
+				libFiles.emplace_back(f.string());
 			}
 		}
 	}

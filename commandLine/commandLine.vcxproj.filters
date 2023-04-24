@@ -40,6 +40,8 @@
     <ClCompile Include="src\utils\Utils.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\uuidxx\src\uuidxx.cpp" />
+    <ClCompile Include="src\uuidxx\src\uuidxx.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
