@@ -59,4 +59,4 @@ jobs:
         release: nightly
         prerelease: false
         replace: true
-        files: projectGenerator-osx.zip projectGenerator-ios.zip
+        files: ../openFrameworks/apps/projectGenerator/projectGenerator-osx.zip ../openFrameworks/apps/projectGenerator/projectGenerator-ios.zip
