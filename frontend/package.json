@@ -1,7 +1,7 @@
 {
-  "name": "projectGenerator",
+  "name": "project-generator",
   "productName": "projectGenerator",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "repo for testing a gui using electron for the project generator",
   "license": "MIT",
   "main": "index.js",
@@ -31,13 +31,11 @@
     "electron-app"
   ],
   "dependencies": {
-    "electron-debug": "^0.1.1",
     "moniker": "^0.1.2",
-    "walk": "^2.3.9",
     "n-readlines": "^1.0.0"
   },
   "devDependencies": {
-    "electron-packager": "^12.1.0",
-    "electron-prebuilt": "^0.37.8"
+    "electron": "^24.1.2",
+    "electron-packager": "^17.1.1"
   }
 }

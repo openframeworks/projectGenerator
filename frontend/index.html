@@ -9,10 +9,12 @@
 		body {
 			background-color: #ddd;
 			-webkit-user-select: none;
+			user-select: none;
 		}
 		/* enable some text to be selectable */
 		.selectable, .selectable * {
 			-webkit-user-select: text;
+			user-select: text;
 		}
 
 		.draggable {
@@ -39,6 +41,7 @@
 
 		.ui.dimmer > .content {
 			-webkit-user-select: none !important;
+			user-select: none !important;
 		}
 
 		#uiModal {
@@ -54,14 +57,13 @@
 		}
 
 		.fixedElement {
-position: fixed;
-  z-index: 101;
-  margin: 0em;
-  width: 100%;
-
+			position: fixed;
+  			z-index: 101;
+  			margin: 0em;
+  			width: 100%;
 		}
 
-		#fullConsoleOutput textarea{
+		#fullConsoleOutput textarea {
 			border:0px;
 			background-color: #333;
 			width:100%;
@@ -83,9 +85,9 @@ position: fixed;
 
 		<div class="draggable" id="df" style="padding:0px; margin:0px; background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)); height:2.5em">
 		<button class="circular ui secondary mini icon button undraggable" onclick="quit()" style="margin:5px;">
-  <i class="icon remove"></i>
-</button>
-			<<!-- div class="ui container" style="padding:0px; margin:0px;">
+			<i class="icon remove"></i>
+		</button>
+			<!-- <div class="ui container" style="padding:0px; margin:0px;">
 				<a class="item menuItem">
 					<div style="white" onclick="quit()"><i class="remove link icon white" style="color:#fff"></i>
 					</div>
@@ -365,7 +367,7 @@ position: fixed;
 				<p>Welcome to the console :)</p>
 			</div>
 		</section>
-		<script type="text/javascript" src="static/js/jquery.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
+		<script type="text/javascript" src="static/js/jquery.min.js"></script>
 		<script type="text/javascript" src="static/js/semantic.min.js"></script>
 		<script type="text/javascript" src="static/js/jquery.dragbetter.js"></script>
 		<script src="app.js"></script>

@@ -1,11 +1,8 @@
-"use strict";
 // instead of ipc, maybe?
 // https://github.com/atom/electron/blob/master/docs/api/remote.md
 
-var ipc = require('ipc');
-var path = require('path');
-var fs = require('fs');
-
+const ipc = window.ipc_wrapper;
+const path = ipc.path;
 
 var platforms;
 var templates;
@@ -20,38 +17,37 @@ var templates;
 //     "linuxarmv7l": "Linux ARMv7 (Makefiles)"
 // };
 
-var defaultSettings;
-var addonsInstalled;
-var currentPath;
-var isOfPathGood = false;
-var isFirstTimeSierra = false;
-var bVerbose = false;
-var localAddons = [];
+let defaultSettings;
+let addonsInstalled;
+let isOfPathGood = false;
+let isFirstTimeSierra = false;
+let bVerbose = false;
+let localAddons = [];
 
-var numAddedSrcPaths = 1;
+let numAddedSrcPaths = 1;
 
 //-----------------------------------------------------------------------------------
 // IPC
 //-----------------------------------------------------------------------------------
 
 //-------------------------------------------
-ipc.on('setOfPath', function(arg) {
+ipc.on('setOfPath', function(event, arg) {
     setOFPath(arg);
 });
 
-ipc.on('cwd', function(arg) {
+ipc.on('cwd', function(event, arg) {
 
     console.log(arg);
 });
 
-ipc.on('setUpdatePath', function(arg) {
+ipc.on('setUpdatePath', function(event, arg) {
     var elem = document.getElementById("updateMultiplePath");
     elem.value = arg;
     $("#updateMultiplePath").change();
 
 });
 
-ipc.on('isUpdateMultiplePathOk', function(arg) {
+ipc.on('isUpdateMultiplePathOk', function(event, arg) {
    if (arg == true){
         $("#updateMultipleWrongMessage").hide();
         $("#updateMultipleButton").removeClass("disabled");
@@ -64,13 +60,13 @@ ipc.on('isUpdateMultiplePathOk', function(arg) {
 });
 
 //-------------------------------------------
-ipc.on('setup', function(arg) {
+ipc.on('setup', function(event, arg) {
     setup();
 });
 
 //-----------------------------------------
 // this is called from main when defaults are loaded in:
-ipc.on('setDefaults', function(arg) {
+ipc.on('setDefaults', function(event, arg) {
 
     defaultSettings = arg;
     setOFPath(defaultSettings['defaultOfPath']);
@@ -79,13 +75,13 @@ ipc.on('setDefaults', function(arg) {
 });
 
 //-------------------------------------------
-ipc.on('setStartingProject', function(arg) {
+ipc.on('setStartingProject', function(event, arg) {
     $("#projectPath").val(arg['path']);
     $("#projectName").val(arg['name']);
 });
 
 //-------------------------------------------
-ipc.on('setProjectPath', function(arg) {
+ipc.on('setProjectPath', function(event, arg) {
     $("#projectPath").val(arg);
     //defaultSettings['lastUsedProjectPath'] = arg;
     //saveDefaultSettings();
@@ -93,24 +89,24 @@ ipc.on('setProjectPath', function(arg) {
 });
 
 //-------------------------------------------
-ipc.on('setSourceExtraPath', function(arg, index) {
+ipc.on('setSourceExtraPath', function(event, [arg, index]) { // TODO:
     checkAddSourcePath(index);
     $("#sourceExtra-"+index).val(arg);
 });
 
 //-------------------------------------------
-ipc.on('setGenerateMode', function(arg) {
+ipc.on('setGenerateMode', function(event, arg) {
     switchGenerateMode(arg);
 });
 
 //-------------------------------------------
-ipc.on('importProjectSettings', function(settings) {
+ipc.on('importProjectSettings', function(event, settings) {
     $("#projectPath").val(settings['projectPath']);
     $("#projectName").val(settings['projectName']).trigger('change'); // change triggers addon scanning
 });
 
 //-------------------------------------------
-ipc.on('setAddons', function(arg) {
+ipc.on('setAddons', function(event, arg) {
 
     console.log("got set addons");
     console.log(arg);
@@ -162,7 +158,7 @@ ipc.on('setAddons', function(arg) {
 });
 
 
-ipc.on('setPlatforms', function(arg) {
+ipc.on('setPlatforms', function(event, arg) {
 
     console.log("got set platforms");
     console.log(arg);
@@ -211,7 +207,7 @@ ipc.on('setPlatforms', function(arg) {
 });
 
 
-ipc.on('setTemplates', function(arg) {
+ipc.on('setTemplates', function(event, arg) {
     console.log("----------------");
     console.log("got set templates");
     console.log(arg);
@@ -268,7 +264,7 @@ ipc.on('setTemplates', function(arg) {
 });
 
 
-ipc.on('enableTemplate', function (arg) {
+ipc.on('enableTemplate', function (event, arg) {
 
     console.log('enableTemplate');
     let items = arg.bMulti === false ? $('#templatesDropdown .menu .item') : $('#templatesDropdownMulti .menu .item');
@@ -291,7 +287,7 @@ ipc.on('enableTemplate', function (arg) {
 
 //-------------------------------------------
 // select the list of addons and notify if some aren't installed
-ipc.on('selectAddons', function(arg) {
+ipc.on('selectAddons', function(event, arg) {
 
 
     // todo : DEAL WITH LOCAL ADDONS HERE....
@@ -321,8 +317,9 @@ ipc.on('selectAddons', function(arg) {
 
                 var neededAddonPathRel = path.join($("#projectPath").val(), $("#projectName").val(), arg[i]);
                 console.log(neededAddonPathRel);
-                if (fs.existsSync(neededAddonPathRel) ||
-                    fs.existsSync(neededAddons[i])){
+                if (fs.existsSync(neededAddonPathRel)
+                    || fs.existsSync(neededAddons[i]))
+                {
                     localAddons.push(arg[i]);
                 } else {
                     neededAddons.push(arg[i]);
@@ -379,7 +376,7 @@ ipc.on('selectAddons', function(arg) {
 
 //-------------------------------------------
 // allow main to send UI messages
-ipc.on('sendUIMessage', function(arg) {
+ipc.on('sendUIMessage', function(event, arg) {
 
     // check if it has "success" message:
 
@@ -388,12 +385,12 @@ ipc.on('sendUIMessage', function(arg) {
 });
 
 //-------------------------------------------
-ipc.on('consoleMessage', function(msg) {
+ipc.on('consoleMessage', function(event, msg) {
     consoleMessage(msg);
 });
 
 //-------------------------------------------
-ipc.on('generateCompleted', function(isSuccessful) {
+ipc.on('generateCompleted', function(event, isSuccessful) {
     if (isSuccessful === true) {
         // We want to switch to update mode now
         $("#projectName").trigger('change');
@@ -401,13 +398,13 @@ ipc.on('generateCompleted', function(isSuccessful) {
 });
 
 //-------------------------------------------
-ipc.on('updateCompleted', function(isSuccessful) {
+ipc.on('updateCompleted', function(event, isSuccessful) {
     if (isSuccessful === true) {
         // eventual callback after update completed
     }
 });
 
-ipc.on('setRandomisedSketchName', function(newName) {
+ipc.on('setRandomisedSketchName', function(event, newName) {
     $("#projectName").val(newName);
 });
 
@@ -420,9 +417,9 @@ ipc.on('setRandomisedSketchName', function(newName) {
 //----------------------------------------
 function setOFPath(arg) {
     // get the element:
-    var elem = document.getElementById("ofPath");
+    const elem = document.getElementById("ofPath");
 
-    if (!path.isAbsolute(arg)) {
+    if (arg != null && !path.isAbsolute(arg)) {
 
         // if we are relative, don't do anything...
 
@@ -746,6 +743,7 @@ function setup() {
                 selectedPlatforms: selectedPlatformArray,
                 bMulti: false
             }
+            console.log(arg);
             ipc.send('refreshTemplateList', arg);
         })
         $("#platformsDropdownMulti").on('change', function () {
@@ -886,15 +884,11 @@ function openDragInputModal(e){
 
 //----------------------------------------
 function saveDefaultSettings() {
+    if(!defaultSettings) return;
 
-    var fs = require('fs');
-    fs.writeFile(path.resolve(__dirname, 'settings.json'), JSON.stringify(defaultSettings, null, '\t'), function(err) {
-        if (err) {
-            console.log("Unable to save defaultSettings to settings.json... (Error=" + err.code + ")");
-        } else {
-            console.log("Updated default settings for the PG. (written to settings.json)");
-        }
-    });
+    const defaultSettingsJsonString = JSON.stringify(defaultSettings, null, '\t');
+    const result = ipc.sendSync('saveDefaultSettings', defaultSettingsJsonString);
+    console.log(result);
 }
 
 //----------------------------------------
@@ -1136,6 +1130,7 @@ function browseOfPath() {
 
 function browseProjectPath() {
     var path = $("#projectPath").val();
+    console.log(path);
     if (path === ''){
         path = $("#ofPath").val();
     }
