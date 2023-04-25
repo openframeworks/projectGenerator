@@ -50,5 +50,13 @@ jobs:
         GA_APPLE_USERNAME: ${{ secrets.GA_APPLE_USERNAME }}
         GA_APPLE_PASS: ${{ secrets.GA_APPLE_PASS }}
         GA_NOTARIZE_PROVIDER: ${{ secrets.GA_NOTARIZE_PROVIDER }}
-
-
+    - name: Update Release
+      if: github.repository == 'openframeworks/projectGenerator' && github.ref == 'refs/heads/master'
+      uses: IsaacShelton/update-existing-release@v1.3.2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: nightly
+        release: nightly
+        prerelease: false
+        replace: true
+        files: projectGenerator-osx.zip projectGenerator-ios.zip
