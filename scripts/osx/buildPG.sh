@@ -17,6 +17,33 @@ echoDots(){
     done
 }
 
+package_app(){
+    #if [[ "${GITHUB_REF##*/}" == "master" &&  -z "${GITHUB_HEAD_REF}" ]] ; then
+    
+        PLATFORM=$1
+        # Copy commandLine into electron .app
+        cd ${pg_root}
+        cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
+            
+        sed -i -e "s/osx/$PLATFORM/g" projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/settings.json
+    
+        # Sign app
+        echo "Signing electron .app"
+        cd ${pg_root}
+        xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
+        
+        electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
+
+        echo "Compressing PG app"
+        zip --symlinks -r -q projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM
+        
+        # need to upload zip of just app to apple for notarizing
+        zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator.app.zip projectGenerator-$PLATFORM/projectGenerator.app
+        xcrun altool --notarize-app --primary-bundle-id "com.electron.projectgenerator" --username "${GA_APPLE_USERNAME}" -p "${GA_APPLE_PASS}" --asc-provider "${GA_NOTARIZE_PROVIDER}" --file projectGenerator-$PLATFORM/projectGenerator.app.zip
+
+    #fi
+}
+
 
 sign_and_upload(){
     PLATFORM=$1
@@ -180,17 +207,17 @@ npm update
 npm install > /dev/null
 npm run build:osx > /dev/null
 mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
-sign_and_upload osx
+package_app osx
 
 cd ${pg_root}/frontend
 npm run build:osx > /dev/null
 mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-ios
-sign_and_upload ios
+package_app ios
 
 cd ${pg_root}/frontend
 npm run build:osx > /dev/null
 mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-android
-sign_and_upload android
+package_app android
 
 rm -rf scripts/id_rsa 2> /dev/null
 rm -rf scripts/*.p12 2> /dev/null
