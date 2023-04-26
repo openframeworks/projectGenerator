@@ -1176,12 +1176,12 @@ function browseImportProject() {
 }
 
 function getUpdatePath() {
-    const path = $("#updateMultiplePath").val();
-    if (path === ''){
-        path = $("#ofPath").val();
+    let updateMultiplePath = $("#updateMultiplePath").val();
+    if (updateMultiplePath === ''){
+        updateMultiplePath = $("#ofPath").val();
     }
 
-    ipc.send('pickUpdatePath', path); // current path could go here
+    ipc.send('pickUpdatePath', updateMultiplePath); // current path could go here
 }
 
 function rescanAddons() {
