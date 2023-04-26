@@ -11,7 +11,8 @@ const {
     dialog,
     ipcMain,
     Menu,
-    crashReporter
+    crashReporter,
+    shell,
 } = require('electron');
 
 
@@ -1060,4 +1061,15 @@ ipcMain.on('fs', (event, [ key, args ]) => {
     console.log('fs', key, args);
     event.returnValue = fs[key](... args);
     return;
+});
+
+ipcMain.on('getOSInfo', (event) => {
+    event.returnValue = {
+        release: os.release(),
+        platform: os.platform(),
+    };
+});
+
+ipcMain.on('openExternal', (event, [ url ]) => {
+    shell.openExternal(url);
 });

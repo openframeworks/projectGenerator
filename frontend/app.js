@@ -428,14 +428,14 @@ function setup() {
 
     $(document).ready(function() {
         try {
-            // TODO: need to fix?
-            const os = require('os');
-
-            const os_release = os.release();
-            const os_major_pos = os_release.indexOf(".");
+            const {
+                release,
+                platform
+            } = ipc.sendSync('getOSInfo');
+            const os_major_pos = release.indexOf(".");
             const os_major = os_release.slice(0, os_major_pos);
+            const isSierra = (platform === 'darwin' && parseInt(os_major) >= 16);
 
-            const isSierra = (os.platform() === 'darwin' && parseInt(os_major) >= 16);
             if(isSierra) {
                 const ofpath = document.getElementById("ofPath").value;
                 try {
@@ -502,10 +502,8 @@ function setup() {
 
         // bind external URLs (load it in default browser; not within Electron)
         $('*[data-toggle="external_target"]').click(function (e) {
-            // TODO: need to fix
             e.preventDefault();
-            const shell = require('shell');
-            shell.openExternal( $(this).prop('href') );
+            ipc.send('openExternal', $(this).prop('href'));
         });
 
         $("#projectPath").on('change', function () {
@@ -580,14 +578,8 @@ function setup() {
             defaultSettings['defaultOfPath'] = ofpath;
             console.log("ofPath val " + ofpath);
             if(isFirstTimeSierra) {
-                // TODO: need to fix (move to main process with ipc send sync?)
-                const exec = require('child_process').exec;
-                function puts(error, stdout, stderr) {
-                    console.log(stdout + " " + stderr);
-                }
-                exec("xattr -r -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app", puts);
+                ipc.sendSync('firstTimeSierra', "xattr -r -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app");
                 $("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
-
             }
             saveDefaultSettings();
 
@@ -612,12 +604,7 @@ function setup() {
             const ofpath = $(this).val();
             setOFPath(ofpath);
             if(isFirstTimeSierra) {
-                // TODO: need to fix (move to main process with ipc send sync?)
-                const exec = require('child_process').exec;
-                function puts(error, stdout, stderr) { 
-                    console.log(stdout + " " + stderr);
-                }
-                exec("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app", puts);
+                ipc.sendSync("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app");
                 $("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
                 //exec("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app", puts);
             }
@@ -1054,9 +1041,7 @@ function getPlatformList() {
 function displayModal(message) {
     $("#uiModal .content").html(message).find('*[data-toggle="external_target"]').click(function (e) {
 		e.preventDefault();
-        // TODO: need to fix this
-		const shell = require('shell');
-		shell.openExternal( $(this).prop("href") );
+        ipc.send('openExternal', $(this).prop("href") );
     });
 
     if (message.indexOf("Success!") > -1){
