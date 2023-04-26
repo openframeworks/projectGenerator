@@ -86,7 +86,7 @@ ipc.on('setProjectPath', function(event, arg) {
 //-------------------------------------------
 ipc.on('setSourceExtraPath', function(event, [arg, index]) { // TODO:
     checkAddSourcePath(index);
-    $("#sourceExtra-"+index).val(arg);
+    $("#sourceExtra-" + index).val(arg);
 });
 
 //-------------------------------------------
@@ -244,7 +244,9 @@ ipc.on('setTemplates', function(event, arg) {
 ipc.on('enableTemplate', function (event, arg) {
 
     console.log('enableTemplate');
-    let items = arg.bMulti === false ? $('#templatesDropdown .menu .item') : $('#templatesDropdownMulti .menu .item');
+    const items = arg.bMulti === false
+                ? $('#templatesDropdown .menu .item')
+                : $('#templatesDropdownMulti .menu .item');
 
     // enable all first
     for (let i = 0; i < items.length; i++) {
@@ -252,7 +254,7 @@ ipc.on('enableTemplate', function (event, arg) {
         item.removeClass("disabled");
     }
 
-    for (let template of arg.invalidTemplateList) {
+    for (const template of arg.invalidTemplateList) {
         for (let i = 0; i < items.length; i++) {
             let item = $(items[i]);
             if (item.attr('data-value') === template) {
@@ -1090,7 +1092,7 @@ function clearExtraSourceList(){
 function checkAddSourcePath(index){
     //if we don't have another field below us - add one
     const nextFieldId = '#sourceExtra-' + (index + 1);
-    if( $(nextFieldId).length == 0 ){
+    if( $(nextFieldId).length == 0 ) {
         const nextIndex = index + 1;
         const extrafield = `<div class="field">
            <div class="ui icon input fluid">
@@ -1106,7 +1108,7 @@ function checkAddSourcePath(index){
 
 function browseSourcePath(index) {
     const ofPath = $("#ofPath").val();
-    ipc.send('pickSourcePath', ofPath, index); // current path could go here
+    ipc.send('pickSourcePath', [ ofPath, index ]); // current path could go here
 }
 
 

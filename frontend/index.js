@@ -483,11 +483,9 @@ function getDirectories(srcpath, acceptedPrefix) {
 // }
 
 ipcMain.on('isOFProjectFolder', function(event, project) {
-    let folder;
-    folder = path.join(project['projectPath'], project['projectName']);
+    const folder = path.join(project['projectPath'], project['projectName']);
 
     try {
-
         const tmpFiles = fs.readdirSync(folder);
         if (!tmpFiles || tmpFiles.length <= 1) {
             return false;
@@ -575,9 +573,9 @@ ipcMain.on('isOFProjectFolder', function(event, project) {
 
                         console.log("Reading config pair. Macro: " + macro + " Value: " + value);
                         
-                        if(macro.startsWith('PROJECT_EXTERNAL_SOURCE_PATHS')){
-                             event.sender.send('setSourceExtraPath', value, extraSrcPathsCount);
-                             extraSrcPathsCount++;
+                        if(macro.startsWith('PROJECT_EXTERNAL_SOURCE_PATHS')) {
+                            event.sender.send('setSourceExtraPath', [value, extraSrcPathsCount]);
+                            extraSrcPathsCount++;
                         }
                     }
                 });
@@ -938,12 +936,12 @@ ipcMain.on('pickProjectPath', function(event, arg) {
     });
 });
 
-ipcMain.on('pickSourcePath', function(event, arg, index) {
+ipcMain.on('pickSourcePath', function(event, [ ofPath, index ]) {
     dialog.showOpenDialog({
         title: 'select extra source or include folder paths to add to project',
         properties: ['openDirectory'],
         filters: [],
-        defaultPath: arg
+        defaultPath: ofPath
     }).then(function(filenames) {
         if (filenames !== undefined && filenames.filePaths.length > 0) {
             event.sender.send('setSourceExtraPath', [filenames.filePaths[0], index]);
