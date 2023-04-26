@@ -35,11 +35,9 @@ package_app(){
         electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
 
         echo "Compressing PG app"
-        zip --symlinks -r -q projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM
-        
         # need to upload zip of just app to apple for notarizing
-        zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator.app.zip projectGenerator-$PLATFORM/projectGenerator.app
-        xcrun altool --notarize-app --primary-bundle-id "com.electron.projectgenerator" --username "${GA_APPLE_USERNAME}" -p "${GA_APPLE_PASS}" --asc-provider "${GA_NOTARIZE_PROVIDER}" --file projectGenerator-$PLATFORM/projectGenerator.app.zip
+        zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM/projectGenerator.app
+        xcrun altool --notarize-app --primary-bundle-id "com.electron.projectgenerator" --username "${GA_APPLE_USERNAME}" -p "${GA_APPLE_PASS}" --asc-provider "${GA_NOTARIZE_PROVIDER}" --file projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip
 
     fi
 }
