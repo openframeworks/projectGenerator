@@ -1073,3 +1073,9 @@ ipcMain.on('getOSInfo', (event) => {
 ipcMain.on('openExternal', (event, [ url ]) => {
     shell.openExternal(url);
 });
+
+ipcMain.on('firstTimeSierra', (event, command) => {
+    exec(command, function callback(error, stdout, stderr){
+        console.log(stdout + " " + stderr);
+    });
+});
