@@ -397,6 +397,7 @@ function getGoodSketchName(currentProjectPath){
             if (fs.existsSync(path.join(currentProjectPath, goodName))) {
                 console.log("«" + goodName + "» already exists, generating a new name...");
                 const adjective = projectNames.choose();
+                console.log(adjective);
                 goodName = "my" + adjective.charAt(0).toUpperCase() + adjective.slice(1) + "Sketch";
             } else {
                 foundOne = true;
@@ -608,6 +609,7 @@ ipcMain.on('isOFProjectFolder', function(event, project) {
 ipcMain.on('refreshAddonList', function(event, arg) {
     console.log("in refresh " + arg)
     parseAddonsAndUpdateSelect(arg);
+    event.returnValue = true;
 });
 
 ipcMain.on('refreshPlatformList', function(event, arg) {
@@ -684,8 +686,9 @@ ipcMain.on('refreshTemplateList', function (event, arg) {
 
 ipcMain.on('getRandomSketchName', function(event, arg) {
     const goodName = getGoodSketchName(arg);
-    event.sender.send('setRandomisedSketchName', goodName);
-    event.sender.send('setGenerateMode', 'createMode'); // it's a new sketch name, we are in create mode
+    event.returnValue = { randomisedSketchName: goodName, generateMode: 'createMode' };
+    // event.sender.send('setRandomisedSketchName', goodName);
+    // event.sender.send('setGenerateMode', 'createMode'); // it's a new sketch name, we are in create mode
 });
 
 function getPgPath() {
