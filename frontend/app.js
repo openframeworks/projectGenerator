@@ -1130,7 +1130,6 @@ function browseOfPath() {
 
 function browseProjectPath() {
     var path = $("#projectPath").val();
-    console.log(path);
     if (path === ''){
         path = $("#ofPath").val();
     }
@@ -1163,13 +1162,13 @@ function checkAddSourcePath(index){
 }
 
 function browseSourcePath(index) {
-    var path = $("#ofPath").val();
+    const path = $("#ofPath").val();
     ipc.send('pickSourcePath', path, index); // current path could go here
 }
 
 
 function browseImportProject() {
-    var path = $("#projectPath").val();
+    const path = $("#projectPath").val();
     if (path === ''){
         path = $("#ofPath").val();
     }
@@ -1177,8 +1176,7 @@ function browseImportProject() {
 }
 
 function getUpdatePath() {
-
-    var path = $("#updateMultiplePath").val();
+    const path = $("#updateMultiplePath").val();
     if (path === ''){
         path = $("#ofPath").val();
     }
@@ -1187,31 +1185,40 @@ function getUpdatePath() {
 }
 
 function rescanAddons() {
-    ipc.send('refreshAddonList', $("#ofPath").val());
-    var projectInfo = {};
-    projectInfo['projectName'] = $("#projectName").val();
-    projectInfo['projectPath'] = $("#projectPath").val();
+    ipc.sendSync('refreshAddonList', $("#ofPath").val());
+
+    const projectInfo = {
+        'projectName': $("#projectName").val(),
+        'projectPath': $("#projectPath").val(),
+    };
     ipc.send('isOFProjectFolder', projectInfo);     // <- this forces addon reload
 }
 
 function getRandomSketchName(){
-    var path = $("#projectPath").val();
-    if (path === ''){
+    const path = $("#projectPath").val();
+    if (path === '') {
         $("#projectPath").oneTimeTooltip('Please specify a path first...');
     }
     else {
-        ipc.send('getRandomSketchName', path );
+        const result = ipc.sendSync('getRandomSketchName', path );
+        const {
+            randomisedSketchName,
+            generateMode
+        } = result;
+        $("#projectName").val(randomisedSketchName);
+        switchGenerateMode(generateMode);
     }
 }
 
 function launchInIDE(){
-    var platform = getPlatformList()[0];
+    const platform = getPlatformList()[0];
 
-    var project = {};
-    project['projectName'] = $("#projectName").val();
-    project['projectPath'] = $("#projectPath").val();
-    project['platform'] = platform;
-    project['ofPath'] = $("#ofPath").val();
+    const project = {
+        'projectName': $("#projectName").val(),
+        'projectPath': $("#projectPath").val(),
+        'platform': platform,
+        'ofPath': $("#ofPath").val()
+    };
 
     ipc.send('launchProjectinIDE', project );
 }
