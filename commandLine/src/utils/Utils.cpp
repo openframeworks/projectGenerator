@@ -36,7 +36,7 @@ using std::cout;
 using std::endl;
 
 std::string generateUUID(std::string input){
-	return uuidxx::uuid::Generate().ToString();
+	return uuidxx::uuid::Generate().ToString(false);
 }
 
 void findandreplace( std::string& tInput, std::string tFind, std::string tReplace ) {
