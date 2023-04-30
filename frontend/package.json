@@ -5,13 +5,13 @@
   "description": "repo for testing a gui using electron for the project generator",
   "license": "MIT",
   "main": "index.js",
-  "repository": "openframeworks/pgelectron",
+  "repository": "github:openframeworks/projectGenerator",
   "author": {
     "name": "zach lieberman",
     "url": "https://openframeworks.cc"
   },
   "engines": {
-    "node": ">=6.11.0"
+    "node": ">=18.14.0"
   },
   "scripts": {
     "start": "electron .",
