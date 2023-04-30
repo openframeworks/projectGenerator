@@ -15,7 +15,12 @@ const {
     shell,
 } = require('electron');
 
-
+//---------------------------------------------------------
+// Report crashes to our server.
+crashReporter.start({
+    uploadToServer: false,
+    productName: 'openFrameworks ProjectGenerator frontend',
+});
 
 // Debugging: start the Electron PG from the terminal to see the messages from console.log()
 // Example: /path/to/PG/Contents/MacOS/Electron /path/to/PG/Contents/Ressources/app
@@ -165,11 +170,6 @@ const startingProject = {
     'path': ''
 };
 getStartingProjectName();
-
-//---------------------------------------------------------
-// Report crashes to our server.
-// TODO: need to fix?
-// crashReporter.start();
 
 //---------------------------------------------------------
 // Keep a global reference of the window object, if you don't, the window will
