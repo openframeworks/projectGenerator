@@ -220,9 +220,6 @@ app.on('ready', () => {
         }
     });
 
-    // load jquery here:
-    // http://stackoverflow.com/questions/30271011/electron-jquery-errors
-
     // and load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
@@ -243,9 +240,6 @@ app.on('ready', () => {
         mainWindow.webContents.send('checkOfPathAfterSetup', '');
     });
 
-
-    //http://electron.atom.io/docs/v0.29.0/api/dialog/
-    //console.log();
 
     // Emitted when the window is closed.
     mainWindow.on('closed', () => {
@@ -792,36 +786,37 @@ ipcMain.on('generate', (event, generate) => {
     let rootPath = defaultOfPath;
     let sourceExtraString = "";
 
-    if (generate['platformList'] !== null) {
+    if (generate['platformList'] != null) {
         platformString = "-p\"" + generate['platformList'].join(",") + "\"";
     }
 
-    if (generate['templateList'] !== null) {
+    if (generate['templateList'] != null) {
         templateString = "-t\"" + generate['templateList'].join(",") + "\"";
     }
 
-    if (generate['addonList'] !== null &&
-        generate['addonList'].length > 0) {
+    if (generate['addonList'] != null &&
+        generate['addonList'].length > 0)
+    {
         addonString = "-a\"" + generate['addonList'].join(",") + "\"";
     } else {
         addonString = "-a\" \"";
     }
 
-    if (generate['ofPath'] !== null) {
+    if (generate['ofPath'] != null) {
         pathString = "-o\"" + generate['ofPath'] + "\"";
         rootPath = generate['ofPath'];
     }
     
-    if( generate['sourcePath'] != null && generate['sourcePath'].length >0 ){
-        sourceExtraString = " -s\"" + generate['sourcePath'] + "\"";
+    if (generate['sourcePath'] != null && generate['sourcePath'].length > 0) {
+        sourceExtraString = "-s\"" + generate['sourcePath'] + "\"";
     }
 
     if (generate['verbose'] === true) {
         verboseString = "-v";
     }
 
-    if (generate.projectName !== null &&
-        generate.projectPath !== null) {
+    if (generate.projectName != null &&
+        generate.projectPath != null) {
         projectString = "\"" + path.join(generate['projectPath'], generate['projectName']) + "\"";
     }
 
@@ -831,7 +826,8 @@ ipcMain.on('generate', (event, generate) => {
         verboseString,
         pathString,
         addonString,
-        platformString + sourceExtraString,
+        platformString,
+        sourceExtraString,
         templateString,
         projectString
     ].join(' ');
@@ -847,7 +843,7 @@ ipcMain.on('generate', (event, generate) => {
                 }
             }
         }
-
+        
         // wasError = did the PG spit out an error (like a bad path, etc)
         // error = did node have an error running this command line app
 
@@ -877,18 +873,11 @@ ipcMain.on('generate', (event, generate) => {
                 '<strong>Error...</strong><br>' +
                 'There was a problem generating your project... <span class="monospace">' + fullPath + '</span>' +
                 '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stdout + '\n\n\n(command used: ' + wholeString + ')\n\n\n</textarea></div>'
-
             );
-
         }
     });
 
     console.log(wholeString);
-
-    console.log(__dirname);
-
-
-    //console.log(arg);
 });
 
 let dialogIsOpen = false;
