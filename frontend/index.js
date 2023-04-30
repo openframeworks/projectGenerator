@@ -177,7 +177,7 @@ getStartingProjectName();
 let mainWindow = null;
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function() {
+app.on('window-all-closed', () => {
     app.quit();
     process.exit();
 });
@@ -208,7 +208,7 @@ function toLetters(num) {
 //-------------------------------------------------------- window
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', function() {
+app.on('ready', () => {
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: 500,
@@ -231,7 +231,7 @@ app.on('ready', function() {
         mainWindow.openDevTools();
     }
     //when the window is loaded send the defaults
-    mainWindow.webContents.on('did-finish-load', function() {
+    mainWindow.webContents.on('did-finish-load', () => {
         //parseAddonsAndUpdateSelect();
 
         mainWindow.webContents.send('cwd', app.getAppPath());
@@ -248,8 +248,7 @@ app.on('ready', function() {
     //console.log();
 
     // Emitted when the window is closed.
-    mainWindow.on('closed', function() {
-
+    mainWindow.on('closed', () => {
         mainWindow = null;
         app.quit();
         process.exit();
@@ -263,7 +262,7 @@ app.on('ready', function() {
         submenu: [{
             label: 'Quit',
             accelerator: 'Command+Q',
-            click: function() {
+            click: () => {
                 mainWindow.close();
             }
         }]
@@ -272,13 +271,13 @@ app.on('ready', function() {
         submenu: [{
             label: 'Reload',
             accelerator: 'Command+R',
-            click: function() {
+            click: () => {
                 mainWindow.reload();
             }
         }, {
             label: 'Toggle DevTools',
             accelerator: 'Alt+Command+I',
-            click: function() {
+            click: () => {
                 mainWindow.toggleDevTools();
             }
         }]
@@ -331,9 +330,7 @@ function parseAddonsAndUpdateSelect(arg) {
 
     if (addons){
         if (addons.length > 0){
-            addons = addons.filter( function(addon) {
-                return addonsToSkip.indexOf(addon) == -1;
-            });
+            addons = addons.filter((addon) => addonsToSkip.indexOf(addon) == -1);
         }
     }
 
@@ -437,7 +434,7 @@ function getDirectories(srcpath, acceptedPrefix) {
 
     try {
 
-        return fs.readdirSync(srcpath).filter(function(file) {
+        return fs.readdirSync(srcpath).filter((file) => {
 
             //console.log(srcpath);
             //console.log(file);
@@ -464,13 +461,13 @@ function getDirectories(srcpath, acceptedPrefix) {
 }
 
 // function getDirs(srcpath, cb) {
-//   fs.readdir(srcpath, function (err, files) {
+//   fs.readdir(srcpath, (err, files) => {
 //     if(err) {
 //       console.error(err);
 //       return cb([]);
 //     }
-//     const iterator = function (file, cb)  {
-//       fs.stat(path.join(srcpath, file), function (err, stats) {
+//     const iterator = (file, cb) => {
+//       fs.stat(path.join(srcpath, file), (err, stats) => {
 //         if(err) {
 //           console.error(err);
 //           return cb(false);
@@ -482,7 +479,7 @@ function getDirectories(srcpath, acceptedPrefix) {
 //   });
 // }
 
-ipcMain.on('isOFProjectFolder', function(event, project) {
+ipcMain.on('isOFProjectFolder', (event, project) => {
     const folder = path.join(project['projectPath'], project['projectName']);
 
     try {
@@ -495,7 +492,7 @@ ipcMain.on('isOFProjectFolder', function(event, project) {
         let foundSrcFolder = false;
         let foundAddons = false;
         let foundConfig = false;
-        tmpFiles.forEach(function(el, i) {
+        tmpFiles.forEach((el, i) => {
             if (el == 'src') {
                 foundSrcFolder = true;
             }
@@ -605,18 +602,18 @@ ipcMain.on('isOFProjectFolder', function(event, project) {
 
 //----------------------------------------------------------- ipc
 
-ipcMain.on('refreshAddonList', function(event, arg) {
+ipcMain.on('refreshAddonList', (event, arg) => {
     console.log("in refresh " + arg)
     parseAddonsAndUpdateSelect(arg);
     event.returnValue = true;
 });
 
-ipcMain.on('refreshPlatformList', function(event, arg) {
+ipcMain.on('refreshPlatformList', (event, arg) => {
     parsePlatformsAndUpdateSelect(arg);
 });
 
 
-ipcMain.on('refreshTemplateList', function (event, arg) {
+ipcMain.on('refreshTemplateList', (event, arg) => {
     console.log("refreshTemplateList");
     let selectedPlatforms = arg.selectedPlatforms;
     let ofPath = arg.ofPath;
@@ -665,9 +662,9 @@ ipcMain.on('refreshTemplateList', function (event, arg) {
         if (platforms === 'enable') {
             bValidTemplate = true;
         } else {
-            bValidTemplate = selectedPlatforms.every(function (p) { return platforms.indexOf(p) > -1; });
+            bValidTemplate = selectedPlatforms.every(p => platforms.indexOf(p) > -1 );
             // Another option to enable template when "some" of the platforms are supported. (not every)
-            // let bValidTemplate = platforms.some(function (p) { supportedPlatforms.indexOf(p) > -1 });
+            // let bValidTemplate = platforms.some((p) => { supportedPlatforms.indexOf(p) > -1 });
         }
 
         if (!bValidTemplate) {
@@ -683,7 +680,7 @@ ipcMain.on('refreshTemplateList', function (event, arg) {
     mainWindow.webContents.send('enableTemplate', returnArg);
 });
 
-ipcMain.on('getRandomSketchName', function(event, arg) {
+ipcMain.on('getRandomSketchName', (event, arg) => {
     const goodName = getGoodSketchName(arg);
     event.returnValue = { randomisedSketchName: goodName, generateMode: 'createMode' };
     // event.sender.send('setRandomisedSketchName', goodName);
@@ -707,7 +704,7 @@ function getPgPath() {
     return pgApp;
 }
 
-ipcMain.on('update', function(event, update) {
+ipcMain.on('update', (event, update) => {
     console.log(update);
 
     let updatePath = "";
@@ -756,7 +753,7 @@ ipcMain.on('update', function(event, update) {
         updatePath
     ].join(" ");
 
-    exec(wholeString, { maxBuffer : Infinity }, function callback(error, stdout, stderr) {
+    exec(wholeString, { maxBuffer : Infinity }, (error, stdout, stderr) => {
 
         if (error === null) {
             event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
@@ -785,7 +782,7 @@ ipcMain.on('update', function(event, update) {
 
 });
 
-ipcMain.on('generate', function(event, generate) {
+ipcMain.on('generate', (event, generate) => {
     let projectString = "";
     let pathString = "";
     let addonString = "";
@@ -839,7 +836,7 @@ ipcMain.on('generate', function(event, generate) {
         projectString
     ].join(' ');
 
-    exec(wholeString, { maxBuffer : Infinity }, function callback(error, stdout, stderr) {
+    exec(wholeString, { maxBuffer : Infinity }, (error, stdout, stderr) => {
         let wasError = false;
         const text = stdout; //Big text with many line breaks
         const lines = text.split(os.EOL); //Will return an array of lines on every OS node works
@@ -894,74 +891,100 @@ ipcMain.on('generate', function(event, generate) {
     //console.log(arg);
 });
 
-ipcMain.on('pickOfPath', function(event, arg) {
-    dialog.showOpenDialog({
+let dialogIsOpen = false;
+
+ipcMain.on('pickOfPath', (event, arg) => {
+    if(dialogIsOpen){
+        return;
+    }
+
+    dialogIsOpen = true;
+    dialog.showOpenDialog(mainWindow, {
         title: 'select the root of OF, where you see libs, addons, etc',
         properties: ['openDirectory'],
         filters: [],
         defaultPath: arg
-    }).then(function(filenames) {
+    }).then((filenames) => {
         if (filenames !== undefined && filenames.filePaths.length > 0) {
             defaultOfPath = filenames.filePaths[0];
             console.log('setOfPath: ', defaultOfPath);
             event.sender.send('setOfPath', defaultOfPath);
         }
+        dialogIsOpen = false;
+    }).catch(err => {
+        console.error('pickOfPath', err);
+        dialogIsOpen = false;
     });
 });
 
-ipcMain.on('pickUpdatePath', function(event, arg) {
+ipcMain.on('pickUpdatePath', (event, arg) => {
+    if(dialogIsOpen){
+        return;
+    }
+
+    dialogIsOpen = true;
     dialog.showOpenDialog({
         title: 'select root folder where you want to update',
         properties: ['openDirectory'],
         filters: [],
         defaultPath: arg
-    }).then(function(filenames) {
+    }).then((filenames) => {
         if (filenames !== undefined && filenames.filePaths.length > 0) {
             // defaultOfPath = filenames.filePaths[0]; // TODO: IS THIS CORRECT?
             event.sender.send('setUpdatePath', filenames.filePaths[0]);
         }
+        dialogIsOpen = false;
+    }).catch(err => {
+        console.error('pickUpdatePath', err);
+        dialogIsOpen = false;
     });
 });
 
-ipcMain.on('pickProjectPath', function(event, arg) {
+ipcMain.on('pickProjectPath', (event, arg) => {
+    if(dialogIsOpen){
+        return;
+    }
+
+    dialogIsOpen = true;
     dialog.showOpenDialog({
         title: 'select parent folder for project, typically apps/myApps',
         properties: ['openDirectory'],
         filters: [],
         defaultPath: arg
-    }).then(function(filenames) {
+    }).then((filenames) => {
         if (filenames !== undefined && filenames.filePaths.length > 0) {
             event.sender.send('setProjectPath', filenames.filePaths[0]);
         }
+        dialogIsOpen = false;
+    }).catch(err => {
+        console.error('pickProjectPath', err);
+        dialogIsOpen = false;
     });
 });
 
-ipcMain.on('pickSourcePath', function(event, [ ofPath, index ]) {
+ipcMain.on('pickSourcePath', (event, [ ofPath, index ]) => {
+    if(dialogIsOpen){
+        return;
+    }
+
+    dialogIsOpen = true;
     dialog.showOpenDialog({
         title: 'select extra source or include folder paths to add to project',
         properties: ['openDirectory'],
         filters: [],
         defaultPath: ofPath
-    }).then(function(filenames) {
+    }).then((filenames) => {
         if (filenames !== undefined && filenames.filePaths.length > 0) {
             event.sender.send('setSourceExtraPath', [filenames.filePaths[0], index]);
         }
+        dialogIsOpen = false;
+    }).catch(err => {
+        console.error('pickSourcePath', err);
+        dialogIsOpen = false;
     });
 });
 
-ipcMain.on('checkMultiUpdatePath', function(event, arg) {
-
-
-    if (fs.existsSync(arg)) {
-        event.sender.send('isUpdateMultiplePathOk', true);
-    } else {
-        event.sender.send('isUpdateMultiplePathOk', false);
-    }
-
-});
-
-let dialogIsOpen = false;
-ipcMain.on('pickProjectImport', function(event, arg) {
+ipcMain.on('pickProjectImport', (event, arg) => {
     if(dialogIsOpen){
         return;
     }
@@ -972,7 +995,7 @@ ipcMain.on('pickProjectImport', function(event, arg) {
         properties: ['openDirectory'],
         filters: [],
         defaultPath: arg
-    }).then(function(filenames) {
+    }).then((filenames) => {
         if (filenames != null && filenames.filePaths.length > 0) {
             // gather project information
             const projectSettings = {
@@ -982,11 +1005,21 @@ ipcMain.on('pickProjectImport', function(event, arg) {
             event.sender.send('importProjectSettings', projectSettings);
         }
         dialogIsOpen = false;
+    }).catch(err => {
+        console.error('pickProjectImport', err);
+        dialogIsOpen = false;
     });
 });
 
+ipcMain.on('checkMultiUpdatePath', (event, arg) => {
+    if (fs.existsSync(arg)) {
+        event.sender.send('isUpdateMultiplePathOk', true);
+    } else {
+        event.sender.send('isUpdateMultiplePathOk', false);
+    }
+});
 
-ipcMain.on('launchProjectinIDE', function(event, arg) {
+ipcMain.on('launchProjectinIDE', (event, arg) => {
     const fullPath = path.join(arg['projectPath'], arg['projectName']);
 
     if( fs.statSync(fullPath).isDirectory() == false ){
@@ -1002,7 +1035,7 @@ ipcMain.on('launchProjectinIDE', function(event, arg) {
             console.log( osxPath );
             osxPath = "\"" + osxPath + "\"";
 
-            exec('open ' + osxPath, function callback(error, stdout, stderr){
+            exec('open ' + osxPath, (error, stdout, stderr) => {
                 return;
             });
         }
@@ -1011,13 +1044,13 @@ ipcMain.on('launchProjectinIDE', function(event, arg) {
             let linuxPath = path.join(fullPath, arg['projectName'] + '.qbs');
             linuxPath = linuxPath.replace(/ /g, '\\ ');
             console.log( linuxPath );
-            exec('xdg-open ' + linuxPath, function callback(error, stdout, stderr){
+            exec('xdg-open ' + linuxPath, (error, stdout, stderr) => {
                 return;
             });
         }
     } else if( arg.platform == 'android'){
         console.log("Launching ", fullPath)
-        exec('studio ' + fullPath, function callback(error, stdout, stderr){
+        exec('studio ' + fullPath, (error, stdout, stderr) => {
             if(error){
                 event.sender.send('sendUIMessage',
                 '<strong>Error!</strong><br>' +
@@ -1029,24 +1062,28 @@ ipcMain.on('launchProjectinIDE', function(event, arg) {
         let windowsPath = path.join(fullPath, arg['projectName'] + '.sln');
         console.log( windowsPath );
         windowsPath = "\"" + windowsPath + "\"";
-        exec('start ' + "\"\"" + " " + windowsPath, function callback(error, stdout, stderr){
+        exec('start ' + "\"\"" + " " + windowsPath, (error, stdout, stderr) => {
             return;
         });
     }
 });
 
-ipcMain.on('quit', function(event, arg) {
+ipcMain.on('quit', (event, arg) => {
     app.quit();
 });
 
-ipcMain.on('saveDefaultSettings', function(event, defaultSettings) {
-    fs.writeFile(path.resolve(__dirname, 'settings.json'), defaultSettings, function(err) {
-        if (err) {
-            event.returnValue = "Unable to save defaultSettings to settings.json... (Error=" + err.code + ")";
-        } else {
-            event.returnValue = "Updated default settings for the PG. (written to settings.json)";
+ipcMain.on('saveDefaultSettings', (event, defaultSettings) => {
+    fs.writeFile(
+        path.resolve(__dirname, 'settings.json'),
+        defaultSettings,
+        (err) => {
+            if (err) {
+                event.returnValue = "Unable to save defaultSettings to settings.json... (Error=" + err.code + ")";
+            } else {
+                event.returnValue = "Updated default settings for the PG. (written to settings.json)";
+            }
         }
-    });
+    );
 });
 
 ipcMain.on('path', (event, [ key, args ]) => {
@@ -1073,7 +1110,7 @@ ipcMain.on('openExternal', (event, [ url ]) => {
 });
 
 ipcMain.on('firstTimeSierra', (event, command) => {
-    exec(command, function callback(error, stdout, stderr){
+    exec(command, (error, stdout, stderr) => {
         console.log(stdout + " " + stderr);
     });
 });

@@ -562,7 +562,7 @@ function setup() {
 
 
          $("#verboseOption").checkbox();
-         $("#verboseOption").on("change", function() {
+         $("#verboseOption").on("change", () => {
             if ($("#verboseOption").filter(":checked").length > 0) {
                  defaultSettings['verboseOutput'] = true;
                  bVerbose = true;
@@ -575,7 +575,7 @@ function setup() {
         });
 
 
-        $("#ofPath").on("change", function(){
+        $("#ofPath").on("change", () => {
             const ofpath = $("#ofPath").val();
             defaultSettings['defaultOfPath'] = ofpath;
             console.log("ofPath val " + ofpath);
