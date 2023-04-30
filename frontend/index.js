@@ -33,7 +33,7 @@ crashReporter.start({
 //--------------------------------------------------------- load settings
 
 /**
- * @type {{ 
+ * @typedef {{ 
  *   defaultOfPath: string, 
  *   advancedMode: boolean, 
  *   defaultPlatform: string,
@@ -41,21 +41,13 @@ crashReporter.start({
  *   showDeveloperTools: boolean, 
  *   defaultRelativeProjectPath: string, 
  *   useDictionaryNameGenerator: boolean
- * }}
+ * }} Settings
  */
-let obj = {};
 
-/**
- * @type {{
- *   defaultOfPath: string,
- *   advancedMode: boolean,
- *   defaultPlatform: string,
- *   showConsole: boolean,
- *   showDeveloperTools: boolean,
- *   defaultRelativeProjectPath: string,
- *   useDictionaryNameGenerator: boolean
- * }}
- */
+/** @type Settings */
+let settings = {};
+
+/** @type Settings */
 const templateSettings = {
     defaultOfPath: "",
     advancedMode: false,
@@ -67,9 +59,9 @@ const templateSettings = {
 };
 
 try {
-    const settings = fs.readFileSync(path.resolve(__dirname, 'settings.json'), 'utf-8');
-    obj = JSON.parse(settings);
-    console.log(obj);
+    const settingsJsonString = fs.readFileSync(path.resolve(__dirname, 'settings.json'), 'utf-8');
+    settings = JSON.parse(settingsJsonString);
+    console.log(settings);
 } catch (e) {
     // automatic platform detection
     let myPlatform = "Unknown";
@@ -94,7 +86,7 @@ try {
         }
     }
 
-    obj = {
+    settings = {
         defaultOfPath: "",
         advancedMode: false,
         defaultPlatform: myPlatform,
@@ -106,8 +98,8 @@ try {
 }
 
 for(const key in templateSettings) {
-    if(!obj.hasOwnProperty(key)) {
-        obj[key] = templateSettings[key];
+    if(!settings.hasOwnProperty(key)) {
+        settings[key] = templateSettings[key];
     }
 }
 
@@ -145,7 +137,7 @@ const platforms = {
     "linuxarmv7l": "Linux ARMv7 (Makefiles)"
 };
 
-const bUseMoniker = obj["useDictionaryNameGenerator"];
+const bUseMoniker = settings["useDictionaryNameGenerator"];
 
 const templates = {
     "emscripten": "Emscripten",
@@ -169,7 +161,7 @@ const templates = {
     "vscode": "Visual Studio Code",
 };
 
-let defaultOfPath = obj["defaultOfPath"];
+let defaultOfPath = settings["defaultOfPath"];
 let addons;
 
 if (!path.isAbsolute(defaultOfPath)) {
@@ -184,7 +176,7 @@ if (!path.isAbsolute(defaultOfPath)) {
     	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../../../"), defaultOfPath));
     }
 
-    obj["defaultOfPath"] = defaultOfPath || "";
+    settings["defaultOfPath"] = defaultOfPath || "";
 }
 
 // now, let's look for a folder called mySketch, and keep counting until we find one that doesn't exist
@@ -247,7 +239,7 @@ app.on('ready', () => {
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
     // Open the devtools.
-    if (obj["showDeveloperTools"]) {
+    if (settings["showDeveloperTools"]) {
         mainWindow.webContents.openDevTools();
     }
     //when the window is loaded send the defaults
@@ -258,7 +250,7 @@ app.on('ready', () => {
         mainWindow.webContents.send('cwd', __dirname);
         mainWindow.webContents.send('cwd', process.resourcesPath);
         mainWindow.webContents.send('setStartingProject', startingProject);
-        mainWindow.webContents.send('setDefaults', obj);
+        mainWindow.webContents.send('setDefaults', settings);
         mainWindow.webContents.send('setup', '');
         mainWindow.webContents.send('checkOfPathAfterSetup', '');
     });
@@ -351,6 +343,7 @@ app.on('ready', () => {
             ]
         },
     ];
+    // @ts-ignore
     const menuV = Menu.buildFromTemplate(menuTemplate); // TODO: correct this
     Menu.setApplicationMenu(menuV);
 });
@@ -359,7 +352,7 @@ function getStartingProjectName() {
     const {
         defaultOfPath,
         defaultRelativeProjectPath
-    } = obj;
+    } = settings;
     console.log(defaultOfPath, defaultRelativeProjectPath);
     const defaultPathForProjects = path.join(defaultOfPath, defaultRelativeProjectPath);
     const goodName = getGoodSketchName(defaultPathForProjects);
