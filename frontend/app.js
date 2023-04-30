@@ -31,21 +31,21 @@ let numAddedSrcPaths = 1;
 //-----------------------------------------------------------------------------------
 
 //-------------------------------------------
-ipc.on('setOfPath', function(event, arg) {
+ipc.on('setOfPath', (event, arg) => {
     setOFPath(arg);
 });
 
-ipc.on('cwd', function(event, arg) {
+ipc.on('cwd', (event, arg) => {
     console.log(arg);
 });
 
-ipc.on('setUpdatePath', function(event, arg) {
+ipc.on('setUpdatePath', (event, arg) => {
     const elem = document.getElementById("updateMultiplePath");
     elem.value = arg;
     $("#updateMultiplePath").change();
 });
 
-ipc.on('isUpdateMultiplePathOk', function(event, arg) {
+ipc.on('isUpdateMultiplePathOk', (event, arg) => {
     if (arg == true){
         $("#updateMultipleWrongMessage").hide();
         $("#updateMultipleButton").removeClass("disabled");
@@ -56,13 +56,13 @@ ipc.on('isUpdateMultiplePathOk', function(event, arg) {
 });
 
 //-------------------------------------------
-ipc.on('setup', function(event, arg) {
+ipc.on('setup', (event, arg) => {
     setup();
 });
 
 //-----------------------------------------
 // this is called from main when defaults are loaded in:
-ipc.on('setDefaults', function(event, arg) {
+ipc.on('setDefaults', (event, arg) => {
     defaultSettings = arg;
     setOFPath(defaultSettings['defaultOfPath']);
     enableAdvancedMode(defaultSettings['advancedMode']);
@@ -70,13 +70,13 @@ ipc.on('setDefaults', function(event, arg) {
 });
 
 //-------------------------------------------
-ipc.on('setStartingProject', function(event, arg) {
+ipc.on('setStartingProject', (event, arg) =>  {
     $("#projectPath").val(arg['path']);
     $("#projectName").val(arg['name']);
 });
 
 //-------------------------------------------
-ipc.on('setProjectPath', function(event, arg) {
+ipc.on('setProjectPath', (event, arg) => {
     $("#projectPath").val(arg);
     //defaultSettings['lastUsedProjectPath'] = arg;
     //saveDefaultSettings();
@@ -84,26 +84,25 @@ ipc.on('setProjectPath', function(event, arg) {
 });
 
 //-------------------------------------------
-ipc.on('setSourceExtraPath', function(event, [arg, index]) { // TODO:
+ipc.on('setSourceExtraPath', (event, [arg, index]) => { // TODO:
     checkAddSourcePath(index);
     $("#sourceExtra-" + index).val(arg);
 });
 
 //-------------------------------------------
-ipc.on('setGenerateMode', function(event, arg) {
+ipc.on('setGenerateMode', (event, arg) => {
     switchGenerateMode(arg);
 });
 
 //-------------------------------------------
-ipc.on('importProjectSettings', function(event, settings) {
+ipc.on('importProjectSettings', (event, settings) => {
     $("#projectPath").val(settings['projectPath']);
     $("#projectName").val(settings['projectName']).trigger('change'); // change triggers addon scanning
 });
 
 //-------------------------------------------
-ipc.on('setAddons', function(event, arg) {
-    console.log("got set addons");
-    console.log(arg);
+ipc.on('setAddons', (event, arg) => {
+    console.log("got set addons:", arg);
 
     addonsInstalled = arg;
 
@@ -145,11 +144,10 @@ ipc.on('setAddons', function(event, arg) {
 });
 
 
-ipc.on('setPlatforms', function(event, arg) {
+ipc.on('setPlatforms', (event, arg) => {
 
     console.log("got set platforms");
     console.log(arg);
-    console.log("got set platforms");
 
     platforms = arg;
 
@@ -190,7 +188,7 @@ ipc.on('setPlatforms', function(event, arg) {
 });
 
 
-ipc.on('setTemplates', function(event, arg) {
+ipc.on('setTemplates', (event, arg) => {
     console.log("----------------");
     console.log("got set templates");
     console.log(arg);
@@ -241,7 +239,7 @@ ipc.on('setTemplates', function(event, arg) {
 });
 
 
-ipc.on('enableTemplate', function (event, arg) {
+ipc.on('enableTemplate', (event, arg) => {
 
     console.log('enableTemplate');
     const items = arg.bMulti === false
@@ -250,13 +248,13 @@ ipc.on('enableTemplate', function (event, arg) {
 
     // enable all first
     for (let i = 0; i < items.length; i++) {
-        let item = $(items[i]);
+        const item = $(items[i]);
         item.removeClass("disabled");
     }
 
     for (const template of arg.invalidTemplateList) {
         for (let i = 0; i < items.length; i++) {
-            let item = $(items[i]);
+            const item = $(items[i]);
             if (item.attr('data-value') === template) {
                 item.addClass("disabled");
             }
@@ -266,7 +264,7 @@ ipc.on('enableTemplate', function (event, arg) {
 
 //-------------------------------------------
 // select the list of addons and notify if some aren't installed
-ipc.on('selectAddons', function(event, arg) {
+ipc.on('selectAddons', (event, arg) => {
     // todo : DEAL WITH LOCAL ADDONS HERE....
 
     const addonsAlreadyPicked = $("#addonsDropdown").val().split(',');
@@ -286,7 +284,6 @@ ipc.on('selectAddons', function(event, arg) {
         if (addonsAlreadyPicked.indexOf(arg[i]) >= 0){
             console.log("already picked"); // alread picked
         } else {
-
             // if not picked, check if have it and try to pick it
             if (addonsInstalled.indexOf(arg[i]) >= 0){
                 $('#addonsDropdown').dropdown('set selected', arg[i]);
@@ -300,8 +297,6 @@ ipc.on('selectAddons', function(event, arg) {
                 } else {
                     neededAddons.push(arg[i]);
                 }
-
-
             }
         }
     }
@@ -332,7 +327,6 @@ ipc.on('selectAddons', function(event, arg) {
         $("#localAddonMessage").hide();
     }
 
-
     // <div class="ui red message" id="missingAddonMessage" style="display: none">
     //     <p>
     //         <div class="header">
@@ -348,19 +342,18 @@ ipc.on('selectAddons', function(event, arg) {
 
 //-------------------------------------------
 // allow main to send UI messages
-ipc.on('sendUIMessage', function(event, arg) {
+ipc.on('sendUIMessage', (event, arg) => {
     // check if it has "success" message:
-
     displayModal(arg);
 });
 
 //-------------------------------------------
-ipc.on('consoleMessage', function(event, msg) {
+ipc.on('consoleMessage', (event, msg) => {
     consoleMessage(msg);
 });
 
 //-------------------------------------------
-ipc.on('generateCompleted', function(event, isSuccessful) {
+ipc.on('generateCompleted', (event, isSuccessful) => {
     if (isSuccessful === true) {
         // We want to switch to update mode now
         $("#projectName").trigger('change');
@@ -368,13 +361,13 @@ ipc.on('generateCompleted', function(event, isSuccessful) {
 });
 
 //-------------------------------------------
-ipc.on('updateCompleted', function(event, isSuccessful) {
+ipc.on('updateCompleted', (event, isSuccessful) => {
     if (isSuccessful === true) {
         // eventual callback after update completed
     }
 });
 
-ipc.on('setRandomisedSketchName', function(event, newName) {
+ipc.on('setRandomisedSketchName', (event, newName) => {
     $("#projectName").val(newName);
 });
 
@@ -428,7 +421,7 @@ function setup() {
     });
 
 
-    $(document).ready(function() {
+    $(document).ready(() => {
         try {
             const {
                 release,
@@ -456,11 +449,11 @@ function setup() {
         });
 
         $("#createMenuButon").tab({
-            'onVisible':function(){
+            'onVisible':() => {
                 if (isOfPathGood !== true){
                     $('#settingsMenuButton').click();
                      $('#ofPathError').modal({
-                        onHide: function () {
+                        onHide: () => {
                              $('#settingsMenuButton').click();
                         }
                     }).modal("show");
@@ -469,11 +462,11 @@ function setup() {
         });
 
         $("#updateMenuButton").tab({
-            'onVisible':function(){
+            'onVisible':() => {
                 if (isOfPathGood !== true) {
                     $('#settingsMenuButton').click();
                      $('#ofPathError').modal({
-                        onHide: function () {
+                        onHide: () => {
                              $('#settingsMenuButton').click();
                         }
                     }).modal("show");
@@ -508,19 +501,19 @@ function setup() {
             ipc.send('openExternal', $(this).prop('href'));
         });
 
-        $("#projectPath").on('change', function () {
-        	if($(this).is(":focus") === true) {
+        $("#projectPath").on('change', () => {
+        	if($("#projectPath").is(":focus") === true) {
                  return; 
             }
 
             $("#projectName").trigger('change'); // checks the project on the new location
         });
-        $("#projectPath").on('focusout', function () {
-        	$(this).trigger('change');
+        $("#projectPath").on('focusout', () => {
+        	$("#projectPath").trigger('change');
         });
 
-        $("#projectName").on('change', function () {
-        	if( $(this).is(":focus")===true ){ return; }
+        $("#projectName").on('change', () => {
+        	if( $("#projectName").is(":focus") === true ){ return; }
 
             // fix "non alpha numeric characters here" as we did in the old PG
             const currentStr = $("#projectName").val()
@@ -539,11 +532,11 @@ function setup() {
             $("#revealProjectFiles").prop('href', 'file:///' + path.join(project['projectPath'],project['projectName']).replace(/^\//, '') );
         }).trigger('change');
 
-        $("#projectName").on('focusout', function () {
-        	$(this).trigger('change');
+        $("#projectName").on('focusout', () => {
+        	$("#projectName").trigger('change');
         });
 
-        $("#updateMultiplePath").on('change', function () {
+        $("#updateMultiplePath").on('change', () => {
             ipc.send('checkMultiUpdatePath', $("#updateMultiplePath").val());
         });
 
@@ -556,9 +549,7 @@ function setup() {
             }
         });
 
-         $("#IDEButton").on("click", function() {
-            launchInIDE();
-         });
+         $("#IDEButton").on("click", () => launchInIDE());
 
 
          $("#verboseOption").checkbox();
@@ -602,18 +593,18 @@ function setup() {
         }
 
         // updates ofPath when the field is manually changed
-        $("#ofPath").on('blur', function(e){
-            const ofpath = $(this).val();
+        $("#ofPath").on('blur', (e) => {
+            const ofpath = $("#ofPath").val();
             setOFPath(ofpath);
             if(isFirstTimeSierra) {
                 ipc.sendSync("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app");
                 $("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
                 //exec("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app", puts);
             }
-        }).on('keypress', function(e){
+        }).on('keypress', (e) => {
             if(e.which == 13){
                 e.preventDefault();
-                $(this).blur();
+                $("#ofPath").blur();
             }
         });
 
@@ -634,10 +625,10 @@ function setup() {
 
         $("#fileDropModal").modal({
             'show': false,
-            onHide: function () {
+            onHide: () => {
                 $('body').removeClass('incomingFile');
             },
-            onShow: function () {
+            onShow: () => {
                 $('body').addClass('incomingFile');
             }
         });
@@ -680,7 +671,7 @@ function setup() {
 
         // this allows to close the drop zone if it ever stays open due to a bug.
         $("#dropZoneOverlay").on('click', closeDragInputModal);
-        $(window).on('keypress', function(e){
+        $(window).on('keypress', (e) => {
             if( e.which === 27 ){ // esc key
                 e.stopPropagation();
                 e.preventDefault();
@@ -690,13 +681,15 @@ function setup() {
 
         // listen for drag events
         // note: dragover is needed because dragleave is called pretty randomly
-        $("#dropZoneUpdate").on('dragenter dragover drop', onDragUpdateFile).on('dragleave', function(e){
-            $(this).removeClass("accept deny");
-        });
+        $("#dropZoneUpdate")
+            .on('dragenter dragover drop', onDragUpdateFile)
+            .on('dragleave', (e) => {
+                $("#dropZoneUpdate").removeClass("accept deny");
+            });
 
 
         // reflesh template dropdown list depends on selected platforms
-        $("#platformsDropdown").on('change', function () {
+        $("#platformsDropdown").on('change', () => {
             let selectedPlatforms = $("#platformsDropdown input").val();
             let selectedPlatformArray = selectedPlatforms.trim().split(',');
             let arg = {
@@ -707,7 +700,7 @@ function setup() {
             console.log(arg);
             ipc.send('refreshTemplateList', arg);
         })
-        $("#platformsDropdownMulti").on('change', function () {
+        $("#platformsDropdownMulti").on('change', () => {
             let selectedPlatforms = $("#platformsDropdownMulti input").val();
             let selectedPlatformArray = selectedPlatforms.trim().split(',');
             let arg = {
@@ -1041,10 +1034,13 @@ function getPlatformList() {
 
 //----------------------------------------
 function displayModal(message) {
-    $("#uiModal .content").html(message).find('*[data-toggle="external_target"]').click(function (e) {
-		e.preventDefault();
-        ipc.send('openExternal', $(this).prop("href") );
-    });
+    $("#uiModal .content")
+        .html(message)
+        .find('*[data-toggle="external_target"]')
+        .click(function (e) {
+            e.preventDefault();
+            ipc.send('openExternal', $(this).prop("href") );
+        });
 
     if (message.indexOf("Success!") > -1){
         $("#IDEButton").show();
