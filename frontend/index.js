@@ -684,7 +684,7 @@ ipcMain.on('getRandomSketchName', (event, arg) => {
 function getPgPath() {
     let pgApp = "";
     if(hostplatform == "linux" || hostplatform == "linux64"){
-        pgApp = path.join(rootPath, "apps/projectGenerator/commandLine/bin/projectGenerator");
+        pgApp = path.join(defaultOfPath, "apps/projectGenerator/commandLine/bin/projectGenerator");
         //pgApp = "projectGenerator";
     } else {
         pgApp = path.normalize(path.join(__dirname, "app", "projectGenerator"));
@@ -707,7 +707,6 @@ ipcMain.on('update', (event, update) => {
     let templateString = "";
     let recursiveString = "";
     let verboseString = "";
-    let rootPath = defaultOfPath;
 
     if (update['updatePath'] !== null) {
         updatePath = update['updatePath'];
@@ -724,7 +723,6 @@ ipcMain.on('update', (event, update) => {
 
     if (update['ofPath'] !== null) {
         pathString = "-o\"" + update['ofPath'] + "\"";
-        rootPath = update['ofPath'];
     }
 
     if (update['updateRecursive'] === true) {
@@ -783,7 +781,6 @@ ipcMain.on('generate', (event, generate) => {
     let platformString = "";
     let templateString = "";
     let verboseString = "";
-    let rootPath = defaultOfPath;
     let sourceExtraString = "";
 
     if (generate['platformList'] != null) {
@@ -804,7 +801,6 @@ ipcMain.on('generate', (event, generate) => {
 
     if (generate['ofPath'] != null) {
         pathString = "-o\"" + generate['ofPath'] + "\"";
-        rootPath = generate['ofPath'];
     }
     
     if (generate['sourcePath'] != null && generate['sourcePath'].length > 0) {
@@ -849,30 +845,33 @@ ipcMain.on('generate', (event, generate) => {
 
         const fullPath = path.join(generate['projectPath'], generate['projectName']);
         if (error === null && wasError === false) {
-            event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
+            event.sender.send('consoleMessage', `<strong>${wholeString}</strong><br>${stdout}`);
             event.sender.send('sendUIMessage',
-                '<strong>Success!</strong><br>' +
-                'Your can now find your project in <a href="file:///' + fullPath + '" data-toggle="external_target" class="monospace">' + fullPath + '</a><br><br>' +
-                '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stdout + '\n\n\n(command used: ' + wholeString + ')\n\n\n</textarea></div>'
+                '<strong>Success!</strong><br>'
+                + 'Your can now find your project in <a href="file:///' + fullPath + '" data-toggle="external_target" class="monospace">' + fullPath + '</a><br><br>'
+                + '<div id="fullConsoleOutput" class="not-hidden"><br>'
+                + '<textarea class="selectable">' + stdout + '\n\n\n(command used: ' + wholeString + ')\n\n\n</textarea></div>'
             );
             event.sender.send('generateCompleted', true);
         } else if (error !== null) {
-            event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + error.message);
+            event.sender.send('consoleMessage', `<strong>${wholeString}</strong><br>${error.message}`);
             // note: stderr mostly seems to be also included in error.message
             // also available: error.code, error.killed, error.signal, error.cmd
             // info: error.code=127 means commandLinePG was not found
             event.sender.send('sendUIMessage',
-                '<strong>Error...</strong><br>' +
-                'There was a problem generating your project... <span class="monospace">' + fullPath + '</span>' +
-                '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + error.message + '</textarea></div>'
+                '<strong>Error...</strong><br>'
+                + 'There was a problem generating your project... <span class="monospace">' + fullPath + '</span>'
+                + '<div id="fullConsoleOutput" class="not-hidden"><br>'
+                + '<textarea class="selectable">' + error.message + '</textarea></div>'
             );
         } else if (wasError === true) {
             event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
             event.sender.send('sendUIMessage',
-                '<strong>Error!</strong><br>' +
-                '<strong>Error...</strong><br>' +
-                'There was a problem generating your project... <span class="monospace">' + fullPath + '</span>' +
-                '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stdout + '\n\n\n(command used: ' + wholeString + ')\n\n\n</textarea></div>'
+                '<strong>Error!</strong><br>'
+                + '<strong>Error...</strong><br>'
+                + 'There was a problem generating your project... <span class="monospace">' + fullPath + '</span>'
+                + '<div id="fullConsoleOutput" class="not-hidden"><br>'
+                + '<textarea class="selectable">' + stdout + '\n\n\n(command used: ' + wholeString + ')\n\n\n</textarea></div>'
             );
         }
     });
@@ -1100,6 +1099,6 @@ ipcMain.on('openExternal', (event, [ url ]) => {
 
 ipcMain.on('firstTimeSierra', (event, command) => {
     exec(command, (error, stdout, stderr) => {
-        console.log(stdout + " " + stderr);
+        console.log(stdout, stderr);
     });
 });
