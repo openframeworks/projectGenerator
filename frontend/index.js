@@ -29,8 +29,40 @@ crashReporter.start({
 
 
 //--------------------------------------------------------- load settings
-let obj;
 
+/**
+ * @type {{ 
+ *   defaultOfPath: string, 
+ *   advancedMode: boolean, 
+ *   defaultPlatform: string,
+ *   showConsole: boolean,
+ *   showDeveloperTools: boolean, 
+ *   defaultRelativeProjectPath: string, 
+ *   useDictionaryNameGenerator: boolean
+ * }}
+ */
+let obj = {};
+
+/**
+ * @type {{
+ *   defaultOfPath: string,
+ *   advancedMode: boolean,
+ *   defaultPlatform: string,
+ *   showConsole: boolean,
+ *   showDeveloperTools: boolean,
+ *   defaultRelativeProjectPath: string,
+ *   useDictionaryNameGenerator: boolean
+ * }}
+ */
+const templateSettings = {
+    defaultOfPath: "",
+    advancedMode: false,
+    defaultPlatform: 'osx',
+    showConsole: false,
+    showDeveloperTools: false,
+    defaultRelativeProjectPath: "apps/myApps",
+    useDictionaryNameGenerator: false
+};
 
 try {
     const settings = fs.readFileSync(path.resolve(__dirname, 'settings.json'));
@@ -61,25 +93,15 @@ try {
     }
 
     obj = {
-        "defaultOfPath": "",
-        "advancedMode": false,
-        "defaultPlatform": myPlatform,
-        "showConsole": false,
-        "showDeveloperTools": false,
-        "defaultRelativeProjectPath": "apps/myApps",
-        "useDictionaryNameGenerator": false
+        defaultOfPath: "",
+        advancedMode: false,
+        defaultPlatform: myPlatform,
+        showConsole: false,
+        showDeveloperTools: false,
+        defaultRelativeProjectPath: "apps/myApps",
+        useDictionaryNameGenerator: false,
     };
 }
-
-const templateSettings = {
-    "defaultOfPath": "",
-    "advancedMode": false,
-    "defaultPlatform": 'osx',
-    "showConsole": false,
-    "showDeveloperTools": false,
-    "defaultRelativeProjectPath": "apps/myApps",
-    "useDictionaryNameGenerator": false
-};
 
 for(const key in templateSettings) {
     if(!obj.hasOwnProperty(key)) {
