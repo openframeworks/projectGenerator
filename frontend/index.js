@@ -251,61 +251,84 @@ app.on('ready', () => {
         // when you should delete the corresponding element.
     });
 
-    const menuTmpl = [{
-        label: 'Atom Shell',
-        submenu: [{
-            label: 'Quit',
-            accelerator: 'Command+Q',
-            click: () => {
-                mainWindow.close();
-            }
-        }]
-    }, {
-        label: 'View',
-        submenu: [{
-            label: 'Reload',
-            accelerator: 'Command+R',
-            click: () => {
-                mainWindow.reload();
-            }
+    const isMac = process.platform === 'darwin'
+    const menuTemplate = [
+        ...(isMac ? [{
+            label: app.name,
+            submenu: [
+              { role: 'about' },
+              { type: 'separator' },
+              { role: 'services' },
+              { type: 'separator' },
+              { role: 'hide' },
+              { role: 'hideOthers' },
+              { role: 'unhide' },
+              { type: 'separator' },
+              { role: 'quit' }
+            ]
+          }] : []),
+        {
+            label: 'File',
+            submenu: [
+                isMac ? { role: 'close' } : { role: 'quit' }
+              ]
         }, {
-            label: 'Toggle DevTools',
-            accelerator: 'Alt+Command+I',
-            click: () => {
-                mainWindow.toggleDevTools();
-            }
-        }]
-    }, {
-        label: 'Edit',
-        submenu: [{
-            label: 'Undo',
-            accelerator: 'Command+Z',
-            selector: 'undo:'
+            label: 'View',
+            submenu: [
+              { role: 'reload' },
+              { role: 'forceReload' },
+              { role: 'toggleDevTools' },
+              { type: 'separator' },
+              { role: 'resetZoom' },
+              { role: 'zoomIn' },
+              { role: 'zoomOut' },
+              { type: 'separator' },
+              { role: 'togglefullscreen' }
+            ]
         }, {
-            label: 'Redo',
-            accelerator: 'Shift+Command+Z',
-            selector: 'redo:'
+            label: 'Edit',
+            submenu: [
+                { role: 'undo' },
+                { role: 'redo' },
+                { type: 'separator' },
+                { role: 'cut' },
+                { role: 'copy' },
+                { role: 'paste' },
+                ...(isMac ? [
+                  { role: 'pasteAndMatchStyle' },
+                  { role: 'delete' },
+                  { role: 'selectAll' },
+                  { type: 'separator' },
+                  {
+                    label: 'Speech',
+                    submenu: [
+                      { role: 'startSpeaking' },
+                      { role: 'stopSpeaking' }
+                    ]
+                  }
+                ] : [
+                  { role: 'delete' },
+                  { type: 'separator' },
+                  { role: 'selectAll' }
+                ])
+            ]
         }, {
-            type: 'separator'
-        }, {
-            label: 'Cut',
-            accelerator: 'Command+X',
-            selector: 'cut:'
-        }, {
-            label: 'Copy',
-            accelerator: 'Command+C',
-            selector: 'copy:'
-        }, {
-            label: 'Paste',
-            accelerator: 'Command+V',
-            selector: 'paste:'
-        }, {
-            label: 'Select All',
-            accelerator: 'Command+A',
-            selector: 'selectAll:'
-        }, ]
-    }];
-    const menuV = Menu.buildFromTemplate(menuTmpl);
+            label: 'Window',
+            submenu: [
+              { role: 'minimize' },
+              { role: 'zoom' },
+              ...(isMac ? [
+                { type: 'separator' },
+                { role: 'front' },
+                { type: 'separator' },
+                { role: 'window' }
+              ] : [
+                { role: 'close' }
+              ])
+            ]
+        },
+    ];
+    const menuV = Menu.buildFromTemplate(menuTemplate);
     Menu.setApplicationMenu(menuV);
 });
 
