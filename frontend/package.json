@@ -16,11 +16,11 @@
   },
   "scripts": {
     "start": "electron .",
-    "build": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --all --overwrite --electron-version=17.1.1",
-    "build:osx": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=17.1.1 --platform=darwin --arch=x64",
-    "build:linux32": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=17.1.1 --platform=linux --arch=ia32",
-    "build:linux64": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=17.1.1 --platform=linux --arch=x64",
-    "build:vs": "electron-packager . --icon=static/icon/of.ico --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=17.1.1 --platform=win32 --arch=ia32"
+    "build": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --all --overwrite --electron-version=24.1.2",
+    "build:osx": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=24.1.2 --platform=darwin --arch=x64",
+    "build:linux32": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=24.1.2 --platform=linux --arch=ia32",
+    "build:linux64": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=24.1.2 --platform=linux --arch=x64",
+    "build:vs": "electron-packager . --icon=static/icon/of.ico --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=24.1.2 --platform=win32 --arch=ia32"
   },
   "files": [
     "index.html",
