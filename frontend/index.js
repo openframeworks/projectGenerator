@@ -310,8 +310,12 @@ app.on('ready', () => {
 });
 
 function getStartingProjectName() {
-    console.log(obj["defaultOfPath"], obj["defaultRelativeProjectPath"]);
-    const defaultPathForProjects = path.join(obj["defaultOfPath"], obj["defaultRelativeProjectPath"]);
+    const {
+        defaultOfPath,
+        defaultRelativeProjectPath
+    } = obj;
+    console.log(defaultOfPath, defaultRelativeProjectPath);
+    const defaultPathForProjects = path.join(defaultOfPath, defaultRelativeProjectPath);
     const goodName = getGoodSketchName(defaultPathForProjects);
     startingProject['path'] = defaultPathForProjects;
     startingProject['name'] = goodName;
@@ -474,7 +478,11 @@ function getDirectories(srcpath, acceptedPrefix) {
 // }
 
 ipcMain.on('isOFProjectFolder', (event, project) => {
-    const folder = path.join(project['projectPath'], project['projectName']);
+    const {
+        projectPath,
+        projectName
+    } = project;
+    const folder = path.join(projectPath, projectName);
 
     try {
         const tmpFiles = fs.readdirSync(folder);
@@ -609,17 +617,19 @@ ipcMain.on('refreshPlatformList', (event, arg) => {
 
 ipcMain.on('refreshTemplateList', (event, arg) => {
     console.log("refreshTemplateList");
-    let selectedPlatforms = arg.selectedPlatforms;
-    let ofPath = arg.ofPath;
+    const {
+        selectedPlatforms,
+        ofPath
+    } = arg;
 
     // Everytime user select/deselect new platforms,
     // we check each templates and disable if it is not supported by selected platforms
     // iterate all avairable templates and check template.config file
 
-    let supportedPlatforms = [];
+    const supportedPlatforms = [];
 
     for (let template in templates) {
-        let configFilePath = ofPath + "/scripts/templates/" + template + "/template.config";
+        const configFilePath = path.join(ofPath, "scripts", "templates", template, "template.config");
         if (fs.existsSync(configFilePath)) {
             const lineByLine = require('n-readlines');
             const liner = new lineByLine(configFilePath);
@@ -701,35 +711,43 @@ function getPgPath() {
 ipcMain.on('update', (event, update) => {
     console.log(update);
 
-    let updatePath = "";
+    let updatePathString = "";
     let pathString = "";
     let platformString = "";
     let templateString = "";
     let recursiveString = "";
     let verboseString = "";
 
-    if (update['updatePath'] !== null) {
-        updatePath = update['updatePath'];
-        updatePath = "\"" + updatePath + "\"";
+    const {
+        updatePath,
+        platformList,
+        templateList,
+        ofPath,
+        updateRecursive,
+        verbose
+    } = update;
+
+    if (updatePath != null) {
+        updatePathString = "\"" + updatePath + "\"";
     }
 
-    if (update['platformList'] !== null) {
-        platformString = "-p\"" + update['platformList'].join(",") + "\"";
+    if (platformList != null) {
+        platformString = "-p\"" + platformList.join(",") + "\"";
     }
 
-    if (update['templateList'] !== null) {
-        templateString = "-t\"" + update['templateList'].join(",") + "\"";
+    if (templateList != null) {
+        templateString = "-t\"" + templateList.join(",") + "\"";
     }
 
-    if (update['ofPath'] !== null) {
-        pathString = "-o\"" + update['ofPath'] + "\"";
+    if (ofPath != null) {
+        pathString = "-o\"" + ofPath + "\"";
     }
 
-    if (update['updateRecursive'] === true) {
+    if (updateRecursive == true) {
         recursiveString = "-r";
     }
 
-    if (update['verbose'] === true) {
+    if (verbose == true) {
         verboseString = "-v";
     }
 
@@ -751,7 +769,7 @@ ipcMain.on('update', (event, update) => {
             event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
             event.sender.send('sendUIMessage',
                 '<strong>Success!</strong><br>' +
-                'Updating your project was successful! <a href="file:///' + update['updatePath'] + '" class="monospace" data-toggle="external_target">' + update['updatePath'] + '</a><br><br>' +
+                'Updating your project was successful! <a href="file:///' + updatePath + '" class="monospace" data-toggle="external_target">' + updatePath + '</a><br><br>' +
                 '<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
                 '<div id="fullConsoleOutput"><br><textarea class="selectable">' + stdout + '\n\n\n(command used:' + wholeString + ')\n\n\n</textarea></div>'
             );
@@ -762,7 +780,7 @@ ipcMain.on('update', (event, update) => {
             event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + error.message);
             event.sender.send('sendUIMessage',
                 '<strong>Error...</strong><br>' +
-                'There was a problem updating your project... <span class="monospace">' + update['updatePath'] + '</span>' +
+                'There was a problem updating your project... <span class="monospace">' + updatePath + '</span>' +
                 '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + error.message + '\n\n\n(command used:' + wholeString + ')\n\n\n</textarea></div>'
             );
         }
@@ -783,37 +801,49 @@ ipcMain.on('generate', (event, generate) => {
     let verboseString = "";
     let sourceExtraString = "";
 
-    if (generate['platformList'] != null) {
-        platformString = "-p\"" + generate['platformList'].join(",") + "\"";
+    const {
+        platformList,
+        templateList,
+        addonList,
+        ofPath,
+        sourcePath,
+        verbose,
+        projectPath,
+        projectName,
+    } = generate;
+
+    if (platformList != null) {
+        platformString = "-p\"" + platformList.join(",") + "\"";
     }
 
-    if (generate['templateList'] != null) {
-        templateString = "-t\"" + generate['templateList'].join(",") + "\"";
+    if (templateList != null) {
+        templateString = "-t\"" + templateList.join(",") + "\"";
     }
 
-    if (generate['addonList'] != null &&
-        generate['addonList'].length > 0)
+    if (addonList != null &&
+        Array.isArray(addonList) &&
+        addonList.length > 0)
     {
-        addonString = "-a\"" + generate['addonList'].join(",") + "\"";
+        addonString = "-a\"" + addonList.join(",") + "\"";
     } else {
         addonString = "-a\" \"";
     }
 
-    if (generate['ofPath'] != null) {
-        pathString = "-o\"" + generate['ofPath'] + "\"";
+    if (ofPath != null) {
+        pathString = "-o\"" + ofPath + "\"";
     }
     
-    if (generate['sourcePath'] != null && generate['sourcePath'].length > 0) {
-        sourceExtraString = "-s\"" + generate['sourcePath'] + "\"";
+    if (sourcePath != null && sourcePath.length > 0) {
+        sourceExtraString = "-s\"" + sourcePath + "\"";
     }
 
-    if (generate['verbose'] === true) {
+    if (verbose === true) {
         verboseString = "-v";
     }
 
-    if (generate.projectName != null &&
-        generate.projectPath != null) {
-        projectString = "\"" + path.join(generate['projectPath'], generate['projectName']) + "\"";
+    if (projectName != null &&
+        projectPath != null) {
+        projectString = "\"" + path.join(projectPath, projectName) + "\"";
     }
 
     const pgApp = getPgPath();
@@ -829,21 +859,14 @@ ipcMain.on('generate', (event, generate) => {
     ].join(' ');
 
     exec(wholeString, { maxBuffer : Infinity }, (error, stdout, stderr) => {
-        let wasError = false;
         const text = stdout; //Big text with many line breaks
         const lines = text.split(os.EOL); //Will return an array of lines on every OS node works
-        for (let i = 0; i < lines.length; i++) {
-            if (lines[i].indexOf("Result:") > -1) {
-                if (lines[i].indexOf("error") > -1) {
-                    wasError = true;
-                }
-            }
-        }
+        const wasError = lines.some(line => (line.indexOf("Result:") > -1 && line.indexOf("error") > -1));
         
         // wasError = did the PG spit out an error (like a bad path, etc)
         // error = did node have an error running this command line app
 
-        const fullPath = path.join(generate['projectPath'], generate['projectName']);
+        const fullPath = path.join(projectPath, projectName);
         if (error === null && wasError === false) {
             event.sender.send('consoleMessage', `<strong>${wholeString}</strong><br>${stdout}`);
             event.sender.send('sendUIMessage',
@@ -1008,7 +1031,11 @@ ipcMain.on('checkMultiUpdatePath', (event, arg) => {
 });
 
 ipcMain.on('launchProjectinIDE', (event, arg) => {
-    const fullPath = path.join(arg['projectPath'], arg['projectName']);
+    const {
+        projectPath,
+        projectName
+    } = arg;
+    const fullPath = path.join(projectPath, projectName);
 
     if( fs.statSync(fullPath).isDirectory() == false ){
         // project doesn't exist
@@ -1019,7 +1046,7 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
     // // launch xcode
     if( arg.platform == 'osx' ){
         if(hostplatform == 'osx'){
-            let osxPath = path.join(fullPath, arg['projectName'] + '.xcodeproj');
+            let osxPath = path.join(fullPath, projectName + '.xcodeproj');
             console.log( osxPath );
             osxPath = "\"" + osxPath + "\"";
 
@@ -1029,7 +1056,7 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
         }
     } else if( arg.platform == 'linux' || arg.platform == 'linux64' ){
         if(hostplatform == 'linux'){
-            let linuxPath = path.join(fullPath, arg['projectName'] + '.qbs');
+            let linuxPath = path.join(fullPath, projectName + '.qbs');
             linuxPath = linuxPath.replace(/ /g, '\\ ');
             console.log( linuxPath );
             exec('xdg-open ' + linuxPath, (error, stdout, stderr) => {
@@ -1047,7 +1074,7 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
             }
         });
     } else if( hostplatform == 'windows'){
-        let windowsPath = path.join(fullPath, arg['projectName'] + '.sln');
+        let windowsPath = path.join(fullPath, projectName + '.sln');
         console.log( windowsPath );
         windowsPath = "\"" + windowsPath + "\"";
         exec('start ' + "\"\"" + " " + windowsPath, (error, stdout, stderr) => {
