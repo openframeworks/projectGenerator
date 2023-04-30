@@ -1,8 +1,11 @@
+// @ts-check
 // instead of ipc, maybe?
 // https://github.com/atom/electron/blob/master/docs/api/remote.md
 
+// @ts-ignore
 const ipc = window.ipc_wrapper;
 const path = ipc.path;
+const fs = ipc.fs;
 
 let platforms;
 let templates;
@@ -152,7 +155,7 @@ ipc.on('setPlatforms', (event, arg) => {
     platforms = arg;
 
 
-    let select = document.getElementById("platformList");
+    let select = $("#platformList");
     for (const i in platforms) {
         $('<div/>', {
             "class": 'item',
@@ -169,7 +172,7 @@ ipc.on('setPlatforms', (event, arg) => {
     // set the platform to default
     $('#platformsDropdown').dropdown('set exactly', defaultSettings['defaultPlatform']);
 
-    select = document.getElementById("platformListMulti");
+    select = $("#platformListMulti");
     for (const i in platforms) {
         $('<div/>', {
             "class": 'item',
@@ -195,7 +198,7 @@ ipc.on('setTemplates', (event, arg) => {
 
     templates = arg;
 
-    let select = document.getElementById("templateList");
+    let select = $("#templateList");
     for (const i in templates) {
         console.log(i);
         $('<div/>', {
@@ -219,7 +222,7 @@ ipc.on('setTemplates', (event, arg) => {
     //$('#templatesDropdown').dropdown('set exactly', defaultSettings['defaultTemplate']);
 
     // Multi
-    select = document.getElementById("templateListMulti");
+    select = $("#templateListMulti");
     for (const i in templates) {
         $('<div/>', {
             "class": 'item',
@@ -380,29 +383,27 @@ ipc.on('setRandomisedSketchName', (event, newName) => {
 //----------------------------------------
 function setOFPath(arg) {
     // get the element:
-    const elem = document.getElementById("ofPath");
+    const ofPathElem = document.getElementById("ofPath");
 
     if (arg != null && !path.isAbsolute(arg)) {
         // if we are relative, don't do anything...
 
-        elem.value = arg;
+        ofPathElem.value = arg;
     } else {
         // else check settings for how we want this path.... make relative if we need to:
         if (defaultSettings['useRelativePath'] === true) {
             const relativePath = path.normalize(path.relative(path.resolve(__dirname), arg)) + "/";
-            elem.value = relativePath;
+            ofPathElem.value = relativePath;
         } else {
-            elem.value = arg;
+            ofPathElem.value = arg;
         }
     }
 
     $("#ofPath").trigger('change');
 }
 
-
 //----------------------------------------
 function setup() {
-
     jQuery.fn.extend({
         oneTimeTooltip: function (msg) {
             return this.each(function () {
@@ -428,13 +429,13 @@ function setup() {
                 platform
             } = ipc.sendSync('getOSInfo');
             const os_major_pos = release.indexOf(".");
-            const os_major = os_release.slice(0, os_major_pos);
+            const os_major = release.slice(0, os_major_pos);
             const isSierra = (platform === 'darwin' && parseInt(os_major) >= 16);
 
             if(isSierra) {
                 const ofpath = document.getElementById("ofPath").value;
                 try {
-                    runningOnVar = (ofpath.length >= 8 && ofpath.substring(0,8)==='/private');
+                    const runningOnVar = (ofpath.length >= 8 && ofpath.substring(0,8)==='/private');
                     isFirstTimeSierra = runningOnVar;
                 } catch(e) {
                     isFirstTimeSierra = false;
@@ -482,6 +483,7 @@ function setup() {
                 $('#settingsMenuButton').addClass('active');
         }
         });
+
         // $('.main.menu .item').filter('.updateMultiMenuOption').tab({
         //     'onVisible':function(){
         //         alert("wh");
@@ -490,10 +492,6 @@ function setup() {
         //         // }
         //     }
         // });
-
-
-
-
 
         // bind external URLs (load it in default browser; not within Electron)
         $('*[data-toggle="external_target"]').click(function (e) {
@@ -516,7 +514,7 @@ function setup() {
         	if( $("#projectName").is(":focus") === true ){ return; }
 
             // fix "non alpha numeric characters here" as we did in the old PG
-            const currentStr = $("#projectName").val()
+            const currentStr = $("#projectName").val();
             const stripped = currentStr.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '_');
             $("#projectName").val(stripped)
 
@@ -690,8 +688,8 @@ function setup() {
 
         // reflesh template dropdown list depends on selected platforms
         $("#platformsDropdown").on('change', () => {
-            let selectedPlatforms = $("#platformsDropdown input").val();
-            let selectedPlatformArray = selectedPlatforms.trim().split(',');
+            const selectedPlatforms = $("#platformsDropdown input").val();
+            const selectedPlatformArray = selectedPlatforms.trim().split(',');
             let arg = {
                 ofPath: $("#ofPath").val(),
                 selectedPlatforms: selectedPlatformArray,
@@ -701,8 +699,8 @@ function setup() {
             ipc.send('refreshTemplateList', arg);
         })
         $("#platformsDropdownMulti").on('change', () => {
-            let selectedPlatforms = $("#platformsDropdownMulti input").val();
-            let selectedPlatformArray = selectedPlatforms.trim().split(',');
+            const selectedPlatforms = $("#platformsDropdownMulti input").val();
+            const selectedPlatformArray = selectedPlatforms.trim().split(',');
             let arg = {
                 ofPath: $("#ofPath").val(),
                 selectedPlatforms: selectedPlatformArray,
@@ -895,7 +893,7 @@ function generate() {
         $("#projectName").oneTimeTooltip("Please name your sketch first.");
     } else if (gen['projectPath'] === '') {
         $("#projectPath").oneTimeTooltip("Your project path is empty...");
-    } else if (gen['platformList'] === null || gen['platformList'] === "" || lengthOfPlatforms == 0) {
+    } else if (gen['platformList'] === null || lengthOfPlatforms == 0) {
         $("#platformsDropdown").oneTimeTooltip("Please select a platform first.");
     } else {
         ipc.send('generate', gen);
@@ -1109,7 +1107,7 @@ function browseSourcePath(index) {
 
 
 function browseImportProject() {
-    const projectPath = $("#projectPath").val();
+    let projectPath = $("#projectPath").val();
     if (projectPath === ''){
         projectPath = $("#ofPath").val();
     }

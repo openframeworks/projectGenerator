@@ -1,3 +1,5 @@
+// @ts-check
+
 const fs = require('fs');
 const path = require('path');
 const moniker = require('moniker');
@@ -65,8 +67,8 @@ const templateSettings = {
 };
 
 try {
-    const settings = fs.readFileSync(path.resolve(__dirname, 'settings.json'));
-    obj = JSON.parse(settings, 'utf8');
+    const settings = fs.readFileSync(path.resolve(__dirname, 'settings.json'), 'utf-8');
+    obj = JSON.parse(settings);
     console.log(obj);
 } catch (e) {
     // automatic platform detection
@@ -148,7 +150,6 @@ const bUseMoniker = obj["useDictionaryNameGenerator"];
 const templates = {
     "emscripten": "Emscripten",
     "gitignore": "Git Ignore",
-    "gles2": "Open GL ES 2",
     "gl3.1": "Open GL 3.1",
     "gl3.2": "Open GL 3.2",
     "gl3.3": "Open GL 3.3",
@@ -220,7 +221,7 @@ function formatDate(d){
 // wraps over to bb no aa, why?
 function toLetters(num) {
     const mod = num % 26;
-    const pow = (num / 26) | 0;
+    let pow = (num / 26) | 0;
     const out = mod ? String.fromCharCode(96 + (num % 26)) : (--pow, 'z');
     return pow ? toLetters(pow) + out : out;
 }
@@ -247,7 +248,7 @@ app.on('ready', () => {
 
     // Open the devtools.
     if (obj["showDeveloperTools"]) {
-        mainWindow.openDevTools();
+        mainWindow.webContents.openDevTools();
     }
     //when the window is loaded send the defaults
     mainWindow.webContents.on('did-finish-load', () => {
@@ -350,7 +351,7 @@ app.on('ready', () => {
             ]
         },
     ];
-    const menuV = Menu.buildFromTemplate(menuTemplate);
+    const menuV = Menu.buildFromTemplate(menuTemplate); // TODO: correct this
     Menu.setApplicationMenu(menuV);
 });
 
@@ -612,7 +613,7 @@ ipcMain.on('isOFProjectFolder', (event, project) => {
                         }
                     }
                     
-                    if( macro.length && value.length){
+                    if( macro != null && value != null && macro.length && value.length) {
                         // this is where you can do things with the macro/values from the config.make file
 
                         console.log("Reading config pair. Macro: " + macro + " Value: " + value);
@@ -738,14 +739,16 @@ ipcMain.on('getRandomSketchName', (event, arg) => {
 
 function getPgPath() {
     let pgApp = "";
-    if(hostplatform == "linux" || hostplatform == "linux64"){
+    // @ts-ignore
+    if(hostplatform == "linux" || hostplatform == "linux64") { // ???: when appear there linux64?
         pgApp = path.join(defaultOfPath, "apps/projectGenerator/commandLine/bin/projectGenerator");
         //pgApp = "projectGenerator";
     } else {
         pgApp = path.normalize(path.join(__dirname, "app", "projectGenerator"));
     }
 
-    if( hostplatform == 'osx' || hostplatform == 'linux' || hostplatform == 'linux64' ){
+    // @ts-ignore
+    if( hostplatform == 'osx' || hostplatform == 'linux' || hostplatform == 'linux64') {  // ???: when appear there linux64?
         pgApp = pgApp.replace(/ /g, '\\ ');
     } else {
         pgApp = pgApp = "\"" + pgApp + "\"";
