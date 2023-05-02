@@ -67,15 +67,15 @@ ipc.on('setup', (event, arg) => {
 // this is called from main when defaults are loaded in:
 ipc.on('setDefaults', (event, arg) => {
     defaultSettings = arg;
-    setOFPath(defaultSettings['defaultOfPath']);
-    enableAdvancedMode(defaultSettings['advancedMode']);
+    setOFPath(defaultSettings.defaultOfPath);
+    enableAdvancedMode(defaultSettings.advancedMode);
 
 });
 
 //-------------------------------------------
 ipc.on('setStartingProject', (event, arg) =>  {
-    $("#projectPath").val(arg['path']);
-    $("#projectName").val(arg['name']);
+    $("#projectPath").val(arg.path);
+    $("#projectName").val(arg.name);
 });
 
 //-------------------------------------------
@@ -99,8 +99,8 @@ ipc.on('setGenerateMode', (event, arg) => {
 
 //-------------------------------------------
 ipc.on('importProjectSettings', (event, settings) => {
-    $("#projectPath").val(settings['projectPath']);
-    $("#projectName").val(settings['projectName']).trigger('change'); // change triggers addon scanning
+    $("#projectPath").val(settings.projectPath);
+    $("#projectName").val(settings.projectName).trigger('change'); // change triggers addon scanning
 });
 
 //-------------------------------------------
@@ -170,7 +170,7 @@ ipc.on('setPlatforms', (event, arg) => {
         });
 
     // set the platform to default
-    $('#platformsDropdown').dropdown('set exactly', defaultSettings['defaultPlatform']);
+    $('#platformsDropdown').dropdown('set exactly', defaultSettings.defaultPlatform);
 
     select = $("#platformListMulti");
     for (const i in platforms) {
@@ -187,7 +187,7 @@ ipc.on('setPlatforms', (event, arg) => {
         });
 
     // // set the platform to default
-    $('#platformsDropdownMulti').dropdown('set exactly', defaultSettings['defaultPlatform']);
+    $('#platformsDropdownMulti').dropdown('set exactly', defaultSettings.defaultPlatform);
 });
 
 
@@ -391,7 +391,7 @@ function setOFPath(arg) {
         ofPathElem.value = arg;
     } else {
         // else check settings for how we want this path.... make relative if we need to:
-        if (defaultSettings['useRelativePath'] === true) {
+        if (defaultSettings.useRelativePath === true) {
             const relativePath = path.normalize(path.relative(path.resolve(__dirname), arg)) + "/";
             ofPathElem.value = relativePath;
         } else {
@@ -435,7 +435,7 @@ function setup() {
             if(isSierra) {
                 const ofpath = document.getElementById("ofPath").value;
                 try {
-                    const runningOnVar = (ofpath.length >= 8 && ofpath.substring(0,8)==='/private');
+                    const runningOnVar = (ofpath.length >= 8 && ofpath.substring(0,8) === '/private');
                     isFirstTimeSierra = runningOnVar;
                 } catch(e) {
                     isFirstTimeSierra = false;
@@ -527,7 +527,7 @@ function setup() {
         	ipc.send('isOFProjectFolder', project);
 
             // update link to local project files
-            $("#revealProjectFiles").prop('href', 'file:///' + path.join(project['projectPath'],project['projectName']).replace(/^\//, '') );
+            $("#revealProjectFiles").prop('href', 'file:///' + path.join(project.projectPath, project.projectName).replace(/^\//, '') );
         }).trigger('change');
 
         $("#projectName").on('focusout', () => {
@@ -553,11 +553,11 @@ function setup() {
          $("#verboseOption").checkbox();
          $("#verboseOption").on("change", () => {
             if ($("#verboseOption").filter(":checked").length > 0) {
-                 defaultSettings['verboseOutput'] = true;
+                 defaultSetting.verboseOutput = true;
                  bVerbose = true;
                  saveDefaultSettings();
             } else {
-                 defaultSettings['verboseOutput'] = false;
+                 defaultSettings.verboseOutput = false;
                  bVerbose = false;
                  saveDefaultSettings();
             }
@@ -566,7 +566,7 @@ function setup() {
 
         $("#ofPath").on("change", () => {
             const ofpath = $("#ofPath").val();
-            defaultSettings['defaultOfPath'] = ofpath;
+            defaultSettings.defaultOfPath = ofpath;
             console.log("ofPath val " + ofpath);
             if(isFirstTimeSierra) {
                 ipc.sendSync('firstTimeSierra', "xattr -r -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app");
@@ -581,11 +581,11 @@ function setup() {
         });
 
 
-        if (defaultSettings['advancedMode'] === true){
+        if (defaultSettings.advancedMode === true){
         	$("#advancedOptions").attr('Checked','Checked');
         }
 
-        if (defaultSettings['verboseOutput'] === true){
+        if (defaultSettings.verboseOutput === true){
             $('#verboseOption').attr('Checked','Checked');
             bVerbose = true;
         }
@@ -633,7 +633,7 @@ function setup() {
 
 
         // show default platform in GUI
-        $("#defaultPlatform").html(defaultSettings['defaultPlatform']);
+        $("#defaultPlatform").html(defaultSettings.defaultPlatform);
         //$("#defaultTemplate").html(defaultSettings['defaultTemplate']);
 
         // Enable tooltips
@@ -826,7 +826,7 @@ function openDragInputModal(e){
     }
 
     // check filetype when entering droppable zone
-    if( e.type==='dragenter' ){
+    if( e.type === 'dragenter' ){
         onDragUpdateFile(e);
     }
 
@@ -889,11 +889,11 @@ function generate() {
     };
 
     // console.log(gen);
-    if (gen['projectName'] === '') {
+    if (gen.projectName === '') {
         $("#projectName").oneTimeTooltip("Please name your sketch first.");
-    } else if (gen['projectPath'] === '') {
+    } else if (gen.projectPath === '') {
         $("#projectPath").oneTimeTooltip("Your project path is empty...");
-    } else if (gen['platformList'] === null || lengthOfPlatforms == 0) {
+    } else if (gen.platformList == null || lengthOfPlatforms == 0) {
         $("#platformsDropdown").oneTimeTooltip("Please select a platform first.");
     } else {
         ipc.send('generate', gen);
@@ -927,7 +927,7 @@ function updateRecursive() {
         verbose: bVerbose
     };
 
-    if (gen['updatePath'] === '') {
+    if (gen.updatePath === '') {
         displayModal("Please set update path");
     } else if (platformValueArray.length === 0) {
         displayModal("Please select a platform first.");
@@ -991,7 +991,7 @@ function enableAdvancedMode(isAdvanced) {
         $('#templateSectionMulti').show();
     } else {
         $('#platformsDropdown').addClass("disabled");
-        $('#platformsDropdown').dropdown('set exactly', defaultSettings['defaultPlatform']);
+        $('#platformsDropdown').dropdown('set exactly', defaultSettings.defaultPlatform);
         $('#sourceExtraSection').hide();
         $('#templateSection').hide();
         $('#templateSectionMulti').hide();
@@ -1001,7 +1001,7 @@ function enableAdvancedMode(isAdvanced) {
         $("body").removeClass('advanced');
         $('a.updateMultiMenuOption').hide();
     }
-    defaultSettings['advancedMode'] = isAdvanced;
+    defaultSettings.advancedMode = isAdvanced;
     saveDefaultSettings();
     //$("#advancedToggle").prop('checked', defaultSettings['advancedMode'] );
 }
