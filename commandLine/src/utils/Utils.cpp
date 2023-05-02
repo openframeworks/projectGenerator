@@ -232,6 +232,7 @@ void getFrameworksRecursively(const fs::path & path, std::vector < std::string >
 		
 		if (fs::is_directory(f)) {
 			if (f.extension() == ".framework") {
+//				cout << "adding framework " << f << endl;
 				frameworks.emplace_back(f.string());
 			} else {
 				if (f.filename() == fs::path("mediaAssets")) continue;

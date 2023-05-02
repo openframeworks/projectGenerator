@@ -579,8 +579,6 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 
 	
 	for (auto & f : frameworks) {
-//		cout << f << endl;
-
 		// knowing if we are system framework or not is important....
 		bool bIsSystemFramework = false;
 		size_t foundUnixPath = f.find('/');
@@ -593,16 +591,10 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 		if (bIsSystemFramework){
 			; // do we need to do anything here?
 		} else {
-
-			fs::path fPath { f };
-			fs::path rel = fs::relative (f, pathToProject);
+			// if addon is local, it is relative to the project folder, and if it is not, it is related to the project folder, ex: addons/ofxSvg
+			fs::path rel = fs::relative (f, isLocalAddon ? pathToProject : pathToOF);
 			fs::path folderFS = rel.parent_path();
 			filesToFolders[f] = folderFS.string();
-
-			//			cout << "pathToProject = " << pathToProject << endl;
-//			cout << "rel " << rel << endl;
-//			cout << "folderFS " << folderFS << endl;
-//			cout << "----" << endl;
 		}
 	}
 
