@@ -996,7 +996,7 @@ ipcMain.on('launchProjectinIDE', function(event, arg) {
     }
 
     // // launch xcode
-    if( arg.platform == 'osx' ){
+    if( arg.platform == 'osx' || 'ios'){
         if(hostplatform == 'osx'){
             let osxPath = path.join(fullPath, arg['projectName'] + '.xcodeproj');
             console.log( osxPath );
