@@ -658,7 +658,8 @@ ipcMain.on('refreshTemplateList', (event, arg) => {
     console.log("refreshTemplateList");
     const {
         selectedPlatforms,
-        ofPath
+        ofPath,
+        bMulti,
     } = arg;
 
     // Everytime user select/deselect new platforms,
@@ -667,7 +668,7 @@ ipcMain.on('refreshTemplateList', (event, arg) => {
 
     const supportedPlatforms = [];
 
-    for (let template in templates) {
+    for (const template in templates) {
         const configFilePath = path.join(ofPath, "scripts", "templates", template, "template.config");
         if (fs.existsSync(configFilePath)) {
             const lineByLine = require('n-readlines');
@@ -698,27 +699,23 @@ ipcMain.on('refreshTemplateList', (event, arg) => {
         }
     }
 
-    let invalidTemplateList = [];
-    for (let template in supportedPlatforms) {
-        let platforms = supportedPlatforms[template];
-        let bValidTemplate = false;
-        if (platforms === 'enable') {
-            bValidTemplate = true;
-        } else {
-            bValidTemplate = selectedPlatforms.every(p => platforms.indexOf(p) > -1 );
+    const invalidTemplateList = [];
+    for (const template in supportedPlatforms) {
+        const platforms = supportedPlatforms[template];
+        if (platforms !== 'enable') {
+            const bValidTemplate = selectedPlatforms.every(p => platforms.indexOf(p) > -1 );
             // Another option to enable template when "some" of the platforms are supported. (not every)
             // let bValidTemplate = platforms.some((p) => { supportedPlatforms.indexOf(p) > -1 });
-        }
-
-        if (!bValidTemplate) {
-            console.log("Selected platform [" + selectedPlatforms + "] does not support template " + template);
-            invalidTemplateList.push(template);
+            if (!bValidTemplate) {
+                console.log("Selected platform [" + selectedPlatforms + "] does not support template " + template);
+                invalidTemplateList.push(template);
+            }
         }
     }
 
-    let returnArg = {
-        invalidTemplateList: invalidTemplateList,
-        bMulti: arg.bMulti
+    const returnArg = {
+        invalidTemplateList,
+        bMulti
     };
     mainWindow.webContents.send('enableTemplate', returnArg);
 });
