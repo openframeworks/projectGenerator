@@ -798,7 +798,7 @@ ipcMain.on('update', (event, update) => {
         pathString,
         platformString,
         templateString,
-        updatePath
+        updatePathString
     ].join(" ");
 
     exec(wholeString, { maxBuffer : Infinity }, (error, stdout, stderr) => {
