@@ -766,19 +766,19 @@ ipcMain.on('update', (event, update) => {
     } = update;
 
     if (updatePath != null) {
-        updatePathString = "\"" + updatePath + "\"";
+        updatePathString = `"${updatePath}"`;
     }
 
     if (platformList != null) {
-        platformString = "-p\"" + platformList.join(",") + "\"";
+        platformString = `-p"${platformList.join(",")}"`;
     }
 
     if (templateList != null) {
-        templateString = "-t\"" + templateList.join(",") + "\"";
+        templateString = `-t"${templateList.join(",")}"`;
     }
 
     if (ofPath != null) {
-        pathString = "-o\"" + ofPath + "\"";
+        pathString = `-o"${ofPath}"`;
     }
 
     if (updateRecursive == true) {
@@ -851,37 +851,36 @@ ipcMain.on('generate', (event, generate) => {
     } = generate;
 
     if (platformList != null) {
-        platformString = "-p\"" + platformList.join(",") + "\"";
+        platformString = `-p"${platformList.join(",")}"`;
     }
 
     if (templateList != null) {
-        templateString = "-t\"" + templateList.join(",") + "\"";
+        templateString = `-t"${templateList.join(",")}"`;
     }
 
     if (addonList != null &&
         Array.isArray(addonList) &&
         addonList.length > 0)
     {
-        addonString = "-a\"" + addonList.join(",") + "\"";
+        addonString = `-a"${addonList.join(",")}"`;
     } else {
-        addonString = "-a\" \"";
+        addonString = '-a" "';
     }
 
     if (ofPath != null) {
-        pathString = "-o\"" + ofPath + "\"";
+        pathString = `-o"${ofPath}"`;
     }
     
     if (sourcePath != null && sourcePath.length > 0) {
-        sourceExtraString = "-s\"" + sourcePath + "\"";
+        sourceExtraString = `-s"${sourcePath}"`;
     }
 
     if (verbose === true) {
         verboseString = "-v";
     }
 
-    if (projectName != null &&
-        projectPath != null) {
-        projectString = "\"" + path.join(projectPath, projectName) + "\"";
+    if (projectName != null && projectPath != null) {
+        projectString = `"${path.join(projectPath, projectName)}"`;
     }
 
     const pgApp = getPgPath();
