@@ -124,7 +124,7 @@ const addonsToSkip = [
     "ofxEmscripten",
     "ofxAccelerometer",
     "ofxAndroid"
-]
+];
 
 const platforms = {
     "osx": "OS X (Xcode)",
@@ -162,7 +162,6 @@ const templates = {
 };
 
 let defaultOfPath = settings["defaultOfPath"];
-let addons;
 
 if (!path.isAbsolute(defaultOfPath)) {
 
@@ -180,11 +179,7 @@ if (!path.isAbsolute(defaultOfPath)) {
 }
 
 // now, let's look for a folder called mySketch, and keep counting until we find one that doesn't exist
-const startingProject = {
-    'name': '',
-    'path': ''
-};
-getStartingProjectName();
+const startingProject = getStartingProjectName();
 
 //---------------------------------------------------------
 // Keep a global reference of the window object, if you don't, the window will
@@ -197,28 +192,31 @@ app.on('window-all-closed', () => {
     process.exit();
 });
 
-
-
-function formatDate(d){
+/**
+ * @param {Date} date 
+ * @returns {string}
+ */
+function formatDate(date){
     //get the year
-    const year = d.getFullYear().toString().substring(2, 4);
+    const year = date.getFullYear().toString().substring(2, 4);
     //get the month
-    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
     //get the day
-    const day = d.getDate().toString().padStart(2, '0');;
+    const day = date.getDate().toString().padStart(2, '0');;
     //return the string "MMddyy"
     return month + day + year;
 }
 
-// wraps over to bb no aa, why?
+/**
+ * @param {number} num
+ * @returns {string}
+ */
 function toLetters(num) {
     const mod = num % 26;
     let pow = (num / 26) | 0;
     const out = mod ? String.fromCharCode(96 + (num % 26)) : (--pow, 'z');
     return pow ? toLetters(pow) + out : out;
 }
-
-
 
 //-------------------------------------------------------- window
 // This method will be called when Electron has finished
@@ -244,7 +242,7 @@ app.on('ready', () => {
     }
     //when the window is loaded send the defaults
     mainWindow.webContents.on('did-finish-load', () => {
-        //parseAddonsAndUpdateSelect();
+        //refreshAddonList();
 
         mainWindow.webContents.send('cwd', app.getAppPath());
         mainWindow.webContents.send('cwd', __dirname);
@@ -348,6 +346,9 @@ app.on('ready', () => {
     Menu.setApplicationMenu(menuV);
 });
 
+/**
+ * @returns {{path: string, name: string}}
+ */
 function getStartingProjectName() {
     const {
         defaultOfPath,
@@ -356,14 +357,20 @@ function getStartingProjectName() {
     console.log(defaultOfPath, defaultRelativeProjectPath);
     const defaultPathForProjects = path.join(defaultOfPath, defaultRelativeProjectPath);
     const goodName = getGoodSketchName(defaultPathForProjects);
-    startingProject['path'] = defaultPathForProjects;
-    startingProject['name'] = goodName;
+    return {
+        path: defaultPathForProjects,
+        name: goodName
+    };
 }
 
-function parseAddonsAndUpdateSelect(arg) {
-    console.log("in parseAddonsAndUpdateSelect " + arg);
+/**
+ * @param {Electron.IpcMainEvent} event
+ * @param {string} ofPathValue
+ */
+function refreshAddonList(event, ofPathValue) {
+    console.log("in refreshAddonList " + ofPathValue);
     //path = require('path').resolve(__dirname, defaultOfPath + "/addons");
-    addons = getDirectories(arg + "/addons","ofx");
+    let addons = getDirectories(path.join(ofPathValue, "addons"), "ofx");
 
     if (addons){
         if (addons.length > 0){
@@ -374,17 +381,22 @@ function parseAddonsAndUpdateSelect(arg) {
     console.log("Reloading the addons folder, these were found:");
     console.log(addons);
     mainWindow.webContents.send('setAddons', addons);
+    event.returnValue = true;
 }
 
-function parsePlatformsAndUpdateSelect(arg) {
-    const folders = getDirectories(arg + "/scripts/templates");
+/**
+ * @param {Electron.IpcMainEvent} event
+ * @param {string} ofPathValue
+ */
+function refreshPlatformList(event, ofPathValue) {
+    const folders = getDirectories(path.join(ofPathValue, "scripts", "templates"));
     console.log("Reloading the templates folder, these were found:");
     console.log(folders);
 
     const platformsWeHave = {};
     const templatesWeHave = {};
 
-    if (folders === undefined || folders === null) {
+    if (folders == null) {
         //do something
     } else {
         // check all folder name under /scripts/templates
@@ -394,12 +406,12 @@ function parsePlatformsAndUpdateSelect(arg) {
                 // this folder is for platform
                 console.log("Found platform, key " + key + " has value " + platforms[key]);
                 platformsWeHave[key] = platforms[key];
-            }else{
+            } else {
                 // this folder is for template
                 if(templates[key]){
                     console.log("Found template folder, key " + key + " has value " + templates[key]);
                     templatesWeHave[key] = templates[key];
-                }else{
+                } else {
                     // Unofficial folder name, maybe user's custom template? 
                     // We use folder name for both of key and value
                     console.log("Found unofficial folder, key " + key + " has value " + key);
@@ -413,66 +425,63 @@ function parsePlatformsAndUpdateSelect(arg) {
     // 	console.log("key " + key + " has value " + platformsWeHave[key]);
     // }
     mainWindow.webContents.send('setPlatforms', platformsWeHave);
-
-   mainWindow.webContents.send('setTemplates', templatesWeHave);
-
+    mainWindow.webContents.send('setTemplates', templatesWeHave);
 }
 
+/**
+ * @param {string} currentProjectPath 
+ * @returns {string}
+ */
 function getGoodSketchName(currentProjectPath){
-    let foundOne = false;
     let goodName = "mySketch";
 
     if (bUseMoniker){
-
         const projectNames = new moniker.Dictionary();
-        projectNames.read(  path.join(__dirname, 'static', 'data', 'sketchAdjectives.txt'));
-        goodName = "mySketch";
+        projectNames.read(path.join(__dirname, 'static', 'data', 'sketchAdjectives.txt'));
 
-        while (foundOne === false) {
+        while (true) {
             if (fs.existsSync(path.join(currentProjectPath, goodName))) {
                 console.log("«" + goodName + "» already exists, generating a new name...");
                 const adjective = projectNames.choose();
                 console.log(adjective);
                 goodName = "my" + adjective.charAt(0).toUpperCase() + adjective.slice(1) + "Sketch";
             } else {
-                foundOne = true;
+                break;
             }
         }
-
     } else {
-
         const date = new Date();
         const formattedDate = formatDate(date);
         goodName = "sketch_" + formattedDate;
         let count = 1;
 
-        while (foundOne === false) {
+        while (true) {
             if (fs.existsSync(path.join(currentProjectPath, goodName))) {
                 console.log("«" + goodName + "» already exists, generating a new name...");
                 goodName = "sketch_" + formattedDate + toLetters(count);
                 count++;
             } else {
-                foundOne = true;
+                break;
             }
         }
     }
 
     return goodName;
-
 }
 
-
+/** 
+ * @param {string} srcpath
+ * @param {string} [acceptedPrefix]
+ * @returns {string[] | null}
+ */
 function getDirectories(srcpath, acceptedPrefix) {
-
     // because this is called at a different time, fs and path
     // seemed to be "bad" for some reason...
     // that's why I am making temp ones here.
     // console.log(path);
 
     try {
-
         return fs.readdirSync(srcpath).filter((file) => {
-
             //console.log(srcpath);
             //console.log(file);
             try{
@@ -497,24 +506,9 @@ function getDirectories(srcpath, acceptedPrefix) {
     }
 }
 
-// function getDirs(srcpath, cb) {
-//   fs.readdir(srcpath, (err, files) => {
-//     if(err) {
-//       console.error(err);
-//       return cb([]);
-//     }
-//     const iterator = (file, cb) => {
-//       fs.stat(path.join(srcpath, file), (err, stats) => {
-//         if(err) {
-//           console.error(err);
-//           return cb(false);
-//         }
-//         cb(stats.isDirectory());
-//       })
-//     }
-//     async.filter(files, iterator, cb);
-//   });
-// }
+// todo: default directories
+
+//----------------------------------------------------------- ipc
 
 ipcMain.on('isOFProjectFolder', (event, project) => {
     const {
@@ -639,20 +633,9 @@ ipcMain.on('isOFProjectFolder', (event, project) => {
     }
 });
 
-// todo: default directories
+ipcMain.on('refreshAddonList', refreshAddonList);
 
-//----------------------------------------------------------- ipc
-
-ipcMain.on('refreshAddonList', (event, arg) => {
-    console.log("in refresh " + arg)
-    parseAddonsAndUpdateSelect(arg);
-    event.returnValue = true;
-});
-
-ipcMain.on('refreshPlatformList', (event, arg) => {
-    parsePlatformsAndUpdateSelect(arg);
-});
-
+ipcMain.on('refreshPlatformList', refreshPlatformList);
 
 ipcMain.on('refreshTemplateList', (event, arg) => {
     console.log("refreshTemplateList");
@@ -720,8 +703,8 @@ ipcMain.on('refreshTemplateList', (event, arg) => {
     mainWindow.webContents.send('enableTemplate', returnArg);
 });
 
-ipcMain.on('getRandomSketchName', (event, arg) => {
-    const goodName = getGoodSketchName(arg);
+ipcMain.on('getRandomSketchName', (event, projectPath) => {
+    const goodName = getGoodSketchName(projectPath);
     event.returnValue = { randomisedSketchName: goodName, generateMode: 'createMode' };
     // event.sender.send('setRandomisedSketchName', goodName);
     // event.sender.send('setGenerateMode', 'createMode'); // it's a new sketch name, we are in create mode
@@ -746,7 +729,20 @@ function getPgPath() {
     return pgApp;
 }
 
-ipcMain.on('update', (event, update) => {
+/** @typedef {{
+ *     updatePath: string,
+ *     platformList: Array<string>,
+ *     templateList: Array<string>,
+ *     ofPath: string,
+ *     updateRecursive: boolean,
+ *     verbose: boolean
+ * }} UpdateArgument */
+
+/**
+ * @param {Electron.IpcMainEvent} event
+ * @param {UpdateArgument} update
+ */
+function updateFunction(event, update) {
     console.log(update);
 
     let updatePathString = "";
@@ -802,7 +798,6 @@ ipcMain.on('update', (event, update) => {
     ].join(" ");
 
     exec(wholeString, { maxBuffer : Infinity }, (error, stdout, stderr) => {
-
         if (error === null) {
             event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
             event.sender.send('sendUIMessage',
@@ -827,10 +822,26 @@ ipcMain.on('update', (event, update) => {
     console.log(wholeString);
 
     //console.log(__dirname);
+}
 
-});
+ipcMain.on('update', updateFunction);
 
-ipcMain.on('generate', (event, generate) => {
+/** @typedef {{
+ *     projectName: string,
+ *     projectPath: string,
+ *     sourcePath: string,
+ *     platformList: Array<string>,
+ *     templateList: Array<string>,
+ *     addonList: Array<string>,
+ *     ofPath: string,
+ *     verbose: boolean,
+ * }} GenerateArgument */
+
+/**
+ * @param {Electron.IpcMainEvent} event
+ * @param {GenerateArgument} generate
+ */
+function generateFunction(event, generate) {
     let projectString = "";
     let pathString = "";
     let addonString = "";
@@ -937,7 +948,9 @@ ipcMain.on('generate', (event, generate) => {
     });
 
     console.log(wholeString);
-});
+}
+
+ipcMain.on('generate', generateFunction);
 
 let dialogIsOpen = false;
 
