@@ -954,109 +954,110 @@ ipcMain.on('generate', generateFunction);
 
 let dialogIsOpen = false;
 
-ipcMain.on('pickOfPath', (event, arg) => {
+ipcMain.on('pickOfPath', async (event, arg) => {
     if(dialogIsOpen){
         return;
     }
 
     dialogIsOpen = true;
-    dialog.showOpenDialog(mainWindow, {
-        title: 'select the root of OF, where you see libs, addons, etc',
-        properties: ['openDirectory'],
-        filters: [],
-        defaultPath: arg
-    }).then((filenames) => {
+    try {
+        const filenames = await dialog.showOpenDialog(mainWindow, {
+            title: 'select the root of OF, where you see libs, addons, etc',
+            properties: ['openDirectory'],
+            filters: [],
+            defaultPath: arg
+        });
         if (filenames !== undefined && filenames.filePaths.length > 0) {
             defaultOfPath = filenames.filePaths[0];
             console.log('setOfPath: ', defaultOfPath);
             event.sender.send('setOfPath', defaultOfPath);
         }
-        dialogIsOpen = false;
-    }).catch(err => {
+    } catch(err) {
         console.error('pickOfPath', err);
-        dialogIsOpen = false;
-    });
+    }
+    dialogIsOpen = false;
 });
 
-ipcMain.on('pickUpdatePath', (event, arg) => {
+ipcMain.on('pickUpdatePath', async (event, arg) => {
     if(dialogIsOpen){
         return;
     }
 
     dialogIsOpen = true;
-    dialog.showOpenDialog({
-        title: 'select root folder where you want to update',
-        properties: ['openDirectory'],
-        filters: [],
-        defaultPath: arg
-    }).then((filenames) => {
+    try {
+        const filenames = await dialog.showOpenDialog({
+            title: 'select root folder where you want to update',
+            properties: ['openDirectory'],
+            filters: [],
+            defaultPath: arg
+        });
         if (filenames !== undefined && filenames.filePaths.length > 0) {
             // defaultOfPath = filenames.filePaths[0]; // TODO: IS THIS CORRECT?
             event.sender.send('setUpdatePath', filenames.filePaths[0]);
         }
-        dialogIsOpen = false;
-    }).catch(err => {
+    } catch(err) {
         console.error('pickUpdatePath', err);
-        dialogIsOpen = false;
-    });
+    }
+    dialogIsOpen = false;
 });
 
-ipcMain.on('pickProjectPath', (event, arg) => {
+ipcMain.on('pickProjectPath', async (event, arg) => {
     if(dialogIsOpen){
         return;
     }
 
     dialogIsOpen = true;
-    dialog.showOpenDialog({
-        title: 'select parent folder for project, typically apps/myApps',
-        properties: ['openDirectory'],
-        filters: [],
-        defaultPath: arg
-    }).then((filenames) => {
+    try {
+        const filenames = await dialog.showOpenDialog({
+            title: 'select parent folder for project, typically apps/myApps',
+            properties: ['openDirectory'],
+            filters: [],
+            defaultPath: arg
+        });
         if (filenames !== undefined && filenames.filePaths.length > 0) {
             event.sender.send('setProjectPath', filenames.filePaths[0]);
         }
-        dialogIsOpen = false;
-    }).catch(err => {
+    } catch(err) {
         console.error('pickProjectPath', err);
-        dialogIsOpen = false;
-    });
+    }
+    dialogIsOpen = false;
 });
 
-ipcMain.on('pickSourcePath', (event, [ ofPath, index ]) => {
+ipcMain.on('pickSourcePath', async (event, [ ofPath, index ]) => {
     if(dialogIsOpen){
         return;
     }
 
     dialogIsOpen = true;
-    dialog.showOpenDialog({
-        title: 'select extra source or include folder paths to add to project',
-        properties: ['openDirectory'],
-        filters: [],
-        defaultPath: ofPath
-    }).then((filenames) => {
+    try {
+        const filenames = await dialog.showOpenDialog({
+            title: 'select extra source or include folder paths to add to project',
+            properties: ['openDirectory'],
+            filters: [],
+            defaultPath: ofPath
+        });
         if (filenames !== undefined && filenames.filePaths.length > 0) {
             event.sender.send('setSourceExtraPath', [filenames.filePaths[0], index]);
         }
-        dialogIsOpen = false;
-    }).catch(err => {
+    } catch(err) {
         console.error('pickSourcePath', err);
-        dialogIsOpen = false;
-    });
+    }
+    dialogIsOpen = false;
 });
 
-ipcMain.on('pickProjectImport', (event, arg) => {
+ipcMain.on('pickProjectImport', async (event, arg) => {
     if(dialogIsOpen){
         return;
     }
 
     dialogIsOpen = true;
-    dialog.showOpenDialog({
-        title: 'Select the folder of your project, typically apps/myApps/myGeniusApp',
-        properties: ['openDirectory'],
-        filters: [],
-        defaultPath: arg
-    }).then((filenames) => {
+    try {
+        const filenames = await dialog.showOpenDialog({
+            title: 'Select the folder of your project, typically apps/myApps/myGeniusApp',
+            properties: ['openDirectory'],
+            filters: [],
+            defaultPath: arg
+        });
         if (filenames != null && filenames.filePaths.length > 0) {
             // gather project information
             const projectSettings = {
@@ -1065,11 +1066,10 @@ ipcMain.on('pickProjectImport', (event, arg) => {
             };
             event.sender.send('importProjectSettings', projectSettings);
         }
-        dialogIsOpen = false;
-    }).catch(err => {
+    } catch(err) {
         console.error('pickProjectImport', err);
-        dialogIsOpen = false;
-    });
+    }
+    dialogIsOpen = false;
 });
 
 ipcMain.on('checkMultiUpdatePath', (event, arg) => {
