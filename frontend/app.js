@@ -43,6 +43,7 @@ ipc.on('cwd', (event, arg) => {
 });
 
 ipc.on('setUpdatePath', (event, arg) => {
+    /** @type {HTMLInputElement} */
     const elem = document.getElementById("updateMultiplePath");
     elem.value = arg;
     $("#updateMultiplePath").change();
@@ -381,21 +382,25 @@ ipc.on('setRandomisedSketchName', (event, newName) => {
 
 
 //----------------------------------------
-function setOFPath(arg) {
+/**
+ * @param {string} ofPathValue 
+ */
+function setOFPath(ofPathValue) {
     // get the element:
+    /** @type {HTMLInputElement} */
     const ofPathElem = document.getElementById("ofPath");
 
-    if (arg != null && !path.isAbsolute(arg)) {
+    if (ofPathValue != null && !path.isAbsolute(ofPathValue)) {
         // if we are relative, don't do anything...
 
-        ofPathElem.value = arg;
+        ofPathElem.value = ofPathValue;
     } else {
         // else check settings for how we want this path.... make relative if we need to:
         if (defaultSettings.useRelativePath === true) {
-            const relativePath = path.normalize(path.relative(path.resolve(__dirname), arg)) + "/";
+            const relativePath = path.normalize(path.relative(path.resolve(__dirname), ofPathValue)) + "/";
             ofPathElem.value = relativePath;
         } else {
-            ofPathElem.value = arg;
+            ofPathElem.value = ofPathValue;
         }
     }
 
@@ -494,9 +499,9 @@ function setup() {
         // });
 
         // bind external URLs (load it in default browser; not within Electron)
-        $('*[data-toggle="external_target"]').click(function (e) {
+        $('*[data-toggle="external_target"]').click((e) => {
             e.preventDefault();
-            ipc.send('openExternal', $(this).prop('href'));
+            ipc.send('openExternal', $(e.currentTarget).prop('href'));
         });
 
         $("#projectPath").on('change', () => {
@@ -562,7 +567,6 @@ function setup() {
                  saveDefaultSettings();
             }
         });
-
 
         $("#ofPath").on("change", () => {
             const ofpath = $("#ofPath").val();
@@ -937,6 +941,10 @@ function updateRecursive() {
 }
 
 //----------------------------------------
+/**
+ * 
+ * @param {'createMode' | 'updateMode'} mode 
+ */
 function switchGenerateMode(mode) {
     // mode can be 'createMode' or 'updateMode'
 
@@ -1035,9 +1043,9 @@ function displayModal(message) {
     $("#uiModal .content")
         .html(message)
         .find('*[data-toggle="external_target"]')
-        .click(function (e) {
+        .click((e) => {
             e.preventDefault();
-            ipc.send('openExternal', $(this).prop("href") );
+            ipc.send('openExternal', $(e.currentTarget).prop("href") );
         });
 
     if (message.indexOf("Success!") > -1){
