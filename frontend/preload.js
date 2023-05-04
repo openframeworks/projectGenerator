@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld('ipc_wrapper', {
         isAbsolute: (p) => ipcRenderer.sendSync('path', ['isAbsolute', [p]]),
         relative: (from, to) => ipcRenderer.sendSync('path', ['relative', [from, to]]),
         resolve: (... args) => ipcRenderer.sendSync('path', ['resolve', args]),
+        normalize: (... args) => ipcRenderer.sendSync('path', ['normalize', args]),
     },
     fs: {
         existsSync: (p) => ipcRenderer.sendSync('fs', ['existsSync', [p]]),
