@@ -1,8 +1,11 @@
+// @ts-check
 // instead of ipc, maybe?
 // https://github.com/atom/electron/blob/master/docs/api/remote.md
 
+// @ts-ignore
 const ipc = window.ipc_wrapper;
 const path = ipc.path;
+const fs = ipc.fs;
 
 let platforms;
 let templates;
@@ -31,21 +34,22 @@ let numAddedSrcPaths = 1;
 //-----------------------------------------------------------------------------------
 
 //-------------------------------------------
-ipc.on('setOfPath', function(event, arg) {
+ipc.on('setOfPath', (event, arg) => {
     setOFPath(arg);
 });
 
-ipc.on('cwd', function(event, arg) {
+ipc.on('cwd', (event, arg) => {
     console.log(arg);
 });
 
-ipc.on('setUpdatePath', function(event, arg) {
+ipc.on('setUpdatePath', (event, arg) => {
+    /** @type {HTMLInputElement} */
     const elem = document.getElementById("updateMultiplePath");
     elem.value = arg;
     $("#updateMultiplePath").change();
 });
 
-ipc.on('isUpdateMultiplePathOk', function(event, arg) {
+ipc.on('isUpdateMultiplePathOk', (event, arg) => {
     if (arg == true){
         $("#updateMultipleWrongMessage").hide();
         $("#updateMultipleButton").removeClass("disabled");
@@ -56,27 +60,27 @@ ipc.on('isUpdateMultiplePathOk', function(event, arg) {
 });
 
 //-------------------------------------------
-ipc.on('setup', function(event, arg) {
+ipc.on('setup', (event, arg) => {
     setup();
 });
 
 //-----------------------------------------
 // this is called from main when defaults are loaded in:
-ipc.on('setDefaults', function(event, arg) {
+ipc.on('setDefaults', (event, arg) => {
     defaultSettings = arg;
-    setOFPath(defaultSettings['defaultOfPath']);
-    enableAdvancedMode(defaultSettings['advancedMode']);
+    setOFPath(defaultSettings.defaultOfPath);
+    enableAdvancedMode(defaultSettings.advancedMode);
 
 });
 
 //-------------------------------------------
-ipc.on('setStartingProject', function(event, arg) {
-    $("#projectPath").val(arg['path']);
-    $("#projectName").val(arg['name']);
+ipc.on('setStartingProject', (event, arg) =>  {
+    $("#projectPath").val(arg.path);
+    $("#projectName").val(arg.name);
 });
 
 //-------------------------------------------
-ipc.on('setProjectPath', function(event, arg) {
+ipc.on('setProjectPath', (event, arg) => {
     $("#projectPath").val(arg);
     //defaultSettings['lastUsedProjectPath'] = arg;
     //saveDefaultSettings();
@@ -84,26 +88,25 @@ ipc.on('setProjectPath', function(event, arg) {
 });
 
 //-------------------------------------------
-ipc.on('setSourceExtraPath', function(event, [arg, index]) { // TODO:
+ipc.on('setSourceExtraPath', (event, [arg, index]) => { // TODO:
     checkAddSourcePath(index);
     $("#sourceExtra-" + index).val(arg);
 });
 
 //-------------------------------------------
-ipc.on('setGenerateMode', function(event, arg) {
+ipc.on('setGenerateMode', (event, arg) => {
     switchGenerateMode(arg);
 });
 
 //-------------------------------------------
-ipc.on('importProjectSettings', function(event, settings) {
-    $("#projectPath").val(settings['projectPath']);
-    $("#projectName").val(settings['projectName']).trigger('change'); // change triggers addon scanning
+ipc.on('importProjectSettings', (event, settings) => {
+    $("#projectPath").val(settings.projectPath);
+    $("#projectName").val(settings.projectName).trigger('change'); // change triggers addon scanning
 });
 
 //-------------------------------------------
-ipc.on('setAddons', function(event, arg) {
-    console.log("got set addons");
-    console.log(arg);
+ipc.on('setAddons', (event, arg) => {
+    console.log("got set addons:", arg);
 
     addonsInstalled = arg;
 
@@ -145,16 +148,15 @@ ipc.on('setAddons', function(event, arg) {
 });
 
 
-ipc.on('setPlatforms', function(event, arg) {
+ipc.on('setPlatforms', (event, arg) => {
 
     console.log("got set platforms");
     console.log(arg);
-    console.log("got set platforms");
 
     platforms = arg;
 
 
-    let select = document.getElementById("platformList");
+    let select = $("#platformList");
     for (const i in platforms) {
         $('<div/>', {
             "class": 'item',
@@ -169,9 +171,9 @@ ipc.on('setPlatforms', function(event, arg) {
         });
 
     // set the platform to default
-    $('#platformsDropdown').dropdown('set exactly', defaultSettings['defaultPlatform']);
+    $('#platformsDropdown').dropdown('set exactly', defaultSettings.defaultPlatform);
 
-    select = document.getElementById("platformListMulti");
+    select = $("#platformListMulti");
     for (const i in platforms) {
         $('<div/>', {
             "class": 'item',
@@ -186,18 +188,18 @@ ipc.on('setPlatforms', function(event, arg) {
         });
 
     // // set the platform to default
-    $('#platformsDropdownMulti').dropdown('set exactly', defaultSettings['defaultPlatform']);
+    $('#platformsDropdownMulti').dropdown('set exactly', defaultSettings.defaultPlatform);
 });
 
 
-ipc.on('setTemplates', function(event, arg) {
+ipc.on('setTemplates', (event, arg) => {
     console.log("----------------");
     console.log("got set templates");
     console.log(arg);
 
     templates = arg;
 
-    let select = document.getElementById("templateList");
+    let select = $("#templateList");
     for (const i in templates) {
         console.log(i);
         $('<div/>', {
@@ -221,7 +223,7 @@ ipc.on('setTemplates', function(event, arg) {
     //$('#templatesDropdown').dropdown('set exactly', defaultSettings['defaultTemplate']);
 
     // Multi
-    select = document.getElementById("templateListMulti");
+    select = $("#templateListMulti");
     for (const i in templates) {
         $('<div/>', {
             "class": 'item',
@@ -241,7 +243,7 @@ ipc.on('setTemplates', function(event, arg) {
 });
 
 
-ipc.on('enableTemplate', function (event, arg) {
+ipc.on('enableTemplate', (event, arg) => {
 
     console.log('enableTemplate');
     const items = arg.bMulti === false
@@ -250,13 +252,13 @@ ipc.on('enableTemplate', function (event, arg) {
 
     // enable all first
     for (let i = 0; i < items.length; i++) {
-        let item = $(items[i]);
+        const item = $(items[i]);
         item.removeClass("disabled");
     }
 
     for (const template of arg.invalidTemplateList) {
         for (let i = 0; i < items.length; i++) {
-            let item = $(items[i]);
+            const item = $(items[i]);
             if (item.attr('data-value') === template) {
                 item.addClass("disabled");
             }
@@ -266,7 +268,7 @@ ipc.on('enableTemplate', function (event, arg) {
 
 //-------------------------------------------
 // select the list of addons and notify if some aren't installed
-ipc.on('selectAddons', function(event, arg) {
+ipc.on('selectAddons', (event, arg) => {
     // todo : DEAL WITH LOCAL ADDONS HERE....
 
     const addonsAlreadyPicked = $("#addonsDropdown").val().split(',');
@@ -286,7 +288,6 @@ ipc.on('selectAddons', function(event, arg) {
         if (addonsAlreadyPicked.indexOf(arg[i]) >= 0){
             console.log("already picked"); // alread picked
         } else {
-
             // if not picked, check if have it and try to pick it
             if (addonsInstalled.indexOf(arg[i]) >= 0){
                 $('#addonsDropdown').dropdown('set selected', arg[i]);
@@ -300,8 +301,6 @@ ipc.on('selectAddons', function(event, arg) {
                 } else {
                     neededAddons.push(arg[i]);
                 }
-
-
             }
         }
     }
@@ -332,7 +331,6 @@ ipc.on('selectAddons', function(event, arg) {
         $("#localAddonMessage").hide();
     }
 
-
     // <div class="ui red message" id="missingAddonMessage" style="display: none">
     //     <p>
     //         <div class="header">
@@ -348,19 +346,18 @@ ipc.on('selectAddons', function(event, arg) {
 
 //-------------------------------------------
 // allow main to send UI messages
-ipc.on('sendUIMessage', function(event, arg) {
+ipc.on('sendUIMessage', (event, arg) => {
     // check if it has "success" message:
-
     displayModal(arg);
 });
 
 //-------------------------------------------
-ipc.on('consoleMessage', function(event, msg) {
+ipc.on('consoleMessage', (event, msg) => {
     consoleMessage(msg);
 });
 
 //-------------------------------------------
-ipc.on('generateCompleted', function(event, isSuccessful) {
+ipc.on('generateCompleted', (event, isSuccessful) => {
     if (isSuccessful === true) {
         // We want to switch to update mode now
         $("#projectName").trigger('change');
@@ -368,13 +365,13 @@ ipc.on('generateCompleted', function(event, isSuccessful) {
 });
 
 //-------------------------------------------
-ipc.on('updateCompleted', function(event, isSuccessful) {
+ipc.on('updateCompleted', (event, isSuccessful) => {
     if (isSuccessful === true) {
         // eventual callback after update completed
     }
 });
 
-ipc.on('setRandomisedSketchName', function(event, newName) {
+ipc.on('setRandomisedSketchName', (event, newName) => {
     $("#projectName").val(newName);
 });
 
@@ -385,31 +382,33 @@ ipc.on('setRandomisedSketchName', function(event, newName) {
 
 
 //----------------------------------------
-function setOFPath(arg) {
+/**
+ * @param {string} ofPathValue 
+ */
+function setOFPath(ofPathValue) {
     // get the element:
-    const elem = document.getElementById("ofPath");
+    /** @type {HTMLInputElement} */
+    const ofPathElem = document.getElementById("ofPath");
 
-    if (arg != null && !path.isAbsolute(arg)) {
+    if (ofPathValue != null && !path.isAbsolute(ofPathValue)) {
         // if we are relative, don't do anything...
 
-        elem.value = arg;
+        ofPathElem.value = ofPathValue;
     } else {
         // else check settings for how we want this path.... make relative if we need to:
-        if (defaultSettings['useRelativePath'] === true) {
-            const relativePath = path.normalize(path.relative(path.resolve(__dirname), arg)) + "/";
-            elem.value = relativePath;
+        if (defaultSettings.useRelativePath === true) {
+            const relativePath = path.normalize(path.relative(path.resolve(__dirname), ofPathValue)) + "/";
+            ofPathElem.value = relativePath;
         } else {
-            elem.value = arg;
+            ofPathElem.value = ofPathValue;
         }
     }
 
     $("#ofPath").trigger('change');
 }
 
-
 //----------------------------------------
 function setup() {
-
     jQuery.fn.extend({
         oneTimeTooltip: function (msg) {
             return this.each(function () {
@@ -428,20 +427,20 @@ function setup() {
     });
 
 
-    $(document).ready(function() {
+    $(document).ready(() => {
         try {
             const {
                 release,
                 platform
             } = ipc.sendSync('getOSInfo');
             const os_major_pos = release.indexOf(".");
-            const os_major = os_release.slice(0, os_major_pos);
+            const os_major = release.slice(0, os_major_pos);
             const isSierra = (platform === 'darwin' && parseInt(os_major) >= 16);
 
             if(isSierra) {
                 const ofpath = document.getElementById("ofPath").value;
                 try {
-                    runningOnVar = (ofpath.length >= 8 && ofpath.substring(0,8)==='/private');
+                    const runningOnVar = (ofpath.length >= 8 && ofpath.substring(0,8) === '/private');
                     isFirstTimeSierra = runningOnVar;
                 } catch(e) {
                     isFirstTimeSierra = false;
@@ -456,11 +455,11 @@ function setup() {
         });
 
         $("#createMenuButon").tab({
-            'onVisible':function(){
+            'onVisible':() => {
                 if (isOfPathGood !== true){
                     $('#settingsMenuButton').click();
                      $('#ofPathError').modal({
-                        onHide: function () {
+                        onHide: () => {
                              $('#settingsMenuButton').click();
                         }
                     }).modal("show");
@@ -469,11 +468,11 @@ function setup() {
         });
 
         $("#updateMenuButton").tab({
-            'onVisible':function(){
+            'onVisible':() => {
                 if (isOfPathGood !== true) {
                     $('#settingsMenuButton').click();
                      $('#ofPathError').modal({
-                        onHide: function () {
+                        onHide: () => {
                              $('#settingsMenuButton').click();
                         }
                     }).modal("show");
@@ -489,6 +488,7 @@ function setup() {
                 $('#settingsMenuButton').addClass('active');
         }
         });
+
         // $('.main.menu .item').filter('.updateMultiMenuOption').tab({
         //     'onVisible':function(){
         //         alert("wh");
@@ -498,32 +498,28 @@ function setup() {
         //     }
         // });
 
-
-
-
-
         // bind external URLs (load it in default browser; not within Electron)
-        $('*[data-toggle="external_target"]').click(function (e) {
+        $('*[data-toggle="external_target"]').click((e) => {
             e.preventDefault();
-            ipc.send('openExternal', $(this).prop('href'));
+            ipc.send('openExternal', $(e.currentTarget).prop('href'));
         });
 
-        $("#projectPath").on('change', function () {
-        	if($(this).is(":focus") === true) {
+        $("#projectPath").on('change', () => {
+        	if($("#projectPath").is(":focus") === true) {
                  return; 
             }
 
             $("#projectName").trigger('change'); // checks the project on the new location
         });
-        $("#projectPath").on('focusout', function () {
-        	$(this).trigger('change');
+        $("#projectPath").on('focusout', () => {
+        	$("#projectPath").trigger('change');
         });
 
-        $("#projectName").on('change', function () {
-        	if( $(this).is(":focus")===true ){ return; }
+        $("#projectName").on('change', () => {
+        	if( $("#projectName").is(":focus") === true ){ return; }
 
             // fix "non alpha numeric characters here" as we did in the old PG
-            const currentStr = $("#projectName").val()
+            const currentStr = $("#projectName").val();
             const stripped = currentStr.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '_');
             $("#projectName").val(stripped)
 
@@ -536,14 +532,14 @@ function setup() {
         	ipc.send('isOFProjectFolder', project);
 
             // update link to local project files
-            $("#revealProjectFiles").prop('href', 'file:///' + path.join(project['projectPath'],project['projectName']).replace(/^\//, '') );
+            $("#revealProjectFiles").prop('href', 'file:///' + path.join(project.projectPath, project.projectName).replace(/^\//, '') );
         }).trigger('change');
 
-        $("#projectName").on('focusout', function () {
-        	$(this).trigger('change');
+        $("#projectName").on('focusout', () => {
+        	$("#projectName").trigger('change');
         });
 
-        $("#updateMultiplePath").on('change', function () {
+        $("#updateMultiplePath").on('change', () => {
             ipc.send('checkMultiUpdatePath', $("#updateMultiplePath").val());
         });
 
@@ -556,28 +552,25 @@ function setup() {
             }
         });
 
-         $("#IDEButton").on("click", function() {
-            launchInIDE();
-         });
+         $("#IDEButton").on("click", () => launchInIDE());
 
 
          $("#verboseOption").checkbox();
-         $("#verboseOption").on("change", function() {
+         $("#verboseOption").on("change", () => {
             if ($("#verboseOption").filter(":checked").length > 0) {
-                 defaultSettings['verboseOutput'] = true;
+                 defaultSettings.verboseOutput = true;
                  bVerbose = true;
                  saveDefaultSettings();
             } else {
-                 defaultSettings['verboseOutput'] = false;
+                 defaultSettings.verboseOutput = false;
                  bVerbose = false;
                  saveDefaultSettings();
             }
         });
 
-
-        $("#ofPath").on("change", function(){
+        $("#ofPath").on("change", () => {
             const ofpath = $("#ofPath").val();
-            defaultSettings['defaultOfPath'] = ofpath;
+            defaultSettings.defaultOfPath = ofpath;
             console.log("ofPath val " + ofpath);
             if(isFirstTimeSierra) {
                 ipc.sendSync('firstTimeSierra', "xattr -r -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app");
@@ -592,28 +585,28 @@ function setup() {
         });
 
 
-        if (defaultSettings['advancedMode'] === true){
+        if (defaultSettings.advancedMode === true){
         	$("#advancedOptions").attr('Checked','Checked');
         }
 
-        if (defaultSettings['verboseOutput'] === true){
+        if (defaultSettings.verboseOutput === true){
             $('#verboseOption').attr('Checked','Checked');
             bVerbose = true;
         }
 
         // updates ofPath when the field is manually changed
-        $("#ofPath").on('blur', function(e){
-            const ofpath = $(this).val();
+        $("#ofPath").on('blur', (e) => {
+            const ofpath = $("#ofPath").val();
             setOFPath(ofpath);
             if(isFirstTimeSierra) {
                 ipc.sendSync("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app");
                 $("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
                 //exec("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app", puts);
             }
-        }).on('keypress', function(e){
+        }).on('keypress', (e) => {
             if(e.which == 13){
                 e.preventDefault();
-                $(this).blur();
+                $("#ofPath").blur();
             }
         });
 
@@ -634,17 +627,17 @@ function setup() {
 
         $("#fileDropModal").modal({
             'show': false,
-            onHide: function () {
+            onHide: () => {
                 $('body').removeClass('incomingFile');
             },
-            onShow: function () {
+            onShow: () => {
                 $('body').addClass('incomingFile');
             }
         });
 
 
         // show default platform in GUI
-        $("#defaultPlatform").html(defaultSettings['defaultPlatform']);
+        $("#defaultPlatform").html(defaultSettings.defaultPlatform);
         //$("#defaultTemplate").html(defaultSettings['defaultTemplate']);
 
         // Enable tooltips
@@ -680,7 +673,7 @@ function setup() {
 
         // this allows to close the drop zone if it ever stays open due to a bug.
         $("#dropZoneOverlay").on('click', closeDragInputModal);
-        $(window).on('keypress', function(e){
+        $(window).on('keypress', (e) => {
             if( e.which === 27 ){ // esc key
                 e.stopPropagation();
                 e.preventDefault();
@@ -690,15 +683,17 @@ function setup() {
 
         // listen for drag events
         // note: dragover is needed because dragleave is called pretty randomly
-        $("#dropZoneUpdate").on('dragenter dragover drop', onDragUpdateFile).on('dragleave', function(e){
-            $(this).removeClass("accept deny");
-        });
+        $("#dropZoneUpdate")
+            .on('dragenter dragover drop', onDragUpdateFile)
+            .on('dragleave', (e) => {
+                $("#dropZoneUpdate").removeClass("accept deny");
+            });
 
 
         // reflesh template dropdown list depends on selected platforms
-        $("#platformsDropdown").on('change', function () {
-            let selectedPlatforms = $("#platformsDropdown input").val();
-            let selectedPlatformArray = selectedPlatforms.trim().split(',');
+        $("#platformsDropdown").on('change', () => {
+            const selectedPlatforms = $("#platformsDropdown input").val();
+            const selectedPlatformArray = selectedPlatforms.trim().split(',');
             let arg = {
                 ofPath: $("#ofPath").val(),
                 selectedPlatforms: selectedPlatformArray,
@@ -707,9 +702,9 @@ function setup() {
             console.log(arg);
             ipc.send('refreshTemplateList', arg);
         })
-        $("#platformsDropdownMulti").on('change', function () {
-            let selectedPlatforms = $("#platformsDropdownMulti input").val();
-            let selectedPlatformArray = selectedPlatforms.trim().split(',');
+        $("#platformsDropdownMulti").on('change', () => {
+            const selectedPlatforms = $("#platformsDropdownMulti input").val();
+            const selectedPlatformArray = selectedPlatforms.trim().split(',');
             let arg = {
                 ofPath: $("#ofPath").val(),
                 selectedPlatforms: selectedPlatformArray,
@@ -835,7 +830,7 @@ function openDragInputModal(e){
     }
 
     // check filetype when entering droppable zone
-    if( e.type==='dragenter' ){
+    if( e.type === 'dragenter' ){
         onDragUpdateFile(e);
     }
 
@@ -898,11 +893,11 @@ function generate() {
     };
 
     // console.log(gen);
-    if (gen['projectName'] === '') {
+    if (gen.projectName === '') {
         $("#projectName").oneTimeTooltip("Please name your sketch first.");
-    } else if (gen['projectPath'] === '') {
+    } else if (gen.projectPath === '') {
         $("#projectPath").oneTimeTooltip("Your project path is empty...");
-    } else if (gen['platformList'] === null || gen['platformList'] === "" || lengthOfPlatforms == 0) {
+    } else if (gen.platformList == null || lengthOfPlatforms == 0) {
         $("#platformsDropdown").oneTimeTooltip("Please select a platform first.");
     } else {
         ipc.send('generate', gen);
@@ -936,7 +931,7 @@ function updateRecursive() {
         verbose: bVerbose
     };
 
-    if (gen['updatePath'] === '') {
+    if (gen.updatePath === '') {
         displayModal("Please set update path");
     } else if (platformValueArray.length === 0) {
         displayModal("Please select a platform first.");
@@ -946,6 +941,10 @@ function updateRecursive() {
 }
 
 //----------------------------------------
+/**
+ * 
+ * @param {'createMode' | 'updateMode'} mode 
+ */
 function switchGenerateMode(mode) {
     // mode can be 'createMode' or 'updateMode'
 
@@ -1000,7 +999,7 @@ function enableAdvancedMode(isAdvanced) {
         $('#templateSectionMulti').show();
     } else {
         $('#platformsDropdown').addClass("disabled");
-        $('#platformsDropdown').dropdown('set exactly', defaultSettings['defaultPlatform']);
+        $('#platformsDropdown').dropdown('set exactly', defaultSettings.defaultPlatform);
         $('#sourceExtraSection').hide();
         $('#templateSection').hide();
         $('#templateSectionMulti').hide();
@@ -1010,7 +1009,7 @@ function enableAdvancedMode(isAdvanced) {
         $("body").removeClass('advanced');
         $('a.updateMultiMenuOption').hide();
     }
-    defaultSettings['advancedMode'] = isAdvanced;
+    defaultSettings.advancedMode = isAdvanced;
     saveDefaultSettings();
     //$("#advancedToggle").prop('checked', defaultSettings['advancedMode'] );
 }
@@ -1041,10 +1040,13 @@ function getPlatformList() {
 
 //----------------------------------------
 function displayModal(message) {
-    $("#uiModal .content").html(message).find('*[data-toggle="external_target"]').click(function (e) {
-		e.preventDefault();
-        ipc.send('openExternal', $(this).prop("href") );
-    });
+    $("#uiModal .content")
+        .html(message)
+        .find('*[data-toggle="external_target"]')
+        .click((e) => {
+            e.preventDefault();
+            ipc.send('openExternal', $(e.currentTarget).prop("href") );
+        });
 
     if (message.indexOf("Success!") > -1){
         $("#IDEButton").show();
@@ -1074,7 +1076,7 @@ function browseOfPath() {
 }
 
 function browseProjectPath() {
-    const projectPath = $("#projectPath").val();
+    let projectPath = $("#projectPath").val();
     if (projectPath === ''){
         projectPath = $("#ofPath").val();
     }
@@ -1113,7 +1115,7 @@ function browseSourcePath(index) {
 
 
 function browseImportProject() {
-    const projectPath = $("#projectPath").val();
+    let projectPath = $("#projectPath").val();
     if (projectPath === ''){
         projectPath = $("#ofPath").val();
     }

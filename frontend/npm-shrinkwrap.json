@@ -1,23 +1,24 @@
 {
-  "name": "projectGenerator",
-  "version": "0.0.1",
+  "name": "project-generator",
+  "version": "0.1.0",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
-      "name": "projectGenerator",
-      "version": "0.0.1",
+      "name": "project-generator",
+      "version": "0.1.0",
       "license": "MIT",
       "dependencies": {
         "moniker": "^0.1.2",
         "n-readlines": "^1.0.0"
       },
       "devDependencies": {
+        "@types/jquery": "^2.0.60",
         "electron": "^24.1.2",
         "electron-packager": "^17.1.1"
       },
       "engines": {
-        "node": ">=6.11.0"
+        "node": ">=18.14.0"
       }
     },
     "node_modules/@electron/asar": {
@@ -360,6 +361,12 @@
       "version": "4.0.1",
       "resolved": "https://registry.npmjs.org/@types/http-cache-semantics/-/http-cache-semantics-4.0.1.tgz",
       "integrity": "sha512-SZs7ekbP8CN0txVG2xVRH6EgKmEm31BOxA07vkFaETzZz1xh+cbt8BcI0slpymvwhx5dlFnQG2rTlPVQn+iRPQ==",
+      "dev": true
+    },
+    "node_modules/@types/jquery": {
+      "version": "2.0.60",
+      "resolved": "https://registry.npmjs.org/@types/jquery/-/jquery-2.0.60.tgz",
+      "integrity": "sha512-izi6OBEVrAwaHiqWITjOPBbVtcKZKAXTocJqPZsAKA2lvmbpFEyPSAxgcqmisbiMYj9EvrooUEPLHQeQqVMWAg==",
       "dev": true
     },
     "node_modules/@types/keyv": {
