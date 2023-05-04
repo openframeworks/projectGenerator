@@ -553,7 +553,7 @@ function setup() {
          $("#verboseOption").checkbox();
          $("#verboseOption").on("change", () => {
             if ($("#verboseOption").filter(":checked").length > 0) {
-                 defaultSetting.verboseOutput = true;
+                 defaultSettings.verboseOutput = true;
                  bVerbose = true;
                  saveDefaultSettings();
             } else {
