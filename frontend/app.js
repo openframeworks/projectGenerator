@@ -1076,7 +1076,7 @@ function browseOfPath() {
 }
 
 function browseProjectPath() {
-    const projectPath = $("#projectPath").val();
+    let projectPath = $("#projectPath").val();
     if (projectPath === ''){
         projectPath = $("#ofPath").val();
     }
