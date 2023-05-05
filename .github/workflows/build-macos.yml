@@ -23,17 +23,17 @@ jobs:
      TARGET: ${{matrix.cfg.target}}
     steps:
     - uses: actions/checkout@v3
-    - name: Cache OF
-      id: cache-of
-      uses: actions/cache@v3
-      env:
-        cache-name: cache-keep-of
-      with:
-        path: |
-          /Users/runner/work/projectGenerator/openFrameworks/**
-        key: ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-${{ hashFiles('openFrameworks/**/*.cpp') }}
-        restore-keys: |
-          ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-          
+    # - name: Cache OF
+    #   id: cache-of
+    #   uses: actions/cache@v3
+    #   env:
+    #     cache-name: cache-keep-of
+    #   with:
+    #     path: |
+    #       /Users/runner/work/projectGenerator/openFrameworks/**
+    #     key: ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-${{ hashFiles('openFrameworks/**/*.cpp') }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-          
     - name: rm-dev
       run: sudo rm -rf /Library/Developer
     - name: Build
