@@ -308,6 +308,7 @@ void printHelp(){
 //-------------------------------------------
 int main(int argc, char** argv){
 
+	ofLog() << "PG v001";
 	//------------------------------------------- pre-parse
 	bAddonsPassedIn = false;
 	bDryRun = false;
