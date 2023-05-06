@@ -216,10 +216,13 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder) {
 
 		if (folders.size()){
 			for (int a=0; a<folders.size(); a++) {
-				 vector <string> joinFolders;
-				 joinFolders.assign(folders.begin(), folders.begin() + (a+1));
-				 string fullPath = ofJoinString(joinFolders, "/");
-
+				vector <string> joinFolders;
+				joinFolders.assign(folders.begin(), folders.begin() + (a+1));
+				string fullPath = ofJoinString(joinFolders, "/");
+				if (fs::path(folder).is_absolute()) {
+					fullPath = "/" + fullPath;
+				}
+				
 				// folder is still not found here:
 				if ( folderUUID.find(fullPath) == folderUUID.end() ) {
 
@@ -229,9 +232,13 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder) {
 					// here we add an UUID for the group (folder) and we initialize an array to receive children (files or folders inside)
 					commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
 					if (isFolder) {
+						
+						// cout << "will check if folder exists :" << fullPath << " folder=" << folder << endl;
 						if (fs::exists(fullPath)) {
+							// cout << "exists " << endl;
 							commands.emplace_back("Add :objects:"+thisUUID+":path string " + fullPath);
 						} else {
+							// cout << "don't exists " << endl;
 							commands.emplace_back("Add :objects:"+thisUUID+":path string " + relRoot + "/" + fullPath);
 						}
 					}
@@ -260,7 +267,7 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder) {
 
 
 void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
-
+	cout << "xcodeProject::addSrc " << srcFile << " : " << folder << endl;
 	string buildUUID;
 
 	//-----------------------------------------------------------------
