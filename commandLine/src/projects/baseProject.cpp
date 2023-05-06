@@ -13,6 +13,7 @@
 #include "ofConstants.h"
 #include <list>
 #include <set>
+#include <unordered_set>
 
 using std::string;
 using std::vector;
@@ -344,15 +345,17 @@ void baseProject::addSrcRecursively(std::string srcPath){
 	getFilesRecursively(srcPath, srcFilesToAdd);
 	ofEnableDataPath();
 	
-	cout << "-----" << endl;
-	for (auto & s : srcFilesToAdd) {
-		cout << s << endl;
-	}
-	cout << "-----" << endl;
+//	cout << "-----" << endl;
+//	for (auto & s : srcFilesToAdd) {
+//		cout << s << endl;
+//	}
+//	cout << "-----" << endl;
 
 	//if the files being added are inside the OF root folder, make them relative to the folder.
 	bool bMakeRelative = false;
-	if( srcPath.find_first_of(getOFRoot().string()) == 0 ){
+
+	if (ofIsPathInPath(srcFS, getOFRoot())) {
+	// if( srcPath.find_first_of(getOFRoot().string()) == 0 ){
 		bMakeRelative = true;
 	}
 
@@ -362,8 +365,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 	//we want folders added for shared_of_code/ and any subfolders, but not folders added for /user/ /user/person/ etc
 	string parentFolder = ofFilePath::getEnclosingDirectory(ofFilePath::removeTrailingSlash(srcPath));
 
-	// FIXME: - I've inspected this map and it is kinda silly because the key is always equal to the value (first = second)
-	std::unordered_map <std::string, std::string> uniqueIncludeFolders;
+	std::unordered_set<std::string> uniqueIncludeFolders;
 	for( auto & fileToAdd : srcFilesToAdd){
 //		cout << "fileToAdd :: " << fileToAdd << endl;
 		//if it is an absolute path it is easy - add the file and enclosing folder to the project
@@ -389,7 +391,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 			// FIXME: remove
 			ofLog() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
 			addSrc(fileToAdd, folder);
-			uniqueIncludeFolders[absFolder] = absFolder;
+			uniqueIncludeFolders.insert(absFolder);
 		} else {
 			auto absPath = fileToAdd;
 
@@ -436,21 +438,20 @@ void baseProject::addSrcRecursively(std::string srcPath){
 			includeFolder = parent.string();
 
 //			addSrc(relPathPathToAdd, folder2);
-			uniqueIncludeFolders[includeFolder] = includeFolder;
+			uniqueIncludeFolders.insert(includeFolder);
 		}
 	}
 
 	//do it this way so we don't try and add a include folder for each file ( as it checks if they are already added ) so should be faster
 	cout << "-------" << endl;
 	for(auto & i : uniqueIncludeFolders){
-		cout << i.first << " -- " << i.second << endl;
+		cout << i << endl;
 	}
 	cout << "-------" << endl;
 
-	for(auto & includeFolder : uniqueIncludeFolders){
-		ofLogVerbose() << " adding search include paths for folder " << includeFolder.second;
-//		cout << "includeFolder.second " << includeFolder.second << endl;
-		addInclude(includeFolder.second);
+	for(auto & i : uniqueIncludeFolders){
+		ofLogVerbose() << " adding search include paths for folder " << i;
+		addInclude(i);
 	}
 }
 
