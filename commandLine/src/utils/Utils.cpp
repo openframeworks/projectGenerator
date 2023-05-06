@@ -481,3 +481,6 @@ void alert(std::string msg, int color) {
 	std::cout << colorText(msg, color) << std::endl;
 }
 
+bool ofIsPathInPath(const fs::path& basePath, const fs::path& subPath) {
+	return (std::search(basePath.begin(), basePath.end(), subPath.begin(), subPath.end()) != basePath.end());
+}
