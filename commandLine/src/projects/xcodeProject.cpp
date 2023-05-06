@@ -267,6 +267,7 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 	// find the extension for the file that's passed in.
 	//-----------------------------------------------------------------
 
+	// FIXME: getExtension() ?
 	size_t found = srcFile.find_last_of(".");
 	string ext = srcFile.substr(found+1);
 
@@ -357,7 +358,11 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 
 	string UUID = generateUUID(srcFile);   // replace with theo's smarter system.
 	string name, path;
+//	cout << "addSrc " << endl;
 	splitFromLast(srcFile, "/", path, name);
+//	cout << "srcFile " << srcFile << endl;
+//	cout << "path " << path << endl;
+//	cout << "name " << name << endl;
 
 	commands.emplace_back("Add :objects:"+UUID+":path string "+srcFile);
 	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
@@ -825,9 +830,9 @@ bool xcodeProject::saveProjectFile(){
 		}
 	}
 
-//	for (auto & c : commands) {
-//		cout << c << endl;
-//	}
+	for (auto & c : commands) {
+		// cout << c << endl;
+	}
 
 	return true;
 }

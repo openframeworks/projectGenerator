@@ -332,6 +332,10 @@ void baseProject::addAddon(std::string addonName){
 
 // FIXME: FS parameter
 void baseProject::addSrcRecursively(std::string srcPath){
+	cout << "addSrcRecursively " << srcPath << endl;;
+	fs::path srcFS = srcPath;
+	fs::path base = srcFS.parent_path();
+	cout << "base = " << base << endl;
 	extSrcPaths.emplace_back(srcPath);
 	vector < string > srcFilesToAdd;
 
@@ -339,6 +343,12 @@ void baseProject::addSrcRecursively(std::string srcPath){
 	ofDisableDataPath();
 	getFilesRecursively(srcPath, srcFilesToAdd);
 	ofEnableDataPath();
+	
+	cout << "-----" << endl;
+	for (auto & s : srcFilesToAdd) {
+		cout << s << endl;
+	}
+	cout << "-----" << endl;
 
 	//if the files being added are inside the OF root folder, make them relative to the folder.
 	bool bMakeRelative = false;
@@ -346,6 +356,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 		bMakeRelative = true;
 	}
 
+	cout << "makeRelative " << bMakeRelative << endl;
 	//need this for absolute paths so we can subtract this path from each file path
 	//say we add this path: /user/person/documents/shared_of_code
 	//we want folders added for shared_of_code/ and any subfolders, but not folders added for /user/ /user/person/ etc
@@ -356,7 +367,11 @@ void baseProject::addSrcRecursively(std::string srcPath){
 	for( auto & fileToAdd : srcFilesToAdd){
 //		cout << "fileToAdd :: " << fileToAdd << endl;
 		//if it is an absolute path it is easy - add the file and enclosing folder to the project
+		fs::path src = fileToAdd;
+//		if (src.is_absolute() && !bMakeRelative) {
 		if( ofFilePath::isAbsolute(fileToAdd) && !bMakeRelative ){
+			
+			// TODO: rewrite
 			string folder = ofFilePath::getEnclosingDirectory(fileToAdd,false);
 			string absFolder = folder;
 
@@ -371,17 +386,27 @@ void baseProject::addSrcRecursively(std::string srcPath){
 			folder = ofFilePath::removeTrailingSlash(folder);
 
 			ofLogVerbose() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
+			// FIXME: remove
+			ofLog() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
 			addSrc(fileToAdd, folder);
 			uniqueIncludeFolders[absFolder] = absFolder;
-		}else{
+		} else {
 			auto absPath = fileToAdd;
 
 			//if it is a realtive path make the file relative to the project folder
-			if( !ofFilePath::isAbsolute(absPath) ){
+//			if (!src.is_absolute()) {
+			if( !ofFilePath::isAbsolute(fileToAdd) ){
 				absPath = ofFilePath::getAbsolutePath( ofFilePath::join(ofFilePath::getCurrentExeDir(), fileToAdd) );
+				absPath = ofFilePath::getAbsolutePath( projectDir / fileToAdd );
+				fs::path f1 = projectDir / fileToAdd;
+				cout << ">>>> f1" << endl;
+				cout << f1 << endl;
+				cout << fs::absolute(f1) << endl;
+				cout << f1.lexically_normal() << endl;
 			}
+//			cout << ">> will canonical " << absPath << endl;
 			auto canPath = fs::canonical(absPath); //resolves the ./ and ../ to be the most minamlist absolute path
-
+//			cout << ">> end canonical" << endl;
 			//get the file path realtive to the project
 			auto projectPath = ofFilePath::getAbsolutePath( projectDir );
 			auto relPathPathToAdd = ofFilePath::makeRelative(projectPath, canPath);
@@ -396,14 +421,32 @@ void baseProject::addSrcRecursively(std::string srcPath){
 #endif
 			folder =  ofFilePath::removeTrailingSlash(folder);
 
-			ofLogVerbose() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
+//			ofLogVerbose() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
+			
+			fs::path parent = src.parent_path();
+			fs::path folder2 = parent.lexically_relative(base);
+//			assert( diff == fs::path("documents/doc") );
+//			fs::path folder =
+			ofLog() <<  " adding file " << fileToAdd << " in folder " << folder2 << " to project ";
+//			cout << "relPathToAdd = " << relPathPathToAdd << endl;
 
-			addSrc(relPathPathToAdd, folder);
+
+			addSrc(src, folder2);
+			
+			includeFolder = parent.string();
+
+//			addSrc(relPathPathToAdd, folder2);
 			uniqueIncludeFolders[includeFolder] = includeFolder;
 		}
 	}
 
 	//do it this way so we don't try and add a include folder for each file ( as it checks if they are already added ) so should be faster
+	cout << "-------" << endl;
+	for(auto & i : uniqueIncludeFolders){
+		cout << i.first << " -- " << i.second << endl;
+	}
+	cout << "-------" << endl;
+
 	for(auto & includeFolder : uniqueIncludeFolders){
 		ofLogVerbose() << " adding search include paths for folder " << includeFolder.second;
 //		cout << "includeFolder.second " << includeFolder.second << endl;
