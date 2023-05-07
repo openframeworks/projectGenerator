@@ -331,31 +331,25 @@ void baseProject::addAddon(std::string addonName){
 	}
 }
 
-// FIXME: FS parameter
-void baseProject::addSrcRecursively(std::string srcPath){
-	cout << "addSrcRecursively " << srcPath << endl;;
-	fs::path srcFS = srcPath;
-	fs::path base = srcFS.parent_path();
+void baseProject::addSrcRecursively(fs::path srcPath){
+	cout << "addSrcRecursively " << srcPath << endl;
+	fs::path base = srcPath.parent_path();
 	cout << "base = " << base << endl;
 	extSrcPaths.emplace_back(srcPath);
-	vector < string > srcFilesToAdd;
+	vector < fs::path > srcFilesToAdd;
 
 	//so we can just pass through the file paths
 	ofDisableDataPath();
 	getFilesRecursively(srcPath, srcFilesToAdd);
 	ofEnableDataPath();
 	
-//	cout << "-----" << endl;
 //	for (auto & s : srcFilesToAdd) {
 //		cout << s << endl;
 //	}
-//	cout << "-----" << endl;
 
 	//if the files being added are inside the OF root folder, make them relative to the folder.
 	bool bMakeRelative = false;
-
-	if (ofIsPathInPath(srcFS, getOFRoot())) {
-	// if( srcPath.find_first_of(getOFRoot().string()) == 0 ){
+	if (ofIsPathInPath(srcPath, getOFRoot())) {
 		bMakeRelative = true;
 	}
 
@@ -370,6 +364,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 //		cout << "fileToAdd :: " << fileToAdd << endl;
 		//if it is an absolute path it is easy - add the file and enclosing folder to the project
 		fs::path src = fileToAdd;
+		string includeFolder { "" };
 		if (src.is_absolute() && !bMakeRelative) {
 //		if( ofFilePath::isAbsolute(fileToAdd) && !bMakeRelative ){
 			// cout << "FIRST " << endl;
@@ -396,13 +391,12 @@ void baseProject::addSrcRecursively(std::string srcPath){
 
 			
 			fs::path parent = src.parent_path();
-//			fs::path folder2 = parent.lexically_relative(base);
+			fs::path folder2 = parent.lexically_relative(base);
 			
-			ofLog() <<  " adding file " << src << " in folder " << parent << " to project ";
-			addSrc(src, parent);
-			uniqueIncludeFolders.insert(parent);
-
-
+			ofLog() <<  " adding file " << src << " in folder " << folder2 << " to project ";
+			// addSrc(src, parent);
+			addSrc(src, folder2);
+			includeFolder = parent;
 
 		} else {
 			auto absPath = fileToAdd;
@@ -427,7 +421,7 @@ void baseProject::addSrcRecursively(std::string srcPath){
 
 			//get the folder from the path and clean it up
 			string folder = ofFilePath::getEnclosingDirectory(relPathPathToAdd,false);
-			string includeFolder = folder;
+			includeFolder = folder;
 
 			ofStringReplace(folder, "../", "");
 #ifdef TARGET_WIN32
@@ -446,12 +440,16 @@ void baseProject::addSrcRecursively(std::string srcPath){
 
 
 			addSrc(src, folder2);
-			
 			includeFolder = parent.string();
+			ofLog() <<  " uniqueIncludeFolders " << includeFolder ;
 
 //			addSrc(relPathPathToAdd, folder2);
+		}
+		
+		if (includeFolder != "") {
 			uniqueIncludeFolders.insert(includeFolder);
 		}
+
 	}
 
 	//do it this way so we don't try and add a include folder for each file ( as it checks if they are already added ) so should be faster

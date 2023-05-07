@@ -139,11 +139,11 @@ bool xcodeProject::createProjectFile(){
 	// FIXME: FS
 	relRoot = getOFRelPathFS(projectDir).string();
 	projectDir = projectDir.lexically_normal();
-	
-        //projectDir is always absolute at the moment
-        //so lets check if the projectDir is inside the OF folder - if it is not make the OF path absolute
+
+		//projectDir is always absolute at the moment
+		//so lets check if the projectDir is inside the OF folder - if it is not make the OF path absolute
 	if( projectDir.string().rfind(getOFRoot().string(), 0) != 0) {
-            relRoot = getOFRoot().string();
+			relRoot = getOFRoot().string();
 	}
 	if (relRoot != "../../.."){
 		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", relRoot);
@@ -152,7 +152,7 @@ bool xcodeProject::createProjectFile(){
 			findandreplaceInTexfile(projectDir / "Makefile", "../../..", relRoot);
 			findandreplaceInTexfile(projectDir / "config.make", "../../..", relRoot);
 		}
-	} 
+	}
 	return true;
 }
 
@@ -208,37 +208,50 @@ void xcodeProject::renameProject(){ //base
 	}
 }
 
-string xcodeProject::getFolderUUID(string folder, bool isFolder) {
+// FIXME: Update to fs::path
+string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
+	// TODO: Change key of folderUUID to base + folder, so "src" in additional source folders
+	// doesn't get confused with "src" from project.
+
+	cout << ">>> getFolderUUID folder=" << folder << " base=" << base << endl;
 	string UUID = "";
-	if ( folderUUID.find(folder) == folderUUID.end() ) { // NOT FOUND
+
+
+	string baseFolder = base + "/" + folder;
+	// If folder UUID exists just return it.
+	// in this case it creates UUID for the entire path
+	if ( folderUUID.find(baseFolder) == folderUUID.end() ) { // NOT FOUND
 		vector < string > folders = ofSplitString(folder, "/", true);
 		string lastFolderUUID = projRootUUID;
 
 		if (folders.size()){
 			for (int a=0; a<folders.size(); a++) {
 				vector <string> joinFolders;
+				// joinFolders.assign(folders.begin(), folders.begin() + (a+1));
 				joinFolders.assign(folders.begin(), folders.begin() + (a+1));
-				string fullPath = ofJoinString(joinFolders, "/");
-				if (fs::path(folder).is_absolute()) {
-					fullPath = "/" + fullPath;
-				}
-				
+				string fullPath = base + "/" + ofJoinString(joinFolders, "/");
+				cout << "fullPath " << a << " : " << fullPath << endl;
+				// if (fs::path(folder).is_absolute()) {
+				// 	fullPath = "/" + fullPath;
+				// }
 				// folder is still not found here:
 				if ( folderUUID.find(fullPath) == folderUUID.end() ) {
-
+					cout << "creating" << endl;
 					string thisUUID = generateUUID(fullPath);
-					folderUUID[fullPath] = thisUUID;
+					folderUUID[fullPath] = thisUUID;	
 
 					// here we add an UUID for the group (folder) and we initialize an array to receive children (files or folders inside)
 					commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
 					if (isFolder) {
-						
+						cout << "isFolder true" << endl;
 						// cout << "will check if folder exists :" << fullPath << " folder=" << folder << endl;
 						if (fs::exists(fullPath)) {
-							// cout << "exists " << endl;
+							// cout << "exists " << fullPath << endl;
+							// FIXME: known issue: doesn't handle files with spaces in name.
 							commands.emplace_back("Add :objects:"+thisUUID+":path string " + fullPath);
 						} else {
-							// cout << "don't exists " << endl;
+							// cout << "don't exists " << fullPath << endl;
+							// FIXME: known issue: doesn't handle files with spaces in name.
 							commands.emplace_back("Add :objects:"+thisUUID+":path string " + relRoot + "/" + fullPath);
 						}
 					}
@@ -255,12 +268,12 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder) {
 				} else {
 					lastFolderUUID = folderUUID[fullPath];
 				}
-			 }
-		 }
+			}
+		}
 		UUID = lastFolderUUID;
 
 	} else {
-		UUID = folderUUID[folder];
+		UUID = folderUUID[baseFolder];
 	}
 	return UUID;
 }
@@ -445,7 +458,29 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 	// (D) folder
 	//-----------------------------------------------------------------
 
-	string folderUUID = getFolderUUID(folder);
+
+
+	fs::path base;
+	fs::path src { srcFile };
+	fs::path folderFS { folder };
+	if (!fs::exists(folderFS)) {
+		// cout << "folder doesn't exist " << folderFS << endl;
+		fs::path parent = src.parent_path();
+		auto nit = folderFS.end();
+
+		base = parent;
+		fs::path folderFS2 = folderFS;
+
+		while(base.filename() == folderFS2.filename()) {
+			base = base.parent_path();
+			folderFS2 = folderFS2.parent_path();
+		}
+		// cout << "base " << base << endl;
+		// cout << "folderFS2 " << folderFS2 << endl;
+	}
+
+	// string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
+	string folderUUID = getFolderUUID(folder, true, base);
 	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
 }
 
@@ -568,7 +603,7 @@ void xcodeProject::addDylib(string name, string path){
 	string folderUUID = getFolderUUID(folder.string(), false);
 	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
 
-	
+
 	string buildUUID = generateUUID(name + "-build");
 	commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
 	commands.emplace_back("Add :objects:"+buildUUID+":fileRef string "+UUID);
@@ -581,7 +616,7 @@ void xcodeProject::addDylib(string name, string path){
 //	// TENTATIVA desesperada aqui...
 //	string folderUUID = getFolderUUID(folder);
 //	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
-	
+
 //	string folderUUID = getFolderUUID(folder, false);
 //	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
 
@@ -671,7 +706,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 		if (a.name == addon.name) return;
 	}
 
-	
+
 	for (auto & d : addon.dependencies) {
 		bool found = false;
 		for (auto & a : addons) {
@@ -686,7 +721,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 			ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << d;
 		}
 	}
-	
+
 
 	ofLogNotice() << "adding addon: " << addon.name;
 	addons.emplace_back(addon);
@@ -773,7 +808,7 @@ bool xcodeProject::saveProjectFile(){
 	fs::path fileName = projectDir / (projectName + ".xcodeproj/project.pbxproj");
 
 	bool usePlistBuddy = false;
-	
+
 	if (usePlistBuddy) {
 		//	PLISTBUDDY - Mac only
 		string command = "/usr/libexec/PlistBuddy " + fileName.string();
@@ -787,13 +822,13 @@ bool xcodeProject::saveProjectFile(){
 		// JSON Block - Multiplatform
 		string contents = ofBufferFromFile(fileName).getText();
 		json j = json::parse(contents);
-		
+
 		for (auto & c : commands) {
 			//		cout << c << endl;
 			vector<string> cols = ofSplitString(c, " ");
 			string thispath = cols[1];
 			ofStringReplace(thispath, ":", "/");
-			
+
 			if (thispath.substr(thispath.length() -1) != "/") {
 				//if (cols[0] == "Set") {
 				json::json_pointer p = json::json_pointer(thispath);
@@ -817,14 +852,14 @@ bool xcodeProject::saveProjectFile(){
 						}
 					}
 					j[p].emplace_back(cols[3]);
-					
+
 				} catch (std::exception e) {
 					cout << "json error " << endl;
 					cout << e.what() << endl;
 				}
 			}
 		}
-		
+
 		ofFile jsonFile(fileName, ofFile::WriteOnly);
 		try{
 			jsonFile << j.dump(1, '	');

@@ -68,7 +68,7 @@ public:
 
 	virtual void addAddon(std::string addon);
 	virtual void addAddon(ofAddon & addon);
-	virtual void addSrcRecursively(std::string srcPath);
+	virtual void addSrcRecursively(fs::path srcPath);
 
 	std::string getName() { return projectName;}
 	of::filesystem::path getPath() { return projectDir; }

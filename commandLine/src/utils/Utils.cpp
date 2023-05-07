@@ -161,11 +161,11 @@ void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileN
 		if (ofIsStringInString(f.filename().string(),".framework")) continue; // ignore frameworks
 		
 		if (fs::is_directory(f)) {
-			if (f.filename() != fs::path(".git")) { // ignore git dir
-				getFilesRecursively(f, fileNames);
-			}
+//			if (f.filename() != fs::path(".git")) { // ignore git dir
+			getFilesRecursively(f, fileNames);
+//			}
 		} else {
-			fileNames.emplace_back(f.string());
+			fileNames.emplace_back(f);
 		}
 	}
 }

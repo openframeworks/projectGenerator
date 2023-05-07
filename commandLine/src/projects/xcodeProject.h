@@ -1,6 +1,7 @@
 #pragma once
 
 #include "baseProject.h"
+#include <unordered_map>
 
 using std::string;
 
@@ -62,10 +63,10 @@ public:
 		"E4B69B600A3A1757003C02F2", //Debug
 	};
 
-	std::map <string, string> folderUUID = {
+	std::unordered_map <string, string> folderUUID = {
 	};
 
-	string getFolderUUID(string folder, bool isFolder = true);
+	string getFolderUUID(string folder, bool isFolder = true, string base = "");
 	
 	string relRoot = "../../..";
 };

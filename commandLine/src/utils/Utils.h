@@ -30,6 +30,7 @@ pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::strin
 void getFoldersRecursively(const of::filesystem::path & path, std::vector < std::string > & folderNames, std::string platform);
 void getFoldersRecursively(const of::filesystem::path & path, std::vector < of::filesystem::path > & folderNames, std::string platform);
 void getFilesRecursively(const of::filesystem::path & path, std::vector < std::string > & fileNames);
+void getFilesRecursively(const of::filesystem::path & path, std::vector < fs::path > & fileNames);
 void getLibsRecursively(const of::filesystem::path & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform = "", std::string arch = "", std::string target = "");
 void getFrameworksRecursively(const of::filesystem::path & path, std::vector < std::string > & frameworks,  std::string platform = "" );
 void getPropsRecursively(const of::filesystem::path & path, std::vector < std::string > & props, const std::string & platform);
@@ -70,5 +71,10 @@ std::string colorText(const std::string & s, int color = 32);
 void alert(std::string msg, int color=32);
 
 bool ofIsPathInPath(const fs::path& basePath, const fs::path& subPath);
+
+
+// fs::path subtract(const fs::path & base, const fs::path & sub) {
+
+// }
 
 #endif /* UTILS_H_ */
