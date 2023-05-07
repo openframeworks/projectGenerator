@@ -209,15 +209,19 @@ void xcodeProject::renameProject(){ //base
 }
 
 // FIXME: Update to fs::path
+// FIXME: Change parameters order.
 string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
 	// TODO: Change key of folderUUID to base + folder, so "src" in additional source folders
 	// doesn't get confused with "src" from project.
 
-	cout << ">>> getFolderUUID folder=" << folder << " base=" << base << endl;
+	// cout << ">>> getFolderUUID folder=" << folder << " base=" << base << endl;
 	string UUID = "";
 
 
 	string baseFolder = base + "/" + folder;
+
+	cout << "baseFolder " << baseFolder << " isFolder:" << isFolder << endl; 
+
 	// If folder UUID exists just return it.
 	// in this case it creates UUID for the entire path
 	if ( folderUUID.find(baseFolder) == folderUUID.end() ) { // NOT FOUND
