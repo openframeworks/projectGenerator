@@ -396,8 +396,7 @@ void baseProject::addSrcRecursively(fs::path srcPath){
 			ofLog() <<  " adding file " << src << " in folder " << folder2 << " to project ";
 			// addSrc(src, parent);
 			addSrc(src.string(), folder2.string());
-			includeFolder = parent;
-
+			includeFolder = parent.string();
 		} else {
 			auto absPath = fileToAdd;
 			// cout << "SECOND " << endl;
@@ -439,7 +438,7 @@ void baseProject::addSrcRecursively(fs::path srcPath){
 //			cout << "relPathToAdd = " << relPathPathToAdd << endl;
 
 
-			addSrc(src, folder2);
+			addSrc(src.string(), folder2);
 			includeFolder = parent.string();
 			ofLog() <<  " uniqueIncludeFolders " << includeFolder ;
 

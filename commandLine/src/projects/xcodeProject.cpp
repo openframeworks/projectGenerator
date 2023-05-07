@@ -280,7 +280,7 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
 
 
 void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
-	cout << "xcodeProject::addSrc " << srcFile << " : " << folder << endl;
+	// cout << "xcodeProject::addSrc " << srcFile << " : " << folder << endl;
 	string buildUUID;
 
 	//-----------------------------------------------------------------
@@ -480,7 +480,7 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 	}
 
 	// string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
-	string folderUUID = getFolderUUID(folder, true, base);
+	string folderUUID = getFolderUUID(folder, true, base.string());
 	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
 }
 
