@@ -335,7 +335,7 @@ void baseProject::addSrcRecursively(fs::path srcPath){
 	cout << "addSrcRecursively " << srcPath << endl;
 	fs::path base = srcPath.parent_path();
 	cout << "base = " << base << endl;
-	extSrcPaths.emplace_back(srcPath);
+	extSrcPaths.emplace_back(srcPath.string());
 	vector < fs::path > srcFilesToAdd;
 
 	//so we can just pass through the file paths
@@ -360,16 +360,14 @@ void baseProject::addSrcRecursively(fs::path srcPath){
 	string parentFolder = ofFilePath::getEnclosingDirectory(ofFilePath::removeTrailingSlash(srcPath));
 
 	std::unordered_set<std::string> uniqueIncludeFolders;
-	for( auto & fileToAdd : srcFilesToAdd){
-//		cout << "fileToAdd :: " << fileToAdd << endl;
+	for( auto & src : srcFilesToAdd){
+//		cout << "fileToAdd :: " << src << endl;
 		//if it is an absolute path it is easy - add the file and enclosing folder to the project
-		fs::path src = fileToAdd;
 		string includeFolder { "" };
 		if (src.is_absolute() && !bMakeRelative) {
-//		if( ofFilePath::isAbsolute(fileToAdd) && !bMakeRelative ){
-			// cout << "FIRST " << endl;
 			// TODO: rewrite
-			string folder = ofFilePath::getEnclosingDirectory(fileToAdd,false);
+			/*
+			string folder = ofFilePath::getEnclosingDirectory(src, false);
 			string absFolder = folder;
 
 			auto pos = folder.find_first_of(parentFolder);
@@ -382,25 +380,25 @@ void baseProject::addSrcRecursively(fs::path srcPath){
 
 			folder = ofFilePath::removeTrailingSlash(folder);
 
-			ofLogVerbose() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
-//			addSrc(fileToAdd, folder);
-
+			ofLogVerbose() <<  " adding file " << src << " in folder " << folder << " to project ";
+//			addSrc(src, folder);
+			*/
 			fs::path parent = src.parent_path();
 			fs::path folder2 = parent.lexically_relative(base);
 			
-			// ofLog() <<  " adding file " << src << " in folder " << folder2 << " to project ";
-			// addSrc(src, parent);
+			ofLog() <<  " adding file FIRST " << src << " in folder " << folder2 << " to project ";
 			addSrc(src.string(), folder2.string());
 			includeFolder = parent.string();
 		} else {
-			auto absPath = fileToAdd;
+			/*
+			auto absPath = src;
 			// cout << "SECOND " << endl;
 			//if it is a realtive path make the file relative to the project folder
-//			if (!src.is_absolute()) {
-			if( !ofFilePath::isAbsolute(fileToAdd) ){
-				absPath = ofFilePath::getAbsolutePath( ofFilePath::join(ofFilePath::getCurrentExeDir(), fileToAdd) );
-				absPath = ofFilePath::getAbsolutePath( projectDir / fileToAdd );
-				fs::path f1 = projectDir / fileToAdd;
+			if (!src.is_absolute()) {
+//			if( !ofFilePath::isAbsolute(src) ){
+				absPath = ofFilePath::getAbsolutePath( ofFilePath::join(ofFilePath::getCurrentExeDir(), src) );
+				absPath = ofFilePath::getAbsolutePath( projectDir / src );
+				fs::path f1 = projectDir / src;
 				cout << ">>>> f1" << endl;
 				cout << f1 << endl;
 				cout << fs::absolute(f1) << endl;
@@ -423,26 +421,19 @@ void baseProject::addSrcRecursively(fs::path srcPath){
 #endif
 			folder =  ofFilePath::removeTrailingSlash(folder);
 
+			*/
 			
 			fs::path parent = src.parent_path();
 			fs::path folder2 = parent.lexically_relative(base);
-//			assert( diff == fs::path("documents/doc") );
-//			fs::path folder =
 
-			// FIXME: enable back
-			// ofLogVerbose() <<  " adding file " << fileToAdd << " in folder " << folder << " to project ";
-			// ofLog() <<  " adding file " << fileToAdd << " in folder " << folder2 << " to project ";
-//			cout << "relPathToAdd = " << relPathPathToAdd << endl;
-
-
+			// FIXME: revert back to ofLogVerbose
+			ofLog() <<  " adding file SECOND " << src << " in folder " << folder2 << " to project ";
 			addSrc(src.string(), folder2.string());
 			includeFolder = parent.string();
-			ofLog() <<  " uniqueIncludeFolders " << includeFolder ;
-
-//			addSrc(relPathPathToAdd, folder2);
 		}
 		
 		if (includeFolder != "") {
+			ofLog() <<  " uniqueIncludeFolders " << includeFolder ;
 			uniqueIncludeFolders.insert(includeFolder);
 		}
 

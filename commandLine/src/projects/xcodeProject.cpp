@@ -230,9 +230,7 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
 			cout << f.first <<  " : " << f.second << endl;
 		}
 		cout << "-----" << endl;
-
 		cout << ">>> getFolderUUID creating folder=" << folder << " base=" << base << endl;
-
 
 		vector < string > folders = ofSplitString(folder, "/", true);
 		string lastFolderUUID = projRootUUID;
@@ -240,15 +238,11 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
 		if (folders.size()){
 			for (int a=0; a<folders.size(); a++) {
 				vector <string> joinFolders;
-				// joinFolders.assign(folders.begin(), folders.begin() + (a+1));
 				joinFolders.assign(folders.begin(), folders.begin() + (a+1));
 				// string fullPath = base + "/" + ofJoinString(joinFolders, "/");
 				string fullPath = ofJoinString(joinFolders, "/");
-				// cout << "fullPath " << a << " : " << fullPath << endl;
-				// if (fs::path(folder).is_absolute()) {
-				// 	fullPath = "/" + fullPath;
-				// }
-				// folder is still not found here:
+
+				// Query if path is already stored. if not execute this following block
 				if ( folderUUID.find(fullPath) == folderUUID.end() ) {
 					// cout << "creating" << endl;
 					string thisUUID = generateUUID(fullPath);
@@ -258,8 +252,7 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
 					commands.emplace_back("");
 					commands.emplace_back("Add :objects:"+thisUUID+":name string " + folders[a]);
 					if (isFolder) {
-						cout << "isFolder true" << endl;
-						// cout << "will check if folder exists :" << fullPath << " folder=" << folder << endl;
+//						cout << "isFolder true" << endl;
 						if (fs::exists(fullPath)) {
 							// cout << "exists " << fullPath << endl;
 							// FIXME: known issue: doesn't handle files with spaces in name.
