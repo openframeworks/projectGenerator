@@ -18,7 +18,7 @@ xcodeProject::xcodeProject(string target)
 		folderUUID = {
 			{ "src", 			"E4B69E1C0A3A1BDC003C02F2" },
 			{ "addons", 		"BB4B014C10F69532006C3DED" },
-			{ "localAddons",	"6948EE371B920CB800B5AC1A" },
+			// { "localAddons",	"6948EE371B920CB800B5AC1A" },
 			{ "", 				"E4B69B4A0A3A1720003C02F2" }
 		};
 
@@ -47,7 +47,7 @@ xcodeProject::xcodeProject(string target)
 		folderUUID = {
 			{ "src", 			"E4D8936A11527B74007E1F53" },
 			{ "addons", 		"BB16F26B0F2B646B00518274" },
-			{ "localAddons", 	"6948EE371B920CB800B5AC1A" },
+			// { "localAddons", 	"6948EE371B920CB800B5AC1A" },
 			{ "", 				"29B97314FDCFA39411CA2CEA" }
 		};
 
@@ -209,22 +209,31 @@ void xcodeProject::renameProject(){ //base
 }
 
 // FIXME: Update to fs::path
-// FIXME: Change parameters order.
 string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
 	// TODO: Change key of folderUUID to base + folder, so "src" in additional source folders
 	// doesn't get confused with "src" from project.
 
-	// cout << ">>> getFolderUUID folder=" << folder << " base=" << base << endl;
-	string UUID = "";
+	string UUID { "" };
+	// string baseFolder { base + "/" + folder };
+	string baseFolder { folder };
 
-
-	string baseFolder = base + "/" + folder;
-
-	cout << "baseFolder " << baseFolder << " isFolder:" << isFolder << endl; 
+	// cout << "baseFolder " << baseFolder << " isFolder:" << isFolder << endl; 
 
 	// If folder UUID exists just return it.
 	// in this case it creates UUID for the entire path
+
+
 	if ( folderUUID.find(baseFolder) == folderUUID.end() ) { // NOT FOUND
+
+		cout << "----- " << folderUUID.size() << endl;
+		for (auto & f : folderUUID) {
+			cout << f.first <<  " : " << f.second << endl;
+		}
+		cout << "-----" << endl;
+
+		cout << ">>> getFolderUUID creating folder=" << folder << " base=" << base << endl;
+
+
 		vector < string > folders = ofSplitString(folder, "/", true);
 		string lastFolderUUID = projRootUUID;
 
@@ -233,19 +242,21 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
 				vector <string> joinFolders;
 				// joinFolders.assign(folders.begin(), folders.begin() + (a+1));
 				joinFolders.assign(folders.begin(), folders.begin() + (a+1));
-				string fullPath = base + "/" + ofJoinString(joinFolders, "/");
-				cout << "fullPath " << a << " : " << fullPath << endl;
+				// string fullPath = base + "/" + ofJoinString(joinFolders, "/");
+				string fullPath = ofJoinString(joinFolders, "/");
+				// cout << "fullPath " << a << " : " << fullPath << endl;
 				// if (fs::path(folder).is_absolute()) {
 				// 	fullPath = "/" + fullPath;
 				// }
 				// folder is still not found here:
 				if ( folderUUID.find(fullPath) == folderUUID.end() ) {
-					cout << "creating" << endl;
+					// cout << "creating" << endl;
 					string thisUUID = generateUUID(fullPath);
 					folderUUID[fullPath] = thisUUID;	
 
 					// here we add an UUID for the group (folder) and we initialize an array to receive children (files or folders inside)
-					commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
+					commands.emplace_back("");
+					commands.emplace_back("Add :objects:"+thisUUID+":name string " + folders[a]);
 					if (isFolder) {
 						cout << "isFolder true" << endl;
 						// cout << "will check if folder exists :" << fullPath << " folder=" << folder << endl;
@@ -259,7 +270,7 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
 							commands.emplace_back("Add :objects:"+thisUUID+":path string " + relRoot + "/" + fullPath);
 						}
 					}
-					commands.emplace_back("Add :objects:"+thisUUID+":name string " + folders[a]);
+					commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
 					commands.emplace_back("Add :objects:"+thisUUID+":children array");
 //					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string <group>");
 					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
@@ -285,7 +296,7 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
 
 void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 	// cout << "xcodeProject::addSrc " << srcFile << " : " << folder << endl;
-	string buildUUID;
+	string buildUUID { "" };
 
 	//-----------------------------------------------------------------
 	// find the extension for the file that's passed in.
@@ -388,9 +399,10 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 //	cout << "path " << path << endl;
 //	cout << "name " << name << endl;
 
+	commands.emplace_back("# ---- ADDSRC");
+	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
 	commands.emplace_back("Add :objects:"+UUID+":path string "+srcFile);
 	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
-	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
 	if(ext == "xib"){
 		commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string "+fileKind);
 	} else {
@@ -402,41 +414,24 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 	//-----------------------------------------------------------------
 	// (B) BUILD REF
 	//-----------------------------------------------------------------
-
 	if (addToBuild || addToBuildResource ){
-
 		buildUUID = generateUUID(srcFile + "-build");
-
 		commands.emplace_back("Add :objects:"+buildUUID+":fileRef string "+UUID);
-
-		/*
-		if (addToBuild) {
-			cout << "ADD TO BUILD" << endl;
-			cout << srcFile << endl;
-			cout << commands.back() << endl;
-			cout << "-----" << endl;
-		}
-		if (addToBuildResource) {
-			cout << "ADD TO BUILD RESOURCE" << endl;
-			cout << srcFile << endl;
-			cout << commands.back() << endl;
-			cout << "-----" << endl;
-		}
-		*/
 		commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
 
 		// FIXME: IOS ONLY check if array insert is working here
 		if( addToBuildResource ){
-
 			// TEST 21092022
 			string mediaAssetsUUID = "9936F60E1BFA4DEE00891288";
 //			commands.emplace_back("Add :objects:"+mediaAssetsUUID+":files: string " + buildUUID);
+			commands.emplace_back("# ---- addToBuildResource");
 			commands.emplace_back("Add :objects:"+mediaAssetsUUID+":files: string " + UUID);
 		}
 
 		if( addToBuild ){
 			// this replaces completely the findArrayForUUID
 			// I found the root from the array (id present already on original project so no need to query an array by a member. in fact buildPhaseUUID maybe can be removed.
+			commands.emplace_back("# ---- addToBuild");
 			commands.emplace_back("Add :objects:"+buildActionMaskUUID+":files: string " + buildUUID);
 		}
 	}
@@ -444,15 +439,12 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 	//-----------------------------------------------------------------
 	// (C) resrouces
 	//-----------------------------------------------------------------
-
 	// MARK: IOS ONLY HERE // because resourcesUUID = "" in macOs
 	if (addToResources == true && resourcesUUID != ""){
-
+		commands.emplace_back("# ---- addToResources");
 		string resUUID = generateUUID(srcFile + "-build");
-
 		commands.emplace_back("Add :objects:"+resUUID+":fileRef string "+UUID);
 		commands.emplace_back("Add :objects:"+resUUID+":isa string PBXBuildFile");
-
 		// FIXME: test if it is working on iOS
 		commands.emplace_back("Add :objects:"+resourcesUUID+": string "+resUUID);
 	}
@@ -461,9 +453,6 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 	//-----------------------------------------------------------------
 	// (D) folder
 	//-----------------------------------------------------------------
-
-
-
 	fs::path base;
 	fs::path src { srcFile };
 	fs::path folderFS { folder };
@@ -489,7 +478,7 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 }
 
 void xcodeProject::addFramework(string name, string path, string folder){
-//	cout << "addFramework " << name << " path = " << path << " folder = " << folder << endl;
+	cout << "addFramework " << name << " path = " << path << " folder = " << folder << endl;
 	// name = name of the framework
 	// path = the full path (w name) of this framework
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
@@ -506,33 +495,42 @@ void xcodeProject::addFramework(string name, string path, string folder){
 	string UUID = generateUUID( name );
 
 	//commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
+
+	commands.emplace_back("# ----- addFramework name="+name+" path="+path+" folder=" +folder);
+	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
 	commands.emplace_back("Add :objects:"+UUID+":path string "+path);
 	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
-	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
 	commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string wrapper.framework");
 	commands.emplace_back("Add :objects:"+UUID+":sourceTree string <group>");
 
+	commands.emplace_back("# ----- addFramework - add to build phase");
 	string buildUUID = generateUUID(name + "-build");
 	commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
 	commands.emplace_back("Add :objects:"+buildUUID+":fileRef string "+UUID);
 
 	// new - code sign frameworks on copy
+	commands.emplace_back("# ----- addFramework - sign on copy");
+
 	commands.emplace_back("Add :objects:"+buildUUID+":settings:ATTRIBUTES array");
 	commands.emplace_back("Add :objects:"+buildUUID+":settings:ATTRIBUTES: string CodeSignOnCopy");
 
 	//	this now adds the recently created object UUID to its parent folder
 	string folderUUID = getFolderUUID(folder, false);
+	commands.emplace_back("# ----- addFramework - add to parent folder : " + folder);
 	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
+
 
 	//commands.emplace_back("Add :objects:"+frameworksUUID+":children array");
 	//commands.emplace_back("Add :objects:"+frameworksUUID+":children: string " + buildUUID);
 
 	// we add the second to a final build phase for copying the framework into app.   we need to make sure we *don't* do this for system frameworks
 
-	if (folder.size() != 0 && !ofIsStringInString(path, "/System/Library/Frameworks")
-		&& target != "ios"){
+	string buildUUID2;
 
-		string buildUUID2 = generateUUID(name + "-build2");
+	if (!folder.empty() && !ofIsStringInString(path, "/System/Library/Frameworks")
+		&& target != "ios"){
+	
+		buildUUID2 = generateUUID(name + "-build2");
 		commands.emplace_back("Add :objects:"+buildUUID2+":fileRef string "+UUID);
 		commands.emplace_back("Add :objects:"+buildUUID2+":isa string PBXBuildFile");
 
@@ -540,45 +538,46 @@ void xcodeProject::addFramework(string name, string path, string folder){
 		commands.emplace_back("Add :objects:"+buildUUID2+":settings:ATTRIBUTES array");
 		commands.emplace_back("Add :objects:"+buildUUID2+":settings:ATTRIBUTES: string CodeSignOnCopy");
 
-
 		// UUID hardcoded para PBXCopyFilesBuildPhase
 		// FIXME: hardcoded - this is the same for the next fixme. so maybe a clearer ident can make things better here.
 		commands.emplace_back("Add :objects:E4C2427710CC5ABF004149E2:files: string " + buildUUID2);
 	}
 
-	// now, we get the path for this framework without the name
-
-	string pathWithoutName;
-	vector < string > pathSplit = ofSplitString(path, "/");
-	for (int i = 0; i < pathSplit.size()-1; i++){
-		if (i != 0) pathWithoutName += "/";
-		pathWithoutName += pathSplit[i];
-	}
-
-	// then, we are going to add this to "FRAMEWORK_SEARCH_PATHS" -- we do this twice, once for debug once for release.
-
+	commands.emplace_back("# ----- FRAMEWORK_SEARCH_PATHS");
+	fs::path parentFolder = fs::path(path).parent_path();
 	for (auto & c : buildConfigs) {
 		commands.emplace_back
-		("Add :objects:"+c+":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + pathWithoutName);
+		("Add :objects:"+c+":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + parentFolder.string());
 	}
 
-	// finally, this is for making folders based on the frameworks position in the addon. so it can appear in the sidebar / file explorer
+	// // finally, this is for making folders based on the frameworks position in the addon. so it can appear in the sidebar / file explorer
+	// // This is doing NOTHING
+	// if (!folder.empty() && !ofIsStringInString(folder, "/System/Library/Frameworks")){
+	// 	string folderUUID = getFolderUUID(folder, false);
+	// } else {
+	// 	//FIXME: else what?
+	// }
 
-	if (folder.size() > 0 && !ofIsStringInString(folder, "/System/Library/Frameworks")){
-		string folderUUID = getFolderUUID(folder, false);
-	} else {
-		//FIXME: else what?
-	}
-
-	if (target != "ios" && folder.size() != 0){
+	if (target != "ios" && !folder.empty()){
 		// add it to the linking phases...
-		// FIXME: hardcoded UUID
-		commands.emplace_back("Add :objects:E4B69B590A3A1756003C02F2:files: string "+buildUUID);
+		// PBXFrameworksBuildPhase
+		// https://www.rubydoc.info/gems/xcodeproj/Xcodeproj/Project/Object/PBXFrameworksBuildPhase
+		// The phase responsible on linking with frameworks. Known as ‘Link Binary With Libraries` in the UI.
+
+		// This is what was missing. a reference in root objects to the framework, so we can add the reference to PBXFrameworksBuildPhase
+		auto tempUUID = generateUUID(name + "-InFrameworks");
+		commands.emplace_back("Add :objects:"+tempUUID+":fileRef string "+UUID);
+		commands.emplace_back("Add :objects:"+tempUUID+":isa string PBXBuildFile");
+
+		commands.emplace_back("# --- PBXFrameworksBuildPhase");
+		commands.emplace_back("Add :objects:E4B69B590A3A1756003C02F2:files: string " + tempUUID);
 	}
+		// return;
+
 }
 
 void xcodeProject::addDylib(string name, string path){
-//	alert("addDylib " + name + " : " + path);
+	//alert("addDylib " + name + " : " + path);
 	// name = name of the dylib
 	// path = the full path (w name) of this framework
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
@@ -640,10 +639,7 @@ void xcodeProject::addDylib(string name, string path){
 
 
 void xcodeProject::addInclude(string includeName){
-//	alert("addInclude " + includeName);
-
-	// Adding to all build configurations, debug and release
-//	for (auto & c : buildConfigurations) {
+	//alert("addInclude " + includeName);
 	for (auto & c : buildConfigs) {
 		string s = "Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName;
 		commands.emplace_back("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
@@ -665,7 +661,6 @@ void xcodeProject::addLDFLAG(string ldflag, LibType libType){
 }
 
 void xcodeProject::addCFLAG(string cflag, LibType libType){
-//	for (auto & c : buildConfigurations) {
 	for (auto & c : buildConfigs) {
 		// FIXME: add array here if it doesnt exist
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_CFLAGS array");
@@ -689,6 +684,7 @@ void xcodeProject::addCPPFLAG(string cppflag, LibType libType){
 }
 
 void xcodeProject::addAfterRule(string rule){
+	// return;
 	commands.emplace_back("Add :objects:"+afterPhaseUUID+":buildActionMask string 2147483647");
 	commands.emplace_back("Add :objects:"+afterPhaseUUID+":files array");
 	commands.emplace_back("Add :objects:"+afterPhaseUUID+":inputPaths array");
@@ -701,7 +697,6 @@ void xcodeProject::addAfterRule(string rule){
 	// adding this phase to build phases array
 	// TODO: Check if nit needs another buildConfigurationListUUID for debug.
 	commands.emplace_back("Add :objects:"+buildConfigurationListUUID+":buildPhases: string " + afterPhaseUUID);
-
 }
 
 void xcodeProject::addAddon(ofAddon & addon){
@@ -828,38 +823,40 @@ bool xcodeProject::saveProjectFile(){
 		json j = json::parse(contents);
 
 		for (auto & c : commands) {
-			//		cout << c << endl;
-			vector<string> cols = ofSplitString(c, " ");
-			string thispath = cols[1];
-			ofStringReplace(thispath, ":", "/");
+			// readable comments enabled now.
+			if (c != "" && c[0] != '#') {
+				vector<string> cols = ofSplitString(c, " ");
+				string thispath = cols[1];
+				ofStringReplace(thispath, ":", "/");
 
-			if (thispath.substr(thispath.length() -1) != "/") {
-				//if (cols[0] == "Set") {
-				json::json_pointer p = json::json_pointer(thispath);
-				if (cols[2] == "string") {
-					j[p] = cols[3];
-				}
-				else if (cols[2] == "array") {
-					j[p] = {};
-				}
-			}
-			else {
-				thispath = thispath.substr(0, thispath.length() -1);
-				json::json_pointer p = json::json_pointer(thispath);
-				try {
-					// Fixing XCode one item array issue
-					if (!j[p].is_array()) {
-						auto v = j[p];
-						j[p] = json::array();
-						if (!v.is_null()) {
-							j[p].emplace_back(v);
-						}
+				if (thispath.substr(thispath.length() -1) != "/") {
+					//if (cols[0] == "Set") {
+					json::json_pointer p = json::json_pointer(thispath);
+					if (cols[2] == "string") {
+						j[p] = cols[3];
 					}
-					j[p].emplace_back(cols[3]);
+					else if (cols[2] == "array") {
+						j[p] = {};
+					}
+				}
+				else {
+					thispath = thispath.substr(0, thispath.length() -1);
+					json::json_pointer p = json::json_pointer(thispath);
+					try {
+						// Fixing XCode one item array issue
+						if (!j[p].is_array()) {
+							auto v = j[p];
+							j[p] = json::array();
+							if (!v.is_null()) {
+								j[p].emplace_back(v);
+							}
+						}
+						j[p].emplace_back(cols[3]);
 
-				} catch (std::exception e) {
-					cout << "json error " << endl;
-					cout << e.what() << endl;
+					} catch (std::exception e) {
+						cout << "json error " << endl;
+						cout << e.what() << endl;
+					}
 				}
 			}
 		}
@@ -877,7 +874,7 @@ bool xcodeProject::saveProjectFile(){
 	}
 
 	for (auto & c : commands) {
-		// cout << c << endl;
+		cout << c << endl;
 	}
 
 	return true;

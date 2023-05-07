@@ -63,10 +63,7 @@ public:
 		"E4B69B600A3A1757003C02F2", //Debug
 	};
 
-	std::unordered_map <string, string> folderUUID = {
-	};
-
+	std::unordered_map <string, string> folderUUID ;
 	string getFolderUUID(string folder, bool isFolder = true, string base = "");
-	
 	string relRoot = "../../..";
 };
