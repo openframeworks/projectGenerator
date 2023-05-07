@@ -395,7 +395,7 @@ void baseProject::addSrcRecursively(fs::path srcPath){
 			
 			ofLog() <<  " adding file " << src << " in folder " << folder2 << " to project ";
 			// addSrc(src, parent);
-			addSrc(src, folder2.string());
+			addSrc(src.string(), folder2.string());
 			includeFolder = parent;
 
 		} else {
