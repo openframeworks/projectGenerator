@@ -151,16 +151,16 @@ cd ..
 of_root=${PWD}/openFrameworks
 pg_root=${PWD}/openFrameworks/apps/projectGenerator
 
-# if [ -d "openframeworks/.git" ]; then
-# 	echo 'OF already cloned, using it'
-# 	cd openframeworks
-# 	git pull
-# 	cd ..
+if [ -d "openframeworks/.git" ]; then
+	echo 'OF already cloned, using it'
+	cd openframeworks
+	git pull
+	cd ..
 # 	# Control will enter here if $DIRECTORY exists.
-# else
-# 	git clone --depth=1 https://github.com/openframeworks/openFrameworks
-# fi
-git clone --depth=1 https://github.com/openframeworks/openFrameworks
+else
+	git clone --depth=1 https://github.com/openframeworks/openFrameworks
+fi
+# git clone --depth=1 https://github.com/openframeworks/openFrameworks
 #cp not move so github actions can do cleanup without error
 cp -r projectGenerator openFrameworks/apps/
 
