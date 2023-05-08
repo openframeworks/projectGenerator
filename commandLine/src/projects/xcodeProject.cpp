@@ -866,9 +866,9 @@ bool xcodeProject::saveProjectFile(){
 		}
 	}
 
-	for (auto & c : commands) {
-		cout << c << endl;
-	}
+	// for (auto & c : commands) {
+	// 	cout << c << endl;
+	// }
 
 	return true;
 }
