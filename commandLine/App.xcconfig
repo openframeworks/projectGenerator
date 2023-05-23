@@ -1,0 +1,4 @@
+OF_NO_FMOD = 1
+OF_CORE_LIBS = $(LIB_GLEW) $(LIB_PUGIXML)
+OF_CORE_HEADERS = $(HEADER_OF) $(HEADER_GLEW) $(HEADER_TESS2) $(HEADER_GLFW) $(HEADER_UTF8) $(HEADER_JSON) $(HEADER_GLM) $(HEADER_PUGIXML)
+OF_CORE_FRAMEWORKS = -framework Accelerate -framework Cocoa -framework CoreFoundation -framework CoreServices -framework CoreVideo -framework IOKit -framework OpenGL -framework QuartzCore -framework Security

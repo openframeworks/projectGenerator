@@ -8,7 +8,7 @@
 #   The location of your root openFrameworks installation
 #       (default) OF_ROOT = ../../.. 
 ################################################################################
-OF_ROOT = ../../..
+OF_ROOT = ../../../
 
 ################################################################################
 # PROJECT ROOT
@@ -27,7 +27,8 @@ OF_ROOT = ../../..
 ################################################################################
 # None
 APPNAME = projectGenerator
-PROJECT_AFTER_OSX = cp "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME" "$TARGET_BUILD_DIR/commandLinePG"; rm -rf "$TARGET_BUILD_DIR/$PRODUCT_NAME.app";	mv "$TARGET_BUILD_DIR/commandLinePG" "$TARGET_BUILD_DIR/projectGenerator"
+#PROJECT_AFTER_OSX = cp "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME" "$TARGET_BUILD_DIR/commandLinePG"; rm -rf "$TARGET_BUILD_DIR/$PRODUCT_NAME.app";	mv "$TARGET_BUILD_DIR/commandLinePG" "$TARGET_BUILD_DIR/projectGenerator"
+PROJECT_AFTER_OSX = if test -f "$TARGET_BUILD_DIR/projectGenerator"; then rm "$TARGET_BUILD_DIR/projectGenerator"; fi;  cp "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME" "$TARGET_BUILD_DIR/projectGenerator"
 
 ################################################################################
 # PROJECT EXTERNAL SOURCE PATHS
@@ -182,3 +183,9 @@ PLATFORM_CORE_EXCLUSIONS += ../../../libs/glm%
 # FIXME: REMOVE
 #PROJECT_CXX = include-what-you-use
 #PROJECT_CC = include-what-you-use
+
+# MADE WITH OFWPGDragDrop
+PROJECT_LDFLAGS += -no-pie
+
+# MADE WITH OFWPGDragDrop
+PROJECT_LDFLAGS += -no-pie

@@ -1,3 +1,4 @@
+
 #define TARGET_NO_SOUND
 #define TARGET_NODISPLAY
 
@@ -5,6 +6,14 @@
 #include "defines.h"
 #include "Utils.h"
 #include <set>
+using std::cout;
+using std::endl;
+
+// int main(int argc, char** argv){
+// 	cout << "v003" << endl;
+// 	return 0;
+// }
+
 
 enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTERNAL, VERSION};
 
@@ -26,8 +35,6 @@ constexpr option::Descriptor usage[] =
 };
 
 
-using std::cout;
-using std::endl;
 
 namespace fs = of::filesystem;
 
@@ -407,7 +414,7 @@ int main(int argc, char** argv){
 	}
 
 
-	// ------------------------------------------------------ post parse
+/*	 ------------------------------------------------------ post parse */
 
 	nProjectsUpdated = 0;
 	nProjectsCreated = 0;
@@ -480,14 +487,16 @@ int main(int argc, char** argv){
 		return EXIT_USAGE;
 	}
 
+
 	if (fs::exists(projectPath) && fs::is_directory(projectPath)) {
 		mode = PG_MODE_UPDATE;
 	}
 	else {
 		mode = PG_MODE_CREATE;
 	}
-        
-        //mode = PG_MODE_CREATE;
+
+       //mode = PG_MODE_CREATE;
+
 
 
 	if (bVerbose){
@@ -529,12 +538,12 @@ int main(int argc, char** argv){
 				ofLogNotice() << "setting up new project " << projectPath;
 
 				if (mode == PG_MODE_UPDATE) {
-					
+
 					updateProject(projectPath, t);
 					ofLogNotice() << "project updated! ";
-					
+
 				} else {
-					
+
 					if (!bDryRun){
 						auto project = getTargetProject(t);
 						project->create(projectPath, templateName);

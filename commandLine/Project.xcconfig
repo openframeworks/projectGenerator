@@ -5,14 +5,6 @@ OF_PATH = ../../..
 //THIS HAS ALL THE HEADER AND LIBS FOR OF CORE
 #include "../../../libs/openFrameworksCompiled/project/osx/CoreOF.xcconfig"
 
-HEADER_OF = "$(OF_PATH)/libs/openFrameworks" "$(OF_PATH)/libs/openFrameworks/utils"
-
-OF_NO_FMOD = 1
-
-OF_CORE_LIBS = $(LIB_GLEW) $(LIB_PUGIXML)
-OF_CORE_HEADERS = $(HEADER_OF) $(HEADER_GLEW) $(HEADER_TESS2) $(HEADER_GLFW) $(HEADER_UTF8) $(HEADER_JSON) $(HEADER_GLM) $(HEADER_PUGIXML)
-OF_CORE_FRAMEWORKS = -framework Accelerate -framework Cocoa -framework CoreFoundation -framework CoreServices -framework CoreVideo -framework IOKit -framework OpenGL -framework QuartzCore -framework Security
-
 //UNCOMMENT BELOW TO ENABLE C++ 17 and std::filesystem
 CLANG_CXX_LANGUAGE_STANDARD = c++17
 MACOSX_DEPLOYMENT_TARGET = 10.15
@@ -36,6 +28,10 @@ ICON_FILE = $(OF_PATH)/libs/openFrameworksCompiled/project/osx/$(ICON_NAME)
 //IF YOU WANT AN APP TO HAVE A CUSTOM ICON - PUT THEM IN YOUR DATA FOLDER AND CHANGE ICON_FILE_PATH to:
 //ICON_FILE_PATH = bin/data/
 
+//FOR AV ENGINE SOUND PLAYER UNCOMMENT TWO LINES BELOW
+//OF_NO_FMOD=1
+//USER_PREPROCESSOR_DEFINITIONS="OF_NO_FMOD=1"
+GCC_PREPROCESSOR_DEFINITIONS=$(inherited)$(USER_PREPROCESSOR_DEFINITIONS)
 
 //APPSTORE, uncomment next lines to bundle data folder and code sign
 //OF_CODESIGN = 1

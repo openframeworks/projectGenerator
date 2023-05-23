@@ -678,14 +678,20 @@ void xcodeProject::addCPPFLAG(string cppflag, LibType libType){
 
 void xcodeProject::addAfterRule(string rule){
 	// return;
+	cout << ">>>>>> addAfterRule " << rule << endl;
 	commands.emplace_back("Add :objects:"+afterPhaseUUID+":buildActionMask string 2147483647");
-	commands.emplace_back("Add :objects:"+afterPhaseUUID+":files array");
-	commands.emplace_back("Add :objects:"+afterPhaseUUID+":inputPaths array");
+	// commands.emplace_back("Add :objects:"+afterPhaseUUID+":files array");
+	// commands.emplace_back("Add :objects:"+afterPhaseUUID+":inputPaths array");
 	commands.emplace_back("Add :objects:"+afterPhaseUUID+":isa string PBXShellScriptBuildPhase");
-	commands.emplace_back("Add :objects:"+afterPhaseUUID+":outputPaths array");
+	// commands.emplace_back("Add :objects:"+afterPhaseUUID+":outputPaths array");
 	commands.emplace_back("Add :objects:"+afterPhaseUUID+":runOnlyForDeploymentPostprocessing string 0");
 	commands.emplace_back("Add :objects:"+afterPhaseUUID+":shellPath string /bin/sh");
+	commands.emplace_back("Add :objects:"+afterPhaseUUID+":showEnvVarsInLog string 0");
+
+	// ofStringReplace(rule, "\"", "\\\"");
+	// commands.emplace_back("Add :objects:"+afterPhaseUUID+":shellScript string \"" + rule + "\"");
 	commands.emplace_back("Add :objects:"+afterPhaseUUID+":shellScript string " + rule);
+
 
 	// adding this phase to build phases array
 	// TODO: Check if nit needs another buildConfigurationListUUID for debug.
@@ -826,7 +832,10 @@ bool xcodeProject::saveProjectFile(){
 					//if (cols[0] == "Set") {
 					json::json_pointer p = json::json_pointer(thispath);
 					if (cols[2] == "string") {
-						j[p] = cols[3];
+						// find position after find word
+						auto stringStart = c.find("string ") + 7;
+						j[p] = c.substr(stringStart);
+						// j[p] = cols[3];
 					}
 					else if (cols[2] == "array") {
 						j[p] = {};
@@ -866,9 +875,9 @@ bool xcodeProject::saveProjectFile(){
 		}
 	}
 
-	// for (auto & c : commands) {
-	// 	cout << c << endl;
-	// }
+	for (auto & c : commands) {
+		cout << c << endl;
+	}
 
 	return true;
 }
