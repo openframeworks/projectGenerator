@@ -46,7 +46,6 @@ std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirect
 	auto name = fs::path(templateDir.getOriginalDirectory()).parent_path().filename();
 	if(templateDir.isDirectory() && !isPlatformName(name.string())){
 		ofBuffer templateconfig;
-//		ofFile templateconfigFile(ofFilePath::join(templateDir.path(), "template.config"));
 		ofFile templateconfigFile(fs::path { templateDir.path() } / "template.config" );
 		if(templateconfigFile.exists()){
 			templateconfigFile >> templateconfig;
@@ -594,15 +593,4 @@ void baseProject::recursiveCopyContents(const fs::path & srcDir, const fs::path 
 			}
 		}
 	}
-			
-//void baseProject::recursiveCopyContents(const ofDirectory & srcDir, ofDirectory & destDir){
-//	for(auto & f: srcDir){
-//		if(f.isDirectory()){
-//			ofDirectory srcSubDir(f.path());
-//			ofDirectory destSubDir(ofFilePath::join(destDir.path(),f.getFileName()));
-//			recursiveTemplateCopy(srcSubDir, destSubDir);
-//		}else{
-//			f.copyTo(ofFilePath::join(destDir.path(),f.getFileName()),false,true);
-//		}
-//	}
 }
