@@ -46,7 +46,8 @@ std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirect
 	auto name = fs::path(templateDir.getOriginalDirectory()).parent_path().filename();
 	if(templateDir.isDirectory() && !isPlatformName(name.string())){
 		ofBuffer templateconfig;
-		ofFile templateconfigFile(ofFilePath::join(templateDir.path(), "template.config"));
+//		ofFile templateconfigFile(ofFilePath::join(templateDir.path(), "template.config"));
+		ofFile templateconfigFile(fs::path { templateDir.path() } / "template.config" );
 		if(templateconfigFile.exists()){
 			templateconfigFile >> templateconfig;
 			auto supported = false;
@@ -205,20 +206,20 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 
 bool baseProject::save(){
 	ofLog(OF_LOG_NOTICE) << "saving addons.make";
-	ofFile addonsMake(ofFilePath::join(projectDir,"addons.make"), ofFile::WriteOnly);
-	for(int i = 0; i < addons.size(); i++){
-		if(addons[i].isLocalAddon){
-			addonsMake << fs::path(addons[i].addonPath).generic_string() << std::endl;
-		}else{
-			addonsMake << addons[i].name << std::endl;
+	ofFile addonsMake(projectDir / "addons.make", ofFile::WriteOnly);
+	for (auto & a : addons) {
+		if (a.isLocalAddon) {
+			addonsMake << fs::path(a.addonPath).generic_string() << std::endl;
+		} else {
+			addonsMake << a.name << std::endl;
 		}
 	}
 
 	//save out params which the PG knows about to config.make
 	//we mostly use this right now for storing the external source paths
-	auto buffer = ofBufferFromFile(ofFilePath::join(projectDir,"config.make"));
+	auto buffer = ofBufferFromFile(projectDir / "config.make");
 	if( buffer.size() ){
-		ofFile saveConfig(ofFilePath::join(projectDir,"config.make"), ofFile::WriteOnly);
+		ofFile saveConfig(projectDir / "config.make", ofFile::WriteOnly);
 
 		for(auto line : buffer.getLines()){
 			string str = line;
@@ -534,7 +535,7 @@ void baseProject::addAddon(ofAddon & addon){
 }
 
 void baseProject::parseAddons(){
-	ofFile addonsMake(ofFilePath::join(projectDir,"addons.make"));
+	ofFile addonsMake(projectDir / "addons.make");
 	ofBuffer addonsMakeMem;
 	addonsMake >> addonsMakeMem;
 	for(auto line: addonsMakeMem.getLines()){
@@ -546,7 +547,7 @@ void baseProject::parseAddons(){
 }
 
 void baseProject::parseConfigMake(){
-	ofFile configMake(ofFilePath::join(projectDir,"config.make"));
+	ofFile configMake(projectDir / "config.make");
 	ofBuffer configMakeMem;
 	configMake >> configMakeMem;
 	for(auto line: configMakeMem.getLines()){
