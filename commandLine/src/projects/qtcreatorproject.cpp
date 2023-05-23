@@ -15,12 +15,12 @@ bool QtCreatorProject::createProjectFile(){
 	ofDirectory dir(projectDir);
 	if(!dir.exists()) dir.create(true);
 
-	ofFile project(ofFilePath::join(projectDir, projectName + ".qbs"));
-	std::string src = ofFilePath::join(templatePath,"qtcreator.qbs");
-	std::string dst = project.path();
+	fs::path project = projectDir / (projectName + ".qbs");
+	fs::path src = templatePath / "qtcreator.qbs";
+	fs::path dst = project;
 
-	if(!project.exists()){
-		if(!ofFile::copyFromTo(src,dst)){
+	if (!fs::exists(project)) {
+		if(!ofFile::copyFromTo(src, dst)){
 			ofLogError(LOG_NAME) << "error copying qbs template from " << src << " to " << dst;
 			return false;
 		}else{
@@ -28,21 +28,21 @@ bool QtCreatorProject::createProjectFile(){
 		}
 	}
 
-	ofFile makefile(ofFilePath::join(projectDir,"Makefile"));
-	if(!makefile.exists()){
-		src = ofFilePath::join(templatePath,"Makefile");
-		dst = makefile.path();
-		if(!ofFile::copyFromTo(src,dst)){
+	fs::path makefile = projectDir / "Makefile";
+	if(!fs::exists(makefile)){
+		src = templatePath / "Makefile";
+		dst = makefile;
+		if(!ofFile::copyFromTo(src, dst)){
 			ofLogError(LOG_NAME) << "error copying Makefile template from " << src << " to " << dst;
 			return false;
 		}
 	}
 
-	ofFile config(ofFilePath::join(projectDir,"config.make"));
-	if(!config.exists()){
-		src = ofFilePath::join(templatePath,"config.make");
-		dst = config.path();
-		if(!ofFile::copyFromTo(src,dst)){
+	fs::path config = projectDir / "config.make";
+	if(!fs::exists(config)){
+		src = templatePath / "config.make";
+		dst = config;
+		if(!ofFile::copyFromTo(src, dst)){
 			ofLogError(LOG_NAME) << "error copying config.make template from " << src << " to " << dst;
 			return false;
 		}
