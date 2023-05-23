@@ -73,16 +73,17 @@ bool xcodeProject::createProjectFile(){
 	xcodeDir.create(true);
 	xcodeDir.close();
 
-	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.xcodeproj/project.pbxproj"),
-					   ofFilePath::join(xcodeProject, "project.pbxproj"), true, true);
+	ofFile::copyFromTo(templatePath / "emptyExample.xcodeproj" / "project.pbxproj",
+					   xcodeProject / "project.pbxproj", 
+					   true, true);
 
-	findandreplaceInTexfile(ofFilePath::join(xcodeProject, "project.pbxproj"), "emptyExample", projectName);
+	findandreplaceInTexfile(xcodeProject / "project.pbxproj", "emptyExample", projectName);
 
-	ofFile::copyFromTo(ofFilePath::join(templatePath,"Project.xcconfig"),projectDir, true, true);
+	ofFile::copyFromTo(templatePath / "Project.xcconfig", projectDir, true, true);
 
-	ofDirectory binDirectory(ofFilePath::join(projectDir, "bin"));
+	ofDirectory binDirectory(projectDir / "bin");
 	if (!binDirectory.exists()){
-		ofDirectory dataDirectory(ofFilePath::join(projectDir, "bin/data"));
+		ofDirectory dataDirectory(projectDir / "bin" / "data");
 		dataDirectory.create(true);
 		dataDirectory.close();
 	}
@@ -113,14 +114,14 @@ bool xcodeProject::createProjectFile(){
 	binDirectory.close();
 
 	if( target == "osx" ){
-		ofFile::copyFromTo(ofFilePath::join(templatePath,"openFrameworks-Info.plist"),projectDir, true, true);
-		ofFile::copyFromTo(ofFilePath::join(templatePath,"of.entitlements"),projectDir, true, true);
+		ofFile::copyFromTo(templatePath / "openFrameworks-Info.plist", projectDir, true, true);
+		ofFile::copyFromTo(templatePath / "of.entitlements", projectDir, true, true);
 	}else{
-		ofFile::copyFromTo(ofFilePath::join(templatePath,"ofxiOS-Info.plist"),projectDir, true, true);
-		ofFile::copyFromTo(ofFilePath::join(templatePath,"ofxiOS_Prefix.pch"),projectDir, true, true);
+		ofFile::copyFromTo(templatePath / "ofxiOS-Info.plist", projectDir, true, true);
+		ofFile::copyFromTo(templatePath / "ofxiOS_Prefix.pch", projectDir, true, true);
 
-		ofDirectory mediaAssetsTemplateDirectory(ofFilePath::join(templatePath, "mediaAssets"));
-		ofDirectory mediaAssetsProjectDirectory(ofFilePath::join(projectDir, "mediaAssets"));
+		ofDirectory mediaAssetsTemplateDirectory(templatePath / "mediaAssets");
+		ofDirectory mediaAssetsProjectDirectory(projectDir / "mediaAssets");
 		if (!mediaAssetsProjectDirectory.exists()){
 			mediaAssetsTemplateDirectory.copyTo(mediaAssetsProjectDirectory.getAbsolutePath(), false, false);
 		}
@@ -166,26 +167,26 @@ void xcodeProject::saveScheme(){
 	if(target=="osx"){
 		for (auto & f : { string("Release"), string("Debug") }) {
 			auto schemeTo = schemeFolder / (projectName + " " +f+ ".xcscheme");
-			ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample "+f+".xcscheme"), schemeTo);
+			ofFile::copyFromTo(templatePath / ("emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample "+f+".xcscheme"), schemeTo);
 			findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
 		}
 
 		auto workspaceTo = projectDir / (projectName + ".xcodeproj/project.xcworkspace");
-		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/project.xcworkspace"), workspaceTo);
+		ofFile::copyFromTo(templatePath / "emptyExample.xcodeproj/project.xcworkspace", workspaceTo);
 	}else{
 
 		// MARK:- IOS sector;
 		auto schemeTo = schemeFolder / (projectName + ".xcscheme");
-		ofFile::copyFromTo(ofFilePath::join(templatePath, "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme"), schemeTo);
+		ofFile::copyFromTo(templatePath / "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme", schemeTo);
 		findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
 	}
 }
 
 void xcodeProject::saveMakefile(){
-	for (auto & f : {"Makefile", "config.make" }) {
-		string fileName = ofFilePath::join(projectDir, f);
-		if(!ofFile(fileName).exists()){
-			ofFile::copyFromTo(ofFilePath::join(templatePath, f), fileName, true, true);
+	for (auto & f : { "Makefile", "config.make" }) {
+		fs::path fileName = projectDir / f;
+		if (!fs::exists(fileName)) {
+			ofFile::copyFromTo(templatePath / f, fileName, true, true);
 		}
 	}
 }
