@@ -157,6 +157,9 @@ void ofAddon::addReplaceString(string & variable, string value, bool addToVariab
 }
 
 void ofAddon::addReplaceStringVector(std::vector<std::string> & variable, std::string value, std::string prefix, bool addToVariable){
+	cout << "----------" << endl;
+	cout << "addReplaceStringVector value=" << value << ", prefix=" << prefix << ", addToVariable=" << addToVariable << endl;
+	cout << "----------" << endl;
 
 	vector<string> values;
 	if(value.find("\"")!=string::npos){

@@ -133,7 +133,9 @@ pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::strin
 
 }
 
-
+// TODO: This can be removed in the future, but not now.
+// Still needed now because srcFiles is vector of string.
+// it can't be changed to fs::path because of addReplaceStringVector
 void getFilesRecursively(const fs::path & path, std::vector < string > & fileNames){
 	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
 	if (!fs::is_directory(path)) return;
@@ -145,7 +147,6 @@ void getFilesRecursively(const fs::path & path, std::vector < string > & fileNam
 		if (fs::is_directory(f)) {
 			getFilesRecursively(f, fileNames);
 		} else {
-			// FIXME - update someday to fs::path
 			fileNames.emplace_back(f.string());
 		}
 	}
