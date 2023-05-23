@@ -3,16 +3,30 @@
 	"classes": {},
 	"objectVersion": "54",
 	"objects": {
-		"07E7149A-A9BE-4804-9A85-44EBBFC8FD84": {
-			"fileRef": "2CEBE531-D975-4942-98B0-85F87EF5679E",
-			"isa": "PBXBuildFile"
+		"0B359B84-50BB-47B9-A721-36AE947437DD": {
+			"explicitFileType": "sourcecode.cpp.cpp",
+			"fileEncoding": "4",
+			"isa": "PBXFileReference",
+			"name": "CBLinuxProject.cpp",
+			"path": "src/projects/CBLinuxProject.cpp",
+			"sourceTree": "SOURCE_ROOT"
 		},
-		"14D4F5B1-69E4-49B8-80A0-2E416AFAEBCA": {
+		"13DCCAF0-3DE4-4A4B-86D4-E1521262D877": {
+			"children": [
+				"B18AB8EF-0816-47FA-86AA-105792D925FA",
+				"3ABADA8D-1C88-4493-9A8D-1E40CA3FAEC7"
+			],
+			"isa": "PBXGroup",
+			"name": "addons",
+			"path": "src/addons",
+			"sourceTree": "SOURCE_ROOT"
+		},
+		"18197640-A15A-4484-BB57-86DB9506C626": {
 			"explicitFileType": "sourcecode.c.h",
 			"fileEncoding": "4",
 			"isa": "PBXFileReference",
-			"name": "visualStudioProject.h",
-			"path": "src/projects/visualStudioProject.h",
+			"name": "LibraryBinary.h",
+			"path": "src/utils/LibraryBinary.h",
 			"sourceTree": "SOURCE_ROOT"
 		},
 		"191CD6FA2847E21E0085CBB6": {
@@ -39,68 +53,39 @@
 			"outputPaths": [],
 			"runOnlyForDeploymentPostprocessing": "0",
 			"shellPath": "/bin/sh",
-			"shellScript": "\"$OF_PATH/scripts/osx/xcode_project.sh\"\n",
-			"showEnvVarsInLog": "0"
+			"shellScript": "\"$OF_PATH/scripts/osx/xcode_project.sh\"\n"
 		},
-		"1E01049B-F977-4F3A-9054-E4CEDF7C1602": {
-			"explicitFileType": "sourcecode.cpp.cpp",
-			"fileEncoding": "4",
-			"isa": "PBXFileReference",
-			"name": "uuidxx.cpp",
-			"path": "src/uuidxx/src/uuidxx.cpp",
-			"sourceTree": "SOURCE_ROOT"
-		},
-		"22C66166-1E03-4792-895E-3E95A008AD00": {
-			"fileRef": "EE4B1F84-8B9E-43F9-B3B7-F7631F0FB23E",
-			"isa": "PBXBuildFile"
-		},
-		"264EE306-47ED-4D52-A4C5-1B9EE5B1D307": {
+		"1E5915D0-4124-45C6-B01A-E6C8076D363F": {
 			"children": [
-				"41B1AEB2-6009-4C37-99F7-9BD671CA7F03",
-				"42761E05-C2B6-4B36-9856-A5D7AB6A84AA"
+				"7A653BDB-8D52-4269-AA58-5D9714D40043",
+				"A2ABAB7E-D4E2-40D8-887C-80053AD84482"
 			],
 			"isa": "PBXGroup",
-			"name": "uuidxx",
-			"path": "src/uuidxx",
+			"name": "src",
+			"path": "src/uuidxx/src",
 			"sourceTree": "SOURCE_ROOT"
 		},
-		"2C6D1665-C638-44E1-829E-475FC4DC0C2D": {
+		"24219FBB-12F4-4E8B-A6AF-0BFE02B15F25": {
+			"explicitFileType": "file",
+			"fileEncoding": "4",
+			"isa": "PBXFileReference",
+			"name": "LICENSE",
+			"path": "src/uuidxx/license/LICENSE",
+			"sourceTree": "SOURCE_ROOT"
+		},
+		"29D265FD-0EE7-4473-8F9F-102D96DA4158": {
 			"explicitFileType": "sourcecode.c.h",
 			"fileEncoding": "4",
 			"isa": "PBXFileReference",
-			"name": "optionparser.h",
-			"path": "src/optionparser.h",
+			"name": "baseProject.h",
+			"path": "src/projects/baseProject.h",
 			"sourceTree": "SOURCE_ROOT"
 		},
-		"2CEBE531-D975-4942-98B0-85F87EF5679E": {
-			"explicitFileType": "sourcecode.cpp.cpp",
-			"fileEncoding": "4",
-			"isa": "PBXFileReference",
-			"name": "CBLinuxProject.cpp",
-			"path": "src/projects/CBLinuxProject.cpp",
-			"sourceTree": "SOURCE_ROOT"
-		},
-		"2CF93B6D-C77B-4C99-8714-BA1A6A36A023": {
-			"explicitFileType": "sourcecode.c.h",
-			"fileEncoding": "4",
-			"isa": "PBXFileReference",
-			"name": "androidStudioProject.h",
-			"path": "src/projects/androidStudioProject.h",
-			"sourceTree": "SOURCE_ROOT"
-		},
-		"2D281F71-D5C9-42D2-A495-20041F817556": {
-			"fileRef": "A96A02A4-B429-4630-9D61-B0AB44EE4936",
+		"30DF9C18-BEEB-4757-9C96-0BDE4A71C612": {
+			"fileRef": "7A653BDB-8D52-4269-AA58-5D9714D40043",
 			"isa": "PBXBuildFile"
 		},
-		"3887CF95-1C97-47B9-9B22-50D2382421FE": {
-			"explicitFileType": "sourcecode.c.h",
-			"fileEncoding": "4",
-			"isa": "PBXFileReference",
-			"name": "LibraryBinary.h",
-			"path": "src/utils/LibraryBinary.h",
-			"sourceTree": "SOURCE_ROOT"
-		},
-		"398265F6-4AC1-4F1F-829B-461592E15DB9": {
+		"3ABADA8D-1C88-4493-9A8D-1E40CA3FAEC7": {
 			"explicitFileType": "sourcecode.c.h",
 			"fileEncoding": "4",
 			"isa": "PBXFileReference",
@@ -108,86 +93,120 @@
 			"path": "src/addons/ofAddon.h",
 			"sourceTree": "SOURCE_ROOT"
 		},
-		"3C8CE4D3-2E98-44DE-A6BB-40BF7D23137B": {
-			"explicitFileType": "sourcecode.c.h",
+		"3DC82FB7-2CD6-493E-8A08-180CEACD4FBD": {
+			"explicitFileType": "sourcecode.cpp.cpp",
 			"fileEncoding": "4",
 			"isa": "PBXFileReference",
-			"name": "uuidxx.h",
-			"path": "src/uuidxx/src/uuidxx.h",
+			"name": "androidStudioProject.cpp",
+			"path": "src/projects/androidStudioProject.cpp",
 			"sourceTree": "SOURCE_ROOT"
 		},
-		"41B1AEB2-6009-4C37-99F7-9BD671CA7F03": {
+		"3F9EA3B3-3D7D-486D-A8D5-D9FC8A9D1850": {
+			"explicitFileType": "sourcecode.cpp.cpp",
+			"fileEncoding": "4",
+			"isa": "PBXFileReference",
+			"name": "CBWinProject.cpp",
+			"path": "src/projects/CBWinProject.cpp",
+			"sourceTree": "SOURCE_ROOT"
+		},
+		"42064BCE-28AF-46C9-BA78-D3FF7048C58D": {
 			"children": [
-				"A96A02A4-B429-4630-9D61-B0AB44EE4936"
+				"24219FBB-12F4-4E8B-A6AF-0BFE02B15F25"
 			],
 			"isa": "PBXGroup",
 			"name": "license",
 			"path": "src/uuidxx/license",
 			"sourceTree": "SOURCE_ROOT"
 		},
-		"42761E05-C2B6-4B36-9856-A5D7AB6A84AA": {
-			"children": [
-				"1E01049B-F977-4F3A-9054-E4CEDF7C1602",
-				"3C8CE4D3-2E98-44DE-A6BB-40BF7D23137B"
-			],
-			"isa": "PBXGroup",
-			"name": "src",
-			"path": "src/uuidxx/src",
+		"42F2EDF3-089B-4626-9C00-A47507B67E85": {
+			"explicitFileType": "sourcecode.c.h",
+			"fileEncoding": "4",
+			"isa": "PBXFileReference",
+			"name": "xcodeProject.h",
+			"path": "src/projects/xcodeProject.h",
 			"sourceTree": "SOURCE_ROOT"
 		},
-		"47A4DDCC-BDF9-4C46-9EB1-8966150AACE2": {
-			"fileRef": "EB0B09E2-CE93-44BA-95BB-2F3B00A1B08C",
+		"44CF9FF8-ED8F-4360-AC9C-1F4001EDCF98": {
+			"fileRef": "24219FBB-12F4-4E8B-A6AF-0BFE02B15F25",
 			"isa": "PBXBuildFile"
 		},
-		"4ED2D687-80CC-498E-9A47-B473E2B234F9": {
-			"children": [
-				"EB0B09E2-CE93-44BA-95BB-2F3B00A1B08C",
-				"E4918A30-5853-4ABE-94D5-97B3A942E147",
-				"9833EB10-3F24-4547-891C-57B2B00ECDAD",
-				"E93A5B4C-5EC3-4950-8C38-3FE9086AD330",
-				"E471FC77-6741-4383-9E3A-8EB353618D96",
-				"E7DE6C53-7DC4-4321-9D1B-68AD449C78D1",
-				"EF2FCA1C-4C25-475C-801B-C5F09F499F70",
-				"AD0B1010-3576-45F8-A0E3-04FCE2DFCBCB",
-				"DB929C14-1FB4-4961-966D-2295D1BE1043",
-				"D6EA4032-2FE2-4FEC-85B2-5729E123DC16",
-				"14D4F5B1-69E4-49B8-80A0-2E416AFAEBCA",
-				"2CF93B6D-C77B-4C99-8714-BA1A6A36A023",
-				"86D202EB-23A9-4F4E-90EC-72FED184832C",
-				"2CEBE531-D975-4942-98B0-85F87EF5679E"
-			],
-			"isa": "PBXGroup",
-			"name": "projects",
-			"path": "src/projects",
+		"507170C5-658E-4FA7-91F6-E70E9AF9A400": {
+			"fileRef": "B18AB8EF-0816-47FA-86AA-105792D925FA",
+			"isa": "PBXBuildFile"
+		},
+		"54FA50A3-4EBB-4D99-93AD-F37227482CE9": {
+			"explicitFileType": "sourcecode.c.h",
+			"fileEncoding": "4",
+			"isa": "PBXFileReference",
+			"name": "CBLinuxProject.h",
+			"path": "src/projects/CBLinuxProject.h",
 			"sourceTree": "SOURCE_ROOT"
 		},
-		"5FC1C341-8A10-44C6-9687-F0ACB79B1AC0": {
-			"fileRef": "E471FC77-6741-4383-9E3A-8EB353618D96",
+		"55E29744-3738-45AA-A83F-B70A32B847C7": {
+			"fileRef": "3DC82FB7-2CD6-493E-8A08-180CEACD4FBD",
 			"isa": "PBXBuildFile"
 		},
-		"66A91618-31CE-4B03-A14B-519E9142A6D3": {
+		"5EE2D333-38B0-4948-9E4C-95CEBABE43B5": {
+			"fileRef": "AB013E01-CE1B-4531-8B88-DDD1C4824DEE",
+			"isa": "PBXBuildFile"
+		},
+		"65722A5F-8282-4DF7-91CD-9B56CCA1C8CF": {
+			"children": [
+				"E51DB2A8-54CF-4BF6-8B00-A46269C67755",
+				"AB013E01-CE1B-4531-8B88-DDD1C4824DEE",
+				"B8FDB82C-D1B2-4580-8ADB-AD8A0DB6AB45",
+				"18197640-A15A-4484-BB57-86DB9506C626"
+			],
+			"isa": "PBXGroup",
+			"name": "utils",
+			"path": "src/utils",
+			"sourceTree": "SOURCE_ROOT"
+		},
+		"6E1DEAFB-F021-42EA-BCE5-EEEEAA742DB8": {
+			"explicitFileType": "sourcecode.c.h",
+			"fileEncoding": "4",
+			"isa": "PBXFileReference",
+			"name": "visualStudioProject.h",
+			"path": "src/projects/visualStudioProject.h",
+			"sourceTree": "SOURCE_ROOT"
+		},
+		"7045D539-1206-49EF-B73A-A2E8265803DD": {
+			"explicitFileType": "sourcecode.c.h",
+			"fileEncoding": "4",
+			"isa": "PBXFileReference",
+			"name": "qtcreatorproject.h",
+			"path": "src/projects/qtcreatorproject.h",
+			"sourceTree": "SOURCE_ROOT"
+		},
+		"74456EBA-DDB0-4740-8BDD-B90AA4A40F94": {
 			"explicitFileType": "sourcecode.cpp.cpp",
 			"fileEncoding": "4",
 			"isa": "PBXFileReference",
-			"name": "ofAddon.cpp",
-			"path": "src/addons/ofAddon.cpp",
+			"name": "baseProject.cpp",
+			"path": "src/projects/baseProject.cpp",
 			"sourceTree": "SOURCE_ROOT"
 		},
-		"6FB1926F-14AB-4943-88EE-6A67CB14BBD0": {
-			"children": [
-				"66A91618-31CE-4B03-A14B-519E9142A6D3",
-				"398265F6-4AC1-4F1F-829B-461592E15DB9"
-			],
-			"isa": "PBXGroup",
-			"name": "addons",
-			"path": "src/addons",
-			"sourceTree": "SOURCE_ROOT"
-		},
-		"7A3E3FC1-6487-4719-8491-9B70693FAE69": {
-			"fileRef": "66A91618-31CE-4B03-A14B-519E9142A6D3",
+		"744F852F-2E31-420C-895F-73F94F0AD699": {
+			"fileRef": "74456EBA-DDB0-4740-8BDD-B90AA4A40F94",
 			"isa": "PBXBuildFile"
 		},
-		"86D202EB-23A9-4F4E-90EC-72FED184832C": {
+		"763E6E96-0D16-44EF-B766-194CA1A9D295": {
+			"explicitFileType": "sourcecode.cpp.cpp",
+			"fileEncoding": "4",
+			"isa": "PBXFileReference",
+			"name": "qtcreatorproject.cpp",
+			"path": "src/projects/qtcreatorproject.cpp",
+			"sourceTree": "SOURCE_ROOT"
+		},
+		"7A653BDB-8D52-4269-AA58-5D9714D40043": {
+			"explicitFileType": "sourcecode.cpp.cpp",
+			"fileEncoding": "4",
+			"isa": "PBXFileReference",
+			"name": "uuidxx.cpp",
+			"path": "src/uuidxx/src/uuidxx.cpp",
+			"sourceTree": "SOURCE_ROOT"
+		},
+		"7B1D9EED-2229-4340-896B-26F0F9C0AD4B": {
 			"explicitFileType": "sourcecode.c.h",
 			"fileEncoding": "4",
 			"isa": "PBXFileReference",
@@ -195,21 +214,27 @@
 			"path": "src/projects/CBWinProject.h",
 			"sourceTree": "SOURCE_ROOT"
 		},
-		"8728AD6C-A88E-463D-9994-B1830AF3D9F5": {
-			"explicitFileType": "sourcecode.cpp.cpp",
-			"fileEncoding": "4",
-			"isa": "PBXFileReference",
-			"name": "Utils.cpp",
-			"path": "src/utils/Utils.cpp",
+		"7C5F799E-6F19-44D6-8BE3-9779E084B5F5": {
+			"children": [
+				"D631E031-5522-45A0-B7AC-B72CA159D30C",
+				"29D265FD-0EE7-4473-8F9F-102D96DA4158",
+				"42F2EDF3-089B-4626-9C00-A47507B67E85",
+				"763E6E96-0D16-44EF-B766-194CA1A9D295",
+				"3DC82FB7-2CD6-493E-8A08-180CEACD4FBD",
+				"3F9EA3B3-3D7D-486D-A8D5-D9FC8A9D1850",
+				"54FA50A3-4EBB-4D99-93AD-F37227482CE9",
+				"7045D539-1206-49EF-B73A-A2E8265803DD",
+				"9D142ED4-A19E-40A7-B338-7DBF5022B166",
+				"74456EBA-DDB0-4740-8BDD-B90AA4A40F94",
+				"6E1DEAFB-F021-42EA-BCE5-EEEEAA742DB8",
+				"B3465ACB-9BED-4E9C-B8FB-0637C953AE78",
+				"7B1D9EED-2229-4340-896B-26F0F9C0AD4B",
+				"0B359B84-50BB-47B9-A721-36AE947437DD"
+			],
+			"isa": "PBXGroup",
+			"name": "projects",
+			"path": "src/projects",
 			"sourceTree": "SOURCE_ROOT"
-		},
-		"8AA962E3-FC5F-4868-9F73-9BD5E3C28E00": {
-			"fileRef": "E7DE6C53-7DC4-4321-9D1B-68AD449C78D1",
-			"isa": "PBXBuildFile"
-		},
-		"9091075A-98DF-465C-A2A6-054FEFCFF775": {
-			"fileRef": "DB929C14-1FB4-4961-966D-2295D1BE1043",
-			"isa": "PBXBuildFile"
 		},
 		"928F60851B6710B200E2D791": {
 			"buildActionMask": "2147483647",
@@ -219,53 +244,87 @@
 			"shellScript": "if test -f \"$TARGET_BUILD_DIR/projectGenerator\"; then rm \"$TARGET_BUILD_DIR/projectGenerator\"; fi;  cp \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\" \"$TARGET_BUILD_DIR/projectGenerator\"",
 			"showEnvVarsInLog": "0"
 		},
-		"9833EB10-3F24-4547-891C-57B2B00ECDAD": {
-			"explicitFileType": "sourcecode.c.h",
-			"fileEncoding": "4",
-			"isa": "PBXFileReference",
-			"name": "xcodeProject.h",
-			"path": "src/projects/xcodeProject.h",
-			"sourceTree": "SOURCE_ROOT"
-		},
-		"A0EA79F4-E8B1-46A7-8870-88CD576FC36C": {
-			"fileRef": "D6EA4032-2FE2-4FEC-85B2-5729E123DC16",
+		"94EA0B80-BF74-43F4-8966-D2BDFED6D688": {
+			"fileRef": "B8FDB82C-D1B2-4580-8ADB-AD8A0DB6AB45",
 			"isa": "PBXBuildFile"
 		},
-		"A268A60E-729E-457D-A118-2BE528D2E059": {
-			"explicitFileType": "sourcecode.c.h",
-			"fileEncoding": "4",
-			"isa": "PBXFileReference",
-			"name": "defines.h",
-			"path": "src/defines.h",
-			"sourceTree": "SOURCE_ROOT"
-		},
-		"A66AEEB0-3A8F-4DB3-BCE6-25A3FD5B079D": {
+		"98DAD7CF-EE74-4F92-A08D-2F8F9F84D55A": {
 			"children": [
-				"FFFB74D7-6723-404C-9C2F-C5ED60CEB805",
-				"8728AD6C-A88E-463D-9994-B1830AF3D9F5",
-				"EE4B1F84-8B9E-43F9-B3B7-F7631F0FB23E",
-				"3887CF95-1C97-47B9-9B22-50D2382421FE"
+				"42064BCE-28AF-46C9-BA78-D3FF7048C58D",
+				"1E5915D0-4124-45C6-B01A-E6C8076D363F"
 			],
 			"isa": "PBXGroup",
-			"name": "utils",
-			"path": "src/utils",
+			"name": "uuidxx",
+			"path": "src/uuidxx",
 			"sourceTree": "SOURCE_ROOT"
 		},
-		"A96A02A4-B429-4630-9D61-B0AB44EE4936": {
-			"explicitFileType": "file",
-			"fileEncoding": "4",
-			"isa": "PBXFileReference",
-			"name": "LICENSE",
-			"path": "src/uuidxx/license/LICENSE",
-			"sourceTree": "SOURCE_ROOT"
-		},
-		"AD0B1010-3576-45F8-A0E3-04FCE2DFCBCB": {
+		"99CBAD3F-66A7-467B-AF30-1F35A3C45FA5": {
 			"explicitFileType": "sourcecode.c.h",
 			"fileEncoding": "4",
 			"isa": "PBXFileReference",
-			"name": "qtcreatorproject.h",
-			"path": "src/projects/qtcreatorproject.h",
+			"name": "optionparser.h",
+			"path": "src/optionparser.h",
 			"sourceTree": "SOURCE_ROOT"
+		},
+		"9D142ED4-A19E-40A7-B338-7DBF5022B166": {
+			"explicitFileType": "sourcecode.cpp.cpp",
+			"fileEncoding": "4",
+			"isa": "PBXFileReference",
+			"name": "xcodeProject.cpp",
+			"path": "src/projects/xcodeProject.cpp",
+			"sourceTree": "SOURCE_ROOT"
+		},
+		"A2ABAB7E-D4E2-40D8-887C-80053AD84482": {
+			"explicitFileType": "sourcecode.c.h",
+			"fileEncoding": "4",
+			"isa": "PBXFileReference",
+			"name": "uuidxx.h",
+			"path": "src/uuidxx/src/uuidxx.h",
+			"sourceTree": "SOURCE_ROOT"
+		},
+		"A3048181-4C52-4FB2-A8B9-3C9BB7A7DB3B": {
+			"fileRef": "3F9EA3B3-3D7D-486D-A8D5-D9FC8A9D1850",
+			"isa": "PBXBuildFile"
+		},
+		"AB013E01-CE1B-4531-8B88-DDD1C4824DEE": {
+			"explicitFileType": "sourcecode.cpp.cpp",
+			"fileEncoding": "4",
+			"isa": "PBXFileReference",
+			"name": "Utils.cpp",
+			"path": "src/utils/Utils.cpp",
+			"sourceTree": "SOURCE_ROOT"
+		},
+		"B18AB8EF-0816-47FA-86AA-105792D925FA": {
+			"explicitFileType": "sourcecode.cpp.cpp",
+			"fileEncoding": "4",
+			"isa": "PBXFileReference",
+			"name": "ofAddon.cpp",
+			"path": "src/addons/ofAddon.cpp",
+			"sourceTree": "SOURCE_ROOT"
+		},
+		"B1B305E6-E84D-42E8-93DD-433EEA8C25BF": {
+			"fileRef": "0B359B84-50BB-47B9-A721-36AE947437DD",
+			"isa": "PBXBuildFile"
+		},
+		"B3465ACB-9BED-4E9C-B8FB-0637C953AE78": {
+			"explicitFileType": "sourcecode.c.h",
+			"fileEncoding": "4",
+			"isa": "PBXFileReference",
+			"name": "androidStudioProject.h",
+			"path": "src/projects/androidStudioProject.h",
+			"sourceTree": "SOURCE_ROOT"
+		},
+		"B8FDB82C-D1B2-4580-8ADB-AD8A0DB6AB45": {
+			"explicitFileType": "sourcecode.cpp.cpp",
+			"fileEncoding": "4",
+			"isa": "PBXFileReference",
+			"name": "LibraryBinary.cpp",
+			"path": "src/utils/LibraryBinary.cpp",
+			"sourceTree": "SOURCE_ROOT"
+		},
+		"BB36E7C5-6AB0-42C6-B8D5-8683BE5D2CEF": {
+			"fileRef": "9D142ED4-A19E-40A7-B338-7DBF5022B166",
+			"isa": "PBXBuildFile"
 		},
 		"BB4B014C10F69532006C3DED": {
 			"children": [],
@@ -274,32 +333,20 @@
 			"path": "../../../addons",
 			"sourceTree": "<group>"
 		},
-		"C217AAE5-FF9A-45A0-A8F1-6E8798A226ED": {
-			"fileRef": "1E01049B-F977-4F3A-9054-E4CEDF7C1602",
-			"isa": "PBXBuildFile"
-		},
-		"CB705445-ED3A-45AC-9777-DD6F89B602F9": {
-			"fileRef": "8728AD6C-A88E-463D-9994-B1830AF3D9F5",
-			"isa": "PBXBuildFile"
-		},
-		"D41950C5-3D0A-40CA-AF65-838DA267E19B": {
-			"fileRef": "E93A5B4C-5EC3-4950-8C38-3FE9086AD330",
-			"isa": "PBXBuildFile"
-		},
-		"D6EA4032-2FE2-4FEC-85B2-5729E123DC16": {
-			"explicitFileType": "sourcecode.cpp.cpp",
+		"C00DA136-3BDA-4C03-A077-634FAB3026CF": {
+			"explicitFileType": "sourcecode.c.h",
 			"fileEncoding": "4",
 			"isa": "PBXFileReference",
-			"name": "baseProject.cpp",
-			"path": "src/projects/baseProject.cpp",
+			"name": "defines.h",
+			"path": "src/defines.h",
 			"sourceTree": "SOURCE_ROOT"
 		},
-		"DB929C14-1FB4-4961-966D-2295D1BE1043": {
+		"D631E031-5522-45A0-B7AC-B72CA159D30C": {
 			"explicitFileType": "sourcecode.cpp.cpp",
 			"fileEncoding": "4",
 			"isa": "PBXFileReference",
-			"name": "xcodeProject.cpp",
-			"path": "src/projects/xcodeProject.cpp",
+			"name": "visualStudioProject.cpp",
+			"path": "src/projects/visualStudioProject.cpp",
 			"sourceTree": "SOURCE_ROOT"
 		},
 		"E42962A92163ECCD00A6A9E2": {
@@ -314,22 +361,6 @@
 			"shellPath": "/bin/sh",
 			"shellScript": "echo \"💾 Compiling Openframeworks\"\nxcodebuild -project \"$OF_PATH/libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj\" -target openFrameworks -configuration \"${CONFIGURATION}\"  CLANG_CXX_LANGUAGE_STANDARD=$CLANG_CXX_LANGUAGE_STANDARD MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET GCC_PREPROCESSOR_DEFINITIONS=$USER_PREPROCESSOR_DEFINITIONS\n",
 			"showEnvVarsInLog": "0"
-		},
-		"E471FC77-6741-4383-9E3A-8EB353618D96": {
-			"explicitFileType": "sourcecode.cpp.cpp",
-			"fileEncoding": "4",
-			"isa": "PBXFileReference",
-			"name": "androidStudioProject.cpp",
-			"path": "src/projects/androidStudioProject.cpp",
-			"sourceTree": "SOURCE_ROOT"
-		},
-		"E4918A30-5853-4ABE-94D5-97B3A942E147": {
-			"explicitFileType": "sourcecode.c.h",
-			"fileEncoding": "4",
-			"isa": "PBXFileReference",
-			"name": "baseProject.h",
-			"path": "src/projects/baseProject.h",
-			"sourceTree": "SOURCE_ROOT"
 		},
 		"E4A5B60F29BAAAE400C2D356": {
 			"buildActionMask": "2147483647",
@@ -420,18 +451,18 @@
 			"files": [
 				"E4B69E200A3A1BDC003C02F2",
 				"E4B69E210A3A1BDC003C02F2",
-				"47A4DDCC-BDF9-4C46-9EB1-8966150AACE2",
-				"D41950C5-3D0A-40CA-AF65-838DA267E19B",
-				"5FC1C341-8A10-44C6-9687-F0ACB79B1AC0",
-				"8AA962E3-FC5F-4868-9F73-9BD5E3C28E00",
-				"9091075A-98DF-465C-A2A6-054FEFCFF775",
-				"A0EA79F4-E8B1-46A7-8870-88CD576FC36C",
-				"07E7149A-A9BE-4804-9A85-44EBBFC8FD84",
-				"7A3E3FC1-6487-4719-8491-9B70693FAE69",
-				"CB705445-ED3A-45AC-9777-DD6F89B602F9",
-				"22C66166-1E03-4792-895E-3E95A008AD00",
-				"2D281F71-D5C9-42D2-A495-20041F817556",
-				"C217AAE5-FF9A-45A0-A8F1-6E8798A226ED"
+				"FF3930BD-8C6D-479F-851C-001105D74B5A",
+				"E6460CAC-1155-4384-8717-CC1931B6F02A",
+				"55E29744-3738-45AA-A83F-B70A32B847C7",
+				"A3048181-4C52-4FB2-A8B9-3C9BB7A7DB3B",
+				"BB36E7C5-6AB0-42C6-B8D5-8683BE5D2CEF",
+				"744F852F-2E31-420C-895F-73F94F0AD699",
+				"B1B305E6-E84D-42E8-93DD-433EEA8C25BF",
+				"507170C5-658E-4FA7-91F6-E70E9AF9A400",
+				"5EE2D333-38B0-4948-9E4C-95CEBABE43B5",
+				"94EA0B80-BF74-43F4-8966-D2BDFED6D688",
+				"44CF9FF8-ED8F-4360-AC9C-1F4001EDCF98",
+				"30DF9C18-BEEB-4757-9C96-0BDE4A71C612"
 			],
 			"isa": "PBXSourcesBuildPhase",
 			"runOnlyForDeploymentPostprocessing": "0"
@@ -534,12 +565,12 @@
 				"E4B69E1D0A3A1BDC003C02F2",
 				"E4B69E1E0A3A1BDC003C02F2",
 				"E4B69E1F0A3A1BDC003C02F2",
-				"2C6D1665-C638-44E1-829E-475FC4DC0C2D",
-				"4ED2D687-80CC-498E-9A47-B473E2B234F9",
-				"6FB1926F-14AB-4943-88EE-6A67CB14BBD0",
-				"A66AEEB0-3A8F-4DB3-BCE6-25A3FD5B079D",
-				"A268A60E-729E-457D-A118-2BE528D2E059",
-				"264EE306-47ED-4D52-A4C5-1B9EE5B1D307"
+				"99CBAD3F-66A7-467B-AF30-1F35A3C45FA5",
+				"7C5F799E-6F19-44D6-8BE3-9779E084B5F5",
+				"13DCCAF0-3DE4-4A4B-86D4-E1521262D877",
+				"65722A5F-8282-4DF7-91CD-9B56CCA1C8CF",
+				"C00DA136-3BDA-4C03-A077-634FAB3026CF",
+				"98DAD7CF-EE74-4F92-A08D-2F8F9F84D55A"
 			],
 			"isa": "PBXGroup",
 			"path": "src",
@@ -599,53 +630,21 @@
 			"path": "Project.xcconfig",
 			"sourceTree": "<group>"
 		},
-		"E7DE6C53-7DC4-4321-9D1B-68AD449C78D1": {
-			"explicitFileType": "sourcecode.cpp.cpp",
-			"fileEncoding": "4",
-			"isa": "PBXFileReference",
-			"name": "CBWinProject.cpp",
-			"path": "src/projects/CBWinProject.cpp",
-			"sourceTree": "SOURCE_ROOT"
-		},
-		"E93A5B4C-5EC3-4950-8C38-3FE9086AD330": {
-			"explicitFileType": "sourcecode.cpp.cpp",
-			"fileEncoding": "4",
-			"isa": "PBXFileReference",
-			"name": "qtcreatorproject.cpp",
-			"path": "src/projects/qtcreatorproject.cpp",
-			"sourceTree": "SOURCE_ROOT"
-		},
-		"EB0B09E2-CE93-44BA-95BB-2F3B00A1B08C": {
-			"explicitFileType": "sourcecode.cpp.cpp",
-			"fileEncoding": "4",
-			"isa": "PBXFileReference",
-			"name": "visualStudioProject.cpp",
-			"path": "src/projects/visualStudioProject.cpp",
-			"sourceTree": "SOURCE_ROOT"
-		},
-		"EE4B1F84-8B9E-43F9-B3B7-F7631F0FB23E": {
-			"explicitFileType": "sourcecode.cpp.cpp",
-			"fileEncoding": "4",
-			"isa": "PBXFileReference",
-			"name": "LibraryBinary.cpp",
-			"path": "src/utils/LibraryBinary.cpp",
-			"sourceTree": "SOURCE_ROOT"
-		},
-		"EF2FCA1C-4C25-475C-801B-C5F09F499F70": {
-			"explicitFileType": "sourcecode.c.h",
-			"fileEncoding": "4",
-			"isa": "PBXFileReference",
-			"name": "CBLinuxProject.h",
-			"path": "src/projects/CBLinuxProject.h",
-			"sourceTree": "SOURCE_ROOT"
-		},
-		"FFFB74D7-6723-404C-9C2F-C5ED60CEB805": {
+		"E51DB2A8-54CF-4BF6-8B00-A46269C67755": {
 			"explicitFileType": "sourcecode.c.h",
 			"fileEncoding": "4",
 			"isa": "PBXFileReference",
 			"name": "Utils.h",
 			"path": "src/utils/Utils.h",
 			"sourceTree": "SOURCE_ROOT"
+		},
+		"E6460CAC-1155-4384-8717-CC1931B6F02A": {
+			"fileRef": "763E6E96-0D16-44EF-B766-194CA1A9D295",
+			"isa": "PBXBuildFile"
+		},
+		"FF3930BD-8C6D-479F-851C-001105D74B5A": {
+			"fileRef": "D631E031-5522-45A0-B7AC-B72CA159D30C",
+			"isa": "PBXBuildFile"
 		}
 	},
 	"rootObject": "E4B69B4C0A3A1720003C02F2"

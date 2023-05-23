@@ -225,12 +225,12 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
 
 	if ( folderUUID.find(baseFolder) == folderUUID.end() ) { // NOT FOUND
 
-		cout << "----- " << folderUUID.size() << endl;
-		for (auto & f : folderUUID) {
-			cout << f.first <<  " : " << f.second << endl;
-		}
-		cout << "-----" << endl;
-		cout << ">>> getFolderUUID creating folder=" << folder << " base=" << base << endl;
+//		cout << "----- " << folderUUID.size() << endl;
+//		for (auto & f : folderUUID) {
+//			cout << f.first <<  " : " << f.second << endl;
+//		}
+//		cout << "-----" << endl;
+//		cout << ">>> getFolderUUID creating folder=" << folder << " base=" << base << endl;
 
 		vector < string > folders = ofSplitString(folder, "/", true);
 		string lastFolderUUID = projRootUUID;
@@ -678,7 +678,7 @@ void xcodeProject::addCPPFLAG(string cppflag, LibType libType){
 
 void xcodeProject::addAfterRule(string rule){
 	// return;
-	cout << ">>>>>> addAfterRule " << rule << endl;
+//	cout << ">>>>>> addAfterRule " << rule << endl;
 	commands.emplace_back("Add :objects:"+afterPhaseUUID+":buildActionMask string 2147483647");
 	// commands.emplace_back("Add :objects:"+afterPhaseUUID+":files array");
 	// commands.emplace_back("Add :objects:"+afterPhaseUUID+":inputPaths array");
@@ -875,9 +875,9 @@ bool xcodeProject::saveProjectFile(){
 		}
 	}
 
-	for (auto & c : commands) {
-		cout << c << endl;
-	}
+//	for (auto & c : commands) {
+//		cout << c << endl;
+//	}
 
 	return true;
 }
