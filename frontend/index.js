@@ -1152,13 +1152,13 @@ ipcMain.on('saveDefaultSettings', (event, defaultSettings) => {
 });
 
 ipcMain.on('path', (event, [ key, args ]) => {
-    console.log('path', key, args);
+    // console.log('path', key, args);
     event.returnValue = path[key](... args);
     return;
 });
 
 ipcMain.on('fs', (event, [ key, args ]) => {
-    console.log('fs', key, args);
+    // console.log('fs', key, args);
     event.returnValue = fs[key](... args);
     return;
 });
