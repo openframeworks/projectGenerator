@@ -215,8 +215,10 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder) {
 		string lastFolderUUID = projRootUUID;
 
 		if (folders.size()){
-			for (int a=0; a<folders.size(); a++) {
-				if(folders[a] == "..") continue;
+			bool isParentDirectory = true;
+			for (int a=0; a < folders.size(); a++) {
+				isParentDirectory = isParentDirectory && folders[a] == "..";
+				if(isParentDirectory) continue;
 				vector <string> joinFolders;
 				joinFolders.assign(folders.begin(), folders.begin() + (a+1));
 				string fullPath = ofJoinString(joinFolders, "/");
