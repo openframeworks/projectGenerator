@@ -262,8 +262,10 @@ void baseProject::addAddon(std::string addonName){
 	bool addonOK = false;
 	bool inCache = isAddonInCache(addonName, target);
 	
-	fs::path addonPath { addonName };
-	if (fs::exists(addonPath)) {
+	auto addonPath = fs::path{addonName};
+	auto addonFilePath = addon.pathToProject / addonName;
+	ofLogNotice() << addonPath.string();
+	if (fs::exists(addonFilePath)) {
 		addon.isLocalAddon = true;
 	} else {
 		addonPath = fs::path(getOFRoot()) / "addons" / addonName;

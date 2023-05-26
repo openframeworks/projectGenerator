@@ -515,7 +515,7 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 	// not possible today because there are string based exclusion functions
 	for (auto & s : srcFiles) {
 		fs::path folder;
-		auto srcFS = fs::path(prefixPath / fs::relative(s, containedPath));
+		auto srcFS = fs::path(prefixPath / fs::relative(s, isLocalAddon ? pathToProject : containedPath));
 		if (isLocalAddon) {
 			folder = srcFS.parent_path();
 		} else {
@@ -624,7 +624,11 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 	paths.sort(); //paths.unique(); // unique not needed anymore. everything is carefully inserted now.
 
 	for (auto & p : paths) {
-		includePaths.emplace_back(p.string());
+		if(isLocalAddon) {
+			includePaths.emplace_back(fs::relative(p, pathToProject));
+		} else {
+			includePaths.emplace_back(p.string());
+		}
 	}
 
 	parseConfig();

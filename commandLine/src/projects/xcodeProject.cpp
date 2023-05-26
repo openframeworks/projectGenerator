@@ -229,7 +229,7 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder) {
 					// here we add an UUID for the group (folder) and we initialize an array to receive children (files or folders inside)
 					commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
 					if (isFolder) {
-						if (fs::exists(fullPath)) {
+						if (fs::exists(fs::path{projectDir} / fullPath)) {
 							commands.emplace_back("Add :objects:"+thisUUID+":path string " + fullPath);
 						} else {
 							commands.emplace_back("Add :objects:"+thisUUID+":path string " + relRoot + "/" + fullPath);
