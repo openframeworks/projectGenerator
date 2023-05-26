@@ -216,9 +216,10 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder) {
 
 		if (folders.size()){
 			for (int a=0; a<folders.size(); a++) {
-				 vector <string> joinFolders;
-				 joinFolders.assign(folders.begin(), folders.begin() + (a+1));
-				 string fullPath = ofJoinString(joinFolders, "/");
+				if(folders[a] == "..") continue;
+				vector <string> joinFolders;
+				joinFolders.assign(folders.begin(), folders.begin() + (a+1));
+				string fullPath = ofJoinString(joinFolders, "/");
 
 				// folder is still not found here:
 				if ( folderUUID.find(fullPath) == folderUUID.end() ) {
