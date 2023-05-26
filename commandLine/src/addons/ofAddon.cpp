@@ -625,7 +625,7 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 
 	for (auto & p : paths) {
 		if(isLocalAddon) {
-			includePaths.emplace_back(fs::relative(p, pathToProject));
+			includePaths.emplace_back(fs::relative(p, pathToProject).string());
 		} else {
 			includePaths.emplace_back(p.string());
 		}
