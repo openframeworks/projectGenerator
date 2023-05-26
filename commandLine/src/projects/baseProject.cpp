@@ -392,9 +392,11 @@ void baseProject::addSrcRecursively(std::string srcPath){
 			string folder = ofFilePath::getEnclosingDirectory(relPathPathToAdd,false);
 			string includeFolder = folder;
 
+#if !defined(TARGET_OSX) && !defined(TARGET_IOS)
 			ofStringReplace(folder, "../", "");
-#ifdef TARGET_WIN32
+#	ifdef TARGET_WIN32
 			ofStringReplace(folder, "..\\", ""); //do both just incase someone has used linux paths on windows
+#	endif
 #endif
 			folder =  ofFilePath::removeTrailingSlash(folder);
 
