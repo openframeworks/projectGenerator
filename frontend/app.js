@@ -292,7 +292,7 @@ ipc.on('selectAddons', (event, arg) => {
             if (addonsInstalled.indexOf(arg[i]) >= 0){
                 $('#addonsDropdown').dropdown('set selected', arg[i]);
             } else {
-                const neededAddonPathRel = path.join($("#projectPath").val(), $("#projectName").val(), arg[i]);
+                const neededAddonPathRel = path.resolve($("#projectPath").val(), $("#projectName").val(), arg[i]);
                 console.log(neededAddonPathRel);
                 if (fs.existsSync(neededAddonPathRel)
                     || fs.existsSync(neededAddons[i]))
