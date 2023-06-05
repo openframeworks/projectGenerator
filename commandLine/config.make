@@ -26,7 +26,7 @@ OF_ROOT = ../../../
 #   GTK is installed, one might test that here and create a variable to check. 
 ################################################################################
 # None
-APPNAME = projectGenerator
+#APPNAME = projectGenerator
 #PROJECT_AFTER_OSX = cp "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME" "$TARGET_BUILD_DIR/commandLinePG"; rm -rf "$TARGET_BUILD_DIR/$PRODUCT_NAME.app";	mv "$TARGET_BUILD_DIR/commandLinePG" "$TARGET_BUILD_DIR/projectGenerator"
 PROJECT_AFTER_OSX = if test -f "$TARGET_BUILD_DIR/projectGenerator"; then rm "$TARGET_BUILD_DIR/projectGenerator"; fi;  cp "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME" "$TARGET_BUILD_DIR/projectGenerator"
 

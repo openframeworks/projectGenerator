@@ -64,21 +64,19 @@ xcodeProject::xcodeProject(string target)
 
 bool xcodeProject::createProjectFile(){
 	fs::path xcodeProject = projectDir / ( projectName + ".xcodeproj" );
-//	cout << "createProjectFile " << xcodeProject << endl;
+	cout << "createProjectFile " << xcodeProject << endl;
 	if (ofDirectory::doesDirectoryExist(xcodeProject)){
 		ofDirectory::removeDirectory(xcodeProject, true);
 	}
-
+	
 	ofDirectory xcodeDir(xcodeProject);
 	xcodeDir.create(true);
 	xcodeDir.close();
-
+	
 	ofFile::copyFromTo(templatePath / "emptyExample.xcodeproj" / "project.pbxproj",
 					   xcodeProject / "project.pbxproj", 
 					   true, true);
-
 	findandreplaceInTexfile(xcodeProject / "project.pbxproj", "emptyExample", projectName);
-
 	ofFile::copyFromTo(templatePath / "Project.xcconfig", projectDir, true, true);
 
 	ofDirectory binDirectory(projectDir / "bin");
@@ -87,6 +85,7 @@ bool xcodeProject::createProjectFile(){
 		dataDirectory.create(true);
 		dataDirectory.close();
 	}
+	
 	if(binDirectory.exists()){
 		fs::path dataDirectory { fs::path(binDirectory.path()) / "data" };
 		if (!fs::exists(dataDirectory)) {
@@ -111,6 +110,7 @@ bool xcodeProject::createProjectFile(){
 //		dataDirectory.close();
 //		srcDataDir.close();
 	}
+
 	binDirectory.close();
 
 	if( target == "osx" ){
@@ -129,7 +129,6 @@ bool xcodeProject::createProjectFile(){
 		mediaAssetsProjectDirectory.close();
 	}
 
-	/// SAVESCHEME HERE
 	saveScheme();
 
 	if(target=="osx"){
@@ -146,6 +145,8 @@ bool xcodeProject::createProjectFile(){
 	if( projectDir.string().rfind(getOFRoot().string(), 0) != 0) {
 			relRoot = getOFRoot().string();
 	}
+	cout << 13 << endl;
+
 	if (relRoot != "../../.."){
 		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", relRoot);
 		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", relRoot);
@@ -154,7 +155,10 @@ bool xcodeProject::createProjectFile(){
 			findandreplaceInTexfile(projectDir / "config.make", "../../..", relRoot);
 		}
 	}
+	cout << 14 << endl;
+
 	return true;
+
 }
 
 void xcodeProject::saveScheme(){
