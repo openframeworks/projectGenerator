@@ -151,16 +151,19 @@ cd ..
 of_root=${PWD}/openFrameworks
 pg_root=${PWD}/openFrameworks/apps/projectGenerator
 
-# if [ -d "openframeworks/.git" ]; then
-# 	echo 'OF already cloned, using it'
-# 	cd openframeworks
-# 	git pull
-# 	cd ..
-# 	# Control will enter here if $DIRECTORY exists.
-# else
-# 	git clone --depth=1 https://github.com/openframeworks/openFrameworks
-# fi
-git clone --depth=1 https://github.com/openframeworks/openFrameworks
+if [ -d "openframeworks/.git" ]; then
+	echo 'OF already cloned, using it'
+	cd openframeworks
+	git pull
+	# git submodule init
+	# git submodule update
+	# git submodule update
+	cd ..
+	# Control will enter here if $DIRECTORY exists.
+else
+	git clone --depth=1 https://github.com/openframeworks/openFrameworks
+fi
+#git clone --depth=1 https://github.com/openframeworks/openFrameworks
 #cp not move so github actions can do cleanup without error
 cp -r projectGenerator openFrameworks/apps/
 
@@ -206,11 +209,17 @@ cd ${pg_root}/frontend
 npm update
 npm install > /dev/null
 npm run build:osx > /dev/null
+if [ -d "${pg_root}/projectGenerator-osx" ]; then
+	rm -rf ${pg_root}/projectGenerator-osx
+fi
 mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
 package_app osx
 
 cd ${pg_root}/frontend
 npm run build:osx > /dev/null
+if [ -d "${pg_root}/projectGenerator-ios" ]; then
+	rm -rf ${pg_root}/projectGenerator-ios
+fi
 mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-ios
 package_app ios
 
