@@ -226,13 +226,10 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 	ofLogNotice() << "updating project " << path;
 
 	if (!bDryRun) {
-		cout << "getTargetProject" << endl;
 		auto project = getTargetProject(target);
 
-		cout << "create" << endl;
 		project->create(path, templateName);
 
-		cout << "addons" << endl;
 		if(bConsiderParameterAddons && bAddonsPassedIn){
 			for(auto & addon: addons){
 				project->addAddon(addon);
@@ -242,21 +239,16 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 			project->parseAddons();
 		}
 
-		cout << "srcPaths" << endl;
-
 		for(auto & srcPath : srcPaths){
 			project->addSrcRecursively(srcPath);
 		}
-		cout << "save" << endl;
 
 		project->save();
-		cout << "end" << endl;
-
 	}
 }
 
 void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
-	cout << "recursiveUpdate " << path << " :: " << nProjectsUpdated << endl;
+	//	cout << "recursiveUpdate " << path << " :: " << nProjectsUpdated << endl;
 	// first, bail if it's just a file
 	if (!fs::is_directory(path)) return;
 

@@ -64,7 +64,7 @@ xcodeProject::xcodeProject(string target)
 
 bool xcodeProject::createProjectFile(){
 	fs::path xcodeProject = projectDir / ( projectName + ".xcodeproj" );
-	cout << "createProjectFile " << xcodeProject << endl;
+//	cout << "createProjectFile " << xcodeProject << endl;
 	if (ofDirectory::doesDirectoryExist(xcodeProject)){
 		ofDirectory::removeDirectory(xcodeProject, true);
 	}
@@ -145,7 +145,6 @@ bool xcodeProject::createProjectFile(){
 	if( projectDir.string().rfind(getOFRoot().string(), 0) != 0) {
 			relRoot = getOFRoot().string();
 	}
-	cout << 13 << endl;
 
 	if (relRoot != "../../.."){
 		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", relRoot);
@@ -155,10 +154,7 @@ bool xcodeProject::createProjectFile(){
 			findandreplaceInTexfile(projectDir / "config.make", "../../..", relRoot);
 		}
 	}
-	cout << 14 << endl;
-
 	return true;
-
 }
 
 void xcodeProject::saveScheme(){
@@ -293,7 +289,7 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
 
 
 void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
-	// cout << "xcodeProject::addSrc " << srcFile << " : " << folder << endl;
+//	cout << "xcodeProject::addSrc " << srcFile << " : " << folder << endl;
 	string buildUUID { "" };
 
 	//-----------------------------------------------------------------
@@ -454,6 +450,7 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 	fs::path base;
 	fs::path src { srcFile };
 	fs::path folderFS { folder };
+	
 	if (!fs::exists(folderFS)) {
 		// cout << "folder doesn't exist " << folderFS << endl;
 		fs::path parent = src.parent_path();
@@ -462,12 +459,15 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 		base = parent;
 		fs::path folderFS2 = folderFS;
 
-		while(base.filename() == folderFS2.filename()) {
+		while(base.filename() == folderFS2.filename() && base.filename() != "" && folderFS2.filename() != "") {
 			base = base.parent_path();
 			folderFS2 = folderFS2.parent_path();
 		}
-		// cout << "base " << base << endl;
-		// cout << "folderFS2 " << folderFS2 << endl;
+		
+//		cout << "srcFile " << srcFile << endl;
+//		cout << "base " << base << endl;
+//		cout << "folderFS2 " << folderFS2 << endl;
+//		cout << "------ e" << endl;
 	}
 
 	// string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {

@@ -112,6 +112,7 @@ std::vector<baseProject::Template> baseProject::listAvailableTemplates(std::stri
 }
 
 bool baseProject::create(const fs::path & _path, std::string templateName){
+//	cout << "baseProject::create " << _path << " : " << templateName << endl;
 	auto path = _path; // just because it is const
 
 	templatePath = getPlatformTemplateDir();
@@ -163,12 +164,12 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 	}
 
 	ret = loadProjectFile();
+
 	if(!ret) return false;
 
 	parseConfigMake();
 
 	if (bDoesDirExist){
-
 		std::vector < string > fileNames;
 		getFilesRecursively(projectDir / "src", fileNames);
 
