@@ -485,7 +485,7 @@ void ofAddon::parseConfig(){
 
 
 bool ofAddon::fromFS(fs::path path, const std::string & platform){
-//	cout << "ofAddon::fromFS path : " << path << endl;
+	cout << "ofAddon::fromFS path : " << path << endl;
 
 	clear();
 	this->platform = platform;
