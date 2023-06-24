@@ -8,10 +8,10 @@
 #ifndef OFADDON_H_
 #define OFADDON_H_
 
-// FIXME: of::filesystem only
 #include "ofConstants.h"
 #include "LibraryBinary.h"
 #include <unordered_map>
+namespace fs = of::filesystem;
 // #include <map>
 
 // About Metadata
@@ -95,7 +95,7 @@ public:
 
 	ofAddon();
 
-	bool fromFS(of::filesystem::path path, const std::string & platform);
+	bool fromFS(fs::path path, const std::string & platform);
 //	void fromXML(std::string installXmlName);
 	void clear();
 
@@ -108,7 +108,8 @@ public:
 	std::vector < std::string > cppsrcFiles;
 	std::vector < std::string > headersrcFiles;
 	std::vector < std::string > objcsrcFiles;
-	std::vector < std::string > propsFiles;
+//	std::vector < std::string > propsFiles;
+	std::vector < fs::path > propsFiles;
 	std::vector < LibraryBinary > libs;
 	std::vector < std::string > dllsToCopy;
 	std::vector < std::string > includePaths;
@@ -125,15 +126,15 @@ public:
 
 	// metadata
 	std::string name;
-	of::filesystem::path addonPath;
+	fs::path addonPath;
 	std::string description;
 	std::string author;
 	std::vector<std::string> tags;
 	std::string url;
 
 
-	of::filesystem::path pathToOF;
-	of::filesystem::path pathToProject;
+	fs::path pathToOF;
+	fs::path pathToProject;
 	bool isLocalAddon; // set to true if the addon path is realtive to the project instead of in OF/addons/
 
 	bool operator <(const ofAddon & addon) const{

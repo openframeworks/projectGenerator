@@ -12,13 +12,6 @@
 #include <list>
 #include <regex>
 
-using std::vector;
-using std::string;
-
-using std::cout;
-using std::endl;
-
-namespace fs = of::filesystem;
 
 vector<string> splitStringOnceByLeft(const string &source, const string &delimiter) {
 	size_t pos = source.find(delimiter);
@@ -473,7 +466,7 @@ void ofAddon::parseConfig(){
 	exclude(cppsrcFiles,excludeSources);
 	exclude(objcsrcFiles,excludeSources);
 	exclude(headersrcFiles,excludeSources);
-	exclude(propsFiles, excludeSources);
+//	exclude(propsFiles, excludeSources);
 	exclude(frameworks, excludeFrameworks);
 	exclude(libs,excludeLibs);
 
@@ -530,23 +523,30 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 
 
 	if (platform == "vs" || platform == "msys2") {
-		getPropsRecursively(addonPath.string(), propsFiles, platform);
+		getPropsRecursively(addonPath, propsFiles, platform);
 	}
 
-	int i = 0;
-	for (auto & s : propsFiles) {
-		fs::path folder;
-		auto srcFS = fs::path(prefixPath / fs::relative(s, containedPath));
-		if (isLocalAddon) {
-//			folder = fs::path("local_addons") / fs::path(s).parent_path();
-			folder = srcFS.parent_path();
-		} else {
-			folder = fs::relative(fs::path(s).parent_path(), containedPath);
-		}
-		s = srcFS.string();
-		propsFiles[i] = folder.string();
-		i++;
+	cout << "pathToProject " << pathToProject << endl;
+	for (auto & p : propsFiles) {
+		cout << "original path " << p << endl;
+		p = fs::relative(p, pathToProject);
+		cout << "new path" << p << endl;
 	}
+	
+//	int i = 0;
+//	for (auto & s : propsFiles) {
+//		fs::path folder;
+//		auto srcFS = fs::path(prefixPath / fs::relative(s, containedPath));
+//		if (isLocalAddon) {
+////			folder = fs::path("local_addons") / fs::path(s).parent_path();
+//			folder = srcFS.parent_path();
+//		} else {
+//			folder = fs::relative(fs::path(s).parent_path(), containedPath);
+//		}
+//		s = srcFS.string();
+//		propsFiles[i] = folder.string();
+//		i++;
+//	}
 
 	fs::path libsPath = path / "libs";
 	vector < string > libFiles;

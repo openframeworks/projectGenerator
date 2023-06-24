@@ -275,6 +275,9 @@ void visualStudioProject::addProps(std::string propsFile){
 	for (int i = 0; i < items.size(); i++) {
 		pugi::xml_node additionalOptions;
 		items[i].node().append_child("Import").append_attribute("Project").set_value(propsFile.c_str());
+		cout << i << endl;
+		cout << items[i].node().name() << endl;
+		cout << items[i].node().value() << endl;
 	}
 }
 
@@ -394,6 +397,7 @@ void visualStudioProject::addDefine(std::string define, LibType libType)
 }
 
 void visualStudioProject::addAddon(ofAddon & addon){
+	cout << "visualStudioProject::addAddon " << addon.name << endl;
 	for(int i=0;i<(int)addons.size();i++){
 		if(addons[i].name==addon.name) return;
 	}

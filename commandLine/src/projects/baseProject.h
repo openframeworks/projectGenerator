@@ -5,7 +5,7 @@
 #include "pugixml.hpp"
 // TODO: - Remove
 #include <map>
-namespace fs = of::filesystem;
+namespace fs = fs;
 
 class baseProject {
 
@@ -29,8 +29,8 @@ public:
 		std::string name;
 		std::vector<std::string> platforms;
 		std::string description;
-//		std::unordered_map<of::filesystem::path, of::filesystem::path> renames;
-		std::map<of::filesystem::path, of::filesystem::path> renames;
+//		std::unordered_map<fs::path, fs::path> renames;
+		std::map<fs::path, fs::path> renames;
 		bool operator<(const Template & other) const{
 			return dir<other.dir;
 		}
@@ -40,7 +40,7 @@ public:
 
 	virtual ~baseProject(){}
 
-	bool create(const of::filesystem::path & path, std::string templateName="");
+	bool create(const fs::path & path, std::string templateName="");
 	void parseAddons();
 	void parseConfigMake();
 	bool save();
@@ -71,7 +71,7 @@ public:
 	virtual void addSrcRecursively(fs::path srcPath);
 
 	std::string getName() { return projectName;}
-	of::filesystem::path getPath() { return projectDir; }
+	fs::path getPath() { return projectDir; }
 
 	std::vector<Template> listAvailableTemplates(std::string target);
 	std::unique_ptr<baseProject::Template> parseTemplate(const ofDirectory & templateDir);

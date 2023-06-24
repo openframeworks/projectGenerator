@@ -5,11 +5,8 @@
 
 using std::vector;
 using std::string;
-using std::cout;
-using std::endl;
 using nlohmann::json;
 using nlohmann::json_pointer;
-namespace fs = of::filesystem;
 
 xcodeProject::xcodeProject(string target)
 :baseProject(target){

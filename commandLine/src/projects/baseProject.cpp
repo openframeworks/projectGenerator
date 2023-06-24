@@ -15,12 +15,6 @@
 #include <set>
 #include <unordered_set>
 
-using std::string;
-using std::vector;
-namespace fs = of::filesystem;
-// Temporary
-using std::cout;
-using std::endl;
 
 const fs::path templatesFolder = "scripts/templates";
 
@@ -136,7 +130,7 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 		bDoesDirExist = true;
 	}else{
 		// MARK: ofDirectory?
-//		bool copyTo(const of::filesystem::path& path, bool bRelativeToData = true, bool overwrite = false);
+//		bool copyTo(const fs::path& path, bool bRelativeToData = true, bool overwrite = false);
 		ofDirectory(templatePath / "src").copyTo(projectDir / "src");
 		ofDirectory(templatePath / "bin").copyTo(projectDir / "bin");
 	}
@@ -155,7 +149,7 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 				auto from = projectDir / rename.first;
 				auto to = projectDir / rename.second;
 //				auto to = projectDir / templateConfig->renames[rename.first];
-				// Reference: moveTo(const of::filesystem::path& path, bool bRelativeToData = true, bool overwrite = false);
+				// Reference: moveTo(const fs::path& path, bool bRelativeToData = true, bool overwrite = false);
 				ofFile(from).moveTo(to,true,true);
 			}
 		}else{
@@ -308,7 +302,7 @@ void baseProject::addAddon(std::string addonName){
 				if (fs::is_regular_file(path)){
 					// TODO: FS
 					ofFile src(path);
-					//	bool copyTo(const of::filesystem::path& path, bool bRelativeToData = true, bool overwrite = false) const;
+					//	bool copyTo(const fs::path& path, bool bRelativeToData = true, bool overwrite = false) const;
 					bool success = src.copyTo(dest / d, false, true);
 					if(success){
 						ofLogVerbose() << "adding addon data file: " << d;
@@ -318,7 +312,7 @@ void baseProject::addAddon(std::string addonName){
 				}else if(fs::is_directory(path)){
 					// TODO: FS
 					ofDirectory dir(path);
-//					bool copyTo(const of::filesystem::path& path, bool bRelativeToData = true, bool overwrite = false);
+//					bool copyTo(const fs::path& path, bool bRelativeToData = true, bool overwrite = false);
 					bool success = dir.copyTo(dest / d, false, true);
 					if(success){
 						ofLogVerbose() << "adding addon data folder: " << d;

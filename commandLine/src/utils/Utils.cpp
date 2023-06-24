@@ -30,10 +30,6 @@
 #endif
 
 using std::unique_ptr;
-namespace fs = of::filesystem;
-
-using std::cout;
-using std::endl;
 
 std::string generateUUID(std::string input){
 	return uuidxx::uuid::Generate().ToString(false);
@@ -249,11 +245,7 @@ void getFrameworksRecursively(const fs::path & path, std::vector < std::string >
 
 
 
-void getPropsRecursively(const fs::path & path, std::vector < std::string > & props, const std::string & platform) {
-	
-	std::cout << "getPropsRecursively " << path << std::endl;
-	
-	
+void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props, const std::string & platform) {
 	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
 	if (!fs::is_directory(path)) return;
 	for (const auto & entry : fs::directory_iterator(path)) {
@@ -269,8 +261,9 @@ void getPropsRecursively(const fs::path & path, std::vector < std::string > & pr
 			getPropsRecursively(f, props, platform);
 		} else {
 			if (f.extension() == ".props") {
-//				cout << f << endl;
-				props.emplace_back(f.string());
+				cout << ">>> getPropsRecursively FOUND PROP::: " << f << endl;
+				cout << ">>> path = " << path << endl;
+				props.emplace_back(f);
 			}
 		}
 	}

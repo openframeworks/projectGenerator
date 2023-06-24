@@ -6,11 +6,9 @@
 #include "defines.h"
 #include "Utils.h"
 #include <set>
-using std::cout;
-using std::endl;
 
 // int main(int argc, char** argv){
-// 	cout << "v003" << endl;
+// 	cout << "v00X" << endl;
 // 	return 0;
 // }
 
@@ -35,8 +33,6 @@ constexpr option::Descriptor usage[] =
 };
 
 
-
-namespace fs = of::filesystem;
 
 #define EXIT_OK 0
 #define EXIT_USAGE 64
@@ -317,7 +313,7 @@ void printHelp(){
 //-------------------------------------------
 int main(int argc, char** argv){
 
-	ofLog() << "PG v003";
+	ofLog() << "PG v003b";
 	//------------------------------------------- pre-parse
 	bAddonsPassedIn = false;
 	bDryRun = false;

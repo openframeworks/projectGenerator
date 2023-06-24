@@ -15,26 +15,32 @@
 #include "baseProject.h"
 struct LibraryBinary;
 
+namespace fs = of::filesystem;
+using std::string;
+using std::vector;
+using std::cout;
+using std::endl;
+
 std::string generateUUID(std::string input);
 
 fs::path getOFRoot();
 void setOFRoot(const fs::path & path);
 void findandreplace( std::string& tInput, std::string tFind, std::string tReplace );
-void findandreplaceInTexfile (const of::filesystem::path & fileName, std::string tFind, std::string tReplace );
+void findandreplaceInTexfile (const fs::path & fileName, std::string tFind, std::string tReplace );
 
 bool doesTagAndAttributeExist(pugi::xml_document & doc, std::string tag, std::string attribute, std::string newValue);
 pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::string attribute, std::string newValue, bool addMultiple = false);
 
 
 
-void getFoldersRecursively(const of::filesystem::path & path, std::vector < std::string > & folderNames, std::string platform);
-void getFoldersRecursively(const of::filesystem::path & path, std::vector < of::filesystem::path > & folderNames, std::string platform);
-void getFilesRecursively(const of::filesystem::path & path, std::vector < std::string > & fileNames);
-void getFilesRecursively(const of::filesystem::path & path, std::vector < fs::path > & fileNames);
-void getLibsRecursively(const of::filesystem::path & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform = "", std::string arch = "", std::string target = "");
-void getFrameworksRecursively(const of::filesystem::path & path, std::vector < std::string > & frameworks,  std::string platform = "" );
-void getPropsRecursively(const of::filesystem::path & path, std::vector < std::string > & props, const std::string & platform);
-void getDllsRecursively(const of::filesystem::path & path, std::vector < std::string > & dlls, std::string platform);
+void getFoldersRecursively(const fs::path & path, std::vector < std::string > & folderNames, std::string platform);
+void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & folderNames, std::string platform);
+void getFilesRecursively(const fs::path & path, std::vector < std::string > & fileNames);
+void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileNames);
+void getLibsRecursively(const fs::path & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform = "", std::string arch = "", std::string target = "");
+void getFrameworksRecursively(const fs::path & path, std::vector < std::string > & frameworks,  std::string platform = "" );
+void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props, const std::string & platform);
+void getDllsRecursively(const fs::path & path, std::vector < std::string > & dlls, std::string platform);
 
 
 void splitFromLast(std::string toSplit, std::string deliminator, std::string & first, std::string & second);
@@ -45,7 +51,7 @@ std::string unsplitString (std::vector < std::string > strings, std::string deli
 
 // FIXME: FS
 std::string getOFRelPath(const std::string & from);
-of::filesystem::path getOFRelPathFS(const of::filesystem::path & from);
+fs::path getOFRelPathFS(const fs::path & from);
 
 bool checkConfigExists();
 bool askOFRoot();
