@@ -69,11 +69,11 @@ bool visualStudioProject::loadProjectFile(){
 
 bool visualStudioProject::saveProjectFile(){
 	auto filters = projectDir / (projectName + ".vcxproj.filters");
-	std::cout << "visualStudioProject::saveProjectFile() " << filters << std::endl;
+//	std::cout << "visualStudioProject::saveProjectFile() " << filters << std::endl;
 	filterXmlDoc.save_file(filters.c_str());
 
 	auto vcxFile = projectDir / (projectName + ".vcxproj");
-	std::cout << "visualStudioProject::saveProjectFile() " << vcxFile << std::endl;
+//	std::cout << "visualStudioProject::saveProjectFile() " << vcxFile << std::endl;
 	return doc.save_file(vcxFile.c_str());
 }
 
@@ -277,12 +277,12 @@ void visualStudioProject::addProps(fs::path propsFile){
 	pugi::xpath_node_set items = doc.select_nodes("//ImportGroup");
 	for (int i = 0; i < items.size(); i++) {
 		pugi::xml_node additionalOptions;
-		cout << "adding path " << propsFile << endl;
-		cout << "adding path c_str " << propsFile.c_str() << endl;
+//		cout << "adding path " << propsFile << endl;
+//		cout << "adding path c_str " << propsFile.c_str() << endl;
 		cout << "adding path " << path << endl;
 		cout << "adding path c_str " << path.c_str() << endl;
 
-		items[i].node().append_child("Import").append_attribute("Project").set_value(propsFile.c_str());
+		items[i].node().append_child("Import").append_attribute("Project").set_value(path.c_str());
 //		items[i].node().append_child("Import").append_attribute("Project").set_value(propsFile);
 		cout << i << endl;
 		cout << items[i].node().name() << endl;

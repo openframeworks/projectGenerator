@@ -261,8 +261,8 @@ void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props
 			getPropsRecursively(f, props, platform);
 		} else {
 			if (f.extension() == ".props") {
-				cout << ">>> getPropsRecursively FOUND PROP::: " << f << endl;
-				cout << ">>> path = " << path << endl;
+//				cout << ">>> getPropsRecursively FOUND PROP::: " << f << endl;
+//				cout << ">>> path = " << path << endl;
 				props.emplace_back(f);
 			}
 		}
