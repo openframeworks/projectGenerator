@@ -5,12 +5,12 @@
 #include "pugixml.hpp"
 // TODO: - Remove
 #include <map>
-namespace fs = fs;
+namespace fs = of::filesystem;
+using std::string;
+
 
 class baseProject {
-
 public:
-
 	enum LibType{
 		DEBUG_LIB = 0,
 		RELEASE_LIB
