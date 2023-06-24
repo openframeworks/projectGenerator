@@ -526,12 +526,12 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 		getPropsRecursively(addonPath, propsFiles, platform);
 	}
 
-	cout << "pathToProject " << pathToProject << endl;
-	for (auto & p : propsFiles) {
-		cout << "original path " << p << endl;
-		p = fs::relative(p, pathToProject);
-		cout << "new path" << p << endl;
-	}
+//	cout << "pathToProject " << pathToProject << endl;
+//	for (auto & p : propsFiles) {
+//		cout << "original path " << p << endl;
+//		p = fs::relative(p, pathToProject);
+//		cout << "new path" << p << endl;
+//	}
 	
 //	int i = 0;
 //	for (auto & s : propsFiles) {
