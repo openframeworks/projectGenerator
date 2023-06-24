@@ -68,12 +68,13 @@ bool visualStudioProject::loadProjectFile(){
 
 
 bool visualStudioProject::saveProjectFile(){
-
 	auto filters = projectDir / (projectName + ".vcxproj.filters");
+	std::cout << "visualStudioProject::saveProjectFile() " << filters << std::endl;
 	filterXmlDoc.save_file(filters.c_str());
 
-
-	return doc.save_file((projectDir / (projectName + ".vcxproj")).c_str());
+	auto vcxFile = projectDir / (projectName + ".vcxproj");
+	std::cout << "visualStudioProject::saveProjectFile() " << vcxFile << std::endl;
+	return doc.save_file(vcxFile.c_str());
 }
 
 
@@ -268,6 +269,7 @@ void addLibraryName(const pugi::xpath_node_set & nodes, std::string libName) {
 }
 
 void visualStudioProject::addProps(std::string propsFile){
+	
 	std::cout << ">>>>> visualStudioProject::addProps " << propsFile << std::endl;
 	pugi::xpath_node_set items = doc.select_nodes("//ImportGroup");
 	for (int i = 0; i < items.size(); i++) {
