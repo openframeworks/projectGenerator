@@ -268,6 +268,7 @@ void addLibraryName(const pugi::xpath_node_set & nodes, std::string libName) {
 }
 
 void visualStudioProject::addProps(std::string propsFile){
+	std::cout << ">>>>> visualStudioProject::addProps " << propsFile << std::endl;
 	pugi::xpath_node_set items = doc.select_nodes("//ImportGroup");
 	for (int i = 0; i < items.size(); i++) {
 		pugi::xml_node additionalOptions;
