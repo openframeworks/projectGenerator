@@ -250,6 +250,10 @@ void getFrameworksRecursively(const fs::path & path, std::vector < std::string >
 
 
 void getPropsRecursively(const fs::path & path, std::vector < std::string > & props, const std::string & platform) {
+	
+	std::cout << "getPropsRecursively " << path << cout::endl;
+	
+	
 	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
 	if (!fs::is_directory(path)) return;
 	for (const auto & entry : fs::directory_iterator(path)) {
