@@ -274,11 +274,15 @@ void visualStudioProject::addProps(fs::path propsFile){
 	pugi::xpath_node_set items = doc.select_nodes("//ImportGroup");
 	for (int i = 0; i < items.size(); i++) {
 		pugi::xml_node additionalOptions;
+		cout << "adding path " << propsFile << endl;
+		cout << "adding path c_str " << propsFile.c_str() << endl;
 		items[i].node().append_child("Import").append_attribute("Project").set_value(propsFile.c_str());
+//		items[i].node().append_child("Import").append_attribute("Project").set_value(propsFile);
 		cout << i << endl;
 		cout << items[i].node().name() << endl;
 		cout << items[i].node().value() << endl;
 	}
+//	auto check = doc.select_nodes("//ImportGroup/Import/Project");
 }
 
 void visualStudioProject::addLibrary(const LibraryBinary & lib) {
