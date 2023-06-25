@@ -27,7 +27,8 @@ public:
 
 	// macOS specific
 	void addFramework(string name, string path, string folder="");
-	void addDylib(string name, string path);
+//	void addDylib(string name, string path);
+	void addDylib(const string & name, const fs::path path);
 
 	void addAddon(ofAddon & addon);
 	void saveScheme();

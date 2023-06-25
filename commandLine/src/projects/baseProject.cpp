@@ -36,19 +36,20 @@ bool isPlatformName(std::string file){
 	return false;
 }
 
-std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const ofDirectory & templateDir){
-	auto name = fs::path(templateDir.getOriginalDirectory()).parent_path().filename();
-	if(templateDir.isDirectory() && !isPlatformName(name.string())){
-		ofBuffer templateconfig;
-		// FIXME: FS
-		ofFile templateconfigFile(fs::path { templateDir.path() } / "template.config" );
-		if(templateconfigFile.exists()){
-			templateconfigFile >> templateconfig;
+std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const fs::path & templateDir){
+	string name = templateDir.parent_path().filename().string();
+	if (fs::is_directory(templateDir) && !isPlatformName(name)) {
+		fs::path templateConfigFilePath = templateDir  / "template.config";
+
+		if (fs::exists(templateConfigFilePath)) {
 			auto supported = false;
 			auto templateConfig = std::make_unique<Template>();
 			templateConfig->dir = templateDir;
-			templateConfig->name = name.string();
-			for(auto line: templateconfig.getLines()){
+			templateConfig->name = name;
+			
+			std::ifstream thisFile(templateConfigFilePath);
+			string line;
+			while(getline(thisFile, line)){
 				if(ofTrim(line).front() == '#') continue;
 				auto varValue = ofSplitString(line,"+=",true,true);
 				if(varValue.size() < 2) {
@@ -107,23 +108,21 @@ std::vector<baseProject::Template> baseProject::listAvailableTemplates(std::stri
 }
 
 bool baseProject::create(const fs::path & path, std::string templateName){
-//	cout << "baseProject::create " << path << " : " << templateName << endl;
+	cout << "baseProject::create " << path << " : " << templateName << endl;
 //	auto path = _path; // just because it is const
 
-	templatePath = getPlatformTemplateDir();
-//	cout << "templatePath " << templatePath << endl;
-	
 	addons.clear();
 	extSrcPaths.clear();
 
+	templatePath = getPlatformTemplateDir();
 	projectDir = path;
-//	cout << "projectDir " << projectDir << endl;
-
 	auto projectPath = fs::canonical(fs::current_path() / path);
-//	cout << "projectPath " << projectPath << endl;
-
 	projectName = projectPath.filename().string();
-//	cout << "projectName = " << projectName << endl;
+
+	cout << "templatePath " << templatePath << endl;
+	cout << "projectDir " << projectDir << endl;
+	cout << "projectPath " << projectPath << endl;
+	cout << "projectName = " << projectName << endl;
 	
 	bool bDoesDirExist = false;
 
@@ -131,7 +130,6 @@ bool baseProject::create(const fs::path & path, std::string templateName){
 	if (fs::exists(project) && fs::is_directory(project)) {
 		bDoesDirExist = true;
 	}else{
-		
 		for (auto & p : { "src" , "bin" }) {
 			fs::path from = templatePath / p;
 			fs::path to = projectDir / p;
@@ -158,10 +156,13 @@ bool baseProject::create(const fs::path & path, std::string templateName){
 				auto to = projectDir / rename.second;
 				cout << "rename from to " << from << " : " << to << endl;
 //				auto to = projectDir / templateConfig->renames[rename.first];
+				
+				if (fs::exists(to)) {
+					fs::remove(to);
+				}
+				fs::rename(from, to);
 				// Reference: moveTo(const fs::path& path, bool bRelativeToData = true, bool overwrite = false);
-//				fs::rename(from, to);
-				// FIXME: FS
-				ofFile(from).moveTo(to,true,true);
+//				ofFile(from).moveTo(to,true,true);
 			}
 		}else{
 			ofLogWarning() << "Cannot find " << templateName << " using platform template only";
@@ -223,6 +224,7 @@ bool baseProject::save(){
 
 	//save out params which the PG knows about to config.make
 	//we mostly use this right now for storing the external source paths
+	// FIXME: Absolute or FS
 	auto buffer = ofBufferFromFile(projectDir / "config.make");
 	if( buffer.size() ){
 		std::ofstream saveConfig(projectDir / "config.make");
@@ -309,21 +311,27 @@ void baseProject::addAddon(std::string addonName){
 			fs::path path { addon.addonPath / data };
 			fs::path dest { projectDir / "bin" / "data" };
 			
-//			if (addon.isLocalAddon) {
-//				path = addon.pathToProject / path;
-//			}
-			
 			if(fs::exists(path)){
 				if (fs::is_regular_file(path)){
-					// FIXME: FS
-					ofFile src(path);
-					//	bool copyTo(const fs::path& path, bool bRelativeToData = true, bool overwrite = false) const;
-					bool success = src.copyTo(dest / d, false, true);
-					if(success){
-						ofLogVerbose() << "adding addon data file: " << d;
-					}else {
-						ofLogWarning() << "Can not add addon data file: " << d;
+					
+					fs::path from { path };
+					fs::path to { dest / d };
+					try {
+						fs::copy_file(from, to, fs::copy_options::overwrite_existing);
+						ofLogVerbose() << "adding addon data file: " << d << endl;
+					} catch(fs::filesystem_error& e) {
+						ofLogWarning() << "Can not add addon data file: " << to << " :: " << e.what() << std::endl;;
 					}
+					
+					// FIXME: FS
+//					ofFile src(path);
+//					//	bool copyTo(const fs::path& path, bool bRelativeToData = true, bool overwrite = false) const;
+//					bool success = src.copyTo(dest / d, false, true);
+//					if(success){
+//						ofLogVerbose() << "adding addon data file: " << d;
+//					}else {
+//						ofLogWarning() << "Can not add addon data file: " << d;
+//					}
 				}else if(fs::is_directory(path)){
 					// FIXME: FS
 					ofDirectory dir(path);

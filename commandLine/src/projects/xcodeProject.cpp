@@ -61,7 +61,8 @@ xcodeProject::xcodeProject(string target)
 
 bool xcodeProject::createProjectFile(){
 	fs::path xcodeProject = projectDir / ( projectName + ".xcodeproj" );
-//	cout << "createProjectFile " << xcodeProject << endl;
+	cout << "createProjectFile " << xcodeProject << endl;
+	cout << "projectDir " << projectDir << endl;
 
 	if (fs::exists(xcodeProject)) {
 		fs::remove_all(xcodeProject);
@@ -109,29 +110,16 @@ bool xcodeProject::createProjectFile(){
 		for (auto & f : { "openFrameworks-Info.plist", "of.entitlements" }) {
 			fs::copy(templatePath / f, projectDir / f, fs::copy_options::overwrite_existing);
 		}
-//		ofFile::copyFromTo(templatePath / "openFrameworks-Info.plist", projectDir, false, true);
-//		ofFile::copyFromTo(templatePath / "of.entitlements", projectDir, false, true);
 	}else{
 		for (auto & f : { "ofxiOS-Info.plist", "ofxiOS_Prefix.pch" }) {
 			fs::copy(templatePath / f, projectDir / f, fs::copy_options::overwrite_existing);
 		}
-//		ofFile::copyFromTo(templatePath / "ofxiOS-Info.plist", projectDir, false, true);
-//		ofFile::copyFromTo(templatePath / "ofxiOS_Prefix.pch", projectDir, false, true);
 
 		fs::path from = templatePath / "mediaAssets";
 		fs::path to = projectDir / "mediaAssets";
 		if (!fs::exists(to)) {
 			fs::copy(from, to, fs::copy_options::recursive);
 		}
-//		ofDirectory mediaAssetsTemplateDirectory(templatePath / "mediaAssets");
-//		ofDirectory mediaAssetsProjectDirectory(projectDir / "mediaAssets");
-//		if (!mediaAssetsProjectDirectory.exists()){
-//			bool copyTo(const of::filesystem::path& path, bool bRelativeToData = true, bool overwrite = false);
-//
-//			mediaAssetsTemplateDirectory.copyTo(mediaAssetsProjectDirectory.getAbsolutePath(), false, false);
-//		}
-//		mediaAssetsTemplateDirectory.close();
-//		mediaAssetsProjectDirectory.close();
 	}
 
 	saveScheme();
@@ -140,8 +128,9 @@ bool xcodeProject::createProjectFile(){
 		saveMakefile();
 	}
 
-	// FIXME: maybe we don't need this variable anymore
-	relRoot = getOFRoot();
+	// Calculate OF Root in relation to each project (recursively);
+	relRoot = fs::relative((fs::current_path() / getOFRoot()), projectDir);
+//	cout << "relRoot" << relRoot << endl;
 
 	if (relRoot != "../../.."){
 		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", relRoot.string());
@@ -589,7 +578,9 @@ void xcodeProject::addFramework(string name, string path, string folder){
 
 }
 
-void xcodeProject::addDylib(string name, string path){
+
+//void xcodeProject::addDylib(string name, string path){
+void xcodeProject::addDylib(const string & name, const fs::path path){
 	//alert("addDylib " + name + " : " + path);
 	// name = name of the dylib
 	// path = the full path (w name) of this framework
@@ -607,15 +598,14 @@ void xcodeProject::addDylib(string name, string path){
 	string UUID = generateUUID( name );
 
 	//commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
-	commands.emplace_back("Add :objects:"+UUID+":path string "+path);
+	commands.emplace_back("Add :objects:"+UUID+":path string "+path.string());
 	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
 	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
 	commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string compiled.mach-o.dylib");
 	commands.emplace_back("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
 
 
-	fs::path fsPath { path };
-	fs::path folder = fsPath.parent_path();
+	fs::path folder = path.parent_path();
 	string folderUUID = getFolderUUID(folder.string(), false);
 	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
 
@@ -755,8 +745,15 @@ void xcodeProject::addAddon(ofAddon & addon){
 		addLibrary(e);
 
 		// FIXME: FS
-		if( ofFilePath::getFileExt(e.path) == "dylib" ){
-			addDylib(ofFilePath::getFileName(e.path), e.path);
+		fs::path dylibPath { e.path };
+		cout << "dylibPath " << dylibPath << endl;
+		
+		if (dylibPath.extension() == ".dylib") {
+//		if( ofFilePath::getFileExt(e.path) == "dylib" ){
+			cout << "inside" << endl;
+			
+//			addDylib(ofFilePath::getFileName(e.path), e.path);
+			addDylib(dylibPath.filename().string(), dylibPath.string());
 		}
 	}
 
