@@ -237,7 +237,7 @@ bool baseProject::save(){
 				auto path = getOFRoot().string();
 		
 				if( projectDir.string().rfind(getOFRoot().string(), 0) == 0) {
-					path = getOFRelPath(projectDir.string());
+					path = getOFRelPath(projectDir);
 				}
 				
 				saveConfig << "OF_ROOT = " << path << std::endl;
