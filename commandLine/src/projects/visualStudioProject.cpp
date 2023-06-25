@@ -9,6 +9,8 @@ std::string visualStudioProject::LOG_NAME = "visualStudioProjectFile";
 
 bool visualStudioProject::createProjectFile(){
 
+	cout << "visualStudioProject::createProjectFile " << endl;
+	
 	fs::path project 	= projectDir / (projectName + ".vcxproj");
 	fs::path user 		= projectDir / (projectName + ".vcxproj.user");
 	fs::path solution	= projectDir / (projectName + ".sln");
@@ -16,41 +18,45 @@ bool visualStudioProject::createProjectFile(){
 
 	// FIXME: FS
 //	static bool copyFromTo(const of::filesystem::path& pathSrc, const of::filesystem::path& pathDst, bool bRelativeToData = true,  bool overwrite = false);
-
 	ofFile::copyFromTo(templatePath / "emptyExample.vcxproj", project,false, true);
 	ofFile::copyFromTo(templatePath / "emptyExample.vcxproj.user", user, false, true);
 	ofFile::copyFromTo(templatePath / "emptyExample.sln", solution, false, true);
 	ofFile::copyFromTo(templatePath / "emptyExample.vcxproj.filters", filters, false, true);
 	ofFile::copyFromTo(templatePath / "icon.rc", projectDir / "icon.rc", false, true);
 
-	ofFile filterFile(filters);
-	std::string temp = filterFile.readToBuffer();
-	pugi::xml_parse_result result = filterXmlDoc.load_string(temp.c_str());
-	if (result.status==pugi::status_ok) ofLogVerbose() << "loaded filter ";
-	else ofLogVerbose() << "problem loading filter ";
+//	ofFile filterFile(filters);
+//	std::string temp = filterFile.readToBuffer();
+//	pugi::xml_parse_result result = filterXmlDoc.load_string(temp.c_str());
+	pugi::xml_parse_result result = filterXmlDoc.load_file(filters.c_str());
+	if (result.status==pugi::status_ok) {
+		ofLogVerbose() << "loaded filter ";
+	} else {
+		ofLogVerbose() << "problem loading filter ";
+	}
 
 	findandreplaceInTexfile(solution, "emptyExample", projectName);
 	findandreplaceInTexfile(user, "emptyExample", projectName);
 	findandreplaceInTexfile(project, "emptyExample", projectName);
 
-	// FIXME: FS
-	std::string relRoot = getOFRelPath(projectDir).string();
+	fs::path relRoot = getOFRelPath(projectDir);
+	cout << "relRoot : " << relRoot << endl;
 	
-	if (relRoot != "../../../"){
-
-	std::string relRootWindows = relRoot;
+//	if (2==2)
+	if (!fs::equivalent(relRoot, "../../.."))
+	{
+		cout << "not equivalent to default ../../.." << endl;
+		std::string relRootWindows = relRoot.string();
 		// let's make it windows friendly:
-		for(int i = 0; i < relRootWindows.length(); i++) {
-			if( relRootWindows[i] == '/' )
-				relRootWindows[i] = '\\';
-		}
-
+		std::replace(relRootWindows.begin(), relRootWindows.end(), '/', '\\');
+		
 		// sln has windows paths:
 		findandreplaceInTexfile(solution, "..\\..\\..\\", relRootWindows);
 
 		// vcx has unixy paths:
 		//..\..\..\libs
-		findandreplaceInTexfile(project, "..\\..\\..\\", relRoot);
+		findandreplaceInTexfile(project, "..\\..\\..\\", relRoot.string());
+	} else {
+		cout << "equivalent to default ../../.." << endl;
 	}
 
 	return true;
