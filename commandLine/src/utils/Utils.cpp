@@ -386,13 +386,14 @@ void setOFRoot(const fs::path & path){
 }
 
 // FIXME: - in the future this can be the getOFRelPath
-fs::path getOFRelPathFS(const fs::path & from) {
+//fs::path getOFRelPathFS(const fs::path & from) {
+fs::path getOFRelPath(const fs::path & from) {
 	return fs::relative(getOFRoot(), from);
 }
 
-std::string getOFRelPath(const std::string & from) {
-	return ofFilePath::addTrailingSlash(getOFRelPathFS(from).string());
-}
+//std::string getOFRelPath(const std::string & from) {
+//	return ofFilePath::addTrailingSlash(getOFRelPathFS(from).string());
+//}
 
 bool checkConfigExists(){
 	ofFile config(ofFilePath::join(ofFilePath::getUserHomeDir(),".ofprojectgenerator/config"));

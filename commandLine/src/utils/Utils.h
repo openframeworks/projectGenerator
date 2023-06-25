@@ -50,8 +50,9 @@ void fixSlashOrder(std::string & toFix);
 std::string unsplitString (std::vector < std::string > strings, std::string deliminator );
 
 // FIXME: FS
-std::string getOFRelPath(const std::string & from);
-fs::path getOFRelPathFS(const fs::path & from);
+//std::string getOFRelPath(const std::string & from);
+//fs::path getOFRelPathFS(const fs::path & from);
+fs::path getOFRelPath(const fs::path & from);
 
 bool checkConfigExists();
 bool askOFRoot();

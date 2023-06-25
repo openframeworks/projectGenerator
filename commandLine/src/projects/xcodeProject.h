@@ -26,9 +26,9 @@ public:
 	void addDefine(string define, LibType libType = RELEASE_LIB);
 
 	// macOS specific
-	void addFramework(string name, string path, string folder="");
+	void addFramework(const string & name, const fs::path & path, string folder="");
 //	void addDylib(string name, string path);
-	void addDylib(const string & name, const fs::path path);
+	void addDylib(const string & name, const fs::path & path);
 
 	void addAddon(ofAddon & addon);
 	void saveScheme();

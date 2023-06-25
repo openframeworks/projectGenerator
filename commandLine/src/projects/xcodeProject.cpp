@@ -61,8 +61,8 @@ xcodeProject::xcodeProject(string target)
 
 bool xcodeProject::createProjectFile(){
 	fs::path xcodeProject = projectDir / ( projectName + ".xcodeproj" );
-	cout << "createProjectFile " << xcodeProject << endl;
-	cout << "projectDir " << projectDir << endl;
+//	cout << "createProjectFile " << xcodeProject << endl;
+//	cout << "projectDir " << projectDir << endl;
 
 	if (fs::exists(xcodeProject)) {
 		fs::remove_all(xcodeProject);
@@ -206,9 +206,10 @@ void xcodeProject::renameProject(){ //base
 }
 
 string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, string base) {
+//	cout << "getFolderUUID " << folder << endl;
 	// TODO: Change key of folderUUID to base + folder, so "src" in additional source folders
 	// doesn't get confused with "src" from project.
-
+	
 	string UUID { "" };
 	// string baseFolder { base + "/" + folder };
 	string baseFolder { folder.string() };
@@ -228,7 +229,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, strin
 //		cout << "-----" << endl;
 //		cout << ">>> getFolderUUID creating folder=" << folder << " base=" << base << endl;
 
-		vector < string > folders = ofSplitString(folder, "/", true);
+		vector < string > folders = ofSplitString(folder.string(), "/", true);
 		string lastFolderUUID = projRootUUID;
 
 //		cout << "relRoot " << relRoot << endl;
@@ -252,17 +253,25 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, strin
 					commands.emplace_back("");
 					commands.emplace_back("Add :objects:"+thisUUID+":name string " + folders[a]);
 					if (isFolder) {
-//						cout << "isFolder true" << endl;
-						if (fs::exists(fullPath)) {
-							// cout << "exists " << fullPath << endl;
-							// FIXME: known issue: doesn't handle files with spaces in name.
-							commands.emplace_back("Add :objects:"+thisUUID+":path string " + fullPath);
-						} else {
-							// cout << "don't exists " << fullPath << endl;
-							// FIXME: known issue: doesn't handle files with spaces in name.
-							commands.emplace_back("Add :objects:"+thisUUID+":path string " + relRoot.string() + "/" + fullPath);
+						fs::path filePath;
+						fs::path filePath_full { relRoot / fullPath };
+						// FIXME: known issue: doesn't handle files with spaces in name.
+						
+						if (fs::exists(filePath_full)) {
+							filePath = filePath_full;
 						}
-//						cout << commands.back() << endl;
+						if (fs::exists(fullPath)) {
+							filePath = fullPath;
+						}
+						
+						if (!filePath.empty()) {
+							commands.emplace_back("Add :objects:"+thisUUID+":path string " + filePath.string());
+//							cout << commands.back() << endl;
+						} else {
+//							cout << ">>>>> filePath empty " << endl;
+						}
+					} else {
+//						cout << "isFolder false" << endl;
 					}
 
 
@@ -479,8 +488,8 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
 }
 
-void xcodeProject::addFramework(string name, string path, string folder){
-	cout << "addFramework " << name << " path = " << path << " folder = " << folder << endl;
+void xcodeProject::addFramework(const string & name, const fs::path & path, string folder){
+//	cout << "xcodeProject::addFramework " << name << " : " << path << " : " << folder << endl;
 	// name = name of the framework
 	// path = the full path (w name) of this framework
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
@@ -493,14 +502,14 @@ void xcodeProject::addFramework(string name, string path, string folder){
 	// (A) make a FILE REF
 	//-----------------------------------------------------------------
 
-	// encoding may be messing up for frameworks... so I switched to a pbx file ref without encoding fields
 	string UUID = generateUUID( name );
 
+	// encoding may be messing up for frameworks... so I switched to a pbx file ref without encoding fields
 	//commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
 
-	commands.emplace_back("# ----- addFramework name="+name+" path="+path+" folder=" +folder);
+	commands.emplace_back("# ----- addFramework name="+name+" path="+path.string()+" folder=" +folder);
 	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
-	commands.emplace_back("Add :objects:"+UUID+":path string "+path);
+	commands.emplace_back("Add :objects:"+UUID+":path string "+path.string());
 	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
 	commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string wrapper.framework");
 	commands.emplace_back("Add :objects:"+UUID+":sourceTree string <group>");
@@ -580,8 +589,9 @@ void xcodeProject::addFramework(string name, string path, string folder){
 
 
 //void xcodeProject::addDylib(string name, string path){
-void xcodeProject::addDylib(const string & name, const fs::path path){
-	//alert("addDylib " + name + " : " + path);
+void xcodeProject::addDylib(const string & name, const fs::path & path){
+//	cout << "xcodeProject::addDylib " << name << " : " << path << endl;
+
 	// name = name of the dylib
 	// path = the full path (w name) of this framework
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
@@ -594,13 +604,17 @@ void xcodeProject::addDylib(const string & name, const fs::path path){
 	// (A) make a FILE REF
 	//-----------------------------------------------------------------
 
-	// encoding may be messing up for frameworks... so I switched to a pbx file ref without encoding fields
 	string UUID = generateUUID( name );
 
+	// encoding may be messing up for frameworks... so I switched to a pbx file ref without encoding fields
 	//commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
-	commands.emplace_back("Add :objects:"+UUID+":path string "+path.string());
-	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
 	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
+	
+	fs::path filePath { relRoot / path };
+
+//	commands.emplace_back("Add :objects:"+UUID+":path string "+path.string());
+	commands.emplace_back("Add :objects:"+UUID+":path string " + filePath.string());
+	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
 	commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string compiled.mach-o.dylib");
 	commands.emplace_back("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
 
@@ -650,6 +664,7 @@ void xcodeProject::addInclude(string includeName){
 }
 
 void xcodeProject::addLibrary(const LibraryBinary & lib){
+//	cout << "addLibrary " << lib.path << endl;
 	// TODO: Test this
 	for (auto & c : buildConfigs) {
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + lib.path);
@@ -745,14 +760,19 @@ void xcodeProject::addAddon(ofAddon & addon){
 		addLibrary(e);
 
 		// FIXME: FS
-		fs::path dylibPath { e.path };
-		cout << "dylibPath " << dylibPath << endl;
+//		fs::path dylibPath { e.path };
+		
+//		cout << "pathToOF " << addon.pathToOF << endl;
+		fs::path dylibPath =  fs::path{ e.path }.lexically_relative(addon.pathToOF);
+//		cout << "dylibPath " << dylibPath << endl;
+		
 		
 		if (dylibPath.extension() == ".dylib") {
 //		if( ofFilePath::getFileExt(e.path) == "dylib" ){
-			cout << "inside" << endl;
+//			cout << "inside" << endl;
 			
 //			addDylib(ofFilePath::getFileName(e.path), e.path);
+			
 			addDylib(dylibPath.filename().string(), dylibPath.string());
 		}
 	}

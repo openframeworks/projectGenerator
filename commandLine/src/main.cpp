@@ -1,4 +1,4 @@
-
+#define PG_VERSION "PG v005"
 #define TARGET_NO_SOUND
 #define TARGET_NODISPLAY
 
@@ -245,7 +245,7 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 }
 
 void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
-	cout << "recursiveUpdate " << path << " :: " << nProjectsUpdated << endl;
+//	cout << "recursiveUpdate " << path << " :: " << nProjectsUpdated << endl;
 	// first, bail if it's just a file
 	if (!fs::is_directory(path)) return;
 
@@ -253,7 +253,7 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 	if (isGoodProjectPath(path)) {
 		nProjectsUpdated++;
 //		auto project = getTargetProject(target);
-		cout << "updateProject " << path << " : " << target << endl;
+//		cout << "updateProject " << path << " : " << target << endl;
 		updateProject(path, target, false);
 		return;
 	} else {
@@ -315,7 +315,7 @@ void printHelp(){
 //-------------------------------------------
 int main(int argc, char** argv){
 
-	ofLog() << "PG v004";
+	ofLog() << PG_VERSION;
 	//------------------------------------------- pre-parse
 	bAddonsPassedIn = false;
 	bDryRun = false;

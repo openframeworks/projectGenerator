@@ -553,6 +553,7 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 
 	if (fs::exists(libsPath)) {
 		getLibsRecursively(libsPath, libFiles, libs, platform);
+		
 		if (platform == "osx" || platform == "ios"){
 			getFrameworksRecursively(libsPath, frameworks, platform);
 		}
@@ -575,10 +576,12 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 	}
 
 	
-	// changing libs folder from absolute to relative.
-	for (auto & l : libs) {
-		l.path = fs::path(prefixPath / fs::relative(l.path, containedPath)).string();
-	}
+//	// changing libs folder from absolute to relative.
+//	for (auto & l : libs) {
+//		cout << "l.path " << l.path << endl;
+//		l.path = fs::path(prefixPath / fs::relative(l.path, containedPath)).string();
+//		cout << "l.path " << l.path << endl;
+//	}
 
 	
 	for (auto & f : frameworks) {
