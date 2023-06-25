@@ -291,7 +291,7 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
 						} else {
 							// cout << "don't exists " << fullPath << endl;
 							// FIXME: known issue: doesn't handle files with spaces in name.
-							commands.emplace_back("Add :objects:"+thisUUID+":path string " + relRoot + "/" + fullPath);
+							commands.emplace_back("Add :objects:"+thisUUID+":path string " + relRoot.string() + "/" + fullPath);
 						}
 //						cout << commands.back() << endl;
 					}

@@ -211,6 +211,8 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 
 bool baseProject::save(){
 	ofLog(OF_LOG_NOTICE) << "saving addons.make";
+	
+	// FIXME: Change here, from CWD so addons get rewritten correctly.
 	ofFile addonsMake(projectDir / "addons.make", ofFile::WriteOnly);
 	for (auto & a : addons) {
 		if (a.isLocalAddon) {
@@ -224,6 +226,8 @@ bool baseProject::save(){
 	//we mostly use this right now for storing the external source paths
 	auto buffer = ofBufferFromFile(projectDir / "config.make");
 	if( buffer.size() ){
+		
+		// FIXME: Change here too.
 		ofFile saveConfig(projectDir / "config.make", ofFile::WriteOnly);
 
 		for(auto line : buffer.getLines()){

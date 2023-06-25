@@ -65,5 +65,5 @@ public:
 
 	std::unordered_map <string, string> folderUUID ;
 	string getFolderUUID(string folder, bool isFolder = true, string base = "");
-	string relRoot = "../../..";
+	fs::path relRoot = "../../..";
 };
