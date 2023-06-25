@@ -555,7 +555,10 @@ void baseProject::addAddon(ofAddon & addon){
 }
 
 void baseProject::parseAddons(){
-	std::ifstream thisFile(projectDir / "addons.make");
+	cout << "baseProject::parseAddons() " << endl;
+	fs::path addonsFile { projectDir / "addons.make" };
+	cout << "addonsFile " << addonsFile << endl;
+	std::ifstream thisFile(addonsFile);
 	string line;
 	while(getline(thisFile, line)){
 		auto addon = ofTrim(line);
