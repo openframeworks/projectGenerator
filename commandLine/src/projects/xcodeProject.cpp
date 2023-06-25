@@ -61,19 +61,12 @@ xcodeProject::xcodeProject(string target)
 
 bool xcodeProject::createProjectFile(){
 	fs::path xcodeProject = projectDir / ( projectName + ".xcodeproj" );
-//	cout << "createProjectFile " << xcodeProject << endl;
+	cout << "createProjectFile " << xcodeProject << endl;
 
 	if (fs::exists(xcodeProject)) {
 		fs::remove_all(xcodeProject);
 	}
 	fs::create_directories(xcodeProject);
-
-//	if (ofDirectory::doesDirectoryExist(xcodeProject)){
-//		ofDirectory::removeDirectory(xcodeProject, true);
-//	}
-//	ofDirectory xcodeDir(xcodeProject);
-//	xcodeDir.create(true);
-//	xcodeDir.close();
 
 	fs::path fileFrom = templatePath / "emptyExample.xcodeproj" / "project.pbxproj";
 	fs::path fileTo = xcodeProject / "project.pbxproj";
@@ -92,7 +85,7 @@ bool xcodeProject::createProjectFile(){
 	} catch(fs::filesystem_error& e) {
 		std::cout << "Could not copy " << fileFrom << " > " << fileTo << " :: "  << e.what() << std::endl;
 	}
-
+	
 	fs::path binDirectory { projectDir / "bin" };
 	fs::path dataDir { binDirectory / "data" };
 
@@ -104,7 +97,7 @@ bool xcodeProject::createProjectFile(){
 	if (fs::exists(binDirectory)) {
 		// originally only on IOS
 		//this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
-		fs::path srcDataDir {  templatePath / "bin" / "data" };
+		fs::path srcDataDir { templatePath / "bin" / "data" };
 		if (fs::exists(srcDataDir) && fs::is_directory(srcDataDir)) {
 			baseProject::recursiveCopyContents(srcDataDir, dataDir);
 		}
@@ -122,13 +115,15 @@ bool xcodeProject::createProjectFile(){
 	}
 
 	if( target == "osx" ){
+		// FIXME: port to FS
 		ofFile::copyFromTo(templatePath / "openFrameworks-Info.plist", projectDir, false, true);
 		ofFile::copyFromTo(templatePath / "of.entitlements", projectDir, false, true);
 	}else{
+		// FIXME: port to FS
 		ofFile::copyFromTo(templatePath / "ofxiOS-Info.plist", projectDir, false, true);
 		ofFile::copyFromTo(templatePath / "ofxiOS_Prefix.pch", projectDir, false, true);
 
-		// TODO: port to FS
+		// FIXME: port to FS
 		ofDirectory mediaAssetsTemplateDirectory(templatePath / "mediaAssets");
 		ofDirectory mediaAssetsProjectDirectory(projectDir / "mediaAssets");
 		if (!mediaAssetsProjectDirectory.exists()){

@@ -105,9 +105,9 @@ std::vector<baseProject::Template> baseProject::listAvailableTemplates(std::stri
 	return templates;
 }
 
-bool baseProject::create(const fs::path & _path, std::string templateName){
-//	cout << "baseProject::create " << _path << " : " << templateName << endl;
-	auto path = _path; // just because it is const
+bool baseProject::create(const fs::path & path, std::string templateName){
+	cout << "baseProject::create " << path << " : " << templateName << endl;
+//	auto path = _path; // just because it is const
 
 	templatePath = getPlatformTemplateDir();
 //	cout << "templatePath " << templatePath << endl;
@@ -115,42 +115,39 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 	addons.clear();
 	extSrcPaths.clear();
 
-//	if(!path.is_absolute()){
-//		path = fs::current_path() / path;
-//	}
 	projectDir = path;
-//	/projectName = fs::current_path().filename().string();
+//	cout << "projectDir " << projectDir << endl;
+
 	auto projectPath = fs::canonical(fs::current_path() / path);
-//	cout << "project Path " << projectPath << endl;
-//	cout << fs::current_path() / path << endl;
+//	cout << "projectPath " << projectPath << endl;
+
 	projectName = projectPath.filename().string();
-//	cout << "projectName = " << projectName << endl;
-//	projectName = path.filename().string();
-//	if (projectName == "") {
-//		projectName = path.parent_path().filename().string();
-//	}
-//	cout << "path = " << path << endl;
 //	cout << "projectName = " << projectName << endl;
 	
 	bool bDoesDirExist = false;
 
 	fs::path project { projectDir / "src" };
 	if (fs::exists(project) && fs::is_directory(project)) {
-//		cout << "project exists" << endl;
 		bDoesDirExist = true;
 	}else{
-//		cout << "project not exists, will copy" << endl;
-		// MARK: ofDirectory?
-//		bool copyTo(const fs::path& path, bool bRelativeToData = true, bool overwrite = false);
-		ofDirectory(templatePath / "src").copyTo(projectDir / "src");
-		ofDirectory(templatePath / "bin").copyTo(projectDir / "bin");
+		
+		for (auto & p : { "src" , "bin" }) {
+			fs::path from = templatePath / p;
+			fs::path to = projectDir / p;
+			fs::copy (templatePath / p, projectDir / p, fs::copy_options::recursive);
+		}
 	}
 
 	bool ret = createProjectFile();
 	if(!ret) return false;
+	
+	cout << "after return : " << templateName << endl;
 
-	if(templateName!=""){
+	if(!empty(templateName)){
+//	if(templateName!=""){
+		cout << "templateName not empty " << templateName << endl;
 		fs::path templateDir = getOFRoot() / templatesFolder / templateName;
+			cout << "templateDir " << templateDir << endl;
 
 		auto templateConfig = parseTemplate(templateDir);
 		if(templateConfig){
@@ -159,8 +156,10 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 				
 				auto from = projectDir / rename.first;
 				auto to = projectDir / rename.second;
+				cout << "rename from to " << from << " : " << to << endl;
 //				auto to = projectDir / templateConfig->renames[rename.first];
 				// Reference: moveTo(const fs::path& path, bool bRelativeToData = true, bool overwrite = false);
+//				fs::rename(from, to);
 				ofFile(from).moveTo(to,true,true);
 			}
 		}else{
@@ -213,7 +212,10 @@ bool baseProject::save(){
 	ofLog(OF_LOG_NOTICE) << "saving addons.make";
 	
 	// FIXME: Change here, from CWD so addons get rewritten correctly.
-	ofFile addonsMake(projectDir / "addons.make", ofFile::WriteOnly);
+//	ofFile addonsMake(projectDir / "addons.make", ofFile::WriteOnly);
+	
+	std::ofstream addonsMake;
+	addonsMake.open(projectDir / "addons.make");
 	for (auto & a : addons) {
 		if (a.isLocalAddon) {
 			addonsMake << fs::path(a.addonPath).generic_string() << std::endl;
@@ -228,8 +230,11 @@ bool baseProject::save(){
 	if( buffer.size() ){
 		
 		// FIXME: Change here too.
-		ofFile saveConfig(projectDir / "config.make", ofFile::WriteOnly);
+//		ofFile saveConfig(projectDir / "config.make", ofFile::WriteOnly);
 
+		std::ofstream saveConfig;
+		saveConfig.open(projectDir / "config.make");
+		
 		for(auto line : buffer.getLines()){
 			string str = line;
 

@@ -413,28 +413,13 @@ int main(int argc, char** argv){
 	}
 
 
-/*	 ------------------------------------------------------ post parse */
+	// ------------------------------------------------------ post parse
 
 	nProjectsUpdated = 0;
 	nProjectsCreated = 0;
 	of::priv::initutils();
 	startTime = ofGetElapsedTimef();
 	consoleSpace();
-
-	
-	fs::path absoluteProjectPath = fs::canonical(fs::current_path() / projectName);
-	
-	// This part of the code changes cwd to the project folder and make everything relative to there.
-	// todo: check if it works recursively too
-	if (fs::exists(absoluteProjectPath)) {
-		fs::path newOfPath = fs::canonical(fs::current_path() / ofPath);
-		fs::current_path(absoluteProjectPath);
-		cout << "newOfPath " << newOfPath << endl;
-		cout << "absoluteProjectPath " << absoluteProjectPath << endl;
-		ofPath = fs::relative(newOfPath, absoluteProjectPath);
-		projectPath = ".";
-	}
-
 	
 	// try to get the OF_PATH as an environt variable
 	char* pPath;
@@ -446,6 +431,26 @@ int main(int argc, char** argv){
 	if (ofPath == "" && ofPathEnv != "") {
 		busingEnvVar = true;
 		ofPath = ofPathEnv;
+	}
+	
+	fs::path absoluteProjectPath = fs::weakly_canonical(fs::current_path() / projectName);
+	
+	if (!fs::exists(absoluteProjectPath)) {
+		mode = PG_MODE_CREATE;
+		fs::create_directory(absoluteProjectPath);
+	} else {
+		mode = PG_MODE_UPDATE;
+	}
+
+	// This part of the code changes cwd to the project folder and make everything relative to there.
+	if (fs::exists(absoluteProjectPath)) {
+		fs::path newOfPath = fs::weakly_canonical(fs::current_path() / ofPath);
+		fs::current_path(absoluteProjectPath);
+//		cout << "newOfPath " << newOfPath << endl;
+//		cout << "absoluteProjectPath " << absoluteProjectPath << endl;
+//		cout << "current path  " << fs::current_path() << endl;
+		ofPath = fs::relative(newOfPath, absoluteProjectPath);
+		projectPath = ".";
 	}
 
 
@@ -460,14 +465,6 @@ int main(int argc, char** argv){
 
 		return EXIT_USAGE;
 	} else {
-
-		// convert ofpath from relative to absolute by appending this to current path and calculating .. by canonical.
-		// TODO: test generating projects from pg executing from other directories
-		
-//		cout << "ofPath = " << ofPath << endl;
-//		if (!fs::path(ofPath).is_absolute()) {
-//			ofPath = (fs::current_path() / fs::path(ofPath)).lexically_normal();
-//		}
 
 		if (!isGoodOFPath(ofPath)) {
 			return EXIT_USAGE;
@@ -486,35 +483,14 @@ int main(int argc, char** argv){
 		}
 	}
 
-	if (projectName != ""){
-//		fs::path projectNameFS { projectName };
-//		if (projectNameFS.is_absolute()) {
-//			projectPath = projectNameFS;
-//		} else {
-//			projectPath = fs::absolute(projectNameFS);
-//		}
-//		// so we remove the trailing dot when running PG last parameter as .
-//		projectPath = projectPath.lexically_normal();
-	} else {
+	if (projectName == ""){
 		ofLogError() << "Missing project path";
 		printHelp();
 		consoleSpace();
-
 		return EXIT_USAGE;
 	}
 
-
-	if (fs::exists(projectPath) && fs::is_directory(projectPath)) {
-		mode = PG_MODE_UPDATE;
-	}
-	else {
-		mode = PG_MODE_CREATE;
-	}
-
-       //mode = PG_MODE_CREATE;
-
-
-
+	
 	if (bVerbose){
 		ofSetLogLevel(OF_LOG_VERBOSE);
 	}
@@ -562,6 +538,7 @@ int main(int argc, char** argv){
 
 					if (!bDryRun){
 						auto project = getTargetProject(t);
+						cout << "will create " << projectPath << " : " << templateName << endl;
 						project->create(projectPath, templateName);
 						for(auto & addon: addons){
 							project->addAddon(addon);

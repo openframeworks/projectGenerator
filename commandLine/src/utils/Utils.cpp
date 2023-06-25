@@ -381,6 +381,7 @@ fs::path getOFRoot(){
 }
 
 void setOFRoot(const fs::path & path){
+//	cout << "setOFRoot " << path << endl;
 	OFRoot = path;
 }
 
