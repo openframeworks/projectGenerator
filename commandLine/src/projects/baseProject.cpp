@@ -561,6 +561,7 @@ void baseProject::parseAddons(){
 	std::ifstream thisFile(addonsFile);
 	string line;
 	while(getline(thisFile, line)){
+		cout << "line : " << line << endl;
 		auto addon = ofTrim(line);
 		if(addon[0] == '#') continue;
 		if(addon == "") continue;
