@@ -14,6 +14,9 @@ bool visualStudioProject::createProjectFile(){
 	fs::path solution	= projectDir / (projectName + ".sln");
 	fs::path filters	= projectDir / (projectName + ".vcxproj.filters");
 
+	// FIXME: FS
+//	static bool copyFromTo(const of::filesystem::path& pathSrc, const of::filesystem::path& pathDst, bool bRelativeToData = true,  bool overwrite = false);
+
 	ofFile::copyFromTo(templatePath / "emptyExample.vcxproj", project,false, true);
 	ofFile::copyFromTo(templatePath / "emptyExample.vcxproj.user", user, false, true);
 	ofFile::copyFromTo(templatePath / "emptyExample.sln", solution, false, true);

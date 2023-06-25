@@ -538,7 +538,8 @@ void xcodeProject::addFramework(const string & name, const fs::path & path, stri
 
 	string buildUUID2;
 
-	if (!folder.empty() && !ofIsStringInString(path, "/System/Library/Frameworks")
+	// maybe check if path exists in path
+	if (!folder.empty() && !ofIsStringInString(path.string(), "/System/Library/Frameworks")
 		&& target != "ios"){
 
 		buildUUID2 = generateUUID(name + "-build2");
@@ -555,7 +556,7 @@ void xcodeProject::addFramework(const string & name, const fs::path & path, stri
 	}
 
 	commands.emplace_back("# ----- FRAMEWORK_SEARCH_PATHS");
-	fs::path parentFolder = fs::path(path).parent_path();
+	fs::path parentFolder { path.parent_path() };
 	for (auto & c : buildConfigs) {
 		commands.emplace_back
 		("Add :objects:"+c+":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + parentFolder.string());

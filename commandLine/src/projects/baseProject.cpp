@@ -234,7 +234,7 @@ bool baseProject::save(){
 
 			//add the of root path
 			if( str.rfind("# OF_ROOT =", 0) == 0 || str.rfind("OF_ROOT =", 0) == 0){
-				auto path = getOFRoot().string();
+				fs::path path = getOFRoot();
 		
 				if( projectDir.string().rfind(getOFRoot().string(), 0) == 0) {
 					path = getOFRelPath(projectDir);

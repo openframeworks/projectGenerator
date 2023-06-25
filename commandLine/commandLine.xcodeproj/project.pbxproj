@@ -136,16 +136,16 @@
 		"7C5F799E-6F19-44D6-8BE3-9779E084B5F5" /* projects */ = {
 			isa = PBXGroup;
 			children = (
-				"D631E031-5522-45A0-B7AC-B72CA159D30C" /* visualStudioProject.cpp */,
 				"29D265FD-0EE7-4473-8F9F-102D96DA4158" /* baseProject.h */,
+				"74456EBA-DDB0-4740-8BDD-B90AA4A40F94" /* baseProject.cpp */,
 				"42F2EDF3-089B-4626-9C00-A47507B67E85" /* xcodeProject.h */,
+				"9D142ED4-A19E-40A7-B338-7DBF5022B166" /* xcodeProject.cpp */,
+				"D631E031-5522-45A0-B7AC-B72CA159D30C" /* visualStudioProject.cpp */,
 				"763E6E96-0D16-44EF-B766-194CA1A9D295" /* qtcreatorproject.cpp */,
 				"3DC82FB7-2CD6-493E-8A08-180CEACD4FBD" /* androidStudioProject.cpp */,
 				"3F9EA3B3-3D7D-486D-A8D5-D9FC8A9D1850" /* CBWinProject.cpp */,
 				"54FA50A3-4EBB-4D99-93AD-F37227482CE9" /* CBLinuxProject.h */,
 				"7045D539-1206-49EF-B73A-A2E8265803DD" /* qtcreatorproject.h */,
-				"9D142ED4-A19E-40A7-B338-7DBF5022B166" /* xcodeProject.cpp */,
-				"74456EBA-DDB0-4740-8BDD-B90AA4A40F94" /* baseProject.cpp */,
 				"6E1DEAFB-F021-42EA-BCE5-EEEEAA742DB8" /* visualStudioProject.h */,
 				"B3465ACB-9BED-4E9C-B8FB-0637C953AE78" /* androidStudioProject.h */,
 				"7B1D9EED-2229-4340-896B-26F0F9C0AD4B" /* CBWinProject.h */,

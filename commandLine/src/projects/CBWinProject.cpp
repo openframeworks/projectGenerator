@@ -16,15 +16,14 @@ bool CBWinProject::createProjectFile(){
 	auto project = projectDir / (projectName + ".cbp");
 	auto workspace = projectDir / (projectName + ".workspace");
 
-
+	// FIXME: FS
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.cbp"),project, false, true);
-
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.workspace"),workspace, false, true);
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"icon.rc"), projectDir / "icon.rc", false, true);
 
 	//let's do some renaming:
 	// FIXME: FS
-	std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
+	std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir)).string();
 
 	if (relRoot != "../../../"){
 
