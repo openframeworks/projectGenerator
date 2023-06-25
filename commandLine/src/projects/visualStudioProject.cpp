@@ -9,16 +9,16 @@ std::string visualStudioProject::LOG_NAME = "visualStudioProjectFile";
 
 bool visualStudioProject::createProjectFile(){
 
-	std::string project = ofFilePath::join(projectDir,projectName + ".vcxproj");
-	std::string user = ofFilePath::join(projectDir,projectName + ".vcxproj.user");
-	std::string solution = ofFilePath::join(projectDir,projectName + ".sln");
-	std::string filters = ofFilePath::join(projectDir, projectName + ".vcxproj.filters");
+	fs::path project 	= projectDir / (projectName + ".vcxproj");
+	fs::path user 		= projectDir / (projectName + ".vcxproj.user");
+	fs::path solution	= projectDir / (projectName + ".sln");
+	fs::path filters	= projectDir / (projectName + ".vcxproj.filters");
 
-	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.vcxproj"),project,false, true);
-	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.vcxproj.user"),user, false, true);
-	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.sln"),solution, false, true);
-	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.vcxproj.filters"),filters, false, true);
-	ofFile::copyFromTo(ofFilePath::join(templatePath,"icon.rc"), projectDir / "icon.rc", false, true);
+	ofFile::copyFromTo(templatePath / "emptyExample.vcxproj", project,false, true);
+	ofFile::copyFromTo(templatePath / "emptyExample.vcxproj.user", user, false, true);
+	ofFile::copyFromTo(templatePath / "emptyExample.sln", solution, false, true);
+	ofFile::copyFromTo(templatePath / "emptyExample.vcxproj.filters", filters, false, true);
+	ofFile::copyFromTo(templatePath / "icon.rc", projectDir / "icon.rc", false, true);
 
 	ofFile filterFile(filters);
 	std::string temp = filterFile.readToBuffer();
@@ -26,9 +26,9 @@ bool visualStudioProject::createProjectFile(){
 	if (result.status==pugi::status_ok) ofLogVerbose() << "loaded filter ";
 	else ofLogVerbose() << "problem loading filter ";
 
-	findandreplaceInTexfile(solution,"emptyExample",projectName);
-	findandreplaceInTexfile(user,"emptyExample",projectName);
-	findandreplaceInTexfile(project,"emptyExample",projectName);
+	findandreplaceInTexfile(solution, "emptyExample", projectName);
+	findandreplaceInTexfile(user, "emptyExample", projectName);
+	findandreplaceInTexfile(project, "emptyExample", projectName);
 
 	// FIXME: FS
 	std::string relRoot = getOFRelPath(projectDir.string());
@@ -55,13 +55,17 @@ bool visualStudioProject::createProjectFile(){
 
 
 bool visualStudioProject::loadProjectFile(){
-
-	ofFile project(projectDir / (projectName + ".vcxproj"));
-	if(!project.exists()){
-		ofLogError(LOG_NAME) << "error loading " << project.path() << " doesn't exist";
+	fs::path projectPath { projectDir / (projectName + ".vcxproj") };
+	if (!fs::exists(projectPath)) {
+		ofLogError(LOG_NAME) << "error loading " << projectPath << " doesn't exist";
 		return false;
 	}
-	pugi::xml_parse_result result = doc.load(project);
+	// ofFile project(projectDir / (projectName + ".vcxproj"));
+	// if(!project.exists()){
+	// 	ofLogError(LOG_NAME) << "error loading " << project.path() << " doesn't exist";
+	// 	return false;
+	// }
+	pugi::xml_parse_result result = doc.load_file(projectPath.c_str());
 	bLoaded = result.status==pugi::status_ok;
 	return bLoaded;
 }
@@ -80,17 +84,16 @@ bool visualStudioProject::saveProjectFile(){
 
 void visualStudioProject::appendFilter(std::string folderName){
 
-
 	fixSlashOrder(folderName);
 
-	 std::string uuid = generateUUID(folderName);
+	std::string uuid = generateUUID(folderName);
 
-	 std::string tag = "//ItemGroup[Filter]/Filter[@Include=\"" + folderName + "\"]";
-	 pugi::xpath_node_set set = filterXmlDoc.select_nodes(tag.c_str());
-	 if (set.size() > 0){
+	std::string tag = "//ItemGroup[Filter]/Filter[@Include=\"" + folderName + "\"]";
+	pugi::xpath_node_set set = filterXmlDoc.select_nodes(tag.c_str());
+	if (set.size() > 0){
 
-		//pugi::xml_node node = set[0].node();
-	 } else {
+	//pugi::xml_node node = set[0].node();
+	} else {
 
 
 		 pugi::xml_node node = filterXmlDoc.select_node("//ItemGroup[Filter]/Filter").node().parent();
@@ -466,8 +469,8 @@ void visualStudioProject::addAddon(ofAddon & addon){
 
 	for(int i=0;i<(int)addon.dllsToCopy.size();i++){
 		ofLogVerbose() << "adding addon dlls to bin: " << addon.dllsToCopy[i];
-		std::string dll = of::filesystem::absolute(addon.addonPath / addon.dllsToCopy[i]).string();
-		ofFile(dll).copyTo(ofFilePath::join(projectDir,"bin/"),false,true);
+		fs::path dll = fs::absolute(addon.addonPath / addon.dllsToCopy[i]);
+		ofFile(dll).copyTo(projectDir / "bin", false, true);
 	}
 
 	for(int i=0;i<(int)addon.cflags.size();i++){

@@ -62,38 +62,51 @@ xcodeProject::xcodeProject(string target)
 bool xcodeProject::createProjectFile(){
 	fs::path xcodeProject = projectDir / ( projectName + ".xcodeproj" );
 //	cout << "createProjectFile " << xcodeProject << endl;
-	if (ofDirectory::doesDirectoryExist(xcodeProject)){
-		ofDirectory::removeDirectory(xcodeProject, true);
-	}
-	
-	ofDirectory xcodeDir(xcodeProject);
-	xcodeDir.create(true);
-	xcodeDir.close();
-	
-	ofFile::copyFromTo(templatePath / "emptyExample.xcodeproj" / "project.pbxproj",
-					   xcodeProject / "project.pbxproj", 
-					   true, true);
-	findandreplaceInTexfile(xcodeProject / "project.pbxproj", "emptyExample", projectName);
-	ofFile::copyFromTo(templatePath / "Project.xcconfig", projectDir, true, true);
 
-	ofDirectory binDirectory(projectDir / "bin");
-	if (!binDirectory.exists()){
-		ofDirectory dataDirectory(projectDir / "bin" / "data");
-		dataDirectory.create(true);
-		dataDirectory.close();
+	if (fs::exists(xcodeProject)) {
+		fs::remove_all(xcodeProject);
 	}
-	
-	if(binDirectory.exists()){
-		fs::path dataDirectory { fs::path(binDirectory.path()) / "data" };
-		if (!fs::exists(dataDirectory)) {
-			fs::create_directory(dataDirectory);
-		}
+	fs::create_directories(xcodeProject);
 
+//	if (ofDirectory::doesDirectoryExist(xcodeProject)){
+//		ofDirectory::removeDirectory(xcodeProject, true);
+//	}
+//	ofDirectory xcodeDir(xcodeProject);
+//	xcodeDir.create(true);
+//	xcodeDir.close();
+
+	fs::path fileFrom = templatePath / "emptyExample.xcodeproj" / "project.pbxproj";
+	fs::path fileTo = xcodeProject / "project.pbxproj";
+	try {
+		fs::copy_file(fileFrom, fileTo, fs::copy_options::overwrite_existing);
+    } catch(fs::filesystem_error& e) {
+		std::cout << "Could not copy " << fileFrom << " > " << fileTo << " :: " << e.what() << std::endl;
+    }
+	findandreplaceInTexfile(fileTo, "emptyExample", projectName);
+
+
+	fileFrom = templatePath / "Project.xcconfig";
+	fileTo = projectDir / "Project.xcconfig";
+	try {
+		fs::copy_file(fileFrom, fileTo, fs::copy_options::overwrite_existing);
+	} catch(fs::filesystem_error& e) {
+		std::cout << "Could not copy " << fileFrom << " > " << fileTo << " :: "  << e.what() << std::endl;
+	}
+
+	fs::path binDirectory { projectDir / "bin" };
+	fs::path dataDir { binDirectory / "data" };
+
+	if (!fs::exists(binDirectory)) {
+		cout << "creating dataDir " << dataDir << endl;
+		fs::create_directories(dataDir);
+	}
+
+	if (fs::exists(binDirectory)) {
 		// originally only on IOS
 		//this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
-		fs::path srcDataDir { fs::path{ templatePath } / "bin" / "data" };
+		fs::path srcDataDir {  templatePath / "bin" / "data" };
 		if (fs::exists(srcDataDir) && fs::is_directory(srcDataDir)) {
-			baseProject::recursiveCopyContents(srcDataDir, dataDirectory);
+			baseProject::recursiveCopyContents(srcDataDir, dataDir);
 		}
 		//		ofDirectory dataDirectory(ofFilePath::join(binDirectory.path(), "data"));
 		//		if (!dataDirectory.exists()){
@@ -108,15 +121,14 @@ bool xcodeProject::createProjectFile(){
 //		srcDataDir.close();
 	}
 
-	binDirectory.close();
-
 	if( target == "osx" ){
-		ofFile::copyFromTo(templatePath / "openFrameworks-Info.plist", projectDir, true, true);
-		ofFile::copyFromTo(templatePath / "of.entitlements", projectDir, true, true);
+		ofFile::copyFromTo(templatePath / "openFrameworks-Info.plist", projectDir, false, true);
+		ofFile::copyFromTo(templatePath / "of.entitlements", projectDir, false, true);
 	}else{
-		ofFile::copyFromTo(templatePath / "ofxiOS-Info.plist", projectDir, true, true);
-		ofFile::copyFromTo(templatePath / "ofxiOS_Prefix.pch", projectDir, true, true);
+		ofFile::copyFromTo(templatePath / "ofxiOS-Info.plist", projectDir, false, true);
+		ofFile::copyFromTo(templatePath / "ofxiOS_Prefix.pch", projectDir, false, true);
 
+		// TODO: port to FS
 		ofDirectory mediaAssetsTemplateDirectory(templatePath / "mediaAssets");
 		ofDirectory mediaAssetsProjectDirectory(projectDir / "mediaAssets");
 		if (!mediaAssetsProjectDirectory.exists()){
@@ -134,14 +146,26 @@ bool xcodeProject::createProjectFile(){
 
 	// make everything relative the right way.
 	// FIXME: FS
-	relRoot = getOFRelPathFS(projectDir).string();
+
 	projectDir = projectDir.lexically_normal();
 
-		//projectDir is always absolute at the moment
-		//so lets check if the projectDir is inside the OF folder - if it is not make the OF path absolute
-	if( projectDir.string().rfind(getOFRoot().string(), 0) != 0) {
-			relRoot = getOFRoot().string();
-	}
+//	cout << "projectDir " << projectDir << endl;
+
+	relRoot = fs::relative(
+						   fs::current_path() / getOFRoot(),
+						   fs::current_path() / projectDir
+						   );
+//	cout << "relRoot " << relRoot << endl;
+//	relRoot = getOFRoot();
+
+
+//	cout << "getOFRoot " << getOFRoot() << endl;
+//	relRoot = getOFRelPathFS(projectDir).string();
+//	//projectDir is always absolute at the moment
+//	//so lets check if the projectDir is inside the OF folder - if it is not make the OF path absolute
+//	if( projectDir.string().rfind(getOFRoot().string(), 0) != 0) {
+//			relRoot = getOFRoot().string();
+//	}
 
 	if (relRoot != "../../.."){
 		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", relRoot);
@@ -156,26 +180,31 @@ bool xcodeProject::createProjectFile(){
 
 void xcodeProject::saveScheme(){
 	auto schemeFolder = projectDir / ( projectName + ".xcodeproj" ) / "xcshareddata/xcschemes";
-	if (ofDirectory::doesDirectoryExist(schemeFolder)){
-		ofDirectory::removeDirectory(schemeFolder, true);
+//	cout << "saveScheme() schemeFolder = " << schemeFolder << endl;
+
+	if (fs::exists(schemeFolder)) {
+		fs::remove_all(schemeFolder);
 	}
-	ofDirectory::createDirectory(schemeFolder, false, true);
+	fs::create_directories(schemeFolder);
 
 	if(target=="osx"){
 		for (auto & f : { string("Release"), string("Debug") }) {
-			auto schemeTo = schemeFolder / (projectName + " " +f+ ".xcscheme");
-			ofFile::copyFromTo(templatePath / ("emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample "+f+".xcscheme"), schemeTo);
-			findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
+			auto fileFrom = templatePath / ("emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample " + f + ".xcscheme");
+			auto fileTo = schemeFolder / (projectName + " " +f+ ".xcscheme");
+			ofFile::copyFromTo(fileFrom, fileTo, false);
+			findandreplaceInTexfile(fileTo, "emptyExample", projectName);
 		}
 
-		auto workspaceTo = projectDir / (projectName + ".xcodeproj/project.xcworkspace");
-		ofFile::copyFromTo(templatePath / "emptyExample.xcodeproj/project.xcworkspace", workspaceTo);
+		auto fileTo = projectDir / (projectName + ".xcodeproj/project.xcworkspace");
+		auto fileFrom = templatePath / "emptyExample.xcodeproj/project.xcworkspace";
+		ofFile::copyFromTo(fileFrom, fileTo, false, true);
 	}else{
 
 		// MARK:- IOS sector;
-		auto schemeTo = schemeFolder / (projectName + ".xcscheme");
-		ofFile::copyFromTo(templatePath / "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme", schemeTo);
-		findandreplaceInTexfile(schemeTo, "emptyExample", projectName);
+		auto fileFrom = templatePath / "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme";
+		auto fileTo = schemeFolder / (projectName + ".xcscheme");
+		ofFile::copyFromTo(fileFrom, fileTo, false);
+		findandreplaceInTexfile(fileTo, "emptyExample", projectName);
 	}
 }
 
@@ -183,7 +212,7 @@ void xcodeProject::saveMakefile(){
 	for (auto & f : { "Makefile", "config.make" }) {
 		fs::path fileName = projectDir / f;
 		if (!fs::exists(fileName)) {
-			ofFile::copyFromTo(templatePath / f, fileName, true, true);
+			ofFile::copyFromTo(templatePath / f, fileName, false, true);
 		}
 	}
 }
@@ -215,7 +244,7 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
 	// string baseFolder { base + "/" + folder };
 	string baseFolder { folder };
 
-	// cout << "baseFolder " << baseFolder << " isFolder:" << isFolder << endl; 
+	// cout << "baseFolder " << baseFolder << " isFolder:" << isFolder << endl;
 
 	// If folder UUID exists just return it.
 	// in this case it creates UUID for the entire path
@@ -233,18 +262,22 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
 		vector < string > folders = ofSplitString(folder, "/", true);
 		string lastFolderUUID = projRootUUID;
 
+//		cout << "relRoot " << relRoot << endl;
+
 		if (folders.size()){
 			for (int a=0; a<folders.size(); a++) {
 				vector <string> joinFolders;
 				joinFolders.assign(folders.begin(), folders.begin() + (a+1));
 				// string fullPath = base + "/" + ofJoinString(joinFolders, "/");
 				string fullPath = ofJoinString(joinFolders, "/");
+//				cout << "fullPath = " << fullPath << endl;
+
 
 				// Query if path is already stored. if not execute this following block
 				if ( folderUUID.find(fullPath) == folderUUID.end() ) {
 					// cout << "creating" << endl;
 					string thisUUID = generateUUID(fullPath);
-					folderUUID[fullPath] = thisUUID;	
+					folderUUID[fullPath] = thisUUID;
 
 					// here we add an UUID for the group (folder) and we initialize an array to receive children (files or folders inside)
 					commands.emplace_back("");
@@ -260,7 +293,10 @@ string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
 							// FIXME: known issue: doesn't handle files with spaces in name.
 							commands.emplace_back("Add :objects:"+thisUUID+":path string " + relRoot + "/" + fullPath);
 						}
+//						cout << commands.back() << endl;
 					}
+
+
 					commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
 					commands.emplace_back("Add :objects:"+thisUUID+":children array");
 //					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string <group>");
@@ -447,7 +483,7 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 	fs::path base;
 	fs::path src { srcFile };
 	fs::path folderFS { folder };
-	
+
 	if (!fs::exists(folderFS)) {
 		// cout << "folder doesn't exist " << folderFS << endl;
 		fs::path parent = src.parent_path();
@@ -460,7 +496,7 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 			base = base.parent_path();
 			folderFS2 = folderFS2.parent_path();
 		}
-		
+
 //		cout << "srcFile " << srcFile << endl;
 //		cout << "base " << base << endl;
 //		cout << "folderFS2 " << folderFS2 << endl;
@@ -468,6 +504,8 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 	}
 
 	// string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
+//	cout << ">>> getFolderUUID  " << folder << endl;
+//	cout << ">>> base  " << base << endl;
 	string folderUUID = getFolderUUID(folder, true, base.string());
 	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
 }
@@ -524,7 +562,7 @@ void xcodeProject::addFramework(string name, string path, string folder){
 
 	if (!folder.empty() && !ofIsStringInString(path, "/System/Library/Frameworks")
 		&& target != "ios"){
-	
+
 		buildUUID2 = generateUUID(name + "-build2");
 		commands.emplace_back("Add :objects:"+buildUUID2+":fileRef string "+UUID);
 		commands.emplace_back("Add :objects:"+buildUUID2+":isa string PBXBuildFile");
@@ -735,6 +773,8 @@ void xcodeProject::addAddon(ofAddon & addon){
 	for (auto & e : addon.libs) {
 		ofLogVerbose() << "adding addon libs: " << e.path;
 		addLibrary(e);
+
+		// FIXME: FS
 		if( ofFilePath::getFileExt(e.path) == "dylib" ){
 			addDylib(ofFilePath::getFileName(e.path), e.path);
 		}
@@ -806,6 +846,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 bool xcodeProject::saveProjectFile(){
 	fs::path fileName = projectDir / (projectName + ".xcodeproj/project.pbxproj");
+//	cout << "saveProjectFile " << fileName << endl;
 
 	bool usePlistBuddy = false;
 
@@ -820,7 +861,11 @@ bool xcodeProject::saveProjectFile(){
 		cout << ofSystem(command) << endl;
 	} else {
 		// JSON Block - Multiplatform
-		string contents = ofBufferFromFile(fileName).getText();
+
+		// I had to use absolute here because ofBufferFromFile always returns relative to data folder.
+		// FIXME: remove absolute
+		string contents = ofBufferFromFile(fs::absolute(fileName)).getText();
+//		cout << contents << endl;
 		json j = json::parse(contents);
 
 		for (auto & c : commands) {
@@ -865,7 +910,8 @@ bool xcodeProject::saveProjectFile(){
 			}
 		}
 
-		ofFile jsonFile(fileName, ofFile::WriteOnly);
+		// FIXME: FIX Absolute here
+		ofFile jsonFile(fs::absolute(fileName), ofFile::WriteOnly);
 		try{
 			jsonFile << j.dump(1, '	');
 		}catch(std::exception & e){

@@ -110,25 +110,36 @@ bool baseProject::create(const fs::path & _path, std::string templateName){
 	auto path = _path; // just because it is const
 
 	templatePath = getPlatformTemplateDir();
+//	cout << "templatePath " << templatePath << endl;
+	
 	addons.clear();
 	extSrcPaths.clear();
 
-	if(!path.is_absolute()){
-		path = fs::current_path() / path;
-	}
+//	if(!path.is_absolute()){
+//		path = fs::current_path() / path;
+//	}
 	projectDir = path;
-	projectName = path.filename().string();
-	if (projectName == "") {
-		projectName = path.parent_path().filename().string();
-	}
+//	/projectName = fs::current_path().filename().string();
+	auto projectPath = fs::canonical(fs::current_path() / path);
+//	cout << "project Path " << projectPath << endl;
+//	cout << fs::current_path() / path << endl;
+	projectName = projectPath.filename().string();
+//	cout << "projectName = " << projectName << endl;
+//	projectName = path.filename().string();
+//	if (projectName == "") {
+//		projectName = path.parent_path().filename().string();
+//	}
 //	cout << "path = " << path << endl;
 //	cout << "projectName = " << projectName << endl;
+	
 	bool bDoesDirExist = false;
 
 	fs::path project { projectDir / "src" };
 	if (fs::exists(project) && fs::is_directory(project)) {
+//		cout << "project exists" << endl;
 		bDoesDirExist = true;
 	}else{
+//		cout << "project not exists, will copy" << endl;
 		// MARK: ofDirectory?
 //		bool copyTo(const fs::path& path, bool bRelativeToData = true, bool overwrite = false);
 		ofDirectory(templatePath / "src").copyTo(projectDir / "src");
@@ -251,15 +262,21 @@ bool baseProject::isAddonInCache(const std::string & addonPath, const std::strin
 }
 
 void baseProject::addAddon(std::string addonName){
-	std::cout << "baseProject::addAddon " << addonName << std::endl;
+//	std::cout << "baseProject::addAddon " << addonName << std::endl;
 	ofAddon addon;
+	// FIXME: Review this path here.
 	addon.pathToOF = getOFRelPath(projectDir.string());
-	addon.pathToProject = ofFilePath::getAbsolutePath(projectDir);
+//	addon.pathToProject = ofFilePath::getAbsolutePath(projectDir);
+	addon.pathToProject = projectDir;
+	
 
 	bool addonOK = false;
 	bool inCache = isAddonInCache(addonName, target);
 	
 	fs::path addonPath { addonName };
+//	auto joinedPath = addon.pathToProject / addonPath;
+//	cout << "joinedPath " << joinedPath << endl;
+//	if (fs::exists(joinedPath)) {
 	if (fs::exists(addonPath)) {
 		addon.isLocalAddon = true;
 	} else {
@@ -294,9 +311,9 @@ void baseProject::addAddon(std::string addonName){
 			fs::path path { addon.addonPath / data };
 			fs::path dest { projectDir / "bin" / "data" };
 			
-			if (addon.isLocalAddon) {
-				path = addon.pathToProject / path;
-			}
+//			if (addon.isLocalAddon) {
+//				path = addon.pathToProject / path;
+//			}
 			
 			if(fs::exists(path)){
 				if (fs::is_regular_file(path)){
@@ -530,10 +547,9 @@ void baseProject::addAddon(ofAddon & addon){
 }
 
 void baseProject::parseAddons(){
-	ofFile addonsMake(projectDir / "addons.make");
-	ofBuffer addonsMakeMem;
-	addonsMake >> addonsMakeMem;
-	for(auto line: addonsMakeMem.getLines()){
+	std::ifstream thisFile(projectDir / "addons.make");
+	string line;
+	while(getline(thisFile, line)){
 		auto addon = ofTrim(line);
 		if(addon[0] == '#') continue;
 		if(addon == "") continue;
@@ -585,7 +601,12 @@ void baseProject::recursiveCopyContents(const fs::path & srcDir, const fs::path 
 			recursiveCopyContents(f, destFile);
 		} else {
 			if (!fs::exists(destFile)) {
-				ofFile::copyFromTo(f, destFile, false, true);
+//				ofFile::copyFromTo(f, destFile, false, true);
+				try {
+					fs::copy_file(f, destFile, fs::copy_options::overwrite_existing);
+				} catch(fs::filesystem_error& e) {
+					std::cout << "Could not copy " << f << " > " << destFile << " :: "  << e.what() << std::endl;
+				}
 			}
 		}
 	}

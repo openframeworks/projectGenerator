@@ -216,6 +216,7 @@ bool isGoodOFPath(fs::path path) {
 
 
 void updateProject(const fs::path & path, ofTargetPlatform target, bool bConsiderParameterAddons = true) {
+//	cout << ">>> updateProject " << path << endl;
 	// bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
 	// either we read the addons.make file, or we look at the parameter list.
 	// if we are updating recursively, we *never* consider addons passed as parameters.
@@ -420,6 +421,21 @@ int main(int argc, char** argv){
 	startTime = ofGetElapsedTimef();
 	consoleSpace();
 
+	
+	fs::path absoluteProjectPath = fs::canonical(fs::current_path() / projectName);
+	
+	// This part of the code changes cwd to the project folder and make everything relative to there.
+	// todo: check if it works recursively too
+	if (fs::exists(absoluteProjectPath)) {
+		fs::path newOfPath = fs::canonical(fs::current_path() / ofPath);
+		fs::current_path(absoluteProjectPath);
+		cout << "newOfPath " << newOfPath << endl;
+		cout << "absoluteProjectPath " << absoluteProjectPath << endl;
+		ofPath = fs::relative(newOfPath, absoluteProjectPath);
+		projectPath = ".";
+	}
+
+	
 	// try to get the OF_PATH as an environt variable
 	char* pPath;
 	pPath = getenv("PG_OF_PATH");
@@ -447,9 +463,11 @@ int main(int argc, char** argv){
 
 		// convert ofpath from relative to absolute by appending this to current path and calculating .. by canonical.
 		// TODO: test generating projects from pg executing from other directories
-		if (!fs::path(ofPath).is_absolute()) {
-			ofPath = (fs::current_path() / fs::path(ofPath)).lexically_normal();
-		}
+		
+//		cout << "ofPath = " << ofPath << endl;
+//		if (!fs::path(ofPath).is_absolute()) {
+//			ofPath = (fs::current_path() / fs::path(ofPath)).lexically_normal();
+//		}
 
 		if (!isGoodOFPath(ofPath)) {
 			return EXIT_USAGE;
@@ -469,14 +487,14 @@ int main(int argc, char** argv){
 	}
 
 	if (projectName != ""){
-		fs::path projectNameFS { projectName };
-		if (projectNameFS.is_absolute()) {
-			projectPath = projectNameFS;
-		} else {
-			projectPath = fs::absolute(projectNameFS);
-		}
-		// so we remove the trailing dot when running PG last parameter as .
-		projectPath = projectPath.lexically_normal();
+//		fs::path projectNameFS { projectName };
+//		if (projectNameFS.is_absolute()) {
+//			projectPath = projectNameFS;
+//		} else {
+//			projectPath = fs::absolute(projectNameFS);
+//		}
+//		// so we remove the trailing dot when running PG last parameter as .
+//		projectPath = projectPath.lexically_normal();
 	} else {
 		ofLogError() << "Missing project path";
 		printHelp();
@@ -514,7 +532,7 @@ int main(int argc, char** argv){
 		}
 	} else {
 		if (mode == PG_MODE_UPDATE && !isGoodProjectPath(projectPath)) {
-			ofLogError() << "there's no src folder in this project path to update, maybe use create instead? (or use force to force updating)";
+			ofLogError() << "there is no src folder in this project path to update, maybe use create instead? (or use force to force updating)";
 		} else {
 			nProjectsCreated += 1;
 

@@ -68,14 +68,16 @@ std::string LoadFileAsString(const std::string & fn) {
 void findandreplaceInTexfile (const fs::path & fileName, std::string tFind, std::string tReplace ){
 //void findandreplaceInTexfile (std::string fileName, std::string tFind, std::string tReplace ){
 	if (fs::exists( fileName )) {
-		std::ifstream t(ofToDataPath(fileName).c_str());
+//		std::ifstream t(ofToDataPath(fileName).c_str());
+		std::ifstream t(fileName.c_str());
 		std::stringstream buffer;
 		buffer << t.rdbuf();
 		std::string bufferStr = buffer.str();
 		t.close();
 		findandreplace(bufferStr, tFind, tReplace);
 		std::ofstream myfile;
-		myfile.open (ofToDataPath(fileName).c_str());
+//		myfile.open (ofToDataPath(fileName).c_str());
+		myfile.open (fileName.c_str());
 		myfile << bufferStr;
 		myfile.close();
 

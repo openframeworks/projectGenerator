@@ -7,17 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		19F126A22A4742A100462AFE /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19F1269F2A4742A100462AFE /* Utils.cpp */; };
-		19F126A32A4742A100462AFE /* LibraryBinary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19F126A12A4742A100462AFE /* LibraryBinary.cpp */; };
 		19F126A82A4742BF00462AFE /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19F126A62A4742BF00462AFE /* Utils.cpp */; };
 		19F126A92A4742BF00462AFE /* LibraryBinary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 19F126A72A4742BF00462AFE /* LibraryBinary.cpp */; };
 		"30DF9C18-BEEB-4757-9C96-0BDE4A71C612" /* uuidxx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "7A653BDB-8D52-4269-AA58-5D9714D40043" /* uuidxx.cpp */; };
 		"44CF9FF8-ED8F-4360-AC9C-1F4001EDCF98" /* LICENSE in Sources */ = {isa = PBXBuildFile; fileRef = "24219FBB-12F4-4E8B-A6AF-0BFE02B15F25" /* LICENSE */; };
 		"507170C5-658E-4FA7-91F6-E70E9AF9A400" /* ofAddon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "B18AB8EF-0816-47FA-86AA-105792D925FA" /* ofAddon.cpp */; };
 		"55E29744-3738-45AA-A83F-B70A32B847C7" /* androidStudioProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "3DC82FB7-2CD6-493E-8A08-180CEACD4FBD" /* androidStudioProject.cpp */; };
-		"5EE2D333-38B0-4948-9E4C-95CEBABE43B5" /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "AB013E01-CE1B-4531-8B88-DDD1C4824DEE" /* Utils.cpp */; };
 		"744F852F-2E31-420C-895F-73F94F0AD699" /* baseProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "74456EBA-DDB0-4740-8BDD-B90AA4A40F94" /* baseProject.cpp */; };
-		"94EA0B80-BF74-43F4-8966-D2BDFED6D688" /* LibraryBinary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "B8FDB82C-D1B2-4580-8ADB-AD8A0DB6AB45" /* LibraryBinary.cpp */; };
 		"A3048181-4C52-4FB2-A8B9-3C9BB7A7DB3B" /* CBWinProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "3F9EA3B3-3D7D-486D-A8D5-D9FC8A9D1850" /* CBWinProject.cpp */; };
 		"B1B305E6-E84D-42E8-93DD-433EEA8C25BF" /* CBLinuxProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "0B359B84-50BB-47B9-A721-36AE947437DD" /* CBLinuxProject.cpp */; };
 		"BB36E7C5-6AB0-42C6-B8D5-8683BE5D2CEF" /* xcodeProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "9D142ED4-A19E-40A7-B338-7DBF5022B166" /* xcodeProject.cpp */; };
@@ -50,13 +46,8 @@
 
 /* Begin PBXFileReference section */
 		"0B359B84-50BB-47B9-A721-36AE947437DD" /* CBLinuxProject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = CBLinuxProject.cpp; path = src/projects/CBLinuxProject.cpp; sourceTree = SOURCE_ROOT; };
-		"18197640-A15A-4484-BB57-86DB9506C626" /* LibraryBinary.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = LibraryBinary.h; path = src/utils/LibraryBinary.h; sourceTree = SOURCE_ROOT; };
 		191CD6FA2847E21E0085CBB6 /* of.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = of.entitlements; sourceTree = "<group>"; };
 		191EF70929D778A400F35F26 /* openFrameworks */ = {isa = PBXFileReference; lastKnownFileType = folder; name = openFrameworks; path = ../../../libs/openFrameworks; sourceTree = SOURCE_ROOT; };
-		19F1269E2A4742A100462AFE /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
-		19F1269F2A4742A100462AFE /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utils.cpp; sourceTree = "<group>"; };
-		19F126A02A4742A100462AFE /* LibraryBinary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LibraryBinary.h; sourceTree = "<group>"; };
-		19F126A12A4742A100462AFE /* LibraryBinary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LibraryBinary.cpp; sourceTree = "<group>"; };
 		19F126A42A4742BF00462AFE /* LibraryBinary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LibraryBinary.h; sourceTree = "<group>"; };
 		19F126A52A4742BF00462AFE /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
 		19F126A62A4742BF00462AFE /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utils.cpp; sourceTree = "<group>"; };
@@ -77,10 +68,8 @@
 		"99CBAD3F-66A7-467B-AF30-1F35A3C45FA5" /* optionparser.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = optionparser.h; path = src/optionparser.h; sourceTree = SOURCE_ROOT; };
 		"9D142ED4-A19E-40A7-B338-7DBF5022B166" /* xcodeProject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = xcodeProject.cpp; path = src/projects/xcodeProject.cpp; sourceTree = SOURCE_ROOT; };
 		"A2ABAB7E-D4E2-40D8-887C-80053AD84482" /* uuidxx.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = uuidxx.h; path = src/uuidxx/src/uuidxx.h; sourceTree = SOURCE_ROOT; };
-		"AB013E01-CE1B-4531-8B88-DDD1C4824DEE" /* Utils.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = Utils.cpp; path = src/utils/Utils.cpp; sourceTree = SOURCE_ROOT; };
 		"B18AB8EF-0816-47FA-86AA-105792D925FA" /* ofAddon.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = ofAddon.cpp; path = src/addons/ofAddon.cpp; sourceTree = SOURCE_ROOT; };
 		"B3465ACB-9BED-4E9C-B8FB-0637C953AE78" /* androidStudioProject.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = androidStudioProject.h; path = src/projects/androidStudioProject.h; sourceTree = SOURCE_ROOT; };
-		"B8FDB82C-D1B2-4580-8ADB-AD8A0DB6AB45" /* LibraryBinary.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = LibraryBinary.cpp; path = src/utils/LibraryBinary.cpp; sourceTree = SOURCE_ROOT; };
 		"C00DA136-3BDA-4C03-A077-634FAB3026CF" /* defines.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = defines.h; path = src/defines.h; sourceTree = SOURCE_ROOT; };
 		"D631E031-5522-45A0-B7AC-B72CA159D30C" /* visualStudioProject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = visualStudioProject.cpp; path = src/projects/visualStudioProject.cpp; sourceTree = SOURCE_ROOT; };
 		E4B69B5B0A3A1756003C02F2 /* commandLineDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = commandLineDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -89,7 +78,6 @@
 		E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofApp.h; path = src/ofApp.h; sourceTree = SOURCE_ROOT; };
 		E4B6FCAD0C3E899E008CF71C /* openFrameworks-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "openFrameworks-Info.plist"; sourceTree = "<group>"; };
 		E4EB6923138AFD0F00A09F29 /* Project.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Project.xcconfig; sourceTree = "<group>"; };
-		"E51DB2A8-54CF-4BF6-8B00-A46269C67755" /* Utils.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = Utils.h; path = src/utils/Utils.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -139,14 +127,6 @@
 				19F126A42A4742BF00462AFE /* LibraryBinary.h */,
 				19F126A62A4742BF00462AFE /* Utils.cpp */,
 				19F126A52A4742BF00462AFE /* Utils.h */,
-				19F126A12A4742A100462AFE /* LibraryBinary.cpp */,
-				19F126A02A4742A100462AFE /* LibraryBinary.h */,
-				19F1269F2A4742A100462AFE /* Utils.cpp */,
-				19F1269E2A4742A100462AFE /* Utils.h */,
-				"E51DB2A8-54CF-4BF6-8B00-A46269C67755" /* Utils.h */,
-				"AB013E01-CE1B-4531-8B88-DDD1C4824DEE" /* Utils.cpp */,
-				"B8FDB82C-D1B2-4580-8ADB-AD8A0DB6AB45" /* LibraryBinary.cpp */,
-				"18197640-A15A-4484-BB57-86DB9506C626" /* LibraryBinary.h */,
 			);
 			name = utils;
 			path = src/utils;
@@ -331,11 +311,7 @@
 				"744F852F-2E31-420C-895F-73F94F0AD699" /* baseProject.cpp in Sources */,
 				"B1B305E6-E84D-42E8-93DD-433EEA8C25BF" /* CBLinuxProject.cpp in Sources */,
 				"507170C5-658E-4FA7-91F6-E70E9AF9A400" /* ofAddon.cpp in Sources */,
-				"5EE2D333-38B0-4948-9E4C-95CEBABE43B5" /* Utils.cpp in Sources */,
-				"94EA0B80-BF74-43F4-8966-D2BDFED6D688" /* LibraryBinary.cpp in Sources */,
-				19F126A32A4742A100462AFE /* LibraryBinary.cpp in Sources */,
 				"44CF9FF8-ED8F-4360-AC9C-1F4001EDCF98" /* LICENSE in Sources */,
-				19F126A22A4742A100462AFE /* Utils.cpp in Sources */,
 				19F126A92A4742BF00462AFE /* LibraryBinary.cpp in Sources */,
 				"30DF9C18-BEEB-4757-9C96-0BDE4A71C612" /* uuidxx.cpp in Sources */,
 			);
