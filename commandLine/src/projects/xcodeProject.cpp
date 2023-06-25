@@ -97,40 +97,41 @@ bool xcodeProject::createProjectFile(){
 	if (fs::exists(binDirectory)) {
 		// originally only on IOS
 		//this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
+		// TODO: Test on IOS
 		fs::path srcDataDir { templatePath / "bin" / "data" };
 		if (fs::exists(srcDataDir) && fs::is_directory(srcDataDir)) {
 			baseProject::recursiveCopyContents(srcDataDir, dataDir);
 		}
-		//		ofDirectory dataDirectory(ofFilePath::join(binDirectory.path(), "data"));
-		//		if (!dataDirectory.exists()){
-		//			dataDirectory.create(false);
-		//		}
-
-//		ofDirectory srcDataDir(ofFilePath::join(templatePath, "bin/data"));
-//		if( srcDataDir.exists() ){
-//			baseProject::recursiveCopyContents(srcDataDir, dataDirectory);
-//		}
-//		dataDirectory.close();
-//		srcDataDir.close();
 	}
 
 	if( target == "osx" ){
-		// FIXME: port to FS
-		ofFile::copyFromTo(templatePath / "openFrameworks-Info.plist", projectDir, false, true);
-		ofFile::copyFromTo(templatePath / "of.entitlements", projectDir, false, true);
-	}else{
-		// FIXME: port to FS
-		ofFile::copyFromTo(templatePath / "ofxiOS-Info.plist", projectDir, false, true);
-		ofFile::copyFromTo(templatePath / "ofxiOS_Prefix.pch", projectDir, false, true);
-
-		// FIXME: port to FS
-		ofDirectory mediaAssetsTemplateDirectory(templatePath / "mediaAssets");
-		ofDirectory mediaAssetsProjectDirectory(projectDir / "mediaAssets");
-		if (!mediaAssetsProjectDirectory.exists()){
-			mediaAssetsTemplateDirectory.copyTo(mediaAssetsProjectDirectory.getAbsolutePath(), false, false);
+		// TODO: TEST
+		for (auto & f : { "openFrameworks-Info.plist", "of.entitlements" }) {
+			fs::copy(templatePath / f, projectDir / f, fs::copy_options::overwrite_existing);
 		}
-		mediaAssetsTemplateDirectory.close();
-		mediaAssetsProjectDirectory.close();
+//		ofFile::copyFromTo(templatePath / "openFrameworks-Info.plist", projectDir, false, true);
+//		ofFile::copyFromTo(templatePath / "of.entitlements", projectDir, false, true);
+	}else{
+		for (auto & f : { "ofxiOS-Info.plist", "ofxiOS_Prefix.pch" }) {
+			fs::copy(templatePath / f, projectDir / f, fs::copy_options::overwrite_existing);
+		}
+//		ofFile::copyFromTo(templatePath / "ofxiOS-Info.plist", projectDir, false, true);
+//		ofFile::copyFromTo(templatePath / "ofxiOS_Prefix.pch", projectDir, false, true);
+
+		fs::path from = templatePath / "mediaAssets";
+		fs::path to = projectDir / "mediaAssets";
+		if (!fs::exists(to)) {
+			fs::copy(from, to, fs::copy_options::recursive);
+		}
+//		ofDirectory mediaAssetsTemplateDirectory(templatePath / "mediaAssets");
+//		ofDirectory mediaAssetsProjectDirectory(projectDir / "mediaAssets");
+//		if (!mediaAssetsProjectDirectory.exists()){
+//			bool copyTo(const of::filesystem::path& path, bool bRelativeToData = true, bool overwrite = false);
+//
+//			mediaAssetsTemplateDirectory.copyTo(mediaAssetsProjectDirectory.getAbsolutePath(), false, false);
+//		}
+//		mediaAssetsTemplateDirectory.close();
+//		mediaAssetsProjectDirectory.close();
 	}
 
 	saveScheme();
@@ -139,35 +140,15 @@ bool xcodeProject::createProjectFile(){
 		saveMakefile();
 	}
 
-	// make everything relative the right way.
-	// FIXME: FS
-
-	projectDir = projectDir.lexically_normal();
-
-//	cout << "projectDir " << projectDir << endl;
-
-	relRoot = fs::relative(
-						   fs::current_path() / getOFRoot(),
-						   fs::current_path() / projectDir
-						   );
-//	cout << "relRoot " << relRoot << endl;
-//	relRoot = getOFRoot();
-
-
-//	cout << "getOFRoot " << getOFRoot() << endl;
-//	relRoot = getOFRelPathFS(projectDir).string();
-//	//projectDir is always absolute at the moment
-//	//so lets check if the projectDir is inside the OF folder - if it is not make the OF path absolute
-//	if( projectDir.string().rfind(getOFRoot().string(), 0) != 0) {
-//			relRoot = getOFRoot().string();
-//	}
+	// FIXME: maybe we don't need this variable anymore
+	relRoot = getOFRoot();
 
 	if (relRoot != "../../.."){
-		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", relRoot);
-		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", relRoot);
+		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", relRoot.string());
+		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", relRoot.string());
 		if( target == "osx" ){
-			findandreplaceInTexfile(projectDir / "Makefile", "../../..", relRoot);
-			findandreplaceInTexfile(projectDir / "config.make", "../../..", relRoot);
+			findandreplaceInTexfile(projectDir / "Makefile", "../../..", relRoot.string());
+			findandreplaceInTexfile(projectDir / "config.make", "../../..", relRoot.string());
 		}
 	}
 	return true;
@@ -186,18 +167,21 @@ void xcodeProject::saveScheme(){
 		for (auto & f : { string("Release"), string("Debug") }) {
 			auto fileFrom = templatePath / ("emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample " + f + ".xcscheme");
 			auto fileTo = schemeFolder / (projectName + " " +f+ ".xcscheme");
+			// FIXME: FS
 			ofFile::copyFromTo(fileFrom, fileTo, false);
 			findandreplaceInTexfile(fileTo, "emptyExample", projectName);
 		}
 
 		auto fileTo = projectDir / (projectName + ".xcodeproj/project.xcworkspace");
 		auto fileFrom = templatePath / "emptyExample.xcodeproj/project.xcworkspace";
+		// FIXME: FS
 		ofFile::copyFromTo(fileFrom, fileTo, false, true);
 	}else{
 
 		// MARK:- IOS sector;
 		auto fileFrom = templatePath / "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme";
 		auto fileTo = schemeFolder / (projectName + ".xcscheme");
+		// FIXME: FS
 		ofFile::copyFromTo(fileFrom, fileTo, false);
 		findandreplaceInTexfile(fileTo, "emptyExample", projectName);
 	}
@@ -207,6 +191,7 @@ void xcodeProject::saveMakefile(){
 	for (auto & f : { "Makefile", "config.make" }) {
 		fs::path fileName = projectDir / f;
 		if (!fs::exists(fileName)) {
+			// FIXME: FS
 			ofFile::copyFromTo(templatePath / f, fileName, false, true);
 		}
 	}
