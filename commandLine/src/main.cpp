@@ -57,8 +57,8 @@ int                 nProjectsCreated;
 fs::path projectPath;
 fs::path ofPath;
 std::vector <std::string> addons;
-// FIXME: FS
-std::vector <std::string> srcPaths;
+//std::vector <std::string> srcPaths;
+std::vector <fs::path> srcPaths;
 std::vector <ofTargetPlatform> targets;
 std::string ofPathEnv;
 std::string templateName;
@@ -314,7 +314,7 @@ void printHelp(){
 //-------------------------------------------
 int main(int argc, char** argv){
 
-	ofLog() << "PG v003b";
+	ofLog() << "PG v004";
 	//------------------------------------------- pre-parse
 	bAddonsPassedIn = false;
 	bDryRun = false;
@@ -391,7 +391,11 @@ int main(int argc, char** argv){
 	if (options[SRCEXTERNAL].count() > 0){
 		if (options[SRCEXTERNAL].arg != NULL){
 			std::string srcString(options[SRCEXTERNAL].arg);
-			srcPaths = ofSplitString(srcString, ",", true, true);
+			// TODO: TEST
+			for (auto & s : ofSplitString(srcString, ",", true, true)) {
+				srcPaths.emplace_back(s);
+			}
+//			srcPaths = ofSplitString(srcString, ",", true, true);
 		}
 	}
 
@@ -538,13 +542,12 @@ int main(int argc, char** argv){
 
 					if (!bDryRun){
 						auto project = getTargetProject(t);
-						cout << "will create " << projectPath << " : " << templateName << endl;
 						project->create(projectPath, templateName);
 						for(auto & addon: addons){
 							project->addAddon(addon);
 						}
-						for(auto & srcPath : srcPaths){
-							project->addSrcRecursively(srcPath);
+						for(auto & s : srcPaths){
+							project->addSrcRecursively(s);
 						}
 						project->save();
 					}

@@ -61,7 +61,7 @@ xcodeProject::xcodeProject(string target)
 
 bool xcodeProject::createProjectFile(){
 	fs::path xcodeProject = projectDir / ( projectName + ".xcodeproj" );
-	cout << "createProjectFile " << xcodeProject << endl;
+//	cout << "createProjectFile " << xcodeProject << endl;
 
 	if (fs::exists(xcodeProject)) {
 		fs::remove_all(xcodeProject);
@@ -167,32 +167,33 @@ void xcodeProject::saveScheme(){
 		for (auto & f : { string("Release"), string("Debug") }) {
 			auto fileFrom = templatePath / ("emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample " + f + ".xcscheme");
 			auto fileTo = schemeFolder / (projectName + " " +f+ ".xcscheme");
-			// FIXME: FS
-			ofFile::copyFromTo(fileFrom, fileTo, false);
+			fs::copy(fileFrom, fileTo);
+//			ofFile::copyFromTo(fileFrom, fileTo, false);
 			findandreplaceInTexfile(fileTo, "emptyExample", projectName);
 		}
 
 		auto fileTo = projectDir / (projectName + ".xcodeproj/project.xcworkspace");
 		auto fileFrom = templatePath / "emptyExample.xcodeproj/project.xcworkspace";
-		// FIXME: FS
-		ofFile::copyFromTo(fileFrom, fileTo, false, true);
+		fs::copy(fileFrom, fileTo);
+//		ofFile::copyFromTo(fileFrom, fileTo, false, true);
 	}else{
 
 		// MARK:- IOS sector;
 		auto fileFrom = templatePath / "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme";
 		auto fileTo = schemeFolder / (projectName + ".xcscheme");
-		// FIXME: FS
-		ofFile::copyFromTo(fileFrom, fileTo, false);
+		fs::copy(fileFrom, fileTo);
+//		ofFile::copyFromTo(fileFrom, fileTo, false);
 		findandreplaceInTexfile(fileTo, "emptyExample", projectName);
 	}
 }
 
 void xcodeProject::saveMakefile(){
 	for (auto & f : { "Makefile", "config.make" }) {
-		fs::path fileName = projectDir / f;
-		if (!fs::exists(fileName)) {
-			// FIXME: FS
-			ofFile::copyFromTo(templatePath / f, fileName, false, true);
+		fs::path fileFrom = templatePath / f;
+		fs::path fileTo = projectDir / f;
+		if (!fs::exists(fileTo)) {
+			fs::copy(fileFrom, fileTo, fs::copy_options::overwrite_existing);
+//			ofFile::copyFromTo(templatePath / f, fileName, false, true);
 		}
 	}
 }
@@ -215,14 +216,13 @@ void xcodeProject::renameProject(){ //base
 	}
 }
 
-// FIXME: Update to fs::path
-string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
+string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, string base) {
 	// TODO: Change key of folderUUID to base + folder, so "src" in additional source folders
 	// doesn't get confused with "src" from project.
 
 	string UUID { "" };
 	// string baseFolder { base + "/" + folder };
-	string baseFolder { folder };
+	string baseFolder { folder.string() };
 
 	// cout << "baseFolder " << baseFolder << " isFolder:" << isFolder << endl;
 
@@ -890,8 +890,9 @@ bool xcodeProject::saveProjectFile(){
 			}
 		}
 
-		// FIXME: FIX Absolute here
-		ofFile jsonFile(fs::absolute(fileName), ofFile::WriteOnly);
+//		ofFile jsonFile(fs::absolute(fileName), ofFile::WriteOnly);
+//		std::ofstream jsonFile(fs::absolute(fileName));
+		std::ofstream jsonFile(fileName);
 		try{
 			jsonFile << j.dump(1, '	');
 		}catch(std::exception & e){

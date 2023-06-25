@@ -46,6 +46,7 @@
 
 /* Begin PBXFileReference section */
 		"0B359B84-50BB-47B9-A721-36AE947437DD" /* CBLinuxProject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = CBLinuxProject.cpp; path = src/projects/CBLinuxProject.cpp; sourceTree = SOURCE_ROOT; };
+		1900B6B22A4897E2006BCA87 /* App.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = App.xcconfig; sourceTree = "<group>"; };
 		191CD6FA2847E21E0085CBB6 /* of.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = of.entitlements; sourceTree = "<group>"; };
 		191EF70929D778A400F35F26 /* openFrameworks */ = {isa = PBXFileReference; lastKnownFileType = folder; name = openFrameworks; path = ../../../libs/openFrameworks; sourceTree = SOURCE_ROOT; };
 		19F126A42A4742BF00462AFE /* LibraryBinary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LibraryBinary.h; sourceTree = "<group>"; };
@@ -178,6 +179,7 @@
 				191CD6FA2847E21E0085CBB6 /* of.entitlements */,
 				E4B6FCAD0C3E899E008CF71C /* openFrameworks-Info.plist */,
 				E4EB6923138AFD0F00A09F29 /* Project.xcconfig */,
+				1900B6B22A4897E2006BCA87 /* App.xcconfig */,
 				E4B69E1C0A3A1BDC003C02F2 /* src */,
 				191EF70929D778A400F35F26 /* openFrameworks */,
 				BB4B014C10F69532006C3DED /* addons */,
