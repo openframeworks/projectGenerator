@@ -59,6 +59,9 @@ bool visualStudioProject::createProjectFile(){
 
 bool visualStudioProject::loadProjectFile(){
 	fs::path projectPath { projectDir / (projectName + ".vcxproj") };
+	cout << "projectDir " << projectDir << endl;
+	cout << "projectName " << projectName << endl;
+	cout << "projectPath " << projectPath << endl;
 	if (!fs::exists(projectPath)) {
 		ofLogError(LOG_NAME) << "error loading " << projectPath << " doesn't exist";
 		return false;
