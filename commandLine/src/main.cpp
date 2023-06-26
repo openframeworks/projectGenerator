@@ -515,7 +515,7 @@ int main(int argc, char** argv){
 		}
 	} else {
 		
-		cout << "|||| fs::current_path()  " << fs::current_path() << endl;
+		cout << "|||| 1 fs::current_path()  " << fs::current_path() << endl;
 
 		
 		if (mode == PG_MODE_UPDATE && !isGoodProjectPath(projectPath)) {
@@ -546,18 +546,25 @@ int main(int argc, char** argv){
 					ofLogNotice() << "project updated! ";
 
 				} else {
-					cout << "|||| fs::current_path()  " << fs::current_path() << endl;
+					cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
 
 					if (!bDryRun){
+						cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
+
 						auto project = getTargetProject(t);
+						cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
 						project->create(projectPath, templateName);
+						cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
 						for(auto & addon: addons){
 							project->addAddon(addon);
 						}
+						cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
 						for(auto & s : srcPaths){
 							project->addSrcRecursively(s);
 						}
+						cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
 						project->save();
+						cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
 					}
 					cout << "|||| fs::current_path()  " << fs::current_path() << endl;
 
