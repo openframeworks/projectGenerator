@@ -559,15 +559,25 @@ void baseProject::parseAddons(){
 	fs::path addonsFile { projectDir / "addons.make" };
 	cout << "addonsFile " << addonsFile << endl;
 	cout << "exists ? : " << fs::exists(addonsFile);
-	std::ifstream thisFile(addonsFile);
-	string line;
-	while(getline(thisFile, line, '\n')){
+	
+	ofBuffer buff2 = ofBufferFromFile(fs::absolute(addonsFile));
+	for(auto & line: buff2.getLines()) {
 		cout << ">>>> line : " << line << endl;
 		auto addon = ofTrim(line);
 		if(addon[0] == '#') continue;
 		if(addon == "") continue;
 		addAddon(ofSplitString(addon, "#")[0]);
 	}
+	// this is sad. not working for windows.
+//	std::ifstream thisFile(addonsFile);
+//	string line;
+//	while(getline(thisFile, line)){
+//		cout << ">>>> line : " << line << endl;
+//		auto addon = ofTrim(line);
+//		if(addon[0] == '#') continue;
+//		if(addon == "") continue;
+//		addAddon(ofSplitString(addon, "#")[0]);
+//	}
 }
 
 void baseProject::parseConfigMake(){
