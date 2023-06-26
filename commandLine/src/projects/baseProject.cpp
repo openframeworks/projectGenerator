@@ -141,7 +141,6 @@ bool baseProject::create(const fs::path & path, std::string templateName){
 	if(!ret) return false;
 	
 //	cout << "after return : " << templateName << endl;
-	cout << "|||| 1 fs::current_path()  " << fs::current_path() << endl;
 
 	if(!empty(templateName)){
 		cout << "templateName not empty " << templateName << endl;
@@ -169,15 +168,12 @@ bool baseProject::create(const fs::path & path, std::string templateName){
 			ofLogWarning() << "Cannot find " << templateName << " using platform template only";
 		}
 	}
-	cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
 
 	ret = loadProjectFile();
-	cout << "|||| 3 fs::current_path()  " << fs::current_path() << endl;
 
 	if(!ret) return false;
 
 	parseConfigMake();
-	cout << "|||| 4 fs::current_path()  " << fs::current_path() << endl;
 
 	if (bDoesDirExist){
 		std::vector < string > fileNames;
