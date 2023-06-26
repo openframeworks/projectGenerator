@@ -9,7 +9,7 @@ std::string visualStudioProject::LOG_NAME = "visualStudioProjectFile";
 
 bool visualStudioProject::createProjectFile(){
 
-	cout << "visualStudioProject::createProjectFile " << endl;
+//	cout << "visualStudioProject::createProjectFile " << endl;
 	
 	fs::path project 	= projectDir / (projectName + ".vcxproj");
 	fs::path user 		= projectDir / (projectName + ".vcxproj.user");
@@ -38,15 +38,14 @@ bool visualStudioProject::createProjectFile(){
 	findandreplaceInTexfile(project, "emptyExample", projectName);
 
 	fs::path relRoot = getOFRelPath(projectDir);
-	cout << "relRoot : " << relRoot << endl;
-	
-//	if (2==2)
-	if (!fs::equivalent(relRoot, "../../.."))
-	{
-		cout << "not equivalent to default ../../.." << endl;
-		std::string relRootWindows = relRoot.string();
+//	cout << "relRoot : " << relRoot << endl;
+
+	// FIXME: Reproduce to other places, same logic of equivalent
+	if (!fs::equivalent(relRoot, "../../..")) {
+//		cout << "not equivalent to default ../../.." << endl;
+		
 		// let's make it windows friendly:
-		std::replace(relRootWindows.begin(), relRootWindows.end(), '/', '\\');
+		std::string relRootWindows = convertStringToWindowsSeparator(relRoot.string());
 		
 		// sln has windows paths:
 		findandreplaceInTexfile(solution, "..\\..\\..\\", relRootWindows);
@@ -55,7 +54,7 @@ bool visualStudioProject::createProjectFile(){
 		//..\..\..\libs
 		findandreplaceInTexfile(project, "..\\..\\..\\", relRoot.string());
 	} else {
-		cout << "equivalent to default ../../.." << endl;
+//		cout << "equivalent to default ../../.." << endl;
 	}
 
 	return true;
@@ -64,9 +63,9 @@ bool visualStudioProject::createProjectFile(){
 
 bool visualStudioProject::loadProjectFile(){
 	fs::path projectPath { projectDir / (projectName + ".vcxproj") };
-	cout << "projectDir " << projectDir << endl;
-	cout << "projectName " << projectName << endl;
-	cout << "projectPath " << projectPath << endl;
+//	cout << "projectDir " << projectDir << endl;
+//	cout << "projectName " << projectName << endl;
+//	cout << "projectPath " << projectPath << endl;
 	if (!fs::exists(projectPath)) {
 		ofLogError(LOG_NAME) << "error loading " << projectPath << " doesn't exist";
 		return false;
@@ -283,6 +282,7 @@ void addLibraryName(const pugi::xpath_node_set & nodes, std::string libName) {
 }
 
 void visualStudioProject::addProps(fs::path propsFile){
+	cout << "visualStudioProject::addProps " << propsFile << endl;
 	std::string path = propsFile.string();
 //	path.replace(path.find("/"), 1, "\\");
 
@@ -293,14 +293,14 @@ void visualStudioProject::addProps(fs::path propsFile){
 		pugi::xml_node additionalOptions;
 //		cout << "adding path " << propsFile << endl;
 //		cout << "adding path c_str " << propsFile.c_str() << endl;
-		cout << "adding path " << path << endl;
-		cout << "adding path c_str " << path.c_str() << endl;
+//		cout << "adding path " << path << endl;
+//		cout << "adding path c_str " << path.c_str() << endl;
 
 		items[i].node().append_child("Import").append_attribute("Project").set_value(path.c_str());
 //		items[i].node().append_child("Import").append_attribute("Project").set_value(propsFile);
-		cout << i << endl;
-		cout << items[i].node().name() << endl;
-		cout << items[i].node().value() << endl;
+//		cout << i << endl;
+//		cout << items[i].node().name() << endl;
+//		cout << items[i].node().value() << endl;
 	}
 //	auto check = doc.select_nodes("//ImportGroup/Import/Project");
 }
@@ -421,7 +421,7 @@ void visualStudioProject::addDefine(std::string define, LibType libType)
 }
 
 void visualStudioProject::addAddon(ofAddon & addon){
-	cout << "visualStudioProject::addAddon " << addon.name << endl;
+//	cout << "visualStudioProject::addAddon " << addon.name << endl;
 	for (auto & a : addons) {
 		if (a.name == addon.name) return;
 	}
@@ -448,8 +448,6 @@ void visualStudioProject::addAddon(ofAddon & addon){
 		addLibrary(lib);
 	}
 
-	cout << "|||| 11 fs::current_path()  " << fs::current_path() << endl;
-
 	for(int i=0;i<(int)addon.srcFiles.size(); i++){
 		ofLogVerbose() << "adding addon srcFiles: " << addon.srcFiles[i];
 		if(addon.filesToFolders[addon.srcFiles[i]]=="") addon.filesToFolders[addon.srcFiles[i]]="other";
@@ -474,9 +472,6 @@ void visualStudioProject::addAddon(ofAddon & addon){
 		addSrc(addon.headersrcFiles[i],addon.filesToFolders[addon.headersrcFiles[i]],C);
 	}
 	
-	cout << "|||| 22 fs::current_path()  " << fs::current_path() << endl;
-
-
 	for(int i=0;i<(int)addon.objcsrcFiles.size(); i++){
 		ofLogVerbose() << "adding addon objc srcFiles: " << addon.objcsrcFiles[i];
 		if(addon.filesToFolders[addon.objcsrcFiles[i]]=="") addon.filesToFolders[addon.objcsrcFiles[i]]="other";
@@ -506,7 +501,4 @@ void visualStudioProject::addAddon(ofAddon & addon){
 		addDefine(addon.defines[i], RELEASE_LIB);
 		addDefine(addon.defines[i], DEBUG_LIB);
 	}
-	
-	cout << "|||| 33 fs::current_path()  " << fs::current_path() << endl;
-
 }

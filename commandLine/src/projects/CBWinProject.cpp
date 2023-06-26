@@ -22,20 +22,16 @@ bool CBWinProject::createProjectFile(){
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"icon.rc"), projectDir / "icon.rc", false, true);
 
 	//let's do some renaming:
-	// FIXME: FS
-	std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir)).string();
+	// FIXME: FS / Move to ouside here
+	fs::path relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
 
-	if (relRoot != "../../../"){
+	if (!fs::equivalent(relRoot, "../../..")) {
 
-		std::string relRootWindows = relRoot;
 		// let's make it windows friendly:
-		for(int i = 0; i < relRootWindows.length(); i++) {
-			if( relRootWindows[i] == '/' )
-				relRootWindows[i] = '\\';
-		}
+		std::string relRootWindows = convertStringToWindowsSeparator(relRoot.string());
 
-		findandreplaceInTexfile(workspace, "../../../", relRoot);
-		findandreplaceInTexfile(project, "../../../", relRoot);
+		findandreplaceInTexfile(workspace, "../../../", relRoot.string());
+		findandreplaceInTexfile(project, "../../../", relRoot.string());
 
 		findandreplaceInTexfile(workspace, "..\\..\\..\\", relRootWindows);
 		findandreplaceInTexfile(project, "..\\..\\..\\", relRootWindows);

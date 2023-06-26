@@ -27,6 +27,7 @@ bool AndroidStudioProject::createProjectFile(){
 	std::string dst = gradleFile.path();
 
 	if(!gradleFile.exists()){
+		// FIXME: FS
 		if(!ofFile::copyFromTo(src,dst)){
 			ofLogError(LOG_NAME) << "error copying gradle template from " << src << " to " << dst;
 		}
@@ -37,6 +38,8 @@ bool AndroidStudioProject::createProjectFile(){
 	if(!settings.exists()){
 		src = ofFilePath::join(templatePath,"settings.gradle");
 		dst = settings.path();
+		// FIXME: FS
+
 		if(!ofFile::copyFromTo(src,dst)){
 			ofLogError(LOG_NAME) << "error copying settings gradle template from " << src << " to " << dst;
 		}
@@ -47,6 +50,8 @@ bool AndroidStudioProject::createProjectFile(){
 	if(!manifest.exists()){
 		src = ofFilePath::join(templatePath,"AndroidManifest.xml");
 		dst = manifest.path();
+		// FIXME: FS
+
 		if(!ofFile::copyFromTo(src,dst)){
 			ofLogError(LOG_NAME) << "error copying Android.manifest template from " << src << " to " << dst;
 		} else {
@@ -59,6 +64,8 @@ bool AndroidStudioProject::createProjectFile(){
 	if(!gitignore.exists()){
 		src = ofFilePath::join(templatePath,".gitignore");
 		dst = gitignore.path();
+		// FIXME: FS
+
 		if(!ofFile::copyFromTo(src,dst)){
 			ofLogError(LOG_NAME) << "error copying gitignore template from " << src << " to " << dst;
 		}
@@ -78,6 +85,7 @@ bool AndroidStudioProject::createProjectFile(){
 	ofDirectory(from).moveTo(to, true, true);
 
 	// Gradle wrapper
+	// FIXME: FS
 	ofDirectory(ofFilePath::join(templatePath,"gradle")).copyTo(ofFilePath::join(projectDir,"gradle"));
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"gradlew"), ofFilePath::join(projectDir,"gradlew"));
 	ofFile::copyFromTo(ofFilePath::join(templatePath,"gradlew.bat"), ofFilePath::join(projectDir,"gradlew.bat"));

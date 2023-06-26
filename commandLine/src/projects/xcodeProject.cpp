@@ -132,7 +132,8 @@ bool xcodeProject::createProjectFile(){
 	relRoot = fs::relative((fs::current_path() / getOFRoot()), projectDir);
 //	cout << "relRoot" << relRoot << endl;
 
-	if (relRoot != "../../.."){
+//	if (relRoot != "../../.."){
+	if (!fs::equivalent(relRoot, "../../..")) {
 		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", relRoot.string());
 		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", relRoot.string());
 		if( target == "osx" ){
@@ -157,21 +158,18 @@ void xcodeProject::saveScheme(){
 			auto fileFrom = templatePath / ("emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample " + f + ".xcscheme");
 			auto fileTo = schemeFolder / (projectName + " " +f+ ".xcscheme");
 			fs::copy(fileFrom, fileTo);
-//			ofFile::copyFromTo(fileFrom, fileTo, false);
 			findandreplaceInTexfile(fileTo, "emptyExample", projectName);
 		}
 
 		auto fileTo = projectDir / (projectName + ".xcodeproj/project.xcworkspace");
 		auto fileFrom = templatePath / "emptyExample.xcodeproj/project.xcworkspace";
 		fs::copy(fileFrom, fileTo);
-//		ofFile::copyFromTo(fileFrom, fileTo, false, true);
 	}else{
 
 		// MARK:- IOS sector;
 		auto fileFrom = templatePath / "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme";
 		auto fileTo = schemeFolder / (projectName + ".xcscheme");
 		fs::copy(fileFrom, fileTo);
-//		ofFile::copyFromTo(fileFrom, fileTo, false);
 		findandreplaceInTexfile(fileTo, "emptyExample", projectName);
 	}
 }
@@ -182,7 +180,6 @@ void xcodeProject::saveMakefile(){
 		fs::path fileTo = projectDir / f;
 		if (!fs::exists(fileTo)) {
 			fs::copy(fileFrom, fileTo, fs::copy_options::overwrite_existing);
-//			ofFile::copyFromTo(templatePath / f, fileName, false, true);
 		}
 	}
 }
@@ -842,9 +839,10 @@ void xcodeProject::addAddon(ofAddon & addon){
 }
 
 bool xcodeProject::saveProjectFile(){
+	
 	fs::path fileName = projectDir / (projectName + ".xcodeproj/project.pbxproj");
 //	cout << "saveProjectFile " << fileName << endl;
-
+	alert("xcodeProject::saveProjectFile() begin");
 	bool usePlistBuddy = false;
 
 	if (usePlistBuddy) {
@@ -860,11 +858,14 @@ bool xcodeProject::saveProjectFile(){
 		// JSON Block - Multiplatform
 
 		// I had to use absolute here because ofBufferFromFile always returns relative to data folder.
-		// FIXME: remove absolute
-		string contents = ofBufferFromFile(fs::absolute(fileName)).getText();
+		// FIXME: FS ! remove absolute
+//		string contents = ofBufferFromFile(fs::absolute(fileName)).getText();
 //		cout << contents << endl;
+		
+		std::ifstream contents(fileName);
 		json j = json::parse(contents);
-
+		contents.close();
+		
 		for (auto & c : commands) {
 			// readable comments enabled now.
 			if (c != "" && c[0] != '#') {
@@ -907,8 +908,6 @@ bool xcodeProject::saveProjectFile(){
 			}
 		}
 
-//		ofFile jsonFile(fs::absolute(fileName), ofFile::WriteOnly);
-//		std::ofstream jsonFile(fs::absolute(fileName));
 		std::ofstream jsonFile(fileName);
 		try{
 			jsonFile << j.dump(1, '	');

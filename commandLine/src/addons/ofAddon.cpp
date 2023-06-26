@@ -191,7 +191,6 @@ void ofAddon::addReplaceStringVector(std::vector<std::string> & variable, std::s
 //			if(prefix=="" || values[i].find(pathToOF.string())==0 || ofFilePath::isAbsolute(values[i])) {
 				variable.emplace_back(values[i]);
 			} else {
-//				variable.emplace_back(ofFilePath::join(prefix,values[i]));
 				variable.emplace_back((fs::path(prefix) / values[i]).string());
 			}
 		}
@@ -233,7 +232,6 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 				variable.push_back({ v, "", "" });
 			} else {
 				variable.push_back( {
-//					ofFilePath::join(prefix, v)
 					( fs::path ( prefix ) / v ).string()
 					, "", "" } );
 			}
@@ -491,7 +489,7 @@ void ofAddon::parseConfig(){
 
 
 bool ofAddon::fromFS(fs::path path, const std::string & platform){
-//	cout << "ofAddon::fromFS path : " << path << endl;
+//	alert("ofAddon::fromFS path : " + path.string());
 	
 	clear();
 	this->platform = platform;
@@ -510,6 +508,7 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 		containedPath = getOFRoot(); //we need to add a trailing slash for the erase to work properly
 		prefixPath = pathToOF;
 	}
+	
 
 	if (!fs::exists(path)) {
 		return false;
@@ -563,9 +562,14 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 //	}
 
 	fs::path libsPath = path / "libs";
+	
 	vector < string > libFiles;
 
 	if (fs::exists(libsPath)) {
+//		alert("getLibsRecursively " + libsPath.string(), 31);
+		cout << "getOFRoot() " << getOFRoot() << endl;
+		cout << "pathToOF " << pathToOF << endl;
+
 		getLibsRecursively(libsPath, libFiles, libs, platform);
 		
 		if (platform == "osx" || platform == "ios"){

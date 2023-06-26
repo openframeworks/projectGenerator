@@ -12,14 +12,19 @@ QtCreatorProject::QtCreatorProject(std::string target)
 }
 
 bool QtCreatorProject::createProjectFile(){
-	ofDirectory dir(projectDir);
-	if(!dir.exists()) dir.create(true);
+	
+	if (!fs::exists(projectDir)) {
+		fs::create_directory(projectDir);
+	}
+//	ofDirectory dir(projectDir);
+//	if(!dir.exists()) dir.create(true);
 
 	fs::path project = projectDir / (projectName + ".qbs");
 	fs::path src = templatePath / "qtcreator.qbs";
 	fs::path dst = project;
 
 	if (!fs::exists(project)) {
+		// FIXME: FS
 		if(!ofFile::copyFromTo(src, dst)){
 			ofLogError(LOG_NAME) << "error copying qbs template from " << src << " to " << dst;
 			return false;
@@ -32,6 +37,8 @@ bool QtCreatorProject::createProjectFile(){
 	if(!fs::exists(makefile)){
 		src = templatePath / "Makefile";
 		dst = makefile;
+		// FIXME: FS
+
 		if(!ofFile::copyFromTo(src, dst)){
 			ofLogError(LOG_NAME) << "error copying Makefile template from " << src << " to " << dst;
 			return false;
@@ -42,6 +49,8 @@ bool QtCreatorProject::createProjectFile(){
 	if(!fs::exists(config)){
 		src = templatePath / "config.make";
 		dst = config;
+		// FIXME: FS
+
 		if(!ofFile::copyFromTo(src, dst)){
 			ofLogError(LOG_NAME) << "error copying config.make template from " << src << " to " << dst;
 			return false;
@@ -50,10 +59,14 @@ bool QtCreatorProject::createProjectFile(){
 
 
 	// handle the relative roots.
+	// FIXME: Move to baseproject?
 	// FIXME: FS
-	std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir)).string();
-	if (relRoot != "../../../"){
-		std::string relPath2 = relRoot;
+	fs::path relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
+//	if (relRoot != "../../../"){
+	if (!fs::equivalent(relRoot, "../../..")) {
+		std::string relPath2 = relRoot.string();
+		
+		// FIXME: this doesn't seem OK
 		relPath2.erase(relPath2.end()-1);
 		findandreplaceInTexfile(projectDir / "qtcreator.qbs", "../../..", relPath2);
 		findandreplaceInTexfile(projectDir / "Makefile", "../../..", relPath2);
@@ -68,7 +81,9 @@ void QtCreatorProject::addSrc(std::string srcFile, std::string folder, baseProje
 }
 
 bool QtCreatorProject::loadProjectFile(){
-	ofFile project(projectDir / (projectName + ".qbs"),ofFile::ReadOnly,true);
+	// FIXME: FS
+
+	ofFile project(projectDir / (projectName + ".qbs"), ofFile::ReadOnly,true);
 	if(!project.exists()){
 		ofLogError(LOG_NAME) << "error loading" << project.path() << "doesn't exist";
 		return false;
@@ -140,6 +155,8 @@ bool QtCreatorProject::saveProjectFile(){
 
 	// save final project
 	qbs.set(qbsStr);
+	// FIXME: FS
+
 	ofFile project(projectDir / (projectName + ".qbs"),ofFile::WriteOnly,true);
 	project.writeFromBuffer(qbs);
 	return true;

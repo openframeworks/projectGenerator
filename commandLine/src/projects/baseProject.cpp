@@ -226,7 +226,7 @@ bool baseProject::save(){
 	
 	// FIXME: create a function to hold this kind of usage. file to vector string.
 	
-	cout << "OUTPUT Config.make" << endl;
+//	cout << "OUTPUT Config.make" << endl;
 	
 	vector <string> lines = fileToStrings(projectDir / "config.make");
 	std::ofstream saveConfig(projectDir / "config.make");
@@ -267,10 +267,10 @@ bool baseProject::isAddonInCache(const std::string & addonPath, const std::strin
 }
 
 void baseProject::addAddon(std::string addonName){
-	std::cout << "baseProject::addAddon " << addonName << std::endl;
+//	std::cout << "baseProject::addAddon " << addonName << std::endl;
 	ofAddon addon;
 	// FIXME: Review this path here.
-	addon.pathToOF = getOFRelPath(projectDir.string());
+	addon.pathToOF = getOFRelPath(projectDir);
 	addon.pathToProject = projectDir;
 	
 
@@ -283,8 +283,11 @@ void baseProject::addAddon(std::string addonName){
 		addon.isLocalAddon = true;
 	} else {
 		addonPath = fs::path(getOFRoot()) / "addons" / addonName;
+		//addonPath = addon.pathToOF / "addons" / addonName;
 		addon.isLocalAddon = false;
 	}
+	
+	alert("addonPath " + addonPath.string(), 33);
 	
 	if(!inCache){
 		addonOK = addon.fromFS(addonPath, target);
@@ -319,9 +322,13 @@ void baseProject::addAddon(std::string addonName){
 				fs::path to { dest / d };
 				
 				
+				alert ("||| copy from to");
 				cout << "||| copy from to " << from << " : " << to << endl;
+				cout << "from exists? " << fs::exists(from) << endl;
+				cout << "to exists? " << fs::exists(to) << endl;
 				
-				if (fs::is_regular_file(path)){
+				if (fs::is_regular_file(from)){
+					cout << "from is regular file" << endl;
 					try {
 						fs::copy_file(from, to, fs::copy_options::overwrite_existing);
 						ofLogVerbose() << "adding addon data file: " << d << endl;
@@ -331,12 +338,12 @@ void baseProject::addAddon(std::string addonName){
 						ofLog() << "Can not add addon data file: " << to << " :: " << e.what() << std::endl;;
 					}
 
-				} else if (fs::is_directory(path)) {
-					fs::path to { dest };
-
-					cout << fs::exists(from) << endl;
-					cout << fs::exists(to) << endl;
-					
+				} else if (fs::is_directory(from)) {
+					cout << "from is directory" << endl;
+//					fs::path to { dest };
+					if (!fs::exists(to)) {
+						fs::create_directory(to);
+					}
 					try {
 						fs::copy_file(from, to,
 							fs::copy_options::overwrite_existing |
@@ -564,7 +571,8 @@ void baseProject::parseAddons(){
 	fs::path parseFile { projectDir / "addons.make" };
 
 	for (auto & line : fileToStrings(parseFile)) {
-		cout << ">>>> line : " << line << endl;
+		alert ("line: " + line);
+//		cout << ">>>> line: " << line << endl;
 		auto addon = ofTrim(line);
 		if(addon[0] == '#') continue;
 		if(addon == "") continue;
@@ -603,6 +611,7 @@ void baseProject::recursiveTemplateCopy(const fs::path & srcDir, const fs::path 
 		else if (f.filename() != "template.config") {
 			if (!fs::exists(destFile)) {
 //				fs::copy(f, destFile);
+				// FIXME: FS
 				ofFile::copyFromTo(f, destFile, false, true); // from, to
 			}
 		}

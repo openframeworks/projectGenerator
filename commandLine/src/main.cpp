@@ -1,4 +1,4 @@
-#define PG_VERSION "PG v005"
+#define PG_VERSION "PG v006"
 #define TARGET_NO_SOUND
 #define TARGET_NODISPLAY
 
@@ -220,6 +220,7 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 	// bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
 	// either we read the addons.make file, or we look at the parameter list.
 	// if we are updating recursively, we *never* consider addons passed as parameters.
+	cout << endl;
 	ofLogNotice() << "updating project " << path;
 
 	if (!bDryRun) {
@@ -454,9 +455,8 @@ int main(int argc, char** argv){
 		fs::path newOfPath = fs::weakly_canonical(fs::current_path() / ofPath);
 		fs::current_path(absoluteProjectPath);
 
-		cout << "newOfPath " << newOfPath << endl;
-		cout << "absoluteProjectPath " << absoluteProjectPath << endl;
-		cout << "|||| fs::current_path()  " << fs::current_path() << endl;
+//		cout << "newOfPath " << newOfPath << endl;
+//		cout << "absoluteProjectPath " << absoluteProjectPath << endl;
 
 		ofPath = fs::relative(newOfPath, absoluteProjectPath);
 		projectPath = ".";
@@ -542,11 +542,8 @@ int main(int argc, char** argv){
 				ofLogNotice() << "setting up new project " << projectPath;
 
 				if (mode == PG_MODE_UPDATE) {
-					cout << "|||| x fs::current_path()  " << fs::current_path() << endl;
 
 					updateProject(projectPath, t);
-					cout << "|||| y fs::current_path()  " << fs::current_path() << endl;
-
 					ofLogNotice() << "project updated! ";
 
 				} else {

@@ -26,6 +26,7 @@ std::string generateUUID(std::string input);
 fs::path getOFRoot();
 void setOFRoot(const fs::path & path);
 
+string convertStringToWindowsSeparator(string in);
 vector<std::string> fileToStrings (const fs::path & file);
 
 void findandreplace( std::string& tInput, std::string tFind, std::string tReplace );

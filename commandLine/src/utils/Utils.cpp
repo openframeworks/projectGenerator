@@ -66,8 +66,7 @@ std::string LoadFileAsString(const std::string & fn) {
 }
 
 void findandreplaceInTexfile (const fs::path & fileName, std::string tFind, std::string tReplace ){
-	cout << "findandreplaceInTexfile " << fileName << " : " << tFind << " : " << tReplace << endl;
-//void findandreplaceInTexfile (std::string fileName, std::string tFind, std::string tReplace ){
+//	cout << "findandreplaceInTexfile " << fileName << " : " << tFind << " : " << tReplace << endl;
 	if (fs::exists( fileName )) {
 //		std::ifstream t(ofToDataPath(fileName).c_str());
 		std::ifstream t(fileName.c_str());
@@ -294,6 +293,7 @@ void getDllsRecursively(const fs::path & path, std::vector < std::string > & dll
 
 
 void getLibsRecursively(const fs::path & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform, std::string arch, std::string target){
+
 	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
 	if (!fs::is_directory(path)) return;
 	for (const auto & entry : fs::directory_iterator(path)) {
@@ -387,6 +387,11 @@ void setOFRoot(const fs::path & path){
 	OFRoot = path;
 }
 
+string convertStringToWindowsSeparator(string in) {
+	std::replace(in.begin(), in.end(), '/', '\\');
+	return in;
+}
+
 vector<std::string> fileToStrings (const fs::path & file) {
 	vector<std::string> out;
 	if (fs::exists(file)) {
@@ -409,6 +414,7 @@ fs::path getOFRelPath(const fs::path & from) {
 //}
 
 bool checkConfigExists(){
+	// FIXME: FS
 	ofFile config(ofFilePath::join(ofFilePath::getUserHomeDir(),".ofprojectgenerator/config"));
 	return config.exists();
 }
