@@ -224,13 +224,13 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 
 	if (!bDryRun) {
 		
-		cout << "|||| fs::current_path()  " << fs::current_path() << endl;
+		cout << "|||| 1 fs::current_path()  " << fs::current_path() << endl;
 
 		auto project = getTargetProject(target);
-		cout << "|||| fs::current_path()  " << fs::current_path() << endl;
+		cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
 
 		project->create(path, templateName);
-		cout << "|||| fs::current_path()  " << fs::current_path() << endl;
+		cout << "|||| 3 fs::current_path()  " << fs::current_path() << endl;
 
 		if(bConsiderParameterAddons && bAddonsPassedIn){
 			for(auto & addon: addons){
@@ -240,15 +240,15 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 			ofLogNotice() << "parsing addons.make";
 			project->parseAddons();
 		}
-		cout << "|||| fs::current_path()  " << fs::current_path() << endl;
+		cout << "|||| 4 fs::current_path()  " << fs::current_path() << endl;
 
 		for(auto & srcPath : srcPaths){
 			project->addSrcRecursively(srcPath);
 		}
-		cout << "|||| fs::current_path()  " << fs::current_path() << endl;
+		cout << "|||| 5 fs::current_path()  " << fs::current_path() << endl;
 
 		project->save();
-		cout << "|||| fs::current_path()  " << fs::current_path() << endl;
+		cout << "|||| 6 fs::current_path()  " << fs::current_path() << endl;
 	}
 }
 
