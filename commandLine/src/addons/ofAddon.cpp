@@ -509,7 +509,7 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 		path = pathToProject / path;
 	}else{
 //		name = ofFilePath::getFileName(path);
-		name = path.filename();
+		name = path.filename().string();
 		addonPath = path;
 		containedPath = getOFRoot(); //we need to add a trailing slash for the erase to work properly
 		prefixPath = pathToOF;
