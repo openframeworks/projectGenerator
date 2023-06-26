@@ -558,11 +558,11 @@ void baseProject::parseAddons(){
 	cout << "baseProject::parseAddons() " << endl;
 	fs::path addonsFile { projectDir / "addons.make" };
 	cout << "addonsFile " << addonsFile << endl;
-	cout << "exists?" << fs::exists(addonsFile);
+	cout << "exists ? : " << fs::exists(addonsFile);
 	std::ifstream thisFile(addonsFile);
 	string line;
-	while(getline(thisFile, line)){
-		cout << "line : " << line << endl;
+	while(getline(thisFile, line, '\n')){
+		cout << ">>>> line : " << line << endl;
 		auto addon = ofTrim(line);
 		if(addon[0] == '#') continue;
 		if(addon == "") continue;
