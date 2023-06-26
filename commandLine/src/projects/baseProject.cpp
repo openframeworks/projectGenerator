@@ -558,7 +558,12 @@ void baseProject::parseAddons(){
 	cout << "baseProject::parseAddons() " << endl;
 	fs::path addonsFile { projectDir / "addons.make" };
 	cout << "addonsFile " << addonsFile << endl;
-	cout << "exists ? : " << fs::exists(addonsFile);
+	cout << "exists ? : " << fs::exists(addonsFile) << endl;
+	
+	std::ifstream thisFile(addonsFile);
+	std::ostringstream sstr;
+	sstr << thisFile.rdbuf();
+	cout << "|||| ENTIRE FILE:" <<  sstr.str() << endl;
 	
 	ofBuffer buff2 = ofBufferFromFile(fs::absolute(addonsFile));
 	for(auto & line: buff2.getLines()) {
