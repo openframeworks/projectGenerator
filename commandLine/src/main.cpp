@@ -223,9 +223,14 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 	ofLogNotice() << "updating project " << path;
 
 	if (!bDryRun) {
+		
+		cout << "|||| fs::current_path()  " << fs::current_path() << endl;
+
 		auto project = getTargetProject(target);
+		cout << "|||| fs::current_path()  " << fs::current_path() << endl;
 
 		project->create(path, templateName);
+		cout << "|||| fs::current_path()  " << fs::current_path() << endl;
 
 		if(bConsiderParameterAddons && bAddonsPassedIn){
 			for(auto & addon: addons){
@@ -235,12 +240,15 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 			ofLogNotice() << "parsing addons.make";
 			project->parseAddons();
 		}
+		cout << "|||| fs::current_path()  " << fs::current_path() << endl;
 
 		for(auto & srcPath : srcPaths){
 			project->addSrcRecursively(srcPath);
 		}
+		cout << "|||| fs::current_path()  " << fs::current_path() << endl;
 
 		project->save();
+		cout << "|||| fs::current_path()  " << fs::current_path() << endl;
 	}
 }
 
@@ -515,7 +523,6 @@ int main(int argc, char** argv){
 		}
 	} else {
 		
-		cout << "|||| 1 fs::current_path()  " << fs::current_path() << endl;
 
 		
 		if (mode == PG_MODE_UPDATE && !isGoodProjectPath(projectPath)) {
@@ -549,27 +556,19 @@ int main(int argc, char** argv){
 					ofLogNotice() << "project updated! ";
 
 				} else {
-					cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
 
 					if (!bDryRun){
-						cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
 
 						auto project = getTargetProject(t);
-						cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
 						project->create(projectPath, templateName);
-						cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
 						for(auto & addon: addons){
 							project->addAddon(addon);
 						}
-						cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
 						for(auto & s : srcPaths){
 							project->addSrcRecursively(s);
 						}
-						cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
 						project->save();
-						cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
 					}
-					cout << "|||| fs::current_path()  " << fs::current_path() << endl;
 
 					ofLogNotice() << "project created! ";
 				}
