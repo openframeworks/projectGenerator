@@ -25,6 +25,9 @@ std::string generateUUID(std::string input);
 
 fs::path getOFRoot();
 void setOFRoot(const fs::path & path);
+
+vector<std::string> fileToStrings (const fs::path & file);
+
 void findandreplace( std::string& tInput, std::string tFind, std::string tReplace );
 void findandreplaceInTexfile (const fs::path & fileName, std::string tFind, std::string tReplace );
 
@@ -49,7 +52,6 @@ void splitFromFirst(std::string toSplit, std::string deliminator, std::string & 
 void fixSlashOrder(std::string & toFix);
 std::string unsplitString (std::vector < std::string > strings, std::string deliminator );
 
-// FIXME: FS
 //std::string getOFRelPath(const std::string & from);
 //fs::path getOFRelPathFS(const fs::path & from);
 fs::path getOFRelPath(const fs::path & from);

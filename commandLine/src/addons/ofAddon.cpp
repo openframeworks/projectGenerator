@@ -418,15 +418,11 @@ void ofAddon::parseConfig(){
 	if (!fs::exists(thisFilePath)) return;
 //	if(!addonConfig.exists()) return;
 
-	string line, originalLine;
 	int lineNum = 0;
 	
-	std::ifstream thisFile(thisFilePath);
-	while(getline(thisFile, line)){
-//	while(addonConfig.good()){
+	for (auto & originalLine : fileToStrings(thisFilePath)) {
 		lineNum++;
-//		std::getline(addonConfig,originalLine);
-		line = originalLine;
+		string line = originalLine;
 		ofStringReplace(line,"\r","");
 		ofStringReplace(line,"\n","");
 		line = ofTrim(line);

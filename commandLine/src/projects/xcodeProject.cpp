@@ -760,7 +760,6 @@ void xcodeProject::addAddon(ofAddon & addon){
 		ofLogVerbose() << "adding addon libs: " << e.path;
 		addLibrary(e);
 
-		// FIXME: FS
 //		fs::path dylibPath { e.path };
 		
 //		cout << "pathToOF " << addon.pathToOF << endl;

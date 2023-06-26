@@ -216,7 +216,7 @@ bool isGoodOFPath(fs::path path) {
 
 
 void updateProject(const fs::path & path, ofTargetPlatform target, bool bConsiderParameterAddons = true) {
-	cout << ">>> updateProject " << path << endl;
+//	cout << ">>> updateProject " << path << endl;
 	// bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
 	// either we read the addons.make file, or we look at the parameter list.
 	// if we are updating recursively, we *never* consider addons passed as parameters.
@@ -227,11 +227,8 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 
 		auto project = getTargetProject(target);
 
-
 		project->create(path, templateName);
-		cout << "|||| yyy fs::current_path()  " << fs::current_path() << endl;
 
-		cout << "|||| 1 fs::current_path()  " << fs::current_path() << endl;
 		if(bConsiderParameterAddons && bAddonsPassedIn){
 			for(auto & addon: addons){
 				project->addAddon(addon);
@@ -240,16 +237,12 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 			ofLogNotice() << "parsing addons.make";
 			project->parseAddons();
 		}
-		cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
 
 		for(auto & srcPath : srcPaths){
 			project->addSrcRecursively(srcPath);
 		}
-		cout << "|||| 3 fs::current_path()  " << fs::current_path() << endl;
 
 		project->save();
-		cout << "|||| 4 fs::current_path()  " << fs::current_path() << endl;
-
 	}
 }
 

@@ -47,9 +47,7 @@ std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const fs::path
 			templateConfig->dir = templateDir;
 			templateConfig->name = name;
 			
-			std::ifstream thisFile(templateConfigFilePath);
-			string line;
-			while(getline(thisFile, line)){
+			for (auto & line : fileToStrings(templateConfigFilePath)) {
 				if(ofTrim(line).front() == '#') continue;
 				auto varValue = ofSplitString(line,"+=",true,true);
 				if(varValue.size() < 2) {
@@ -225,34 +223,38 @@ bool baseProject::save(){
 	//save out params which the PG knows about to config.make
 	//we mostly use this right now for storing the external source paths
 	// FIXME: Absolute or FS
-	auto buffer = ofBufferFromFile(projectDir / "config.make");
-	if( buffer.size() ){
-		std::ofstream saveConfig(projectDir / "config.make");
-		
-		for(auto line : buffer.getLines()){
-			string str = line;
+	
+	// FIXME: create a function to hold this kind of usage. file to vector string.
+	
+	cout << "OUTPUT Config.make" << endl;
+	
+	vector <string> lines = fileToStrings(projectDir / "config.make");
+	std::ofstream saveConfig(projectDir / "config.make");
 
-			//add the of root path
-			if( str.rfind("# OF_ROOT =", 0) == 0 || str.rfind("OF_ROOT =", 0) == 0){
-				fs::path path = getOFRoot();
-		
-				if( projectDir.string().rfind(getOFRoot().string(), 0) == 0) {
-					path = getOFRelPath(projectDir);
-				}
-				
-				saveConfig << "OF_ROOT = " << path << std::endl;
+	for (auto & line : lines) {
+//		cout << line << endl;		
+		string str = line;
+
+		//add the of root path
+		if( str.rfind("# OF_ROOT =", 0) == 0 || str.rfind("OF_ROOT =", 0) == 0){
+			fs::path path = getOFRoot();
+	
+			if( projectDir.string().rfind(getOFRoot().string(), 0) == 0) {
+				path = getOFRelPath(projectDir);
 			}
-			// replace this section with our external paths
-			else if( extSrcPaths.size() && str.rfind("# PROJECT_EXTERNAL_SOURCE_PATHS =", 0) == 0 ){
+			
+			saveConfig << "OF_ROOT = " << path << std::endl;
+		}
+		// replace this section with our external paths
+		else if( extSrcPaths.size() && str.rfind("# PROJECT_EXTERNAL_SOURCE_PATHS =", 0) == 0 ){
 
-				for(int d = 0; d < extSrcPaths.size(); d++){
-					ofLog(OF_LOG_VERBOSE) << " adding PROJECT_EXTERNAL_SOURCE_PATHS to config" << extSrcPaths[d] << std::endl;
-					saveConfig << "PROJECT_EXTERNAL_SOURCE_PATHS" << (d == 0 ? " = " : " += ") << extSrcPaths[d] << std::endl;
-				}
-
-			}else{
-			   saveConfig << str << std::endl;
+			for(int d = 0; d < extSrcPaths.size(); d++){
+				ofLog(OF_LOG_VERBOSE) << " adding PROJECT_EXTERNAL_SOURCE_PATHS to config" << extSrcPaths[d] << std::endl;
+				saveConfig << "PROJECT_EXTERNAL_SOURCE_PATHS" << (d == 0 ? " = " : " += ") << extSrcPaths[d] << std::endl;
 			}
+
+		}else{
+		   saveConfig << str << std::endl;
 		}
 	}
 
@@ -312,35 +314,39 @@ void baseProject::addAddon(std::string addonName){
 			fs::path dest { projectDir / "bin" / "data" };
 			
 			if(fs::exists(path)){
+				
+				fs::path from { path };
+				fs::path to { dest / d };
+				
+				
+				cout << "||| copy from to " << from << " : " << to << endl;
+				
 				if (fs::is_regular_file(path)){
-					
-					fs::path from { path };
-					fs::path to { dest / d };
 					try {
 						fs::copy_file(from, to, fs::copy_options::overwrite_existing);
 						ofLogVerbose() << "adding addon data file: " << d << endl;
+						ofLog() << "adding addon data file: " << d << endl;
 					} catch(fs::filesystem_error& e) {
 						ofLogWarning() << "Can not add addon data file: " << to << " :: " << e.what() << std::endl;;
+						ofLog() << "Can not add addon data file: " << to << " :: " << e.what() << std::endl;;
 					}
+
+				} else if (fs::is_directory(path)) {
+					fs::path to { dest };
+
+					cout << fs::exists(from) << endl;
+					cout << fs::exists(to) << endl;
 					
-					// FIXME: FS
-//					ofFile src(path);
-//					//	bool copyTo(const fs::path& path, bool bRelativeToData = true, bool overwrite = false) const;
-//					bool success = src.copyTo(dest / d, false, true);
-//					if(success){
-//						ofLogVerbose() << "adding addon data file: " << d;
-//					}else {
-//						ofLogWarning() << "Can not add addon data file: " << d;
-//					}
-				}else if(fs::is_directory(path)){
-					// FIXME: FS
-					ofDirectory dir(path);
-//					bool copyTo(const fs::path& path, bool bRelativeToData = true, bool overwrite = false);
-					bool success = dir.copyTo(dest / d, false, true);
-					if(success){
-						ofLogVerbose() << "adding addon data folder: " << d;
-					}else{
-						ofLogWarning() << "Can not add addon data folder: " << d;
+					try {
+						fs::copy_file(from, to,
+							fs::copy_options::overwrite_existing |
+							fs::copy_options::recursive
+						);
+						ofLogVerbose() << "adding addon data file: " << d << endl;
+						ofLog() << "adding addon data file: " << d << endl;
+					} catch(fs::filesystem_error& e) {
+						ofLogWarning() << "Can not add addon data file: " << to << " :: " << e.what() << std::endl;;
+						ofLog() << "Can not add addon data file: " << to << " :: " << e.what() << std::endl;;
 					}
 				}
 			}else{
@@ -377,8 +383,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 	//say we add this path: /user/person/documents/shared_of_code
 	//we want folders added for shared_of_code/ and any subfolders, but not folders added for /user/ /user/person/ etc
 	
-	// FIXME: FS
-	string parentFolder = ofFilePath::getEnclosingDirectory(ofFilePath::removeTrailingSlash(srcPath));
+//	string parentFolder = ofFilePath::getEnclosingDirectory(ofFilePath::removeTrailingSlash(srcPath));
 
 	std::unordered_set<std::string> uniqueIncludeFolders;
 	for( auto & src : srcFilesToAdd){
@@ -557,52 +562,21 @@ void baseProject::addAddon(ofAddon & addon){
 void baseProject::parseAddons(){
 	cout << "baseProject::parseAddons() " << endl;
 	fs::path parseFile { projectDir / "addons.make" };
-	cout << "parseFile " << parseFile << endl;
-	cout << "exists ? : " << fs::exists(parseFile) << endl;
-	
-	std::ifstream thisFile(parseFile);
-	string line;
-	
-	cout << "|||| 111 fs::current_path()  " << fs::current_path() << endl;
 
-	while(getline(thisFile, line)){
+	for (auto & line : fileToStrings(parseFile)) {
 		cout << ">>>> line : " << line << endl;
 		auto addon = ofTrim(line);
 		if(addon[0] == '#') continue;
 		if(addon == "") continue;
 		addAddon(ofSplitString(addon, "#")[0]);
 	}
-
-	cout << "|||| 222 fs::current_path()  " << fs::current_path() << endl;
-//	string f = fs::canonical(addonsFile).string();
-//	cout << f << endl;
-//	std::ifstream thisFile(f);
-//	std::ostringstream sstr;
-//	sstr << thisFile.rdbuf();
-//
-//	cout << "CURRENT " << fs::current_path() << endl;
-//	cout << "|||| ENTIRE FILE:" <<  sstr.str() << endl;
-//
-//	ofBuffer buff2 = ofBufferFromFile(fs::absolute(addonsFile));
-//	for(auto & line: buff2.getLines()) {
-//		cout << ">>>> line : " << line << endl;
-//		auto addon = ofTrim(line);
-//		if(addon[0] == '#') continue;
-//		if(addon == "") continue;
-//		addAddon(ofSplitString(addon, "#")[0]);
-//	}
-
 }
 
 void baseProject::parseConfigMake(){
 	
 	fs::path parseFile { projectDir / "config.make" };
-	cout << "parseFile " << parseFile << endl;
-	cout << "exists ? : " << fs::exists(parseFile) << endl;
-	
-	std::ifstream thisFile(parseFile);
-	string line;
-	while(getline(thisFile, line)){
+
+	for (auto & line : fileToStrings(parseFile)) {
 		auto config = ofTrim(line);
 		if(config[0] == '#') continue;
 		if(config == "") continue;
@@ -617,26 +591,6 @@ void baseProject::parseConfigMake(){
 			}
 		}
 	}
-	
-//	// FIXME: FS
-//	ofFile configMake(projectDir / "config.make");
-//	ofBuffer configMakeMem;
-//	configMake >> configMakeMem;
-//	for(auto line: configMakeMem.getLines()){
-//		auto config = ofTrim(line);
-//		if(config[0] == '#') continue;
-//		if(config == "") continue;
-//		if(config.find("=")!=std::string::npos){
-//			auto varValue = ofSplitString(config,"=",true,true);
-//			if(varValue.size()>1){
-//				auto var = ofTrim(varValue[0]);
-//				auto value = ofTrim(varValue[1]);
-//				if (var=="PROJECT_AFTER_OSX" && target=="osx"){
-//					addAfterRule(value);
-//				}
-//			}
-//		}
-//	}
 }
 
 void baseProject::recursiveTemplateCopy(const fs::path & srcDir, const fs::path & destDir){
@@ -648,7 +602,7 @@ void baseProject::recursiveTemplateCopy(const fs::path & srcDir, const fs::path 
 		}
 		else if (f.filename() != "template.config") {
 			if (!fs::exists(destFile)) {
-				// FIXME: FS
+//				fs::copy(f, destFile);
 				ofFile::copyFromTo(f, destFile, false, true); // from, to
 			}
 		}

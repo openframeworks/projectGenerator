@@ -387,6 +387,17 @@ void setOFRoot(const fs::path & path){
 	OFRoot = path;
 }
 
+vector<std::string> fileToStrings (const fs::path & file) {
+	vector<std::string> out;
+	if (fs::exists(file)) {
+		std::ifstream thisFile(file);
+		string line;
+		while(getline(thisFile, line)){
+			out.emplace_back(line);
+		}
+	}
+	return out;
+}
 // FIXME: - in the future this can be the getOFRelPath
 //fs::path getOFRelPathFS(const fs::path & from) {
 fs::path getOFRelPath(const fs::path & from) {
