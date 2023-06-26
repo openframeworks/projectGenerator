@@ -562,6 +562,9 @@ void baseProject::parseAddons(){
 	
 	std::ifstream thisFile(parseFile);
 	string line;
+	
+	cout << "|||| 111 fs::current_path()  " << fs::current_path() << endl;
+
 	while(getline(thisFile, line)){
 		cout << ">>>> line : " << line << endl;
 		auto addon = ofTrim(line);
@@ -569,6 +572,8 @@ void baseProject::parseAddons(){
 		if(addon == "") continue;
 		addAddon(ofSplitString(addon, "#")[0]);
 	}
+
+	cout << "|||| 222 fs::current_path()  " << fs::current_path() << endl;
 //	string f = fs::canonical(addonsFile).string();
 //	cout << f << endl;
 //	std::ifstream thisFile(f);
