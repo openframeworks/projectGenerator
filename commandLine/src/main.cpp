@@ -216,7 +216,7 @@ bool isGoodOFPath(fs::path path) {
 
 
 void updateProject(const fs::path & path, ofTargetPlatform target, bool bConsiderParameterAddons = true) {
-//	cout << ">>> updateProject " << path << endl;
+	cout << ">>> updateProject " << path << endl;
 	// bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
 	// either we read the addons.make file, or we look at the parameter list.
 	// if we are updating recursively, we *never* consider addons passed as parameters.
