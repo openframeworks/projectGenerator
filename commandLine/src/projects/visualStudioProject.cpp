@@ -16,12 +16,12 @@ bool visualStudioProject::createProjectFile(){
 	fs::path solution	= projectDir / (projectName + ".sln");
 	fs::path filters	= projectDir / (projectName + ".vcxproj.filters");
 
-	fs::copy(templatePath / "emptyExample.vcxproj", 		project);
-	fs::copy(templatePath / "emptyExample.vcxproj.user", 	user);
-	fs::copy(templatePath / "emptyExample.sln", 			solution);
-	fs::copy(templatePath / "emptyExample.vcxproj.filters", filters);
+	fs::copy(templatePath / "emptyExample.vcxproj", 		project, fs::copy_options::overwrite_existing);
+	fs::copy(templatePath / "emptyExample.vcxproj.user", 	user, fs::copy_options::overwrite_existing);
+	fs::copy(templatePath / "emptyExample.sln", 			solution, fs::copy_options::overwrite_existing);
+	fs::copy(templatePath / "emptyExample.vcxproj.filters", filters, fs::copy_options::overwrite_existing);
 	
-	fs::copy(templatePath / "icon.rc", projectDir / "icon.rc");
+	fs::copy(templatePath / "icon.rc", projectDir / "icon.rc", fs::copy_options::overwrite_existing);
 
 //	ofFile filterFile(filters);
 //	std::string temp = filterFile.readToBuffer();
