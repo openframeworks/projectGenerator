@@ -541,8 +541,11 @@ int main(int argc, char** argv){
 				ofLogNotice() << "setting up new project " << projectPath;
 
 				if (mode == PG_MODE_UPDATE) {
+					cout << "|||| x fs::current_path()  " << fs::current_path() << endl;
 
 					updateProject(projectPath, t);
+					cout << "|||| y fs::current_path()  " << fs::current_path() << endl;
+
 					ofLogNotice() << "project updated! ";
 
 				} else {
