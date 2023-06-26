@@ -451,9 +451,11 @@ int main(int argc, char** argv){
 	if (fs::exists(absoluteProjectPath)) {
 		fs::path newOfPath = fs::weakly_canonical(fs::current_path() / ofPath);
 		fs::current_path(absoluteProjectPath);
-//		cout << "newOfPath " << newOfPath << endl;
-//		cout << "absoluteProjectPath " << absoluteProjectPath << endl;
-//		cout << "current path  " << fs::current_path() << endl;
+
+		cout << "newOfPath " << newOfPath << endl;
+		cout << "absoluteProjectPath " << absoluteProjectPath << endl;
+		cout << "current path  " << fs::current_path() << endl;
+
 		ofPath = fs::relative(newOfPath, absoluteProjectPath);
 		projectPath = ".";
 	}
