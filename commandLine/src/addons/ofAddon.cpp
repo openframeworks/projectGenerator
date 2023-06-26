@@ -187,8 +187,13 @@ void ofAddon::addReplaceStringVector(std::vector<std::string> & variable, std::s
 				}
 			}
 
-			if(prefix=="" || values[i].find(pathToOF.string())==0 || ofFilePath::isAbsolute(values[i])) variable.emplace_back(values[i]);
-			else variable.emplace_back(ofFilePath::join(prefix,values[i]));
+			if(prefix=="" || values[i].find(pathToOF.string())==0 || fs::path{values[i]}.is_absolute()) {
+//			if(prefix=="" || values[i].find(pathToOF.string())==0 || ofFilePath::isAbsolute(values[i])) {
+				variable.emplace_back(values[i]);
+			} else {
+//				variable.emplace_back(ofFilePath::join(prefix,values[i]));
+				variable.emplace_back((fs::path(prefix) / values[i]).string());
+			}
 		}
 	}
 }
@@ -222,10 +227,15 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 				}
 			}
 
-			if (prefix == "" || v.find(pathToOF.string()) == 0 || ofFilePath::isAbsolute(v)) {
+			
+			if (prefix == "" || v.find(pathToOF.string()) == 0 || fs::path{v}.is_absolute()) {
+//			if (prefix == "" || v.find(pathToOF.string()) == 0 || ofFilePath::isAbsolute(v)) {
 				variable.push_back({ v, "", "" });
 			} else {
-				variable.push_back( { ofFilePath::join(prefix, v), "", "" } );
+				variable.push_back( {
+//					ofFilePath::join(prefix, v)
+					( fs::path ( prefix ) / v ).string()
+					, "", "" } );
 			}
 		}
 	}
@@ -395,20 +405,27 @@ void ofAddon::exclude(vector<LibraryBinary> & variables, vector<string> exclusio
 }
 
 void ofAddon::parseConfig(){
-	ofFile addonConfig;
+//	ofFile addonConfig;
+	fs::path thisFilePath;
 	if(isLocalAddon){
-		addonConfig.open(pathToProject / addonPath / "addon_config.mk");
+		thisFilePath = pathToProject / addonPath / "addon_config.mk";
+//		addonConfig.open(pathToProject / addonPath / "addon_config.mk");
 	}else{
-		addonConfig.open(addonPath / "addon_config.mk");
+		thisFilePath = addonPath / "addon_config.mk";
+//		addonConfig.open(addonPath / "addon_config.mk");
 	}
 
-	if(!addonConfig.exists()) return;
+	if (!fs::exists(thisFilePath)) return;
+//	if(!addonConfig.exists()) return;
 
 	string line, originalLine;
 	int lineNum = 0;
-	while(addonConfig.good()){
+	
+	std::ifstream thisFile(thisFilePath);
+	while(getline(thisFile, line)){
+//	while(addonConfig.good()){
 		lineNum++;
-		std::getline(addonConfig,originalLine);
+//		std::getline(addonConfig,originalLine);
 		line = originalLine;
 		ofStringReplace(line,"\r","");
 		ofStringReplace(line,"\n","");
@@ -491,7 +508,8 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 		addonPath = path;
 		path = pathToProject / path;
 	}else{
-		name = ofFilePath::getFileName(path);
+//		name = ofFilePath::getFileName(path);
+		name = path.filename();
 		addonPath = path;
 		containedPath = getOFRoot(); //we need to add a trailing slash for the erase to work properly
 		prefixPath = pathToOF;
