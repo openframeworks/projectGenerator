@@ -265,7 +265,7 @@ bool baseProject::isAddonInCache(const std::string & addonPath, const std::strin
 }
 
 void baseProject::addAddon(std::string addonName){
-//	std::cout << "baseProject::addAddon " << addonName << std::endl;
+	std::cout << "baseProject::addAddon " << addonName << std::endl;
 	ofAddon addon;
 	// FIXME: Review this path here.
 	addon.pathToOF = getOFRelPath(projectDir.string());
