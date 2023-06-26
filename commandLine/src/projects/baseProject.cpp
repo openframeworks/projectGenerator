@@ -111,7 +111,6 @@ bool baseProject::create(const fs::path & path, std::string templateName){
 //	cout << "baseProject::create " << path << " : " << templateName << endl;
 //	auto path = _path; // just because it is const
 
-	cout << "|||| 1 fs::current_path()  " << fs::current_path() << endl;
 	addons.clear();
 	extSrcPaths.clear();
 
@@ -120,7 +119,6 @@ bool baseProject::create(const fs::path & path, std::string templateName){
 	auto projectPath = fs::canonical(fs::current_path() / path);
 	projectName = projectPath.filename().string();
 
-	cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
 //	cout << "templatePath " << templatePath << endl;
 //	cout << "projectDir " << projectDir << endl;
 //	cout << "projectPath " << projectPath << endl;
@@ -139,12 +137,11 @@ bool baseProject::create(const fs::path & path, std::string templateName){
 		}
 	}
 
-	cout << "|||| 3 fs::current_path()  " << fs::current_path() << endl;
 	bool ret = createProjectFile();
 	if(!ret) return false;
 	
 //	cout << "after return : " << templateName << endl;
-	cout << "|||| 4 fs::current_path()  " << fs::current_path() << endl;
+	cout << "|||| 1 fs::current_path()  " << fs::current_path() << endl;
 
 	if(!empty(templateName)){
 		cout << "templateName not empty " << templateName << endl;
@@ -172,12 +169,15 @@ bool baseProject::create(const fs::path & path, std::string templateName){
 			ofLogWarning() << "Cannot find " << templateName << " using platform template only";
 		}
 	}
+	cout << "|||| 2 fs::current_path()  " << fs::current_path() << endl;
 
 	ret = loadProjectFile();
+	cout << "|||| 3 fs::current_path()  " << fs::current_path() << endl;
 
 	if(!ret) return false;
 
 	parseConfigMake();
+	cout << "|||| 4 fs::current_path()  " << fs::current_path() << endl;
 
 	if (bDoesDirExist){
 		std::vector < string > fileNames;
