@@ -560,45 +560,48 @@ void baseProject::addAddon(ofAddon & addon){
 
 void baseProject::parseAddons(){
 	cout << "baseProject::parseAddons() " << endl;
-	fs::path addonsFile { projectDir / "addons.make" };
-	cout << "addonsFile " << addonsFile << endl;
-	cout << "exists ? : " << fs::exists(addonsFile) << endl;
+	fs::path parseFile { projectDir / "addons.make" };
+	cout << "parseFile " << parseFile << endl;
+	cout << "exists ? : " << fs::exists(parseFile) << endl;
 	
-	string f = fs::canonical(addonsFile).string();
-	cout << f << endl;
-	std::ifstream thisFile(f);
-	std::ostringstream sstr;
-	sstr << thisFile.rdbuf();
-	
-	cout << "CURRENT " << fs::current_path() << endl;
-	cout << "|||| ENTIRE FILE:" <<  sstr.str() << endl;
-	
-	ofBuffer buff2 = ofBufferFromFile(fs::absolute(addonsFile));
-	for(auto & line: buff2.getLines()) {
+	std::ifstream thisFile(parseFile);
+	string line;
+	while(getline(thisFile, line)){
 		cout << ">>>> line : " << line << endl;
 		auto addon = ofTrim(line);
 		if(addon[0] == '#') continue;
 		if(addon == "") continue;
 		addAddon(ofSplitString(addon, "#")[0]);
 	}
-	// this is sad. not working for windows.
-//	std::ifstream thisFile(addonsFile);
-//	string line;
-//	while(getline(thisFile, line)){
+//	string f = fs::canonical(addonsFile).string();
+//	cout << f << endl;
+//	std::ifstream thisFile(f);
+//	std::ostringstream sstr;
+//	sstr << thisFile.rdbuf();
+//
+//	cout << "CURRENT " << fs::current_path() << endl;
+//	cout << "|||| ENTIRE FILE:" <<  sstr.str() << endl;
+//
+//	ofBuffer buff2 = ofBufferFromFile(fs::absolute(addonsFile));
+//	for(auto & line: buff2.getLines()) {
 //		cout << ">>>> line : " << line << endl;
 //		auto addon = ofTrim(line);
 //		if(addon[0] == '#') continue;
 //		if(addon == "") continue;
 //		addAddon(ofSplitString(addon, "#")[0]);
 //	}
+
 }
 
 void baseProject::parseConfigMake(){
-	// FIXME: FS
-	ofFile configMake(projectDir / "config.make");
-	ofBuffer configMakeMem;
-	configMake >> configMakeMem;
-	for(auto line: configMakeMem.getLines()){
+	
+	fs::path parseFile { projectDir / "config.make" };
+	cout << "parseFile " << parseFile << endl;
+	cout << "exists ? : " << fs::exists(parseFile) << endl;
+	
+	std::ifstream thisFile(parseFile);
+	string line;
+	while(getline(thisFile, line)){
 		auto config = ofTrim(line);
 		if(config[0] == '#') continue;
 		if(config == "") continue;
@@ -613,6 +616,26 @@ void baseProject::parseConfigMake(){
 			}
 		}
 	}
+	
+//	// FIXME: FS
+//	ofFile configMake(projectDir / "config.make");
+//	ofBuffer configMakeMem;
+//	configMake >> configMakeMem;
+//	for(auto line: configMakeMem.getLines()){
+//		auto config = ofTrim(line);
+//		if(config[0] == '#') continue;
+//		if(config == "") continue;
+//		if(config.find("=")!=std::string::npos){
+//			auto varValue = ofSplitString(config,"=",true,true);
+//			if(varValue.size()>1){
+//				auto var = ofTrim(varValue[0]);
+//				auto value = ofTrim(varValue[1]);
+//				if (var=="PROJECT_AFTER_OSX" && target=="osx"){
+//					addAfterRule(value);
+//				}
+//			}
+//		}
+//	}
 }
 
 void baseProject::recursiveTemplateCopy(const fs::path & srcDir, const fs::path & destDir){
