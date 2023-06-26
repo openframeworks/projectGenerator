@@ -454,7 +454,7 @@ int main(int argc, char** argv){
 
 		cout << "newOfPath " << newOfPath << endl;
 		cout << "absoluteProjectPath " << absoluteProjectPath << endl;
-		cout << "current path  " << fs::current_path() << endl;
+		cout << "|||| fs::current_path()  " << fs::current_path() << endl;
 
 		ofPath = fs::relative(newOfPath, absoluteProjectPath);
 		projectPath = ".";
@@ -514,6 +514,10 @@ int main(int argc, char** argv){
 			ofLogNotice() << "-----------------------------------------------";
 		}
 	} else {
+		
+		cout << "|||| fs::current_path()  " << fs::current_path() << endl;
+
+		
 		if (mode == PG_MODE_UPDATE && !isGoodProjectPath(projectPath)) {
 			ofLogError() << "there is no src folder in this project path to update, maybe use create instead? (or use force to force updating)";
 		} else {
@@ -542,6 +546,7 @@ int main(int argc, char** argv){
 					ofLogNotice() << "project updated! ";
 
 				} else {
+					cout << "|||| fs::current_path()  " << fs::current_path() << endl;
 
 					if (!bDryRun){
 						auto project = getTargetProject(t);
@@ -554,6 +559,7 @@ int main(int argc, char** argv){
 						}
 						project->save();
 					}
+					cout << "|||| fs::current_path()  " << fs::current_path() << endl;
 
 					ofLogNotice() << "project created! ";
 				}
