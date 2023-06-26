@@ -558,6 +558,7 @@ void baseProject::parseAddons(){
 	cout << "baseProject::parseAddons() " << endl;
 	fs::path addonsFile { projectDir / "addons.make" };
 	cout << "addonsFile " << addonsFile << endl;
+	cout << "exists?" << fs::exists(addonsFile);
 	std::ifstream thisFile(addonsFile);
 	string line;
 	while(getline(thisFile, line)){
