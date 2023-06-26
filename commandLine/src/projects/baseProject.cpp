@@ -565,6 +565,8 @@ void baseProject::parseAddons(){
 	std::ifstream thisFile(f);
 	std::ostringstream sstr;
 	sstr << thisFile.rdbuf();
+	
+	cout << "CURRENT " << fs::current_path << endl;
 	cout << "|||| ENTIRE FILE:" <<  sstr.str() << endl;
 	
 	ofBuffer buff2 = ofBufferFromFile(fs::absolute(addonsFile));
