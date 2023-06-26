@@ -71,7 +71,7 @@ bool CBLinuxProject::createProjectFile(){
 	// FIXME: FS
 	fs::path relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
 	if (!fs::equivalent(relRoot, "../../..")) {
-		std::string relPath2 = relRoot;
+		std::string relPath2 = relRoot.string();
 		relPath2.erase(relPath2.end()-1);
 		findandreplaceInTexfile(projectDir / "Makefile", "../../..", relPath2);
 		findandreplaceInTexfile(projectDir / "config.make", "../../..", relPath2);
