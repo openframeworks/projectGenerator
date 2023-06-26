@@ -560,7 +560,9 @@ void baseProject::parseAddons(){
 	cout << "addonsFile " << addonsFile << endl;
 	cout << "exists ? : " << fs::exists(addonsFile) << endl;
 	
-	std::ifstream thisFile(addonsFile);
+	string f = fs::canonical(addonsFile).string();
+	cout << f << endl;
+	std::ifstream thisFile(f);
 	std::ostringstream sstr;
 	sstr << thisFile.rdbuf();
 	cout << "|||| ENTIRE FILE:" <<  sstr.str() << endl;
