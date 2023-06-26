@@ -423,20 +423,20 @@ void visualStudioProject::addDefine(std::string define, LibType libType)
 
 void visualStudioProject::addAddon(ofAddon & addon){
 	cout << "visualStudioProject::addAddon " << addon.name << endl;
-	for(int i=0;i<(int)addons.size();i++){
-		if(addons[i].name==addon.name) return;
+	for (auto & a : addons) {
+		if (a.name == addon.name) return;
 	}
 
-	for(int i=0;i<addon.dependencies.size();i++){
-		baseProject::addAddon(addon.dependencies[i]);
+	for (auto & d : addon.dependencies) {
+		baseProject::addAddon(d);
 	}
 
 	ofLogNotice() << "adding addon: " << addon.name;
 	addons.emplace_back(addon);
 
-	for(int i=0;i<(int)addon.includePaths.size();i++){
-		ofLogVerbose() << "adding addon include path: " << addon.includePaths[i];
-		addInclude(addon.includePaths[i]);
+	for (auto & e : addon.includePaths) {
+		ofLogVerbose() << "adding addon include path: " << e;
+		addInclude(e);
 	}
 
 	for (auto & props : addon.propsFiles) {
@@ -448,6 +448,8 @@ void visualStudioProject::addAddon(ofAddon & addon){
 		ofLogVerbose() << "adding addon libs: " << lib.path;
 		addLibrary(lib);
 	}
+
+	cout << "|||| 11 fs::current_path()  " << fs::current_path() << endl;
 
 	for(int i=0;i<(int)addon.srcFiles.size(); i++){
 		ofLogVerbose() << "adding addon srcFiles: " << addon.srcFiles[i];
@@ -472,6 +474,9 @@ void visualStudioProject::addAddon(ofAddon & addon){
 		if(addon.filesToFolders[addon.headersrcFiles[i]]=="") addon.filesToFolders[addon.headersrcFiles[i]]="other";
 		addSrc(addon.headersrcFiles[i],addon.filesToFolders[addon.headersrcFiles[i]],C);
 	}
+	
+	cout << "|||| 22 fs::current_path()  " << fs::current_path() << endl;
+
 
 	for(int i=0;i<(int)addon.objcsrcFiles.size(); i++){
 		ofLogVerbose() << "adding addon objc srcFiles: " << addon.objcsrcFiles[i];
@@ -502,4 +507,7 @@ void visualStudioProject::addAddon(ofAddon & addon){
 		addDefine(addon.defines[i], RELEASE_LIB);
 		addDefine(addon.defines[i], DEBUG_LIB);
 	}
+	
+	cout << "|||| 33 fs::current_path()  " << fs::current_path() << endl;
+
 }
