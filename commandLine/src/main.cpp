@@ -229,6 +229,7 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 		}
 
 		for(auto & srcPath : srcPaths){
+			alert("addSrcRecursively " + srcPath.string());
 			project->addSrcRecursively(srcPath);
 		}
 		project->save();
