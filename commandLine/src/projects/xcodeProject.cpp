@@ -758,6 +758,8 @@ void xcodeProject::addAddon(ofAddon & addon){
 //		fs::path dylibPath { e.path };
 		
 //		cout << "pathToOF " << addon.pathToOF << endl;
+//		cout << "--->>" << endl;
+//		cout << "dylibPath " << e.path << endl;
 		fs::path dylibPath =  fs::path{ e.path }.lexically_relative(addon.pathToOF);
 //		cout << "dylibPath " << dylibPath << endl;
 		

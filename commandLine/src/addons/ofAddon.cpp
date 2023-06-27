@@ -489,7 +489,7 @@ void ofAddon::parseConfig(){
 
 
 bool ofAddon::fromFS(fs::path path, const string & platform){
-//	alert("ofAddon::fromFS path : " + path.string());
+	alert("ofAddon::fromFS path : " + path.string());
 	
 	clear();
 	this->platform = platform;
@@ -514,7 +514,7 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		return false;
 	}
 
-	fs::path srcPath = path / "src";
+	fs::path srcPath { path / "src" };
 
 	if (fs::exists(srcPath)) {
 		getFilesRecursively(srcPath, srcFiles);
@@ -538,6 +538,12 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	if (platform == "vs" || platform == "msys2") {
 		getPropsRecursively(addonPath, propsFiles, platform);
 	}
+	
+//	cout << "---- LIST PROPS FILES" << endl;
+	for (auto & p : propsFiles) {
+		cout << p << endl;
+	}
+//	cout << "---- LIST PROPS FILES" << endl;
 
 //	cout << "pathToProject " << pathToProject << endl;
 //	for (auto & p : propsFiles) {
@@ -579,8 +585,15 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 			getDllsRecursively(libsPath, dllsToCopy, platform);
 		}
 	}
+	
+	for (auto & l : libs) {
+		auto srcFS = fs::path(prefixPath / fs::relative(l.path, containedPath));
+		l.path = srcFS.string();
+	}
 
 	for (auto & s : libFiles) {
+//		cout << "---- >> " << endl;
+//		cout << s << endl;
 		fs::path folder;
 		auto srcFS = fs::path(prefixPath / fs::relative(s, containedPath));
 		if (isLocalAddon) {
@@ -591,8 +604,11 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		s = srcFS.string();
 		srcFiles.emplace_back(s);
 		filesToFolders[s] = folder.string();
+//		cout << s << endl;
+//		cout << "filesToFolders " << s << " : " << folder << endl;
 	}
 
+	
 	
 //	// changing libs folder from absolute to relative.
 //	for (auto & l : libs) {

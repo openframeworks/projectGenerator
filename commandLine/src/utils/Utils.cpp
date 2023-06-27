@@ -48,27 +48,21 @@ void findandreplace( string& tInput, string tFind, string tReplace ) {
 		tInput.replace( uPos, uFindLen, tReplace );
 		uPos += uReplaceLen;
 	}
-
 }
-
 
 string LoadFileAsString(const string & fn) {
 	std::ifstream fin(fn.c_str());
-
 	if(!fin) {
 		// throw exception
 	}
-
 	std::ostringstream oss;
 	oss << fin.rdbuf();
-
 	return oss.str();
 }
 
 void findandreplaceInTexfile (const fs::path & fileName, string tFind, string tReplace ){
 //	cout << "findandreplaceInTexfile " << fileName << " : " << tFind << " : " << tReplace << endl;
 	if (fs::exists( fileName )) {
-//		std::ifstream t(ofToDataPath(fileName).c_str());
 		std::ifstream t(fileName.c_str());
 		std::stringstream buffer;
 		buffer << t.rdbuf();
@@ -76,7 +70,6 @@ void findandreplaceInTexfile (const fs::path & fileName, string tFind, string tR
 		t.close();
 		findandreplace(bufferStr, tFind, tReplace);
 		std::ofstream myfile;
-//		myfile.open (ofToDataPath(fileName).c_str());
 		myfile.open (fileName.c_str());
 		myfile << bufferStr;
 		myfile.close();
@@ -86,9 +79,6 @@ void findandreplaceInTexfile (const fs::path & fileName, string tFind, string tR
 	   ; // some error checking here would be good.
    }
 }
-
-
-
 
 bool doesTagAndAttributeExist(pugi::xml_document & doc, string tag, string attribute, string newValue){
 	char xpathExpressionExists[1024];
@@ -103,7 +93,6 @@ bool doesTagAndAttributeExist(pugi::xml_document & doc, string tag, string attri
 }
 
 pugi::xml_node appendValue(pugi::xml_document & doc, string tag, string attribute, string newValue, bool overwriteMultiple){
-
 	if (overwriteMultiple == true){
 		// find the existing node...
 		char xpathExpression[1024];
@@ -129,7 +118,6 @@ pugi::xml_node appendValue(pugi::xml_document & doc, string tag, string attribut
 	}else{
 		return pugi::xml_node();
 	}
-
 }
 
 // TODO: This can be removed in the future, but not now.
@@ -151,25 +139,21 @@ void getFilesRecursively(const fs::path & path, std::vector < string > & fileNam
 	}
 }
 
-
 void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileNames){
 	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
 	if (!fs::is_directory(path)) return;
 	for (const auto & entry : fs::directory_iterator(path)) {
 		auto f = entry.path();
-		if (f.filename().c_str()[0] == '.') continue; // avoid hidden files .DS_Store .vscode .git etc
+		if (f.filename().c_str()[0] == '.') continue; // avoid hidden files .DS_Store .vscode  .git etc
 		if (ofIsStringInString(f.filename().string(),".framework")) continue; // ignore frameworks
 		
 		if (fs::is_directory(f)) {
-//			if (f.filename() != fs::path(".git")) { // ignore git dir
 			getFilesRecursively(f, fileNames);
-//			}
 		} else {
 			fileNames.emplace_back(f);
 		}
 	}
 }
-
 
 static std::vector <string> platforms;
 bool isFolderNotCurrentPlatform(string folderName, string platform){
@@ -191,7 +175,6 @@ bool isFolderNotCurrentPlatform(string folderName, string platform){
 			return true;
 		}
 	}
-
 	return false;
 }
 
@@ -246,8 +229,6 @@ void getFrameworksRecursively(const fs::path & path, std::vector < string > & fr
 	}
 }
 
-
-
 void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props, const string & platform) {
 	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
 	if (!fs::is_directory(path)) return;
@@ -272,7 +253,6 @@ void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props
 	}
 }
 
-
 void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, string platform) {
 	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
 	if (!fs::is_directory(path)) return;
@@ -291,9 +271,8 @@ void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, st
 	}
 }
 
-
-void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles, std::vector < LibraryBinary > & libLibs, string platform, string arch, string target){
-
+void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles, std::vector < LibraryBinary > & libLibs, string platform, string arch, string target) {
+//	cout << ">> getLibsRecursively " << path << endl;
 	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
 	if (!fs::is_directory(path)) return;
 	for (const auto & entry : fs::directory_iterator(path)) {
@@ -334,9 +313,13 @@ void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles
 				}
 			}
 
-			if (ext == "a" || ext == "lib" || ext == "dylib" || ext == "so" || (ext == "dll" && platform != "vs")){
+			if (ext == "a" || ext == "lib" || ext == "dylib" || ext == "so" ||
+				(ext == "dll" && platform != "vs")){
 				if (platformFound){
 //					libLibs.emplace_back( f, arch, target );
+					cout << "----" << endl;
+					cout << f.string() << endl;
+					
 					libLibs.push_back({ f.string(), arch, target});
 
 					//TODO: THEO hack
@@ -365,7 +348,6 @@ void fixSlashOrder(string & toFix){
 	std::replace(toFix.begin(), toFix.end(),'/', '\\');
 }
 
-
 string unsplitString (std::vector < string > strings, string deliminator ){
 	string result;
 	for (int i = 0; i < (int)strings.size(); i++){
@@ -375,7 +357,6 @@ string unsplitString (std::vector < string > strings, string deliminator ){
 	return result;
 }
 
-
 static fs::path OFRoot { "../../.." };
 
 fs::path getOFRoot(){
@@ -383,7 +364,6 @@ fs::path getOFRoot(){
 }
 
 void setOFRoot(const fs::path & path){
-//	cout << "setOFRoot " << path << endl;
 	OFRoot = path;
 }
 
@@ -457,7 +437,6 @@ string getTargetString(ofTargetPlatform t){
 			return "";
 	}
 }
-
 
 unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ) {
 //	cout << "getTargetProject :" << getTargetString(targ) << endl;
