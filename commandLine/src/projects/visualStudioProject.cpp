@@ -407,7 +407,7 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 	}
 
 	ofLogNotice() << "adding addon: " << addon.name;
-	addons.emplace_back(addon);
+	addons.push_back(addon);
 
 	for (auto & e : addon.includePaths) {
 		ofLogVerbose() << "adding addon include path: " << e;
@@ -432,7 +432,7 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 			addon.filesToFolders[s]="other";
 		}
 		
-//		cout << "addSrc s=" << s << " : " << addon.filesToFolders[s] << endl;
+		cout << "addSrc s=" << s << " : " << addon.filesToFolders[s] << endl;
 		addSrc(s,addon.filesToFolders[s]);
 	}
 

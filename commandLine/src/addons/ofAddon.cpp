@@ -527,7 +527,7 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 #endif
 //			 cout << s << endl;
 		}
-		cout << " -----> getFilesRecursively " << srcPath << endl;
+		cout << " -----> getFilesRecursively end " << endl;
 	}
 
 	// MARK: srcFiles to fs::path
