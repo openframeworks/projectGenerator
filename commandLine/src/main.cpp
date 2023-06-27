@@ -1,4 +1,4 @@
-#define PG_VERSION "PG v006"
+#define PG_VERSION "PG v007"
 #define TARGET_NO_SOUND
 #define TARGET_NODISPLAY
 

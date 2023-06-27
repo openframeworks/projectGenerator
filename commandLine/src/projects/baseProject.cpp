@@ -320,6 +320,8 @@ void baseProject::addAddon(string addonName){
 				fs::path to { dest / d };
 
 				
+				
+				
 				if (fs::is_regular_file(from)){
 //					cout << "from is regular file" << endl;
 					try {
