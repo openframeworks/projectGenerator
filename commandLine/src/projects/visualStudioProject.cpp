@@ -431,14 +431,13 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 	}
 
 	
-	
 	for (auto & s : addon.srcFiles) {
 		ofLogVerbose() << "adding addon srcFiles: " << s;
 		if ( addon.filesToFolders[s] == "" ) {
 			addon.filesToFolders[s] = "other";
 		}
 		
-		cout << "addSrc s=" << s << " : " << addon.filesToFolders[s] << endl;
+//		cout << "addSrc s=" << s << " : " << addon.filesToFolders[s] << endl;
 		addSrc(s,addon.filesToFolders[s]);
 	}
 
