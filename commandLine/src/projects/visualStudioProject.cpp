@@ -406,6 +406,12 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 		baseProject::addAddon(d);
 	}
 
+	cout << "-x-x-x-" << endl;
+	for (auto & s : addon.srcFiles) {
+		cout << s << endl;
+	}
+	cout << "-x-x-x-" << endl;
+	
 	ofLogNotice() << "adding addon: " << addon.name;
 	addons.push_back(addon);
 
