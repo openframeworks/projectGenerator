@@ -149,7 +149,7 @@ void ofAddon::addReplaceString(string & variable, string value, bool addToVariab
 	else variable = value;
 }
 
-void ofAddon::addReplaceStringVector(std::vector<std::string> & variable, std::string value, std::string prefix, bool addToVariable){
+void ofAddon::addReplaceStringVector(std::vector<string> & variable, string value, string prefix, bool addToVariable){
 //	cout << "----------" << endl;
 //	cout << "addReplaceStringVector value=" << value << ", prefix=" << prefix << ", addToVariable=" << addToVariable << endl;
 //	cout << "----------" << endl;
@@ -488,7 +488,7 @@ void ofAddon::parseConfig(){
 }
 
 
-bool ofAddon::fromFS(fs::path path, const std::string & platform){
+bool ofAddon::fromFS(fs::path path, const string & platform){
 //	alert("ofAddon::fromFS path : " + path.string());
 	
 	clear();
@@ -607,8 +607,8 @@ bool ofAddon::fromFS(fs::path path, const std::string & platform){
 		bool bIsSystemFramework = false;
 		size_t foundUnixPath = f.find('/');
 		size_t foundWindowsPath = f.find('\\');
-		if (foundUnixPath==std::string::npos &&
-			foundWindowsPath==std::string::npos){
+		if (foundUnixPath==string::npos &&
+			foundWindowsPath==string::npos){
 			bIsSystemFramework = true;                  // we have no "path" so we are system
 		}
 

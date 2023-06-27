@@ -31,11 +31,11 @@
 
 using std::unique_ptr;
 
-std::string generateUUID(std::string input){
+string generateUUID(string input){
 	return uuidxx::uuid::Generate().ToString(false);
 }
 
-void findandreplace( std::string& tInput, std::string tFind, std::string tReplace ) {
+void findandreplace( string& tInput, string tFind, string tReplace ) {
 	size_t uPos = 0;
 	size_t uFindLen = tFind.length();
 	size_t uReplaceLen = tReplace.length();
@@ -44,7 +44,7 @@ void findandreplace( std::string& tInput, std::string tFind, std::string tReplac
 		return;
 	}
 
-	for( ;(uPos = tInput.find( tFind, uPos )) != std::string::npos; ){
+	for( ;(uPos = tInput.find( tFind, uPos )) != string::npos; ){
 		tInput.replace( uPos, uFindLen, tReplace );
 		uPos += uReplaceLen;
 	}
@@ -52,7 +52,7 @@ void findandreplace( std::string& tInput, std::string tFind, std::string tReplac
 }
 
 
-std::string LoadFileAsString(const std::string & fn) {
+string LoadFileAsString(const string & fn) {
 	std::ifstream fin(fn.c_str());
 
 	if(!fin) {
@@ -65,14 +65,14 @@ std::string LoadFileAsString(const std::string & fn) {
 	return oss.str();
 }
 
-void findandreplaceInTexfile (const fs::path & fileName, std::string tFind, std::string tReplace ){
+void findandreplaceInTexfile (const fs::path & fileName, string tFind, string tReplace ){
 //	cout << "findandreplaceInTexfile " << fileName << " : " << tFind << " : " << tReplace << endl;
 	if (fs::exists( fileName )) {
 //		std::ifstream t(ofToDataPath(fileName).c_str());
 		std::ifstream t(fileName.c_str());
 		std::stringstream buffer;
 		buffer << t.rdbuf();
-		std::string bufferStr = buffer.str();
+		string bufferStr = buffer.str();
 		t.close();
 		findandreplace(bufferStr, tFind, tReplace);
 		std::ofstream myfile;
@@ -90,7 +90,7 @@ void findandreplaceInTexfile (const fs::path & fileName, std::string tFind, std:
 
 
 
-bool doesTagAndAttributeExist(pugi::xml_document & doc, std::string tag, std::string attribute, std::string newValue){
+bool doesTagAndAttributeExist(pugi::xml_document & doc, string tag, string attribute, string newValue){
 	char xpathExpressionExists[1024];
 	sprintf(xpathExpressionExists, "//%s[@%s='%s']", tag.c_str(), attribute.c_str(), newValue.c_str());
 	//cout <<xpathExpressionExists <<endl;
@@ -102,14 +102,14 @@ bool doesTagAndAttributeExist(pugi::xml_document & doc, std::string tag, std::st
 	}
 }
 
-pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::string attribute, std::string newValue, bool overwriteMultiple){
+pugi::xml_node appendValue(pugi::xml_document & doc, string tag, string attribute, string newValue, bool overwriteMultiple){
 
 	if (overwriteMultiple == true){
 		// find the existing node...
 		char xpathExpression[1024];
 		sprintf(xpathExpression, "//%s[@%s='%s']", tag.c_str(), attribute.c_str(), newValue.c_str());
 		pugi::xpath_node node = doc.select_node(xpathExpression);
-		if(std::string(node.node().attribute(attribute.c_str()).value()).size() > 0){ // for some reason we get nulls here?
+		if(string(node.node().attribute(attribute.c_str()).value()).size() > 0){ // for some reason we get nulls here?
 			// ...delete the existing node
 			std::cout << "DELETING: " << node.node().name() << ": " << " " << node.node().attribute(attribute.c_str()).value() << std::endl;
 			node.node().parent().remove_child(node.node());
@@ -171,8 +171,8 @@ void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileN
 }
 
 
-static std::vector <std::string> platforms;
-bool isFolderNotCurrentPlatform(std::string folderName, std::string platform){
+static std::vector <string> platforms;
+bool isFolderNotCurrentPlatform(string folderName, string platform){
 	if( platforms.size() == 0 ){
 		platforms = {
 			"osx",
@@ -195,20 +195,20 @@ bool isFolderNotCurrentPlatform(std::string folderName, std::string platform){
 	return false;
 }
 
-void splitFromLast(std::string toSplit, std::string deliminator, std::string & first, std::string & second){
+void splitFromLast(string toSplit, string deliminator, string & first, string & second){
 	size_t found = toSplit.find_last_of(deliminator.c_str());
 	first = toSplit.substr(0,found);
 	second = toSplit.substr(found+1);
 }
 
-void splitFromFirst(std::string toSplit, std::string deliminator, std::string & first, std::string & second){
+void splitFromFirst(string toSplit, string deliminator, string & first, string & second){
 	size_t found = toSplit.find(deliminator.c_str());
 	first = toSplit.substr(0,found );
 	second = toSplit.substr(found+deliminator.size());
 }
 
 
-void getFoldersRecursively(const fs::path & path, std::vector < std::string > & folderNames, std::string platform){
+void getFoldersRecursively(const fs::path & path, std::vector < string > & folderNames, string platform){
 	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
 	if (!fs::is_directory(path)) return;
 	if (path.extension() != ".framework") {
@@ -223,7 +223,7 @@ void getFoldersRecursively(const fs::path & path, std::vector < std::string > & 
 	}
 }
 
-void getFrameworksRecursively(const fs::path & path, std::vector < std::string > & frameworks, std::string platform) {
+void getFrameworksRecursively(const fs::path & path, std::vector < string > & frameworks, string platform) {
 	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
 	if (!fs::is_directory(path)) return;
 	for (const auto & entry : fs::directory_iterator(path)) {
@@ -248,7 +248,7 @@ void getFrameworksRecursively(const fs::path & path, std::vector < std::string >
 
 
 
-void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props, const std::string & platform) {
+void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props, const string & platform) {
 	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
 	if (!fs::is_directory(path)) return;
 	for (const auto & entry : fs::directory_iterator(path)) {
@@ -273,7 +273,7 @@ void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props
 }
 
 
-void getDllsRecursively(const fs::path & path, std::vector < std::string > & dlls, std::string platform) {
+void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, string platform) {
 	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
 	if (!fs::is_directory(path)) return;
 	if (path.filename().c_str()[0] == '.') return; // avoid hidden files .DS_Store .vscode .git etc
@@ -292,17 +292,17 @@ void getDllsRecursively(const fs::path & path, std::vector < std::string > & dll
 }
 
 
-void getLibsRecursively(const fs::path & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform, std::string arch, std::string target){
+void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles, std::vector < LibraryBinary > & libLibs, string platform, string arch, string target){
 
 	if (!fs::exists(path)) return; //check for dir existing before listing to prevent lots of "source directory does not exist" errors printed on console
 	if (!fs::is_directory(path)) return;
 	for (const auto & entry : fs::directory_iterator(path)) {
 		auto f = entry.path();
-		std::vector<std::string> splittedPath = ofSplitString(f.string(), fs::path("/").make_preferred().string());
+		std::vector<string> splittedPath = ofSplitString(f.string(), fs::path("/").make_preferred().string());
 
 //		ofFile temp(dir.getFile(i));
-		std::string ext = "";
-		std::string first = "";
+		string ext = "";
+		string first = "";
 		splitFromLast(f.string(), ".", first, ext);
 		
 		if (fs::is_directory(f)) {
@@ -342,10 +342,10 @@ void getLibsRecursively(const fs::path & path, std::vector < std::string > & lib
 					//TODO: THEO hack
 					if( platform == "ios" ){ //this is so we can add the osx libs for the simulator builds
 
-						std::string currentPath = f.string();
+						string currentPath = f.string();
 
 						//TODO: THEO double hack this is why we need install.xml - custom ignore ofxOpenCv
-						if( currentPath.find("ofxOpenCv") == std::string::npos ){
+						if( currentPath.find("ofxOpenCv") == string::npos ){
 							ofStringReplace(currentPath, "ios", "osx");
 							if( fs::exists(currentPath) ){
 //								libLibs.emplace_back( currentPath, arch, target );
@@ -361,13 +361,13 @@ void getLibsRecursively(const fs::path & path, std::vector < std::string > & lib
 	}
 }
 
-void fixSlashOrder(std::string & toFix){
+void fixSlashOrder(string & toFix){
 	std::replace(toFix.begin(), toFix.end(),'/', '\\');
 }
 
 
-std::string unsplitString (std::vector < std::string > strings, std::string deliminator ){
-	std::string result;
+string unsplitString (std::vector < string > strings, string deliminator ){
+	string result;
 	for (int i = 0; i < (int)strings.size(); i++){
 		if (i != 0) result += deliminator;
 		result += strings[i];
@@ -392,8 +392,8 @@ string convertStringToWindowsSeparator(string in) {
 	return in;
 }
 
-vector<std::string> fileToStrings (const fs::path & file) {
-	vector<std::string> out;
+vector<string> fileToStrings (const fs::path & file) {
+	vector<string> out;
 	if (fs::exists(file)) {
 		std::ifstream thisFile(file);
 		string line;
@@ -424,14 +424,14 @@ bool askOFRoot(){
 	return true;
 }
 
-std::string getOFRootFromConfig(){
+string getOFRootFromConfig(){
 	if(!checkConfigExists()) return "";
 	ofFile configFile(ofFilePath::join(ofFilePath::getUserHomeDir(),".ofprojectgenerator/config"),ofFile::ReadOnly);
 	ofBuffer filePath = configFile.readToBuffer();
 	return filePath.getLines().begin().asString();
 }
 
-std::string getTargetString(ofTargetPlatform t){
+string getTargetString(ofTargetPlatform t){
 	switch (t) {
 		case OF_TARGET_OSX:
 			return "osx";
@@ -487,12 +487,12 @@ unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ) {
 	}
 }
 
-std::string colorText(const std::string & s, int color) {
-	std::string c = std::to_string(color);
+string colorText(const string & s, int color) {
+	string c = std::to_string(color);
 	return "\033[1;"+c+"m" + s + "\033[0m";
 }
 
-void alert(std::string msg, int color) {
+void alert(string msg, int color) {
 	std::cout << colorText(msg, color) << std::endl;
 }
 
