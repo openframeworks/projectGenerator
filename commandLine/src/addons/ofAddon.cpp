@@ -517,30 +517,25 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	fs::path srcPath { path / "src" };
 
 	if (fs::exists(srcPath)) {
-		cout << " -----> getFilesRecursively " << srcPath << endl;
 		getFilesRecursively(srcPath, srcFiles);
-		for (auto & s : srcFiles) {
-			cout << s << endl;
-			cout << fs::exists(s) << endl;
-#ifdef TARGET_WIN32
-//			std::replace(s.begin(), s.end(), '\', '\\');
-#endif
-//			 cout << s << endl;
-		}
-		cout << " -----> getFilesRecursively end " << endl;
+		//		cout << " -----> getFilesRecursively " << srcPath << endl;
+//		for (auto & s : srcFiles) {
+//			cout << s << endl;
+//			cout << fs::exists(s) << endl;
+//		}
+//		cout << " -----> getFilesRecursively end " << endl;
 	}
 
 	// MARK: srcFiles to fs::path
 	// not possible today because there are string based exclusion functions
 	for (auto & s : srcFiles) {
+		fs::path sFS { s };
 		fs::path folder;
-		auto srcFS = fs::path(prefixPath / fs::relative(s, containedPath));
 		if (isLocalAddon) {
-			folder = srcFS.parent_path();
+			folder = sFS.parent_path();
 		} else {
-			folder = fs::relative(fs::path(s).parent_path(), containedPath);
+			folder = fs::relative(sFS.parent_path(), containedPath);
 		}
-		s = srcFS.string();
 		filesToFolders[s] = folder.string();
 	}
 
@@ -550,44 +545,29 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	}
 	
 //	cout << "---- LIST PROPS FILES" << endl;
-	for (auto & p : propsFiles) {
-		cout << p << endl;
-	}
-//	cout << "---- LIST PROPS FILES" << endl;
-
-//	cout << "pathToProject " << pathToProject << endl;
-//	for (auto & p : propsFiles) {
-//		cout << "original path " << p << endl;
-//		p = fs::relative(p, pathToProject);
-//		cout << "new path" << p << endl;
-//	}
+	for (auto & p : propsFiles) { cout << p << endl; } //	cout << "---- LIST PROPS FILES" << endl;
 	
-//	int i = 0;
-//	for (auto & s : propsFiles) {
-//		fs::path folder;
-//		auto srcFS = fs::path(prefixPath / fs::relative(s, containedPath));
-//		if (isLocalAddon) {
-////			folder = fs::path("local_addons") / fs::path(s).parent_path();
-//			folder = srcFS.parent_path();
-//		} else {
-//			folder = fs::relative(fs::path(s).parent_path(), containedPath);
-//		}
-//		s = srcFS.string();
-//		propsFiles[i] = folder.string();
-//		i++;
-//	}
+	int i = 0;
+	for (auto & s : propsFiles) {
+		fs::path sFS { s };
+		fs::path folder;
+		if (isLocalAddon) {
+			folder = sFS.parent_path();
+		} else {
+			folder = fs::relative(sFS.parent_path(), containedPath);
+		}
+		propsFiles[i] = folder;
+		i++;
+	}
 
 	fs::path libsPath = path / "libs";
-	
 	vector < string > libFiles;
 
 	if (fs::exists(libsPath)) {
 //		alert("getLibsRecursively " + libsPath.string(), 31);
-		cout << "getOFRoot() " << getOFRoot() << endl;
-		cout << "pathToOF " << pathToOF << endl;
-
+//		cout << "getOFRoot() " << getOFRoot() << endl;
+//		cout << "pathToOF " << pathToOF << endl;
 		getLibsRecursively(libsPath, libFiles, libs, platform);
-		
 		if (platform == "osx" || platform == "ios"){
 			getFrameworksRecursively(libsPath, frameworks, platform);
 		}
@@ -602,20 +582,15 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	}
 
 	for (auto & s : libFiles) {
-//		cout << "---- >> " << endl;
-//		cout << s << endl;
+		fs::path sFS { s };
 		fs::path folder;
-		auto srcFS = fs::path(prefixPath / fs::relative(s, containedPath));
 		if (isLocalAddon) {
-			folder = srcFS.parent_path();
+			folder = sFS.parent_path();
 		} else {
-			folder = fs::relative(fs::path(s).parent_path(), containedPath);
+			folder = fs::relative(sFS.parent_path(), containedPath);
 		}
-		s = srcFS.string();
 		srcFiles.emplace_back(s);
 		filesToFolders[s] = folder.string();
-//		cout << s << endl;
-//		cout << "filesToFolders " << s << " : " << folder << endl;
 	}
 
 	
@@ -673,9 +648,16 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 
 	paths.sort(); //paths.unique(); // unique not needed anymore. everything is carefully inserted now.
 
+	
 	for (auto & p : paths) {
 		includePaths.emplace_back(p.string());
 	}
+
+	cout << "--- inludePaths " << endl;
+	for (auto & i : includePaths) {
+		cout << i << endl;
+	}
+	cout << "--- inludePaths " << endl;
 
 	parseConfig();
 
