@@ -271,15 +271,18 @@ void baseProject::addAddon(std::string addonName){
 	
 	fs::path addonPath { addonName };
 
+	// Flawed logic. it will return YES if you are in the project folder and path is ../../../addons/xxx
 	if (fs::exists(addonPath)) {
+		alert("local addon");
 		addon.isLocalAddon = true;
 	} else {
+		alert("global addon");
 		addonPath = fs::path(getOFRoot()) / "addons" / addonName;
 		//addonPath = addon.pathToOF / "addons" / addonName;
 		addon.isLocalAddon = false;
 	}
 	
-	alert("addonPath " + addonPath.string(), 33);
+	alert("baseProject::addAddon addonPath " + addonPath.string(), 33);
 	
 	if(!inCache){
 		addonOK = addon.fromFS(addonPath, target);

@@ -403,26 +403,20 @@ vector<std::string> fileToStrings (const fs::path & file) {
 	}
 	return out;
 }
-// FIXME: - in the future this can be the getOFRelPath
-//fs::path getOFRelPathFS(const fs::path & from) {
+
 fs::path getOFRelPath(const fs::path & from) {
 	return fs::relative(getOFRoot(), from);
 }
 
-//std::string getOFRelPath(const std::string & from) {
-//	return ofFilePath::addTrailingSlash(getOFRelPathFS(from).string());
-//}
-
 bool checkConfigExists(){
 	return fs::exists(fs::path { ofFilePath::getUserHomeDir() }  / ".ofprojectgenerator/config");
-//	ofFile config(ofFilePath::join(ofFilePath::getUserHomeDir(),".ofprojectgenerator/config"));
-//	return config.exists();
 }
 
 bool askOFRoot(){
 	ofFileDialogResult res = ofSystemLoadDialog("Select the folder of your openFrameworks install",true);
 	if (res.fileName == "" || res.filePath == "") return false;
 
+	// FIXME: FS
 	ofDirectory config(ofFilePath::join(ofFilePath::getUserHomeDir(),".ofprojectgenerator"));
 	config.create(true);
 	ofFile configFile(ofFilePath::join(ofFilePath::getUserHomeDir(),".ofprojectgenerator/config"),ofFile::WriteOnly);

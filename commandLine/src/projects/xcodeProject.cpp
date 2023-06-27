@@ -722,7 +722,7 @@ void xcodeProject::addAfterRule(string rule){
 }
 
 void xcodeProject::addAddon(ofAddon & addon){
-//	alert("xcodeProject addAddon string :: " + addon.name, 31);
+	alert("xcodeProject addAddon string :: " + addon.name, 31);
 	for (auto & a : addons) {
 		if (a.name == addon.name) return;
 	}
@@ -834,10 +834,8 @@ void xcodeProject::addAddon(ofAddon & addon){
 }
 
 bool xcodeProject::saveProjectFile(){
-	
 	fs::path fileName = projectDir / (projectName + ".xcodeproj/project.pbxproj");
-//	cout << "saveProjectFile " << fileName << endl;
-	alert("xcodeProject::saveProjectFile() begin");
+//	alert("xcodeProject::saveProjectFile() begin " + fileName.string());
 	bool usePlistBuddy = false;
 
 	if (usePlistBuddy) {
@@ -851,11 +849,6 @@ bool xcodeProject::saveProjectFile(){
 		cout << ofSystem(command) << endl;
 	} else {
 		// JSON Block - Multiplatform
-
-		// I had to use absolute here because ofBufferFromFile always returns relative to data folder.
-		// FIXME: FS ! remove absolute
-//		string contents = ofBufferFromFile(fs::absolute(fileName)).getText();
-//		cout << contents << endl;
 		
 		std::ifstream contents(fileName);
 		json j = json::parse(contents);
