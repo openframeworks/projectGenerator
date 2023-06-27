@@ -260,6 +260,12 @@ bool baseProject::isAddonInCache(const string & addonPath, const string platform
 
 void baseProject::addAddon(string addonName){
 //	std::cout << "baseProject::addAddon " << addonName << std::endl;
+	
+	#ifdef TARGET_WIN32
+		std::replace( addonName.begin(), addonName.end(), '/', '\\' );
+	#endif
+	
+
 	ofAddon addon;
 	// FIXME: Review this path here.
 	addon.pathToOF = getOFRelPath(projectDir);
@@ -359,7 +365,7 @@ void baseProject::addAddon(string addonName){
 }
 
 void baseProject::addSrcRecursively(const fs::path & srcPath){
-	cout << "addSrcRecursively " << srcPath << endl;
+		cout << "addSrcRecursively " << srcPath << endl;
 	fs::path base = srcPath.parent_path();
 	cout << "base = " << base << endl;
 	extSrcPaths.emplace_back(srcPath.string());
