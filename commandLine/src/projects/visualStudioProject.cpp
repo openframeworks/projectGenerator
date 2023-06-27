@@ -104,7 +104,7 @@ void visualStudioProject::appendFilter(string folderName){
 
 
 void visualStudioProject::addSrc(string srcFile, string folder, SrcType type){
-	alert("addSrc " + srcFile, 35);
+//	alert("addSrc " + srcFile, 35);
 	string original = srcFile ;
 	fixSlashOrder(folder);
 	fixSlashOrder(srcFile);
@@ -424,11 +424,23 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 		addLibrary(lib);
 	}
 
-	for(int i=0;i<(int)addon.srcFiles.size(); i++){
-		ofLogVerbose() << "adding addon srcFiles: " << addon.srcFiles[i];
-		if(addon.filesToFolders[addon.srcFiles[i]]=="") addon.filesToFolders[addon.srcFiles[i]]="other";
-		addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
+	
+	
+	for (auto & s : addon.srcFiles) {
+		ofLogVerbose() << "adding addon srcFiles: " << s;
+		if ( addon.filesToFolders[s] == "" ) {
+			addon.filesToFolders[s]="other";
+		}
+		
+		cout << "addSrc s=" << s << " : " << addon.filesToFolders[s] << endl;
+		addSrc(s,addon.filesToFolders[s]);
 	}
+	
+//	for(int i=0;i<(int)addon.srcFiles.size(); i++){
+//		ofLogVerbose() << "adding addon srcFiles: " << addon.srcFiles[i];
+//		if(addon.filesToFolders[addon.srcFiles[i]]=="") addon.filesToFolders[addon.srcFiles[i]]="other";
+//		addSrc(addon.srcFiles[i],addon.filesToFolders[addon.srcFiles[i]]);
+//	}
 
 	for(int i=0;i<(int)addon.csrcFiles.size(); i++){
 		ofLogVerbose() << "adding addon c srcFiles: " << addon.csrcFiles[i];
