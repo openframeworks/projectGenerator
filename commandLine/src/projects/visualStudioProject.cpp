@@ -104,6 +104,7 @@ void visualStudioProject::appendFilter(string folderName){
 
 
 void visualStudioProject::addSrc(string srcFile, string folder, SrcType type){
+	alert("addSrc " + srcFile, 35);
 	string original = srcFile ;
 	fixSlashOrder(folder);
 	fixSlashOrder(srcFile);
