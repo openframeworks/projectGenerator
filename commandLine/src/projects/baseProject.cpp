@@ -17,7 +17,7 @@
 
 const fs::path templatesFolder = "scripts/templates";
 
-baseProject::baseProject(std::string _target){
+baseProject::baseProject(string _target){
 	bLoaded = false;
 	target = _target;
 }
@@ -26,7 +26,7 @@ fs::path baseProject::getPlatformTemplateDir(){
 	return getOFRoot() / templatesFolder / target;
 }
 
-bool isPlatformName(std::string file){
+bool isPlatformName(string file){
 	for(int platform=OF_TARGET_OSX;platform<OF_TARGET_EMSCRIPTEN+1;platform++){
 		if(file==getTargetString((ofTargetPlatform)platform)){
 			return true;
@@ -83,8 +83,8 @@ std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const fs::path
 	return std::unique_ptr<baseProject::Template>();
 }
 
-std::vector<baseProject::Template> baseProject::listAvailableTemplates(std::string target){
-	std::vector<baseProject::Template> templates;
+vector<baseProject::Template> baseProject::listAvailableTemplates(string target){
+	vector<baseProject::Template> templates;
 	std::set<fs::path> sorted;
 	for (const auto & entry : fs::directory_iterator(getOFRoot() / templatesFolder)) {
 		auto f = entry.path();
@@ -102,8 +102,8 @@ std::vector<baseProject::Template> baseProject::listAvailableTemplates(std::stri
 	return templates;
 }
 
-bool baseProject::create(const fs::path & path, std::string templateName){
-//	cout << "baseProject::create " << path << " : " << templateName << endl;
+bool baseProject::create(const fs::path & path, string templateName){
+	alert("baseProject::create " + path.string() + " : " + templateName);
 //	auto path = _path; // just because it is const
 	addons.clear();
 	extSrcPaths.clear();
@@ -167,14 +167,14 @@ bool baseProject::create(const fs::path & path, std::string templateName){
 	parseConfigMake();
 
 	if (bDoesDirExist){
-		std::vector < string > fileNames;
+		vector < string > fileNames;
 		getFilesRecursively(projectDir / "src", fileNames);
 
 		for (auto & f : fileNames) {
 			fs::path rel { fs::relative(f, projectDir) };
 			fs::path folder { rel.parent_path() };
 
-			std::string fileName = rel.string();
+			string fileName = rel.string();
 
 			if (fileName != "src/ofApp.cpp" &&
 				fileName != "src/ofApp.h" &&
@@ -187,7 +187,7 @@ bool baseProject::create(const fs::path & path, std::string templateName){
 		}
 
 		// only add unique paths
-		std::vector < fs::path > paths;
+		vector < fs::path > paths;
 		for (auto & f : fileNames) {
 			auto dir = fs::path(f).parent_path().filename();
 			if (std::find(paths.begin(), paths.end(), dir) == paths.end()) {
@@ -253,12 +253,12 @@ bool baseProject::save(){
 	return saveProjectFile();
 }
 
-bool baseProject::isAddonInCache(const std::string & addonPath, const std::string platform){
+bool baseProject::isAddonInCache(const string & addonPath, const string platform){
 	if (addonsCache.find(platform) == addonsCache.end()) return false;
 	return addonsCache[platform].find(addonPath) != addonsCache[platform].end();
 }
 
-void baseProject::addAddon(std::string addonName){
+void baseProject::addAddon(string addonName){
 //	std::cout << "baseProject::addAddon " << addonName << std::endl;
 	ofAddon addon;
 	// FIXME: Review this path here.
@@ -308,7 +308,7 @@ void baseProject::addAddon(std::string addonName){
 	// Process values from ADDON_DATA
 	if(addon.data.size()){
 		for(auto & data : addon.data){
-			std::string d = data;
+			string d = data;
 			ofStringReplace(d, "data/", ""); // avoid to copy files at /data/data/*
 
 			fs::path path { addon.addonPath / data };
@@ -389,7 +389,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 	
 //	string parentFolder = ofFilePath::getEnclosingDirectory(ofFilePath::removeTrailingSlash(srcPath));
 
-	std::unordered_set<std::string> uniqueIncludeFolders;
+	std::unordered_set<string> uniqueIncludeFolders;
 	for( auto & src : srcFilesToAdd){
 //		cout << "fileToAdd :: " << src << endl;
 		//if it is an absolute path it is easy - add the file and enclosing folder to the project
@@ -584,7 +584,7 @@ void baseProject::parseConfigMake(){
 		auto config = ofTrim(line);
 		if(config[0] == '#') continue;
 		if(config == "") continue;
-		if(config.find("=")!=std::string::npos){
+		if(config.find("=")!=string::npos){
 			auto varValue = ofSplitString(config,"=",true,true);
 			if(varValue.size()>1){
 				auto var = ofTrim(varValue[0]);

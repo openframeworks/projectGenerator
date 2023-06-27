@@ -13,7 +13,7 @@
 // }
 
 
-enum  optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTERNAL, VERSION};
+enum optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTERNAL, VERSION };
 
 constexpr option::Descriptor usage[] =
 {
@@ -32,12 +32,9 @@ constexpr option::Descriptor usage[] =
 	{0,0,0,0,0,0}
 };
 
-
-
 #define EXIT_OK 0
 #define EXIT_USAGE 64
 #define EXIT_DATAERR 65
-
 #define STRINGIFY(A)  #A
 
 //-----------------------------------------------------
@@ -47,32 +44,27 @@ enum pgMode {
 	PG_MODE_UPDATE
 };
 
-
 float               startTime;
 int                 nProjectsUpdated;
 int                 nProjectsCreated;
 
-
-//std::string projectPath;
 fs::path projectPath;
 fs::path ofPath;
-std::vector <std::string> addons;
-//std::vector <std::string> srcPaths;
-std::vector <fs::path> srcPaths;
-std::vector <ofTargetPlatform> targets;
-std::string ofPathEnv;
-std::string templateName;
+vector <string> addons;
+vector <fs::path> srcPaths;
+vector <ofTargetPlatform> targets;
+string ofPathEnv;
+string templateName;
 
 bool busingEnvVar;
 bool bVerbose;
 bool bAddonsPassedIn;
-bool bForce;                            // force even if things like ofRoot seem wrong of if update folder looks wonky
-int mode;                               // what mode are we in?
-bool bRecursive;                        // do we recurse in update mode?
-bool bHelpRequested;                    // did we request help?
-bool bListTemplates;                    // did we request help?
-bool bDryRun;                           // do dry run (useful for debugging recursive update)
-
+bool bForce;                  // force even if things like ofRoot seem wrong of if update folder looks wonky
+int mode;                     // what mode are we in?
+bool bRecursive;              // do we recurse in update mode?
+bool bHelpRequested;          // did we request help?
+bool bListTemplates;          // did we request help?
+bool bDryRun;                 // do dry run (useful for debugging recursive update)
 
 //-------------------------------------------
 void consoleSpace() {
@@ -85,7 +77,7 @@ void printVersion() {
 
 bool printTemplates() {
 	if(targets.size()>1){
-	std::vector<std::vector<baseProject::Template>> allPlatformsTemplates;
+	vector<vector<baseProject::Template>> allPlatformsTemplates;
 		for(auto & target: targets){
 			auto templates = getTargetProject(target)->listAvailableTemplates(getTargetString(target));
 			allPlatformsTemplates.emplace_back(templates);
@@ -134,9 +126,9 @@ bool printTemplates() {
 	}
 }
 
-void addPlatforms(const std::string & value) {
+void addPlatforms(const string & value) {
 	targets.clear();
-	std::vector < std::string > platforms = ofSplitString(value, ",", true, true);
+	vector < string > platforms = ofSplitString(value, ",", true, true);
 
 	for (auto & p : platforms) {
 		if (p == "linux") {
@@ -187,7 +179,7 @@ void addPlatforms(const std::string & value) {
 	}
 }
 
-bool containsFolder(fs::path path, std::string folderName) {
+bool containsFolder(fs::path path, string folderName) {
 	bool contains = false;
 	for (const auto & entry : fs::directory_iterator(path)) {
 		auto f = entry.path();
@@ -200,7 +192,7 @@ bool containsFolder(fs::path path, std::string folderName) {
 }
 
 bool isGoodProjectPath(fs::path path) {
-	if (!fs::is_directory(path)) return false;
+//	if (!fs::is_directory(path)) return false;
 	return fs::exists(path / "src");
 }
 
@@ -216,7 +208,7 @@ bool isGoodOFPath(fs::path path) {
 
 
 void updateProject(const fs::path & path, ofTargetPlatform target, bool bConsiderParameterAddons = true) {
-//	cout << ">>> updateProject " << path << endl;
+	alert(">>>  updateProject " + path.string() , 34);;
 	// bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
 	// either we read the addons.make file, or we look at the parameter list.
 	// if we are updating recursively, we *never* consider addons passed as parameters.
@@ -224,10 +216,7 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 	ofLogNotice() << "updating project " << path;
 
 	if (!bDryRun) {
-		
-
 		auto project = getTargetProject(target);
-
 		project->create(path, templateName);
 
 		if(bConsiderParameterAddons && bAddonsPassedIn){
@@ -242,12 +231,12 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 		for(auto & srcPath : srcPaths){
 			project->addSrcRecursively(srcPath);
 		}
-
 		project->save();
 	}
 }
 
 void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
+	alert("recursiveUpdate " + path.string());
 //	cout << "recursiveUpdate " << path << " :: " << nProjectsUpdated << endl;
 	// first, bail if it's just a file
 	if (!fs::is_directory(path)) return;
@@ -274,7 +263,7 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 void printHelp(){
 	consoleSpace();
 
-	std::string header = "";
+	string header = "";
 	header += "\tprojectGenerator [options] pathName\n\n";
 	header += "if pathName exists, project is updated\n";
 	header += "if pathName doesn't exist, project is created\n";
@@ -287,7 +276,7 @@ void printHelp(){
 
 	consoleSpace();
 
-	std::string footer = "";
+	string footer = "";
 	footer += "examples:\n\n";
 	footer +=
 	STRINGIFY(
@@ -333,7 +322,7 @@ int main(int argc, char** argv){
 	startTime = 0;
 	nProjectsUpdated = 0;
 	nProjectsCreated = 0;
-	std::string projectName = "";
+	string projectName = "";
 //    projectPath = "";
 //	ofPath = "";
 	templateName = "";
@@ -341,8 +330,8 @@ int main(int argc, char** argv){
 	// ------------------------------------------------------ parse args
 	argc-=(argc>0); argv+=(argc>0); // skip program name argv[0] if present
 	option::Stats  stats(usage, argc, argv);
-	std::vector<option::Option> options(stats.options_max);
-	std::vector<option::Option> buffer(stats.buffer_max);
+	vector<option::Option> options(stats.options_max);
+	vector<option::Option> buffer(stats.buffer_max);
 
 	option::Parser parse(usage, argc, argv, &options[0], &buffer[0]);
 
@@ -379,7 +368,7 @@ int main(int argc, char** argv){
 
 	if (options[PLATFORMS].count() > 0){
 		if (options[PLATFORMS].arg != NULL){
-			std::string platformString(options[PLATFORMS].arg);
+			string platformString(options[PLATFORMS].arg);
 			addPlatforms(platformString);
 		}
 	}
@@ -387,14 +376,14 @@ int main(int argc, char** argv){
 	if (options[ADDONS].count() > 0){
 		bAddonsPassedIn = true; // could be empty
 		if (options[ADDONS].arg != NULL){
-			std::string addonsString(options[ADDONS].arg);
+			string addonsString(options[ADDONS].arg);
 			addons = ofSplitString(addonsString, ",", true, true);
 		}
 	}
 
 	if (options[SRCEXTERNAL].count() > 0){
 		if (options[SRCEXTERNAL].arg != NULL){
-			std::string srcString(options[SRCEXTERNAL].arg);
+			string srcString(options[SRCEXTERNAL].arg);
 			// TODO: TEST
 			for (auto & s : ofSplitString(srcString, ",", true, true)) {
 				srcPaths.emplace_back(s);
@@ -411,7 +400,7 @@ int main(int argc, char** argv){
 
 	if (options[TEMPLATE].count() > 0){
 		if (options[TEMPLATE].arg != NULL){
-			std::string templateString(options[TEMPLATE].arg);
+			string templateString(options[TEMPLATE].arg);
 			templateName = templateString;
 		}
 	}
@@ -433,7 +422,7 @@ int main(int argc, char** argv){
 	char* pPath;
 	pPath = getenv("PG_OF_PATH");
 	if (pPath != NULL) {
-		ofPathEnv = std::string(pPath);
+		ofPathEnv = string(pPath);
 	}
 
 	if (ofPath == "" && ofPathEnv != "") {
@@ -516,9 +505,6 @@ int main(int argc, char** argv){
 			ofLogNotice() << "-----------------------------------------------";
 		}
 	} else {
-		
-
-		
 		if (mode == PG_MODE_UPDATE && !isGoodProjectPath(projectPath)) {
 			ofLogError() << "there is no src folder in this project path to update, maybe use create instead? (or use force to force updating)";
 		} else {
