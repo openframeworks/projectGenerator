@@ -261,6 +261,7 @@ bool baseProject::isAddonInCache(const string & addonPath, const string platform
 void baseProject::addAddon(string addonName){
 //	std::cout << "baseProject::addAddon " << addonName << std::endl;
 	
+	// FIXME : not target, yes platform.
 	#ifdef TARGET_WIN32
 		std::replace( addonName.begin(), addonName.end(), '/', '\\' );
 	#endif
