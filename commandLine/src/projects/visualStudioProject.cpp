@@ -110,7 +110,7 @@ void visualStudioProject::addSrc(std::string srcFile, std::string folder, SrcTyp
 	
 	// I had an empty ClCompile field causing errors
 	if (srcFile == "") {
-		cout << "NOOOOO empty " << folder << " : " original << endl;
+		cout << "NOOOOO empty " << folder << " : " << original << endl;
 		return;
 	}
 
