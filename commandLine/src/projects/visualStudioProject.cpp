@@ -8,9 +8,8 @@ std::string visualStudioProject::LOG_NAME = "visualStudioProjectFile";
 
 
 bool visualStudioProject::createProjectFile(){
+//	alert("visualStudioProject::createProjectFile");
 
-//	cout << "visualStudioProject::createProjectFile " << endl;
-	
 	fs::path project 	= projectDir / (projectName + ".vcxproj");
 	fs::path user 		= projectDir / (projectName + ".vcxproj.user");
 	fs::path solution	= projectDir / (projectName + ".sln");
@@ -20,12 +19,9 @@ bool visualStudioProject::createProjectFile(){
 	fs::copy(templatePath / "emptyExample.vcxproj.user", 	user, fs::copy_options::overwrite_existing);
 	fs::copy(templatePath / "emptyExample.sln", 			solution, fs::copy_options::overwrite_existing);
 	fs::copy(templatePath / "emptyExample.vcxproj.filters", filters, fs::copy_options::overwrite_existing);
-	
+
 	fs::copy(templatePath / "icon.rc", projectDir / "icon.rc", fs::copy_options::overwrite_existing);
 
-//	ofFile filterFile(filters);
-//	std::string temp = filterFile.readToBuffer();
-//	pugi::xml_parse_result result = filterXmlDoc.load_string(temp.c_str());
 	pugi::xml_parse_result result = filterXmlDoc.load_file(filters.c_str());
 	if (result.status==pugi::status_ok) {
 		ofLogVerbose() << "loaded filter ";
@@ -38,15 +34,11 @@ bool visualStudioProject::createProjectFile(){
 	findandreplaceInTexfile(project, "emptyExample", projectName);
 
 	fs::path relRoot = getOFRelPath(projectDir);
-//	cout << "relRoot : " << relRoot << endl;
 
-	// FIXME: Reproduce to other places, same logic of equivalent
 	if (!fs::equivalent(relRoot, "../../..")) {
-//		cout << "not equivalent to default ../../.." << endl;
-		
 		// let's make it windows friendly:
 		std::string relRootWindows = convertStringToWindowsSeparator(relRoot.string());
-		
+
 		// sln has windows paths:
 		findandreplaceInTexfile(solution, "..\\..\\..\\", relRootWindows);
 
@@ -70,11 +62,6 @@ bool visualStudioProject::loadProjectFile(){
 		ofLogError(LOG_NAME) << "error loading " << projectPath << " doesn't exist";
 		return false;
 	}
-	// ofFile project(projectDir / (projectName + ".vcxproj"));
-	// if(!project.exists()){
-	// 	ofLogError(LOG_NAME) << "error loading " << project.path() << " doesn't exist";
-	// 	return false;
-	// }
 	pugi::xml_parse_result result = doc.load_file(projectPath.c_str());
 	bLoaded = result.status==pugi::status_ok;
 	return bLoaded;
@@ -83,48 +70,40 @@ bool visualStudioProject::loadProjectFile(){
 
 bool visualStudioProject::saveProjectFile(){
 	auto filters = projectDir / (projectName + ".vcxproj.filters");
-//	std::cout << "visualStudioProject::saveProjectFile() " << filters << std::endl;
 	filterXmlDoc.save_file(filters.c_str());
 
 	auto vcxFile = projectDir / (projectName + ".vcxproj");
-//	std::cout << "visualStudioProject::saveProjectFile() " << vcxFile << std::endl;
 	return doc.save_file(vcxFile.c_str());
 }
 
-
 void visualStudioProject::appendFilter(std::string folderName){
-
 	fixSlashOrder(folderName);
-
 	std::string uuid = generateUUID(folderName);
-
 	std::string tag = "//ItemGroup[Filter]/Filter[@Include=\"" + folderName + "\"]";
 	pugi::xpath_node_set set = filterXmlDoc.select_nodes(tag.c_str());
 	if (set.size() > 0){
-
 	//pugi::xml_node node = set[0].node();
 	} else {
 
-
-		 pugi::xml_node node = filterXmlDoc.select_node("//ItemGroup[Filter]/Filter").node().parent();
-		 pugi::xml_node nodeAdded = node.append_child("Filter");
-		 nodeAdded.append_attribute("Include").set_value(folderName.c_str());
-		 pugi::xml_node nodeAdded2 = nodeAdded.append_child("UniqueIdentifier");
+		pugi::xml_node node = filterXmlDoc.select_node("//ItemGroup[Filter]/Filter").node().parent();
+		pugi::xml_node nodeAdded = node.append_child("Filter");
+		nodeAdded.append_attribute("Include").set_value(folderName.c_str());
+		pugi::xml_node nodeAdded2 = nodeAdded.append_child("UniqueIdentifier");
 
 		 uuid.insert(8,"-");
 		 uuid.insert(8+4+1,"-");
 		 uuid.insert(8+4+4+2,"-");
 		 uuid.insert(8+4+4+4+3,"-");
 
-		 //d8376475-7454-4a24-b08a-aac121d3ad6f
+		//d8376475-7454-4a24-b08a-aac121d3ad6f
 
-		 std::string uuidAltered = "{" + uuid + "}";
-		 nodeAdded2.append_child(pugi::node_pcdata).set_value(uuidAltered.c_str());
+		std::string uuidAltered = "{" + uuid + "}";
+		nodeAdded2.append_child(pugi::node_pcdata).set_value(uuidAltered.c_str());
 	 }
 }
 
-void visualStudioProject::addSrc(std::string srcFile, std::string folder, SrcType type){
 
+void visualStudioProject::addSrc(std::string srcFile, std::string folder, SrcType type){
 	fixSlashOrder(folder);
 	fixSlashOrder(srcFile);
 
@@ -211,14 +190,9 @@ void visualStudioProject::addSrc(std::string srcFile, std::string folder, SrcTyp
 		}
 		}
 	}
-
-
-
 }
 
 void visualStudioProject::addInclude(std::string includeName){
-
-
 	fixSlashOrder(includeName);
 
 	pugi::xpath_node_set source = doc.select_nodes("//ClCompile/AdditionalIncludeDirectories");
@@ -261,9 +235,7 @@ void addLibraryPath(const pugi::xpath_node_set & nodes, std::string libFolder) {
 }
 
 void addLibraryName(const pugi::xpath_node_set & nodes, std::string libName) {
-
 	for (auto & node : nodes) {
-
 		std::string includes = node.node().first_child().value();
 		std::vector < std::string > strings = ofSplitString(includes, ";");
 		bool bAdd = true;
@@ -346,7 +318,6 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 
 	ofLogVerbose() << "adding lib path " << libFolder;
 	ofLogVerbose() << "adding lib " << libName;
-
 }
 
 void visualStudioProject::addCFLAG(std::string cflag, LibType libType){
@@ -369,7 +340,6 @@ void visualStudioProject::addCFLAG(std::string cflag, LibType libType){
 			additionalOptions.set_value((std::string(additionalOptions.value()) + " " + cflag).c_str());
 		}
 	}
-
 }
 
 void visualStudioProject::addCPPFLAG(std::string cppflag, LibType libType){
@@ -392,11 +362,9 @@ void visualStudioProject::addCPPFLAG(std::string cppflag, LibType libType){
 			additionalOptions.set_value((std::string(additionalOptions.value()) + " " + cppflag).c_str());
 		}
 	}
-
 }
 
-void visualStudioProject::addDefine(std::string define, LibType libType)
-{
+void visualStudioProject::addDefine(std::string define, LibType libType) {
 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
 	for (int i = 0; i<items.size(); i++) {
 		pugi::xml_node additionalOptions;
@@ -420,7 +388,7 @@ void visualStudioProject::addDefine(std::string define, LibType libType)
 	}
 }
 
-void visualStudioProject::addAddon(ofAddon & addon){
+void visualStudioProject::addAddon(ofAddon & addon) {
 //	cout << "visualStudioProject::addAddon " << addon.name << endl;
 	for (auto & a : addons) {
 		if (a.name == addon.name) return;
@@ -471,7 +439,7 @@ void visualStudioProject::addAddon(ofAddon & addon){
 		if(addon.filesToFolders[addon.headersrcFiles[i]]=="") addon.filesToFolders[addon.headersrcFiles[i]]="other";
 		addSrc(addon.headersrcFiles[i],addon.filesToFolders[addon.headersrcFiles[i]],C);
 	}
-	
+
 	for(int i=0;i<(int)addon.objcsrcFiles.size(); i++){
 		ofLogVerbose() << "adding addon objc srcFiles: " << addon.objcsrcFiles[i];
 		if(addon.filesToFolders[addon.objcsrcFiles[i]]=="") addon.filesToFolders[addon.objcsrcFiles[i]]="other";

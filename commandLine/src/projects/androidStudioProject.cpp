@@ -8,7 +8,6 @@ std::string AndroidStudioProject::LOG_NAME = "AndroidStudioProject";
 
 AndroidStudioProject::AndroidStudioProject(std::string target)
 	: baseProject(target){
-
 }
 
 bool AndroidStudioProject::createProjectFile(){
@@ -17,80 +16,52 @@ bool AndroidStudioProject::createProjectFile(){
 	std::string packageName = projectName;
 	ofStringReplace(packageName, "-", "");
 
-	ofDirectory dir(projectDir);
-	if(!dir.exists()) dir.create(true);
-
-	// build.gradle
-	// FIXME: FS
-	ofFile gradleFile(ofFilePath::join(projectDir, "build.gradle"));
-	std::string src = ofFilePath::join(templatePath,"build.gradle");
-	std::string dst = gradleFile.path();
-
-	if(!gradleFile.exists()){
-		// FIXME: FS
-		if(!ofFile::copyFromTo(src,dst)){
-			ofLogError(LOG_NAME) << "error copying gradle template from " << src << " to " << dst;
-		}
+	if (!fs::exists(projectDir)) {
+		fs::create_directory(projectDir);
 	}
 
-	// settings.gradle
-	ofFile settings(ofFilePath::join(projectDir, "settings.gradle"));
-	if(!settings.exists()){
-		src = ofFilePath::join(templatePath,"settings.gradle");
-		dst = settings.path();
-		// FIXME: FS
+	vector <string> fileNames = {
+		"build.gradle",
+		"settings.gradle",
+		"AndroidManifest.xml",
+		".gitignore"
+	};
+	
+	for (auto & f : fileNames) {
 
-		if(!ofFile::copyFromTo(src,dst)){
-			ofLogError(LOG_NAME) << "error copying settings gradle template from " << src << " to " << dst;
-		}
-	}
+		fs::path from { templatePath / f };
+		fs::path to { projectDir / f };
 
-	// Android.manifest
-	ofFile manifest(ofFilePath::join(projectDir,"AndroidManifest.xml"));
-	if(!manifest.exists()){
-		src = ofFilePath::join(templatePath,"AndroidManifest.xml");
-		dst = manifest.path();
-		// FIXME: FS
-
-		if(!ofFile::copyFromTo(src,dst)){
-			ofLogError(LOG_NAME) << "error copying Android.manifest template from " << src << " to " << dst;
-		} else {
-			findandreplaceInTexfile(dst, "TEMPLATE_PACKAGE_NAME", packageName);
-		}
-	}
-
-	// gitignore
-	ofFile gitignore(ofFilePath::join(projectDir,".gitignore"));
-	if(!gitignore.exists()){
-		src = ofFilePath::join(templatePath,".gitignore");
-		dst = gitignore.path();
-		// FIXME: FS
-
-		if(!ofFile::copyFromTo(src,dst)){
-			ofLogError(LOG_NAME) << "error copying gitignore template from " << src << " to " << dst;
+		if (!fs::exists(to)) {
+			try {
+				fs::copy(from, to);
+			} catch(fs::filesystem_error& e) {
+				if (f == "AndroidManifest.xml") {
+					findandreplaceInTexfile(to, "TEMPLATE_PACKAGE_NAME", packageName);
+				} else {
+					ofLogError(LOG_NAME) << "error copying template from " << from << " to " << to << e.what();
+				}
+			}
 		}
 	}
 
 	// res folder
-	ofDirectory(ofFilePath::join(templatePath,"res")).copyTo(ofFilePath::join(projectDir,"res"));
-	findandreplaceInTexfile(ofFilePath::join(projectDir,"res/values/strings.xml"), "TEMPLATE_APP_NAME", projectName);
+	ofDirectory( templatePath / "res" ).copyTo( projectDir / "res" );
+	findandreplaceInTexfile( projectDir / "res/values/strings.xml", "TEMPLATE_APP_NAME", projectName);
 
 	// srcJava folder
-	ofDirectory(ofFilePath::join(templatePath,"srcJava")).copyTo(ofFilePath::join(projectDir,"srcJava"));
+	ofDirectory( templatePath / "srcJava" ).copyTo( projectDir / "srcJava" );
 
-	std::string from = ofFilePath::join(projectDir,"srcJava/cc/openframeworks/APP_NAME");
-	std::string to = ofFilePath::join(projectDir,"srcJava/cc/openframeworks/"+projectName);
+	fs::path from = projectDir / "srcJava/cc/openframeworks/APP_NAME";
+	fs::path to = projectDir / ("srcJava/cc/openframeworks/"+projectName);
 
-	findandreplaceInTexfile(ofFilePath::join(from,"OFActivity.java"), "TEMPLATE_APP_NAME", projectName);
+	findandreplaceInTexfile(from / "OFActivity.java", "TEMPLATE_APP_NAME", projectName);
 	ofDirectory(from).moveTo(to, true, true);
 
 	// Gradle wrapper
-	// FIXME: FS
-	ofDirectory(ofFilePath::join(templatePath,"gradle")).copyTo(ofFilePath::join(projectDir,"gradle"));
-	ofFile::copyFromTo(ofFilePath::join(templatePath,"gradlew"), ofFilePath::join(projectDir,"gradlew"));
-	ofFile::copyFromTo(ofFilePath::join(templatePath,"gradlew.bat"), ofFilePath::join(projectDir,"gradlew.bat"));
+	ofDirectory(templatePath / "gradle").copyTo( projectDir / "gradle" );
+	ofFile::copyFromTo(templatePath / "gradlew",  projectDir / "gradlew" );
+	ofFile::copyFromTo(templatePath / "gradlew.bat",  projectDir / "gradlew.bat" );
 
 	return true;
-
-
 }

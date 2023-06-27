@@ -414,9 +414,9 @@ fs::path getOFRelPath(const fs::path & from) {
 //}
 
 bool checkConfigExists(){
-	// FIXME: FS
-	ofFile config(ofFilePath::join(ofFilePath::getUserHomeDir(),".ofprojectgenerator/config"));
-	return config.exists();
+	return fs::exists(fs::path { ofFilePath::getUserHomeDir() }  / ".ofprojectgenerator/config");
+//	ofFile config(ofFilePath::join(ofFilePath::getUserHomeDir(),".ofprojectgenerator/config"));
+//	return config.exists();
 }
 
 bool askOFRoot(){

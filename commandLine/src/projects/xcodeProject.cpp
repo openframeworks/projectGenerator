@@ -765,11 +765,6 @@ void xcodeProject::addAddon(ofAddon & addon){
 		
 		
 		if (dylibPath.extension() == ".dylib") {
-//		if( ofFilePath::getFileExt(e.path) == "dylib" ){
-//			cout << "inside" << endl;
-			
-//			addDylib(ofFilePath::getFileName(e.path), e.path);
-			
 			addDylib(dylibPath.filename().string(), dylibPath.string());
 		}
 	}

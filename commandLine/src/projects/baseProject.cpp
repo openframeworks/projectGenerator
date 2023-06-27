@@ -15,7 +15,6 @@
 #include <set>
 #include <unordered_set>
 
-
 const fs::path templatesFolder = "scripts/templates";
 
 baseProject::baseProject(std::string _target){
@@ -86,7 +85,6 @@ std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const fs::path
 
 std::vector<baseProject::Template> baseProject::listAvailableTemplates(std::string target){
 	std::vector<baseProject::Template> templates;
-
 	std::set<fs::path> sorted;
 	for (const auto & entry : fs::directory_iterator(getOFRoot() / templatesFolder)) {
 		auto f = entry.path();
@@ -101,14 +99,12 @@ std::vector<baseProject::Template> baseProject::listAvailableTemplates(std::stri
 			templates.emplace_back(*templateConfig);
 		}
 	}
-
 	return templates;
 }
 
 bool baseProject::create(const fs::path & path, std::string templateName){
 //	cout << "baseProject::create " << path << " : " << templateName << endl;
 //	auto path = _path; // just because it is const
-
 	addons.clear();
 	extSrcPaths.clear();
 
@@ -153,14 +149,11 @@ bool baseProject::create(const fs::path & path, std::string templateName){
 				auto from = projectDir / rename.first;
 				auto to = projectDir / rename.second;
 				cout << "rename from to " << from << " : " << to << endl;
-//				auto to = projectDir / templateConfig->renames[rename.first];
 				
 				if (fs::exists(to)) {
 					fs::remove(to);
 				}
 				fs::rename(from, to);
-				// Reference: moveTo(const fs::path& path, bool bRelativeToData = true, bool overwrite = false);
-//				ofFile(from).moveTo(to,true,true);
 			}
 		}else{
 			ofLogWarning() << "Cannot find " << templateName << " using platform template only";
@@ -199,7 +192,6 @@ bool baseProject::create(const fs::path & path, std::string templateName){
 			auto dir = fs::path(f).parent_path().filename();
 			if (std::find(paths.begin(), paths.end(), dir) == paths.end()) {
 				paths.emplace_back(dir);
-//				cout << "addInclude " << dir << endl;
 				addInclude(dir.string());
 			}
 		}
@@ -340,7 +332,6 @@ void baseProject::addAddon(std::string addonName){
 
 				} else if (fs::is_directory(from)) {
 					cout << "from is directory" << endl;
-//					fs::path to { dest };
 					if (!fs::exists(to)) {
 						fs::create_directory(to);
 					}
@@ -567,7 +558,7 @@ void baseProject::addAddon(ofAddon & addon){
 }
 
 void baseProject::parseAddons(){
-	cout << "baseProject::parseAddons() " << endl;
+	// cout << "baseProject::parseAddons() " << endl;
 	fs::path parseFile { projectDir / "addons.make" };
 
 	for (auto & line : fileToStrings(parseFile)) {
@@ -581,7 +572,6 @@ void baseProject::parseAddons(){
 }
 
 void baseProject::parseConfigMake(){
-	
 	fs::path parseFile { projectDir / "config.make" };
 
 	for (auto & line : fileToStrings(parseFile)) {
