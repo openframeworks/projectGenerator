@@ -517,6 +517,7 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	fs::path srcPath { path / "src" };
 
 	if (fs::exists(srcPath)) {
+		cout << " getFilesRecursively " << srcPath << endl;
 		getFilesRecursively(srcPath, srcFiles);
 	}
 
