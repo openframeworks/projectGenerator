@@ -23,7 +23,7 @@ bool CBWinProject::createProjectFile(){
 
 	//let's do some renaming:
 	// FIXME: FS / Move to ouside here
-	fs::path relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
+	fs::path relRoot = getOFRelPath(projectDir);
 
 	if (!fs::equivalent(relRoot, "../../..")) {
 

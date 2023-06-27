@@ -69,7 +69,7 @@ bool CBLinuxProject::createProjectFile(){
 
 	// handle the relative roots.
 	// FIXME: FS
-	fs::path relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
+	fs::path relRoot = getOFRelPath(projectDir);
 	if (!fs::equivalent(relRoot, "../../..")) {
 		std::string relPath2 = relRoot.string();
 		relPath2.erase(relPath2.end()-1);

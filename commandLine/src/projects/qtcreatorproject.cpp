@@ -61,8 +61,7 @@ bool QtCreatorProject::createProjectFile(){
 	// handle the relative roots.
 	// FIXME: Move to baseproject?
 	// FIXME: FS
-	fs::path relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
-//	if (relRoot != "../../../"){
+	fs::path relRoot = getOFRelPath(projectDir);
 	if (!fs::equivalent(relRoot, "../../..")) {
 		std::string relPath2 = relRoot.string();
 		
