@@ -104,12 +104,13 @@ void visualStudioProject::appendFilter(std::string folderName){
 
 
 void visualStudioProject::addSrc(std::string srcFile, std::string folder, SrcType type){
+	std::string original = srcFile ;
 	fixSlashOrder(folder);
 	fixSlashOrder(srcFile);
 	
 	// I had an empty ClCompile field causing errors
 	if (srcFile == "") {
-		cout << "NOOOOO empty " << folder << " : " << endl;
+		cout << "NOOOOO empty " << folder << " : " original << endl;
 		return;
 	}
 
