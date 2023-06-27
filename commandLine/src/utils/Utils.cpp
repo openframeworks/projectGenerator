@@ -317,8 +317,10 @@ void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles
 				(ext == "dll" && platform != "vs")){
 				if (platformFound){
 //					libLibs.emplace_back( f, arch, target );
-					cout << "----" << endl;
-					cout << f.string() << endl;
+
+					// XAXA
+//					cout << "----" << endl;
+//					cout << f.string() << endl;
 					
 					libLibs.push_back({ f.string(), arch, target});
 

@@ -318,15 +318,10 @@ void baseProject::addAddon(string addonName){
 				
 				fs::path from { path };
 				fs::path to { dest / d };
-				
-				
-				alert ("||| copy from to");
-				cout << "||| copy from to " << from << " : " << to << endl;
-				cout << "from exists? " << fs::exists(from) << endl;
-				cout << "to exists? " << fs::exists(to) << endl;
+
 				
 				if (fs::is_regular_file(from)){
-					cout << "from is regular file" << endl;
+//					cout << "from is regular file" << endl;
 					try {
 						fs::copy_file(from, to, fs::copy_options::overwrite_existing);
 						ofLogVerbose() << "adding addon data file: " << d << endl;
@@ -337,20 +332,21 @@ void baseProject::addAddon(string addonName){
 					}
 
 				} else if (fs::is_directory(from)) {
-					cout << "from is directory" << endl;
+//					cout << "from is directory" << endl;
 					if (!fs::exists(to)) {
 						fs::create_directory(to);
 					}
+					
 					try {
-						fs::copy_file(from, to,
+						fs::copy(from, to,
 							fs::copy_options::overwrite_existing |
 							fs::copy_options::recursive
 						);
 						ofLogVerbose() << "adding addon data file: " << d << endl;
 						ofLog() << "adding addon data file: " << d << endl;
 					} catch(fs::filesystem_error& e) {
-						ofLogWarning() << "Can not add addon data file: " << to << " :: " << e.what() << std::endl;;
-						ofLog() << "Can not add addon data file: " << to << " :: " << e.what() << std::endl;;
+						ofLogWarning() << "Can not add addon data file: " << to << " :: " << e.what() << std::endl;
+						ofLog() << "Can not add addon data file: " << to << " :: " << e.what() << std::endl;
 					}
 				}
 			}else{
