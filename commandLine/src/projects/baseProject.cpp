@@ -270,6 +270,10 @@ void baseProject::addAddon(std::string addonName){
 	bool inCache = isAddonInCache(addonName, target);
 	
 	fs::path addonPath { addonName };
+	
+	cout << "projectDir " << projectDir << endl;
+	cout << "pathToOf " << addon.pathToOF << endl;
+	alert("baseProject::addAddon addonPath " + addonPath.string(), 33);
 
 	// Flawed logic. it will return YES if you are in the project folder and path is ../../../addons/xxx
 	if (fs::exists(addonPath)) {
@@ -282,7 +286,6 @@ void baseProject::addAddon(std::string addonName){
 		addon.isLocalAddon = false;
 	}
 	
-	alert("baseProject::addAddon addonPath " + addonPath.string(), 33);
 	
 	if(!inCache){
 		addonOK = addon.fromFS(addonPath, target);
