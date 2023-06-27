@@ -523,9 +523,9 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 			cout << s << endl;
 			cout << fs::exists(s) << endl;
 #ifdef TARGET_WIN32
-			std::replace(s.begin(), s.end(), '\', '\\');
+//			std::replace(s.begin(), s.end(), '\', '\\');
 #endif
-			 cout << s << endl;
+//			 cout << s << endl;
 		}
 		cout << " -----> getFilesRecursively " << srcPath << endl;
 	}
