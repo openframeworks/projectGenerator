@@ -646,10 +646,14 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		}
 	}
 
+	cout << " --- srcfolders" << endl;
 	for (auto & l : srcFolders) {
+		cout << l << endl;
 		paths.emplace_back( prefixPath / fs::relative(fs::path(l), containedPath) );
+		cout << paths.back() << endl;
 	}
-
+	cout << " --- srcfolders" << endl;
+	
 	paths.sort(); //paths.unique(); // unique not needed anymore. everything is carefully inserted now.
 
 	
