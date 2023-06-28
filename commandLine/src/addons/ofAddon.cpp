@@ -500,7 +500,7 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	if(isLocalAddon){
 		name = path.stem().string();
 		addonPath = path;
-		path = pathToProject / path;
+//		path = pathToProject / path;
 	}else{
 //		name = ofFilePath::getFileName(path);
 		name = path.filename().string();
