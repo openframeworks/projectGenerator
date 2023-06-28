@@ -638,9 +638,12 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	}
 
 	// convert paths to relative
+	cout << "--- libFolders" << endl;
 	for (auto & l : libFolders) {
+		cout << l << endl;
 		paths.emplace_back( prefixPath / fs::relative(fs::path(l), containedPath) );
 	}
+	cout << "--- libFolders" << endl;
 
 	for (auto & l : srcFolders) {
 		paths.emplace_back( prefixPath / fs::relative(fs::path(l), containedPath) );
