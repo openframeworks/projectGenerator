@@ -539,14 +539,14 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		filesToFolders[s] = folder.string();
 	}
 
-
 	if (platform == "vs" || platform == "msys2") {
 		getPropsRecursively(addonPath, propsFiles, platform);
-	}
-	
-//	cout << "---- LIST PROPS FILES" << endl;
+	}	
+
+	cout << "---- LIST PROPS FILES" << endl;
 	for (auto & p : propsFiles) { cout << p << endl; } //	cout << "---- LIST PROPS FILES" << endl;
-	
+	cout << "---- LIST PROPS FILES" << endl;
+
 	int i = 0;
 	for (auto & s : propsFiles) {
 		fs::path sFS { s };
@@ -564,9 +564,6 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	vector < string > libFiles;
 
 	if (fs::exists(libsPath)) {
-//		alert("getLibsRecursively " + libsPath.string(), 31);
-//		cout << "getOFRoot() " << getOFRoot() << endl;
-//		cout << "pathToOF " << pathToOF << endl;
 		getLibsRecursively(libsPath, libFiles, libs, platform);
 		if (platform == "osx" || platform == "ios"){
 			getFrameworksRecursively(libsPath, frameworks, platform);
@@ -646,31 +643,25 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		}
 	}
 
-	cout << " --- srcfolders" << endl;
 	for (auto & l : srcFolders) {
-//		cout << l << endl;
-//		paths.emplace_back( prefixPath / fs::relative(fs::path(l), containedPath) );
-//		cout << paths.back() << endl;
 		if (isLocalAddon) {
 			paths.emplace_back(l);
 		} else {
 			paths.emplace_back( prefixPath / fs::relative(fs::path(l), containedPath) );
 		}
 	}
-	cout << " --- srcfolders" << endl;
 	
 	paths.sort(); //paths.unique(); // unique not needed anymore. everything is carefully inserted now.
 
-	
 	for (auto & p : paths) {
 		includePaths.emplace_back(p.string());
 	}
 
-	cout << "--- inludePaths " << endl;
-	for (auto & i : includePaths) {
-		cout << i << endl;
-	}
-	cout << "--- inludePaths " << endl;
+//	cout << "--- inludePaths " << endl;
+//	for (auto & i : includePaths) {
+//		cout << i << endl;
+//	}
+//	cout << "--- inludePaths " << endl;
 
 	parseConfig();
 

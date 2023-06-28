@@ -262,6 +262,7 @@ void addLibraryName(const pugi::xpath_node_set & nodes, string libName) {
 }
 
 void visualStudioProject::addProps(fs::path propsFile){
+
 	cout << "visualStudioProject::addProps " << propsFile << endl;
 	string path = propsFile.string();
 //	path.replace(path.find("/"), 1, "\\");

@@ -13,17 +13,16 @@
 #include <unordered_map>
 namespace fs = of::filesystem;
 using std::string;
+using std::vector;
 // #include <map>
-
 // About Metadata
-
 const string ADDON_NAME = "ADDON_NAME";
 const string ADDON_DESCRIPTION = "ADDON_DESCRIPTION";
 const string ADDON_AUTHOR = "ADDON_AUTHOR";
 const string ADDON_TAGS = "ADDON_TAGS";
 const string ADDON_URL = "ADDON_URL";
 
-const std::vector<string> AddonMetaVariables = {
+const vector<string> AddonMetaVariables = {
 	ADDON_NAME,
 	ADDON_DESCRIPTION,
 	ADDON_AUTHOR,
@@ -62,7 +61,7 @@ const string ADDON_PKG_CONFIG_LIBRARIES = "ADDON_PKG_CONFIG_LIBRARIES";
 const string ADDON_FRAMEWORKS = "ADDON_FRAMEWORKS";
 const string ADDON_DLLS_TO_COPY = "ADDON_DLLS_TO_COPY";
 
-const std::vector<string> AddonProjectVariables = {
+const vector<string> AddonProjectVariables = {
 	ADDON_DEPENDENCIES,
 
 	ADDON_INCLUDES,
@@ -104,33 +103,33 @@ public:
 	std::unordered_map < string, string > filesToFolders;      //the addons has had, for each file,
 												//sometimes a listing of what folder to put it in, such as "addons/ofxOsc/src"
 
-	std::vector < string > srcFiles;
-	std::vector < string > csrcFiles;
-	std::vector < string > cppsrcFiles;
-	std::vector < string > headersrcFiles;
-	std::vector < string > objcsrcFiles;
-//	std::vector < string > propsFiles;
-	std::vector < fs::path > propsFiles;
-	std::vector < LibraryBinary > libs;
-	std::vector < string > dllsToCopy;
-	std::vector < string > includePaths;
+	vector < string > srcFiles;
+	vector < string > csrcFiles;
+	vector < string > cppsrcFiles;
+	vector < string > headersrcFiles;
+	vector < string > objcsrcFiles;
+//	vector < string > propsFiles;
+	vector < fs::path > propsFiles;
+	vector < LibraryBinary > libs;
+	vector < string > dllsToCopy;
+	vector < string > includePaths;
 
 	// From addon_config.mk
-	std::vector < string > dependencies;
-	std::vector < string > cflags;   // C_FLAGS
-	std::vector < string > cppflags; // CXX_FLAGS
-	std::vector < string > ldflags;
-	std::vector < string > pkgConfigLibs; 	// linux only
-	std::vector < string > frameworks;		// osx only
-	std::vector < string > data;
-	std::vector < string > defines;
+	vector < string > dependencies;
+	vector < string > cflags;   // C_FLAGS
+	vector < string > cppflags; // CXX_FLAGS
+	vector < string > ldflags;
+	vector < string > pkgConfigLibs; 	// linux only
+	vector < string > frameworks;		// osx only
+	vector < string > data;
+	vector < string > defines;
 
 	// metadata
 	string name;
 	fs::path addonPath;
 	string description;
 	string author;
-	std::vector<string> tags;
+	vector<string> tags;
 	string url;
 
 
@@ -166,10 +165,10 @@ private:
 	void parseConfig();
 	void parseVariableValue(string variable, string value, bool addToValue, string line, int lineNum);
 	void addReplaceString(string & variable, string value, bool addToVariable);
-	void addReplaceStringVector(std::vector<string> & variable, string value, string prefix, bool addToVariable);
-	void addReplaceStringVector(std::vector<LibraryBinary> & variable, string value, string prefix, bool addToVariable);
-	void exclude(std::vector<string> & variable, std::vector<string> exclusions);
-	void exclude(std::vector<LibraryBinary> & variable, std::vector<string> exclusions);
+	void addReplaceStringVector(vector<string> & variable, string value, string prefix, bool addToVariable);
+	void addReplaceStringVector(vector<LibraryBinary> & variable, string value, string prefix, bool addToVariable);
+	void exclude(vector<string> & variable, vector<string> exclusions);
+	void exclude(vector<LibraryBinary> & variable, vector<string> exclusions);
 	ConfigParseState stateFromString(string name);
 	string stateName(ConfigParseState state);
 	bool checkCorrectVariable(string variable, ConfigParseState state);
@@ -177,10 +176,10 @@ private:
 
 	string platform;
 
-	std::vector<string> excludeLibs;
-	std::vector<string> excludeSources;
-	std::vector<string> excludeIncludes;
-	std::vector<string> excludeFrameworks;
+	vector<string> excludeLibs;
+	vector<string> excludeSources;
+	vector<string> excludeIncludes;
+	vector<string> excludeFrameworks;
 };
 
 #endif /* OFADDON_H_ */
