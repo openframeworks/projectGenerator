@@ -648,9 +648,14 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 
 	cout << " --- srcfolders" << endl;
 	for (auto & l : srcFolders) {
-		cout << l << endl;
-		paths.emplace_back( prefixPath / fs::relative(fs::path(l), containedPath) );
-		cout << paths.back() << endl;
+//		cout << l << endl;
+//		paths.emplace_back( prefixPath / fs::relative(fs::path(l), containedPath) );
+//		cout << paths.back() << endl;
+		if (isLocalAddon) {
+			paths.emplace_back(l);
+		} else {
+			paths.emplace_back( prefixPath / fs::relative(fs::path(l), containedPath) );
+		}
 	}
 	cout << " --- srcfolders" << endl;
 	
