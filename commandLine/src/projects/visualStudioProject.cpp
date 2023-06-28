@@ -421,10 +421,11 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 		addInclude(e);
 	}
 
-	for (auto & props : addon.propsFiles) {
-		ofLogVerbose() << "adding addon props: " << props;
-		addProps(props);
-	}
+	// temporary removal
+//	for (auto & props : addon.propsFiles) {
+//		ofLogVerbose() << "adding addon props: " << props;
+//		addProps(props);
+//	}
 
 	for(auto & lib: addon.libs){
 		ofLogVerbose() << "adding addon libs: " << lib.path;
