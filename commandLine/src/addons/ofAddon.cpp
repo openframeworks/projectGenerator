@@ -556,6 +556,8 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		} else {
 			folder = fs::relative(sFS.parent_path(), containedPath);
 		}
+		cout << s << endl;
+		cout << folder << endl;
 		propsFiles[i] = folder;
 		i++;
 	}
