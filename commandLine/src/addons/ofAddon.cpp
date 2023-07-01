@@ -547,20 +547,20 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	for (auto & p : propsFiles) { cout << p << endl; } //	cout << "---- LIST PROPS FILES" << endl;
 	cout << "---- LIST PROPS FILES" << endl;
 
-	int i = 0;
-	for (auto & s : propsFiles) {
-		fs::path sFS { s };
-		fs::path folder;
-		if (isLocalAddon) {
-			folder = sFS.parent_path();
-		} else {
-			folder = fs::relative(sFS.parent_path(), containedPath);
-		}
-		cout << s << endl;
-		cout << folder << endl;
-		propsFiles[i] = folder;
-		i++;
-	}
+//	int i = 0;
+//	for (auto & s : propsFiles) {
+//		fs::path sFS { s };
+//		fs::path folder;
+//		if (isLocalAddon) {
+//			folder = sFS.parent_path();
+//		} else {
+//			folder = fs::relative(sFS.parent_path(), containedPath);
+//		}
+//		cout << s << endl;
+//		cout << folder << endl;
+//		propsFiles[i] = folder;
+//		i++;
+//	}
 
 	fs::path libsPath = path / "libs";
 	vector < string > libFiles;
