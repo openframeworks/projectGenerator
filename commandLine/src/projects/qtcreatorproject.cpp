@@ -8,7 +8,6 @@ std::string QtCreatorProject::LOG_NAME = "QtCreatorProject";
 
 QtCreatorProject::QtCreatorProject(std::string target)
 	: baseProject(target){
-
 }
 
 bool QtCreatorProject::createProjectFile(){
@@ -19,39 +18,44 @@ bool QtCreatorProject::createProjectFile(){
 //	ofDirectory dir(projectDir);
 //	if(!dir.exists()) dir.create(true);
 
-	fs::path project = projectDir / (projectName + ".qbs");
+//	alert("project " + project.string());
+	
+	// FIXME: modularize the sequence of files to copy there.
+	
 	fs::path src = templatePath / "qtcreator.qbs";
-	fs::path dst = project;
+	fs::path dst = projectDir / (projectName + ".qbs");
 
-	if (!fs::exists(project)) {
-		// FIXME: FS
-		if(!ofFile::copyFromTo(src, dst)){
+	if (!fs::exists(dst)) {
+		try {
+			fs::copy_file(src, dst);
+		} catch(fs::filesystem_error& e) {
 			ofLogError(LOG_NAME) << "error copying qbs template from " << src << " to " << dst;
 			return false;
-		}else{
-			findandreplaceInTexfile(dst, "emptyExample", projectName);
 		}
+		findandreplaceInTexfile(dst, "emptyExample", projectName);
 	}
 
-	fs::path makefile = projectDir / "Makefile";
-	if(!fs::exists(makefile)){
-		src = templatePath / "Makefile";
-		dst = makefile;
-		// FIXME: FS
+	dst = projectDir / "Makefile";
+	src = templatePath / "Makefile";
 
-		if(!ofFile::copyFromTo(src, dst)){
+	alert("src " + src.string());
+	alert("dst " + dst.string());
+
+	if(!fs::exists(dst)){
+		try {
+			fs::copy_file(src, dst);
+		} catch(fs::filesystem_error& e) {
 			ofLogError(LOG_NAME) << "error copying Makefile template from " << src << " to " << dst;
 			return false;
 		}
 	}
 
-	fs::path config = projectDir / "config.make";
-	if(!fs::exists(config)){
-		src = templatePath / "config.make";
-		dst = config;
-		// FIXME: FS
-
-		if(!ofFile::copyFromTo(src, dst)){
+	dst = projectDir / "config.make";
+	src = templatePath / "config.make";
+	if(!fs::exists(dst)){
+		try {
+			fs::copy_file(src, dst);
+		} catch(fs::filesystem_error& e) {
 			ofLogError(LOG_NAME) << "error copying config.make template from " << src << " to " << dst;
 			return false;
 		}
