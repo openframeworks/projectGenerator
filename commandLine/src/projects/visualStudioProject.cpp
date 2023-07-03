@@ -262,8 +262,7 @@ void addLibraryName(const pugi::xpath_node_set & nodes, string libName) {
 }
 
 void visualStudioProject::addProps(fs::path propsFile){
-
-	cout << "visualStudioProject::addProps " << propsFile << endl;
+//	alert ("visualStudioProject::addProps " + propsFile.string());
 	string path = propsFile.string();
 //	path.replace(path.find("/"), 1, "\\");
 
@@ -468,11 +467,12 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 		addSrc(addon.objcsrcFiles[i],addon.filesToFolders[addon.objcsrcFiles[i]],C);
 	}
 
-	for(int i=0;i<(int)addon.dllsToCopy.size();i++){
-		ofLogVerbose() << "adding addon dlls to bin: " << addon.dllsToCopy[i];
-		fs::path dll = addon.addonPath / addon.dllsToCopy[i];
-		// FIXME: FS
-		ofFile(dll).copyTo(projectDir / "bin", false, true);
+	for (auto & d : addon.dllsToCopy) {
+		ofLogVerbose() << "adding addon dlls to bin: " << d;
+		fs::path from = addon.addonPath / d;
+		fs::path to = projectDir / "bin" / from.filename();
+		alert("copy from to " + from.string() + " : " + to.string());
+		fs::copy_file(from, to, fs::copy_options::overwrite_existing);
 	}
 
 	for(int i=0;i<(int)addon.cflags.size();i++){

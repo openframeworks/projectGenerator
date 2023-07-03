@@ -103,7 +103,7 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(string target)
 }
 
 bool baseProject::create(const fs::path & path, string templateName){
-	alert("baseProject::create " + path.string() + " : " + templateName);
+//	alert("baseProject::create " + path.string() + " : " + templateName);
 //	auto path = _path; // just because it is const
 	addons.clear();
 	extSrcPaths.clear();
@@ -137,9 +137,9 @@ bool baseProject::create(const fs::path & path, string templateName){
 //	cout << "after return : " << templateName << endl;
 
 	if(!empty(templateName)){
-		cout << "templateName not empty " << templateName << endl;
+//		cout << "templateName not empty " << templateName << endl;
 		fs::path templateDir = getOFRoot() / templatesFolder / templateName;
-			cout << "templateDir " << templateDir << endl;
+		alert("templateDir " + templateDir.string());
 
 		auto templateConfig = parseTemplate(templateDir);
 		if(templateConfig){
@@ -148,7 +148,7 @@ bool baseProject::create(const fs::path & path, string templateName){
 				
 				auto from = projectDir / rename.first;
 				auto to = projectDir / rename.second;
-				cout << "rename from to " << from << " : " << to << endl;
+//				cout << "rename from to " << from << " : " << to << endl;
 				
 				if (fs::exists(to)) {
 					fs::remove(to);
@@ -278,16 +278,16 @@ void baseProject::addAddon(string addonName){
 	
 	fs::path addonPath { addonName };
 	
-	cout << "projectDir " << projectDir << endl;
-	cout << "pathToOf " << addon.pathToOF << endl;
-	alert("baseProject::addAddon addonPath " + addonPath.string(), 33);
+//	cout << "projectDir " << projectDir << endl;
+//	cout << "pathToOf " << addon.pathToOF << endl;
+//	alert("baseProject::addAddon addonPath " + addonPath.string(), 33);
 
 	// Flawed logic. it will return YES if you are in the project folder and path is ../../../addons/xxx
 	if (fs::exists(addonPath)) {
-		alert("local addon");
+//		alert("local addon");
 		addon.isLocalAddon = true;
 	} else {
-		alert("global addon");
+//		alert("global addon");
 		addonPath = fs::path(getOFRoot()) / "addons" / addonName;
 		//addonPath = addon.pathToOF / "addons" / addonName;
 		addon.isLocalAddon = false;

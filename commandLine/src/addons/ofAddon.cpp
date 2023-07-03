@@ -489,7 +489,7 @@ void ofAddon::parseConfig(){
 
 
 bool ofAddon::fromFS(fs::path path, const string & platform){
-	alert("ofAddon::fromFS path : " + path.string());
+//	alert("ofAddon::fromFS path : " + path.string());
 	
 	clear();
 	this->platform = platform;
@@ -543,10 +543,12 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		getPropsRecursively(addonPath, propsFiles, platform);
 	}	
 
-	cout << "---- LIST PROPS FILES" << endl;
-	for (auto & p : propsFiles) { cout << p << endl; } //	cout << "---- LIST PROPS FILES" << endl;
-	cout << "---- LIST PROPS FILES" << endl;
-
+	if (propsFiles.size()) {
+		for (auto & p : propsFiles) {
+			alert ("props files " + p.string());
+		}
+	}
+	
 //	int i = 0;
 //	for (auto & s : propsFiles) {
 //		fs::path sFS { s };

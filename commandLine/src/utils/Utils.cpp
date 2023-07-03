@@ -263,7 +263,7 @@ void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, st
 			getDllsRecursively(f, dlls, platform);
 		} else {
 			if (f.extension() == ".dll") {
-				cout << "---->> getDLLs " << f << endl;;
+				alert("getDLLs " + f.string());
 
 				dlls.emplace_back(f.string());
 			}
