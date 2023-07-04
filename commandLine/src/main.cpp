@@ -231,28 +231,39 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 }
 
 void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
-	alert("recursiveUpdate " + path.string());
-//	cout << "recursiveUpdate " << path << " :: " << nProjectsUpdated << endl;
-	// first, bail if it's just a file
+	alert("recursiveUpdate " + path.string() );
 	if (!fs::is_directory(path)) return;
+	
+	vector <fs::path> dirs;
 
 	// second check if this is a folder that has src in it
 	if (isGoodProjectPath(path)) {
-		nProjectsUpdated++;
-//		auto project = getTargetProject(target);
-//		cout << "updateProject " << path << " : " << target << endl;
-		updateProject(path, target, false);
-		return;
-	} else {
+		dirs.emplace_back(path);
 	}
-
-	// finally, recursively look at this
-	for (const auto & entry : fs::directory_iterator(path)) {
-		auto f = entry.path();
-		if (fs::is_directory(f)) {
-			recursiveUpdate(f, target);
+	
+	for (const auto & entry : fs::recursive_directory_iterator(path)) {
+		auto p = entry.path();
+		if (fs::is_directory(p)) {
+			if (isGoodProjectPath(p)) {
+				dirs.emplace_back(p);
+			}
+//			recursiveUpdate(f, target);
 		}
 	}
+//	for (auto & path : dirs) {
+//		alert(path.string());
+//		alert(fs::absolute(path).string());
+//	}
+	for (auto & path : dirs) {
+//		fs::current_path(path);
+		nProjectsUpdated++;
+		updateProject(path, target, false);
+	}
+	
+//	nProjectsUpdated++;
+//	updateProject(path, target, false);
+//	return;
+
 }
 
 void printHelp(){
@@ -429,6 +440,7 @@ int main(int argc, char** argv){
 	
 	if (!fs::exists(absoluteProjectPath)) {
 		mode = PG_MODE_CREATE;
+		// FIXME: Maybe it is best not to create anything here.
 		fs::create_directory(absoluteProjectPath);
 	} else {
 		mode = PG_MODE_UPDATE;

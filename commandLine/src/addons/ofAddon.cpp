@@ -494,19 +494,12 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	clear();
 	this->platform = platform;
 
-	fs::path prefixPath;
-	fs::path containedPath { "" };
-
 	if(isLocalAddon){
 		name = path.stem().string();
 		addonPath = path;
-//		path = pathToProject / path;
 	}else{
-//		name = ofFilePath::getFileName(path);
 		name = path.filename().string();
 		addonPath = path;
-		containedPath = getOFRoot(); //we need to add a trailing slash for the erase to work properly
-		prefixPath = pathToOF;
 	}
 	
 
@@ -518,12 +511,6 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 
 	if (fs::exists(srcPath)) {
 		getFilesRecursively(srcPath, srcFiles);
-		//		cout << " -----> getFilesRecursively " << srcPath << endl;
-//		for (auto & s : srcFiles) {
-//			cout << s << endl;
-//			cout << fs::exists(s) << endl;
-//		}
-//		cout << " -----> getFilesRecursively end " << endl;
 	}
 
 	// MARK: srcFiles to fs::path
@@ -534,7 +521,8 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		if (isLocalAddon) {
 			folder = sFS.parent_path();
 		} else {
-			folder = fs::relative(sFS.parent_path(), containedPath);
+			s = fixPath(s);
+			folder = fs::relative(sFS.parent_path(), getOFRoot());
 		}
 		filesToFolders[s] = folder.string();
 	}
@@ -556,7 +544,7 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 //		if (isLocalAddon) {
 //			folder = sFS.parent_path();
 //		} else {
-//			folder = fs::relative(sFS.parent_path(), containedPath);
+//			folder = fs::relative(sFS.parent_path(), getOFRoot());
 //		}
 //		cout << s << endl;
 //		cout << folder << endl;
@@ -578,8 +566,9 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	}
 	
 	for (auto & l : libs) {
-		auto srcFS = fs::path(prefixPath / fs::relative(l.path, containedPath));
-		l.path = srcFS.string();
+//		alert(l.path);
+		l.path = fixPath(l.path).string();
+//		alert(l.path);
 	}
 
 	for (auto & s : libFiles) {
@@ -588,21 +577,20 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		if (isLocalAddon) {
 			folder = sFS.parent_path();
 		} else {
-			folder = fs::relative(sFS.parent_path(), containedPath);
+			folder = fs::relative(sFS.parent_path(), getOFRoot());
+			s = fixPath(s);
 		}
+//		alert ("libFiles " + s);
 		srcFiles.emplace_back(s);
+//		alert ("libFiles " + folder.string());
 		filesToFolders[s] = folder.string();
 	}
-
-	
-	
 //	// changing libs folder from absolute to relative.
 //	for (auto & l : libs) {
 //		cout << "l.path " << l.path << endl;
-//		l.path = fs::path(prefixPath / fs::relative(l.path, containedPath)).string();
+//		l.path = fs::path(pathToOF / fs::relative(l.path, getOFRoot())).string();
 //		cout << "l.path " << l.path << endl;
 //	}
-
 	
 	for (auto & f : frameworks) {
 		// knowing if we are system framework or not is important....
@@ -628,11 +616,13 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	std::list < fs::path > paths;
 
 	// get every folder in addon/src and addon/libs
+	// FIXME: FS here and getFoldersRecursively
 	vector < string > libFolders;
 	if (fs::exists(libsPath)) {
 		getFoldersRecursively(libsPath, libFolders, platform);
 	}
 
+	// FIXME: FS here and getFoldersRecursively
 	vector < string > srcFolders;
 	if (fs::exists(srcPath)) {
 		getFoldersRecursively(srcPath, srcFolders, platform);
@@ -643,7 +633,8 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		if (isLocalAddon) {
 			paths.emplace_back(l);
 		} else {
-			paths.emplace_back( prefixPath / fs::relative(fs::path(l), containedPath) );
+//			paths.emplace_back( pathToOF / fs::relative(fs::path(l), getOFRoot()) );
+			paths.emplace_back( fixPath(l) );
 		}
 	}
 
@@ -651,7 +642,12 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		if (isLocalAddon) {
 			paths.emplace_back(l);
 		} else {
-			paths.emplace_back( prefixPath / fs::relative(fs::path(l), containedPath) );
+//			cout << "l " << l << endl;
+//			cout << "pathToOF " << pathToOF << endl;
+//			cout << "getOFRoot() " << getOFRoot() << endl;
+			fs::path fix = fixPath(l);
+//			cout << "fix " << fix << endl;
+			paths.emplace_back( fix );
 		}
 	}
 	
@@ -680,4 +676,9 @@ void ofAddon::clear(){
 	libs.clear();
 	includePaths.clear();
 	name.clear();
+}
+
+// maybe remove
+fs::path ofAddon::fixPath(const fs::path & path) {
+	return pathToOF / fs::relative(path, getOFRoot());
 }

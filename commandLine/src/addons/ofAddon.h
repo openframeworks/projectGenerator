@@ -180,6 +180,8 @@ private:
 	vector<string> excludeSources;
 	vector<string> excludeIncludes;
 	vector<string> excludeFrameworks;
+	
+	fs::path fixPath(const fs::path & path);
 };
 
 #endif /* OFADDON_H_ */

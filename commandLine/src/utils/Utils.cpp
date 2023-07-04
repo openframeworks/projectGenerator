@@ -185,6 +185,8 @@ void splitFromFirst(string toSplit, string deliminator, string & first, string &
 }
 
 
+// TODO: This should be able to work with a vector of FS::path too
+
 void getFoldersRecursively(const fs::path & path, std::vector < string > & folderNames, string platform){
 	if (!fs::exists(path)) return;
 	if (!fs::is_directory(path)) return;
@@ -294,8 +296,12 @@ void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles
 	if (!fs::exists(path)) return;
 	if (!fs::is_directory(path)) return;
 	
+	// FIXME : recursive instead
 	for (const auto & entry : fs::directory_iterator(path)) {
 		auto f = entry.path();
+		//					XAXA
+//		auto f = getOFRelPath(entry.path());
+//		alert(f);
 		std::vector<string> splittedPath = ofSplitString(f.string(), fs::path("/").make_preferred().string());
 		
 		if (fs::is_directory(f)) {
@@ -334,6 +340,8 @@ void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles
 				if (platformFound){
 //					libLibs.emplace_back( f, arch, target );
 					
+
+					
 					libLibs.push_back({ f.string(), arch, target });
 
 					//TODO: THEO hack
@@ -351,6 +359,8 @@ void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles
 					}
 				}
 			} else if (ext == ".h" || ext == ".hpp" || ext == ".c" || ext == ".cpp" || ext == ".cc" || ext == ".cxx" || ext == ".m" || ext == ".mm"){
+				
+//				alert(f.string());
 				libFiles.emplace_back(f.string());
 			}
 		}
