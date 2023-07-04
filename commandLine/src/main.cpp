@@ -1,4 +1,4 @@
-#define PG_VERSION "PG v008"
+#define PG_VERSION "PG v009"
 #define TARGET_NO_SOUND
 #define TARGET_NODISPLAY
 
@@ -6,12 +6,6 @@
 #include "defines.h"
 #include "Utils.h"
 #include <set>
-
-// int main(int argc, char** argv){
-// 	cout << "v00X" << endl;
-// 	return 0;
-// }
-
 
 enum optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTERNAL, VERSION };
 
@@ -444,10 +438,8 @@ int main(int argc, char** argv){
 	if (fs::exists(absoluteProjectPath)) {
 		fs::path newOfPath = fs::weakly_canonical(fs::current_path() / ofPath);
 		fs::current_path(absoluteProjectPath);
-
 //		cout << "newOfPath " << newOfPath << endl;
 //		cout << "absoluteProjectPath " << absoluteProjectPath << endl;
-
 		ofPath = fs::relative(newOfPath, absoluteProjectPath);
 		projectPath = ".";
 	}
@@ -554,10 +546,7 @@ int main(int argc, char** argv){
 				consoleSpace();
 			}
 		}
-
 	}
-
-
 
 	consoleSpace();
 	float elapsedTime = ofGetElapsedTimef() - startTime;

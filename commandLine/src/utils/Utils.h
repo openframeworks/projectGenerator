@@ -46,15 +46,11 @@ void getFrameworksRecursively(const fs::path & path, std::vector < string > & fr
 void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props, const string & platform);
 void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, string platform);
 
-
-//void splitFromLast(string toSplit, string deliminator, string & first, string & second);
 void splitFromFirst(string toSplit, string deliminator, string & first, string & second);
 
 void fixSlashOrder(string & toFix);
 string unsplitString (std::vector < string > strings, string deliminator );
 
-//string getOFRelPath(const string & from);
-//fs::path getOFRelPathFS(const fs::path & from);
 fs::path getOFRelPath(const fs::path & from);
 
 bool checkConfigExists();
@@ -82,9 +78,6 @@ void alert(string msg, int color=32);
 
 bool ofIsPathInPath(const fs::path& basePath, const fs::path& subPath);
 
-
-// fs::path subtract(const fs::path & base, const fs::path & sub) {
-
-// }
+// fs::path subtract(const fs::path & base, const fs::path & sub) {// }
 
 #endif /* UTILS_H_ */

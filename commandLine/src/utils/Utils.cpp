@@ -132,7 +132,6 @@ void getFilesRecursively(const fs::path & path, std::vector < string > & fileNam
 		auto f = entry.path();
 		// avoid hidden files .DS_Store .vscode .git etc
 		if (f.filename().c_str()[0] == '.') continue;
-		
 		// Attention: this function will search src files which doesn't usually have .frameworks inside.
 		if (f.extension() == ".framework") continue;
 		if (fs::is_regular_file(f)) {
@@ -178,12 +177,6 @@ bool isFolderNotCurrentPlatform(string folderName, string platform){
 	}
 	return false;
 }
-
-//void splitFromLast(string toSplit, string deliminator, string & first, string & second){
-//	size_t found = toSplit.find_last_of(deliminator.c_str());
-//	first = toSplit.substr(0,found);
-//	second = toSplit.substr(found+1);
-//}
 
 void splitFromFirst(string toSplit, string deliminator, string & first, string & second){
 	size_t found = toSplit.find(deliminator.c_str());
@@ -340,10 +333,6 @@ void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles
 				(ext == ".dll" && platform != "vs")){
 				if (platformFound){
 //					libLibs.emplace_back( f, arch, target );
-
-					// XAXA
-//					cout << "----" << endl;
-//					cout << f.string() << endl;
 					
 					libLibs.push_back({ f.string(), arch, target });
 
@@ -356,7 +345,6 @@ void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles
 						if( currentPath.find("ofxOpenCv") == string::npos ){
 							ofStringReplace(currentPath, "ios", "osx");
 							if( fs::exists(currentPath) ){
-//								libLibs.emplace_back( currentPath, arch, target );
 								libLibs.push_back({ currentPath, arch, target });
 							}
 						}

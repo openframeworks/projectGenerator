@@ -297,7 +297,6 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	auto libFolder = libraryName.parent_path();
 	auto libName = libraryName.filename();
 
-	
 	// ---------| invariant: libExtension is `lib`
 
 	// paths for libraries

@@ -366,9 +366,10 @@ void baseProject::addAddon(string addonName){
 }
 
 void baseProject::addSrcRecursively(const fs::path & srcPath){
-		cout << "addSrcRecursively " << srcPath << endl;
+	alert("addSrcRecursively " + srcPath.string());
 	fs::path base = srcPath.parent_path();
-	cout << "base = " << base << endl;
+	alert("base = " + base.string());
+	
 	extSrcPaths.emplace_back(srcPath.string());
 	vector < fs::path > srcFilesToAdd;
 
@@ -391,7 +392,6 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 	//need this for absolute paths so we can subtract this path from each file path
 	//say we add this path: /user/person/documents/shared_of_code
 	//we want folders added for shared_of_code/ and any subfolders, but not folders added for /user/ /user/person/ etc
-	
 //	string parentFolder = ofFilePath::getEnclosingDirectory(ofFilePath::removeTrailingSlash(srcPath));
 
 	std::unordered_set<string> uniqueIncludeFolders;
@@ -471,15 +471,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 			ofLog() <<  " uniqueIncludeFolders " << includeFolder ;
 			uniqueIncludeFolders.insert(includeFolder);
 		}
-
 	}
-
-	//do it this way so we don't try and add a include folder for each file ( as it checks if they are already added ) so should be faster
-	// cout << "------- Unique Include Folders" << endl;
-	// for(auto & i : uniqueIncludeFolders){
-	// 	cout << i << endl;
-	// }
-	// cout << "-------" << endl;
 
 	for(auto & i : uniqueIncludeFolders){
 		ofLogVerbose() << " adding search include paths for folder " << i;
@@ -493,10 +485,8 @@ void baseProject::addAddon(ofAddon & addon){
 			return;
 		}
 	}
-
 	// FIXME: Test this, I suppose this is only invoked when an addon is added
 	// from a dependency of another addon, and it has its own dependencies too.
-	
 	cout << "---> dependencies" << endl;
 	for (auto & d : addon.dependencies) {
 		bool found = false;
@@ -514,7 +504,6 @@ void baseProject::addAddon(ofAddon & addon){
 		}
 	}
 	cout << "---> " << endl;
-
 	addons.emplace_back(addon);
 
 	ofLogVerbose("baseProject") << "libs in addAddon " << addon.libs.size();
@@ -569,12 +558,9 @@ void baseProject::addAddon(ofAddon & addon){
 }
 
 void baseProject::parseAddons(){
-	// cout << "baseProject::parseAddons() " << endl;
 	fs::path parseFile { projectDir / "addons.make" };
 
 	for (auto & line : fileToStrings(parseFile)) {
-		alert ("line: " + line);
-//		cout << ">>>> line: " << line << endl;
 		auto addon = ofTrim(line);
 		if(addon[0] == '#') continue;
 		if(addon == "") continue;
