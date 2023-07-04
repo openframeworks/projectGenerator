@@ -71,7 +71,8 @@ bool visualStudioProject::loadProjectFile(){
 bool visualStudioProject::saveProjectFile(){
 	if (!additionalvcxproj.empty()) {
 		string additionalProjects;
-		string divider = "\r\n";
+//		string divider = "\r\n";
+		string divider = "\n";
 		for (auto & a : additionalvcxproj) {
 			string name = a.filename().stem().string();
 			string aString = a.string();
