@@ -79,7 +79,8 @@ bool visualStudioProject::saveProjectFile(){
 			"Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \""+name+"\", \""+a.string()+"\", \"{"+uuid+"\"}" +
 			divider + "EndProject" + divider;
 		}
-		string findString = "Global" + divider;
+//		string findString = "Global" + divider;
+		string findString = "Global";
 		additionalProjects += findString;
 		
 		cout << fs::current_path() << endl;
