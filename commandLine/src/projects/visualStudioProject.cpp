@@ -84,7 +84,7 @@ bool visualStudioProject::saveProjectFile(){
 //		string findString = "Global" + divider;
 		string findString = "Global";
 		
-		additionalProjects += findString + divider;
+		additionalProjects += findString ;
 		
 		solution = solution.lexically_normal();
 //		findandreplaceInTexfile(solution, findString, additionalProjects);
