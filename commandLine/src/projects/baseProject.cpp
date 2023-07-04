@@ -216,40 +216,28 @@ bool baseProject::save(){
 	//we mostly use this right now for storing the external source paths
 	// FIXME: Absolute or FS
 	
-	// FIXME: create a function to hold this kind of usage. file to vector string.
-	
-//	cout << "OUTPUT Config.make" << endl;
-	
 	vector <string> lines = fileToStrings(projectDir / "config.make");
 	std::ofstream saveConfig(projectDir / "config.make");
 
-	for (auto & line : lines) {
-//		cout << line << endl;		
-		string str = line;
-
+	for (auto & str : lines) {
 		//add the of root path
 		if( str.rfind("# OF_ROOT =", 0) == 0 || str.rfind("OF_ROOT =", 0) == 0){
 			fs::path path = getOFRoot();
-	
 			if( projectDir.string().rfind(getOFRoot().string(), 0) == 0) {
 				path = getOFRelPath(projectDir);
 			}
-			
 			saveConfig << "OF_ROOT = " << path << std::endl;
 		}
 		// replace this section with our external paths
 		else if( extSrcPaths.size() && str.rfind("# PROJECT_EXTERNAL_SOURCE_PATHS =", 0) == 0 ){
-
 			for(int d = 0; d < extSrcPaths.size(); d++){
 				ofLog(OF_LOG_VERBOSE) << " adding PROJECT_EXTERNAL_SOURCE_PATHS to config" << extSrcPaths[d] << std::endl;
 				saveConfig << "PROJECT_EXTERNAL_SOURCE_PATHS" << (d == 0 ? " = " : " += ") << extSrcPaths[d] << std::endl;
 			}
-
-		}else{
+		} else {
 		   saveConfig << str << std::endl;
 		}
 	}
-
 	return saveProjectFile();
 }
 
@@ -271,28 +259,18 @@ void baseProject::addAddon(string addonName){
 	// FIXME: Review this path here.
 	addon.pathToOF = getOFRelPath(projectDir);
 	addon.pathToProject = projectDir;
-	
 
 	bool addonOK = false;
 	bool inCache = isAddonInCache(addonName, target);
 	
 	fs::path addonPath { addonName };
 	
-//	cout << "projectDir " << projectDir << endl;
-//	cout << "pathToOf " << addon.pathToOF << endl;
-//	alert("baseProject::addAddon addonPath " + addonPath.string(), 33);
-
-	// Flawed logic. it will return YES if you are in the project folder and path is ../../../addons/xxx
 	if (fs::exists(addonPath)) {
-//		alert("local addon");
 		addon.isLocalAddon = true;
 	} else {
-//		alert("global addon");
 		addonPath = fs::path(getOFRoot()) / "addons" / addonName;
-		//addonPath = addon.pathToOF / "addons" / addonName;
 		addon.isLocalAddon = false;
 	}
-	
 	
 	if(!inCache){
 		addonOK = addon.fromFS(addonPath, target);
@@ -307,7 +285,8 @@ void baseProject::addAddon(string addonName){
 	}
 
 	if(!inCache){
-		addonsCache[target][addonName] = addon; //cache the addon so we dont have to be reading form disk all the time
+		//cache the addon so we dont have to be reading form disk all the time
+		addonsCache[target][addonName] = addon;
 	}
 	
 	addAddon(addon);
@@ -318,17 +297,11 @@ void baseProject::addAddon(string addonName){
 			string d = data;
 			ofStringReplace(d, "data/", ""); // avoid to copy files at /data/data/*
 
-			fs::path path { addon.addonPath / data };
+			fs::path from { addon.addonPath / data };
 			fs::path dest { projectDir / "bin" / "data" };
 			
-			if(fs::exists(path)){
-				
-				fs::path from { path };
+			if(fs::exists(from)){
 				fs::path to { dest / d };
-
-				
-				
-				
 				if (fs::is_regular_file(from)){
 //					cout << "from is regular file" << endl;
 					try {
@@ -358,7 +331,7 @@ void baseProject::addAddon(string addonName){
 						ofLog() << "Can not add addon data file: " << to << " :: " << e.what() << std::endl;
 					}
 				}
-			}else{
+			} else {
 				ofLogWarning() << "addon data file does not exist, skipping: " << d;
 			}
 		}
@@ -374,14 +347,13 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 	vector < fs::path > srcFilesToAdd;
 
 	//so we can just pass through the file paths
-	ofDisableDataPath();
+//	ofDisableDataPath();
 	getFilesRecursively(srcPath, srcFilesToAdd);
-	ofEnableDataPath();
+//	ofEnableDataPath();
 	
 //	for (auto & s : srcFilesToAdd) {
 //		cout << s << endl;
 //	}
-
 	//if the files being added are inside the OF root folder, make them relative to the folder.
 	bool bMakeRelative = false;
 	if (ofIsPathInPath(srcPath, getOFRoot())) {

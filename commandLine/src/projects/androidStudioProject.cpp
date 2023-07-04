@@ -28,10 +28,8 @@ bool AndroidStudioProject::createProjectFile(){
 	};
 	
 	for (auto & f : fileNames) {
-
 		fs::path from { templatePath / f };
 		fs::path to { projectDir / f };
-
 		if (!fs::exists(to)) {
 			try {
 				fs::copy(from, to);
@@ -45,10 +43,12 @@ bool AndroidStudioProject::createProjectFile(){
 		}
 	}
 
+	// FIXME: FS
 	// res folder
 	ofDirectory( templatePath / "res" ).copyTo( projectDir / "res" );
 	findandreplaceInTexfile( projectDir / "res/values/strings.xml", "TEMPLATE_APP_NAME", projectName);
 
+	// FIXME: FS
 	// srcJava folder
 	ofDirectory( templatePath / "srcJava" ).copyTo( projectDir / "srcJava" );
 
@@ -56,8 +56,10 @@ bool AndroidStudioProject::createProjectFile(){
 	fs::path to = projectDir / ("srcJava/cc/openframeworks/"+projectName);
 
 	findandreplaceInTexfile(from / "OFActivity.java", "TEMPLATE_APP_NAME", projectName);
+	// FIXME: FS
 	ofDirectory(from).moveTo(to, true, true);
 
+	// FIXME: FS
 	// Gradle wrapper
 	ofDirectory(templatePath / "gradle").copyTo( projectDir / "gradle" );
 	ofFile::copyFromTo(templatePath / "gradlew",  projectDir / "gradlew" );
