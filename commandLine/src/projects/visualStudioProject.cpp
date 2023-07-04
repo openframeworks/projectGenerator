@@ -79,7 +79,7 @@ bool visualStudioProject::saveProjectFile(){
 			std::replace (aString.begin(), aString.end(), '/', '\\');
 			string uuid = generateUUID(name);
 			additionalProjects +=
-			"Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \""+name+"\", \""+aString+"\", \"{"+uuid+"\"}" +
+			"Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \""+name+"\", \""+aString+"\", \"{"+uuid+"}\"" +
 			divider + "EndProject" + divider;
 		}
 //		string findString = "Global" + divider;
