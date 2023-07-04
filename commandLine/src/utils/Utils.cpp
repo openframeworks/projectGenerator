@@ -236,9 +236,11 @@ void getFrameworksRecursively(const fs::path & path, std::vector < string > & fr
 }
 
 void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props, const string & platform) {
+	alert("getPropsRecursively " + path.string());
 	if (!fs::exists(path)) return;
 	if (!fs::is_directory(path)) return;
-		
+	
+	cout << 1 << endl;
 //	for (const auto & entry : fs::directory_iterator(path)) {
 	for (const auto & entry : fs::recursive_directory_iterator(path)) {
 		auto f = entry.path();
@@ -263,6 +265,7 @@ void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props
 //			}
 //		}
 	}
+	cout << 2 << endl;
 }
 
 void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, string platform) {
