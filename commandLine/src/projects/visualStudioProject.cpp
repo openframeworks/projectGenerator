@@ -85,6 +85,7 @@ bool visualStudioProject::saveProjectFile(){
 		cout << fs::current_path() << endl;
 		cout << fs::absolute(solution) << endl;
 		cout << solution.lexically_normal() << endl;
+		solution = solution.lexically_normal();
 		findandreplaceInTexfile(solution, findString, additionalProjects);
 	}
 	
