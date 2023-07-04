@@ -105,13 +105,17 @@ void QtCreatorProject::addSrc(std::string srcFile, std::string folder, baseProje
 }
 
 bool QtCreatorProject::loadProjectFile(){
-	// FIXME: FS
 
-	ofFile project(projectDir / (projectName + ".qbs"), ofFile::ReadOnly,true);
-	if(!project.exists()){
-		ofLogError(LOG_NAME) << "error loading" << project.path() << "doesn't exist";
+// FIXME: FS
+//	ofFile project(projectDir / (projectName + ".qbs"), ofFile::ReadOnly,true);
+
+	fs::path file { projectDir / (projectName + ".qbs") };
+	if (!fs::exists(file)) {
+		ofLogError(LOG_NAME) << "error loading" << file << "doesn't exist";
 		return false;
 	}
+	
+	std::ifstream project(file);
 	auto ret = qbs.set(project);
 	// parse files in current .qbs
 	std::regex filesregex("files[ \t\r\n]*:[ \t\r\n]*\\[[ \t\r\n]*([\"'][^\\]\"']*[\"'][ \t\r\n]*,?[ \t\r\n]*)*\\]");

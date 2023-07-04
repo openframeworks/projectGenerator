@@ -518,7 +518,7 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		if (isLocalAddon) {
 			folder = sFS.parent_path();
 		} else {
-			s = fixPath(s);
+			s = fixPath(s).string();
 			folder = fs::relative(sFS.parent_path(), getOFRoot());
 		}
 		filesToFolders[s] = folder.string();
@@ -569,7 +569,7 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 			folder = sFS.parent_path();
 		} else {
 			folder = fs::relative(sFS.parent_path(), getOFRoot());
-			s = fixPath(s);
+			s = fixPath(s).string();
 		}
 		srcFiles.emplace_back(s);
 		filesToFolders[s] = folder.string();
