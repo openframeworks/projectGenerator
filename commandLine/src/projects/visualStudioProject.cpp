@@ -286,19 +286,18 @@ void visualStudioProject::addProps(fs::path propsFile){
 }
 
 void visualStudioProject::addLibrary(const LibraryBinary & lib) {
-	auto libraryName = lib.path;
-	fixSlashOrder(libraryName);
+	
+	// TODO: in future change Library to FS
+	auto libraryName = fs::path { lib.path };
+//	fixSlashOrder(libraryName);
 
 	// ok first, split path and library name.
-	size_t found = libraryName.find_last_of("\\");
-	string libFolder = libraryName.substr(0, found);
-	string libName = libraryName.substr(found + 1);
+//	size_t found = libraryName.find_last_of("\\");
+//	string libFolder = libraryName.substr(0, found);
+	auto libFolder = libraryName.parent_path();
+	auto libName = libraryName.filename();
 
-	string libBaseName;
-	string libExtension;
-
-	splitFromLast(libName, ".", libBaseName, libExtension);
-
+	
 	// ---------| invariant: libExtension is `lib`
 
 	// paths for libraries
@@ -471,7 +470,7 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 		ofLogVerbose() << "adding addon dlls to bin: " << d;
 		fs::path from = addon.addonPath / d;
 		fs::path to = projectDir / "bin" / from.filename();
-		alert("copy from to " + from.string() + " : " + to.string());
+//		alert("copy from to " + from.string() + " : " + to.string());
 		fs::copy_file(from, to, fs::copy_options::overwrite_existing);
 	}
 

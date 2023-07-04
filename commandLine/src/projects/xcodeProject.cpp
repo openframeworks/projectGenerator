@@ -294,6 +294,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, strin
 }
 
 
+// FIXME: FS in srcFile, here and in all others.
 void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 //	cout << "xcodeProject::addSrc " << srcFile << " : " << folder << endl;
 	string buildUUID { "" };
@@ -391,13 +392,11 @@ void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
 	// (A) make a FILE REF
 	//-----------------------------------------------------------------
 
-	string UUID = generateUUID(srcFile);   // replace with theo's smarter system.
-	string name, path;
-//	cout << "addSrc " << endl;
-	splitFromLast(srcFile, "/", path, name);
-//	cout << "srcFile " << srcFile << endl;
-//	cout << "path " << path << endl;
-//	cout << "name " << name << endl;
+	string UUID { generateUUID(srcFile) };   // replace with theo's smarter system.
+
+	fs::path srcFS { srcFile };
+	string name = srcFS.filename().string();
+	string path = srcFS.parent_path().string();
 
 	commands.emplace_back("# ---- ADDSRC");
 	commands.emplace_back("Add :objects:"+UUID+":name string "+name);

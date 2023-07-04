@@ -34,32 +34,53 @@ bool QtCreatorProject::createProjectFile(){
 		}
 		findandreplaceInTexfile(dst, "emptyExample", projectName);
 	}
-
-	dst = projectDir / "Makefile";
-	src = templatePath / "Makefile";
-
-	alert("src " + src.string());
-	alert("dst " + dst.string());
-
-	if(!fs::exists(dst)){
-		try {
-			fs::copy_file(src, dst);
-		} catch(fs::filesystem_error& e) {
-			ofLogError(LOG_NAME) << "error copying Makefile template from " << src << " to " << dst;
-			return false;
+	
+	vector < std::pair <fs::path, fs::path > > fromTo {
+		{ "qtcreator.qbs", fs::path { projectName + ".qbs" } },
+		{ "Makefile", "Makefile" },
+		{ "config.make", "config.make" },
+	};
+	
+	for (auto & p : fromTo) {
+		fs::path src = templatePath / p.first;
+		if(!fs::exists(dst)){
+			fs::path dst = projectDir / p.second;
+			
+			alert("fromTo");
+			cout << src << endl;
+			cout << dst << endl;
+			cout << "---" << endl;
+//			try {
+//				fs::copy_file(src, dst);
+//			} catch(fs::filesystem_error& e) {
+//				ofLogError(LOG_NAME) << "error copying Makefile template from " << src << " to " << dst;
+//				return false;
+//			}
 		}
 	}
+	
 
-	dst = projectDir / "config.make";
-	src = templatePath / "config.make";
-	if(!fs::exists(dst)){
-		try {
-			fs::copy_file(src, dst);
-		} catch(fs::filesystem_error& e) {
-			ofLogError(LOG_NAME) << "error copying config.make template from " << src << " to " << dst;
-			return false;
-		}
-	}
+//	dst = projectDir / "Makefile";
+//	src = templatePath / "Makefile";
+//	if(!fs::exists(dst)){
+//		try {
+//			fs::copy_file(src, dst);
+//		} catch(fs::filesystem_error& e) {
+//			ofLogError(LOG_NAME) << "error copying Makefile template from " << src << " to " << dst;
+//			return false;
+//		}
+//	}
+//
+//	dst = projectDir / "config.make";
+//	src = templatePath / "config.make";
+//	if(!fs::exists(dst)){
+//		try {
+//			fs::copy_file(src, dst);
+//		} catch(fs::filesystem_error& e) {
+//			ofLogError(LOG_NAME) << "error copying config.make template from " << src << " to " << dst;
+//			return false;
+//		}
+//	}
 
 
 	// handle the relative roots.

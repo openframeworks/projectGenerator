@@ -543,11 +543,11 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		getPropsRecursively(addonPath, propsFiles, platform);
 	}	
 
-	if (propsFiles.size()) {
-		for (auto & p : propsFiles) {
-			alert ("props files " + p.string());
-		}
-	}
+//	if (propsFiles.size()) {
+//		for (auto & p : propsFiles) {
+//			alert ("props files " + p.string());
+//		}
+//	}
 	
 //	int i = 0;
 //	for (auto & s : propsFiles) {

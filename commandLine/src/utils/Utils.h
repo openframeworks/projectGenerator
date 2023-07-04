@@ -47,7 +47,7 @@ void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props
 void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, string platform);
 
 
-void splitFromLast(string toSplit, string deliminator, string & first, string & second);
+//void splitFromLast(string toSplit, string deliminator, string & first, string & second);
 void splitFromFirst(string toSplit, string deliminator, string & first, string & second);
 
 void fixSlashOrder(string & toFix);

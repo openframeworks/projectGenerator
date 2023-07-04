@@ -179,11 +179,11 @@ bool isFolderNotCurrentPlatform(string folderName, string platform){
 	return false;
 }
 
-void splitFromLast(string toSplit, string deliminator, string & first, string & second){
-	size_t found = toSplit.find_last_of(deliminator.c_str());
-	first = toSplit.substr(0,found);
-	second = toSplit.substr(found+1);
-}
+//void splitFromLast(string toSplit, string deliminator, string & first, string & second){
+//	size_t found = toSplit.find_last_of(deliminator.c_str());
+//	first = toSplit.substr(0,found);
+//	second = toSplit.substr(found+1);
+//}
 
 void splitFromFirst(string toSplit, string deliminator, string & first, string & second){
 	size_t found = toSplit.find(deliminator.c_str());
@@ -304,19 +304,13 @@ void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles
 	for (const auto & entry : fs::directory_iterator(path)) {
 		auto f = entry.path();
 		std::vector<string> splittedPath = ofSplitString(f.string(), fs::path("/").make_preferred().string());
-
-//		ofFile temp(dir.getFile(i));
-		string ext = "";
-		string first = "";
-		
-		// FIXME: is this function useful to extract extension only? if yes lets move to FS
-		splitFromLast(f.string(), ".", first, ext);
 		
 		if (fs::is_directory(f)) {
 
 			// on osx, framework is a directory, let's not parse it....
 			auto stem = f.stem();
-			if (ext != "framework") {
+			
+			if (f.extension() != ".framework") {
 				auto archFound = std::find(LibraryBinary::archs.begin(), LibraryBinary::archs.end(), stem);
 				if (archFound != LibraryBinary::archs.end()) {
 					arch = *archFound;
@@ -330,6 +324,7 @@ void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles
 			}
 
 		} else {
+			auto ext = f.extension();
 
 			bool platformFound = false;
 
@@ -341,8 +336,8 @@ void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles
 				}
 			}
 
-			if (ext == "a" || ext == "lib" || ext == "dylib" || ext == "so" ||
-				(ext == "dll" && platform != "vs")){
+			if (ext == ".a" || ext == ".lib" || ext == ".dylib" || ext == ".so" ||
+				(ext == ".dll" && platform != "vs")){
 				if (platformFound){
 //					libLibs.emplace_back( f, arch, target );
 
@@ -367,7 +362,7 @@ void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles
 						}
 					}
 				}
-			} else if (ext == "h" || ext == "hpp" || ext == "c" || ext == "cpp" || ext == "cc" || ext == "cxx" || ext == "m" || ext == "mm"){
+			} else if (ext == ".h" || ext == ".hpp" || ext == ".c" || ext == ".cpp" || ext == ".cc" || ext == ".cxx" || ext == ".m" || ext == ".mm"){
 				libFiles.emplace_back(f.string());
 			}
 		}

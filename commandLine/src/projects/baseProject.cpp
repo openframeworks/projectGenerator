@@ -139,7 +139,7 @@ bool baseProject::create(const fs::path & path, string templateName){
 	if(!empty(templateName)){
 //		cout << "templateName not empty " << templateName << endl;
 		fs::path templateDir = getOFRoot() / templatesFolder / templateName;
-		alert("templateDir " + templateDir.string());
+//		alert("templateDir " + templateDir.string());
 
 		auto templateConfig = parseTemplate(templateDir);
 		if(templateConfig){
