@@ -81,10 +81,10 @@ bool visualStudioProject::saveProjectFile(){
 			"Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \""+name+"\", \""+aString+"\", \"{"+uuid+"\"}" +
 			divider + "EndProject" + divider;
 		}
-		string findString = "Global" + divider;
-//		string findString = "Global";
+//		string findString = "Global" + divider;
+		string findString = "Global";
 		
-		additionalProjects += findString;
+		additionalProjects += findString + divider;
 		
 		solution = solution.lexically_normal();
 //		findandreplaceInTexfile(solution, findString, additionalProjects);
