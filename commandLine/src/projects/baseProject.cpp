@@ -538,6 +538,9 @@ void baseProject::parseAddons(){
 		alert("line " + addon);
 		if(addon[0] == '#') continue;
 		if(addon == "") continue;
+		cout << "will split string" << endl;
+		auto s = ofSplitString(addon, "#")[0];
+		cout << "after" << endl;
 		addAddon(ofSplitString(addon, "#")[0]);
 	}
 }
