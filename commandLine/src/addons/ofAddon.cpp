@@ -491,19 +491,15 @@ void ofAddon::parseConfig(){
 bool ofAddon::fromFS(fs::path path, const string & platform){
 	alert("ofAddon::fromFS path : " + path.string());
 	
-	cout << 1 << endl;
-
 	clear();
 	this->platform = platform;
 
 	addonPath = path;
-	if(isLocalAddon){
+	if (isLocalAddon) {
 		name = path.stem().string();
-	}else{
+	} else {
 		name = path.filename().string();
 	}
-	
-	cout << 2 << endl;
 
 	if (!fs::exists(path)) {
 		return false;
@@ -513,8 +509,6 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	if (fs::exists(srcPath)) {
 		getFilesRecursively(srcPath, srcFiles);
 	}
-
-	cout << 3 << endl;
 
 	// MARK: srcFiles to fs::path
 	// not possible today because there are string based exclusion functions
@@ -533,7 +527,10 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 
 
 	if (platform == "vs" || platform == "msys2") {
-		getPropsRecursively(addonPath, propsFiles, platform);
+		
+		// XAXA
+//		getPropsRecursively(addonPath, propsFiles, platform);
+		getPropsRecursively(path, propsFiles, platform);
 	}
 	
 	cout << 5 << endl;
