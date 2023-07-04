@@ -73,7 +73,7 @@ bool visualStudioProject::saveProjectFile(){
 	if (!additionalvcxproj.empty()) {
 		string additionalProjects;
 		for (auto & a : additionalvcxproj) {
-			string name = a.filename().stem();
+			string name = a.filename().stem().string();
 			string uuid = generateUUID(name);
 			additionalProjects += "Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \""+name+"\", \""+a.string()+"\", \"{"+uuid+"\"}" +
 			"\nEndProject" + "\n";
@@ -340,11 +340,11 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 
 	if (!libFolder.empty()) {
 		pugi::xpath_node_set addlLibsDir = doc.select_nodes((linkPath + "AdditionalLibraryDirectories").c_str());
-		addLibraryPath(addlLibsDir, libFolder);
+		addLibraryPath(addlLibsDir, libFolder.string());
 	}
 
 	pugi::xpath_node_set addlDeps = doc.select_nodes((linkPath + "AdditionalDependencies").c_str());
-	addLibraryName(addlDeps, libName);
+	addLibraryName(addlDeps, libName.string());
 
 	ofLogVerbose() << "adding lib path " << libFolder;
 	ofLogVerbose() << "adding lib " << libName;

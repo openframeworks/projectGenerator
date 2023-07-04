@@ -153,7 +153,11 @@ bool baseProject::create(const fs::path & path, string templateName){
 				if (fs::exists(to)) {
 					fs::remove(to);
 				}
-				fs::rename(from, to);
+				try {
+					fs::rename(from, to);
+				} catch(fs::filesystem_error& e) {
+					ofLog() << "Can not rename: " << from << " :: " to << " :: " << e.what() ;
+				}
 			}
 		}else{
 			ofLogWarning() << "Cannot find " << templateName << " using platform template only";
