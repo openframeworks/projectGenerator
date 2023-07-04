@@ -156,7 +156,7 @@ bool baseProject::create(const fs::path & path, string templateName){
 				try {
 					fs::rename(from, to);
 				} catch(fs::filesystem_error& e) {
-					ofLog() << "Can not rename: " << from << " :: " to << " :: " << e.what() ;
+					ofLog() << "Can not rename: " << from << " :: " << to << " :: " << e.what() ;
 				}
 			}
 		}else{
