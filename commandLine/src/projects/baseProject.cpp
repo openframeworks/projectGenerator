@@ -346,14 +346,8 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 	extSrcPaths.emplace_back(srcPath.string());
 	vector < fs::path > srcFilesToAdd;
 
-	//so we can just pass through the file paths
-//	ofDisableDataPath();
 	getFilesRecursively(srcPath, srcFilesToAdd);
-//	ofEnableDataPath();
-	
-//	for (auto & s : srcFilesToAdd) {
-//		cout << s << endl;
-//	}
+
 	//if the files being added are inside the OF root folder, make them relative to the folder.
 	bool bMakeRelative = false;
 	if (ofIsPathInPath(srcPath, getOFRoot())) {
@@ -371,6 +365,10 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 //		cout << "fileToAdd :: " << src << endl;
 		//if it is an absolute path it is easy - add the file and enclosing folder to the project
 		string includeFolder { "" };
+		
+		fs::path parent = src.parent_path();
+		fs::path folder2 = parent.lexically_relative(base);
+		
 		if (src.is_absolute() && !bMakeRelative) {
 			// TODO: rewrite
 			/*
@@ -390,8 +388,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 			ofLogVerbose() <<  " adding file " << src << " in folder " << folder << " to project ";
 //			addSrc(src, folder);
 			*/
-			fs::path parent = src.parent_path();
-			fs::path folder2 = parent.lexically_relative(base);
+
 			
 			ofLog() <<  " adding file FIRST " << src << " in folder " << folder2 << " to project ";
 			addSrc(src.string(), folder2.string());
@@ -430,8 +427,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 
 			*/
 			
-			fs::path parent = src.parent_path();
-			fs::path folder2 = parent.lexically_relative(base);
+
 
 			// FIXME: revert back to ofLogVerbose
 			ofLog() <<  " adding file SECOND " << src << " in folder " << folder2 << " to project ";
@@ -452,6 +448,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 }
 
 void baseProject::addAddon(ofAddon & addon){
+	alert("baseProject::addAddon " + addon.name);
 	for(int i=0;i<(int)addons.size();i++){
 		if(addons[i].name==addon.name){
 			return;
