@@ -248,6 +248,7 @@ void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props
 //		if (f.filename().c_str()[0] == '.') continue;
 
 		cout << 2 << endl;
+		cout << f << endl;
 		if (fs::is_regular_file(f)) {
 			cout << 3 << endl;
 			if (f.extension() == ".props") {
