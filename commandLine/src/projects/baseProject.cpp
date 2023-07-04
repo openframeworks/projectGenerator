@@ -535,6 +535,7 @@ void baseProject::parseAddons(){
 
 	for (auto & line : fileToStrings(parseFile)) {
 		auto addon = ofTrim(line);
+		alert("line " + addon);
 		if(addon[0] == '#') continue;
 		if(addon == "") continue;
 		addAddon(ofSplitString(addon, "#")[0]);
