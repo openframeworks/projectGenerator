@@ -245,11 +245,18 @@ void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props
 	for (const auto & entry : fs::recursive_directory_iterator(path)) {
 		auto f = entry.path();
 		// avoid hidden files .DS_Store .vscode .git etc
-		if (f.filename().c_str()[0] == '.') continue;
+//		if (f.filename().c_str()[0] == '.') continue;
 
-		if (fs::is_regular_file(f) && f.extension() == ".props") {
-			props.emplace_back(f);
+		cout << 2 << endl;
+		if (fs::is_regular_file(f)) {
+			cout << 3 << endl;
+			if (f.extension() == ".props") {
+				cout << 4 << endl;
+				props.emplace_back(f);
+				cout << 5 << endl;
+			}
 		}
+		
 //		if (fs::is_directory(f)) {
 //			if (f.filename() == fs::path("mediaAssets")) continue;
 //			if (f.extension() == ".xcodeproj") continue;
