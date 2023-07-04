@@ -41,6 +41,7 @@ void findandreplace( string& tInput, string tFind, string tReplace ) {
 	size_t uReplaceLen = tReplace.length();
 
 	if( uFindLen == 0 ){
+		cout << "findandreplace, tFind not found " << tFind << endl;
 		return;
 	}
 
