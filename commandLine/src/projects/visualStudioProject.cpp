@@ -82,7 +82,7 @@ bool visualStudioProject::saveProjectFile(){
 		string findString = "Global" + divider;
 		additionalProjects += findString;
 		
-		cout << fs::current_path << endl;
+		cout << fs::current_path() << endl;
 		cout << fs::absolute(solution) << endl;
 		cout << solution.lexically_normal() << endl;
 		findandreplaceInTexfile(solution, findString, additionalProjects);
