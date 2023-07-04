@@ -259,6 +259,8 @@ void baseProject::addAddon(string addonName){
 	#endif
 	
 
+	cout << 1 << endl;
+	
 	ofAddon addon;
 	// FIXME: Review this path here.
 	addon.pathToOF = getOFRelPath(projectDir);
@@ -293,7 +295,11 @@ void baseProject::addAddon(string addonName){
 		addonsCache[target][addonName] = addon;
 	}
 	
+	cout << 2 << endl;
+
 	addAddon(addon);
+
+	cout << 3 << endl;
 
 	// Process values from ADDON_DATA
 	if(addon.data.size()){
