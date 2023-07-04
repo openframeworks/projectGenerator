@@ -263,6 +263,8 @@ void baseProject::addAddon(string addonName){
 	
 	ofAddon addon;
 	// FIXME: Review this path here.
+	cout << 2 << endl;
+
 	addon.pathToOF = getOFRelPath(projectDir);
 	addon.pathToProject = projectDir;
 
@@ -270,25 +272,29 @@ void baseProject::addAddon(string addonName){
 	bool inCache = isAddonInCache(addonName, target);
 	
 	fs::path addonPath { addonName };
-	
+	cout << 2 << endl;
+
 	if (fs::exists(addonPath)) {
 		addon.isLocalAddon = true;
 	} else {
 		addonPath = fs::path(getOFRoot()) / "addons" / addonName;
 		addon.isLocalAddon = false;
 	}
-	
+	cout << 2 << endl;
+
 	if(!inCache){
 		addonOK = addon.fromFS(addonPath, target);
 	}else{
 		addon = addonsCache[target][addonName];
 		addonOK = true;
 	}
+	cout << 2 << endl;
 
 	if(!addonOK){
 		ofLogVerbose() << "Ignoring addon that doesn't seem to exist: " << addonName;
 		return; //if addon does not exist, stop early
 	}
+	cout << 2 << endl;
 
 	if(!inCache){
 		//cache the addon so we dont have to be reading form disk all the time
