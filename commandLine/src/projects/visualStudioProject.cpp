@@ -81,6 +81,8 @@ bool visualStudioProject::saveProjectFile(){
 		}
 		string findString = "Global" + divider;
 		additionalProjects += findString;
+		
+		
 		findandreplaceInTexfile(solution, findString, additionalProjects);
 	}
 	

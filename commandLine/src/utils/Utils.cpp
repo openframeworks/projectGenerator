@@ -61,7 +61,7 @@ string LoadFileAsString(const string & fn) {
 }
 
 void findandreplaceInTexfile (const fs::path & fileName, string tFind, string tReplace ){
-//	cout << "findandreplaceInTexfile " << fileName << " : " << tFind << " : " << tReplace << endl;
+	cout << "findandreplaceInTexfile " << fileName << " : " << tFind << " : " << tReplace << endl;
 	if (fs::exists( fileName )) {
 		std::ifstream t(fileName.c_str());
 		std::stringstream buffer;
