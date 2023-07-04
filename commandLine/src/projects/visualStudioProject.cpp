@@ -79,15 +79,33 @@ bool visualStudioProject::saveProjectFile(){
 			"Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \""+name+"\", \""+a.string()+"\", \"{"+uuid+"\"}" +
 			divider + "EndProject" + divider;
 		}
-//		string findString = "Global" + divider;
-		string findString = "Global";
+		string findString = "Global" + divider;
+//		string findString = "Global";
+		
 		additionalProjects += findString;
 		
-		cout << fs::current_path() << endl;
-		cout << fs::absolute(solution) << endl;
-		cout << solution.lexically_normal() << endl;
 		solution = solution.lexically_normal();
-		findandreplaceInTexfile(solution, findString, additionalProjects);
+//		findandreplaceInTexfile(solution, findString, additionalProjects);
+
+		std::ifstream file(solution);
+		std::stringstream buffer;
+		buffer << file.rdbuf();
+		string str = buffer.str();
+		file.close();
+
+		std::size_t pos = str.find(findString);
+		if (pos != std::string::npos) {
+			str.replace(pos, findString.length(), additionalProjects);
+		}
+
+		std::ofstream myfile(solution);
+		myfile << str;
+		myfile.close();
+		
+		
+//		cout << fs::current_path() << endl;
+//		cout << fs::absolute(solution) << endl;
+//		cout << solution.lexically_normal() << endl;
 	}
 	
 	
