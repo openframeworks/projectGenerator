@@ -10,9 +10,9 @@ string visualStudioProject::LOG_NAME = "visualStudioProjectFile";
 bool visualStudioProject::createProjectFile(){
 //	alert("visualStudioProject::createProjectFile");
 
+	solution	= projectDir / (projectName + ".sln");
 	fs::path project 	= projectDir / (projectName + ".vcxproj");
 	fs::path user 		= projectDir / (projectName + ".vcxproj.user");
-	fs::path solution	= projectDir / (projectName + ".sln");
 	fs::path filters	= projectDir / (projectName + ".vcxproj.filters");
 
 	fs::copy(templatePath / "emptyExample.vcxproj", 		project, fs::copy_options::overwrite_existing);
@@ -69,16 +69,19 @@ bool visualStudioProject::loadProjectFile(){
 
 
 bool visualStudioProject::saveProjectFile(){
-	
 	if (!additionalvcxproj.empty()) {
 		string additionalProjects;
+		string divider = "\r\n";
 		for (auto & a : additionalvcxproj) {
 			string name = a.filename().stem().string();
 			string uuid = generateUUID(name);
-			additionalProjects += "Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \""+name+"\", \""+a.string()+"\", \"{"+uuid+"\"}" +
-			"\nEndProject" + "\n";
+			additionalProjects +=
+			"Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \""+name+"\", \""+a.string()+"\", \"{"+uuid+"\"}" +
+			divider + "EndProject" + divider;
 		}
-		cout << additionalProjects << endl;
+		string findString = "Global" + divider;
+		additionalProjects += findString;
+		findandreplaceInTexfile(solution, findString, additionalProjects);
 	}
 	
 	
