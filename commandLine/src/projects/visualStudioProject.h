@@ -28,6 +28,7 @@ public:
 
 	void appendFilter(std::string folderName);
 
+	vector <fs::path> additionalvcxproj;
 private:
 
 };

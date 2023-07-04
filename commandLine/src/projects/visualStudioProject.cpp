@@ -69,11 +69,35 @@ bool visualStudioProject::loadProjectFile(){
 
 
 bool visualStudioProject::saveProjectFile(){
+	
+	if (!additionalvcxproj.empty()) {
+		string additionalProjects;
+		for (auto & a : additionalvcxproj) {
+			string name = a.filename().stem();
+			string uuid = generateUUID(name);
+			additionalProjects += "Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \""+name+"\", \""+a.string()+"\", \"{"+uuid+"\"}" +
+			"\nEndProject" + "\n";
+		}
+		cout << additionalProjects << endl;
+	}
+	
+	
 	auto filters = projectDir / (projectName + ".vcxproj.filters");
 	filterXmlDoc.save_file(filters.c_str());
 
 	auto vcxFile = projectDir / (projectName + ".vcxproj");
 	return doc.save_file(vcxFile.c_str());
+	
+	/*
+	 PSEUDOCODE HERE
+	 open sln project
+	 find position of first "Global" word, put cursor behind
+	 add one entry for each additional, fixing slashes, generating new uuid.
+	 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openframeworksLib", "..\..\..\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj", "{5837595D-ACA9-485C-8E76-729040CE4B0B}"
+	 EndProject
+	*/
+	
+
 }
 
 void visualStudioProject::appendFilter(string folderName){
@@ -395,7 +419,25 @@ void visualStudioProject::addDefine(string define, LibType libType) {
 }
 
 void visualStudioProject::addAddon(ofAddon & addon) {
-//	cout << "visualStudioProject::addAddon " << addon.name << endl;
+	alert ("visualStudioProject::addAddon " + addon.name);
+	
+	fs::path additionalFolder = addon.addonPath / (addon.name + "Lib");
+	if (fs::exists(additionalFolder)) {
+//		alert("Additional! " + additionalFolder.string(), 34);
+		for (const auto & entry : fs::directory_iterator(additionalFolder)) {
+			auto f = entry.path();
+			alert(f.string());
+			if (f.extension() == ".vcxproj") {
+				additionalvcxproj.emplace_back(f);
+				alert("VCSPROJ Exists " + f.string(), 35);
+			}
+		}
+		
+//		if (fs::exists(additionalFolder / "*.vcxproj")) {
+//		}
+	}
+	
+	
 	for (auto & a : addons) {
 		if (a.name == addon.name) return;
 	}
