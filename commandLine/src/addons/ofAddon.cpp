@@ -494,21 +494,18 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	clear();
 	this->platform = platform;
 
+	addonPath = path;
 	if(isLocalAddon){
 		name = path.stem().string();
-		addonPath = path;
 	}else{
 		name = path.filename().string();
-		addonPath = path;
 	}
 	
-
 	if (!fs::exists(path)) {
 		return false;
 	}
 
 	fs::path srcPath { path / "src" };
-
 	if (fs::exists(srcPath)) {
 		getFilesRecursively(srcPath, srcFiles);
 	}
@@ -529,13 +526,7 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 
 	if (platform == "vs" || platform == "msys2") {
 		getPropsRecursively(addonPath, propsFiles, platform);
-	}	
-
-//	if (propsFiles.size()) {
-//		for (auto & p : propsFiles) {
-//			alert ("props files " + p.string());
-//		}
-//	}
+	}
 	
 //	int i = 0;
 //	for (auto & s : propsFiles) {
@@ -580,17 +571,9 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 			folder = fs::relative(sFS.parent_path(), getOFRoot());
 			s = fixPath(s);
 		}
-//		alert ("libFiles " + s);
 		srcFiles.emplace_back(s);
-//		alert ("libFiles " + folder.string());
 		filesToFolders[s] = folder.string();
 	}
-//	// changing libs folder from absolute to relative.
-//	for (auto & l : libs) {
-//		cout << "l.path " << l.path << endl;
-//		l.path = fs::path(pathToOF / fs::relative(l.path, getOFRoot())).string();
-//		cout << "l.path " << l.path << endl;
-//	}
 	
 	for (auto & f : frameworks) {
 		// knowing if we are system framework or not is important....
@@ -616,38 +599,19 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	std::list < fs::path > paths;
 
 	// get every folder in addon/src and addon/libs
-	// FIXME: FS here and getFoldersRecursively
-	vector < string > libFolders;
+	vector < fs::path > libFolders;
 	if (fs::exists(libsPath)) {
 		getFoldersRecursively(libsPath, libFolders, platform);
-	}
-
-	// FIXME: FS here and getFoldersRecursively
-	vector < string > srcFolders;
-	if (fs::exists(srcPath)) {
-		getFoldersRecursively(srcPath, srcFolders, platform);
-	}
-
-	// convert paths to relative
-	for (auto & l : libFolders) {
-		if (isLocalAddon) {
-			paths.emplace_back(l);
-		} else {
-//			paths.emplace_back( pathToOF / fs::relative(fs::path(l), getOFRoot()) );
-			paths.emplace_back( fixPath(l) );
+		for (auto & path : libFolders) {
+			paths.emplace_back( isLocalAddon ? path : fixPath(path) );
 		}
 	}
 
-	for (auto & l : srcFolders) {
-		if (isLocalAddon) {
-			paths.emplace_back(l);
-		} else {
-//			cout << "l " << l << endl;
-//			cout << "pathToOF " << pathToOF << endl;
-//			cout << "getOFRoot() " << getOFRoot() << endl;
-			fs::path fix = fixPath(l);
-//			cout << "fix " << fix << endl;
-			paths.emplace_back( fix );
+	vector < fs::path > srcFolders;
+	if (fs::exists(srcPath)) {
+		getFoldersRecursively(srcPath, srcFolders, platform);
+		for (auto & path : srcFolders) {
+			paths.emplace_back( isLocalAddon ? path : fixPath(path) );
 		}
 	}
 	
@@ -656,15 +620,7 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	for (auto & p : paths) {
 		includePaths.emplace_back(p.string());
 	}
-
-//	cout << "--- inludePaths " << endl;
-//	for (auto & i : includePaths) {
-//		cout << i << endl;
-//	}
-//	cout << "--- inludePaths " << endl;
-
 	parseConfig();
-
 	return true;
 }
 

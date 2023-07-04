@@ -184,10 +184,7 @@ void splitFromFirst(string toSplit, string deliminator, string & first, string &
 	second = toSplit.substr(found+deliminator.size());
 }
 
-
-// TODO: This should be able to work with a vector of FS::path too
-
-void getFoldersRecursively(const fs::path & path, std::vector < string > & folderNames, string platform){
+void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & folderNames, string platform){
 	if (!fs::exists(path)) return;
 	if (!fs::is_directory(path)) return;
 
