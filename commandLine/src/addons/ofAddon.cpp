@@ -489,8 +489,10 @@ void ofAddon::parseConfig(){
 
 
 bool ofAddon::fromFS(fs::path path, const string & platform){
-//	alert("ofAddon::fromFS path : " + path.string());
+	alert("ofAddon::fromFS path : " + path.string());
 	
+	cout << 1 << endl;
+
 	clear();
 	this->platform = platform;
 
@@ -501,6 +503,8 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		name = path.filename().string();
 	}
 	
+	cout << 2 << endl;
+
 	if (!fs::exists(path)) {
 		return false;
 	}
@@ -509,6 +513,8 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	if (fs::exists(srcPath)) {
 		getFilesRecursively(srcPath, srcFiles);
 	}
+
+	cout << 3 << endl;
 
 	// MARK: srcFiles to fs::path
 	// not possible today because there are string based exclusion functions
@@ -523,10 +529,15 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		}
 		filesToFolders[s] = folder.string();
 	}
+	cout << 4 << endl;
+
 
 	if (platform == "vs" || platform == "msys2") {
 		getPropsRecursively(addonPath, propsFiles, platform);
 	}
+	
+	cout << 5 << endl;
+
 	
 //	int i = 0;
 //	for (auto & s : propsFiles) {
@@ -556,6 +567,8 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		}
 	}
 	
+	cout << 6 << endl;
+
 	for (auto & l : libs) {
 //		alert(l.path);
 		l.path = fixPath(l.path).string();

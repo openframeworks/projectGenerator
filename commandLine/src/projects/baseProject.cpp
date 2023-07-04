@@ -279,18 +279,12 @@ void baseProject::addAddon(string addonName){
 	}
 
 	
-	cout << 1 << endl;
-
 	if(!inCache){
-		cout << 2 << endl;
 		addonOK = addon.fromFS(addonPath, target);
-		cout << 3 << endl;
 
 	}else{
-		cout << 4 << endl;
 		addon = addonsCache[target][addonName];
 		addonOK = true;
-		cout << 5 << endl;
 	}
 
 	if(!addonOK){
