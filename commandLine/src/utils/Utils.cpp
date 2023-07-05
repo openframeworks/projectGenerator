@@ -63,7 +63,7 @@ string LoadFileAsString(const string & fn) {
 
 void findandreplaceInTexfile (const fs::path & fileName, string tFind, string tReplace ){
 	if (fs::exists( fileName )) {
-		cout << "findandreplaceInTexfile " << fileName << " : " << tFind << " : " << tReplace << endl;
+//		cout << "findandreplaceInTexfile " << fileName << " : " << tFind << " : " << tReplace << endl;
 
 		std::ifstream t(fileName);
 		std::stringstream buffer;
@@ -83,10 +83,8 @@ void findandreplaceInTexfile (const fs::path & fileName, string tFind, string tR
 }
 
 bool doesTagAndAttributeExist(pugi::xml_document & doc, string tag, string attribute, string newValue){
-	char xpathExpressionExists[1024];
-	sprintf(xpathExpressionExists, "//%s[@%s='%s']", tag.c_str(), attribute.c_str(), newValue.c_str());
-	//cout <<xpathExpressionExists <<endl;
-	pugi::xpath_node_set set = doc.select_nodes(xpathExpressionExists);
+	string expression { "//" + tag + "[@" + attribute + "='" + newValue + "']" };
+	pugi::xpath_node_set set = doc.select_nodes(expression.c_str());
 	if (set.size() != 0){
 		return true;
 	} else {
@@ -95,11 +93,12 @@ bool doesTagAndAttributeExist(pugi::xml_document & doc, string tag, string attri
 }
 
 pugi::xml_node appendValue(pugi::xml_document & doc, string tag, string attribute, string newValue, bool overwriteMultiple){
+	alert ("appendValue");
+	
 	if (overwriteMultiple == true){
 		// find the existing node...
-		char xpathExpression[1024];
-		sprintf(xpathExpression, "//%s[@%s='%s']", tag.c_str(), attribute.c_str(), newValue.c_str());
-		pugi::xpath_node node = doc.select_node(xpathExpression);
+		string expression { "//" + tag + "[@" + attribute + "='" + newValue + "']" };
+		pugi::xpath_node node = doc.select_node(expression.c_str());
 		if(string(node.node().attribute(attribute.c_str()).value()).size() > 0){ // for some reason we get nulls here?
 			// ...delete the existing node
 			std::cout << "DELETING: " << node.node().name() << ": " << " " << node.node().attribute(attribute.c_str()).value() << std::endl;
@@ -109,10 +108,8 @@ pugi::xml_node appendValue(pugi::xml_document & doc, string tag, string attribut
 
 	if (!doesTagAndAttributeExist(doc, tag, attribute, newValue)){
 		// otherwise, add it please:
-		char xpathExpression[1024];
-		sprintf(xpathExpression, "//%s[@%s]", tag.c_str(), attribute.c_str());
-		//cout << xpathExpression << endl;
-		pugi::xpath_node_set add = doc.select_nodes(xpathExpression);
+		string expression { "//" + tag + "[@" + attribute + "]" };
+		pugi::xpath_node_set add = doc.select_nodes(expression.c_str());
 		pugi::xml_node node = add[add.size()-1].node();
 		pugi::xml_node nodeAdded = node.parent().append_copy(node);
 		nodeAdded.attribute(attribute.c_str()).set_value(newValue.c_str());
@@ -236,11 +233,10 @@ void getFrameworksRecursively(const fs::path & path, std::vector < string > & fr
 }
 
 void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props, const string & platform) {
-	alert("getPropsRecursively " + path.string());
+//	alert("getPropsRecursively " + path.string());
 	if (!fs::exists(path)) return;
 	if (!fs::is_directory(path)) return;
 	
-//	for (const auto & entry : fs::directory_iterator(path)) {
 	for (const auto & entry : fs::recursive_directory_iterator(path)) {
 		auto f = entry.path();
 		// avoid hidden files .DS_Store .vscode .git etc

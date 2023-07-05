@@ -719,7 +719,7 @@ void xcodeProject::addAfterRule(string rule){
 }
 
 void xcodeProject::addAddon(ofAddon & addon){
-	alert("xcodeProject addAddon string :: " + addon.name, 31);
+//	alert("xcodeProject addAddon string :: " + addon.name, 31);
 	for (auto & a : addons) {
 		if (a.name == addon.name) return;
 	}
