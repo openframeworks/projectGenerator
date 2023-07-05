@@ -451,19 +451,18 @@ void visualStudioProject::addDefine(string define, LibType libType) {
 void visualStudioProject::addAddon(ofAddon & addon) {
 	alert ("visualStudioProject::addAddon " + addon.name);
 	
-//	fs::path additionalFolder = addon.addonPath / (addon.name + "Lib");
-//	if (fs::exists(additionalFolder)) {
-//		alert("Additional! " + additionalFolder.string(), 34);
-//		for (const auto & entry : fs::directory_iterator(additionalFolder)) {
-//			auto f = entry.path();
-//			alert(f.string());
-//			if (f.extension() == ".vcxproj") {
-//				additionalvcxproj.emplace_back(f);
-//				alert("VCSPROJ Exists " + f.string(), 35);
-//			}
-//		}
-//	}
-//	
+	fs::path additionalFolder = addon.addonPath / (addon.name + "Lib");
+	if (fs::exists(additionalFolder)) {
+		alert("Additional! " + additionalFolder.string(), 34);
+		for (const auto & entry : fs::directory_iterator(additionalFolder)) {
+			auto f = entry.path();
+			alert(f.string());
+			if (f.extension() == ".vcxproj") {
+				additionalvcxproj.emplace_back(f);
+				alert("VCSPROJ Exists " + f.string(), 35);
+			}
+		}
+	}
 	
 	for (auto & a : addons) {
 		if (a.name == addon.name) return;
