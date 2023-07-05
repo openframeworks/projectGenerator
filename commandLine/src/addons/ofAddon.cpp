@@ -527,10 +527,12 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 
 
 	if (platform == "vs" || platform == "msys2") {
-		
-		// XAXA
-//		getPropsRecursively(addonPath, propsFiles, platform);
-		getPropsRecursively(path, propsFiles, platform);
+		cout << "---" << endl;
+		cout << addonPath << endl;
+		cout << path << endl;
+		cout << "---" << endl;
+		getPropsRecursively(addonPath, propsFiles, platform);
+//		getPropsRecursively(path, propsFiles, platform);
 	}
 	
 	cout << 5 << endl;

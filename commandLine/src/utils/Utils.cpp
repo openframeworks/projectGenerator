@@ -240,21 +240,15 @@ void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props
 	if (!fs::exists(path)) return;
 	if (!fs::is_directory(path)) return;
 	
-	cout << 1 << endl;
 //	for (const auto & entry : fs::directory_iterator(path)) {
 	for (const auto & entry : fs::recursive_directory_iterator(path)) {
 		auto f = entry.path();
 		// avoid hidden files .DS_Store .vscode .git etc
 //		if (f.filename().c_str()[0] == '.') continue;
 
-		cout << 2 << endl;
-		cout << f << endl;
 		if (fs::is_regular_file(f)) {
-			cout << 3 << endl;
 			if (f.extension() == ".props") {
-				cout << 4 << endl;
 				props.emplace_back(f);
-				cout << 5 << endl;
 			}
 		}
 		
@@ -273,7 +267,6 @@ void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props
 //			}
 //		}
 	}
-	cout << 2 << endl;
 }
 
 void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, string platform) {
