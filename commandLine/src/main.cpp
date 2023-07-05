@@ -50,6 +50,8 @@ vector <ofTargetPlatform> targets;
 string ofPathEnv;
 string templateName;
 
+
+
 bool busingEnvVar;
 bool bVerbose;
 bool bAddonsPassedIn;
@@ -59,6 +61,9 @@ bool bRecursive;              // do we recurse in update mode?
 bool bHelpRequested;          // did we request help?
 bool bListTemplates;          // did we request help?
 bool bDryRun;                 // do dry run (useful for debugging recursive update)
+
+
+
 
 //-------------------------------------------
 void consoleSpace() {
@@ -241,8 +246,9 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 		dirs.emplace_back(path);
 	}
 	
-	for (const auto & entry : fs::recursive_directory_iterator(path)) {
-		auto p = entry.path();
+//	for (const auto & entry : fs::recursive_directory_iterator(path)) {
+//		auto p = entry.path();
+	for (const auto & p : dirList(path)) {
 		if (fs::is_directory(p)) {
 			if (isGoodProjectPath(p)) {
 				dirs.emplace_back(p);
@@ -250,12 +256,8 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 //			recursiveUpdate(f, target);
 		}
 	}
-//	for (auto & path : dirs) {
-//		alert(path.string());
-//		alert(fs::absolute(path).string());
-//	}
+
 	for (auto & path : dirs) {
-//		fs::current_path(path);
 		nProjectsUpdated++;
 		updateProject(path, target, false);
 	}

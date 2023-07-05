@@ -15,6 +15,7 @@
 #include <set>
 #include <unordered_set>
 
+
 const fs::path templatesFolder = "scripts/templates";
 
 baseProject::baseProject(string _target){

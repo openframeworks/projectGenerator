@@ -84,7 +84,10 @@ public:
 	fs::path templatePath;
 	string projectName;
 	string target;
+	
 
+	
+	
 protected:
 	void recursiveCopyContents(const fs::path & srcDir, const fs::path & destDir);
 	void recursiveTemplateCopy(const fs::path & srcDir, const fs::path & destDir);

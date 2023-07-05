@@ -5,6 +5,8 @@
  *      Author: arturo
  */
 
+#pragma once
+
 #ifndef UTILS_H_
 #define UTILS_H_
 
@@ -79,5 +81,7 @@ void alert(string msg, int color=32);
 bool ofIsPathInPath(const fs::path& basePath, const fs::path& subPath);
 
 // fs::path subtract(const fs::path & base, const fs::path & sub) {// }
+
+vector <fs::path> dirList (const fs::path & path);
 
 #endif /* UTILS_H_ */

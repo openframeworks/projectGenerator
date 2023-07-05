@@ -1,4 +1,5 @@
 #pragma once
+
 #include "baseProject.h"
 
 class AndroidStudioProject : public baseProject

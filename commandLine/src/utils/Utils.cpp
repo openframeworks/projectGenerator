@@ -93,7 +93,7 @@ bool doesTagAndAttributeExist(pugi::xml_document & doc, string tag, string attri
 }
 
 pugi::xml_node appendValue(pugi::xml_document & doc, string tag, string attribute, string newValue, bool overwriteMultiple){
-	alert ("appendValue");
+//	alert ("appendValue");
 	
 	if (overwriteMultiple == true){
 		// find the existing node...
@@ -127,8 +127,10 @@ void getFilesRecursively(const fs::path & path, std::vector < string > & fileNam
 	if (!fs::exists(path)) return;
 	if (!fs::is_directory(path)) return;
 	
-	for (const auto & entry : fs::recursive_directory_iterator(path)) {
-		auto f = entry.path();
+	for (const auto & f : dirList(path)) {
+
+//	for (const auto & entry : fs::recursive_directory_iterator(path)) {
+//		auto f = entry.path();
 		// avoid hidden files .DS_Store .vscode .git etc
 		if (f.filename().c_str()[0] == '.') continue;
 		// Attention: this function will search src files which doesn't usually have .frameworks inside.
@@ -143,8 +145,10 @@ void getFilesRecursively(const fs::path & path, std::vector < string > & fileNam
 void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileNames){
 	if (!fs::exists(path)) return;
 	if (!fs::is_directory(path)) return;
-	for (const auto & entry : fs::recursive_directory_iterator(path)) {
-		auto f = entry.path();
+	
+	for (const auto & f : dirList(path)) {
+//	for (const auto & entry : fs::recursive_directory_iterator(path)) {
+//		auto f = entry.path();
 		// avoid hidden files .DS_Store .vscode  .git etc
 		if (f.filename().c_str()[0] == '.') continue;
 		if (f.extension() == ".framework") continue;
@@ -212,8 +216,10 @@ void getFrameworksRecursively(const fs::path & path, std::vector < string > & fr
 	if (!fs::is_directory(path)) return;
 	
 	//	for (const auto & entry : fs::directory_iterator(path)) {
-	for (const auto & entry : fs::recursive_directory_iterator(path)) {
-		auto f = entry.path();
+	for (const auto & f : dirList(path)) {
+
+//	for (const auto & entry : fs::recursive_directory_iterator(path)) {
+//		auto f = entry.path();
 		if (f.filename().c_str()[0] == '.') continue; // avoid hidden files .DS_Store .vscode .git etc
 		
 		if (fs::is_directory(f)) {
@@ -237,8 +243,10 @@ void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props
 	if (!fs::exists(path)) return;
 	if (!fs::is_directory(path)) return;
 	
-	for (const auto & entry : fs::recursive_directory_iterator(path)) {
-		auto f = entry.path();
+	for (const auto & f : dirList(path)) {
+
+//	for (const auto & entry : fs::recursive_directory_iterator(path)) {
+//		auto f = entry.path();
 		// avoid hidden files .DS_Store .vscode .git etc
 //		if (f.filename().c_str()[0] == '.') continue;
 
@@ -271,8 +279,11 @@ void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, st
 	
 	// avoid hidden files .DS_Store .vscode .git etc
 //	if (path.filename().c_str()[0] == '.') return;
-	for (const auto & entry : fs::recursive_directory_iterator(path)) {
-		auto f = entry.path();
+	
+	for (const auto & f : dirList(path)) {
+
+//	for (const auto & entry : fs::recursive_directory_iterator(path)) {
+//		auto f = entry.path();
 		// avoid hidden files .DS_Store .vscode .git etc
 		if (f.filename().c_str()[0] == '.') continue;
 		if (fs::is_regular_file(f) && f.extension() == ".dll") {
@@ -499,4 +510,19 @@ void alert(string msg, int color) {
 
 bool ofIsPathInPath(const fs::path& basePath, const fs::path& subPath) {
 	return (std::search(basePath.begin(), basePath.end(), subPath.begin(), subPath.end()) != basePath.end());
+}
+
+
+vector <fs::path> dirList (const fs::path & path) {
+	// map to cache recursive directory listing for subsequent usage
+	static std::map<fs::path, vector <fs::path >> dirListMap;
+	if (dirListMap.find(path) == dirListMap.end()) {
+//		alert("LISTING " + path.string(), 35);
+		for (const auto & entry : fs::recursive_directory_iterator(path)) {
+			dirListMap[path].emplace_back(entry.path());
+		}
+	} else {
+//		alert("IN CACHE " + path.string());
+	}
+	return dirListMap[path];
 }
