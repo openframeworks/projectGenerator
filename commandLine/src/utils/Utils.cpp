@@ -351,7 +351,7 @@ void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles
 //					libLibs.emplace_back( f, arch, target );
 					
 
-					
+//					alert ("libLibs " + f.string());
 					libLibs.push_back({ f.string(), arch, target });
 
 					//TODO: THEO hack
@@ -512,12 +512,10 @@ bool ofIsPathInPath(const fs::path& basePath, const fs::path& subPath) {
 	return (std::search(basePath.begin(), basePath.end(), subPath.begin(), subPath.end()) != basePath.end());
 }
 
-
 vector <fs::path> dirList (const fs::path & path) {
 	// map to cache recursive directory listing for subsequent usage
 	static std::map<fs::path, vector <fs::path >> dirListMap;
 	if (dirListMap.find(path) == dirListMap.end()) {
-//		alert("LISTING " + path.string(), 35);
 		for (const auto & entry : fs::recursive_directory_iterator(path)) {
 			dirListMap[path].emplace_back(entry.path());
 		}

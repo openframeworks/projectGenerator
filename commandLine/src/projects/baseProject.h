@@ -57,7 +57,7 @@ private:
 
 public:
 
-	virtual void addSrc(string srcFile, string folder, SrcType type=DEFAULT) = 0;
+	virtual void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) = 0;
 	virtual void addInclude(string includeName) = 0;
 	virtual void addLibrary(const LibraryBinary & lib) = 0;
 	virtual void addLDFLAG(string ldflag, LibType libType = RELEASE_LIB){}
@@ -85,6 +85,7 @@ public:
 	string projectName;
 	string target;
 	
+	bool bMakeRelative = false;
 
 	
 	

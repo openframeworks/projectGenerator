@@ -12,7 +12,7 @@ public:
 	bool loadProjectFile();
 	bool saveProjectFile();
 
-	void addSrc(std::string srcFile, std::string folder, SrcType type=DEFAULT);
+	void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT);
 	void addInclude(std::string includeName);
 	void addProps(fs::path propsFile);
 	void addLibrary(const LibraryBinary & lib);

@@ -66,7 +66,7 @@ bool CBWinProject::saveProjectFile(){
 	return doc.save_file((projectDir / (projectName + ".cbp")).c_str());
 }
 
-void CBWinProject::addSrc(std::string srcName, std::string folder, SrcType type){
+void CBWinProject::addSrc(const fs::path & srcName, const fs::path & folder, SrcType type){
 	pugi::xml_node node = appendValue(doc, "Unit", "filename", srcName);
 	if(!node.empty()){
 		node.child("Option").attribute("virtualFolder").set_value(folder.c_str());

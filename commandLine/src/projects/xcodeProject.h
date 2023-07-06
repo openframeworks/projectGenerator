@@ -16,7 +16,7 @@ private:
 	void saveMakefile();
 
 public:
-	void addSrc(string srcFile, string folder, SrcType type=DEFAULT);
+	void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT);
 	void addInclude(string includeName);
 	void addLibrary(const LibraryBinary & lib);
 	void addLDFLAG(string ldflag, LibType libType = RELEASE_LIB);
@@ -26,9 +26,9 @@ public:
 	void addDefine(string define, LibType libType = RELEASE_LIB);
 
 	// macOS specific
+	// FIXME: Folder to FS::path and const?
 	void addFramework(const string & name, const fs::path & path, string folder="");
-//	void addDylib(string name, string path);
-	void addDylib(const string & name, const fs::path & path);
+	void addDylib(const string & name, const fs::path & path, const fs::path & folder);
 
 	void addAddon(ofAddon & addon);
 	void saveScheme();

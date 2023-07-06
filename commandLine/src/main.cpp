@@ -450,11 +450,24 @@ int main(int argc, char** argv){
 
 	// This part of the code changes cwd to the project folder and make everything relative to there.
 	if (fs::exists(absoluteProjectPath)) {
+		
+		cout << "ofPath " << ofPath << endl;
 		fs::path newOfPath = fs::weakly_canonical(fs::current_path() / ofPath);
+		
+		cout << "newOfPath " << newOfPath << endl;
+		
+		cout << "current " << fs::current_path() << endl;
+		
 		fs::current_path(absoluteProjectPath);
 //		cout << "newOfPath " << newOfPath << endl;
 //		cout << "absoluteProjectPath " << absoluteProjectPath << endl;
-		ofPath = fs::relative(newOfPath, absoluteProjectPath);
+		
+		if (ofIsPathInPath(fs::current_path(), getOFRoot())) {
+			ofPath = fs::relative(newOfPath, absoluteProjectPath);
+		}
+
+		cout << "ofPath " << ofPath << endl;
+
 		projectPath = ".";
 	}
 

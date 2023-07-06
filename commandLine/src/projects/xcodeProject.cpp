@@ -295,7 +295,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, strin
 
 
 // FIXME: FS in srcFile, here and in all others.
-void xcodeProject::addSrc(string srcFile, string folder, SrcType type){
+void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type){
 //	cout << "xcodeProject::addSrc " << srcFile << " : " << folder << endl;
 	string buildUUID { "" };
 
@@ -584,8 +584,8 @@ void xcodeProject::addFramework(const string & name, const fs::path & path, stri
 
 
 //void xcodeProject::addDylib(string name, string path){
-void xcodeProject::addDylib(const string & name, const fs::path & path){
-//	cout << "xcodeProject::addDylib " << name << " : " << path << endl;
+void xcodeProject::addDylib(const string & name, const fs::path & path, const fs::path & folder){
+	alert( "xcodeProject::addDylib " + name + " : " + path.string() , 33);
 
 	// name = name of the dylib
 	// path = the full path (w name) of this framework
@@ -605,17 +605,18 @@ void xcodeProject::addDylib(const string & name, const fs::path & path){
 	//commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
 	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
 	
+	
 	fs::path filePath { relRoot / path };
 
-//	commands.emplace_back("Add :objects:"+UUID+":path string "+path.string());
-	commands.emplace_back("Add :objects:"+UUID+":path string " + filePath.string());
+	commands.emplace_back("Add :objects:"+UUID+":path string "+path.string());
+//	commands.emplace_back("Add :objects:"+UUID+":path string " + filePath.string());
 	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
 	commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string compiled.mach-o.dylib");
 	commands.emplace_back("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
 
 
-	fs::path folder = path.parent_path();
-	string folderUUID = getFolderUUID(folder.string(), false);
+//	fs::path folder = path.parent_path();
+	string folderUUID = getFolderUUID(folder, false);
 	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
 
 
@@ -659,7 +660,7 @@ void xcodeProject::addInclude(string includeName){
 }
 
 void xcodeProject::addLibrary(const LibraryBinary & lib){
-//	cout << "addLibrary " << lib.path << endl;
+	alert("addLibrary " + lib.path , 35);
 	// TODO: Test this
 	for (auto & c : buildConfigs) {
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + lib.path);
@@ -752,19 +753,26 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 	for (auto & e : addon.libs) {
 		ofLogVerbose() << "adding addon libs: " << e.path;
+		
 		addLibrary(e);
 
-//		fs::path dylibPath { e.path };
+		fs::path dylibPath { e.path };
 		
 //		cout << "pathToOF " << addon.pathToOF << endl;
 //		cout << "--->>" << endl;
 //		cout << "dylibPath " << e.path << endl;
-		fs::path dylibPath =  fs::path{ e.path }.lexically_relative(addon.pathToOF);
+		
+		cout << "e.path " << e.path << endl;
+//		fs::path dylibPath =  fs::path{ e.path }.lexically_relative(addon.pathToOF);
+		
+		
+		fs::path folder = dylibPath.parent_path().lexically_relative(addon.pathToOF);
 //		cout << "dylibPath " << dylibPath << endl;
 		
 		
 		if (dylibPath.extension() == ".dylib") {
-			addDylib(dylibPath.filename().string(), dylibPath.string());
+//			addDylib(dylibPath.filename().string(), dylibPath.string());
+			addDylib(dylibPath.filename().string(), dylibPath, folder);
 		}
 	}
 

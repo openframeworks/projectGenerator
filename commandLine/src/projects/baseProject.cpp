@@ -264,7 +264,12 @@ void baseProject::addAddon(string addonName){
 	ofAddon addon;
 	// FIXME: Review this path here.
 
-	addon.pathToOF = getOFRelPath(projectDir);
+	if (bMakeRelative) {
+		addon.pathToOF = getOFRelPath(projectDir);
+	} else {
+		addon.pathToOF = getOFRoot();
+	}
+	
 	addon.pathToProject = projectDir;
 
 	bool addonOK = false;
@@ -358,7 +363,6 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 	getFilesRecursively(srcPath, srcFilesToAdd);
 
 	//if the files being added are inside the OF root folder, make them relative to the folder.
-	bool bMakeRelative = false;
 	if (ofIsPathInPath(srcPath, getOFRoot())) {
 		bMakeRelative = true;
 	}

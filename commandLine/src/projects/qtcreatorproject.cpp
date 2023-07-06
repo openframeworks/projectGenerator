@@ -100,7 +100,7 @@ bool QtCreatorProject::createProjectFile(){
 	return true;
 }
 
-void QtCreatorProject::addSrc(std::string srcFile, std::string folder, baseProject::SrcType type){
+void QtCreatorProject::addSrc(const fs::path & srcFile, const fs::path & folder, baseProject::SrcType type){
 	qbsProjectFiles.insert(srcFile);
 }
 
