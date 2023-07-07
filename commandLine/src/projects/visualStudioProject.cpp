@@ -181,7 +181,7 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 		appendFilter(folderName);
 	}
 
-	string ext = srcFile.extension();
+	string ext = srcFile.extension().string();
 	if(type==DEFAULT){
 		if ( ext == ".h" || ext == ".hpp" || ext == ".inl" ) {
 			appendValue(doc, "ClInclude", "Include", srcFileString);
