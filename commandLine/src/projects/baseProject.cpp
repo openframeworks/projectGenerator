@@ -236,6 +236,8 @@ bool baseProject::save(){
 		//add the of root path
 		if( str.rfind("# OF_ROOT =", 0) == 0 || str.rfind("OF_ROOT =", 0) == 0){
 			fs::path path = getOFRoot();
+			
+			// FIXME: change to ofIsPathInPath
 			if( projectDir.string().rfind(getOFRoot().string(), 0) == 0) {
 				path = getOFRelPath(projectDir);
 			}

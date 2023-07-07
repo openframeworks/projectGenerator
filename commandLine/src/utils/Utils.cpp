@@ -61,7 +61,8 @@ string LoadFileAsString(const string & fn) {
 	return oss.str();
 }
 
-void findandreplaceInTexfile (const fs::path & fileName, string tFind, string tReplace ){
+void findandreplaceInTexfile( const fs::path & fileName, string tFind, string tReplace ) {
+//	alert("findandreplaceInTexfile " + fileName.string() + " : " + tFind + " : " + tReplace);
 	if (fs::exists( fileName )) {
 //		cout << "findandreplaceInTexfile " << fileName << " : " << tFind << " : " << tReplace << endl;
 

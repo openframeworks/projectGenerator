@@ -11,90 +11,36 @@ QtCreatorProject::QtCreatorProject(std::string target)
 }
 
 bool QtCreatorProject::createProjectFile(){
-	
+	alert("QtCreatorProject::createProjectFile " + projectDir.string());
 	if (!fs::exists(projectDir)) {
 		fs::create_directory(projectDir);
 	}
-//	ofDirectory dir(projectDir);
-//	if(!dir.exists()) dir.create(true);
-
-//	alert("project " + project.string());
 	
-	// FIXME: modularize the sequence of files to copy there.
-	
-	fs::path src = templatePath / "qtcreator.qbs";
-	fs::path dst = projectDir / (projectName + ".qbs");
-
-	if (!fs::exists(dst)) {
-		try {
-			fs::copy_file(src, dst);
-		} catch(fs::filesystem_error& e) {
-			ofLogError(LOG_NAME) << "error copying qbs template from " << src << " to " << dst;
-			return false;
-		}
-		findandreplaceInTexfile(dst, "emptyExample", projectName);
-	}
-	
+	fs::path qbsFile { fs::path { projectName + ".qbs" } };
 	vector < std::pair <fs::path, fs::path > > fromTo {
-		{ "qtcreator.qbs", fs::path { projectName + ".qbs" } },
+		{ "qtcreator.qbs",  qbsFile},
 		{ "Makefile", "Makefile" },
 		{ "config.make", "config.make" },
 	};
 	
 	for (auto & p : fromTo) {
 		fs::path src = templatePath / p.first;
-		if(!fs::exists(dst)){
-			fs::path dst = projectDir / p.second;
-			
-			alert("fromTo");
-			cout << src << endl;
-			cout << dst << endl;
-			cout << "---" << endl;
-//			try {
-//				fs::copy_file(src, dst);
-//			} catch(fs::filesystem_error& e) {
-//				ofLogError(LOG_NAME) << "error copying Makefile template from " << src << " to " << dst;
-//				return false;
-//			}
+		fs::path dst = projectDir / p.second;
+		try {
+			fs::copy_file(src, dst, fs::copy_options::overwrite_existing);
+		} catch(fs::filesystem_error& e) {
+			ofLogError(LOG_NAME) << "error copying Makefile template from " << src << " to " << dst;
+			return false;
 		}
 	}
 	
+	// TODO: This opens twice the same file to find and replace. maybe we can make another function with std::pairs of find, replace strings
+	findandreplaceInTexfile(qbsFile, "emptyExample", projectName);
 
-//	dst = projectDir / "Makefile";
-//	src = templatePath / "Makefile";
-//	if(!fs::exists(dst)){
-//		try {
-//			fs::copy_file(src, dst);
-//		} catch(fs::filesystem_error& e) {
-//			ofLogError(LOG_NAME) << "error copying Makefile template from " << src << " to " << dst;
-//			return false;
-//		}
-//	}
-//
-//	dst = projectDir / "config.make";
-//	src = templatePath / "config.make";
-//	if(!fs::exists(dst)){
-//		try {
-//			fs::copy_file(src, dst);
-//		} catch(fs::filesystem_error& e) {
-//			ofLogError(LOG_NAME) << "error copying config.make template from " << src << " to " << dst;
-//			return false;
-//		}
-//	}
-
-
-	// handle the relative roots.
-	// FIXME: Move to baseproject?
-	// FIXME: FS
-	fs::path relRoot = getOFRelPath(projectDir);
-	if (!fs::equivalent(relRoot, "../../..")) {
-		std::string relPath2 = relRoot.string();
-		
-		// FIXME: this doesn't seem OK
-		relPath2.erase(relPath2.end()-1);
-		findandreplaceInTexfile(projectDir / "qtcreator.qbs", "../../..", relPath2);
-		findandreplaceInTexfile(projectDir / "Makefile", "../../..", relPath2);
-		findandreplaceInTexfile(projectDir / "config.make", "../../..", relPath2);
+	if (!fs::equivalent(getOFRoot(), "../../..")) {
+		for (auto & p : fromTo) {
+			findandreplaceInTexfile(p.second, "../../..", getOFRoot().string());
+		}
 	}
 
 	return true;
@@ -105,9 +51,6 @@ void QtCreatorProject::addSrc(const fs::path & srcFile, const fs::path & folder,
 }
 
 bool QtCreatorProject::loadProjectFile(){
-
-// FIXME: FS
-//	ofFile project(projectDir / (projectName + ".qbs"), ofFile::ReadOnly,true);
 
 	fs::path file { projectDir / (projectName + ".qbs") };
 	if (!fs::exists(file)) {
@@ -183,17 +126,26 @@ bool QtCreatorProject::saveProjectFile(){
 
 	// save final project
 	qbs.set(qbsStr);
-	// FIXME: FS
-
-	ofFile project(projectDir / (projectName + ".qbs"),ofFile::WriteOnly,true);
-	project.writeFromBuffer(qbs);
+	
+	fs::path fileName = projectDir / (projectName + ".qbs");
+	std::ofstream projectFile(fileName);
+	try{
+		projectFile << qbs;
+	}catch(std::exception & e){
+		ofLogError("") << "Error saving " << fileName << " : " << e.what();
+		return false;
+	}catch(...){
+		ofLogError("") << "Error saving " << fileName;
+		return false;
+	}
+//	ofFile project(projectDir / (projectName + ".qbs"),ofFile::WriteOnly,true);
+//	project.writeFromBuffer(qbs);
 	return true;
 }
 
 void QtCreatorProject::addAddon(ofAddon & addon){
-	for(int i=0;i<(int)addons.size();i++){
-		if(addons[i].name==addon.name) return;
+	for (auto & a : addons) {
+		if (a.name == addon.name) return;
 	}
-
 	addons.emplace_back(addon);
 }
