@@ -103,16 +103,16 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(string target)
 }
 
 bool baseProject::create(const fs::path & path, string templateName){
-	alert("baseProject::create " + path.string() + " : " + templateName, 35);
+//	alert("baseProject::create " + path.string() + " : " + templateName, 35);
 //	auto path = _path; // just because it is const
 	
 	
 	//if the files being added are inside the OF root folder, make them relative to the folder.
 	if (ofIsPathInPath(fs::absolute(path), getOFRoot())) {
-		alert ("bMakeRelative true", 35);
+//		alert ("bMakeRelative true", 35);
 		bMakeRelative = true;
 	} else {
-		alert ("bMakeRelative false", 35);
+//		alert ("bMakeRelative false", 35);
 	}
 	
 	addons.clear();
@@ -270,7 +270,7 @@ void baseProject::addAddon(string addonName){
 
 	
 	ofAddon addon;
-	// FIXME: Review this path here. EDIT: I think it is finally good
+	// MARK: Review this path here. EDIT: I think it is finally good
 
 	if (bMakeRelative) {
 		addon.pathToOF = getOFRelPath(projectDir);
@@ -386,9 +386,18 @@ void baseProject::addAddon(ofAddon & addon){
 		if (a.name == addon.name) return;
 	}
 
-	// FIXME: Test this, I suppose this is only invoked when an addon is added
-	// from a dependency of another addon, and it has its own dependencies too.
-	cout << "---> dependencies" << endl;
+	/*
+	 
+	 MARK: Test this, I suppose this is only invoked when an addon is added
+	 from a dependency of another addon, and it has its own dependencies too.
+	 
+	 this is not possible to test easily using xcode or visualstudio project
+	 because baseProject::addAddon is only invoked when there is already dependencies in xcode addons.
+	 the only way to test this is other platforms like qbs?
+	 unless there is one addon added which needs another, and it needs another.
+
+	 */
+	alert("---> dependencies");
 	for (auto & d : addon.dependencies) {
 		bool found = false;
 		for (auto & a : addons) {
@@ -404,7 +413,7 @@ void baseProject::addAddon(ofAddon & addon){
 			ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << d;
 		}
 	}
-	cout << "---> " << endl;
+	alert("---> dependencies");
 	addons.emplace_back(addon);
 
 	ofLogVerbose("baseProject") << "libs in addAddon " << addon.libs.size();
@@ -502,49 +511,16 @@ void baseProject::parseConfigMake(){
 }
 
 void baseProject::recursiveTemplateCopy(const fs::path & srcDir, const fs::path & destDir){
-//	alert("recursiveTemplateCopy " + srcDir.string() + " : " + destDir.string(), 33);
 	if (recursiveCopy(srcDir, destDir)) {
 		fs::path templateFile = destDir / "template.config";
 		if (fs::exists(templateFile)) {
 			fs::remove(templateFile);
 		}
 	}
-	
-//	for (const auto & entry : fs::directory_iterator(srcDir)) {
-//		auto f = entry.path();
-//		auto destFile = destDir / f.filename();
-//		if (fs::is_directory(f)) {
-//			recursiveTemplateCopy(f, destFile);
-//		}
-//		else if (f.filename() != "template.config") {
-//			if (!fs::exists(destFile)) {
-////				fs::copy(f, destFile);
-//				// FIXME: FS
-//				ofFile::copyFromTo(f, destFile, false, true); // from, to
-//			}
-//		}
-//	}
 }
 
 void baseProject::recursiveCopyContents(const fs::path & srcDir, const fs::path & destDir){
-//	alert("recursiveCopyContents " + srcDir.string() + " : " + destDir.string(), 32);
 	recursiveCopy(srcDir, destDir);
-
-	//	for (const auto & entry : fs::directory_iterator(srcDir)) {
-//		auto f = entry.path();
-//		auto destFile = destDir / f.filename();
-//		if (fs::is_directory(f)) {
-//			recursiveCopyContents(f, destFile);
-//		} else {
-//			if (!fs::exists(destFile)) {
-//				try {
-//					fs::copy_file(f, destFile, fs::copy_options::overwrite_existing);
-//				} catch(fs::filesystem_error& e) {
-//					std::cout << "Could not copy " << f << " > " << destFile << " :: "  << e.what() << std::endl;
-//				}
-//			}
-//		}
-//	}
 }
 
 bool baseProject::recursiveCopy(const fs::path & srcDir, const fs::path & destDir){

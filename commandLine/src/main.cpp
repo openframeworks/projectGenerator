@@ -1,4 +1,4 @@
-#define PG_VERSION "PG v009"
+#define PG_VERSION "PG v010"
 #define TARGET_NO_SOUND
 #define TARGET_NODISPLAY
 
@@ -191,17 +191,19 @@ bool containsFolder(fs::path path, string folderName) {
 }
 
 bool isGoodProjectPath(fs::path path) {
+	
 //	if (!fs::is_directory(path)) return false;
 	return fs::exists(path / "src");
 }
 
-bool isGoodOFPath(fs::path path) {
+bool isGoodOFPath(const fs::path & path) {
+	
 	if (!fs::is_directory(path)) {
-		ofLogError() << "ofPath seems wrong... not a directory";
+		ofLogError() << "ofPath seems wrong... not a directory " << path.string();
 		return false;
 	}
 	bool bHasTemplates = containsFolder(path, "scripts");
-	if (!bHasTemplates) ofLogError() << "ofPath seems wrong... no scripts / templates directory";
+	if (!bHasTemplates) ofLogError() << "ofPath seems wrong... no scripts / templates directory " << path.string();
 	return bHasTemplates;
 }
 
@@ -235,36 +237,33 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 }
 
 void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
-	alert("recursiveUpdate " + path.string() );
+//	alert("recursiveUpdate " + path.string() );
 	if (!fs::is_directory(path)) return;
-	
-	vector <fs::path> dirs;
+	vector <fs::path> folders;
 
 	// second check if this is a folder that has src in it
 	if (isGoodProjectPath(path)) {
-		dirs.emplace_back(path);
+		folders.emplace_back(path);
 	}
-	
-//	for (const auto & entry : fs::recursive_directory_iterator(path)) {
-//		auto p = entry.path();
-	for (const auto & p : dirList(path)) {
-		if (fs::is_directory(p)) {
-			if (isGoodProjectPath(p)) {
-				dirs.emplace_back(p);
+
+// Known issue. it can add undesired folders which can mirror directory of a valid project like
+// "./templates/allAddonsExample/obj/osx/Release"
+// "./templates/allAddonsExample/bin/build/build/arm64-apple-darwin_Release/obj.room/Volumes/tool/ofw/addons/ofxKinect"
+
+	for (const auto & p : folderList(path)) {
+		if (p.filename() == "src") {
+			auto parent = p.parent_path();
+			if (isGoodProjectPath(parent)) {
+				folders.emplace_back(parent);
 			}
-//			recursiveUpdate(f, target);
 		}
 	}
 
-	for (auto & path : dirs) {
+	for (auto & path : folders) {
 		nProjectsUpdated++;
+//		cout << path << endl;
 		updateProject(path, target, false);
 	}
-	
-//	nProjectsUpdated++;
-//	updateProject(path, target, false);
-//	return;
-
 }
 
 void printHelp(){
@@ -437,8 +436,22 @@ int main(int argc, char** argv){
 		ofPath = ofPathEnv;
 	}
 	
-	fs::path absoluteProjectPath = fs::weakly_canonical(fs::current_path() / projectName);
+
 	
+//	alert ("projectName " + projectName);
+//	alert ("ofPath " + ofPath.string());
+	fs::path projectPath = fs::weakly_canonical(fs::current_path() / projectName);
+	fs::path ofCalcPath = fs::weakly_canonical(fs::current_path() / ofPath);
+	
+	if (ofIsPathInPath(projectPath, ofCalcPath)) {
+		ofCalcPath = fs::relative(ofCalcPath, projectPath);
+	}
+//	alert ("projectPath " + projectPath.string());
+//	alert ("ofCalcPath " + ofCalcPath.string());
+
+	fs::path absoluteProjectPath = fs::weakly_canonical(fs::current_path() / projectName);
+//	cout << "absoluteProjectPath " << absoluteProjectPath << endl;
+
 	if (!fs::exists(absoluteProjectPath)) {
 		mode = PG_MODE_CREATE;
 		// FIXME: Maybe it is best not to create anything here, unless specified by parameter
@@ -449,23 +462,9 @@ int main(int argc, char** argv){
 
 	// This part of the code changes cwd to the project folder and make everything relative to there.
 	if (fs::exists(absoluteProjectPath)) {
-		
-		cout << "ofPath " << ofPath << endl;
-		fs::path newOfPath = fs::weakly_canonical(fs::current_path() / ofPath);
-		
-		cout << "newOfPath " << newOfPath << endl;
-		
-		cout << "current " << fs::current_path() << endl;
-		
 		fs::current_path(absoluteProjectPath);
-//		cout << "newOfPath " << newOfPath << endl;
-//		cout << "absoluteProjectPath " << absoluteProjectPath << endl;
-		
-		if (ofIsPathInPath(fs::current_path(), getOFRoot())) {
-			ofPath = fs::relative(newOfPath, absoluteProjectPath);
-		}
-
-		cout << "ofPath " << ofPath << endl;
+		ofPath = ofCalcPath;
+//		cout << "ofPath " << ofPath << endl;
 
 		projectPath = ".";
 	}

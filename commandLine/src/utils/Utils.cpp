@@ -508,8 +508,8 @@ void alert(string msg, int color) {
 	std::cout << colorText(msg, color) << std::endl;
 }
 
-bool ofIsPathInPath(const fs::path& basePath, const fs::path& subPath) {
-	return (std::search(basePath.begin(), basePath.end(), subPath.begin(), subPath.end()) != basePath.end());
+bool ofIsPathInPath(const fs::path& fullPath, const fs::path& findPath) {
+	return (std::search(fullPath.begin(), fullPath.end(), findPath.begin(), findPath.end()) != fullPath.end());
 }
 
 // TODO: Maybe rename this function to a more descriptive name.
@@ -530,7 +530,31 @@ vector <fs::path> dirList(const fs::path & path) {
 			dirListMap[path].emplace_back(i->path());
 		}
 	} else {
-		alert("IN CACHE " + path.string());
+//		alert("IN CACHE " + path.string());
 	}
 	return dirListMap[path];
+}
+
+vector <fs::path> folderList(const fs::path & path) {
+	static std::map<fs::path, vector <fs::path >> folderListMap;
+	
+	if (folderListMap.find(path) == folderListMap.end()) {
+		auto iterator = fs::recursive_directory_iterator(path);
+		for(auto i = fs::recursive_directory_iterator(path);
+				 i != fs::recursive_directory_iterator();
+			++i ) {
+			// this wont' allow hidden directories files like .git to be added, and stop recursivity at this folder level.
+			if (i->path().filename().c_str()[0] == '.') {
+				i.disable_recursion_pending();
+				continue;
+			}
+			
+			if (fs::is_directory(i->path())) {
+				folderListMap[path].emplace_back(i->path());
+			}
+		}
+	} else {
+//		alert("IN CACHE " + path.string());
+	}
+	return folderListMap[path];
 }

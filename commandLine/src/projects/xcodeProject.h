@@ -1,7 +1,8 @@
 #pragma once
 
 #include "baseProject.h"
-#include <unordered_map>
+//#include <unordered_map>
+#include <map>
 
 using std::string;
 
@@ -25,9 +26,7 @@ public:
 	void addAfterRule(string script);
 	void addDefine(string define, LibType libType = RELEASE_LIB);
 
-	// macOS specific
-	// FIXME: Folder to FS::path and const?
-	void addFramework(const string & name, const fs::path & path, string folder="");
+	void addFramework(const string & name, const fs::path & path, const fs::path & folder);
 	void addDylib(const string & name, const fs::path & path, const fs::path & folder);
 
 	void addAddon(ofAddon & addon);
@@ -64,7 +63,8 @@ public:
 		"E4B69B600A3A1757003C02F2", //Debug
 	};
 
-	std::unordered_map <string, string> folderUUID ;
-	string getFolderUUID(const fs::path & folder, bool isFolder = true, string base = "");
+//	std::unordered_map <string, string> folderUUID ;
+	std::map < fs::path , string> folderUUID ;
+	string getFolderUUID(const fs::path & folder, bool isFolder = true, fs::path base = "");
 	fs::path relRoot = "../../..";
 };

@@ -8,7 +8,7 @@ using nlohmann::json_pointer;
 
 xcodeProject::xcodeProject(string target)
 :baseProject(target){
-	// FIXME: remove unused variables
+	// TODO: remove unused variables
 	if( target == "osx" ){
 		folderUUID = {
 			{ "src", 			"E4B69E1C0A3A1BDC003C02F2" },
@@ -198,43 +198,28 @@ void xcodeProject::renameProject(){ //base
 	}
 }
 
-string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, string base) {
-//	cout << "getFolderUUID " << folder << endl;
-	// TODO: Change key of folderUUID to base + folder, so "src" in additional source folders
-	// doesn't get confused with "src" from project.
-	
-	string UUID { "" };
-	// string baseFolder { base + "/" + folder };
-	string baseFolder { folder.string() };
+string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::path base) {
+//	alert ("xcodeProject::getFolderUUID " + folder.string() + " : base=" + base.string());
+	/*
+	TODO: Change key of folderUUID to base + folder, so "src" in additional source folders
+	doesn't get confused with "src" from project.
+	this can work but fullPath variable has to follow the same pattern
+	fs::path keyFS = base / folder;
+	 */
 
-	// cout << "baseFolder " << baseFolder << " isFolder:" << isFolder << endl;
+	string UUID { "" };
 
 	// If folder UUID exists just return it.
-	// in this case it creates UUID for the entire path
-
-
-	if ( folderUUID.find(baseFolder) == folderUUID.end() ) { // NOT FOUND
-
-//		cout << "----- " << folderUUID.size() << endl;
-//		for (auto & f : folderUUID) {
-//			cout << f.first <<  " : " << f.second << endl;
-//		}
-//		cout << "-----" << endl;
-//		cout << ">>> getFolderUUID creating folder=" << folder << " base=" << base << endl;
-
+	// in this case it is not found, so it creates UUID for the entire path
+	if ( folderUUID.find(folder) == folderUUID.end() ) { // NOT FOUND
 		vector < string > folders = ofSplitString(folder.string(), "/", true);
 		string lastFolderUUID = projRootUUID;
-
-//		cout << "relRoot " << relRoot << endl;
 
 		if (folders.size()){
 			for (int a=0; a<folders.size(); a++) {
 				vector <string> joinFolders;
 				joinFolders.assign(folders.begin(), folders.begin() + (a+1));
-				// string fullPath = base + "/" + ofJoinString(joinFolders, "/");
 				string fullPath = ofJoinString(joinFolders, "/");
-//				cout << "fullPath = " << fullPath << endl;
-
 
 				// Query if path is already stored. if not execute this following block
 				if ( folderUUID.find(fullPath) == folderUUID.end() ) {
@@ -259,14 +244,12 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, strin
 						
 						if (!filePath.empty()) {
 							commands.emplace_back("Add :objects:"+thisUUID+":path string " + filePath.string());
-//							cout << commands.back() << endl;
 						} else {
 //							cout << ">>>>> filePath empty " << endl;
 						}
 					} else {
 //						cout << "isFolder false" << endl;
 					}
-
 
 					commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
 					commands.emplace_back("Add :objects:"+thisUUID+":children array");
@@ -284,39 +267,24 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, strin
 			}
 		}
 		UUID = lastFolderUUID;
-
 	} else {
-		UUID = folderUUID[baseFolder];
+		// Folder already exists, only return it.
+		UUID = folderUUID[folder];
 	}
 	return UUID;
 }
 
-
-// FIXME: FS in srcFile, here and in all others.
 void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type){
 //	cout << "xcodeProject::addSrc " << srcFile << " : " << folder << endl;
 	string buildUUID { "" };
-
-	//-----------------------------------------------------------------
-	// find the extension for the file that's passed in.
-	//-----------------------------------------------------------------
-
-	// FIXME: getExtension() ?
-	//	size_t found = srcFile.find_last_of(".");
-	//	string ext = srcFile.substr(found+1);
-	
 	string ext = srcFile.extension();
-
-	//-----------------------------------------------------------------
-	// based on the extension make some choices about what to do:
-	//-----------------------------------------------------------------
 
 	bool addToResources = true;
 	bool addToBuild = true;
 	bool addToBuildResource = false;
 	string fileKind = "file";
 
-	if(type==DEFAULT){
+	if( type == DEFAULT ){
 		if ( ext == ".cpp" || ext == ".cc" || ext ==".cxx" ) {
 			fileKind = "sourcecode.cpp.cpp";
 			addToResources = false;
@@ -363,7 +331,7 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 			addToBuild	= false;
 			addToResources = true;
 		}
-	}else{
+	} else {
 		switch(type){
 		case CPP:
 			fileKind = "sourcecode.cpp.cpp";
@@ -395,8 +363,8 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 	string UUID { generateUUID(srcFile) };   // replace with theo's smarter system.
 
 	fs::path srcFS { srcFile };
-	string name = srcFS.filename().string();
-	string path = srcFS.parent_path().string();
+	string name { srcFS.filename().string() };
+	string path { srcFS.parent_path().string() };
 
 	commands.emplace_back("# ---- ADDSRC");
 	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
@@ -478,11 +446,13 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 	// string xcodeProject::getFolderUUID(string folder, bool isFolder, string base) {
 //	cout << ">>> getFolderUUID  " << folder << endl;
 //	cout << ">>> base  " << base << endl;
-	string folderUUID = getFolderUUID(folder, true, base.string());
+	string folderUUID = getFolderUUID(folder, true, base);
 	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
 }
 
-void xcodeProject::addFramework(const string & name, const fs::path & path, string folder){
+void xcodeProject::addFramework(const string & name, const fs::path & path, const fs::path & folder){
+//	alert( "xcodeProject::addFramework " + name + " : " + folder.string() , 33);
+
 //	cout << "xcodeProject::addFramework " << name << " : " << path << " : " << folder << endl;
 	// name = name of the framework
 	// path = the full path (w name) of this framework
@@ -501,7 +471,7 @@ void xcodeProject::addFramework(const string & name, const fs::path & path, stri
 	// encoding may be messing up for frameworks... so I switched to a pbx file ref without encoding fields
 	//commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
 
-	commands.emplace_back("# ----- addFramework name="+name+" path="+path.string()+" folder=" +folder);
+	commands.emplace_back("# ----- addFramework name="+name+" path="+path.string()+" folder=" +folder.string());
 	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
 	commands.emplace_back("Add :objects:"+UUID+":path string "+path.string());
 	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
@@ -521,7 +491,7 @@ void xcodeProject::addFramework(const string & name, const fs::path & path, stri
 
 	//	this now adds the recently created object UUID to its parent folder
 	string folderUUID = getFolderUUID(folder, false);
-	commands.emplace_back("# ----- addFramework - add to parent folder : " + folder);
+	commands.emplace_back("# ----- addFramework - add to parent folder : " + folder.string());
 	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
 
 
@@ -556,14 +526,6 @@ void xcodeProject::addFramework(const string & name, const fs::path & path, stri
 		("Add :objects:"+c+":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + parentFolder.string());
 	}
 
-	// // finally, this is for making folders based on the frameworks position in the addon. so it can appear in the sidebar / file explorer
-	// // This is doing NOTHING
-	// if (!folder.empty() && !ofIsStringInString(folder, "/System/Library/Frameworks")){
-	// 	string folderUUID = getFolderUUID(folder, false);
-	// } else {
-	// 	//FIXME: else what?
-	// }
-
 	if (target != "ios" && !folder.empty()){
 		// add it to the linking phases...
 		// PBXFrameworksBuildPhase
@@ -585,7 +547,7 @@ void xcodeProject::addFramework(const string & name, const fs::path & path, stri
 
 //void xcodeProject::addDylib(string name, string path){
 void xcodeProject::addDylib(const string & name, const fs::path & path, const fs::path & folder){
-	alert( "xcodeProject::addDylib " + name + " : " + path.string() , 33);
+//	alert( "xcodeProject::addDylib " + name + " : " + path.string() , 33);
 
 	// name = name of the dylib
 	// path = the full path (w name) of this framework
@@ -660,13 +622,14 @@ void xcodeProject::addInclude(string includeName){
 }
 
 void xcodeProject::addLibrary(const LibraryBinary & lib){
+//	alert( "xcodeProject::addLibrary " + lib.path , 33);
+
 	//	alert("addLibrary " + lib.path , 35);
 	for (auto & c : buildConfigs) {
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + lib.path);
 	}
 }
 
-// FIXME: libtype is unused here and in the next configurations
 void xcodeProject::addLDFLAG(string ldflag, LibType libType){
 	for (auto & c : buildConfigs) {
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ldflag);
@@ -753,25 +716,11 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 	for (auto & e : addon.libs) {
 		ofLogVerbose() << "adding addon libs: " << e.path;
-		
 		addLibrary(e);
-
 		fs::path dylibPath { e.path };
-		
-//		cout << "pathToOF " << addon.pathToOF << endl;
-//		cout << "--->>" << endl;
-//		cout << "dylibPath " << e.path << endl;
-		
-//		cout << "e.path " << e.path << endl;
-//		fs::path dylibPath =  fs::path{ e.path }.lexically_relative(addon.pathToOF);
-		
-		
 		fs::path folder = dylibPath.parent_path().lexically_relative(addon.pathToOF);
 //		cout << "dylibPath " << dylibPath << endl;
-		
-		
 		if (dylibPath.extension() == ".dylib") {
-//			addDylib(dylibPath.filename().string(), dylibPath.string());
 			addDylib(dylibPath.filename().string(), dylibPath, folder);
 		}
 	}
@@ -803,38 +752,39 @@ void xcodeProject::addAddon(ofAddon & addon){
 		addDefine(e);
 	}
 
-	for(int i=0;i<(int)addon.frameworks.size(); i++){
-		ofLogVerbose() << "adding addon frameworks: " << addon.frameworks[i];
+	// TODO: iterator
+	for (auto & f : addon.frameworks) {
+		ofLogVerbose() << "adding addon frameworks: " << f;
 
-		size_t found=addon.frameworks[i].find('/');
+		size_t found=f.find('/');
 		if (found==string::npos){
+			fs::path folder = fs::path{ "addons" } / addon.name / "frameworks";
+
 			if (target == "ios"){
-				addFramework( addon.frameworks[i] + ".framework", "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/" +
-					addon.frameworks[i] + ".framework",
-					"addons/" + addon.name + "/frameworks");
+				addFramework( f + ".framework", "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/" +
+					f + ".framework",
+					folder);
 			} else {
-				string folder = "addons/" + addon.name + "/frameworks";
 				if (addon.isLocalAddon) {
-					// XAXA
-					folder = (addon.addonPath / "frameworks").string();
+					folder = addon.addonPath / "frameworks";
 				}
-				addFramework( addon.frameworks[i] + ".framework",
+				addFramework( f + ".framework",
 					"/System/Library/Frameworks/" +
-					addon.frameworks[i] + ".framework",
+					f + ".framework",
 					folder);
 			}
 		} else {
-			if (ofIsStringInString(addon.frameworks[i], "/System/Library")){
-				vector < string > pathSplit = ofSplitString(addon.frameworks[i], "/");
+			if (ofIsStringInString(f, "/System/Library")){
+				vector < string > pathSplit = ofSplitString(f, "/");
 				addFramework(pathSplit[pathSplit.size()-1],
-							 addon.frameworks[i],
+							 f,
 							 "addons/" + addon.name + "/frameworks");
 
 			} else {
-				vector < string > pathSplit = ofSplitString(addon.frameworks[i], "/");
+				vector < string > pathSplit = ofSplitString(f, "/");
 				addFramework(pathSplit[pathSplit.size()-1],
-							 addon.frameworks[i],
-							 addon.filesToFolders[addon.frameworks[i]]);
+							 f,
+							 addon.filesToFolders[f]);
 			}
 		}
 	}
