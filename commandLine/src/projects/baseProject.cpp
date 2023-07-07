@@ -270,7 +270,7 @@ void baseProject::addAddon(string addonName){
 
 	
 	ofAddon addon;
-	// FIXME: Review this path here.
+	// FIXME: Review this path here. EDIT: I think it is finally good
 
 	if (bMakeRelative) {
 		addon.pathToOF = getOFRelPath(projectDir);
@@ -318,39 +318,29 @@ void baseProject::addAddon(string addonName){
 		for(auto & data : addon.data){
 			string d = data;
 			ofStringReplace(d, "data/", ""); // avoid to copy files at /data/data/*
-
 			fs::path from { addon.addonPath / data };
 			fs::path dest { projectDir / "bin" / "data" };
 			
 			if(fs::exists(from)){
 				fs::path to { dest / d };
 				if (fs::is_regular_file(from)){
-//					cout << "from is regular file" << endl;
 					try {
 						fs::copy_file(from, to, fs::copy_options::overwrite_existing);
 						ofLogVerbose() << "adding addon data file: " << d << endl;
-						ofLog() << "adding addon data file: " << d << endl;
 					} catch(fs::filesystem_error& e) {
 						ofLogWarning() << "Can not add addon data file: " << to << " :: " << e.what() << std::endl;;
-						ofLog() << "Can not add addon data file: " << to << " :: " << e.what() << std::endl;;
 					}
 
 				} else if (fs::is_directory(from)) {
-//					cout << "from is directory" << endl;
 					if (!fs::exists(to)) {
 						fs::create_directory(to);
 					}
 					
 					try {
-						fs::copy(from, to,
-							fs::copy_options::overwrite_existing |
-							fs::copy_options::recursive
-						);
+						fs::copy(from, to, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
 						ofLogVerbose() << "adding addon data file: " << d << endl;
-						ofLog() << "adding addon data file: " << d << endl;
 					} catch(fs::filesystem_error& e) {
 						ofLogWarning() << "Can not add addon data file: " << to << " :: " << e.what() << std::endl;
-						ofLog() << "Can not add addon data file: " << to << " :: " << e.what() << std::endl;
 					}
 				}
 			} else {
@@ -370,8 +360,6 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 
 	getFilesRecursively(srcPath, srcFilesToAdd);
 
-
-
 	// cout << "makeRelative " << bMakeRelative << endl;
 	//need this for absolute paths so we can subtract this path from each file path
 	//say we add this path: /user/person/documents/shared_of_code
@@ -386,6 +374,15 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 		
 		fs::path parent = src.parent_path();
 		fs::path folder2 = parent.lexically_relative(base);
+		
+		/*
+		 FIXME: Test all of this
+		 
+		 bMakeRelative maybe it is not relevant because additional source folders can be anything, relative to project / ofw path or not.
+		 */
+		
+		
+		alert( (bMakeRelative ? "bMakeRelative 1" : " bMakeRelative0"));
 		
 		if (src.is_absolute() && !bMakeRelative) {
 			// TODO: rewrite
@@ -407,8 +404,8 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 //			addSrc(src, folder);
 			*/
 
-			
-			ofLog() <<  " adding file FIRST " << src << " in folder " << folder2 << " to project ";
+			alert ("adding file FIRST " + src.string() + " in folder " + folder2.string() + " to project ");
+//			ofLog() <<  " adding file FIRST " << src << " in folder " << folder2 << " to project ";
 			addSrc(src.string(), folder2.string());
 			includeFolder = parent.string();
 		} else {
@@ -445,10 +442,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 
 			*/
 			
-
-
-			// FIXME: revert back to ofLogVerbose
-			ofLog() <<  " adding file SECOND " << src << " in folder " << folder2 << " to project ";
+			alert ("adding file SECOND " + src.string() + " in folder " + folder2.string() + " to project ");
 			addSrc(src.string(), folder2.string());
 			includeFolder = parent.string();
 		}
@@ -465,13 +459,15 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 	}
 }
 
+// MARK: - This function is only called by addon dependencies, when one addon is asking for another one to be included.
+// this is only invoked by XCode and visualStudioProject, and I don't understand why as they are similar
 void baseProject::addAddon(ofAddon & addon){
 	alert("baseProject::addAddon " + addon.name);
-	for(int i=0;i<(int)addons.size();i++){
-		if(addons[i].name==addon.name){
-			return;
-		}
+
+	for (auto & a : addons) {
+		if (a.name == addon.name) return;
 	}
+
 	// FIXME: Test this, I suppose this is only invoked when an addon is added
 	// from a dependency of another addon, and it has its own dependencies too.
 	cout << "---> dependencies" << endl;
@@ -588,19 +584,12 @@ void baseProject::parseConfigMake(){
 }
 
 void baseProject::recursiveTemplateCopy(const fs::path & srcDir, const fs::path & destDir){
-	alert("recursiveTemplateCopy " + srcDir.string() + " : " + destDir.string(), 33);
-	try
-	{
-		fs::copy(srcDir, destDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
-	}
-	catch (std::exception& e)
-	{
-		std::cout << e.what();
-	}
-	
-	fs::path templateFile = destDir / "template.config";
-	if (fs::exists(templateFile)) {
-		fs::remove(templateFile);
+//	alert("recursiveTemplateCopy " + srcDir.string() + " : " + destDir.string(), 33);
+	if (recursiveCopy(srcDir, destDir)) {
+		fs::path templateFile = destDir / "template.config";
+		if (fs::exists(templateFile)) {
+			fs::remove(templateFile);
+		}
 	}
 	
 //	for (const auto & entry : fs::directory_iterator(srcDir)) {
@@ -620,19 +609,10 @@ void baseProject::recursiveTemplateCopy(const fs::path & srcDir, const fs::path 
 }
 
 void baseProject::recursiveCopyContents(const fs::path & srcDir, const fs::path & destDir){
-	alert("recursiveCopyContents " + srcDir.string() + " : " + destDir.string(), 32);
+//	alert("recursiveCopyContents " + srcDir.string() + " : " + destDir.string(), 32);
+	recursiveCopy(srcDir, destDir);
 
-	try
-	{
-		fs::copy(srcDir, destDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
-	}
-	catch (std::exception& e)
-	{
-		std::cout << e.what();
-	}
-
-	
-//	for (const auto & entry : fs::directory_iterator(srcDir)) {
+	//	for (const auto & entry : fs::directory_iterator(srcDir)) {
 //		auto f = entry.path();
 //		auto destFile = destDir / f.filename();
 //		if (fs::is_directory(f)) {
@@ -647,4 +627,16 @@ void baseProject::recursiveCopyContents(const fs::path & srcDir, const fs::path 
 //			}
 //		}
 //	}
+}
+
+bool baseProject::recursiveCopy(const fs::path & srcDir, const fs::path & destDir){
+	//	alert("recursiveCopy " + srcDir.string() + " : " + destDir.string(), 32);
+	try {
+		fs::copy(srcDir, destDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
+		return true;
+	} catch (std::exception& e) {
+		// TODO: ofLogWarning()
+		std::cout << e.what();
+		return false;
+	}
 }

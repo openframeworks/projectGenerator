@@ -512,11 +512,14 @@ bool ofIsPathInPath(const fs::path& basePath, const fs::path& subPath) {
 	return (std::search(basePath.begin(), basePath.end(), subPath.begin(), subPath.end()) != basePath.end());
 }
 
-vector <fs::path> dirList (const fs::path & path) {
+// TODO: Maybe rename this function to a more descriptive name.
+vector <fs::path> dirList(const fs::path & path) {
 	// map to cache recursive directory listing for subsequent usage
 	static std::map<fs::path, vector <fs::path >> dirListMap;
 	if (dirListMap.find(path) == dirListMap.end()) {
 		for (const auto & entry : fs::recursive_directory_iterator(path)) {
+			if (entry.path().filename().c_str()[0] == '.') continue;
+
 			dirListMap[path].emplace_back(entry.path());
 		}
 	} else {

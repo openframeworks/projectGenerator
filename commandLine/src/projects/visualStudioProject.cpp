@@ -469,6 +469,7 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 		if (a.name == addon.name) return;
 	}
 
+	// MARK: - XCode version is more complete, checking if you have this addon already added.
 	for (auto & d : addon.dependencies) {
 		baseProject::addAddon(d);
 	}
@@ -492,41 +493,50 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 		addLibrary(lib);
 	}
 
+	// MARK: -NEW TEST, lets see how it works now.
+	for (auto & f : addon.filesToFolders) {
+		if (f.second == "") f.second = "other";
+	}
+	// MARK: -
 	
 	for (auto & s : addon.srcFiles) {
 		ofLogVerbose() << "adding addon srcFiles: " << s;
-		if ( addon.filesToFolders[s] == "" ) {
-			addon.filesToFolders[s] = "other";
-		}
+//		if ( addon.filesToFolders[s] == "" ) {
+//			addon.filesToFolders[s] = "other";
+//		}
 		
 //		cout << "addSrc s=" << s << " : " << addon.filesToFolders[s] << endl;
 		addSrc(s,addon.filesToFolders[s]);
 	}
 
-
-	for(int i=0;i<(int)addon.csrcFiles.size(); i++){
-		ofLogVerbose() << "adding addon c srcFiles: " << addon.csrcFiles[i];
-		if(addon.filesToFolders[addon.csrcFiles[i]]=="") addon.filesToFolders[addon.csrcFiles[i]]="other";
-		addSrc(addon.csrcFiles[i],addon.filesToFolders[addon.csrcFiles[i]],C);
+	for (auto & a : addon.csrcFiles) {
+		ofLogVerbose() << "adding addon c srcFiles: " << a;
+		addSrc(a, addon.filesToFolders[a], C);
 	}
+//		if(addon.filesToFolders[addon.csrcFiles[i]]=="") addon.filesToFolders[addon.csrcFiles[i]]="other";
 
-	for(int i=0;i<(int)addon.cppsrcFiles.size(); i++){
-		ofLogVerbose() << "adding addon cpp srcFiles: " << addon.cppsrcFiles[i];
-		if(addon.filesToFolders[addon.cppsrcFiles[i]]=="") addon.filesToFolders[addon.cppsrcFiles[i]]="other";
-		addSrc(addon.cppsrcFiles[i],addon.filesToFolders[addon.cppsrcFiles[i]],C);
+	for (auto & a : addon.cppsrcFiles) {
+		ofLogVerbose() << "adding addon cpp srcFiles: " << a;
+		addSrc(a, addon.filesToFolders[a],CPP);
 	}
+//		if(addon.filesToFolders[addon.cppsrcFiles[i]]=="") addon.filesToFolders[addon.cppsrcFiles[i]]="other";
+//		addSrc(addon.cppsrcFiles[i],addon.filesToFolders[addon.cppsrcFiles[i]],C);
 
-	for(int i=0;i<(int)addon.headersrcFiles.size(); i++){
-		ofLogVerbose() << "adding addon header srcFiles: " << addon.headersrcFiles[i];
-		if(addon.filesToFolders[addon.headersrcFiles[i]]=="") addon.filesToFolders[addon.headersrcFiles[i]]="other";
-		addSrc(addon.headersrcFiles[i],addon.filesToFolders[addon.headersrcFiles[i]],C);
+	for (auto & a : addon.objcsrcFiles) {
+		ofLogVerbose() << "adding addon objc srcFiles: " << a;
+		addSrc(a, addon.filesToFolders[a],OBJC);
 	}
+//		if(addon.filesToFolders[addon.objcsrcFiles[i]]=="") addon.filesToFolders[addon.objcsrcFiles[i]]="other";
+//		addSrc(addon.objcsrcFiles[i],addon.filesToFolders[addon.objcsrcFiles[i]],C);
 
-	for(int i=0;i<(int)addon.objcsrcFiles.size(); i++){
-		ofLogVerbose() << "adding addon objc srcFiles: " << addon.objcsrcFiles[i];
-		if(addon.filesToFolders[addon.objcsrcFiles[i]]=="") addon.filesToFolders[addon.objcsrcFiles[i]]="other";
-		addSrc(addon.objcsrcFiles[i],addon.filesToFolders[addon.objcsrcFiles[i]],C);
+	
+	for (auto & a : addon.headersrcFiles) {
+		ofLogVerbose() << "adding addon header srcFiles: " << a;
+		addSrc(a, addon.filesToFolders[a],HEADER);
 	}
+//		if(addon.filesToFolders[addon.headersrcFiles[i]]=="") addon.filesToFolders[addon.headersrcFiles[i]]="other";
+//		addSrc(addon.headersrcFiles[i],addon.filesToFolders[addon.headersrcFiles[i]],C);
+
 
 	for (auto & d : addon.dllsToCopy) {
 		ofLogVerbose() << "adding addon dlls to bin: " << d;
@@ -536,21 +546,23 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 		fs::copy_file(from, to, fs::copy_options::overwrite_existing);
 	}
 
-	for(int i=0;i<(int)addon.cflags.size();i++){
-		ofLogVerbose() << "adding addon cflags: " << addon.cflags[i];
-		addCFLAG(addon.cflags[i],RELEASE_LIB);
-		addCFLAG(addon.cflags[i],DEBUG_LIB);
+	
+
+	for (auto & a : addon.cflags) {
+		ofLogVerbose() << "adding addon cflags: " << a;
+		addCFLAG(a, RELEASE_LIB);
+		addCFLAG(a, DEBUG_LIB);
 	}
 
-	for(int i=0;i<(int)addon.cppflags.size();i++){
-		ofLogVerbose() << "adding addon cppflags: " << addon.cppflags[i];
-		addCPPFLAG(addon.cppflags[i],RELEASE_LIB);
-		addCPPFLAG(addon.cppflags[i],DEBUG_LIB);
+	for (auto & a : addon.cppflags) {
+		ofLogVerbose() << "adding addon cppflags: " << a;
+		addCPPFLAG(a, RELEASE_LIB);
+		addCPPFLAG(a, DEBUG_LIB);
 	}
-
-	for (int i = 0; i<(int)addon.defines.size(); i++) {
-		ofLogVerbose() << "adding addon define: " << addon.defines[i];
-		addDefine(addon.defines[i], RELEASE_LIB);
-		addDefine(addon.defines[i], DEBUG_LIB);
+	
+	for (auto & a : addon.defines) {
+		ofLogVerbose() << "adding addon defines: " << a;
+		addDefine(a, RELEASE_LIB);
+		addDefine(a, DEBUG_LIB);
 	}
 }

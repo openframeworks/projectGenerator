@@ -89,7 +89,8 @@ public:
 protected:
 	void recursiveCopyContents(const fs::path & srcDir, const fs::path & destDir);
 	void recursiveTemplateCopy(const fs::path & srcDir, const fs::path & destDir);
-	
+	bool recursiveCopy(const fs::path & srcDir, const fs::path & destDir);
+
 	std::vector<ofAddon> addons;
 	std::vector<string> extSrcPaths;
 

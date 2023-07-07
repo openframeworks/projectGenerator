@@ -660,8 +660,7 @@ void xcodeProject::addInclude(string includeName){
 }
 
 void xcodeProject::addLibrary(const LibraryBinary & lib){
-	alert("addLibrary " + lib.path , 35);
-	// TODO: Test this
+	//	alert("addLibrary " + lib.path , 35);
 	for (auto & c : buildConfigs) {
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + lib.path);
 	}
@@ -735,6 +734,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 			}
 		}
 		if (!found) {
+			// MARK: Not sure why this calls for baseProject one.
 			baseProject::addAddon(d);
 		} else {
 			ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << d;
@@ -762,7 +762,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 //		cout << "--->>" << endl;
 //		cout << "dylibPath " << e.path << endl;
 		
-		cout << "e.path " << e.path << endl;
+//		cout << "e.path " << e.path << endl;
 //		fs::path dylibPath =  fs::path{ e.path }.lexically_relative(addon.pathToOF);
 		
 		
