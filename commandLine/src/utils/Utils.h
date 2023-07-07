@@ -23,7 +23,8 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-string generateUUID(string input);
+string generateUUID(const string & input);
+string generateUUID(const fs::path & path);
 
 fs::path getOFRoot();
 void setOFRoot(const fs::path & path);

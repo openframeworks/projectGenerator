@@ -31,8 +31,12 @@
 
 using std::unique_ptr;
 
-string generateUUID(string input){
+string generateUUID(const string & input){
 	return uuidxx::uuid::Generate().ToString(false);
+}
+
+string generateUUID(const fs::path & path){
+	return generateUUID(path.string());
 }
 
 void findandreplace( string& tInput, string tFind, string tReplace ) {
