@@ -189,7 +189,7 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 			pugi::xml_node node = filterXmlDoc.select_node("//ItemGroup[ClInclude]").node();
 			pugi::xml_node nodeAdded = node.append_child("ClInclude");
 			nodeAdded.append_attribute("Include").set_value(srcFileString.c_str());
-			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
+			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folderString.c_str());
 		} else if ( ext == ".vert" || ext == ".frag" ) {
 			// TODO: add to None but there's no None in the original template so this fails
 			/*appendValue(doc, "None", "Include", srcFile);
