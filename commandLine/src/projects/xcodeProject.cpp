@@ -277,7 +277,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type){
 //	cout << "xcodeProject::addSrc " << srcFile << " : " << folder << endl;
 	string buildUUID { "" };
-	string ext = srcFile.extension();
+	string ext = srcFile.extension().string();
 
 	bool addToResources = true;
 	bool addToBuild = true;
