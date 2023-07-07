@@ -128,9 +128,7 @@ bool xcodeProject::createProjectFile(){
 
 	// Calculate OF Root in relation to each project (recursively);
 	relRoot = fs::relative((fs::current_path() / getOFRoot()), projectDir);
-//	cout << "relRoot" << relRoot << endl;
 
-//	if (relRoot != "../../.."){
 	if (!fs::equivalent(relRoot, "../../..")) {
 		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", relRoot.string());
 		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", relRoot.string());
@@ -304,8 +302,10 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 	//-----------------------------------------------------------------
 
 	// FIXME: getExtension() ?
-	size_t found = srcFile.find_last_of(".");
-	string ext = srcFile.substr(found+1);
+	//	size_t found = srcFile.find_last_of(".");
+	//	string ext = srcFile.substr(found+1);
+	
+	string ext = srcFile.extension();
 
 	//-----------------------------------------------------------------
 	// based on the extension make some choices about what to do:
@@ -317,30 +317,30 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 	string fileKind = "file";
 
 	if(type==DEFAULT){
-		if( ext == "cpp" || ext == "cc" || ext =="cxx" ){
+		if ( ext == ".cpp" || ext == ".cc" || ext ==".cxx" ) {
 			fileKind = "sourcecode.cpp.cpp";
 			addToResources = false;
 		}
-		else if( ext == "c" ){
+		else if ( ext == ".c" ) {
 			fileKind = "sourcecode.c.c";
 			addToResources = false;
 		}
-		else if(ext == "h" || ext == "hpp"){
+		else if (ext == ".h" || ext == ".hpp") {
 			fileKind = "sourcecode.c.h";
 			addToBuild = false;
 			addToResources = false;
 		}
-		else if(ext == "mm" || ext == "m"){
+		else if (ext == ".mm" || ext == ".m") {
 			addToResources = false;
 			fileKind = "sourcecode.cpp.objcpp";
 		}
-		else if(ext == "xib"){
+		else if (ext == ".xib") {
 			fileKind = "file.xib";
 			addToBuild	= false;
 			addToBuildResource = true;
 			addToResources = true;
 		}
-		else if(ext == ".metal"){
+		else if (ext == ".metal") {
 			fileKind = "file.metal";
 			addToBuild    = true;
 			addToBuildResource = true;
@@ -400,7 +400,7 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 
 	commands.emplace_back("# ---- ADDSRC");
 	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
-	commands.emplace_back("Add :objects:"+UUID+":path string "+srcFile);
+	commands.emplace_back("Add :objects:"+UUID+":path string "+srcFile.string());
 	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
 	if(ext == "xib"){
 		commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string "+fileKind);
@@ -414,7 +414,7 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 	// (B) BUILD REF
 	//-----------------------------------------------------------------
 	if (addToBuild || addToBuildResource ){
-		buildUUID = generateUUID(srcFile + "-build");
+		buildUUID = generateUUID(srcFile.string() + "-build");
 		commands.emplace_back("Add :objects:"+buildUUID+":fileRef string "+UUID);
 		commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
 
@@ -441,7 +441,7 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 	// MARK: IOS ONLY HERE // because resourcesUUID = "" in macOs
 	if (addToResources == true && resourcesUUID != ""){
 		commands.emplace_back("# ---- addToResources");
-		string resUUID = generateUUID(srcFile + "-build");
+		string resUUID = generateUUID(srcFile.string() + "-build");
 		commands.emplace_back("Add :objects:"+resUUID+":fileRef string "+UUID);
 		commands.emplace_back("Add :objects:"+resUUID+":isa string PBXBuildFile");
 		// FIXME: test if it is working on iOS

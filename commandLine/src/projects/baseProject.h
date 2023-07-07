@@ -3,7 +3,7 @@
 #include "ofAddon.h"
 #include "ofFileUtils.h"
 #include "pugixml.hpp"
-// TODO: - Remove
+
 #include <map>
 namespace fs = of::filesystem;
 using std::string;
@@ -29,7 +29,6 @@ public:
 		string name;
 		std::vector<string> platforms;
 		string description;
-//		std::unordered_map<fs::path, fs::path> renames;
 		std::map<fs::path, fs::path> renames;
 		bool operator<(const Template & other) const{
 			return dir<other.dir;
@@ -87,8 +86,6 @@ public:
 	
 	bool bMakeRelative = false;
 
-	
-	
 protected:
 	void recursiveCopyContents(const fs::path & srcDir, const fs::path & destDir);
 	void recursiveTemplateCopy(const fs::path & srcDir, const fs::path & destDir);

@@ -181,16 +181,16 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 		appendFilter(folderName);
 	}
 
+	string ext = srcFile.extension();
 	if(type==DEFAULT){
-		if (ofIsStringInString(srcFile, ".h") || ofIsStringInString(srcFile, ".hpp") || ofIsStringInString(srcFile, ".inl")){
-			appendValue(doc, "ClInclude", "Include", srcFile);
-
+		if ( ext == ".h" || ext == ".hpp" || ext == ".inl" ) {
+			appendValue(doc, "ClInclude", "Include", srcFileString);
+			
 			pugi::xml_node node = filterXmlDoc.select_node("//ItemGroup[ClInclude]").node();
 			pugi::xml_node nodeAdded = node.append_child("ClInclude");
-			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
+			nodeAdded.append_attribute("Include").set_value(srcFileString.c_str());
 			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
-
-		} else if (ofIsStringInString(srcFile, ".glsl") || ofIsStringInString(srcFile, ".vert") || ofIsStringInString(srcFile, ".frag")) {
+		} else if ( ext == ".vert" || ext == ".frag" ) {
 			// TODO: add to None but there's no None in the original template so this fails
 			/*appendValue(doc, "None", "Include", srcFile);
 
@@ -200,26 +200,26 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());*/
 
 		} else{
-			appendValue(doc, "ClCompile", "Include", srcFile);
+			appendValue(doc, "ClCompile", "Include", srcFileString);
 
 			pugi::xml_node nodeFilters = filterXmlDoc.select_node("//ItemGroup[ClCompile]").node();
 			pugi::xml_node nodeAdded = nodeFilters.append_child("ClCompile");
-			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
-			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
+			nodeAdded.append_attribute("Include").set_value(srcFileString.c_str());
+			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folderString.c_str());
 		}
 	}else{
 		switch(type){
 		case CPP:{
-			appendValue(doc, "ClCompile", "Include", srcFile);
+			appendValue(doc, "ClCompile", "Include", srcFileString);
 
 			pugi::xml_node nodeFilters = filterXmlDoc.select_node("//ItemGroup[ClCompile]").node();
 			pugi::xml_node nodeAdded = nodeFilters.append_child("ClCompile");
-			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
-			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
+			nodeAdded.append_attribute("Include").set_value(srcFileString.c_str());
+			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folderString.c_str());
 			break;
 		}
 		case C:{
-			pugi::xml_node node = appendValue(doc, "ClCompile", "Include", srcFile);
+			pugi::xml_node node = appendValue(doc, "ClCompile", "Include", srcFileString);
 
 			if(!node.child("CompileAs")){
 				pugi::xml_node compileAs = node.append_child("CompileAs");
@@ -233,25 +233,25 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 
 			pugi::xml_node nodeFilters = filterXmlDoc.select_node("//ItemGroup[ClCompile]").node();
 			pugi::xml_node nodeAdded = nodeFilters.append_child("ClCompile");
-			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
-			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
+			nodeAdded.append_attribute("Include").set_value(srcFileString.c_str());
+			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folderString.c_str());
 			break;
 		}
 		case HEADER:{
-			appendValue(doc, "ClInclude", "Include", srcFile);
+			appendValue(doc, "ClInclude", "Include", srcFileString);
 
 			pugi::xml_node node = filterXmlDoc.select_node("//ItemGroup[ClInclude]").node();
 			pugi::xml_node nodeAdded = node.append_child("ClInclude");
-			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
-			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());
+			nodeAdded.append_attribute("Include").set_value(srcFileString.c_str());
+			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folderString.c_str());
 			break;
 		}
 		case OBJC:{
-			ofLogError() << "objective c type not supported on vs for " << srcFile;
+			ofLogError() << "objective c type not supported on vs for " << srcFileString;
 			break;
 		}
 		default:{
-			ofLogError() << "explicit source type " << type << " not supported yet on osx for " << srcFile;
+			ofLogError() << "explicit source type " << type << " not supported yet on osx for " << srcFileString;
 			break;
 		}
 		}

@@ -362,6 +362,7 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 	}
 }
 
+// TODO: exclude based on vector of fs::path
 void ofAddon::exclude(vector<string> & variables, vector<string> exclusions){
 	for(auto & exclusion: exclusions){
 		ofStringReplace(exclusion,"\\","/");
@@ -403,14 +404,11 @@ void ofAddon::exclude(vector<LibraryBinary> & variables, vector<string> exclusio
 }
 
 void ofAddon::parseConfig(){
-//	ofFile addonConfig;
 	fs::path thisFilePath;
 	if(isLocalAddon){
 		thisFilePath = pathToProject / addonPath / "addon_config.mk";
-//		addonConfig.open(pathToProject / addonPath / "addon_config.mk");
 	}else{
 		thisFilePath = addonPath / "addon_config.mk";
-//		addonConfig.open(addonPath / "addon_config.mk");
 	}
 
 	if (!fs::exists(thisFilePath)) return;
@@ -561,10 +559,13 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	}
 	
 	if (!isLocalAddon) {
+//		if (libs.size()) {
+//			alert ("listing libs --- ", 34);
+//		}
 		for (auto & l : libs) {
-			alert(l.path);
+//			alert(l.path);
 			l.path = fixPath(l.path).string();
-			alert(l.path);
+//			alert(l.path);
 		}
 	}
 

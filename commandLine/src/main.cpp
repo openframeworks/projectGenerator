@@ -442,7 +442,7 @@ int main(int argc, char** argv){
 	
 	if (!fs::exists(absoluteProjectPath)) {
 		mode = PG_MODE_CREATE;
-		// FIXME: Maybe it is best not to create anything here.
+		// FIXME: Maybe it is best not to create anything here, unless specified by parameter
 		fs::create_directory(absoluteProjectPath);
 	} else {
 		mode = PG_MODE_UPDATE;

@@ -15,7 +15,6 @@
 #include <set>
 #include <unordered_set>
 
-
 const fs::path templatesFolder = "scripts/templates";
 
 baseProject::baseProject(string _target){
@@ -104,8 +103,18 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(string target)
 }
 
 bool baseProject::create(const fs::path & path, string templateName){
-//	alert("baseProject::create " + path.string() + " : " + templateName);
+	alert("baseProject::create " + path.string() + " : " + templateName, 35);
 //	auto path = _path; // just because it is const
+	
+	
+	//if the files being added are inside the OF root folder, make them relative to the folder.
+	if (ofIsPathInPath(fs::absolute(path), getOFRoot())) {
+		alert ("bMakeRelative true", 35);
+		bMakeRelative = true;
+	} else {
+		alert ("bMakeRelative false", 35);
+	}
+	
 	addons.clear();
 	extSrcPaths.clear();
 
@@ -219,7 +228,6 @@ bool baseProject::save(){
 
 	//save out params which the PG knows about to config.make
 	//we mostly use this right now for storing the external source paths
-	// FIXME: Absolute or FS
 	
 	vector <string> lines = fileToStrings(projectDir / "config.make");
 	std::ofstream saveConfig(projectDir / "config.make");
@@ -362,10 +370,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 
 	getFilesRecursively(srcPath, srcFilesToAdd);
 
-	//if the files being added are inside the OF root folder, make them relative to the folder.
-	if (ofIsPathInPath(srcPath, getOFRoot())) {
-		bMakeRelative = true;
-	}
+
 
 	// cout << "makeRelative " << bMakeRelative << endl;
 	//need this for absolute paths so we can subtract this path from each file path
@@ -493,49 +498,59 @@ void baseProject::addAddon(ofAddon & addon){
 		ofLogVerbose("baseProject") << lib.path;
 	}
 
-	for(int i=0;i<(int)addon.includePaths.size();i++){
-		ofLogVerbose() << "adding addon include path: " << addon.includePaths[i];
-		addInclude(addon.includePaths[i]);
+	for (auto & a : addon.includePaths) {
+		ofLogVerbose() << "adding addon include path: " << a;
+		addInclude(a);
 	}
-	for(int i=0;i<(int)addon.libs.size();i++){
-		ofLogVerbose() << "adding addon libs: " << addon.libs[i].path;
-		addLibrary(addon.libs[i]);
+
+	for (auto & a : addon.libs) {
+		ofLogVerbose() << "adding addon libs: " << a.path;
+		addLibrary(a);
 	}
-	for(int i=0;i<(int)addon.cflags.size();i++){
-		ofLogVerbose() << "adding addon cflags: " << addon.cflags[i];
-		addCFLAG(addon.cflags[i]);
+	
+	for (auto & a : addon.cflags) {
+		ofLogVerbose() << "adding addon cflags: " << a;
+		addCFLAG(a);
 	}
-	for(int i=0;i<(int)addon.cppflags.size();i++){
-		ofLogVerbose() << "adding addon cppflags: " << addon.cppflags[i];
-		addCPPFLAG(addon.cppflags[i]);
+	
+	for (auto & a : addon.cppflags) {
+		ofLogVerbose() << "adding addon cppflags: " << a;
+		addCPPFLAG(a);
 	}
-	for(int i=0;i<(int)addon.ldflags.size();i++){
-		ofLogVerbose() << "adding addon ldflags: " << addon.ldflags[i];
-		addLDFLAG(addon.ldflags[i]);
+	
+	for (auto & a : addon.ldflags) {
+		ofLogVerbose() << "adding addon ldflags: " << a;
+		addLDFLAG(a);
 	}
-	for(int i=0;i<(int)addon.srcFiles.size(); i++){
-		ofLogVerbose() << "adding addon srcFiles: " << addon.srcFiles[i];
-		addSrc(addon.srcFiles[i], addon.filesToFolders[addon.srcFiles[i]]);
+	
+	for (auto & a : addon.srcFiles) {
+		ofLogVerbose() << "adding addon srcFiles: " << a;
+		addSrc(a, addon.filesToFolders[a]);
 	}
-	for(int i=0;i<(int)addon.csrcFiles.size(); i++){
-		ofLogVerbose() << "adding addon c srcFiles: " << addon.csrcFiles[i];
-		addSrc(addon.csrcFiles[i], addon.filesToFolders[addon.csrcFiles[i]],C);
+	
+	for (auto & a : addon.csrcFiles) {
+		ofLogVerbose() << "adding addon c srcFiles: " << a;
+		addSrc(a, addon.filesToFolders[a], C);
 	}
-	for(int i=0;i<(int)addon.cppsrcFiles.size(); i++){
-		ofLogVerbose() << "adding addon cpp srcFiles: " << addon.cppsrcFiles[i];
-		addSrc(addon.cppsrcFiles[i], addon.filesToFolders[addon.cppsrcFiles[i]],CPP);
+	
+	for (auto & a : addon.cppsrcFiles) {
+		ofLogVerbose() << "adding addon cpp srcFiles: " << a;
+		addSrc(a, addon.filesToFolders[a],CPP);
 	}
-	for(int i=0;i<(int)addon.objcsrcFiles.size(); i++){
-		ofLogVerbose() << "adding addon objc srcFiles: " << addon.objcsrcFiles[i];
-		addSrc(addon.objcsrcFiles[i], addon.filesToFolders[addon.objcsrcFiles[i]],OBJC);
+	
+	for (auto & a : addon.objcsrcFiles) {
+		ofLogVerbose() << "adding addon objc srcFiles: " << a;
+		addSrc(a, addon.filesToFolders[a],OBJC);
 	}
-	for(int i=0;i<(int)addon.headersrcFiles.size(); i++){
-		ofLogVerbose() << "adding addon header srcFiles: " << addon.headersrcFiles[i];
-		addSrc(addon.headersrcFiles[i], addon.filesToFolders[addon.headersrcFiles[i]],HEADER);
+	
+	for (auto & a : addon.headersrcFiles) {
+		ofLogVerbose() << "adding addon header srcFiles: " << a;
+		addSrc(a, addon.filesToFolders[a],HEADER);
 	}
-	for (int i = 0; i<(int)addon.defines.size(); i++) {
-		ofLogVerbose() << "adding addon defines: " << addon.defines[i];
-		addDefine(addon.defines[i]);
+
+	for (auto & a : addon.defines) {
+		ofLogVerbose() << "adding addon defines: " << a;
+		addDefine(a);
 	}
 }
 
@@ -573,36 +588,63 @@ void baseProject::parseConfigMake(){
 }
 
 void baseProject::recursiveTemplateCopy(const fs::path & srcDir, const fs::path & destDir){
-	for (const auto & entry : fs::directory_iterator(srcDir)) {
-		auto f = entry.path();
-		auto destFile = destDir / f.filename();
-		if (fs::is_directory(f)) {
-			recursiveTemplateCopy(f, destFile);
-		}
-		else if (f.filename() != "template.config") {
-			if (!fs::exists(destFile)) {
-//				fs::copy(f, destFile);
-				// FIXME: FS
-				ofFile::copyFromTo(f, destFile, false, true); // from, to
-			}
-		}
+	alert("recursiveTemplateCopy " + srcDir.string() + " : " + destDir.string(), 33);
+	try
+	{
+		fs::copy(srcDir, destDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
 	}
+	catch (std::exception& e)
+	{
+		std::cout << e.what();
+	}
+	
+	fs::path templateFile = destDir / "template.config";
+	if (fs::exists(templateFile)) {
+		fs::remove(templateFile);
+	}
+	
+//	for (const auto & entry : fs::directory_iterator(srcDir)) {
+//		auto f = entry.path();
+//		auto destFile = destDir / f.filename();
+//		if (fs::is_directory(f)) {
+//			recursiveTemplateCopy(f, destFile);
+//		}
+//		else if (f.filename() != "template.config") {
+//			if (!fs::exists(destFile)) {
+////				fs::copy(f, destFile);
+//				// FIXME: FS
+//				ofFile::copyFromTo(f, destFile, false, true); // from, to
+//			}
+//		}
+//	}
 }
 
 void baseProject::recursiveCopyContents(const fs::path & srcDir, const fs::path & destDir){
-	for (const auto & entry : fs::directory_iterator(srcDir)) {
-		auto f = entry.path();
-		auto destFile = destDir / f.filename();
-		if (fs::is_directory(f)) {
-			recursiveCopyContents(f, destFile);
-		} else {
-			if (!fs::exists(destFile)) {
-				try {
-					fs::copy_file(f, destFile, fs::copy_options::overwrite_existing);
-				} catch(fs::filesystem_error& e) {
-					std::cout << "Could not copy " << f << " > " << destFile << " :: "  << e.what() << std::endl;
-				}
-			}
-		}
+	alert("recursiveCopyContents " + srcDir.string() + " : " + destDir.string(), 32);
+
+	try
+	{
+		fs::copy(srcDir, destDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
 	}
+	catch (std::exception& e)
+	{
+		std::cout << e.what();
+	}
+
+	
+//	for (const auto & entry : fs::directory_iterator(srcDir)) {
+//		auto f = entry.path();
+//		auto destFile = destDir / f.filename();
+//		if (fs::is_directory(f)) {
+//			recursiveCopyContents(f, destFile);
+//		} else {
+//			if (!fs::exists(destFile)) {
+//				try {
+//					fs::copy_file(f, destFile, fs::copy_options::overwrite_existing);
+//				} catch(fs::filesystem_error& e) {
+//					std::cout << "Could not copy " << f << " > " << destFile << " :: "  << e.what() << std::endl;
+//				}
+//			}
+//		}
+//	}
 }
