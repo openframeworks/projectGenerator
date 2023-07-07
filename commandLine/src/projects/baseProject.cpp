@@ -351,105 +351,23 @@ void baseProject::addAddon(string addonName){
 }
 
 void baseProject::addSrcRecursively(const fs::path & srcPath){
-	alert("addSrcRecursively " + srcPath.string());
+//	alert("addSrcRecursively " + srcPath.string());
 	fs::path base = srcPath.parent_path();
-	alert("base = " + base.string());
+//	alert("base = " + base.string());
 	
 	extSrcPaths.emplace_back(srcPath.string());
 	vector < fs::path > srcFilesToAdd;
-
 	getFilesRecursively(srcPath, srcFilesToAdd);
-
-	// cout << "makeRelative " << bMakeRelative << endl;
-	//need this for absolute paths so we can subtract this path from each file path
-	//say we add this path: /user/person/documents/shared_of_code
-	//we want folders added for shared_of_code/ and any subfolders, but not folders added for /user/ /user/person/ etc
-//	string parentFolder = ofFilePath::getEnclosingDirectory(ofFilePath::removeTrailingSlash(srcPath));
+//	bool isRelative = ofIsPathInPath(fs::absolute(srcPath), getOFRoot());
 
 	std::unordered_set<string> uniqueIncludeFolders;
 	for( auto & src : srcFilesToAdd){
-//		cout << "fileToAdd :: " << src << endl;
-		//if it is an absolute path it is easy - add the file and enclosing folder to the project
-		string includeFolder { "" };
-		
 		fs::path parent = src.parent_path();
-		fs::path folder2 = parent.lexically_relative(base);
-		
-		/*
-		 FIXME: Test all of this
-		 
-		 bMakeRelative maybe it is not relevant because additional source folders can be anything, relative to project / ofw path or not.
-		 */
-		
-		
-		alert( (bMakeRelative ? "bMakeRelative 1" : " bMakeRelative0"));
-		
-		if (src.is_absolute() && !bMakeRelative) {
-			// TODO: rewrite
-			/*
-			string folder = ofFilePath::getEnclosingDirectory(src, false);
-			string absFolder = folder;
-
-			auto pos = folder.find_first_of(parentFolder);
-
-			//just to be 100% sure - check if the parent folder path is at the beginning of the file path
-			//then remove it so we just get the folder structure of the actual src files being added and not the full path
-			if( pos == 0 && parentFolder.size() < folder.size() ){
-				folder = folder.substr(parentFolder.size());
-			}
-
-			folder = ofFilePath::removeTrailingSlash(folder);
-
-			ofLogVerbose() <<  " adding file " << src << " in folder " << folder << " to project ";
-//			addSrc(src, folder);
-			*/
-
-			alert ("adding file FIRST " + src.string() + " in folder " + folder2.string() + " to project ");
-//			ofLog() <<  " adding file FIRST " << src << " in folder " << folder2 << " to project ";
-			addSrc(src.string(), folder2.string());
-			includeFolder = parent.string();
-		} else {
-			/*
-			auto absPath = src;
-			// cout << "SECOND " << endl;
-			//if it is a realtive path make the file relative to the project folder
-			if (!src.is_absolute()) {
-//			if( !ofFilePath::isAbsolute(src) ){
-				absPath = ofFilePath::getAbsolutePath( ofFilePath::join(ofFilePath::getCurrentExeDir(), src) );
-				absPath = ofFilePath::getAbsolutePath( projectDir / src );
-				fs::path f1 = projectDir / src;
-				cout << ">>>> f1" << endl;
-				cout << f1 << endl;
-				cout << fs::absolute(f1) << endl;
-				cout << f1.lexically_normal() << endl;
-			}
-//			cout << ">> will canonical " << absPath << endl;
-			auto canPath = fs::canonical(absPath); //resolves the ./ and ../ to be the most minamlist absolute path
-//			cout << ">> end canonical" << endl;
-			//get the file path realtive to the project
-			auto projectPath = ofFilePath::getAbsolutePath( projectDir );
-			auto relPathPathToAdd = ofFilePath::makeRelative(projectPath, canPath);
-
-			//get the folder from the path and clean it up
-			string folder = ofFilePath::getEnclosingDirectory(relPathPathToAdd,false);
-			includeFolder = folder;
-
-			ofStringReplace(folder, "../", "");
-#ifdef TARGET_WIN32
-			ofStringReplace(folder, "..\\", ""); //do both just incase someone has used linux paths on windows
-#endif
-			folder =  ofFilePath::removeTrailingSlash(folder);
-
-			*/
-			
-			alert ("adding file SECOND " + src.string() + " in folder " + folder2.string() + " to project ");
-			addSrc(src.string(), folder2.string());
-			includeFolder = parent.string();
-		}
-		
-		if (includeFolder != "") {
-			ofLog() <<  " uniqueIncludeFolders " << includeFolder ;
-			uniqueIncludeFolders.insert(includeFolder);
+		fs::path folder = parent.lexically_relative(base);
+//		alert ("addSrc " + src.string() + " : " + folder.string());
+		addSrc(src.string(), folder.string());
+		if (parent.string() != "") {
+			uniqueIncludeFolders.insert(parent.string());
 		}
 	}
 

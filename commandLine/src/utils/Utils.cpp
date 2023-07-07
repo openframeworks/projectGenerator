@@ -516,14 +516,21 @@ bool ofIsPathInPath(const fs::path& basePath, const fs::path& subPath) {
 vector <fs::path> dirList(const fs::path & path) {
 	// map to cache recursive directory listing for subsequent usage
 	static std::map<fs::path, vector <fs::path >> dirListMap;
+	
 	if (dirListMap.find(path) == dirListMap.end()) {
-		for (const auto & entry : fs::recursive_directory_iterator(path)) {
-			if (entry.path().filename().c_str()[0] == '.') continue;
-
-			dirListMap[path].emplace_back(entry.path());
+		auto iterator = fs::recursive_directory_iterator(path);
+		for(auto i = fs::recursive_directory_iterator(path);
+				 i != fs::recursive_directory_iterator();
+			++i ) {
+			// this wont' allow hidden directories files like .git to be added, and stop recursivity at this folder level.
+			if (i->path().filename().c_str()[0] == '.') {
+				i.disable_recursion_pending();
+				continue;
+			}
+			dirListMap[path].emplace_back(i->path());
 		}
 	} else {
-//		alert("IN CACHE " + path.string());
+		alert("IN CACHE " + path.string());
 	}
 	return dirListMap[path];
 }
