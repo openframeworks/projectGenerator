@@ -100,6 +100,7 @@ public:
 	void clear();
 
 	// this is source files:
+	// FIXME: map using fs::path, fs::path
 	std::unordered_map < string, string > filesToFolders;      //the addons has had, for each file,
 												//sometimes a listing of what folder to put it in, such as "addons/ofxOsc/src"
 

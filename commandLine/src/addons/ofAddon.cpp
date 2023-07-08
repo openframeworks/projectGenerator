@@ -578,7 +578,7 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 			s = fixPath(s).string();
 		}
 		srcFiles.emplace_back(s);
-		filesToFolders[s] = folder.string();
+		filesToFolders[s.string()] = folder.string();
 	}
 	
 	for (auto & f : frameworks) {
