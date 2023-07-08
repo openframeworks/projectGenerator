@@ -15,11 +15,26 @@ bool CBWinProject::createProjectFile(){
 
 	auto project = projectDir / (projectName + ".cbp");
 	auto workspace = projectDir / (projectName + ".workspace");
-
 	// FIXME: FS
-	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.cbp"),project, false, true);
-	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.workspace"),workspace, false, true);
-	ofFile::copyFromTo(ofFilePath::join(templatePath,"icon.rc"), projectDir / "icon.rc", false, true);
+//	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.cbp"),project, false, true);
+//	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.workspace"),workspace, false, true);
+//	ofFile::copyFromTo(ofFilePath::join(templatePath,"icon.rc"), projectDir / "icon.rc", false, true);
+	
+	vector < std::pair <fs::path, fs::path > > fromTo {
+		{ templatePath / "emptyExample.cbp",   		projectDir / (projectName + ".cbp") },
+		{ templatePath / "emptyExample.workspace", 	projectDir / (projectName + ".workspace") },
+		{ templatePath / "icon.rc", 	projectDir / "icon.rc" },
+	};
+	
+	for (auto & p : fromTo) {
+		try {
+			fs::copy_file(p.first, p.second, fs::copy_options::overwrite_existing);
+		} catch(fs::filesystem_error& e) {
+			ofLogError(LOG_NAME) << "error copying Makefile template " << e.what();
+			return false;
+		}
+	}
+	
 
 	if (!fs::equivalent(getOFRoot(), "../../..")) {
 		string root = getOFRoot().string();

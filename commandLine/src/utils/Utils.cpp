@@ -129,17 +129,9 @@ pugi::xml_node appendValue(pugi::xml_document & doc, string tag, string attribut
 // it can't be changed to fs::path because of addReplaceStringVector
 void getFilesRecursively(const fs::path & path, std::vector < string > & fileNames){
 //	alert ("getFilesRecursively " + path.string());
-	if (!fs::exists(path)) return;
-	if (!fs::is_directory(path)) return;
+	if (!fs::exists(path) || !fs::is_directory(path)) return;
 	
 	for (const auto & f : dirList(path)) {
-
-//	for (const auto & entry : fs::recursive_directory_iterator(path)) {
-//		auto f = entry.path();
-		// avoid hidden files .DS_Store .vscode .git etc
-		if (f.filename().c_str()[0] == '.') continue;
-		// Attention: this function will search src files which doesn't usually have .frameworks inside.
-		if (f.extension() == ".framework") continue;
 		if (fs::is_regular_file(f)) {
 			fileNames.emplace_back(f.string());
 		}
@@ -148,15 +140,9 @@ void getFilesRecursively(const fs::path & path, std::vector < string > & fileNam
 
 // same function as before, but using fs::path instead of string.
 void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileNames){
-	if (!fs::exists(path)) return;
-	if (!fs::is_directory(path)) return;
-	
+	if (!fs::exists(path) || !fs::is_directory(path)) return;
+
 	for (const auto & f : dirList(path)) {
-//	for (const auto & entry : fs::recursive_directory_iterator(path)) {
-//		auto f = entry.path();
-		// avoid hidden files .DS_Store .vscode  .git etc
-		if (f.filename().c_str()[0] == '.') continue;
-		if (f.extension() == ".framework") continue;
 		if (fs::is_regular_file(f)) {
 			fileNames.emplace_back(f.string());
 		}
@@ -164,7 +150,7 @@ void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileN
 }
 
 static std::vector <string> platforms;
-bool isFolderNotCurrentPlatform(string folderName, string platform){
+bool isFolderNotCurrentPlatform(const string & folderName, const string & platform){
 	if( platforms.size() == 0 ){
 		platforms = {
 			"osx",
@@ -178,8 +164,8 @@ bool isFolderNotCurrentPlatform(string folderName, string platform){
 		};
 	}
 
-	for(int i = 0; i < platforms.size(); i++){
-		if( folderName == platforms[i] && folderName != platform ){
+	for (auto & p : platforms) {
+		if( folderName == p && folderName != platform ){
 			return true;
 		}
 	}
