@@ -241,7 +241,7 @@ bool baseProject::save(){
 			if( projectDir.string().rfind(getOFRoot().string(), 0) == 0) {
 				path = getOFRelPath(projectDir);
 			}
-			saveConfig << "OF_ROOT = " << path << std::endl;
+			saveConfig << "OF_ROOT = " << path.string() << std::endl;
 		}
 		// replace this section with our external paths
 		else if( extSrcPaths.size() && str.rfind("# PROJECT_EXTERNAL_SOURCE_PATHS =", 0) == 0 ){

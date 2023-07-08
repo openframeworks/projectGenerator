@@ -135,7 +135,8 @@ bool xcodeProject::createProjectFile(){
 		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", root);
 		if( target == "osx" ){
 			findandreplaceInTexfile(projectDir / "Makefile", "../../..", root);
-			findandreplaceInTexfile(projectDir / "config.make", "../../..", root);
+			// MARK: not needed because baseProject::save() does the same
+//			findandreplaceInTexfile(projectDir / "config.make", "../../..", root);
 		}
 	}
 	return true;
@@ -635,7 +636,7 @@ void xcodeProject::addLibrary(const LibraryBinary & lib){
 }
 
 void xcodeProject::addLDFLAG(string ldflag, LibType libType){
-	alert( "xcodeProject::addLDFLAG " + ldflag , 34);
+//	alert( "xcodeProject::addLDFLAG " + ldflag , 34);
 	for (auto & c : buildConfigs) {
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ldflag);
 	}
@@ -742,7 +743,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 	for (auto & e : addon.ldflags) {
 		ofLogVerbose() << "adding addon ldflags: " << e;
-		alert("addon ldflags " + e, 31 );
+//		alert("addon ldflags " + e, 31 );
 		addLDFLAG(e);
 	}
 

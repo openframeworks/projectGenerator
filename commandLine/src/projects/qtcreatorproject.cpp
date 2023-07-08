@@ -38,8 +38,9 @@ bool QtCreatorProject::createProjectFile(){
 	findandreplaceInTexfile(qbsFile, "emptyExample", projectName);
 
 	if (!fs::equivalent(getOFRoot(), "../../..")) {
+		string root = getOFRoot().string();
 		for (auto & p : fromTo) {
-			findandreplaceInTexfile(p.second, "../../..", getOFRoot().string());
+			findandreplaceInTexfile(p.second, "../../..", root);
 		}
 	}
 	return true;

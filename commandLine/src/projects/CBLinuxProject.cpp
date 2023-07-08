@@ -72,16 +72,16 @@ bool CBLinuxProject::createProjectFile(){
 	}
 
 
-	// handle the relative roots.
-	// FIXME: FS
-	fs::path relRoot = getOFRelPath(projectDir);
-	if (!fs::equivalent(relRoot, "../../..")) {
-		std::string relPath2 = relRoot.string();
-		relPath2.erase(relPath2.end()-1);
-		findandreplaceInTexfile(projectDir / "Makefile", "../../..", relPath2);
-		findandreplaceInTexfile(projectDir / "config.make", "../../..", relPath2);
-		findandreplaceInTexfile(ofFilePath::join(projectDir , projectName + ".workspace"), "../../../", relRoot.string());
-		findandreplaceInTexfile(ofFilePath::join(projectDir , projectName + ".cbp"), "../../../", relRoot.string());
+	if (!fs::equivalent(getOFRoot(), "../../..")) {
+		string root = getOFRoot().string();
+		std::string root2 = root;
+		// TODO: check this
+//		root2.erase(root2.end()-1);
+		findandreplaceInTexfile(projectDir / "Makefile", "../../..", root2);
+		findandreplaceInTexfile(projectDir / "config.make", "../../..", root2);
+		
+		findandreplaceInTexfile(projectDir / (projectName + ".workspace"), "../../../", root);
+		findandreplaceInTexfile(projectDir / (projectName + ".cbp"), "../../../", root);
 	}
 
 	return true;
