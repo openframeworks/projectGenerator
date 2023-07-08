@@ -485,7 +485,7 @@ void ofAddon::parseConfig(){
 }
 
 
-bool ofAddon::fromFS(fs::path path, const string & platform){
+bool ofAddon::fromFS(const fs::path & path, const string & platform){
 //	alert("ofAddon::fromFS path : " + path.string());
 	
 	clear();

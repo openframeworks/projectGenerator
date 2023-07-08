@@ -95,7 +95,7 @@ public:
 
 	ofAddon();
 
-	bool fromFS(fs::path path, const string & platform);
+	bool fromFS(const fs::path & path, const string & platform);
 //	void fromXML(string installXmlName);
 	void clear();
 
