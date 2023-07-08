@@ -14,6 +14,7 @@
 #include <list>
 #include <set>
 #include <unordered_set>
+using std::string;
 
 const fs::path templatesFolder = "scripts/templates";
 
