@@ -231,9 +231,8 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 //			if (prefix == "" || v.find(pathToOF.string()) == 0 || ofFilePath::isAbsolute(v)) {
 				variable.push_back({ v, "", "" });
 			} else {
-				variable.push_back( {
-					( fs::path ( prefix ) / v ).string()
-					, "", "" } );
+				fs::path p = fs::path { prefix } / v;
+				variable.push_back( { p.string(), "", "" } );
 			}
 		}
 	}
