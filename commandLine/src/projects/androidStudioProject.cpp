@@ -4,6 +4,7 @@
 #include "Utils.h"
 #include <regex>
 
+using std::string;
 std::string AndroidStudioProject::LOG_NAME = "AndroidStudioProject";
 
 AndroidStudioProject::AndroidStudioProject(std::string target)
@@ -44,7 +45,7 @@ bool AndroidStudioProject::createProjectFile(){
 		}
 	}
 
-	for (auto & p : { "res" , "srcJava", "gradle" }) {
+	for (auto & p : { string("res") , string("srcJava"), string("gradle") }) {
 		fs::copy (templatePath / p, projectDir / p, fs::copy_options::recursive);
 	}
 	

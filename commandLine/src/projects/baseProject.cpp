@@ -15,6 +15,7 @@
 #include <set>
 #include <unordered_set>
 using std::string;
+using std::vector;
 
 const fs::path templatesFolder = "scripts/templates";
 
@@ -135,7 +136,7 @@ bool baseProject::create(const fs::path & path, string templateName){
 	if (fs::exists(project) && fs::is_directory(project)) {
 		bDoesDirExist = true;
 	}else{
-		for (auto & p : { "src" , "bin" }) {
+		for (auto & p : { string("src") , string("bin") }) {
 			fs::copy (templatePath / p, projectDir / p, fs::copy_options::recursive);
 		}
 	}
