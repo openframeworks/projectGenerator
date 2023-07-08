@@ -190,7 +190,8 @@ void ofAddon::addReplaceStringVector(std::vector<string> & variable, string valu
 //			if(prefix=="" || values[i].find(pathToOF.string())==0 || ofFilePath::isAbsolute(values[i])) {
 				variable.emplace_back(values[i]);
 			} else {
-				variable.emplace_back((fs::path(prefix) / values[i]).string());
+				fs::path p = fs::path{ prefix } / values[i];
+				variable.emplace_back(p.string());
 			}
 		}
 	}
