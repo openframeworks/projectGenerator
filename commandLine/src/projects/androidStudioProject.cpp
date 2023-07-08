@@ -11,7 +11,6 @@ AndroidStudioProject::AndroidStudioProject(std::string target)
 }
 
 bool AndroidStudioProject::createProjectFile(){
-
 	// Make sure project name doesn't include "-"
 	std::string packageName = projectName;
 	ofStringReplace(packageName, "-", "");
@@ -24,13 +23,15 @@ bool AndroidStudioProject::createProjectFile(){
 		"build.gradle",
 		"settings.gradle",
 		"AndroidManifest.xml",
-		".gitignore"
+		".gitignore",
+		"gradlew",
+		"gradlew.bat",
 	};
 	
 	for (auto & f : fileNames) {
-		fs::path from { templatePath / f };
 		fs::path to { projectDir / f };
 		if (!fs::exists(to)) {
+			fs::path from { templatePath / f };
 			try {
 				fs::copy(from, to);
 			} catch(fs::filesystem_error& e) {
@@ -43,27 +44,16 @@ bool AndroidStudioProject::createProjectFile(){
 		}
 	}
 
-	// FIXME: FS
-	// res folder
-	ofDirectory( templatePath / "res" ).copyTo( projectDir / "res" );
+	for (auto & p : { "res" , "srcJava", "gradle" }) {
+		fs::copy (templatePath / p, projectDir / p, fs::copy_options::recursive);
+	}
+	
 	findandreplaceInTexfile( projectDir / "res/values/strings.xml", "TEMPLATE_APP_NAME", projectName);
-
-	// FIXME: FS
-	// srcJava folder
-	ofDirectory( templatePath / "srcJava" ).copyTo( projectDir / "srcJava" );
 
 	fs::path from = projectDir / "srcJava/cc/openframeworks/APP_NAME";
 	fs::path to = projectDir / ("srcJava/cc/openframeworks/"+projectName);
-
-	findandreplaceInTexfile(from / "OFActivity.java", "TEMPLATE_APP_NAME", projectName);
-	// FIXME: FS
-	ofDirectory(from).moveTo(to, true, true);
-
-	// FIXME: FS
-	// Gradle wrapper
-	ofDirectory(templatePath / "gradle").copyTo( projectDir / "gradle" );
-	ofFile::copyFromTo(templatePath / "gradlew",  projectDir / "gradlew" );
-	ofFile::copyFromTo(templatePath / "gradlew.bat",  projectDir / "gradlew.bat" );
+	fs::rename ( from, to );
+	findandreplaceInTexfile(to / "OFActivity.java", "TEMPLATE_APP_NAME", projectName);
 
 	return true;
 }

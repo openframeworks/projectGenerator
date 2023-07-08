@@ -15,10 +15,6 @@ bool CBWinProject::createProjectFile(){
 
 	auto project = projectDir / (projectName + ".cbp");
 	auto workspace = projectDir / (projectName + ".workspace");
-	// FIXME: FS
-//	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.cbp"),project, false, true);
-//	ofFile::copyFromTo(ofFilePath::join(templatePath,"emptyExample.workspace"),workspace, false, true);
-//	ofFile::copyFromTo(ofFilePath::join(templatePath,"icon.rc"), projectDir / "icon.rc", false, true);
 	
 	vector < std::pair <fs::path, fs::path > > fromTo {
 		{ templatePath / "emptyExample.cbp",   		projectDir / (projectName + ".cbp") },
@@ -30,15 +26,13 @@ bool CBWinProject::createProjectFile(){
 		try {
 			fs::copy_file(p.first, p.second, fs::copy_options::overwrite_existing);
 		} catch(fs::filesystem_error& e) {
-			ofLogError(LOG_NAME) << "error copying Makefile template " << e.what();
+			ofLogError(LOG_NAME) << "error copying template file " << p.first << " : " << p.second << e.what();
 			return false;
 		}
 	}
 	
-
 	if (!fs::equivalent(getOFRoot(), "../../..")) {
 		string root = getOFRoot().string();
-
 		// let's make it windows friendly:
 		std::string relRootWindows = convertStringToWindowsSeparator(root);
 
@@ -48,7 +42,6 @@ bool CBWinProject::createProjectFile(){
 		findandreplaceInTexfile(workspace, "..\\..\\..\\", relRootWindows);
 		findandreplaceInTexfile(project, "..\\..\\..\\", relRootWindows);
 	}
-
 	return true;
 }
 

@@ -135,8 +135,6 @@ bool baseProject::create(const fs::path & path, string templateName){
 		bDoesDirExist = true;
 	}else{
 		for (auto & p : { "src" , "bin" }) {
-			fs::path from = templatePath / p;
-			fs::path to = projectDir / p;
 			fs::copy (templatePath / p, projectDir / p, fs::copy_options::recursive);
 		}
 	}

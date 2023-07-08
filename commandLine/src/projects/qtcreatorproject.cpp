@@ -29,7 +29,7 @@ bool QtCreatorProject::createProjectFile(){
 		try {
 			fs::copy_file(src, dst, fs::copy_options::overwrite_existing);
 		} catch(fs::filesystem_error& e) {
-			ofLogError(LOG_NAME) << "error copying Makefile template from " << src << " to " << dst;
+			ofLogError(LOG_NAME) << "error copying template file " << p.first << " : " << p.second << e.what();
 			return false;
 		}
 	}
