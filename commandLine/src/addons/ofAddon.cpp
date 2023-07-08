@@ -188,10 +188,10 @@ void ofAddon::addReplaceStringVector(std::vector<string> & variable, string valu
 
 			if(prefix=="" || values[i].find(pathToOF.string())==0 || fs::path{values[i]}.is_absolute()) {
 //			if(prefix=="" || values[i].find(pathToOF.string())==0 || ofFilePath::isAbsolute(values[i])) {
-				variable.emplace_back(values[i]);
+				variable.push_back(values[i]);
 			} else {
 				fs::path p = fs::path{ prefix } / values[i];
-				variable.emplace_back(p.string());
+				variable.push_back(p.string());
 			}
 		}
 	}
@@ -229,7 +229,7 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 			
 			if (prefix == "" || v.find(pathToOF.string()) == 0 || fs::path{v}.is_absolute()) {
 //			if (prefix == "" || v.find(pathToOF.string()) == 0 || ofFilePath::isAbsolute(v)) {
-				variable.push_back({ v, "", "" });
+				variable.push_back( { v, "", "" } );
 			} else {
 				fs::path p = fs::path { prefix } / v;
 				variable.push_back( { p.string(), "", "" } );
