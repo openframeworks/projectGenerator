@@ -436,39 +436,27 @@ int main(int argc, char** argv){
 		ofPath = ofPathEnv;
 	}
 	
-
-	
-//	alert ("projectName " + projectName);
-//	alert ("ofPath " + ofPath.string());
 	fs::path projectPath = fs::weakly_canonical(fs::current_path() / projectName);
-	fs::path ofCalcPath = fs::weakly_canonical(fs::current_path() / ofPath);
-	
-	if (ofIsPathInPath(projectPath, ofCalcPath)) {
-		ofCalcPath = fs::relative(ofCalcPath, projectPath);
-	}
-//	alert ("projectPath " + projectPath.string());
-//	alert ("ofCalcPath " + ofCalcPath.string());
-
-	fs::path absoluteProjectPath = fs::weakly_canonical(fs::current_path() / projectName);
-//	cout << "absoluteProjectPath " << absoluteProjectPath << endl;
-
-	if (!fs::exists(absoluteProjectPath)) {
+	if (!fs::exists(projectPath)) {
 		mode = PG_MODE_CREATE;
 		// FIXME: Maybe it is best not to create anything here, unless specified by parameter
-		fs::create_directory(absoluteProjectPath);
+		fs::create_directory(projectPath);
 	} else {
 		mode = PG_MODE_UPDATE;
 	}
 
 	// This part of the code changes cwd to the project folder and make everything relative to there.
-	if (fs::exists(absoluteProjectPath)) {
-		fs::current_path(absoluteProjectPath);
-		ofPath = ofCalcPath;
-//		cout << "ofPath " << ofPath << endl;
+	if (fs::exists(projectPath)) {
+		fs::path ofCalcPath = fs::weakly_canonical(fs::current_path() / ofPath);
+		if (ofIsPathInPath(projectPath, ofCalcPath)) {
+			ofCalcPath = fs::relative(ofCalcPath, projectPath);
+		}
 
+		fs::current_path(projectPath);
+		
+		ofPath = ofCalcPath;
 		projectPath = ".";
 	}
-
 
 	if (ofPath.empty()) {
 		consoleSpace();

@@ -7,9 +7,6 @@
 
 #pragma once
 
-#ifndef UTILS_H_
-#define UTILS_H_
-
 #include "pugixml.hpp"
 
 #include "ofLog.h"
@@ -30,7 +27,6 @@ fs::path getOFRoot();
 void setOFRoot(const fs::path & path);
 
 string convertStringToWindowsSeparator(string in);
-vector<string> fileToStrings (const fs::path & file);
 
 void findandreplace( string& tInput, string tFind, string tReplace );
 void findandreplaceInTexfile (const fs::path & fileName, string tFind, string tReplace );
@@ -38,9 +34,6 @@ void findandreplaceInTexfile (const fs::path & fileName, string tFind, string tR
 bool doesTagAndAttributeExist(pugi::xml_document & doc, string tag, string attribute, string newValue);
 pugi::xml_node appendValue(pugi::xml_document & doc, string tag, string attribute, string newValue, bool addMultiple = false);
 
-
-
-//void getFoldersRecursively(const fs::path & path, std::vector < string > & folderNames, string platform);
 void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & folderNames, string platform);
 void getFilesRecursively(const fs::path & path, std::vector < string > & fileNames);
 void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileNames);
@@ -83,5 +76,4 @@ bool ofIsPathInPath(const fs::path& fullPath, const fs::path& findPath);
 
 vector <fs::path> dirList (const fs::path & path);
 vector <fs::path> folderList (const fs::path & path);
-
-#endif /* UTILS_H_ */
+vector <string> fileToStrings (const fs::path & file);

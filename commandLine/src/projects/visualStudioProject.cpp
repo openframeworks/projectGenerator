@@ -33,18 +33,15 @@ bool visualStudioProject::createProjectFile(){
 	findandreplaceInTexfile(user, "emptyExample", projectName);
 	findandreplaceInTexfile(project, "emptyExample", projectName);
 
-	fs::path relRoot = getOFRelPath(projectDir);
-
-	if (!fs::equivalent(relRoot, "../../..")) {
-		// let's make it windows friendly:
-		string relRootWindows = convertStringToWindowsSeparator(relRoot.string());
+	if (!fs::equivalent(getOFRoot(), "../../..")) {
+		string relRootWindows = convertStringToWindowsSeparator(getOFRoot().string());
 
 		// sln has windows paths:
 		findandreplaceInTexfile(solution, "..\\..\\..\\", relRootWindows);
 
 		// vcx has unixy paths:
 		//..\..\..\libs
-		findandreplaceInTexfile(project, "..\\..\\..\\", relRoot.string());
+		findandreplaceInTexfile(project, "..\\..\\..\\", relRootWindows);
 	} else {
 //		cout << "equivalent to default ../../.." << endl;
 	}
@@ -76,7 +73,8 @@ bool visualStudioProject::saveProjectFile(){
 		for (auto & a : additionalvcxproj) {
 			string name = a.filename().stem().string();
 			string aString = a.string();
-			std::replace (aString.begin(), aString.end(), '/', '\\');
+			//std::replace (aString.begin(), aString.end(), '/', '\\');
+			fixSlashOrder(aString);
 			string uuid = generateUUID(name);
 			additionalProjects +=
 			"Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \""+name+"\", \""+aString+"\", \"{"+uuid+"}\"" +
@@ -322,23 +320,14 @@ void addLibraryName(const pugi::xpath_node_set & nodes, string libName) {
 void visualStudioProject::addProps(fs::path propsFile){
 //	alert ("visualStudioProject::addProps " + propsFile.string());
 	string path = propsFile.string();
+	fixSlashOrder(path);
 //	path.replace(path.find("/"), 1, "\\");
-
 
 //	std::cout << ">>>>> visualStudioProject::addProps " << propsFile << std::endl;
 	pugi::xpath_node_set items = doc.select_nodes("//ImportGroup");
 	for (int i = 0; i < items.size(); i++) {
 		pugi::xml_node additionalOptions;
-//		cout << "adding path " << propsFile << endl;
-//		cout << "adding path c_str " << propsFile.c_str() << endl;
-//		cout << "adding path " << path << endl;
-//		cout << "adding path c_str " << path.c_str() << endl;
-
 		items[i].node().append_child("Import").append_attribute("Project").set_value(path.c_str());
-//		items[i].node().append_child("Import").append_attribute("Project").set_value(propsFile);
-//		cout << i << endl;
-//		cout << items[i].node().name() << endl;
-//		cout << items[i].node().value() << endl;
 	}
 //	auto check = doc.select_nodes("//ImportGroup/Import/Project");
 }

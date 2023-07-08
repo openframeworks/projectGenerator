@@ -1,5 +1,4 @@
-#ifndef VSWINPROJECT_H_
-#define VSWINPROJECT_H_
+#pragma once
 
 #include "baseProject.h"
 
@@ -33,4 +32,3 @@ public:
 private:
 
 };
-#endif

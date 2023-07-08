@@ -5,8 +5,7 @@
  *      Author: arturo
  */
 
-#ifndef CBWINPROJECT_H_
-#define CBWINPROJECT_H_
+#pragma once
 
 #include "baseProject.h"
 
@@ -30,5 +29,3 @@ public:
 private:
 
 };
-
-#endif /* CBLINUXPROJECT_H_ */

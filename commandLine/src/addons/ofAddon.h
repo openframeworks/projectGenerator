@@ -5,8 +5,7 @@
  *      Author: arturo
  */
 
-#ifndef OFADDON_H_
-#define OFADDON_H_
+#pragma once
 
 #include "ofConstants.h"
 #include "LibraryBinary.h"
@@ -184,5 +183,3 @@ private:
 	
 	fs::path fixPath(const fs::path & path);
 };
-
-#endif /* OFADDON_H_ */

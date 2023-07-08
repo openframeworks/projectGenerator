@@ -12,7 +12,6 @@
 #include <list>
 #include <regex>
 
-
 vector<string> splitStringOnceByLeft(const string &source, const string &delimiter) {
 	size_t pos = source.find(delimiter);
 	vector<string> res;
@@ -528,6 +527,7 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		getPropsRecursively(addonPath, propsFiles, platform);
 	}
 	
+	// TODO: Remove comments
 //	int i = 0;
 //	for (auto & s : propsFiles) {
 //		fs::path sFS { s };
@@ -559,11 +559,7 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	}
 	
 	if (!isLocalAddon) {
-//		if (libs.size()) {
-//			alert ("listing libs --- ", 34);
-//		}
 		for (auto & l : libs) {
-//			alert(l.path);
 			l.path = fixPath(l.path).string();
 //			alert(l.path);
 		}
@@ -611,7 +607,6 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 	if (fs::exists(libsPath)) {
 		getFoldersRecursively(libsPath, libFolders, platform);
 		for (auto & path : libFolders) {
-//			cout << (isLocalAddon ? path : fixPath(path)) << endl;
 			paths.emplace_back( isLocalAddon ? path : fixPath(path) );
 		}
 	}
@@ -624,7 +619,7 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		}
 	}
 	
-	paths.sort(); //paths.unique(); // unique not needed anymore. everything is carefully inserted now.
+	paths.sort();
 
 	for (auto & p : paths) {
 		includePaths.emplace_back(p.string());
@@ -644,10 +639,5 @@ void ofAddon::clear(){
 }
 
 fs::path ofAddon::fixPath(const fs::path & path) {
-//	alert ("fixPath " + path.string());
-//	cout << pathToOF << endl;
-//	cout << path << endl;
-//	cout << getOFRoot() << endl;
-	
 	return pathToOF / fs::relative(path, getOFRoot());
 }

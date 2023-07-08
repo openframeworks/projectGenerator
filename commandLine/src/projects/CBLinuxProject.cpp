@@ -13,9 +13,11 @@
 std::string CBLinuxProject::LOG_NAME = "CBLinuxProject";
 
 bool CBLinuxProject::createProjectFile(){
+	// FIXME: FS
 	ofDirectory dir(projectDir);
 	if(!dir.exists()) dir.create(true);
 
+	// FIXME: FS
 	ofFile project(ofFilePath::join(projectDir, projectName + ".cbp"));
 	std::string src =  ofFilePath::join(templatePath,"emptyExample_" + target + ".cbp");
 	std::string dst = project.path();
@@ -31,6 +33,7 @@ bool CBLinuxProject::createProjectFile(){
 		}
 	}
 
+	// FIXME: FS
 	ofFile workspace(ofFilePath::join(projectDir, projectName + ".workspace"));
 	if(!workspace.exists()){
 		src = ofFilePath::join(templatePath,"emptyExample_" + target + ".workspace");
@@ -44,6 +47,7 @@ bool CBLinuxProject::createProjectFile(){
 		}
 	}
 
+	// FIXME: FS
 	ofFile makefile(ofFilePath::join(projectDir,"Makefile"));
 	if(!makefile.exists()){
 		src = ofFilePath::join(templatePath,"Makefile");
@@ -55,6 +59,7 @@ bool CBLinuxProject::createProjectFile(){
 		}
 	}
 
+	// FIXME: FS
 	ofFile config(ofFilePath::join(projectDir,"config.make"));
 	if(!config.exists()){
 		src = ofFilePath::join(templatePath,"config.make");

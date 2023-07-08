@@ -8,7 +8,6 @@
 namespace fs = of::filesystem;
 using std::string;
 
-
 class baseProject {
 public:
 	enum LibType{

@@ -382,6 +382,11 @@ void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles
 	}
 }
 
+string convertStringToWindowsSeparator(string in) {
+	std::replace(in.begin(), in.end(), '/', '\\');
+	return in;
+}
+
 void fixSlashOrder(string & toFix){
 	std::replace(toFix.begin(), toFix.end(),'/', '\\');
 }
@@ -405,23 +410,6 @@ void setOFRoot(const fs::path & path){
 	OFRoot = path;
 }
 
-string convertStringToWindowsSeparator(string in) {
-	std::replace(in.begin(), in.end(), '/', '\\');
-	return in;
-}
-
-vector<string> fileToStrings (const fs::path & file) {
-	vector<string> out;
-	if (fs::exists(file)) {
-		std::ifstream thisFile(file);
-		string line;
-		while(getline(thisFile, line)){
-			out.emplace_back(line);
-		}
-	}
-	return out;
-}
-
 fs::path getOFRelPath(const fs::path & from) {
 	return fs::relative(getOFRoot(), from);
 }
@@ -430,11 +418,11 @@ bool checkConfigExists(){
 	return fs::exists(fs::path { ofFilePath::getUserHomeDir() }  / ".ofprojectgenerator/config");
 }
 
+// FIXME: FS or even remove everything because this function is never used.
 bool askOFRoot(){
 	ofFileDialogResult res = ofSystemLoadDialog("Select the folder of your openFrameworks install",true);
 	if (res.fileName == "" || res.filePath == "") return false;
 
-	// FIXME: FS
 	ofDirectory config(ofFilePath::join(ofFilePath::getUserHomeDir(),".ofprojectgenerator"));
 	config.create(true);
 	ofFile configFile(ofFilePath::join(ofFilePath::getUserHomeDir(),".ofprojectgenerator/config"),ofFile::WriteOnly);
@@ -562,4 +550,16 @@ vector <fs::path> folderList(const fs::path & path) {
 //		alert("IN CACHE " + path.string());
 	}
 	return folderListMap[path];
+}
+
+vector<string> fileToStrings (const fs::path & file) {
+	vector<string> out;
+	if (fs::exists(file)) {
+		std::ifstream thisFile(file);
+		string line;
+		while(getline(thisFile, line)){
+			out.emplace_back(line);
+		}
+	}
+	return out;
 }

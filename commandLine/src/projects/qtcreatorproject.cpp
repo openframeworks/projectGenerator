@@ -11,7 +11,7 @@ QtCreatorProject::QtCreatorProject(std::string target)
 }
 
 bool QtCreatorProject::createProjectFile(){
-	alert("QtCreatorProject::createProjectFile " + projectDir.string());
+//	alert("QtCreatorProject::createProjectFile " + projectDir.string());
 	if (!fs::exists(projectDir)) {
 		fs::create_directory(projectDir);
 	}
@@ -42,7 +42,6 @@ bool QtCreatorProject::createProjectFile(){
 			findandreplaceInTexfile(p.second, "../../..", getOFRoot().string());
 		}
 	}
-
 	return true;
 }
 

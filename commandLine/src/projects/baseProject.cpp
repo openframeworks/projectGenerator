@@ -266,7 +266,8 @@ void baseProject::addAddon(string addonName){
 	
 	// FIXME : not target, yes platform.
 	#ifdef TARGET_WIN32
-		std::replace( addonName.begin(), addonName.end(), '/', '\\' );
+//	std::replace( addonName.begin(), addonName.end(), '/', '\\' );
+	fixSlashOrder(addonName);
 	#endif
 	
 
