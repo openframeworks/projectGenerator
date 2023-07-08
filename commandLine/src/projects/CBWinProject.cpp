@@ -53,29 +53,27 @@ bool CBWinProject::createProjectFile(){
 }
 
 bool CBWinProject::loadProjectFile(){
-
-	//project.open(ofFilePath::join(projectDir , projectName + ".cbp"));
-
-	ofFile project(projectDir / (projectName + ".cbp"));
-	if(!project.exists()){
-		ofLogError(LOG_NAME) << "error loading" << project.path() << "doesn't exist";
+	fs::path project { projectDir / (projectName + ".cbp") };
+	if (!fs::exists(project)) {
+		ofLogError(LOG_NAME) << "error loading" << project << "doesn't exist";
 		return false;
 	}
-	pugi::xml_parse_result result = doc.load(project);
+	pugi::xml_parse_result result = doc.load_file(project.c_str());
 	bLoaded =result.status==pugi::status_ok;
 	return bLoaded;
 }
 
 bool CBWinProject::saveProjectFile(){
-
-	findandreplaceInTexfile(ofFilePath::join(projectDir , projectName + ".workspace"),"emptyExample",projectName);
+	auto workspace = projectDir / (projectName + ".workspace");
+	findandreplaceInTexfile(workspace, "emptyExample", projectName);
 	pugi::xpath_node_set title = doc.select_nodes("//Option[@title]");
 	if(!title.empty()){
 		if(!title[0].node().attribute("title").set_value(projectName.c_str())){
 			ofLogError(LOG_NAME) << "can't set title";
 		}
 	}
-	return doc.save_file((projectDir / (projectName + ".cbp")).c_str());
+	fs::path project { projectDir / (projectName + ".cbp") };
+	return doc.save_file(project.c_str());
 }
 
 void CBWinProject::addSrc(const fs::path & srcName, const fs::path & folder, SrcType type){
