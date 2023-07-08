@@ -545,8 +545,6 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 
 	fs::path libsPath = path / "libs";
 	vector < fs::path > libFiles;
-
-
 	
 	if (fs::exists(libsPath)) {
 		getLibsRecursively(libsPath, libFiles, libs, platform);
@@ -575,7 +573,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 			folder = s.parent_path();
 		} else {
 			folder = fs::relative(s.parent_path(), getOFRoot());
-			s = fixPath(s).string();
+			s = fixPath(s);
 		}
 		srcFiles.emplace_back(s);
 		filesToFolders[s.string()] = folder.string();
