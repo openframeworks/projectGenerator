@@ -127,14 +127,15 @@ bool xcodeProject::createProjectFile(){
 	}
 
 	// Calculate OF Root in relation to each project (recursively);
-	relRoot = fs::relative((fs::current_path() / getOFRoot()), projectDir);
+	//	relRoot = fs::relative((fs::current_path() / getOFRoot()), projectDir);
 
-	if (!fs::equivalent(relRoot, "../../..")) {
-		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", relRoot.string());
-		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", relRoot.string());
+	if (!fs::equivalent(getOFRoot(), "../../..")) {
+		string root = getOFRoot().string();
+		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", root);
+		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", root);
 		if( target == "osx" ){
-			findandreplaceInTexfile(projectDir / "Makefile", "../../..", relRoot.string());
-			findandreplaceInTexfile(projectDir / "config.make", "../../..", relRoot.string());
+			findandreplaceInTexfile(projectDir / "Makefile", "../../..", root);
+			findandreplaceInTexfile(projectDir / "config.make", "../../..", root);
 		}
 	}
 	return true;
@@ -565,27 +566,27 @@ void xcodeProject::addDylib(const string & name, const fs::path & path, const fs
 
 	// encoding may be messing up for frameworks... so I switched to a pbx file ref without encoding fields
 	//commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
+	commands.emplace_back("");
+	commands.emplace_back("# ---- xcodeProject::addDylib " + name + " : " + path.string());
 	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
-	
-	
-	fs::path filePath { relRoot / path };
-
 	commands.emplace_back("Add :objects:"+UUID+":path string "+path.string());
-//	commands.emplace_back("Add :objects:"+UUID+":path string " + filePath.string());
 	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
 	commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string compiled.mach-o.dylib");
 	commands.emplace_back("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
 
 
-//	fs::path folder = path.parent_path();
+	// add to folder in xcode?
 	string folderUUID = getFolderUUID(folder, false);
+	commands.emplace_back("");
+	commands.emplace_back("# --- folderUUID " + folderUUID);
 	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
 
 
 	string buildUUID = generateUUID(name + "-build");
+	commands.emplace_back("");
+	commands.emplace_back("# --- buildUUID " + buildUUID);
 	commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
 	commands.emplace_back("Add :objects:"+buildUUID+":fileRef string "+UUID);
-
 	// new - code sign dylibs on copy
 	commands.emplace_back("Add :objects:"+buildUUID+":settings:ATTRIBUTES array");
 	commands.emplace_back("Add :objects:"+buildUUID+":settings:ATTRIBUTES: string CodeSignOnCopy");
@@ -600,6 +601,8 @@ void xcodeProject::addDylib(const string & name, const fs::path & path, const fs
 
 
 	string buildUUID2 = generateUUID(name + "-build2");
+	commands.emplace_back("");
+	commands.emplace_back("# --- buildUUID2 " + buildUUID2);
 	commands.emplace_back("Add :objects:"+buildUUID2+":fileRef string "+UUID);
 	commands.emplace_back("Add :objects:"+buildUUID2+":isa string PBXBuildFile");
 
@@ -609,6 +612,7 @@ void xcodeProject::addDylib(const string & name, const fs::path & path, const fs
 
 	// UUID hardcoded para PBXCopyFilesBuildPhase
 	// FIXME: hardcoded - this is the same for the next fixme. so maybe a clearer ident can make things better here.
+	
 	commands.emplace_back("Add :objects:E4A5B60F29BAAAE400C2D356:files: string " + buildUUID2);
 }
 
@@ -631,6 +635,7 @@ void xcodeProject::addLibrary(const LibraryBinary & lib){
 }
 
 void xcodeProject::addLDFLAG(string ldflag, LibType libType){
+	alert( "xcodeProject::addLDFLAG " + ldflag , 34);
 	for (auto & c : buildConfigs) {
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ldflag);
 	}
@@ -737,6 +742,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 	for (auto & e : addon.ldflags) {
 		ofLogVerbose() << "adding addon ldflags: " << e;
+		alert("addon ldflags " + e, 31 );
 		addLDFLAG(e);
 	}
 
@@ -782,9 +788,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 			} else {
 				vector < string > pathSplit = ofSplitString(f, "/");
-				addFramework(pathSplit[pathSplit.size()-1],
-							 f,
-							 addon.filesToFolders[f]);
+				addFramework(pathSplit[pathSplit.size()-1], f, addon.filesToFolders[f]);
 			}
 		}
 	}
@@ -865,9 +869,7 @@ bool xcodeProject::saveProjectFile(){
 		}
 	}
 
-//	for (auto & c : commands) {
-//		cout << c << endl;
-//	}
-
+//	for (auto & c : commands) cout << c << endl
+	
 	return true;
 }

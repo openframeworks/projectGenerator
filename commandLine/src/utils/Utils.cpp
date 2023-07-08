@@ -306,25 +306,18 @@ void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, st
 	}
 }
 
-void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles, std::vector < LibraryBinary > & libLibs, string platform, string arch, string target) {
+void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFiles, std::vector < LibraryBinary > & libLibs, string platform, string arch, string target) {
 //	cout << ">> getLibsRecursively " << path << endl;
 	if (!fs::exists(path)) return;
 	if (!fs::is_directory(path)) return;
 	
-	// FIXME : recursive instead
-	for (const auto & entry : fs::directory_iterator(path)) {
-		auto f = entry.path();
-		//					XAXA
-//		auto f = getOFRelPath(entry.path());
-//		alert(f);
-		std::vector<string> splittedPath = ofSplitString(f.string(), fs::path("/").make_preferred().string());
-		
-		if (fs::is_directory(f)) {
+	for (const auto & entry : fs::recursive_directory_iterator(path)) {
+		const fs::path f = entry.path();
 
+		if (fs::is_directory(f)) {
 			// on osx, framework is a directory, let's not parse it....
-			auto stem = f.stem();
-			
 			if (f.extension() != ".framework") {
+				auto stem = f.stem();
 				auto archFound = std::find(LibraryBinary::archs.begin(), LibraryBinary::archs.end(), stem);
 				if (archFound != LibraryBinary::archs.end()) {
 					arch = *archFound;
@@ -334,15 +327,15 @@ void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles
 						target = *targetFound;
 					}
 				}
-				getLibsRecursively(f, libFiles, libLibs, platform, arch, target);
 			}
-
 		} else {
 			auto ext = f.extension();
 
 			bool platformFound = false;
 
 			if(platform!=""){
+				std::vector<string> splittedPath = ofSplitString(f.string(), fs::path("/").make_preferred().string());
+				
 				for(int j=0;j<(int)splittedPath.size();j++){
 					if(splittedPath[j]==platform){
 						platformFound = true;
@@ -354,9 +347,6 @@ void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles
 				(ext == ".dll" && platform != "vs")){
 				if (platformFound){
 //					libLibs.emplace_back( f, arch, target );
-					
-
-//					alert ("libLibs " + f.string());
 					libLibs.push_back({ f.string(), arch, target });
 
 					//TODO: THEO hack
@@ -374,9 +364,7 @@ void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles
 					}
 				}
 			} else if (ext == ".h" || ext == ".hpp" || ext == ".c" || ext == ".cpp" || ext == ".cc" || ext == ".cxx" || ext == ".m" || ext == ".mm"){
-				
-//				alert(f.string());
-				libFiles.emplace_back(f.string());
+				libFiles.emplace_back(f);
 			}
 		}
 	}

@@ -544,7 +544,7 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 //	}
 
 	fs::path libsPath = path / "libs";
-	vector < string > libFiles;
+	vector < fs::path > libFiles;
 
 
 	
@@ -558,21 +558,23 @@ bool ofAddon::fromFS(fs::path path, const string & platform){
 		}
 	}
 	
+	// TODO: this is not needed even if it is local addon but project is outside OF root path
+	// Absolute paths will be used in this case too.
 	if (!isLocalAddon) {
 		for (auto & l : libs) {
+//			alert("fixpath " + l.path);
 			l.path = fixPath(l.path).string();
-//			alert(l.path);
+//			alert("fixpath " + l.path);
 		}
 	}
 
 	
 	for (auto & s : libFiles) {
-		fs::path sFS { s };
 		fs::path folder;
 		if (isLocalAddon) {
-			folder = sFS.parent_path();
+			folder = s.parent_path();
 		} else {
-			folder = fs::relative(sFS.parent_path(), getOFRoot());
+			folder = fs::relative(s.parent_path(), getOFRoot());
 			s = fixPath(s).string();
 		}
 		srcFiles.emplace_back(s);
@@ -639,5 +641,9 @@ void ofAddon::clear(){
 }
 
 fs::path ofAddon::fixPath(const fs::path & path) {
-	return pathToOF / fs::relative(path, getOFRoot());
+//	cout << "fixPath before " << path << endl;
+//	cout << "fixPath after  " << fs::path { pathToOF / fs::relative(path, getOFRoot()) } << endl;
+	// This actually was resolving symlink susbtituting name, so I'll use a more complex function
+	//  pathToOF / fs::relative(path, getOFRoot())
+	return ( pathToOF / fs::relative(path, getOFRoot()) ).parent_path() / path.filename();
 }

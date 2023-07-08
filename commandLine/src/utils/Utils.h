@@ -37,7 +37,7 @@ pugi::xml_node appendValue(pugi::xml_document & doc, string tag, string attribut
 void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & folderNames, string platform);
 void getFilesRecursively(const fs::path & path, std::vector < string > & fileNames);
 void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileNames);
-void getLibsRecursively(const fs::path & path, std::vector < string > & libFiles, std::vector < LibraryBinary > & libLibs, string platform = "", string arch = "", string target = "");
+void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFiles, std::vector < LibraryBinary > & libLibs, string platform = "", string arch = "", string target = "");
 void getFrameworksRecursively(const fs::path & path, std::vector < string > & frameworks,  string platform = "" );
 void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props, const string & platform);
 void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, string platform);
