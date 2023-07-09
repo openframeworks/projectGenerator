@@ -203,105 +203,50 @@ void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & fol
 }
 
 void getFrameworksRecursively(const fs::path & path, std::vector < string > & frameworks, string platform) {
-	if (!fs::exists(path)) return;
-	if (!fs::is_directory(path)) return;
+	if (!fs::exists(path) || !fs::is_directory(path)) return;
 	
-	//	for (const auto & entry : fs::directory_iterator(path)) {
 	for (const auto & f : dirList(path)) {
-
-//	for (const auto & entry : fs::recursive_directory_iterator(path)) {
-//		auto f = entry.path();
-		if (f.filename().c_str()[0] == '.') continue; // avoid hidden files .DS_Store .vscode .git etc
-		
 		if (fs::is_directory(f)) {
 			if (f.extension() == ".framework") {
-//				cout << "adding framework " << f << endl;
 				frameworks.emplace_back(f.string());
 			}
-//			else {
-//				if (f.filename() == fs::path("mediaAssets")) continue;
-//				if (f.extension() == ".xcodeproj") continue;
-//				if( f.string().rfind("example", 0) == 0) continue;
-//				//				if (f.filename() == fs::path(".git")) continue;
-//				getFrameworksRecursively(f, frameworks, platform);
-//			}
 		}
 	}
 }
 
 void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props, const string & platform) {
 //	alert("getPropsRecursively " + path.string());
-	if (!fs::exists(path)) return;
-	if (!fs::is_directory(path)) return;
-	
+	if (!fs::exists(path) || !fs::is_directory(path)) return;
+
 	for (const auto & f : dirList(path)) {
-
-//	for (const auto & entry : fs::recursive_directory_iterator(path)) {
-//		auto f = entry.path();
-		// avoid hidden files .DS_Store .vscode .git etc
-//		if (f.filename().c_str()[0] == '.') continue;
-
 		if (fs::is_regular_file(f)) {
 			if (f.extension() == ".props") {
 				props.emplace_back(f);
 			}
 		}
-		
-//		if (fs::is_directory(f)) {
-//			if (f.filename() == fs::path("mediaAssets")) continue;
-//			if (f.extension() == ".xcodeproj") continue;
-//			if( f.string().rfind("example", 0) == 0) continue;
-////			if (f.filename() == fs::path(".git")) continue;
-//
-//			getPropsRecursively(f, props, platform);
-//		} else {
-//			if (f.extension() == ".props") {
-////				cout << ">>> getPropsRecursively FOUND PROP::: " << f << endl;
-////				cout << ">>> path = " << path << endl;
-//				props.emplace_back(f);
-//			}
-//		}
 	}
 }
 
 void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, string platform) {
-	if (!fs::exists(path)) return;
-	if (!fs::is_directory(path)) return;
-	
-	// avoid hidden files .DS_Store .vscode .git etc
-//	if (path.filename().c_str()[0] == '.') return;
-	
-	for (const auto & f : dirList(path)) {
+	if (!fs::exists(path) || !fs::is_directory(path)) return;
 
-//	for (const auto & entry : fs::recursive_directory_iterator(path)) {
-//		auto f = entry.path();
-		// avoid hidden files .DS_Store .vscode .git etc
-		if (f.filename().c_str()[0] == '.') continue;
+	for (const auto & f : dirList(path)) {
 		if (fs::is_regular_file(f) && f.extension() == ".dll") {
 			dlls.emplace_back(f.string());
 		}
-//		if (fs::is_directory(f)) {
-//			getDllsRecursively(f, dlls, platform);
-//		} else {
-//			if (f.extension() == ".dll") {
-////				alert("getDLLs " + f.string());
-//
-//				dlls.emplace_back(f.string());
-//			}
-//		}
 	}
 }
 
 void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFiles, std::vector < LibraryBinary > & libLibs, string platform, string arch, string target) {
 //	cout << ">> getLibsRecursively " << path << endl;
-	if (!fs::exists(path)) return;
-	if (!fs::is_directory(path)) return;
+	if (!fs::exists(path) || !fs::is_directory(path)) return;
 	
 	for (const auto & entry : fs::recursive_directory_iterator(path)) {
-		const fs::path f = entry.path();
+		auto f = entry.path();
 
 		if (fs::is_directory(f)) {
 			// on osx, framework is a directory, let's not parse it....
+			// TODO: skip entire directory
 			if (f.extension() != ".framework") {
 				auto stem = f.stem();
 				auto archFound = std::find(LibraryBinary::archs.begin(), LibraryBinary::archs.end(), stem);
@@ -316,12 +261,10 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 			}
 		} else {
 			auto ext = f.extension();
-
 			bool platformFound = false;
 
 			if(platform!=""){
 				std::vector<string> splittedPath = ofSplitString(f.string(), fs::path("/").make_preferred().string());
-				
 				for(int j=0;j<(int)splittedPath.size();j++){
 					if(splittedPath[j]==platform){
 						platformFound = true;
@@ -337,9 +280,7 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 
 					//TODO: THEO hack
 					if( platform == "ios" ){ //this is so we can add the osx libs for the simulator builds
-
 						string currentPath = f.string();
-
 						//TODO: THEO double hack this is why we need install.xml - custom ignore ofxOpenCv
 						if( currentPath.find("ofxOpenCv") == string::npos ){
 							ofStringReplace(currentPath, "ios", "osx");

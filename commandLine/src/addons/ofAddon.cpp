@@ -149,10 +149,6 @@ void ofAddon::addReplaceString(string & variable, string value, bool addToVariab
 }
 
 void ofAddon::addReplaceStringVector(std::vector<string> & variable, string value, string prefix, bool addToVariable){
-//	cout << "----------" << endl;
-//	cout << "addReplaceStringVector value=" << value << ", prefix=" << prefix << ", addToVariable=" << addToVariable << endl;
-//	cout << "----------" << endl;
-
 	vector<string> values;
 	if(value.find("\"")!=string::npos){
 		values = ofSplitString(value,"\"",true,true);
@@ -163,11 +159,9 @@ void ofAddon::addReplaceStringVector(std::vector<string> & variable, string valu
 	if(!addToVariable) variable.clear();
 	//value : -F$(OF_ROOT)/addons/ofxSyphon/libs/Syphon/lib/osx/
 
-	//\$\(.+\)
-	//(?<=\$\().+(?=\)) // now with positive look behind and look ahead to get rid of $( and )
-//	std::regex findVar("(?<=\\$\().+(?=\\))");
-//	std::regex findVar("\\$\\(.+\\)");
-//	(\$\()(.+)(\)) // now three capture groups here. we use only the second
+	//	std::regex findVar("(?<=\\$\().+(?=\\))");
+	//	std::regex findVar("\\$\\(.+\\)");
+	//	(\$\()(.+)(\)) // now three capture groups here. we use only the second
 	std::regex findVar("(\\$\\()(.+)(\\))");
 	for(int i=0;i<(int)values.size();i++){
 		if(values[i]!=""){
@@ -251,14 +245,10 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 
 	fs::path addonRelPath;
 	if (!isLocalAddon) {
-		// addonRelPath = ofFilePath::addTrailingSlash(pathToOF) + "addons/" + name;
 		addonRelPath = pathToOF / "addons" / name;
-//		cout << "-----> this is not local addon" << endl;
-//		cout << pathToOF << endl;
-//		cout << addonRelPath << endl;
-
+	} else {
+		addonRelPath = addonPath;
 	}
-	else addonRelPath = addonPath;
 
 	if(variable == ADDON_DESCRIPTION){
 		addReplaceString(description,value,addToValue);
@@ -369,12 +359,6 @@ void ofAddon::exclude(vector<string> & variables, vector<string> exclusions){
 		ofStringReplace(exclusion,"%",".*");
 		exclusion =".*"+ exclusion;
 
-//		cout << "EXCLUDE " << exclusion << endl;
-//		cout << variables.size() << endl;
-//		for (auto & v : variables) {
-//			cout << v << endl;
-//		}
-
 		std::regex findVar(exclusion);
 		std::smatch varMatch;
 		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const string & variable){
@@ -411,7 +395,6 @@ void ofAddon::parseConfig(){
 	}
 
 	if (!fs::exists(thisFilePath)) return;
-//	if(!addonConfig.exists()) return;
 
 	int lineNum = 0;
 	
@@ -566,7 +549,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		}
 	}
 
-	
+	// libFiles is fs::path
 	for (auto & s : libFiles) {
 		fs::path folder;
 		if (isLocalAddon) {
@@ -575,7 +558,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 			folder = fs::relative(s.parent_path(), getOFRoot());
 			s = fixPath(s);
 		}
-		srcFiles.emplace_back(s);
+		srcFiles.emplace_back(s.string());
 		filesToFolders[s.string()] = folder.string();
 	}
 	
