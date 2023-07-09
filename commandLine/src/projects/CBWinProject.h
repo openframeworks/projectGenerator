@@ -5,8 +5,7 @@
  *      Author: arturo
  */
 
-#ifndef CBWINPROJECT_H_
-#define CBWINPROJECT_H_
+#pragma once
 
 #include "baseProject.h"
 
@@ -18,7 +17,7 @@ public:
 	bool loadProjectFile();
 	bool saveProjectFile();
 
-	void addSrc(std::string srcName, std::string folder, SrcType type=DEFAULT);
+	void addSrc(const fs::path & srcName, const fs::path & folder, SrcType type=DEFAULT);
 	void addInclude(std::string includeName);
 	void addLibrary(const LibraryBinary & lib);
 
@@ -30,5 +29,3 @@ public:
 private:
 
 };
-
-#endif /* CBLINUXPROJECT_H_ */

@@ -1,5 +1,4 @@
-#ifndef VSWINPROJECT_H_
-#define VSWINPROJECT_H_
+#pragma once
 
 #include "baseProject.h"
 
@@ -12,9 +11,9 @@ public:
 	bool loadProjectFile();
 	bool saveProjectFile();
 
-	void addSrc(std::string srcFile, std::string folder, SrcType type=DEFAULT);
+	void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT);
 	void addInclude(std::string includeName);
-	void addProps(std::string propsFile);
+	void addProps(fs::path propsFile);
 	void addLibrary(const LibraryBinary & lib);
 	void addCFLAG(std::string cflag, LibType libType = RELEASE_LIB); // C
 	void addCPPFLAG(std::string cppflag, LibType libType = RELEASE_LIB); // C++
@@ -28,7 +27,8 @@ public:
 
 	void appendFilter(std::string folderName);
 
+	vector <fs::path> additionalvcxproj;
+	fs::path solution;
 private:
 
 };
-#endif

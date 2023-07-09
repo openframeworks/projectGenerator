@@ -1,6 +1,8 @@
 #pragma once
 
 #include "baseProject.h"
+//#include <unordered_map>
+#include <map>
 
 using std::string;
 
@@ -15,7 +17,7 @@ private:
 	void saveMakefile();
 
 public:
-	void addSrc(string srcFile, string folder, SrcType type=DEFAULT);
+	void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT);
 	void addInclude(string includeName);
 	void addLibrary(const LibraryBinary & lib);
 	void addLDFLAG(string ldflag, LibType libType = RELEASE_LIB);
@@ -24,9 +26,8 @@ public:
 	void addAfterRule(string script);
 	void addDefine(string define, LibType libType = RELEASE_LIB);
 
-	// macOS specific
-	void addFramework(string name, string path, string folder="");
-	void addDylib(string name, string path);
+	void addFramework(const string & name, const fs::path & path, const fs::path & folder);
+	void addDylib(const string & name, const fs::path & path, const fs::path & folder);
 
 	void addAddon(ofAddon & addon);
 	void saveScheme();
@@ -62,10 +63,10 @@ public:
 		"E4B69B600A3A1757003C02F2", //Debug
 	};
 
-	std::map <string, string> folderUUID = {
-	};
-
-	string getFolderUUID(string folder, bool isFolder = true);
+//	std::unordered_map <string, string> folderUUID ;
+	std::map < fs::path , string> folderUUID ;
+	string getFolderUUID(const fs::path & folder, bool isFolder = true, fs::path base = "");
 	
-	string relRoot = "../../..";
+	// TODO: Phase out relRoot. totally
+	fs::path relRoot = "../../..";
 };

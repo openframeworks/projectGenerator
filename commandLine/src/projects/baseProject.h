@@ -3,14 +3,12 @@
 #include "ofAddon.h"
 #include "ofFileUtils.h"
 #include "pugixml.hpp"
-// TODO: - Remove
+
 #include <map>
 namespace fs = of::filesystem;
 
 class baseProject {
-
 public:
-
 	enum LibType{
 		DEBUG_LIB = 0,
 		RELEASE_LIB
@@ -27,10 +25,9 @@ public:
 	struct Template{
 		ofDirectory dir;
 		std::string name;
-		std::vector<std::string> platforms;
+		std::vector<string> platforms;
 		std::string description;
-//		std::unordered_map<of::filesystem::path, of::filesystem::path> renames;
-		std::map<of::filesystem::path, of::filesystem::path> renames;
+		std::map<fs::path, fs::path> renames;
 		bool operator<(const Template & other) const{
 			return dir<other.dir;
 		}
@@ -40,7 +37,7 @@ public:
 
 	virtual ~baseProject(){}
 
-	bool create(const of::filesystem::path & path, std::string templateName="");
+	bool create(const fs::path & path, std::string templateName="");
 	void parseAddons();
 	void parseConfigMake();
 	bool save();
@@ -57,7 +54,7 @@ private:
 
 public:
 
-	virtual void addSrc(std::string srcFile, std::string folder, SrcType type=DEFAULT) = 0;
+	virtual void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) = 0;
 	virtual void addInclude(std::string includeName) = 0;
 	virtual void addLibrary(const LibraryBinary & lib) = 0;
 	virtual void addLDFLAG(std::string ldflag, LibType libType = RELEASE_LIB){}
@@ -68,13 +65,13 @@ public:
 
 	virtual void addAddon(std::string addon);
 	virtual void addAddon(ofAddon & addon);
-	virtual void addSrcRecursively(std::string srcPath);
+	virtual void addSrcRecursively(const fs::path & srcPath);
 
 	std::string getName() { return projectName;}
-	of::filesystem::path getPath() { return projectDir; }
+	fs::path getPath() { return projectDir; }
 
 	std::vector<Template> listAvailableTemplates(std::string target);
-	std::unique_ptr<baseProject::Template> parseTemplate(const ofDirectory & templateDir);
+	std::unique_ptr<baseProject::Template> parseTemplate(const fs::path & templateDir);
 	virtual fs::path getPlatformTemplateDir();
 
 	pugi::xml_document doc;
@@ -84,11 +81,14 @@ public:
 	fs::path templatePath;
 	std::string projectName;
 	std::string target;
+	
+	bool bMakeRelative = false;
 
 protected:
 	void recursiveCopyContents(const fs::path & srcDir, const fs::path & destDir);
 	void recursiveTemplateCopy(const fs::path & srcDir, const fs::path & destDir);
-	
+	bool recursiveCopy(const fs::path & srcDir, const fs::path & destDir);
+
 	std::vector<ofAddon> addons;
 	std::vector<std::string> extSrcPaths;
 

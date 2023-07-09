@@ -13,70 +13,42 @@
 std::string CBLinuxProject::LOG_NAME = "CBLinuxProject";
 
 bool CBLinuxProject::createProjectFile(){
-	ofDirectory dir(projectDir);
-	if(!dir.exists()) dir.create(true);
-
-	ofFile project(ofFilePath::join(projectDir, projectName + ".cbp"));
-	std::string src =  ofFilePath::join(templatePath,"emptyExample_" + target + ".cbp");
-	std::string dst = project.path();
-	bool ret;
-
-	if(!project.exists()){
-		ret = ofFile::copyFromTo(src,dst);
-		if(!ret){
-			ofLogError(LOG_NAME) << "error copying cbp template from " << src << " to " << dst;
-			return false;
-		}else{
-			findandreplaceInTexfile(dst, "emptyExample", projectName);
-		}
+	// FIXME: This only exists here, not other projects. I think it should be removed
+	if (!fs::exists(projectDir)) {
+		fs::create_directory(projectDir);
 	}
 
-	ofFile workspace(ofFilePath::join(projectDir, projectName + ".workspace"));
-	if(!workspace.exists()){
-		src = ofFilePath::join(templatePath,"emptyExample_" + target + ".workspace");
-		dst = workspace.path();
-		ret = ofFile::copyFromTo(src,dst);
-		if(!ret){
-			ofLogError(LOG_NAME) << "error copying workspace template from "<< src << " to " << dst;
-			return false;
-		}else{
-			findandreplaceInTexfile(dst, "emptyExample", projectName);
-		}
-	}
-
-	ofFile makefile(ofFilePath::join(projectDir,"Makefile"));
-	if(!makefile.exists()){
-		src = ofFilePath::join(templatePath,"Makefile");
-		dst = makefile.path();
-		ret = ofFile::copyFromTo(src,dst);
-		if(!ret){
-			ofLogError(LOG_NAME) << "error copying Makefile template from " << src << " to " << dst;
+	vector < std::pair <fs::path, fs::path > > fromTo {
+		{ templatePath / ("emptyExample_" + target + ".cbp"),   		projectDir / (projectName + ".cbp") },
+		{ templatePath / ("emptyExample_" + target + ".workspace"), 	projectDir / (projectName + ".workspace") },
+		{ templatePath / "Makefile", 	projectDir / "Makefile" },
+		{ templatePath / "config.make", 	projectDir / "config.make" },
+	};
+	
+	for (auto & p : fromTo) {
+		try {
+			fs::copy_file(p.first, p.second, fs::copy_options::overwrite_existing);
+		} catch(fs::filesystem_error& e) {
+			ofLogError(LOG_NAME) << "error copying template file " << p.first << " : " << p.second << e.what();
 			return false;
 		}
 	}
+	
+	// fromTo[0].second is cbp project in destination path.
+	findandreplaceInTexfile(fromTo[0].second, "emptyExample", projectName);
+	findandreplaceInTexfile(fromTo[1].second, "emptyExample", projectName);
 
-	ofFile config(ofFilePath::join(projectDir,"config.make"));
-	if(!config.exists()){
-		src = ofFilePath::join(templatePath,"config.make");
-		dst = config.path();
-		ret = ofFile::copyFromTo(src,dst);
-		if(!ret){
-			ofLogError(LOG_NAME) << "error copying config.make template from " << src << " to " << dst;
-			return false;
-		}
-	}
-
-
-	// handle the relative roots.
-	// FIXME: FS
-	std::string relRoot = getOFRelPath(ofFilePath::removeTrailingSlash(projectDir));
-	if (relRoot != "../../../"){
-		std::string relPath2 = relRoot;
-		relPath2.erase(relPath2.end()-1);
-		findandreplaceInTexfile(projectDir / "Makefile", "../../..", relPath2);
-		findandreplaceInTexfile(projectDir / "config.make", "../../..", relPath2);
-		findandreplaceInTexfile(ofFilePath::join(projectDir , projectName + ".workspace"), "../../../", relRoot);
-		findandreplaceInTexfile(ofFilePath::join(projectDir , projectName + ".cbp"), "../../../", relRoot);
+	if (!fs::equivalent(getOFRoot(), "../../..")) {
+		string root = getOFRoot().string();
+		std::string root2 = root;
+		
+		// TODO: check this
+//		root2.erase(root2.end()-1);
+		findandreplaceInTexfile(projectDir / "Makefile", "../../..", root2);
+		findandreplaceInTexfile(projectDir / "config.make", "../../..", root2);
+		
+		findandreplaceInTexfile(projectDir / (projectName + ".workspace"), "../../../", root);
+		findandreplaceInTexfile(projectDir / (projectName + ".cbp"), "../../../", root);
 	}
 
 	return true;

@@ -5,8 +5,7 @@
  *      Author: arturo
  */
 
-#ifndef UTILS_H_
-#define UTILS_H_
+#pragma once
 
 #include "pugixml.hpp"
 
@@ -15,42 +14,46 @@
 #include "baseProject.h"
 struct LibraryBinary;
 
-std::string generateUUID(std::string input);
+namespace fs = of::filesystem;
+using std::string;
+using std::vector;
+using std::cout;
+using std::endl;
+
+string generateUUID(const string & input);
+string generateUUID(const fs::path & path);
 
 fs::path getOFRoot();
 void setOFRoot(const fs::path & path);
-void findandreplace( std::string& tInput, std::string tFind, std::string tReplace );
-void findandreplaceInTexfile (const of::filesystem::path & fileName, std::string tFind, std::string tReplace );
 
-bool doesTagAndAttributeExist(pugi::xml_document & doc, std::string tag, std::string attribute, std::string newValue);
-pugi::xml_node appendValue(pugi::xml_document & doc, std::string tag, std::string attribute, std::string newValue, bool addMultiple = false);
+string convertStringToWindowsSeparator(string in);
 
+void findandreplace( string& tInput, string tFind, string tReplace );
+void findandreplaceInTexfile (const fs::path & fileName, string tFind, string tReplace );
 
+bool doesTagAndAttributeExist(pugi::xml_document & doc, string tag, string attribute, string newValue);
+pugi::xml_node appendValue(pugi::xml_document & doc, string tag, string attribute, string newValue, bool addMultiple = false);
 
-void getFoldersRecursively(const of::filesystem::path & path, std::vector < std::string > & folderNames, std::string platform);
-void getFoldersRecursively(const of::filesystem::path & path, std::vector < of::filesystem::path > & folderNames, std::string platform);
-void getFilesRecursively(const of::filesystem::path & path, std::vector < std::string > & fileNames);
-void getLibsRecursively(const of::filesystem::path & path, std::vector < std::string > & libFiles, std::vector < LibraryBinary > & libLibs, std::string platform = "", std::string arch = "", std::string target = "");
-void getFrameworksRecursively(const of::filesystem::path & path, std::vector < std::string > & frameworks,  std::string platform = "" );
-void getPropsRecursively(const of::filesystem::path & path, std::vector < std::string > & props, const std::string & platform);
-void getDllsRecursively(const of::filesystem::path & path, std::vector < std::string > & dlls, std::string platform);
+void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & folderNames, string platform);
+void getFilesRecursively(const fs::path & path, std::vector < string > & fileNames);
+void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileNames);
+void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFiles, std::vector < LibraryBinary > & libLibs, string platform = "", string arch = "", string target = "");
+void getFrameworksRecursively(const fs::path & path, std::vector < string > & frameworks,  string platform = "" );
+void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props, const string & platform);
+void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, string platform);
 
+void splitFromFirst(string toSplit, string deliminator, string & first, string & second);
 
-void splitFromLast(std::string toSplit, std::string deliminator, std::string & first, std::string & second);
-void splitFromFirst(std::string toSplit, std::string deliminator, std::string & first, std::string & second);
+void fixSlashOrder(string & toFix);
+string unsplitString (std::vector < string > strings, string deliminator );
 
-void fixSlashOrder(std::string & toFix);
-std::string unsplitString (std::vector < std::string > strings, std::string deliminator );
-
-// FIXME: FS
-std::string getOFRelPath(const std::string & from);
-of::filesystem::path getOFRelPathFS(const of::filesystem::path & from);
+fs::path getOFRelPath(const fs::path & from);
 
 bool checkConfigExists();
 bool askOFRoot();
-std::string getOFRootFromConfig();
+string getOFRootFromConfig();
 
-std::string getTargetString(ofTargetPlatform t);
+string getTargetString(ofTargetPlatform t);
 
 std::unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ);
 
@@ -66,9 +69,12 @@ inline bool isInVector(T item, std::vector<T> & vec){
 	return bIsInVector;
 }
 
-std::string colorText(const std::string & s, int color = 32);
-void alert(std::string msg, int color=32);
+string colorText(const string & s, int color = 32);
+void alert(string msg, int color=32);
 
+bool ofIsPathInPath(const fs::path& fullPath, const fs::path& findPath);
 
-
-#endif /* UTILS_H_ */
+vector <fs::path> dirList (const fs::path & path);
+vector <fs::path> folderList (const fs::path & path);
+vector <string> fileToStrings (const fs::path & file);
+fs::path getUserHomeDir();

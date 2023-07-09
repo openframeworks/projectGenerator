@@ -4,9 +4,7 @@
  *  Created on: 28/12/2011
  *      Author: arturo
  */
-
-#ifndef CBLINUXPROJECT_H_
-#define CBLINUXPROJECT_H_
+#pragma once
 
 #include "CBWinProject.h"
 #include "LibraryBinary.h"
@@ -21,5 +19,3 @@ public:
 
 	static std::string LOG_NAME;
 };
-
-#endif /* CBLINUXPROJECT_H_ */
