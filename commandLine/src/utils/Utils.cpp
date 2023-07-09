@@ -330,7 +330,7 @@ fs::path getOFRelPath(const fs::path & from) {
 }
 
 bool checkConfigExists(){
-	return fs::exists(fs::path { ofFilePath::getUserHomeDir() }  / ".ofprojectgenerator/config");
+	return fs::exists(getUserHomeDir()  / ".ofprojectgenerator/config");
 }
 
 // FIXME: remove everything because this function is never used. (FS)
@@ -338,16 +338,17 @@ bool askOFRoot(){
 	ofFileDialogResult res = ofSystemLoadDialog("Select the folder of your openFrameworks install",true);
 	if (res.fileName == "" || res.filePath == "") return false;
 
-	ofDirectory config(ofFilePath::join(ofFilePath::getUserHomeDir(),".ofprojectgenerator"));
+	ofDirectory config(getUserHomeDir() / ".ofprojectgenerator");
 	config.create(true);
-	ofFile configFile(ofFilePath::join(ofFilePath::getUserHomeDir(),".ofprojectgenerator/config"),ofFile::WriteOnly);
+	ofFile configFile(getUserHomeDir() / ".ofprojectgenerator/config",ofFile::WriteOnly);
 	configFile << res.filePath;
 	return true;
 }
 
+// Unused. remove?
 string getOFRootFromConfig(){
 	if(!checkConfigExists()) return "";
-	ofFile configFile(ofFilePath::join(ofFilePath::getUserHomeDir(),".ofprojectgenerator/config"),ofFile::ReadOnly);
+	ofFile configFile( getUserHomeDir() / ".ofprojectgenerator/config",ofFile::ReadOnly);
 	ofBuffer filePath = configFile.readToBuffer();
 	return filePath.getLines().begin().asString();
 }
@@ -477,4 +478,8 @@ vector<string> fileToStrings (const fs::path & file) {
 		}
 	}
 	return out;
+}
+
+fs::path getUserHomeDir() {
+	return fs::path { ofFilePath::getUserHomeDir() };
 }

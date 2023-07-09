@@ -181,7 +181,6 @@ void ofAddon::addReplaceStringVector(std::vector<string> & variable, string valu
 			}
 
 			if(prefix=="" || values[i].find(pathToOF.string())==0 || fs::path{values[i]}.is_absolute()) {
-//			if(prefix=="" || values[i].find(pathToOF.string())==0 || ofFilePath::isAbsolute(values[i])) {
 				variable.push_back(values[i]);
 			} else {
 				fs::path p = fs::path{ prefix } / values[i];
@@ -222,7 +221,6 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 
 			
 			if (prefix == "" || v.find(pathToOF.string()) == 0 || fs::path{v}.is_absolute()) {
-//			if (prefix == "" || v.find(pathToOF.string()) == 0 || ofFilePath::isAbsolute(v)) {
 				variable.push_back( { v, "", "" } );
 			} else {
 				fs::path p = fs::path { prefix } / v;
@@ -387,18 +385,18 @@ void ofAddon::exclude(vector<LibraryBinary> & variables, vector<string> exclusio
 }
 
 void ofAddon::parseConfig(){
-	fs::path thisFilePath;
+	fs::path fileName;
 	if(isLocalAddon){
-		thisFilePath = pathToProject / addonPath / "addon_config.mk";
+		fileName = pathToProject / addonPath / "addon_config.mk";
 	}else{
-		thisFilePath = addonPath / "addon_config.mk";
+		fileName = addonPath / "addon_config.mk";
 	}
 
-	if (!fs::exists(thisFilePath)) return;
+	if (!fs::exists(fileName)) return;
 
 	int lineNum = 0;
 	
-	for (auto & originalLine : fileToStrings(thisFilePath)) {
+	for (auto & originalLine : fileToStrings(fileName)) {
 		lineNum++;
 		string line = originalLine;
 		ofStringReplace(line,"\r","");
@@ -541,6 +539,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	
 	// TODO: this is not needed even if it is local addon but project is outside OF root path
 	// Absolute paths will be used in this case too.
+	// Maybe it is the same situation for all others fixPath occurences?
 	if (!isLocalAddon) {
 		for (auto & l : libs) {
 //			alert("fixpath " + l.path);
@@ -622,9 +621,11 @@ void ofAddon::clear(){
 }
 
 fs::path ofAddon::fixPath(const fs::path & path) {
-//	cout << "fixPath before " << path << endl;
-//	cout << "fixPath after  " << fs::path { pathToOF / fs::relative(path, getOFRoot()) } << endl;
-	// This actually was resolving symlink susbtituting name, so I'll use a more complex function
-	//  pathToOF / fs::relative(path, getOFRoot())
+	/*
+	 I was using this before
+	 pathToOF / fs::relative(path, getOFRoot())
+	 but the problem is fs::relative actually calculate symlink paths, modifying filename.
+	 which is not good for macos dylibs, like ofxHapPlayer, so I had to replace with the original filename back
+	 */
 	return ( pathToOF / fs::relative(path, getOFRoot()) ).parent_path() / path.filename();
 }

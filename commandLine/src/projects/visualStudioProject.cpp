@@ -73,7 +73,6 @@ bool visualStudioProject::saveProjectFile(){
 		for (auto & a : additionalvcxproj) {
 			string name = a.filename().stem().string();
 			string aString = a.string();
-			//std::replace (aString.begin(), aString.end(), '/', '\\');
 			fixSlashOrder(aString);
 			string uuid = generateUUID(name);
 			additionalProjects +=
@@ -318,7 +317,7 @@ void addLibraryName(const pugi::xpath_node_set & nodes, string libName) {
 }
 
 void visualStudioProject::addProps(fs::path propsFile){
-	alert ("visualStudioProject::addProps " + propsFile.string());
+//	alert ("visualStudioProject::addProps " + propsFile.string());
 	string path = propsFile.string();
 	fixSlashOrder(path);
 	pugi::xpath_node_set items = doc.select_nodes("//ImportGroup");
