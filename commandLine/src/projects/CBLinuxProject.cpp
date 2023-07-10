@@ -38,8 +38,12 @@ bool CBLinuxProject::createProjectFile(){
 	findandreplaceInTexfile(fromTo[0].second, "emptyExample", projectName);
 	findandreplaceInTexfile(fromTo[1].second, "emptyExample", projectName);
 
-	if (!fs::equivalent(getOFRoot(), "../../..")) {
-		string root = getOFRoot().string();
+	// Calculate OF Root in relation to each project (recursively);
+	auto relRoot = fs::relative((fs::current_path() / getOFRoot()), projectDir);
+	
+	if (!fs::equivalent(relRoot, "../../..")) {
+		string root = relRoot.string();
+
 		std::string root2 = root;
 		
 		// TODO: check this

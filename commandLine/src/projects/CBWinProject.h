@@ -21,8 +21,8 @@ public:
 	void addInclude(std::string includeName);
 	void addLibrary(const LibraryBinary & lib);
 
-	std::string getName();
-	of::filesystem::path getPath();
+//	std::string getName();
+//	fs::path getPath();
 
 	static std::string LOG_NAME;
 

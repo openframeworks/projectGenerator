@@ -42,21 +42,10 @@ public:
 	void parseConfigMake();
 	bool save();
 
-	// this shouldn't be called by anyone.  call "create(...), save" etc
-private:
-
-	virtual bool createProjectFile()=0;
-	virtual bool loadProjectFile()=0;
-	virtual bool saveProjectFile()=0;
-
-	// virtual void renameProject();
-	// this should get called at the end.
-
-public:
-
 	virtual void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) = 0;
 	virtual void addInclude(std::string includeName) = 0;
 	virtual void addLibrary(const LibraryBinary & lib) = 0;
+	
 	virtual void addLDFLAG(std::string ldflag, LibType libType = RELEASE_LIB){}
 	virtual void addCFLAG(std::string cflag, LibType libType = RELEASE_LIB){} // C_FLAGS
 	virtual void addCPPFLAG(std::string cppflag, LibType libType = RELEASE_LIB){} // CXX_FLAGS
@@ -67,7 +56,7 @@ public:
 	virtual void addAddon(ofAddon & addon);
 	virtual void addSrcRecursively(const fs::path & srcPath);
 
-	std::string getName() { return projectName;}
+	std::string getName() { return projectName; }
 	fs::path getPath() { return projectDir; }
 
 	std::vector<Template> listAvailableTemplates(std::string target);
@@ -83,6 +72,17 @@ public:
 	std::string target;
 	
 	bool bMakeRelative = false;
+
+	
+	// this shouldn't be called by anyone.  call "create(...), save" etc
+private:
+
+	virtual bool createProjectFile()=0;
+	virtual bool loadProjectFile()=0;
+	virtual bool saveProjectFile()=0;
+
+	// virtual void renameProject();
+	// this should get called at the end.
 
 protected:
 	void recursiveCopyContents(const fs::path & srcDir, const fs::path & destDir);

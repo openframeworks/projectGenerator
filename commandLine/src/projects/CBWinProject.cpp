@@ -31,8 +31,12 @@ bool CBWinProject::createProjectFile(){
 		}
 	}
 	
-	if (!fs::equivalent(getOFRoot(), "../../..")) {
-		string root = getOFRoot().string();
+	// Calculate OF Root in relation to each project (recursively);
+	auto relRoot = fs::relative((fs::current_path() / getOFRoot()), projectDir);
+	
+	if (!fs::equivalent(relRoot, "../../..")) {
+		string root = relRoot.string();
+
 		// let's make it windows friendly:
 		std::string relRootWindows = convertStringToWindowsSeparator(root);
 
@@ -87,10 +91,10 @@ void CBWinProject::addLibrary(const LibraryBinary & lib){
 	// this is because we might need to say libosc, then ws2_32
 }
 
-std::string CBWinProject::getName(){
-	return projectName;
-}
-
-of::filesystem::path CBWinProject::getPath(){
-	return projectDir;
-}
+//std::string CBWinProject::getName(){
+//	return projectName;
+//}
+//
+//fs::path CBWinProject::getPath(){
+//	return projectDir;
+//}

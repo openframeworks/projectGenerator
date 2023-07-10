@@ -37,8 +37,10 @@ bool QtCreatorProject::createProjectFile(){
 	// TODO: This opens twice the same file to find and replace. maybe we can make another function with std::pairs of find, replace strings
 	findandreplaceInTexfile(qbsFile, "emptyExample", projectName);
 
-	if (!fs::equivalent(getOFRoot(), "../../..")) {
-		string root = getOFRoot().string();
+	// Calculate OF Root in relation to each project (recursively);
+	auto relRoot = fs::relative((fs::current_path() / getOFRoot()), projectDir);
+	if (!fs::equivalent(relRoot, "../../..")) {
+		string root = relRoot.string();
 		for (auto & p : fromTo) {
 			findandreplaceInTexfile(p.second, "../../..", root);
 		}

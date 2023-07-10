@@ -110,6 +110,11 @@ bool baseProject::create(const fs::path & path, string templateName){
 	
 	
 	//if the files being added are inside the OF root folder, make them relative to the folder.
+	
+//	alert("getOFRoot() " + getOFRoot().string());
+//	alert("getOFRoot() " + fs::weakly_canonical(fs::absolute(getOFRoot())).string());
+//	alert("path " + path.string());
+//	alert("path " + fs::weakly_canonical(fs::absolute(path)).string());
 	if (ofIsPathInPath(fs::absolute(path), getOFRoot())) {
 //		alert ("bMakeRelative true", 35);
 		bMakeRelative = true;
@@ -135,7 +140,7 @@ bool baseProject::create(const fs::path & path, string templateName){
 	fs::path project { projectDir / "src" };
 	if (fs::exists(project) && fs::is_directory(project)) {
 		bDoesDirExist = true;
-	}else{
+	} else {
 		for (auto & p : { string("src") , string("bin") }) {
 			fs::copy (templatePath / p, projectDir / p, fs::copy_options::recursive);
 		}
@@ -148,6 +153,8 @@ bool baseProject::create(const fs::path & path, string templateName){
 
 	if(!empty(templateName)){
 //		cout << "templateName not empty " << templateName << endl;
+//		return getOFRoot() / templatesFolder / target;
+
 		fs::path templateDir = getOFRoot() / templatesFolder / templateName;
 //		alert("templateDir " + templateDir.string());
 
@@ -155,21 +162,18 @@ bool baseProject::create(const fs::path & path, string templateName){
 		if(templateConfig){
 			recursiveTemplateCopy(templateDir, projectDir);
 			for(auto & rename: templateConfig->renames){
-				
 				auto from = projectDir / rename.first;
 				auto to = projectDir / rename.second;
-//				cout << "rename from to " << from << " : " << to << endl;
-				
 				if (fs::exists(to)) {
 					fs::remove(to);
 				}
 				try {
 					fs::rename(from, to);
 				} catch(fs::filesystem_error& e) {
-					ofLog() << "Can not rename: " << from << " :: " << to << " :: " << e.what() ;
+					ofLogError() << "Can not rename: " << from << " :: " << to << " :: " << e.what() ;
 				}
 			}
-		}else{
+		} else {
 			ofLogWarning() << "Cannot find " << templateName << " using platform template only";
 		}
 	}
@@ -209,7 +213,6 @@ bool baseProject::create(const fs::path & path, string templateName){
 				addInclude(dir.string());
 			}
 		}
-
 	}
 	return true;
 }

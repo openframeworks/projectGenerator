@@ -127,10 +127,10 @@ bool xcodeProject::createProjectFile(){
 	}
 
 	// Calculate OF Root in relation to each project (recursively);
-	//	relRoot = fs::relative((fs::current_path() / getOFRoot()), projectDir);
-
-	if (!fs::equivalent(getOFRoot(), "../../..")) {
-		string root = getOFRoot().string();
+	auto relRoot = fs::relative((fs::current_path() / getOFRoot()), projectDir);
+	
+	if (!fs::equivalent(relRoot, "../../..")) {
+		string root = relRoot.string();
 		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", root);
 		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", root);
 		if( target == "osx" ){
