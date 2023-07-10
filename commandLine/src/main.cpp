@@ -209,7 +209,7 @@ bool isGoodOFPath(const fs::path & path) {
 
 
 void updateProject(const fs::path & path, ofTargetPlatform target, bool bConsiderParameterAddons = true) {
-//	alert("updateProject " + path.string() , 34);;
+//	alert("updateProject " + path.string() , 34);
 	// bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
 	// either we read the addons.make file, or we look at the parameter list.
 	// if we are updating recursively, we *never* consider addons passed as parameters.
@@ -237,7 +237,7 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 }
 
 void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
-//	alert("recursiveUpdate " + path.string() );
+	alert("recursiveUpdate " + path.string() );
 	if (!fs::is_directory(path)) return;
 	vector <fs::path> folders;
 
@@ -259,9 +259,22 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 		}
 	}
 
+	fs::path ofCalcPath = fs::weakly_canonical(fs::current_path() / ofPath);
+	
 	for (auto & path : folders) {
 		nProjectsUpdated++;
-//		cout << path << endl;
+
+		if (!ofPath.is_absolute()) {
+			ofPath = ofCalcPath;
+			if (ofIsPathInPath(path, ofPath)) {
+				ofPath = fs::relative(ofCalcPath, path);
+			}
+		}
+		setOFRoot(ofPath);
+		fs::current_path(path);
+		alert ("ofRoot " + ofPath.string());
+		alert ("cwd " + path.string());
+
 		updateProject(path, target, false);
 	}
 }
@@ -446,17 +459,18 @@ int main(int argc, char** argv){
 	}
 
 	// This part of the code changes cwd to the project folder and make everything relative to there.
-	if (fs::exists(projectPath)) {
-		fs::path ofCalcPath = fs::weakly_canonical(fs::current_path() / ofPath);
-		if (ofIsPathInPath(projectPath, ofCalcPath)) {
-			ofCalcPath = fs::relative(ofCalcPath, projectPath);
-		}
-
-		fs::current_path(projectPath);
-		
-		ofPath = ofCalcPath;
-		projectPath = ".";
-	}
+//	if (fs::exists(projectPath)) {
+//		fs::path ofCalcPath = fs::weakly_canonical(fs::current_path() / ofPath);
+//		if (ofIsPathInPath(projectPath, ofCalcPath)) {
+//			ofCalcPath = fs::relative(ofCalcPath, projectPath);
+//		}
+//
+//		fs::current_path(projectPath);
+//		alert ("before " +ofPath.string());
+//		ofPath = ofCalcPath;
+//		alert ("after " +ofPath.string());
+//		projectPath = ".";
+//	}
 
 	if (ofPath.empty()) {
 		consoleSpace();

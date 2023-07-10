@@ -33,8 +33,13 @@ bool visualStudioProject::createProjectFile(){
 	findandreplaceInTexfile(user, "emptyExample", projectName);
 	findandreplaceInTexfile(project, "emptyExample", projectName);
 
-	if (!fs::equivalent(getOFRoot(), "../../..")) {
-		string relRootWindows = convertStringToWindowsSeparator(getOFRoot().string());
+
+	// Calculate OF Root in relation to each project (recursively);
+	auto relRoot = fs::relative((fs::current_path() / getOFRoot()), projectDir);
+	
+	if (!fs::equivalent(relRoot, "../../..")) {
+		string root = relRoot.string();
+		string relRootWindows = convertStringToWindowsSeparator(root);
 
 		// sln has windows paths:
 		findandreplaceInTexfile(solution, "..\\..\\..\\", relRootWindows);
