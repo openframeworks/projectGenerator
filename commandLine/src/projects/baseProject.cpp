@@ -273,8 +273,6 @@ void baseProject::addAddon(string addonName){
 	fixSlashOrder(addonName);
 	#endif
 	
-
-	
 	ofAddon addon;
 	// MARK: Review this path here. EDIT: I think it is finally good
 
@@ -357,6 +355,8 @@ void baseProject::addAddon(string addonName){
 }
 
 void baseProject::addSrcRecursively(const fs::path & srcPath){
+	ofLog() << "using additional source folder " << srcPath.string();
+//	alert("--");
 //	alert("addSrcRecursively " + srcPath.string());
 	fs::path base = srcPath.parent_path();
 //	alert("base = " + base.string());
@@ -367,10 +367,12 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 //	bool isRelative = ofIsPathInPath(fs::absolute(srcPath), getOFRoot());
 
 	std::unordered_set<string> uniqueIncludeFolders;
+	
 	for( auto & src : srcFilesToAdd){
 		fs::path parent = src.parent_path();
 		fs::path folder = parent.lexically_relative(base);
-//		alert ("addSrc " + src.string() + " : " + folder.string());
+
+		//		alert ("addSrc file:" + src.string() + " -- folder:" + folder.string(), 35);
 		addSrc(src.string(), folder.string());
 		if (parent.string() != "") {
 			uniqueIncludeFolders.insert(parent.string());
