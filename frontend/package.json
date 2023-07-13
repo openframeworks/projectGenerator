@@ -34,7 +34,6 @@
   "dependencies": {
     "moniker": "^0.1.2",
     "n-readlines": "^1.0.0",
-    "utils": "^0.3.1"
   },
   "devDependencies": {
     "@types/jquery": "^2.0.60",
