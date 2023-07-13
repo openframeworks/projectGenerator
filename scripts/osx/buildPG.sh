@@ -219,7 +219,7 @@ npm run build:macos > /dev/null
 if [ -d "${pg_root}/projectGenerator-osx" ]; then
 	rm -rf ${pg_root}/projectGenerator-osx
 fi
-cp dist/projectGenerator-darwin-universal ${pg_root}/projectGenerator-osx
+cp -r dist/projectGenerator-darwin-universal ${pg_root}/projectGenerator-osx
 package_app osx
 
 cd ${pg_root}/frontend
@@ -227,7 +227,7 @@ cd ${pg_root}/frontend
 #if [ -d "${pg_root}/projectGenerator-ios" ]; then
 #	rm -rf ${pg_root}/projectGenerator-ios
 #fi
-cp dist/projectGenerator-darwin-universal ${pg_root}/projectGenerator-ios
+cp -r dist/projectGenerator-darwin-universal ${pg_root}/projectGenerator-ios
 package_app ios
 
 #cd ${pg_root}/frontend
