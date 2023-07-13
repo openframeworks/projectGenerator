@@ -407,12 +407,8 @@ int main(int argc, char** argv){
 			for (auto & s : ofSplitString(srcString, ",", true, true)) {
 				s = ofFilePath::removeTrailingSlash(s);
 				srcPaths.emplace_back(s);
+				//alert ("additional src folder : " + s);
 			}
-			
-			for (auto & s : srcPaths) {
-				alert ("additional src folder : " + s.string());
-			}
-//			srcPaths = ofSplitString(srcString, ",", true, true);
 		}
 	}
 
