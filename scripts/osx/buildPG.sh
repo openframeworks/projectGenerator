@@ -209,24 +209,26 @@ import_certificate
 cd ${pg_root}/frontend
 npm update
 npm install > /dev/null
-npm run build:osx > /dev/null
+npm run build:macos > /dev/null
+cp -r app dist/projectGenerator-darwin-universal/projectGenerator.app/Contents/Resources/app/
 if [ -d "${pg_root}/projectGenerator-osx" ]; then
 	rm -rf ${pg_root}/projectGenerator-osx
 fi
-mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-osx
+mv dist/projectGenerator-darwin-universal ${pg_root}/projectGenerator-osx
 package_app osx
 
 cd ${pg_root}/frontend
-npm run build:osx > /dev/null
+npm run build:macos > /dev/null
+cp -r app dist/projectGenerator-darwin-universal/projectGenerator.app/Contents/Resources/app/
 if [ -d "${pg_root}/projectGenerator-ios" ]; then
 	rm -rf ${pg_root}/projectGenerator-ios
 fi
-mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-ios
+mv dist/projectGenerator-darwin-universal ${pg_root}/projectGenerator-ios
 package_app ios
 
 #cd ${pg_root}/frontend
 #npm run build:osx > /dev/null
-#mv dist/projectGenerator-darwin-x64 ${pg_root}/projectGenerator-android
+#mv dist/projectGenerator-darwin-universal ${pg_root}/projectGenerator-android
 #package_app android
 
 rm -rf scripts/id_rsa 2> /dev/null
