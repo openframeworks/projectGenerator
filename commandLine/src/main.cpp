@@ -272,8 +272,8 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 		}
 		setOFRoot(ofPath);
 		fs::current_path(path);
-		alert ("ofRoot " + ofPath.string());
-		alert ("cwd " + path.string());
+//		alert ("ofRoot " + ofPath.string());
+//		alert ("cwd " + path.string());
 
 		updateProject(path, target, false);
 	}

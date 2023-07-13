@@ -128,10 +128,12 @@ bool xcodeProject::createProjectFile(){
 	}
 
 	// Calculate OF Root in relation to each project (recursively);
-	fs::path relRoot;
+	fs::path relRoot { getOFRoot() };
 	if (ofIsPathInPath(fs::current_path(), getOFRoot())) {
 		auto relRoot = fs::relative((fs::current_path() / getOFRoot()), projectDir);
 	}
+	
+	
 	
 	if (!fs::equivalent(relRoot, "../../..")) {
 		string root = relRoot.string();
