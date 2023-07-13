@@ -13,6 +13,7 @@ xcodeProject::xcodeProject(string target)
 		folderUUID = {
 			{ "src", 			"E4B69E1C0A3A1BDC003C02F2" },
 			{ "addons", 		"BB4B014C10F69532006C3DED" },
+			{ "openFrameworks", 		"191EF70929D778A400F35F26" },
 			// { "localAddons",	"6948EE371B920CB800B5AC1A" },
 			{ "", 				"E4B69B4A0A3A1720003C02F2" }
 		};
@@ -127,10 +128,16 @@ bool xcodeProject::createProjectFile(){
 	}
 
 	// Calculate OF Root in relation to each project (recursively);
-	auto relRoot = fs::relative((fs::current_path() / getOFRoot()), projectDir);
+	fs::path relRoot { getOFRoot() };
+	if (ofIsPathInPath(fs::current_path(), getOFRoot())) {
+		auto relRoot = fs::relative((fs::current_path() / getOFRoot()), projectDir);
+	}
+	
+	
 	
 	if (!fs::equivalent(relRoot, "../../..")) {
 		string root = relRoot.string();
+		alert ("root = " + root);
 		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", root);
 		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", root);
 		if( target == "osx" ){
@@ -870,7 +877,7 @@ bool xcodeProject::saveProjectFile(){
 		}
 	}
 
-//	for (auto & c : commands) cout << c << endl
+//	for (auto & c : commands) cout << c << endl;
 	
 	return true;
 }

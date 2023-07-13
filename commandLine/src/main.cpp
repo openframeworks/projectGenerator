@@ -1,4 +1,4 @@
-#define PG_VERSION "PG v010"
+#define PG_VERSION "PG v011"
 #define TARGET_NO_SOUND
 #define TARGET_NODISPLAY
 
@@ -272,8 +272,8 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 		}
 		setOFRoot(ofPath);
 		fs::current_path(path);
-		alert ("ofRoot " + ofPath.string());
-		alert ("cwd " + path.string());
+//		alert ("ofRoot " + ofPath.string());
+//		alert ("cwd " + path.string());
 
 		updateProject(path, target, false);
 	}
@@ -405,9 +405,10 @@ int main(int argc, char** argv){
 			string srcString(options[SRCEXTERNAL].arg);
 			// TODO: TEST
 			for (auto & s : ofSplitString(srcString, ",", true, true)) {
+				s = ofFilePath::removeTrailingSlash(s);
 				srcPaths.emplace_back(s);
+				//alert ("additional src folder : " + s);
 			}
-//			srcPaths = ofSplitString(srcString, ",", true, true);
 		}
 	}
 

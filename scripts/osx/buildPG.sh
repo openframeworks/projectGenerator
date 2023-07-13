@@ -196,6 +196,7 @@ if [[ $errorcode -ne 0 ]]; then
 fi
 
 # install electron sign globally
+# sudo npx create-react-app electron-osx-sign
 sudo npm install -g electron-osx-sign
 
 if [ -d "/Users/runner/" ]; then
