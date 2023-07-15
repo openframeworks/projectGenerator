@@ -409,22 +409,22 @@ function setOFPath(ofPathValue) {
 
 //----------------------------------------
 function setup() {
-    jQuery.fn.extend({
-        oneTimeTooltip: function (msg) {
-            return this.each(function () {
-                $(this).popup({
-                    content: msg,
-                    position: 'bottom center',
-                    on: 'manual',
-                    onVisible: function (e) {
-                        // hide on focus / change / onShow (for dropdowns)
-                        $(e).one('focus change click', function () { $(this).popup('hide'); });
-                        console.log($(e).children('input'));
-                    }
-                }).popup('show')
-            });
-        }
-    });
+    // jQuery.fn.extend({
+    //     oneTimeTooltip: function (msg) {
+    //         return this.each(function () {
+    //             $(this).popup({
+    //                 content: msg,
+    //                 position: 'bottom center',
+    //                 on: 'manual',
+    //                 onVisible: function (e) {
+    //                     // hide on focus / change / onShow (for dropdowns)
+    //                     $(e).one('focus change click', function () { $(this).popup('hide'); });
+    //                     console.log($(e).children('input'));
+    //                 }
+    //             }).popup('show')
+    //         });
+    //     }
+    // });
 
 
     $(document).ready(() => {
