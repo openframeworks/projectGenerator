@@ -367,9 +367,18 @@
 				<p>Welcome to the console :)</p>
 			</div>
 		</section>
+
+                <script>
+                window.nodeRequire = require;
+                delete window.require;
+                delete window.exports;
+                delete window.module;
+                </script>
+
 		<script type="text/javascript" src="static/js/jquery.min.js"></script>
 		<script type="text/javascript" src="static/js/semantic.min.js"></script>
 		<script type="text/javascript" src="static/js/jquery.dragbetter.js"></script>
-		<script src="app.js"></script>
+		<script type="text/javascript" src="app.js"></script>
+
 	</body>
 </html>

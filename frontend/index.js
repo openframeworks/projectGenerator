@@ -1,5 +1,3 @@
-// @ts-check
-
 const fs = require('fs');
 const path = require('path');
 const moniker = require('moniker');
@@ -225,11 +223,13 @@ app.on('ready', () => {
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: 500,
-        height: 600,
+        height: 700,
         resizable: true, // TODO: fix to false, true for debug
         frame: false,
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js')
+            //preload: path.join(__dirname, 'preload.js'),
+            nodeIntegration: true,
+            contextIsolation: false,
         }
     });
 
@@ -240,10 +240,11 @@ app.on('ready', () => {
     if (settings["showDeveloperTools"]) {
         mainWindow.webContents.openDevTools();
     }
+    
     //when the window is loaded send the defaults
     mainWindow.webContents.on('did-finish-load', () => {
         //refreshAddonList();
-
+        
         mainWindow.webContents.send('cwd', app.getAppPath());
         mainWindow.webContents.send('cwd', __dirname);
         mainWindow.webContents.send('cwd', process.resourcesPath);

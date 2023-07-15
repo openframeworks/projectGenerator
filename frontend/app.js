@@ -1,11 +1,8 @@
-// @ts-check
-// instead of ipc, maybe?
-// https://github.com/atom/electron/blob/master/docs/api/remote.md
-
-// @ts-ignore
-const ipc = window.ipc_wrapper;
-const path = ipc.path;
-const fs = ipc.fs;
+//nodeRequire is used instead of require due to clash with node and jquery
+//see section - I can not use jQuery/RequireJS/Meteor/AngularJS in Electron : https://www.electronjs.org/docs/latest/faq/ 
+const { ipcRenderer } = nodeRequire('electron');
+path = nodeRequire('path');
+fs = nodeRequire('fs');
 
 let platforms;
 let templates;
@@ -34,22 +31,22 @@ let numAddedSrcPaths = 1;
 //-----------------------------------------------------------------------------------
 
 //-------------------------------------------
-ipc.on('setOfPath', (event, arg) => {
+ipcRenderer.on('setOfPath', (event, arg) => {
     setOFPath(arg);
 });
 
-ipc.on('cwd', (event, arg) => {
+ipcRenderer.on('cwd', (event, arg) => {
     console.log(arg);
 });
 
-ipc.on('setUpdatePath', (event, arg) => {
+ipcRenderer.on('setUpdatePath', (event, arg) => {
     /** @type {HTMLInputElement} */
     const elem = document.getElementById("updateMultiplePath");
     elem.value = arg;
     $("#updateMultiplePath").change();
 });
 
-ipc.on('isUpdateMultiplePathOk', (event, arg) => {
+ipcRenderer.on('isUpdateMultiplePathOk', (event, arg) => {
     if (arg == true){
         $("#updateMultipleWrongMessage").hide();
         $("#updateMultipleButton").removeClass("disabled");
@@ -60,13 +57,13 @@ ipc.on('isUpdateMultiplePathOk', (event, arg) => {
 });
 
 //-------------------------------------------
-ipc.on('setup', (event, arg) => {
+ipcRenderer.on('setup', (event, arg) => {
     setup();
 });
 
 //-----------------------------------------
 // this is called from main when defaults are loaded in:
-ipc.on('setDefaults', (event, arg) => {
+ipcRenderer.on('setDefaults', (event, arg) => {
     defaultSettings = arg;
     setOFPath(defaultSettings.defaultOfPath);
     enableAdvancedMode(defaultSettings.advancedMode);
@@ -74,13 +71,13 @@ ipc.on('setDefaults', (event, arg) => {
 });
 
 //-------------------------------------------
-ipc.on('setStartingProject', (event, arg) =>  {
+ipcRenderer.on('setStartingProject', (event, arg) =>  {
     $("#projectPath").val(arg.path);
     $("#projectName").val(arg.name);
 });
 
 //-------------------------------------------
-ipc.on('setProjectPath', (event, arg) => {
+ipcRenderer.on('setProjectPath', (event, arg) => {
     $("#projectPath").val(arg);
     //defaultSettings['lastUsedProjectPath'] = arg;
     //saveDefaultSettings();
@@ -88,24 +85,24 @@ ipc.on('setProjectPath', (event, arg) => {
 });
 
 //-------------------------------------------
-ipc.on('setSourceExtraPath', (event, [arg, index]) => { // TODO:
+ipcRenderer.on('setSourceExtraPath', (event, [arg, index]) => { // TODO:
     checkAddSourcePath(index);
     $("#sourceExtra-" + index).val(arg);
 });
 
 //-------------------------------------------
-ipc.on('setGenerateMode', (event, arg) => {
+ipcRenderer.on('setGenerateMode', (event, arg) => {
     switchGenerateMode(arg);
 });
 
 //-------------------------------------------
-ipc.on('importProjectSettings', (event, settings) => {
+ipcRenderer.on('importProjectSettings', (event, settings) => {
     $("#projectPath").val(settings.projectPath);
     $("#projectName").val(settings.projectName).trigger('change'); // change triggers addon scanning
 });
 
 //-------------------------------------------
-ipc.on('setAddons', (event, arg) => {
+ipcRenderer.on('setAddons', (event, arg) => {
     console.log("got set addons:", arg);
 
     addonsInstalled = arg;
@@ -148,7 +145,7 @@ ipc.on('setAddons', (event, arg) => {
 });
 
 
-ipc.on('setPlatforms', (event, arg) => {
+ipcRenderer.on('setPlatforms', (event, arg) => {
 
     console.log("got set platforms");
     console.log(arg);
@@ -192,7 +189,7 @@ ipc.on('setPlatforms', (event, arg) => {
 });
 
 
-ipc.on('setTemplates', (event, arg) => {
+ipcRenderer.on('setTemplates', (event, arg) => {
     console.log("----------------");
     console.log("got set templates");
     console.log(arg);
@@ -243,7 +240,7 @@ ipc.on('setTemplates', (event, arg) => {
 });
 
 
-ipc.on('enableTemplate', (event, arg) => {
+ipcRenderer.on('enableTemplate', (event, arg) => {
 
     console.log('enableTemplate');
     const items = arg.bMulti === false
@@ -268,7 +265,7 @@ ipc.on('enableTemplate', (event, arg) => {
 
 //-------------------------------------------
 // select the list of addons and notify if some aren't installed
-ipc.on('selectAddons', (event, arg) => {
+ipcRenderer.on('selectAddons', (event, arg) => {
     // todo : DEAL WITH LOCAL ADDONS HERE....
 
     const addonsAlreadyPicked = $("#addonsDropdown").val().split(',');
@@ -346,18 +343,18 @@ ipc.on('selectAddons', (event, arg) => {
 
 //-------------------------------------------
 // allow main to send UI messages
-ipc.on('sendUIMessage', (event, arg) => {
+ipcRenderer.on('sendUIMessage', (event, arg) => {
     // check if it has "success" message:
     displayModal(arg);
 });
 
 //-------------------------------------------
-ipc.on('consoleMessage', (event, msg) => {
+ipcRenderer.on('consoleMessage', (event, msg) => {
     consoleMessage(msg);
 });
 
 //-------------------------------------------
-ipc.on('generateCompleted', (event, isSuccessful) => {
+ipcRenderer.on('generateCompleted', (event, isSuccessful) => {
     if (isSuccessful === true) {
         // We want to switch to update mode now
         $("#projectName").trigger('change');
@@ -365,13 +362,13 @@ ipc.on('generateCompleted', (event, isSuccessful) => {
 });
 
 //-------------------------------------------
-ipc.on('updateCompleted', (event, isSuccessful) => {
+ipcRenderer.on('updateCompleted', (event, isSuccessful) => {
     if (isSuccessful === true) {
         // eventual callback after update completed
     }
 });
 
-ipc.on('setRandomisedSketchName', (event, newName) => {
+ipcRenderer.on('setRandomisedSketchName', (event, newName) => {
     $("#projectName").val(newName);
 });
 
@@ -432,7 +429,7 @@ function setup() {
             const {
                 release,
                 platform
-            } = ipc.sendSync('getOSInfo');
+            } = ipcRenderer.sendSync('getOSInfo');
             const os_major_pos = release.indexOf(".");
             const os_major = release.slice(0, os_major_pos);
             const isSierra = (platform === 'darwin' && parseInt(os_major) >= 16);
@@ -501,7 +498,7 @@ function setup() {
         // bind external URLs (load it in default browser; not within Electron)
         $('*[data-toggle="external_target"]').click((e) => {
             e.preventDefault();
-            ipc.send('openExternal', $(e.currentTarget).prop('href'));
+            ipcRenderer.send('openExternal', $(e.currentTarget).prop('href'));
         });
 
         $("#projectPath").on('change', () => {
@@ -529,7 +526,7 @@ function setup() {
             };
 
         	// check if project exists
-        	ipc.send('isOFProjectFolder', project);
+        	ipcRenderer.send('isOFProjectFolder', project);
 
             // update link to local project files
             $("#revealProjectFiles").prop('href', 'file:///' + path.join(project.projectPath, project.projectName).replace(/^\//, '') );
@@ -540,7 +537,7 @@ function setup() {
         });
 
         $("#updateMultiplePath").on('change', () => {
-            ipc.send('checkMultiUpdatePath', $("#updateMultiplePath").val());
+            ipcRenderer.send('checkMultiUpdatePath', $("#updateMultiplePath").val());
         });
 
         $("#advancedOptions").checkbox();
@@ -573,15 +570,15 @@ function setup() {
             defaultSettings.defaultOfPath = ofpath;
             console.log("ofPath val " + ofpath);
             if(isFirstTimeSierra) {
-                ipc.sendSync('firstTimeSierra', "xattr -r -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app");
+                ipcRenderer.sendSync('firstTimeSierra', "xattr -r -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app");
                 $("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
             }
             saveDefaultSettings();
 
             console.log("requesting addons");
             // trigger reload addons from the new OF path
-            ipc.send('refreshAddonList', $("#ofPath").val());
-            ipc.send('refreshPlatformList', $("#ofPath").val());
+            ipcRenderer.send('refreshAddonList', $("#ofPath").val());
+            ipcRenderer.send('refreshPlatformList', $("#ofPath").val());
         });
 
 
@@ -599,7 +596,7 @@ function setup() {
             const ofpath = $("#ofPath").val();
             setOFPath(ofpath);
             if(isFirstTimeSierra) {
-                ipc.sendSync("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app");
+                ipcRenderer.sendSync("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app");
                 $("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
                 //exec("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app", puts);
             }
@@ -700,7 +697,7 @@ function setup() {
                 bMulti: false
             }
             console.log(arg);
-            ipc.send('refreshTemplateList', arg);
+            ipcRenderer.send('refreshTemplateList', arg);
         })
         $("#platformsDropdownMulti").on('change', () => {
             const selectedPlatforms = $("#platformsDropdownMulti input").val();
@@ -710,7 +707,7 @@ function setup() {
                 selectedPlatforms: selectedPlatformArray,
                 bMulti: true
             }
-            ipc.send('refreshTemplateList', arg);
+            ipcRenderer.send('refreshTemplateList', arg);
         })
 
     });
@@ -842,7 +839,7 @@ function saveDefaultSettings() {
     if(!defaultSettings) return;
 
     const defaultSettingsJsonString = JSON.stringify(defaultSettings, null, '\t');
-    const result = ipc.sendSync('saveDefaultSettings', defaultSettingsJsonString);
+    const result = ipcRenderer.sendSync('saveDefaultSettings', defaultSettingsJsonString);
     console.log(result);
 }
 
@@ -900,7 +897,7 @@ function generate() {
     } else if (gen.platformList == null || lengthOfPlatforms == 0) {
         $("#platformsDropdown").oneTimeTooltip("Please select a platform first.");
     } else {
-        ipc.send('generate', gen);
+        ipcRenderer.send('generate', gen);
     }
 }
 
@@ -936,7 +933,7 @@ function updateRecursive() {
     } else if (platformValueArray.length === 0) {
         displayModal("Please select a platform first.");
     } else {
-        ipc.send('update', gen);
+        ipcRenderer.send('update', gen);
     }
 }
 
@@ -1045,7 +1042,7 @@ function displayModal(message) {
         .find('*[data-toggle="external_target"]')
         .click((e) => {
             e.preventDefault();
-            ipc.send('openExternal', $(e.currentTarget).prop("href") );
+            ipcRenderer.send('openExternal', $(e.currentTarget).prop("href") );
         });
 
     if (message.indexOf("Success!") > -1){
@@ -1069,10 +1066,10 @@ function consoleMessage(orig_message) {
 //-----------------------------------------------------------------------------------
 
 function quit(){
-    ipc.send('quit', '');
+    ipcRenderer.send('quit', '');
 }
 function browseOfPath() {
-    ipc.send('pickOfPath', ''); // current path could go here (but the OS also remembers the last used folder)
+    ipcRenderer.send('pickOfPath', ''); // current path could go here (but the OS also remembers the last used folder)
 }
 
 function browseProjectPath() {
@@ -1080,7 +1077,7 @@ function browseProjectPath() {
     if (projectPath === ''){
         projectPath = $("#ofPath").val();
     }
-    ipc.send('pickProjectPath', projectPath); // current path could go here
+    ipcRenderer.send('pickProjectPath', projectPath); // current path could go here
 }
 
 function clearExtraSourceList(){
@@ -1110,7 +1107,7 @@ function checkAddSourcePath(index){
 
 function browseSourcePath(index) {
     const ofPath = $("#ofPath").val();
-    ipc.send('pickSourcePath', [ ofPath, index ]); // current path could go here
+    ipcRenderer.send('pickSourcePath', [ ofPath, index ]); // current path could go here
 }
 
 
@@ -1119,7 +1116,7 @@ function browseImportProject() {
     if (projectPath === ''){
         projectPath = $("#ofPath").val();
     }
-    ipc.send('pickProjectImport', projectPath);
+    ipcRenderer.send('pickProjectImport', projectPath);
 }
 
 function getUpdatePath() {
@@ -1128,17 +1125,17 @@ function getUpdatePath() {
         updateMultiplePath = $("#ofPath").val();
     }
 
-    ipc.send('pickUpdatePath', updateMultiplePath); // current path could go here
+    ipcRenderer.send('pickUpdatePath', updateMultiplePath); // current path could go here
 }
 
 function rescanAddons() {
-    ipc.sendSync('refreshAddonList', $("#ofPath").val());
+    ipcRenderer.sendSync('refreshAddonList', $("#ofPath").val());
 
     const projectInfo = {
         'projectName': $("#projectName").val(),
         'projectPath': $("#projectPath").val(),
     };
-    ipc.send('isOFProjectFolder', projectInfo);     // <- this forces addon reload
+    ipcRenderer.send('isOFProjectFolder', projectInfo);     // <- this forces addon reload
 }
 
 function getRandomSketchName(){
@@ -1147,7 +1144,7 @@ function getRandomSketchName(){
         $("#projectPath").oneTimeTooltip('Please specify a path first...');
     }
     else {
-        const result = ipc.sendSync('getRandomSketchName', projectPath);
+        const result = ipcRenderer.sendSync('getRandomSketchName', projectPath);
         const {
             randomisedSketchName,
             generateMode
@@ -1167,5 +1164,5 @@ function launchInIDE(){
         'ofPath': $("#ofPath").val()
     };
 
-    ipc.send('launchProjectinIDE', project );
+    ipcRenderer.send('launchProjectinIDE', project );
 }
