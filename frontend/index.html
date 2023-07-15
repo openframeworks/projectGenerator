@@ -305,7 +305,7 @@
 					</div>
 					<div class="ui negative message" id="ofPathSierraMessage" style="display: none">
 						<div class="header">
-							Running on macOS 10.12 or later for the first time?
+							ACTION NEEDED: Running on macOS for the first time?
 						</div>
 						<p>Please close the ProjectGenerator.app, move it up a level (or anywhere on HD) and then back into the projectGenerator/ folder. If the OF path is not the root of the unzipped OF folder please set the OF path to this folder (ie, the folder which has "addons", "libs", in it)</p>
 					</div>
@@ -367,9 +367,18 @@
 				<p>Welcome to the console :)</p>
 			</div>
 		</section>
+
+                <script>
+                window.nodeRequire = require;
+                delete window.require;
+                delete window.exports;
+                delete window.module;
+                </script>
+
 		<script type="text/javascript" src="static/js/jquery.min.js"></script>
 		<script type="text/javascript" src="static/js/semantic.min.js"></script>
 		<script type="text/javascript" src="static/js/jquery.dragbetter.js"></script>
-		<script src="app.js"></script>
+		<script type="text/javascript" src="app.js"></script>
+
 	</body>
 </html>
