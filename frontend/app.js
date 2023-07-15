@@ -572,11 +572,12 @@ function setup() {
             defaultSettings.defaultOfPath = ofpath;
             console.log("ofPath val " + ofpath);
             if(isFirstTimeSierra) {
-                ipcRenderer.sendSync('firstTimeSierra', "xattr -r -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app");
-                $("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
+                //ipcRenderer.sendSync('firstTimeSierra', "xattr -r -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app");
+                //$("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
+            }else{
+                saveDefaultSettings();
             }
-            saveDefaultSettings();
-
+            
             console.log("requesting addons");
             // trigger reload addons from the new OF path
             ipcRenderer.send('refreshAddonList', $("#ofPath").val());
@@ -598,8 +599,7 @@ function setup() {
             const ofpath = $("#ofPath").val();
             setOFPath(ofpath);
             if(isFirstTimeSierra) {
-                $("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
-                //exec("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app", puts);
+                //$("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
             }
         }).on('keypress', (e) => {
             if(e.which == 13){
@@ -838,6 +838,7 @@ function openDragInputModal(e){
 //----------------------------------------
 function saveDefaultSettings() {
     if(!defaultSettings) return;
+    if(isFirstTimeSierra) return;
 
     const defaultSettingsJsonString = JSON.stringify(defaultSettings, null, '\t');
     const result = ipcRenderer.sendSync('saveDefaultSettings', defaultSettingsJsonString);
