@@ -119,7 +119,7 @@ ipcRenderer.on('setAddons', (event, arg) => {
             }).html(addonsInstalled[i]).appendTo(select);
         }
 
-        $("#ofPathSierraMessage").hide();
+        //$("#ofPathSierraMessage").hide();
         $("#ofPathWrongMessage").hide();
         isOfPathGood = true;
     } else {
@@ -448,7 +448,9 @@ function setup() {
         } catch(e) {
             isFirstTimeSierra = false;
         }
-
+        
+        console.log("App is translocated: " + isFirstTimeSierra);
+ 
         $('.main.menu .item').tab({
             history: false
         });
@@ -574,6 +576,11 @@ function setup() {
             if(isFirstTimeSierra) {
                 //ipcRenderer.sendSync('firstTimeSierra', "xattr -r -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app");
                 //$("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
+                
+                if( isFirstTimeSierra ){
+                    $("#ofPathSierraMessage").show();
+                    $('#settingsMenuButton').click();
+                }
             }else{
                 saveDefaultSettings();
                 $("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
@@ -607,8 +614,7 @@ function setup() {
                 $("#ofPath").blur();
             }
         });
-
-
+    
         /* Stuff for the console setting (removed from UI)
         $("#consoleToggle").on("change", function () {
             enableConsole( $(this).is(':checked') );

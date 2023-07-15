@@ -230,7 +230,9 @@
 						<div class="ui olive button" id="generateButton" onclick="generate()">Generate</div>
 						<div class="ui orange button" id="updateButton" style="display: none" onclick="generate()">Update</div>
 					</div>
+     
 				</div>
+                
 			</div>
 
 
@@ -303,12 +305,6 @@
 						<p>Please set the OF path to root of openframeworks (ie, the folder which has "addons", "libs", in it)
 						</p>
 					</div>
-					<div class="ui negative message" id="ofPathSierraMessage" style="display: none">
-						<div class="header">
-							ACTION NEEDED: Running on macOS for the first time?
-						</div>
-						<p>Please close the ProjectGenerator.app, move it up a level (or anywhere on HD) and then back into the projectGenerator/ folder. If the OF path is not the root of the unzipped OF folder please set the OF path to this folder (ie, the folder which has "addons", "libs", in it)</p>
-					</div>
 					<div class="field">
 						<div class="ui checkbox verbose">
 							<input type="checkbox" name="Verbose" id="verboseOption">
@@ -323,9 +319,19 @@
 					</div>
 
 
-				</div>
+                                        <div class="ui negative message" id="ofPathSierraMessage" style="position: absolute; top:-10px; left:0px; width:100%; height:400px; display:none;">
+                                            <div class="header">
+                                                ACTION NEEDED: Running on macOS for the first time?
+                                            </div>
 
+                                            <p><br/>Please close the ProjectGenerator.app, move it up a level (or anywhere on HD) and then back into the projectGenerator/ folder. <br/> <br/> If the OF path is not the root of the unzipped OF folder please set the OF path to this folder (ie, the folder which has "addons", "libs", in it)</p>
+                                        </div>
+
+				</div>
+                                
+                                
 			</div>
+                    
 		</div>
 
 		<div class="ui small modal" id="ofPathError">
