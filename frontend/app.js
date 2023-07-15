@@ -406,22 +406,22 @@ function setOFPath(ofPathValue) {
 
 //----------------------------------------
 function setup() {
-    jQuery.fn.extend({
-        oneTimeTooltip: function (msg) {
-            return this.each(function () {
-                $(this).popup({
-                    content: msg,
-                    position: 'bottom center',
-                    on: 'manual',
-                    onVisible: function (e) {
-                        // hide on focus / change / onShow (for dropdowns)
-                        $(e).one('focus change click', function () { $(this).popup('hide'); });
-                        console.log($(e).children('input'));
-                    }
-                }).popup('show')
-            });
-        }
-    });
+    // jQuery.fn.extend({
+    //     oneTimeTooltip: function (msg) {
+    //         return this.each(function () {
+    //             $(this).popup({
+    //                 content: msg,
+    //                 position: 'bottom center',
+    //                 on: 'manual',
+    //                 onVisible: function (e) {
+    //                     // hide on focus / change / onShow (for dropdowns)
+    //                     $(e).one('focus change click', function () { $(this).popup('hide'); });
+    //                     console.log($(e).children('input'));
+    //                 }
+    //             }).popup('show')
+    //         });
+    //     }
+    // });
 
 
     $(document).ready(() => {
@@ -576,12 +576,12 @@ function setup() {
                 //$("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
             }else{
                 saveDefaultSettings();
+                $("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
+                console.log("requesting addons");
+                // trigger reload addons from the new OF path
+                ipcRenderer.send('refreshAddonList', $("#ofPath").val());
+                ipcRenderer.send('refreshPlatformList', $("#ofPath").val());
             }
-            
-            console.log("requesting addons");
-            // trigger reload addons from the new OF path
-            ipcRenderer.send('refreshAddonList', $("#ofPath").val());
-            ipcRenderer.send('refreshPlatformList', $("#ofPath").val());
         });
 
 
