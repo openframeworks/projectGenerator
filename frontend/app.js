@@ -1,5 +1,5 @@
 //nodeRequire is used instead of require due to clash with node and jquery
-//see section - I can not use jQuery/RequireJS/Meteor/AngularJS in Electron : https://www.electronjs.org/docs/latest/faq/ 
+//see section - I can not use jQuery/RequireJS/Meteor/AngularJS in Electron : https://www.electronjs.org/docs/latest/faq/
 const { ipcRenderer } = nodeRequire('electron');
 path = nodeRequire('path');
 fs = nodeRequire('fs');
@@ -432,10 +432,12 @@ function setup() {
             } = ipcRenderer.sendSync('getOSInfo');
             const os_major_pos = release.indexOf(".");
             const os_major = release.slice(0, os_major_pos);
-            const isSierra = (platform === 'darwin' && parseInt(os_major) >= 16);
+            const isSierra = (platform === 'darwin' || platform=== 'osx' );
 
+            const ofpath = document.getElementById("ofPath").value;
+            console.log("platform is " + platform + " isSierra is " + isSierra + " ofpath is " + ofpath  )
+    
             if(isSierra) {
-                const ofpath = document.getElementById("ofPath").value;
                 try {
                     const runningOnVar = (ofpath.length >= 8 && ofpath.substring(0,8) === '/private');
                     isFirstTimeSierra = runningOnVar;
@@ -596,7 +598,6 @@ function setup() {
             const ofpath = $("#ofPath").val();
             setOFPath(ofpath);
             if(isFirstTimeSierra) {
-                ipcRenderer.sendSync("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app");
                 $("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
                 //exec("xattr -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app", puts);
             }
