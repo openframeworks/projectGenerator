@@ -576,7 +576,6 @@ function setup() {
             if(isFirstTimeSierra) {
                 //ipcRenderer.sendSync('firstTimeSierra', "xattr -r -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app");
                 //$("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
-                
                 if( isFirstTimeSierra ){
                     $("#ofPathSierraMessage").show();
                     $('#settingsMenuButton').click();
