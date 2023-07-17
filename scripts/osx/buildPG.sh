@@ -210,11 +210,6 @@ cd ${pg_root}/frontend
 npm update
 npm install > /dev/null
 
-#annoying fix to build universal app
-#see https://github.com/electron/electron-packager/issues/1226
-#see https://github.com/openframeworks/projectGenerator/issues/376
-sed -i bak 's/...comboOpts.osxUniversal,/...comboOpts.osxUniversal,x64ArchFiles:comboOpts.x64ArchFiles,/g' node_modules/electron-packager/src/universal.js
-
 npm run build:macos > /dev/null
 if [ -d "${pg_root}/projectGenerator-osx" ]; then
 	rm -rf ${pg_root}/projectGenerator-osx
