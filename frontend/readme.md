@@ -92,7 +92,7 @@ npm run build
 To build a platform-specific package:
 
 ```
-npm run build:osx
+npm run build:macos
 npm run build:linux32
 npm run build:linux64
 npm run build:vs
