@@ -12,7 +12,7 @@ git submodule init
 git submodule update
 ```
 
-# Install libs
+# Install libs ( replace with platform )
 `./scripts/osx/download_libs.sh`
 
 # Build the projectGenerator ( can also use project file ) 
