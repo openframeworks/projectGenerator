@@ -3,6 +3,8 @@ You can download packaged macOS and Windows builds here ( note Linux needs to be
 - https://github.com/openframeworks/projectGenerator/releases/download/nightly/projectGenerator-osx.zip
 - https://github.com/openframeworks/projectGenerator/releases/download/nightly/projectGenerator-vs.zip 
 
+---------------------------------------
+
 # Build instructions 
 
 ## Clone OF ( skip if already cloned ) 
