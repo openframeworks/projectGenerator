@@ -127,6 +127,8 @@ pugi::xml_node appendValue(pugi::xml_document & doc, string tag, string attribut
 // TODO: This can be removed in the future, but not now.
 // Still needed now because srcFiles is vector of string.
 // it can't be changed to fs::path because of addReplaceStringVector
+
+// FIXME: ignore .framework folders
 void getFilesRecursively(const fs::path & path, std::vector < string > & fileNames){
 //	alert ("getFilesRecursively " + path.string());
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
@@ -178,6 +180,7 @@ void splitFromFirst(string toSplit, string deliminator, string & first, string &
 	second = toSplit.substr(found+deliminator.size());
 }
 
+// TODO
 void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & folderNames, string platform){
 	if (!fs::exists(path)) return;
 	if (!fs::is_directory(path)) return;
@@ -189,6 +192,9 @@ void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & fol
 //		if (f.filename().c_str()[0] == '.') continue;
 //		if (f.extension() == ".framework") continue;
 //	}
+	
+	
+	
 	
 	if (path.extension() != ".framework") {
 		for (const auto & entry : fs::directory_iterator(path)) {
@@ -241,13 +247,24 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 //	cout << ">> getLibsRecursively " << path << endl;
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
 	
-	for (const auto & entry : fs::recursive_directory_iterator(path)) {
-		auto f = entry.path();
+	
+	auto iterator = fs::recursive_directory_iterator(path);
+	for(auto i = fs::recursive_directory_iterator(path);
+			 i != fs::recursive_directory_iterator();
+		++i ) {
+
+	
+	
+//	for (const auto & entry : fs::recursive_directory_iterator(path)) {
+//		auto f = entry.path();
+		auto f = i->path();
 
 		if (fs::is_directory(f)) {
 			// on osx, framework is a directory, let's not parse it....
-			// TODO: skip entire directory
-			if (f.extension() != ".framework") {
+			if (f.extension() == ".framework") {
+				i.disable_recursion_pending();
+				continue;
+			} else {
 				auto stem = f.stem();
 				auto archFound = std::find(LibraryBinary::archs.begin(), LibraryBinary::archs.end(), stem);
 				if (archFound != LibraryBinary::archs.end()) {
@@ -432,7 +449,7 @@ vector <fs::path> dirList(const fs::path & path) {
 				 i != fs::recursive_directory_iterator();
 			++i ) {
 			// this wont' allow hidden directories files like .git to be added, and stop recursivity at this folder level.
-			if (i->path().filename().c_str()[0] == '.') {
+			if ( i->path().filename().c_str()[0] == '.'  ) {
 				i.disable_recursion_pending();
 				continue;
 			}
@@ -453,7 +470,7 @@ vector <fs::path> folderList(const fs::path & path) {
 				 i != fs::recursive_directory_iterator();
 			++i ) {
 			// this wont' allow hidden directories files like .git to be added, and stop recursivity at this folder level.
-			if (i->path().filename().c_str()[0] == '.') {
+			if ( i->path().filename().c_str()[0] == '.' || i->path().extension() == ".framework" ) {
 				i.disable_recursion_pending();
 				continue;
 			}
