@@ -460,7 +460,7 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 }
 
 void xcodeProject::addFramework(const string & name, const fs::path & path, const fs::path & folder){
-	alert( "xcodeProject::addFramework " + name + " : " + path.string() + " : " + folder.string() , 33);
+//	alert( "xcodeProject::addFramework " + name + " : " + path.string() + " : " + folder.string() , 33);
 
 //	cout << "xcodeProject::addFramework " << name << " : " << path << " : " << folder << endl;
 	// name = name of the framework
@@ -532,11 +532,9 @@ void xcodeProject::addFramework(const string & name, const fs::path & path, cons
 
 	commands.emplace_back("# ----- FRAMEWORK_SEARCH_PATHS");
 	
-	alert ("path " + path.string() );
-
 	fs::path parentFolder { path.parent_path() };
-	
-	alert ("parentFolder " + parentFolder.string() );
+//	alert ("parentFolder " + parentFolder.string() );
+
 	for (auto & c : buildConfigs) {
 		commands.emplace_back
 		("Add :objects:"+c+":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + parentFolder.string());
@@ -883,7 +881,7 @@ bool xcodeProject::saveProjectFile(){
 		}
 	}
 
-	for (auto & c : commands) cout << c << endl;
+//	for (auto & c : commands) cout << c << endl;
 	
 	return true;
 }

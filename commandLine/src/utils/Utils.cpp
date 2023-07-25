@@ -261,8 +261,10 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 
 		if (fs::is_directory(f)) {
 			// on osx, framework is a directory, let's not parse it....
-			// TODO: skip entire directory
-			if (f.extension() != ".framework") {
+			if (f.extension() == ".framework") {
+				i.disable_recursion_pending();
+				continue;
+			} else {
 				auto stem = f.stem();
 				auto archFound = std::find(LibraryBinary::archs.begin(), LibraryBinary::archs.end(), stem);
 				if (archFound != LibraryBinary::archs.end()) {
@@ -273,9 +275,6 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 						target = *targetFound;
 					}
 				}
-			} else {
-				i.disable_recursion_pending();
-				continue;
 			}
 		} else {
 			auto ext = f.extension();
