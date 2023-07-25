@@ -460,7 +460,7 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 }
 
 void xcodeProject::addFramework(const string & name, const fs::path & path, const fs::path & folder){
-//	alert( "xcodeProject::addFramework " + name + " : " + folder.string() , 33);
+	alert( "xcodeProject::addFramework " + name + " : " + path.string() + " : " + folder.string() , 33);
 
 //	cout << "xcodeProject::addFramework " << name << " : " << path << " : " << folder << endl;
 	// name = name of the framework
@@ -485,7 +485,9 @@ void xcodeProject::addFramework(const string & name, const fs::path & path, cons
 	commands.emplace_back("Add :objects:"+UUID+":path string "+path.string());
 	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
 	commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string wrapper.framework");
-	commands.emplace_back("Add :objects:"+UUID+":sourceTree string <group>");
+//	commands.emplace_back("Add :objects:"+UUID+":sourceTree string <group>");
+	commands.emplace_back("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
+
 
 	commands.emplace_back("# ----- addFramework - add to build phase");
 	string buildUUID = generateUUID(name + "-build");
@@ -529,7 +531,12 @@ void xcodeProject::addFramework(const string & name, const fs::path & path, cons
 	}
 
 	commands.emplace_back("# ----- FRAMEWORK_SEARCH_PATHS");
+	
+	alert ("path " + path.string() );
+
 	fs::path parentFolder { path.parent_path() };
+	
+	alert ("parentFolder " + parentFolder.string() );
 	for (auto & c : buildConfigs) {
 		commands.emplace_back
 		("Add :objects:"+c+":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + parentFolder.string());
@@ -783,8 +790,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 					folder = addon.addonPath / "frameworks";
 				}
 				addFramework( f + ".framework",
-					"/System/Library/Frameworks/" +
-					f + ".framework",
+					"/System/Library/Frameworks/" + f + ".framework",
 					folder);
 			}
 		} else {
@@ -877,7 +883,7 @@ bool xcodeProject::saveProjectFile(){
 		}
 	}
 
-//	for (auto & c : commands) cout << c << endl;
+	for (auto & c : commands) cout << c << endl;
 	
 	return true;
 }
