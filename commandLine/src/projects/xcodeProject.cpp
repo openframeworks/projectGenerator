@@ -60,8 +60,7 @@ xcodeProject::xcodeProject(string target)
 
 bool xcodeProject::createProjectFile(){
 	fs::path xcodeProject = projectDir / ( projectName + ".xcodeproj" );
-//	cout << "createProjectFile " << xcodeProject << endl;
-//	cout << "projectDir " << projectDir << endl;
+//	alert ("createProjectFile " + xcodeProject.string(), 35);
 
 	if (fs::exists(xcodeProject)) {
 		fs::remove_all(xcodeProject);
@@ -130,14 +129,27 @@ bool xcodeProject::createProjectFile(){
 	// Calculate OF Root in relation to each project (recursively);
 //	fs::path relRoot { getOFRoot() };
 
-	if (ofIsPathInPath(projectDir, getOFRoot())) {
-		setOFRoot(fs::relative(getOFRoot(), projectDir));
-//		relRoot = fs::relative(getOFRoot(), projectDir);
-//		alert ("relRoot = " + relRoot.string());
-	} else {
-//		alert ("ofIsPathInPath not");
-	}
+//	// FIXME: maybe not needed anymore
+//	if (ofIsPathInPath(projectDir, getOFRoot())) {
+//		setOFRoot(fs::relative(getOFRoot(), projectDir));
+////		relRoot = fs::relative(getOFRoot(), projectDir);
+////		alert ("relRoot = " + relRoot.string());
+//	} else {
+////		alert ("ofIsPathInPath not");
+//	}
 	
+	
+	if (fs::exists( projectDir / "App.xcconfig" )) {
+		string UUID { generateUUID( string("App.xcconfig") ) };
+		commands.emplace_back("# ---- App.xcconfig");
+		commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
+		commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
+		commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string text.xcconfig");
+		commands.emplace_back("Add :objects:"+UUID+":path string App.xcconfig");
+		commands.emplace_back("Add :objects:"+UUID+":sourceTree string <group>");
+		commands.emplace_back("Add :objects:" + folderUUID[""] + ":children: string " + UUID);
+		commands.emplace_back("#");
+	}
 
 	
 	if (!fs::equivalent(getOFRoot(), fs::path{"../../.."})) {
@@ -386,7 +398,7 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
 	commands.emplace_back("Add :objects:"+UUID+":path string "+srcFile.string());
 	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
-	if(ext == "xib"){
+	if(ext == ".xib"){
 		commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string "+fileKind);
 	} else {
 		commands.emplace_back("Add :objects:"+UUID+":explicitFileType string "+fileKind);
