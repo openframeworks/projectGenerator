@@ -490,8 +490,6 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 
 	// MARK: srcFiles to fs::path
 	// not possible today because there are string based exclusion functions
-	alert("fromFS path " + path.string());
-	fs::path srcFolder = fs::path { "local_addons" } / path.filename();
 	
 	fs::path parentFolder = path.parent_path();
 	
@@ -593,7 +591,6 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 				fs::path fFS { f };
 				folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
 			}
-
 			
 			filesToFolders[f] = folder.string();
 		}
