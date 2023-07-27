@@ -191,8 +191,8 @@ bool containsFolder(fs::path path, string folderName) {
 }
 
 bool isGoodProjectPath(fs::path path) {
-	
-//	if (!fs::is_directory(path)) return false;
+	// TODO: think of a way of detecting make obj folders which creates a structure similar to project
+	// like this assimp3DModelLoaderExample/obj/osx/Release/src
 	return fs::exists(path / "src");
 }
 
@@ -262,6 +262,9 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 	fs::path ofCalcPath = fs::weakly_canonical(fs::current_path() / ofPath);
 	
 	for (auto & path : folders) {
+//		cout << "------" << endl;
+//		cout << path << endl;
+//		cout << "------" << endl;
 		nProjectsUpdated++;
 
 		if (!ofPath.is_absolute()) {
@@ -488,6 +491,22 @@ int main(int argc, char** argv){
 		if (!isGoodOFPath(ofPath)) {
 			return EXIT_USAGE;
 		}
+		
+		alert ("ofPath before " + ofPath.string());
+		alert ("projectPath " + projectPath.string());
+
+		if (ofPath.is_relative()) {
+			ofPath = fs::canonical(fs::current_path() / ofPath);
+			alert ("ofPath canonical " + ofPath.string());
+		}
+		
+
+		if (ofIsPathInPath(projectPath, ofPath)) {
+			ofPath = fs::relative(ofPath, projectPath);
+		}
+		fs::current_path(projectPath);
+		
+		alert ("ofPath after " + ofPath.string());
 		setOFRoot(ofPath);
 	}
 

@@ -128,16 +128,21 @@ bool xcodeProject::createProjectFile(){
 	}
 
 	// Calculate OF Root in relation to each project (recursively);
-	fs::path relRoot { getOFRoot() };
-	if (ofIsPathInPath(fs::current_path(), getOFRoot())) {
-		auto relRoot = fs::relative((fs::current_path() / getOFRoot()), projectDir);
+//	fs::path relRoot { getOFRoot() };
+
+	if (ofIsPathInPath(projectDir, getOFRoot())) {
+		setOFRoot(fs::relative(getOFRoot(), projectDir));
+//		relRoot = fs::relative(getOFRoot(), projectDir);
+//		alert ("relRoot = " + relRoot.string());
+	} else {
+//		alert ("ofIsPathInPath not");
 	}
 	
+
 	
-	
-	if (!fs::equivalent(relRoot, "../../..")) {
-		string root = relRoot.string();
-		alert ("root = " + root);
+	if (!fs::equivalent(getOFRoot(), fs::path{"../../.."})) {
+		string root = getOFRoot().string();
+		alert ("fs not equivalent to ../../.. root = " + root);
 		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", root);
 		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", root);
 		if( target == "osx" ){
@@ -145,6 +150,8 @@ bool xcodeProject::createProjectFile(){
 			// MARK: not needed because baseProject::save() does the same
 //			findandreplaceInTexfile(projectDir / "config.make", "../../..", root);
 		}
+	} else {
+//		alert ("fs equivalent " + relRoot.string());
 	}
 	return true;
 }
