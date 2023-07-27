@@ -191,6 +191,8 @@ bool containsFolder(fs::path path, string folderName) {
 }
 
 bool isGoodProjectPath(fs::path path) {
+	// TODO: think of a way of detecting make obj folders which creates a structure similar to project
+	// like this assimp3DModelLoaderExample/obj/osx/Release/src
 	return fs::exists(path / "src");
 }
 
