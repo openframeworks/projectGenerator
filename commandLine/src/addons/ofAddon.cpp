@@ -490,11 +490,19 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 
 	// MARK: srcFiles to fs::path
 	// not possible today because there are string based exclusion functions
+	alert("fromFS path " + path.string());
+	fs::path srcFolder = fs::path { "local_addons" } / path.filename();
+	
+	fs::path parentFolder = path.parent_path();
+	
 	for (auto & s : srcFiles) {
 		fs::path sFS { s };
 		fs::path folder;
 		if (isLocalAddon) {
-			folder = sFS.parent_path();
+//			folder = sFS.parent_path();
+//			folder = fs::path { "local_addons" } / sFS.parent_path().filename();
+			folder = fs::path { "local_addons" } / fs::relative(sFS.parent_path(), parentFolder);
+			alert ("isLocal folder=" + folder.string(), 36);
 		} else {
 			sFS = fixPath(s);
 			s = sFS.string();
@@ -552,7 +560,8 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	for (auto & s : libFiles) {
 		fs::path folder;
 		if (isLocalAddon) {
-			folder = s.parent_path();
+			folder = fs::path { "local_addons" } / fs::relative(s.parent_path(), parentFolder);
+//			alert ("isLocal folder=" + folder.string(), 36);
 		} else {
 			folder = fs::relative(s.parent_path(), getOFRoot());
 			s = fixPath(s);
@@ -575,9 +584,18 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 			; // do we need to do anything here?
 		} else {
 			// if addon is local, it is relative to the project folder, and if it is not, it is related to the project folder, ex: addons/ofxSvg
+			
+			// FIXME:: Cleanup the mess
 			fs::path rel = fs::relative (f, isLocalAddon ? pathToProject : pathToOF);
-			fs::path folderFS = rel.parent_path();
-			filesToFolders[f] = folderFS.string();
+			fs::path folder = rel.parent_path();
+
+			if (isLocalAddon) {
+				fs::path fFS { f };
+				folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
+			}
+
+			
+			filesToFolders[f] = folder.string();
 		}
 	}
 
