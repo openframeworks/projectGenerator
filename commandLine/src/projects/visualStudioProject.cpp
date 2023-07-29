@@ -369,7 +369,7 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	}
 
 	if (!libFolderString.empty()) {
-		alert("yes " + libFolderString, 34);
+//		alert("yes " + libFolderString, 34);
 		pugi::xpath_node_set addlLibsDir = doc.select_nodes((linkPath + "AdditionalLibraryDirectories").c_str());
 		addLibraryPath(addlLibsDir, libFolderString);
 	}
