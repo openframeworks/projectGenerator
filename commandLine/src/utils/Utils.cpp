@@ -266,6 +266,8 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 				continue;
 			} else {
 				auto stem = f.stem();
+				
+//				cout << "STEM " << stem << endl;
 				auto archFound = std::find(LibraryBinary::archs.begin(), LibraryBinary::archs.end(), stem);
 				if (archFound != LibraryBinary::archs.end()) {
 					arch = *archFound;

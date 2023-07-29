@@ -205,12 +205,24 @@ bool baseProject::create(const fs::path & path, string templateName){
 		}
 
 		// only add unique paths
+//		vector < fs::path > paths;
+//		for (auto & f : fileNames) {
+//			auto dir = fs::path(f).parent_path().filename();
+//			if (std::find(paths.begin(), paths.end(), dir) == paths.end()) {
+//				paths.emplace_back(dir);
+//				addInclude(dir.string());
+//			}
+//		}
+
+		// FIXME: Port to std::list, so no comparison is needed.
+		// only add unique paths
 		vector < fs::path > paths;
 		for (auto & f : fileNames) {
-			auto dir = fs::path(f).parent_path().filename();
-			if (std::find(paths.begin(), paths.end(), dir) == paths.end()) {
-				paths.emplace_back(dir);
-				addInclude(dir.string());
+			fs::path rel { fs::relative(fs::path(f).parent_path(), projectDir) };
+			if (std::find(paths.begin(), paths.end(), rel) == paths.end()) {
+				paths.emplace_back(rel);
+//				alert ("rel = " + rel.string());
+				addInclude(rel.string());
 			}
 		}
 	}
@@ -436,6 +448,7 @@ void baseProject::addAddon(ofAddon & addon){
 
 	for (auto & a : addon.libs) {
 		ofLogVerbose() << "adding addon libs: " << a.path;
+		alert ("addlibrary " + a.path, 33);
 		addLibrary(a);
 	}
 	
