@@ -533,7 +533,9 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	fs::path libsPath = path / "libs";
 	vector < fs::path > libFiles;
 	
+//	alert ("libsPath " + libsPath.string());
 	if (fs::exists(libsPath)) {
+//		alert ("exists");
 		getLibsRecursively(libsPath, libFiles, libs, platform);
 		if (platform == "osx" || platform == "ios"){
 			getFrameworksRecursively(libsPath, frameworks, platform);
@@ -548,9 +550,9 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	// Maybe it is the same situation for all others fixPath occurences?
 	if (!isLocalAddon) {
 		for (auto & l : libs) {
-//			alert("fixpath " + l.path);
+//			alert("fixpath before " + l.path);
 			l.path = fixPath(l.path).string();
-//			alert("fixpath " + l.path);
+//			alert("fixpath after  " + l.path);
 		}
 	}
 
@@ -559,7 +561,6 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		fs::path folder;
 		if (isLocalAddon) {
 			folder = fs::path { "local_addons" } / fs::relative(s.parent_path(), parentFolder);
-//			alert ("isLocal folder=" + folder.string(), 36);
 		} else {
 			folder = fs::relative(s.parent_path(), getOFRoot());
 			s = fixPath(s);
@@ -622,6 +623,13 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		includePaths.emplace_back(p.string());
 	}
 	parseConfig();
+		
+//		alert ("--- LIST LIBS", 35);
+//		for (auto & l : libs) {
+//			alert (l.path, 35);
+//		}
+//		alert ("--- LIST LIBS", 35);
+
 	return true;
 }
 

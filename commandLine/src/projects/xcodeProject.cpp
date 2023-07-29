@@ -753,6 +753,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 	for (auto & e : addon.libs) {
 		ofLogVerbose() << "adding addon libs: " << e.path;
+//		alert("addon libs " + e.path);
 		addLibrary(e);
 		fs::path dylibPath { e.path };
 		fs::path folder = dylibPath.parent_path().lexically_relative(addon.pathToOF);

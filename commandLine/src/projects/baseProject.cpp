@@ -213,6 +213,20 @@ bool baseProject::create(const fs::path & path, string templateName){
 				addInclude(dir.string());
 			}
 		}
+		
+//		vector < fs::path > paths;
+//		for (auto & f : fileNames) {
+////			auto dir = fs::path(f).parent_path().filename();
+//			fs::path rel { fs::relative(fs::path(f).parent_path(), projectDir) };
+//			if (std::find(paths.begin(), paths.end(), rel) == paths.end()) {
+//				paths.emplace_back(rel);
+////				alert ("f = " + f);
+////				alert ("dir = " + dir.string());
+////				alert ("rel = " + rel.string());
+//
+//				addInclude(rel.string());
+//			}
+//		}
 	}
 	return true;
 }
@@ -436,6 +450,7 @@ void baseProject::addAddon(ofAddon & addon){
 
 	for (auto & a : addon.libs) {
 		ofLogVerbose() << "adding addon libs: " << a.path;
+		alert ("addlibrary " + a.path, 33);
 		addLibrary(a);
 	}
 	
