@@ -1,4 +1,3 @@
-#define PG_VERSION "PG v015"
 #define TARGET_NO_SOUND
 #define TARGET_NODISPLAY
 
@@ -329,7 +328,7 @@ void printHelp(){
 //-------------------------------------------
 int main(int argc, char** argv){
 
-	ofLog() << PG_VERSION;
+	ofLog() << "PG v."+getPGVersion();
 	//------------------------------------------- pre-parse
 	bAddonsPassedIn = false;
 	bDryRun = false;
@@ -492,12 +491,12 @@ int main(int argc, char** argv){
 			return EXIT_USAGE;
 		}
 		
-		alert ("ofPath before " + ofPath.string());
-		alert ("projectPath " + projectPath.string());
+//		alert ("ofPath before " + ofPath.string());
+//		alert ("projectPath " + projectPath.string());
 
 		if (ofPath.is_relative()) {
 			ofPath = fs::canonical(fs::current_path() / ofPath);
-			alert ("ofPath canonical " + ofPath.string());
+//			alert ("ofPath canonical " + ofPath.string());
 		}
 		
 
@@ -506,7 +505,7 @@ int main(int argc, char** argv){
 		}
 		fs::current_path(projectPath);
 		
-		alert ("ofPath after " + ofPath.string());
+//		alert ("ofPath after " + ofPath.string());
 		setOFRoot(ofPath);
 	}
 

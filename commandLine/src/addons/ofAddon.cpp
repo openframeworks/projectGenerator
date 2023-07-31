@@ -500,7 +500,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 //			folder = sFS.parent_path();
 //			folder = fs::path { "local_addons" } / sFS.parent_path().filename();
 			folder = fs::path { "local_addons" } / fs::relative(sFS.parent_path(), parentFolder);
-			alert ("isLocal folder=" + folder.string(), 36);
+//			alert ("isLocal folder=" + folder.string(), 36);
 		} else {
 			sFS = fixPath(s);
 			s = sFS.string();
@@ -539,6 +539,8 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		getLibsRecursively(libsPath, libFiles, libs, platform);
 		if (platform == "osx" || platform == "ios"){
 			getFrameworksRecursively(libsPath, frameworks, platform);
+			
+
 		}
 		if(platform == "vs" || platform == "msys2"){
 			getDllsRecursively(libsPath, dllsToCopy, platform);
@@ -569,7 +571,10 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		filesToFolders[s.string()] = folder.string();
 	}
 	
-	for (auto & f : frameworks) {
+	// FIXME: This is flawed logic, frameworks acquired here will always come from filesystem, config is not yet parsed
+	// so addons will never be system.
+	for (const auto & f : frameworks) {
+//		alert ("addon::fromFS " + f , 35);
 		// knowing if we are system framework or not is important....
 		bool bIsSystemFramework = false;
 		size_t foundUnixPath = f.find('/');
@@ -593,10 +598,15 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 				folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
 			}
 			
+//			alert (f);
+//			alert (folder.string());
 			filesToFolders[f] = folder.string();
 		}
 	}
 
+	
+
+	
 	// paths that are needed for the includes.
 	std::list < fs::path > paths;
 
@@ -617,13 +627,17 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		}
 	}
 	
+
+
+	
 	paths.sort();
 
 	for (auto & p : paths) {
 		includePaths.emplace_back(p.string());
 	}
+	
 	parseConfig();
-		
+	
 //		alert ("--- LIST LIBS", 35);
 //		for (auto & l : libs) {
 //			alert (l.path, 35);
