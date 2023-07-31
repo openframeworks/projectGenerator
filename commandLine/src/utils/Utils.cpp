@@ -193,9 +193,7 @@ void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & fol
 //		if (f.extension() == ".framework") continue;
 //	}
 	
-	
-	
-	
+	// TODO: disable recursion pending... it is not recursive yet.
 	if (path.extension() != ".framework") {
 		for (const auto & entry : fs::directory_iterator(path)) {
 			auto f = entry.path();
@@ -501,4 +499,8 @@ vector<string> fileToStrings (const fs::path & file) {
 
 fs::path getUserHomeDir() {
 	return fs::path { ofFilePath::getUserHomeDir() };
+}
+
+std::string getPGVersion() {
+	return PG_VERSION;
 }

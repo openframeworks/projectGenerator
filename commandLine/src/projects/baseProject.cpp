@@ -309,10 +309,9 @@ void baseProject::addAddon(string addonName){
 	}
 
 	
-	if(!inCache){
+	if (!inCache) {
 		addonOK = addon.fromFS(addonPath, target);
-
-	}else{
+	} else {
 		addon = addonsCache[target][addonName];
 		addonOK = true;
 	}

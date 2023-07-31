@@ -139,6 +139,9 @@ bool xcodeProject::createProjectFile(){
 //	}
 	
 	
+	commands.emplace_back("# ---- PG VERSION " + getPGVersion());
+	commands.emplace_back("Add :openFrameworksProjectGeneratorVersion string " + getPGVersion());
+
 	if (fs::exists( projectDir / "App.xcconfig" )) {
 		string UUID { generateUUID( string("App.xcconfig") ) };
 		commands.emplace_back("# ---- App.xcconfig");
@@ -719,7 +722,11 @@ void xcodeProject::addAfterRule(string rule){
 }
 
 void xcodeProject::addAddon(ofAddon & addon){
-//	alert("xcodeProject addAddon string :: " + addon.name, 31);
+	//	alert("xcodeProject addAddon string :: " + addon.name, 31);
+
+	// FIXME: FUTURE
+	//	baseProject::addAddon(addon);
+	// more xcode specific coding here.
 	for (auto & a : addons) {
 		if (a.name == addon.name) return;
 	}
@@ -791,14 +798,15 @@ void xcodeProject::addAddon(ofAddon & addon){
 		addDefine(e);
 	}
 
-	// TODO: iterator
 	for (auto & f : addon.frameworks) {
+//		alert ("xcodeproj addon.frameworks : " + f);
 		ofLogVerbose() << "adding addon frameworks: " << f;
 
 		size_t found=f.find('/');
 		if (found==string::npos){
 			fs::path folder = fs::path{ "addons" } / addon.name / "frameworks";
-
+//			fs::path folder = addon.filesToFolders[f];
+			
 			if (target == "ios"){
 				addFramework( f + ".framework", "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/" +
 					f + ".framework",

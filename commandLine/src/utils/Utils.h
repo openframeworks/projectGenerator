@@ -78,3 +78,4 @@ vector <fs::path> dirList (const fs::path & path);
 vector <fs::path> folderList (const fs::path & path);
 vector <string> fileToStrings (const fs::path & file);
 fs::path getUserHomeDir();
+std::string getPGVersion();
