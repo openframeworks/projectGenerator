@@ -722,7 +722,11 @@ void xcodeProject::addAfterRule(string rule){
 }
 
 void xcodeProject::addAddon(ofAddon & addon){
-//	alert("xcodeProject addAddon string :: " + addon.name, 31);
+	//	alert("xcodeProject addAddon string :: " + addon.name, 31);
+
+	// FIXME: FUTURE
+	//	baseProject::addAddon(addon);
+	// more xcode specific coding here.
 	for (auto & a : addons) {
 		if (a.name == addon.name) return;
 	}
