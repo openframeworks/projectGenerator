@@ -288,6 +288,7 @@ void visualStudioProject::addInclude(string includeName){
 }
 
 void addLibraryPath(const pugi::xpath_node_set & nodes, string libFolder) {
+	alert ("addLibraryPath " + libFolder);
 	for (auto & node : nodes) {
 		string includes = node.node().first_child().value();
 		std::vector < string > strings = ofSplitString(includes, ";");
