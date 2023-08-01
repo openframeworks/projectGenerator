@@ -288,7 +288,7 @@ void visualStudioProject::addInclude(string includeName){
 }
 
 void addLibraryPath(const pugi::xpath_node_set & nodes, string libFolder) {
-	alert ("addLibraryPath " + libFolder);
+//	alert ("addLibraryPath " + libFolder);
 	for (auto & node : nodes) {
 		string includes = node.node().first_child().value();
 		std::vector < string > strings = ofSplitString(includes, ";");
@@ -374,6 +374,12 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	if (!libFolderString.empty()) {
 //		alert("yes " + libFolderString, 34);
 		pugi::xpath_node_set addlLibsDir = doc.select_nodes((linkPath + "AdditionalLibraryDirectories").c_str());
+		
+		// FIXME:
+		// this function is called many times with the same parameters, like adding openCV. about 20 times the same command
+		// addLibraryPath ..\..\..\addons\ofxOpenCv\libs\opencv\lib\vs\x64\Debug
+		// if we save a unique list of commands we can make this alter in the end of execution, after removing duplicity.
+		// less pugi nodes traversed.
 		addLibraryPath(addlLibsDir, libFolderString);
 	}
 
