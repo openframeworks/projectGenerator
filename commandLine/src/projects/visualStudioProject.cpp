@@ -71,6 +71,15 @@ bool visualStudioProject::loadProjectFile(){
 
 
 bool visualStudioProject::saveProjectFile(){
+	
+	/*
+	 PSEUDOCODE HERE
+	 open sln project
+	 find position of first "Global" word, put cursor behind
+	 add one entry for each additional, fixing slashes, generating new uuid.
+	 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openframeworksLib", "..\..\..\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj", "{5837595D-ACA9-485C-8E76-729040CE4B0B}"
+	 EndProject
+	*/
 	if (!additionalvcxproj.empty()) {
 		string additionalProjects;
 //		string divider = "\r\n";
@@ -120,14 +129,7 @@ bool visualStudioProject::saveProjectFile(){
 	auto vcxFile = projectDir / (projectName + ".vcxproj");
 	return doc.save_file(vcxFile.c_str());
 	
-	/*
-	 PSEUDOCODE HERE
-	 open sln project
-	 find position of first "Global" word, put cursor behind
-	 add one entry for each additional, fixing slashes, generating new uuid.
-	 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openframeworksLib", "..\..\..\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj", "{5837595D-ACA9-485C-8E76-729040CE4B0B}"
-	 EndProject
-	*/
+
 	
 
 }
@@ -160,7 +162,7 @@ void visualStudioProject::appendFilter(string folderName){
 
 
 void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type){
-//	alert("addSrc " + srcFile, 35);
+	alert("addSrc " + srcFile.string(), 35);
 
 	// I had an empty ClCompile field causing errors
 	if (srcFile.empty()) {
@@ -381,6 +383,7 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	ofLogVerbose() << "adding lib " << libName;
 }
 
+
 void visualStudioProject::addCFLAG(string cflag, LibType libType){
 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
 	for(int i=0;i<items.size();i++){
@@ -403,6 +406,7 @@ void visualStudioProject::addCFLAG(string cflag, LibType libType){
 	}
 }
 
+
 void visualStudioProject::addCPPFLAG(string cppflag, LibType libType){
 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
 	for(int i=0;i<items.size();i++){
@@ -424,6 +428,7 @@ void visualStudioProject::addCPPFLAG(string cppflag, LibType libType){
 		}
 	}
 }
+
 
 void visualStudioProject::addDefine(string define, LibType libType) {
 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
@@ -448,6 +453,7 @@ void visualStudioProject::addDefine(string define, LibType libType) {
 		}
 	}
 }
+
 
 void visualStudioProject::addAddon(ofAddon & addon) {
 //	alert ("visualStudioProject::addAddon " + addon.name);
@@ -487,7 +493,7 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 
 //	cout << "addon libs size = " << addon.libs.size() << endl;
 	for(auto & lib: addon.libs){
-//		alert ("visualStudioProject::addon.libs " + lib.path);
+		alert ("visualStudioProject::addon.libs " + lib.path);
 		ofLogVerbose() << "adding addon libs: " << lib.path;
 		addLibrary(lib);
 	}

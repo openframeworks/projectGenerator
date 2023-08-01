@@ -30,7 +30,6 @@ constexpr option::Descriptor usage[] =
 #define EXIT_DATAERR 65
 #define STRINGIFY(A)  #A
 
-//-----------------------------------------------------
 enum pgMode {
 	PG_MODE_NONE,
 	PG_MODE_CREATE,
@@ -50,7 +49,6 @@ string ofPathEnv;
 string templateName;
 
 
-
 bool busingEnvVar;
 bool bVerbose;
 bool bAddonsPassedIn;
@@ -62,9 +60,6 @@ bool bListTemplates;          // did we request help?
 bool bDryRun;                 // do dry run (useful for debugging recursive update)
 
 
-
-
-//-------------------------------------------
 void consoleSpace() {
 	std::cout << std::endl;
 }
@@ -124,6 +119,7 @@ bool printTemplates() {
 	}
 }
 
+
 void addPlatforms(const string & value) {
 	targets.clear();
 	vector < string > platforms = ofSplitString(value, ",", true, true);
@@ -177,6 +173,7 @@ void addPlatforms(const string & value) {
 	}
 }
 
+
 bool containsFolder(fs::path path, string folderName) {
 	bool contains = false;
 	for (const auto & entry : fs::directory_iterator(path)) {
@@ -189,14 +186,15 @@ bool containsFolder(fs::path path, string folderName) {
 	return contains;
 }
 
+
 bool isGoodProjectPath(fs::path path) {
 	// TODO: think of a way of detecting make obj folders which creates a structure similar to project
 	// like this assimp3DModelLoaderExample/obj/osx/Release/src
 	return fs::exists(path / "src");
 }
 
+
 bool isGoodOFPath(const fs::path & path) {
-	
 	if (!fs::is_directory(path)) {
 		ofLogError() << "ofPath seems wrong... not a directory " << path.string();
 		return false;
@@ -245,7 +243,7 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 		folders.emplace_back(path);
 	}
 
-// Known issue. it can add undesired folders which can mirror directory of a valid project like
+// MARK: - Known issue. it can add undesired folders which can mirror directory of a valid project like
 // "./templates/allAddonsExample/obj/osx/Release"
 // "./templates/allAddonsExample/bin/build/build/arm64-apple-darwin_Release/obj.room/Volumes/tool/ofw/addons/ofxKinect"
 
@@ -325,11 +323,8 @@ void printHelp(){
 }
 
 
-//-------------------------------------------
 int main(int argc, char** argv){
-
-	ofLog() << "PG v."+getPGVersion();
-	//------------------------------------------- pre-parse
+	ofLog() << "PG v." + getPGVersion();
 	bAddonsPassedIn = false;
 	bDryRun = false;
 	busingEnvVar = false;
@@ -461,19 +456,6 @@ int main(int argc, char** argv){
 		mode = PG_MODE_UPDATE;
 	}
 
-	// This part of the code changes cwd to the project folder and make everything relative to there.
-//	if (fs::exists(projectPath)) {
-//		fs::path ofCalcPath = fs::weakly_canonical(fs::current_path() / ofPath);
-//		if (ofIsPathInPath(projectPath, ofCalcPath)) {
-//			ofCalcPath = fs::relative(ofCalcPath, projectPath);
-//		}
-//
-//		fs::current_path(projectPath);
-//		alert ("before " +ofPath.string());
-//		ofPath = ofCalcPath;
-//		alert ("after " +ofPath.string());
-//		projectPath = ".";
-//	}
 
 	if (ofPath.empty()) {
 		consoleSpace();
@@ -493,18 +475,15 @@ int main(int argc, char** argv){
 		
 //		alert ("ofPath before " + ofPath.string());
 //		alert ("projectPath " + projectPath.string());
-
 		if (ofPath.is_relative()) {
 			ofPath = fs::canonical(fs::current_path() / ofPath);
 //			alert ("ofPath canonical " + ofPath.string());
 		}
 		
-
 		if (ofIsPathInPath(projectPath, ofPath)) {
 			ofPath = fs::relative(ofPath, projectPath);
 		}
 		fs::current_path(projectPath);
-		
 //		alert ("ofPath after " + ofPath.string());
 		setOFRoot(ofPath);
 	}
@@ -527,7 +506,6 @@ int main(int argc, char** argv){
 		return EXIT_USAGE;
 	}
 
-	
 	if (bVerbose){
 		ofSetLogLevel(OF_LOG_VERBOSE);
 	}
@@ -538,6 +516,7 @@ int main(int argc, char** argv){
 			ofLogNotice() << "updating an existing project";
 			ofLogNotice() << "target platform is: " << getTargetString(t);
 
+// MARK: - RECURSIVE UPDATE
 			recursiveUpdate(projectPath, t);
 
 			ofLogNotice() << "project updated! ";
@@ -559,22 +538,17 @@ int main(int argc, char** argv){
 				}
 				ofLogNotice() << "target platform is: " << getTargetString(t);
 				ofLogNotice() << "project path is: " << projectPath;
-
 				if(templateName != ""){
 					ofLogNotice() << "using additional template " << templateName;
 				}
-
 				ofLogNotice() << "setting up new project " << projectPath;
 
 				if (mode == PG_MODE_UPDATE) {
-
+// MARK: - UPDATE
 					updateProject(projectPath, t);
 					ofLogNotice() << "project updated! ";
-
 				} else {
-
 					if (!bDryRun){
-
 						auto project = getTargetProject(t);
 						project->create(projectPath, templateName);
 						for(auto & addon: addons){
@@ -585,7 +559,6 @@ int main(int argc, char** argv){
 						}
 						project->save();
 					}
-
 					ofLogNotice() << "project created! ";
 				}
 				ofLogNotice() << "-----------------------------------------------";
