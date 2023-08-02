@@ -451,6 +451,13 @@ int main(int argc, char** argv){
 	if (!fs::exists(projectPath)) {
 		mode = PG_MODE_CREATE;
 		// FIXME: Maybe it is best not to create anything here, unless specified by parameter
+		if (!fs::exists(projectPath.parent_path())) {
+			consoleSpace();
+			ofLog() << "Folder doesn't exist " << projectPath.parent_path() << endl;
+			consoleSpace();
+			return EXIT_USAGE;
+
+		}
 		fs::create_directory(projectPath);
 	} else {
 		mode = PG_MODE_UPDATE;
