@@ -788,6 +788,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 	std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), std::less<string>());
 
+
 	for (auto & e : addon.srcFiles) {
 		ofLogVerbose() << "adding addon srcFiles: " << e;
 		addSrc(e,addon.filesToFolders[e]);

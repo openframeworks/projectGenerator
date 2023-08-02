@@ -71,6 +71,15 @@ bool visualStudioProject::loadProjectFile(){
 
 
 bool visualStudioProject::saveProjectFile(){
+	
+	/*
+	 PSEUDOCODE HERE
+	 open sln project
+	 find position of first "Global" word, put cursor behind
+	 add one entry for each additional, fixing slashes, generating new uuid.
+	 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openframeworksLib", "..\..\..\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj", "{5837595D-ACA9-485C-8E76-729040CE4B0B}"
+	 EndProject
+	*/
 	if (!additionalvcxproj.empty()) {
 		string additionalProjects;
 //		string divider = "\r\n";
@@ -120,14 +129,7 @@ bool visualStudioProject::saveProjectFile(){
 	auto vcxFile = projectDir / (projectName + ".vcxproj");
 	return doc.save_file(vcxFile.c_str());
 	
-	/*
-	 PSEUDOCODE HERE
-	 open sln project
-	 find position of first "Global" word, put cursor behind
-	 add one entry for each additional, fixing slashes, generating new uuid.
-	 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openframeworksLib", "..\..\..\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj", "{5837595D-ACA9-485C-8E76-729040CE4B0B}"
-	 EndProject
-	*/
+
 	
 
 }
@@ -160,7 +162,7 @@ void visualStudioProject::appendFilter(string folderName){
 
 
 void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type){
-//	alert("addSrc " + srcFile, 35);
+//	alert("addSrc " + srcFile.string(), 35);
 
 	// I had an empty ClCompile field causing errors
 	if (srcFile.empty()) {
@@ -286,6 +288,7 @@ void visualStudioProject::addInclude(string includeName){
 }
 
 void addLibraryPath(const pugi::xpath_node_set & nodes, string libFolder) {
+//	alert ("addLibraryPath " + libFolder);
 	for (auto & node : nodes) {
 		string includes = node.node().first_child().value();
 		std::vector < string > strings = ofSplitString(includes, ";");
@@ -337,7 +340,7 @@ void visualStudioProject::addProps(fs::path propsFile){
 void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	
 	// TODO: in future change Library to FS
-	alert ("visualStudioProject::addLibrary " + lib.path, 36);
+//	alert ("visualStudioProject::addLibrary " + lib.path, 36);
 	auto libraryName = fs::path { lib.path };
 //	fixSlashOrder(libraryName);
 
@@ -371,6 +374,12 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	if (!libFolderString.empty()) {
 //		alert("yes " + libFolderString, 34);
 		pugi::xpath_node_set addlLibsDir = doc.select_nodes((linkPath + "AdditionalLibraryDirectories").c_str());
+		
+		// FIXME:
+		// this function is called many times with the same parameters, like adding openCV. about 20 times the same command
+		// addLibraryPath ..\..\..\addons\ofxOpenCv\libs\opencv\lib\vs\x64\Debug
+		// if we save a unique list of commands we can make this alter in the end of execution, after removing duplicity.
+		// less pugi nodes traversed.
 		addLibraryPath(addlLibsDir, libFolderString);
 	}
 
@@ -380,6 +389,7 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	ofLogVerbose() << "adding lib path " << libFolder;
 	ofLogVerbose() << "adding lib " << libName;
 }
+
 
 void visualStudioProject::addCFLAG(string cflag, LibType libType){
 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
@@ -403,6 +413,7 @@ void visualStudioProject::addCFLAG(string cflag, LibType libType){
 	}
 }
 
+
 void visualStudioProject::addCPPFLAG(string cppflag, LibType libType){
 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
 	for(int i=0;i<items.size();i++){
@@ -424,6 +435,7 @@ void visualStudioProject::addCPPFLAG(string cppflag, LibType libType){
 		}
 	}
 }
+
 
 void visualStudioProject::addDefine(string define, LibType libType) {
 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
@@ -448,6 +460,7 @@ void visualStudioProject::addDefine(string define, LibType libType) {
 		}
 	}
 }
+
 
 void visualStudioProject::addAddon(ofAddon & addon) {
 //	alert ("visualStudioProject::addAddon " + addon.name);
