@@ -475,24 +475,6 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 		}
 	}
 	
-	for (auto & a : addons) {
-		if (a.name == addon.name) return;
-	}
-
-	// MARK: - XCode version is more complete, checking if you have this addon already added.
-	for (auto & d : addon.dependencies) {
-		baseProject::addAddon(d);
-	}
-
-	ofLogNotice() << "adding addon: " << addon.name;
-	addons.push_back(addon);
-
-	for (auto & e : addon.includePaths) {
-		ofLogVerbose() << "adding addon include path: " << e;
-		addInclude(e);
-	}
-
-	// temporary removal
 	for (auto & props : addon.propsFiles) {
 		ofLogVerbose() << "adding addon props: " << props;
 		addProps(props);
@@ -507,15 +489,14 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 
 	// MARK: -NEW TEST, lets see how it works now.
 	for (auto & f : addon.filesToFolders) {
-		if (f.second == "") f.second = "other";
+		if (f.second == "") {
+//			alert("OTHER");
+			f.second = "other";
+		}
 	}
-	// MARK: -
 	
 	for (auto & s : addon.srcFiles) {
 		ofLogVerbose() << "adding addon srcFiles: " << s;
-//		if ( addon.filesToFolders[s] == "" ) {
-//			addon.filesToFolders[s] = "other";
-//		}
 		
 //		cout << "addSrc s=" << s << " : " << addon.filesToFolders[s] << endl;
 		addSrc(s,addon.filesToFolders[s]);

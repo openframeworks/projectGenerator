@@ -333,6 +333,40 @@ void baseProject::addAddon(string addonName){
 		addonsCache[target][addonName] = addon;
 	}
 	
+	for (auto & a : addons) {
+		if (a.name == addon.name) return;
+	}
+
+
+	for (auto & d : addon.dependencies) {
+		bool found = false;
+		for (auto & a : addons) {
+			if (a.name == d) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			baseProject::addAddon(d);
+		} else {
+			ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << d;
+		}
+	}
+	
+	
+	ofLogNotice() << "adding addon: " << addon.name;
+	addons.emplace_back(addon);
+	
+	for (auto & e : addon.includePaths) {
+		ofLogVerbose() << "adding addon include path: " << e;
+//		ofLog() << "adding addon include path: " << e;
+		addInclude(e);
+	}
+	
+	
+	
+	// MARK: - SPECIFIC for each project.
+	// XCode and VS override the base addAddon. other templates will use baseproject::addAddon(ofAddon...
 	addAddon(addon);
 
 	// Process values from ADDON_DATA
@@ -372,44 +406,17 @@ void baseProject::addAddon(string addonName){
 	}
 }
 
-void baseProject::addSrcRecursively(const fs::path & srcPath){
-	ofLog() << "using additional source folder " << srcPath.string();
-//	alert("--");
-//	alert("addSrcRecursively " + srcPath.string());
-	fs::path base = srcPath.parent_path();
-//	alert("base = " + base.string());
-	
-	extSrcPaths.emplace_back(srcPath.string());
-	vector < fs::path > srcFilesToAdd;
-	getFilesRecursively(srcPath, srcFilesToAdd);
-//	bool isRelative = ofIsPathInPath(fs::absolute(srcPath), getOFRoot());
-
-	std::unordered_set<string> uniqueIncludeFolders;
-	
-	for( auto & src : srcFilesToAdd){
-		fs::path parent = src.parent_path();
-		fs::path folder = parent.lexically_relative(base);
-
-		//		alert ("addSrc file:" + src.string() + " -- folder:" + folder.string(), 35);
-		addSrc(src.string(), folder.string());
-		if (parent.string() != "") {
-			uniqueIncludeFolders.insert(parent.string());
-		}
-	}
-
-	for(auto & i : uniqueIncludeFolders){
-		ofLogVerbose() << " adding search include paths for folder " << i;
-		addInclude(i);
-	}
-}
 
 // MARK: - This function is only called by addon dependencies, when one addon is asking for another one to be included.
 // this is only invoked by XCode and visualStudioProject, and I don't understand why as they are similar
 void baseProject::addAddon(ofAddon & addon){
-	alert("baseProject::addAddon " + addon.name);
+	alert("baseProject::addAddon ofAddon & addon :: " + addon.name);
 
+	// FIXME: Duplicate Code
 	for (auto & a : addons) {
-		if (a.name == addon.name) return;
+		if (a.name == addon.name) {
+			return;
+		}
 	}
 
 	/*
@@ -503,6 +510,39 @@ void baseProject::addAddon(ofAddon & addon){
 		addDefine(a);
 	}
 }
+
+
+void baseProject::addSrcRecursively(const fs::path & srcPath){
+	ofLog() << "using additional source folder " << srcPath.string();
+//	alert("--");
+//	alert("addSrcRecursively " + srcPath.string());
+	fs::path base = srcPath.parent_path();
+//	alert("base = " + base.string());
+	
+	extSrcPaths.emplace_back(srcPath.string());
+	vector < fs::path > srcFilesToAdd;
+	getFilesRecursively(srcPath, srcFilesToAdd);
+//	bool isRelative = ofIsPathInPath(fs::absolute(srcPath), getOFRoot());
+
+	std::unordered_set<string> uniqueIncludeFolders;
+	
+	for( auto & src : srcFilesToAdd){
+		fs::path parent = src.parent_path();
+		fs::path folder = parent.lexically_relative(base);
+
+		//		alert ("addSrc file:" + src.string() + " -- folder:" + folder.string(), 35);
+		addSrc(src.string(), folder.string());
+		if (parent.string() != "") {
+			uniqueIncludeFolders.insert(parent.string());
+		}
+	}
+
+	for(auto & i : uniqueIncludeFolders){
+		ofLogVerbose() << " adding search include paths for folder " << i;
+		addInclude(i);
+	}
+}
+
 
 void baseProject::parseAddons(){
 	fs::path parseFile { projectDir / "addons.make" };

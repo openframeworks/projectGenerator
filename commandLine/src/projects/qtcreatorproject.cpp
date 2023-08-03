@@ -146,8 +146,9 @@ bool QtCreatorProject::saveProjectFile(){
 }
 
 void QtCreatorProject::addAddon(ofAddon & addon){
-	for (auto & a : addons) {
-		if (a.name == addon.name) return;
-	}
+	// FIXME: I think this is unneded since this function here is triggered by baseclass::addAddon(string) which already checked if exists.
+//	for (auto & a : addons) {
+//		if (a.name == addon.name) return;
+//	}
 	addons.emplace_back(addon);
 }

@@ -724,44 +724,13 @@ void xcodeProject::addAfterRule(string rule){
 void xcodeProject::addAddon(ofAddon & addon){
 	//	alert("xcodeProject addAddon string :: " + addon.name, 31);
 
-	// FIXME: FUTURE
-	//	baseProject::addAddon(addon);
-	// more xcode specific coding here.
-	for (auto & a : addons) {
-		if (a.name == addon.name) return;
-	}
-
-
-	for (auto & d : addon.dependencies) {
-		bool found = false;
-		for (auto & a : addons) {
-			if (a.name == d) {
-				found = true;
-				break;
-			}
-		}
-		if (!found) {
-			// MARK: Not sure why this calls for baseProject one.
-			baseProject::addAddon(d);
-		} else {
-			ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << d;
-		}
-	}
-
-
-	ofLogNotice() << "adding addon: " << addon.name;
-	addons.emplace_back(addon);
-
-	for (auto & e : addon.includePaths) {
-		ofLogVerbose() << "adding addon include path: " << e;
-//		ofLog() << "adding addon include path: " << e;
-		addInclude(e);
-	}
+	// Files listed alphabetically on XCode navigator.
+	std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), std::less<string>());
 
 	for (auto & e : addon.libs) {
 		ofLogVerbose() << "adding addon libs: " << e.path;
-//		alert("addon libs " + e.path);
 		addLibrary(e);
+
 		fs::path dylibPath { e.path };
 		fs::path folder = dylibPath.parent_path().lexically_relative(addon.pathToOF);
 //		cout << "dylibPath " << dylibPath << endl;
@@ -785,9 +754,6 @@ void xcodeProject::addAddon(ofAddon & addon){
 //		alert("addon ldflags " + e, 31 );
 		addLDFLAG(e);
 	}
-
-	std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), std::less<string>());
-
 
 	for (auto & e : addon.srcFiles) {
 		ofLogVerbose() << "adding addon srcFiles: " << e;
