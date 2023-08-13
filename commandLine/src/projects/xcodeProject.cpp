@@ -157,7 +157,7 @@ bool xcodeProject::createProjectFile(){
 	
 	if (!fs::equivalent(getOFRoot(), fs::path{"../../.."})) {
 		string root = getOFRoot().string();
-		alert ("fs not equivalent to ../../.. root = " + root);
+//		alert ("fs not equivalent to ../../.. root = " + root);
 		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", root);
 		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", root);
 		if( target == "osx" ){
