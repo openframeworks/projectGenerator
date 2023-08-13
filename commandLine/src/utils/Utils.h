@@ -79,3 +79,15 @@ vector <fs::path> folderList (const fs::path & path);
 vector <string> fileToStrings (const fs::path & file);
 fs::path getUserHomeDir();
 std::string getPGVersion();
+
+
+/*
+ Idea: create an object to hold the origin and destination files, with renames where needed
+ and string substitution, so we can avoid opening and writing multiple times the same file, less ssd wear.
+ */
+struct fromToReplace {
+public:
+	fs::path from;
+	fs::path to;
+	std::vector <std::pair <string, string> > findReplaces;
+};

@@ -157,7 +157,7 @@ bool xcodeProject::createProjectFile(){
 	
 	if (!fs::equivalent(getOFRoot(), fs::path{"../../.."})) {
 		string root = getOFRoot().string();
-		alert ("fs not equivalent to ../../.. root = " + root);
+//		alert ("fs not equivalent to ../../.. root = " + root);
 		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", root);
 		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", root);
 		if( target == "osx" ){
@@ -173,7 +173,7 @@ bool xcodeProject::createProjectFile(){
 
 void xcodeProject::saveScheme(){
 	auto schemeFolder = projectDir / ( projectName + ".xcodeproj" ) / "xcshareddata/xcschemes";
-//	cout << "saveScheme() schemeFolder = " << schemeFolder << endl;
+//	alert ("saveScheme " + schemeFolder.string());
 
 	if (fs::exists(schemeFolder)) {
 		fs::remove_all(schemeFolder);
@@ -202,10 +202,13 @@ void xcodeProject::saveScheme(){
 }
 
 void xcodeProject::saveMakefile(){
+//	alert ("saveMakefile " , 35);
 	for (auto & f : { "Makefile", "config.make" }) {
 		fs::path fileFrom = templatePath / f;
 		fs::path fileTo = projectDir / f;
-		if (!fs::exists(fileTo)) {
+		// Always overwrite for now, so we can have the original file from template before substituting anything
+		// if (!fs::exists(fileTo))
+		{
 			fs::copy(fileFrom, fileTo, fs::copy_options::overwrite_existing);
 		}
 	}
