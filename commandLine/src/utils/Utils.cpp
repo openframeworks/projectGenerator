@@ -444,16 +444,16 @@ vector <fs::path> dirList(const fs::path & path) {
 	static std::map<fs::path, vector <fs::path >> dirListMap;
 	
 	if (dirListMap.find(path) == dirListMap.end()) {
-		auto iterator = fs::recursive_directory_iterator(path);
-		for(auto i = fs::recursive_directory_iterator(path);
-				 i != fs::recursive_directory_iterator();
-			++i ) {
+		fs::recursive_directory_iterator it { path };
+		fs::recursive_directory_iterator last {  };
+
+		for(; it != last; ++it) {
 			// this wont' allow hidden directories files like .git to be added, and stop recursivity at this folder level.
-			if ( i->path().filename().c_str()[0] == '.'  ) {
-				i.disable_recursion_pending();
+			if (it->path().filename().c_str()[0] == '.') {
+				it.disable_recursion_pending();
 				continue;
 			}
-			dirListMap[path].emplace_back(i->path());
+			dirListMap[path].emplace_back(it->path());
 		}
 	} else {
 //		alert("IN CACHE " + path.string());
@@ -465,18 +465,18 @@ vector <fs::path> folderList(const fs::path & path) {
 	static std::map<fs::path, vector <fs::path >> folderListMap;
 	
 	if (folderListMap.find(path) == folderListMap.end()) {
-		auto iterator = fs::recursive_directory_iterator(path);
-		for(auto i = fs::recursive_directory_iterator(path);
-				 i != fs::recursive_directory_iterator();
-			++i ) {
+		fs::recursive_directory_iterator it { path };
+		fs::recursive_directory_iterator last {  };
+
+		for(; it != last; ++it) {
 			// this wont' allow hidden directories files like .git to be added, and stop recursivity at this folder level.
-			if ( i->path().filename().c_str()[0] == '.' || i->path().extension() == ".framework" ) {
-				i.disable_recursion_pending();
+			if ( it->path().filename().c_str()[0] == '.' || it->path().extension() == ".framework" ) {
+				it.disable_recursion_pending();
 				continue;
 			}
 			
-			if (fs::is_directory(i->path())) {
-				folderListMap[path].emplace_back(i->path());
+			if (fs::is_directory(it->path())) {
+				folderListMap[path].emplace_back(it->path());
 			}
 		}
 	} else {
