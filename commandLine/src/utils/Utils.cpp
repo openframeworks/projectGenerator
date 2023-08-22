@@ -438,14 +438,14 @@ vector <fs::path> dirList(const fs::path & path) {
 	static std::map<fs::path, vector <fs::path >> dirListMap;
 	
 	if (dirListMap.find(path) == dirListMap.end()) {
-		alert ("will list dir " + path.string(), 35);
+//		alert ("will list dir " + path.string(), 35);
 		fs::recursive_directory_iterator it { path };
 		fs::recursive_directory_iterator last {  };
 
 		for(; it != last; ++it) {
 			// this wont' allow hidden directories files like .git to be added, and stop recursivity at this folder level.
 			if (it->path().filename().c_str()[0] == '.') {
-				alert ("will disable recursion pending " + it->path().filename().string(), 34);
+//				alert ("will disable recursion pending " + it->path().filename().string(), 34);
 				it.disable_recursion_pending();
 				continue;
 			}
