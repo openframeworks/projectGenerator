@@ -449,6 +449,8 @@ vector <fs::path> dirList(const fs::path & path) {
 				it.disable_recursion_pending();
 				continue;
 			}
+			alert ("keep going " + it->path().filename().string(), 33);
+
 			dirListMap[path].emplace_back(it->path());
 		}
 	} else {
