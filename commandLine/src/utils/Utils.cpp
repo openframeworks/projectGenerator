@@ -245,22 +245,16 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 //	cout << ">> getLibsRecursively " << path << endl;
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
 	
-	
-	auto iterator = fs::recursive_directory_iterator(path);
-	for(auto i = fs::recursive_directory_iterator(path);
-			 i != fs::recursive_directory_iterator();
-		++i ) {
+	fs::recursive_directory_iterator it { path };
+	fs::recursive_directory_iterator last {  };
 
-	
-	
-//	for (const auto & entry : fs::recursive_directory_iterator(path)) {
-//		auto f = entry.path();
-		auto f = i->path();
+	for(; it != last; ++it) {
+		auto f = it->path();
 
 		if (fs::is_directory(f)) {
 			// on osx, framework is a directory, let's not parse it....
 			if (f.extension() == ".framework") {
-				i.disable_recursion_pending();
+				it.disable_recursion_pending();
 				continue;
 			} else {
 				auto stem = f.stem();
@@ -444,16 +438,20 @@ vector <fs::path> dirList(const fs::path & path) {
 	static std::map<fs::path, vector <fs::path >> dirListMap;
 	
 	if (dirListMap.find(path) == dirListMap.end()) {
-		auto iterator = fs::recursive_directory_iterator(path);
-		for(auto i = fs::recursive_directory_iterator(path);
-				 i != fs::recursive_directory_iterator();
-			++i ) {
+//		alert ("will list dir " + path.string(), 35);
+		fs::recursive_directory_iterator it { path };
+		fs::recursive_directory_iterator last {  };
+
+		for(; it != last; ++it) {
 			// this wont' allow hidden directories files like .git to be added, and stop recursivity at this folder level.
-			if ( i->path().filename().c_str()[0] == '.'  ) {
-				i.disable_recursion_pending();
+			if (it->path().filename().c_str()[0] == '.') {
+//				alert ("will disable recursion pending " + it->path().filename().string(), 34);
+				it.disable_recursion_pending();
 				continue;
 			}
-			dirListMap[path].emplace_back(i->path());
+//			alert ("keep going " + it->path().filename().string(), 33);
+
+			dirListMap[path].emplace_back(it->path());
 		}
 	} else {
 //		alert("IN CACHE " + path.string());
@@ -465,18 +463,18 @@ vector <fs::path> folderList(const fs::path & path) {
 	static std::map<fs::path, vector <fs::path >> folderListMap;
 	
 	if (folderListMap.find(path) == folderListMap.end()) {
-		auto iterator = fs::recursive_directory_iterator(path);
-		for(auto i = fs::recursive_directory_iterator(path);
-				 i != fs::recursive_directory_iterator();
-			++i ) {
+		fs::recursive_directory_iterator it { path };
+		fs::recursive_directory_iterator last {  };
+
+		for(; it != last; ++it) {
 			// this wont' allow hidden directories files like .git to be added, and stop recursivity at this folder level.
-			if ( i->path().filename().c_str()[0] == '.' || i->path().extension() == ".framework" ) {
-				i.disable_recursion_pending();
+			if ( it->path().filename().c_str()[0] == '.' || it->path().extension() == ".framework" ) {
+				it.disable_recursion_pending();
 				continue;
 			}
 			
-			if (fs::is_directory(i->path())) {
-				folderListMap[path].emplace_back(i->path());
+			if (fs::is_directory(it->path())) {
+				folderListMap[path].emplace_back(it->path());
 			}
 		}
 	} else {
