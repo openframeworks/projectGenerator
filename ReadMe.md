@@ -38,7 +38,13 @@ cp commandLine.exe ../frontend/app/projectGenerator.exe
 xcodebuild -configuration Release -target commandLine CODE_SIGN_IDENTITY="" -project commandLine.xcodeproj
 cp bin/projectGenerator ../frontend/app/
 ```
+On macOS, if you get this error: 
+> xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer directory '/Library/Developer/CommandLineTools' is a command line tools instance
 
+It's probably because your Command Line Tools were installed via Home Brew or some other mechanism. You need to re-select the whole Xcode install by executing:
+```
+sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+```
 ## Build the frontend electron app 
 Note: see the more detailed guide include node install in the frontend [ReadMe](frontend/ReadMe.md)
 ```
