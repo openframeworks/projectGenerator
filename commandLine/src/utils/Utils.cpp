@@ -245,22 +245,16 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 //	cout << ">> getLibsRecursively " << path << endl;
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
 	
-	
-	auto iterator = fs::recursive_directory_iterator(path);
-	for(auto i = fs::recursive_directory_iterator(path);
-			 i != fs::recursive_directory_iterator();
-		++i ) {
+	fs::recursive_directory_iterator it { path };
+	fs::recursive_directory_iterator last {  };
 
-	
-	
-//	for (const auto & entry : fs::recursive_directory_iterator(path)) {
-//		auto f = entry.path();
-		auto f = i->path();
+	for(; it != last; ++it) {
+		auto f = it->path();
 
 		if (fs::is_directory(f)) {
 			// on osx, framework is a directory, let's not parse it....
 			if (f.extension() == ".framework") {
-				i.disable_recursion_pending();
+				it.disable_recursion_pending();
 				continue;
 			} else {
 				auto stem = f.stem();
@@ -444,12 +438,14 @@ vector <fs::path> dirList(const fs::path & path) {
 	static std::map<fs::path, vector <fs::path >> dirListMap;
 	
 	if (dirListMap.find(path) == dirListMap.end()) {
+		alert ("will list dir " + path.string(), 35);
 		fs::recursive_directory_iterator it { path };
 		fs::recursive_directory_iterator last {  };
 
 		for(; it != last; ++it) {
 			// this wont' allow hidden directories files like .git to be added, and stop recursivity at this folder level.
 			if (it->path().filename().c_str()[0] == '.') {
+				alert ("will disable recursion pending " + it->path().filename().string(), 34);
 				it.disable_recursion_pending();
 				continue;
 			}
