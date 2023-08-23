@@ -34,14 +34,12 @@ bool visualStudioProject::createProjectFile(){
 	findandreplaceInTexfile(project, "emptyExample", projectName);
 
 
-	// Calculate OF Root in relation to each project (recursively);
-	auto relRoot = fs::relative((fs::current_path() / getOFRoot()), projectDir);
-	
-	if (!fs::equivalent(relRoot, "../../..")) {
-		string root = relRoot.string();
-		string relRootWindows = convertStringToWindowsSeparator(root);
+	if (!fs::equivalent(getOFRoot(), fs::path{ "../../.." })) {
+		string root = getOFRoot().string() ;
+		string relRootWindows = convertStringToWindowsSeparator(root) + "\\";
 
 		// sln has windows paths:
+//		alert ("replacing root with " + relRootWindows, 36);
 		findandreplaceInTexfile(solution, "..\\..\\..\\", relRootWindows);
 
 		// vcx has unixy paths:
@@ -57,15 +55,13 @@ bool visualStudioProject::createProjectFile(){
 
 bool visualStudioProject::loadProjectFile(){
 	fs::path projectPath { projectDir / (projectName + ".vcxproj") };
-//	cout << "projectDir " << projectDir << endl;
-//	cout << "projectName " << projectName << endl;
-//	cout << "projectPath " << projectPath << endl;
 	if (!fs::exists(projectPath)) {
 		ofLogError(LOG_NAME) << "error loading " << projectPath << " doesn't exist";
 		return false;
 	}
 	pugi::xml_parse_result result = doc.load_file(projectPath.c_str());
 	bLoaded = result.status==pugi::status_ok;
+//	alert ("visualStudioProject::loadProjectFile() " + projectPath.string() + " : " + ofToString(bLoaded));
 	return bLoaded;
 }
 
@@ -122,17 +118,19 @@ bool visualStudioProject::saveProjectFile(){
 //		cout << solution.lexically_normal() << endl;
 	}
 	
+
 	
 	auto filters = projectDir / (projectName + ".vcxproj.filters");
-	filterXmlDoc.save_file(filters.c_str());
+//	alert ("saving filters file : " + filters.string(), 35);
+	bool ok1 = filterXmlDoc.save_file(filters.c_str());
 
 	auto vcxFile = projectDir / (projectName + ".vcxproj");
-	return doc.save_file(vcxFile.c_str());
+//	alert ("saving vcxFile file : " + vcxFile.string(), 35);
+	bool ok2 = doc.save_file(vcxFile.c_str());
 	
-
-	
-
+	return ok1 && ok2;
 }
+
 
 void visualStudioProject::appendFilter(string folderName){
 	fixSlashOrder(folderName);
