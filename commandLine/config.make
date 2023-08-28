@@ -180,12 +180,3 @@ PLATFORM_CORE_EXCLUSIONS += ../../../libs/rtAudio%
 # inside ofImage inside ofUtils
 #PLATFORM_CORE_EXCLUSIONS += ../../../libs/uriparser%
 
-# FIXME: REMOVE
-#PROJECT_CXX = include-what-you-use
-#PROJECT_CC = include-what-you-use
-
-# MADE WITH OFWPGDragDrop
-PROJECT_LDFLAGS += -no-pie
-
-# MADE WITH OFWPGDragDrop
-PROJECT_LDFLAGS += -no-pie

@@ -428,9 +428,7 @@ void alert(string msg, int color) {
 	std::cout << colorText(msg, color) << std::endl;
 }
 
-bool ofIsPathInPath(const fs::path& fullPath, const fs::path& findPath) {
-	return (std::search(fullPath.begin(), fullPath.end(), findPath.begin(), findPath.end()) != fullPath.end());
-}
+
 
 // TODO: Maybe rename this function to a more descriptive name.
 vector <fs::path> dirList(const fs::path & path) {
@@ -495,10 +493,20 @@ vector<string> fileToStrings (const fs::path & file) {
 	return out;
 }
 
+
 fs::path getUserHomeDir() {
 	return fs::path { ofFilePath::getUserHomeDir() };
 }
 
+
 std::string getPGVersion() {
 	return PG_VERSION;
+}
+
+
+bool ofIsPathInPath(const std::filesystem::path & path, const std::filesystem::path & base) {
+//	alert ("ofIsPathInPath " + base.string() + " : " + path.string(), 35);
+	auto rel = std::filesystem::relative(path, base);
+//	cout << (!rel.empty() && rel.native()[0] != '.') << endl;
+	return !rel.empty() && rel.native()[0] != '.';
 }
