@@ -257,7 +257,7 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 	}
 
 	fs::path ofCalcPath = fs::weakly_canonical(fs::current_path() / ofPath);
-	
+
 	for (auto & path : folders) {
 //		cout << "------" << endl;
 //		cout << path << endl;
@@ -434,7 +434,7 @@ int main(int argc, char** argv){
 	of::priv::initutils();
 	startTime = ofGetElapsedTimef();
 	consoleSpace();
-	
+
 	// try to get the OF_PATH as an environt variable
 	char* pPath;
 	pPath = getenv("PG_OF_PATH");
@@ -446,14 +446,14 @@ int main(int argc, char** argv){
 		busingEnvVar = true;
 		ofPath = ofPathEnv;
 	}
-	
+
 	fs::path projectPath = fs::weakly_canonical(fs::current_path() / projectName);
 	if (!fs::exists(projectPath)) {
 		mode = PG_MODE_CREATE;
 		// FIXME: Maybe it is best not to create anything here, unless specified by parameter
 		if (!fs::exists(projectPath.parent_path())) {
 			consoleSpace();
-			ofLog() << "Folder doesn't exist " << projectPath.parent_path() << endl;
+			ofLogError() << "Folder doesn't exist " << projectPath.parent_path() << endl;
 			consoleSpace();
 			return EXIT_USAGE;
 
@@ -479,14 +479,14 @@ int main(int argc, char** argv){
 		if (!isGoodOFPath(ofPath)) {
 			return EXIT_USAGE;
 		}
-		
+
 //		alert ("ofPath before " + ofPath.string());
 //		alert ("projectPath " + projectPath.string());
 		if (ofPath.is_relative()) {
 			ofPath = fs::canonical(fs::current_path() / ofPath);
 //			alert ("ofPath canonical " + ofPath.string());
 		}
-		
+
 		if (ofIsPathInPath(projectPath, ofPath)) {
 			ofPath = fs::relative(ofPath, projectPath);
 		}
