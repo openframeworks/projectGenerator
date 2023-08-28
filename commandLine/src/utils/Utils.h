@@ -72,13 +72,13 @@ inline bool isInVector(T item, std::vector<T> & vec){
 string colorText(const string & s, int color = 32);
 void alert(string msg, int color=32);
 
-bool ofIsPathInPath(const fs::path& fullPath, const fs::path& findPath);
-
 vector <fs::path> dirList (const fs::path & path);
 vector <fs::path> folderList (const fs::path & path);
 vector <string> fileToStrings (const fs::path & file);
 fs::path getUserHomeDir();
 std::string getPGVersion();
+
+bool ofIsPathInPath(const fs::path & path, const fs::path & base);
 
 
 /*
