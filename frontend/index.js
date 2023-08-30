@@ -126,7 +126,7 @@ const addonsToSkip = [
 
 const platforms = {
     "osx": "OS X (Xcode)",
-    "vs": "Windows (Visual Studio 2017)",
+    "vs": "Windows (Visual Studio)",
     "msys2": "Windows (msys2/mingw)",
     "ios": "iOS (Xcode)",
     "android": "Android (Android Studio)",
