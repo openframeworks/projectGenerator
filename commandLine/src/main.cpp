@@ -206,7 +206,7 @@ bool isGoodOFPath(const fs::path & path) {
 
 
 void updateProject(const fs::path & path, ofTargetPlatform target, bool bConsiderParameterAddons = true) {
-//	alert("updateProject " + path.string() , 34);
+    //alert("updateProject " + path.string() , 34);
 	// bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
 	// either we read the addons.make file, or we look at the parameter list.
 	// if we are updating recursively, we *never* consider addons passed as parameters.
@@ -234,6 +234,7 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 }
 
 void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
+    // FIXME: remove
 	alert("recursiveUpdate " + path.string() );
 	if (!fs::is_directory(path)) return;
 	vector <fs::path> folders;
@@ -272,8 +273,8 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 		}
 		setOFRoot(ofPath);
 		fs::current_path(path);
-//		alert ("ofRoot " + ofPath.string());
-//		alert ("cwd " + path.string());
+        //alert ("ofRoot " + ofPath.string());
+        //alert ("cwd " + path.string());
 
 		updateProject(path, target, false);
 	}
@@ -480,18 +481,18 @@ int main(int argc, char** argv){
 			return EXIT_USAGE;
 		}
 		
-//		alert ("ofPath before " + ofPath.string());
-//		alert ("projectPath " + projectPath.string());
+// alert ("ofPath before " + ofPath.string());
+// alert ("projectPath " + projectPath.string());
 		if (ofPath.is_relative()) {
 			ofPath = fs::canonical(fs::current_path() / ofPath);
-//			alert ("ofPath canonical " + ofPath.string());
+            //alert ("ofPath canonical " + ofPath.string());
 		}
 		
 		if (ofIsPathInPath(projectPath, ofPath)) {
 			ofPath = fs::relative(ofPath, projectPath);
 		}
 		fs::current_path(projectPath);
-//		alert ("ofPath after " + ofPath.string());
+        //alert ("ofPath after " + ofPath.string());
 		setOFRoot(ofPath);
 	}
 
