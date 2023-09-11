@@ -338,7 +338,7 @@ void visualStudioProject::addProps(fs::path propsFile){
 void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	
 	// TODO: in future change Library to FS
-	alert ("visualStudioProject::addLibrary " + lib.path, 36);
+//	alert ("visualStudioProject::addLibrary " + lib.path, 36);
 	auto libraryName = fs::path { lib.path };
 //	fixSlashOrder(libraryName);
 
@@ -350,7 +350,7 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	string libFolderString = libFolder.string();
 	fixSlashOrder(libFolderString);
 	
-    alert ("libFolderString " + libFolderString, 36);
+//    alert ("libFolderString " + libFolderString, 36);
     
 	auto libName = libraryName.filename();
 
@@ -372,7 +372,7 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	}
 
 	if (!libFolderString.empty()) {
-		alert("yes " + libFolderString, 34);
+//		alert("yes " + libFolderString, 34);
 		pugi::xpath_node_set addlLibsDir = doc.select_nodes((linkPath + "AdditionalLibraryDirectories").c_str());
 		
 		// FIXME:
