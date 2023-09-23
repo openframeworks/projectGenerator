@@ -263,13 +263,13 @@ bool baseProject::save(){
 			if( projectDir.string().rfind(getOFRoot().string(), 0) == 0) {
 				path = getOFRelPath(projectDir);
 			}
-			saveConfig << "OF_ROOT = " << path.string() << std::endl;
+			saveConfig << "OF_ROOT = " << path.generic_string() << std::endl;
 		}
 		// replace this section with our external paths
 		else if( extSrcPaths.size() && str.rfind("# PROJECT_EXTERNAL_SOURCE_PATHS =", 0) == 0 ){
 			for(int d = 0; d < extSrcPaths.size(); d++){
-				ofLog(OF_LOG_VERBOSE) << " adding PROJECT_EXTERNAL_SOURCE_PATHS to config" << extSrcPaths[d] << std::endl;
-				saveConfig << "PROJECT_EXTERNAL_SOURCE_PATHS" << (d == 0 ? " = " : " += ") << extSrcPaths[d] << std::endl;
+				ofLog(OF_LOG_VERBOSE) << " adding PROJECT_EXTERNAL_SOURCE_PATHS to config" << extSrcPaths[d].generic_string() << std::endl;
+				saveConfig << "PROJECT_EXTERNAL_SOURCE_PATHS" << (d == 0 ? " = " : " += ") << extSrcPaths[d].generic_string() << std::endl;
 			}
 		} else {
 		   saveConfig << str << std::endl;
