@@ -92,7 +92,7 @@ protected:
 	bool recursiveCopy(const fs::path & srcDir, const fs::path & destDir);
 
 	std::vector<ofAddon> addons;
-	std::vector<std::string> extSrcPaths;
+	std::vector<fs::path> extSrcPaths;
 
 	//cached addons - if an addon is requested more than once, avoid loading from disk as it's quite slow
 	std::unordered_map<std::string,std::unordered_map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]

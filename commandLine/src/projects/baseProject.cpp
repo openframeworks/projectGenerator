@@ -519,7 +519,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 	fs::path base = srcPath.parent_path();
 //	alert("base = " + base.string());
 	
-	extSrcPaths.emplace_back(srcPath.string());
+	extSrcPaths.emplace_back(srcPath);
 	vector < fs::path > srcFilesToAdd;
 	getFilesRecursively(srcPath, srcFilesToAdd);
 //	bool isRelative = ofIsPathInPath(fs::absolute(srcPath), getOFRoot());
