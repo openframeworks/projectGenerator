@@ -130,7 +130,7 @@ const platforms = {
     "msys2": "Windows (msys2/mingw)",
     "ios": "iOS (Xcode)",
     "android": "Android (Android Studio)",
-    "linux64": "Linux 64-bit (qtCreator)",
+    "linux64": "Linux 64bit (VSCode)",
     "linuxarmv6l": "Linux ARMv6 (Makefiles)",
     "linuxarmv7l": "Linux ARMv7 (Makefiles)"
 };
@@ -769,6 +769,12 @@ function updateFunction(event, update) {
     if (platformList != null) {
         platformString = `-p"${platformList.join(",")}"`;
     }
+    
+    if( hostplatform == "linux" || hostplatform == "osx" ){
+		if( Array.isArray(templateList) && templateList.length == 0 ){
+			templateList.push("vscode");
+		}
+	}
 
     if (templateList != null) {
         templateString = `-t"${templateList.join(",")}"`;
@@ -865,6 +871,12 @@ function generateFunction(event, generate) {
     if (platformList != null) {
         platformString = `-p"${platformList.join(",")}"`;
     }
+    
+    if( hostplatform == "linux" || hostplatform == "osx" ){
+		if( Array.isArray(templateList) && templateList.length == 0 ){
+			templateList.push("vscode");
+		}
+	}
 
     if (templateList != null) {
         templateString = `-t"${templateList.join(",")}"`;
@@ -1107,7 +1119,7 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
         }
     } else if( arg.platform == 'linux' || arg.platform == 'linux64' ){
         if(hostplatform == 'linux'){
-            let linuxPath = path.join(fullPath, projectName + '.qbs');
+            let linuxPath = path.join(fullPath, projectName + '.code-workspace');
             linuxPath = linuxPath.replace(/ /g, '\\ ');
             console.log( linuxPath );
             exec('xdg-open ' + linuxPath, (error, stdout, stderr) => {
