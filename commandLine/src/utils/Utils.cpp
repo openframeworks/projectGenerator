@@ -7,11 +7,14 @@
 
 #include "Utils.h"
 #include "ofUtils.h"
-#include "qtcreatorproject.h"
-#include "CBWinProject.h"
-#include "xcodeProject.h"
-#include "visualStudioProject.h"
+
 #include "androidStudioProject.h"
+#include "CBWinProject.h"
+#include "visualStudioProject.h"
+#include "VSCodeProject.h"
+#include "qtcreatorproject.h"
+#include "xcodeProject.h"
+
 #include "uuidxx.h"
 #include <algorithm>
 #include <iostream>
@@ -386,6 +389,8 @@ string getTargetString(ofTargetPlatform t){
 			return "linuxarmv7l";
 		case OF_TARGET_LINUXAARCH64:
 			return "linuxaarch64";
+		case OF_TARGET_VSCODE:
+			return "vscode";
 		default:
 			return "";
 	}
@@ -414,6 +419,8 @@ unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ) {
 		return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
 	case OF_TARGET_ANDROID:
 		return unique_ptr<AndroidStudioProject>(new AndroidStudioProject(getTargetString(targ)));
+	case OF_TARGET_VSCODE:
+		return unique_ptr<VSCodeProject>(new VSCodeProject(getTargetString(targ)));
 	default:
 		return unique_ptr<baseProject>();
 	}

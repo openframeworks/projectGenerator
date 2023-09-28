@@ -155,6 +155,9 @@ void addPlatforms(const string & value) {
 		else if (p == "android") {
 			targets.emplace_back(OF_TARGET_ANDROID);
 		}
+		else if (p == "vscode") {
+			targets.emplace_back(OF_TARGET_VSCODE);
+		}
 		else if (p == "allplatforms") {
 			targets = {
 				OF_TARGET_LINUX,
