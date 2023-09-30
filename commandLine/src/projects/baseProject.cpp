@@ -21,7 +21,6 @@ const fs::path templatesFolder = "scripts/templates";
 
 baseProject::baseProject(const string & _target) : target(_target) {
 	bLoaded = false;
-//	target = _target;
 }
 
 fs::path baseProject::getPlatformTemplateDir(){

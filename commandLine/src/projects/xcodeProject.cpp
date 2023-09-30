@@ -870,10 +870,10 @@ bool xcodeProject::saveProjectFile(){
 		try{
 			jsonFile << j.dump(1, '	');
 		}catch(std::exception & e){
-			ofLogError("ofSaveJson") << "Error saving json to " << fileName << ": " << e.what();
+			ofLogError("xcodeProject::saveProjectFile") << "Error saving json to " << fileName << ": " << e.what();
 			return false;
 		}catch(...){
-			ofLogError("ofSaveJson") << "Error saving json to " << fileName;
+			ofLogError("xcodeProject::saveProjectFile") << "Error saving json to " << fileName;
 			return false;
 		}
 	}

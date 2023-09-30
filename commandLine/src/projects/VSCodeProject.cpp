@@ -22,11 +22,13 @@ struct key_value_t
 };
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(key_value_t, path);
 
+json j;
 
 std::string VSCodeProject::LOG_NAME = "VSCodeProject";
 bool VSCodeProject::createProjectFile(){
+//	alert("VSCodeProject::createProjectFile() ");
 
-	auto projectWorkspace = projectDir / (projectName + ".code-workspace");
+	auto projectWorkspace { projectDir / (projectName + ".code-workspace") };
 	alert ("projectDir " + projectDir.string(), 33);
 	alert ("templatePath " + templatePath.string(), 34);
 	
@@ -45,92 +47,55 @@ bool VSCodeProject::createProjectFile(){
 	}
 
 	std::string contents = ofBufferFromFile(projectWorkspace).getData();
-	alert (contents, 35);
-	
-	std::string contents2 = R"({
- "folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "${workspaceRoot}/../../../../libs/openFrameworks"
-		},
-		{
-			"path": "${workspaceRoot}/../../../../addons"
-		}
-	],
-	"settings": {}
-})";
-	
-	json j = json::parse(contents);
-	json::json_pointer p = json::json_pointer("/folders");
-//	string valor = ;
-	for (int a=0; a<3; a++) {
-		key_value_t kv1{ "${workspaceRoot}/../../../../ARWIL" + ofToString(a) };
-		j[p].emplace_back(kv1);
-	}
-
-	std::cout << j.dump(1, '\t') << std::endl;
-
+	j = json::parse(contents);
 	return true;
 }
+
 
 bool VSCodeProject::loadProjectFile(){
-	cout << "VSCodeProject::loadProjectFile() " << endl;
+//	alert("VSCodeProject::loadProjectFile() ");
+	json::json_pointer p = json::json_pointer("/folders");
 	return true;
-//	fs::path project { projectDir / (projectName + ".cbp") };
-//	if (!fs::exists(project)) {
-//		ofLogError(LOG_NAME) << "error loading" << project << "doesn't exist";
-//		return false;
-//	}
-//	pugi::xml_parse_result result = doc.load_file(project.c_str());
-//	bLoaded =result.status==pugi::status_ok;
-//	return bLoaded;
-	
 }
+
+
+void VSCodeProject::addAddon(ofAddon & addon) {
+	key_value_t kv1{ "${workspaceRoot}/../" + addon.addonPath.string() };
+	json::json_pointer p = json::json_pointer("/folders");
+	j[p].emplace_back(kv1);
+}
+
 
 bool VSCodeProject::saveProjectFile(){
-	cout << "VSCodeProject::saveProjectFile() " << endl;
+//	alert("VSCodeProject::saveProjectFile() ");
+	std::cout << j.dump(1, '\t') << std::endl;
+	
+	auto fileName { projectDir / (projectName + ".code-workspace") };
+	std::ofstream jsonFile(fileName);
+	try{
+		jsonFile << j.dump(1, '\t');
+	}catch(std::exception & e){
+		ofLogError(LOG_NAME) << "Error saving json to " << fileName << ": " << e.what();
+		return false;
+	}catch(...){
+		ofLogError(LOG_NAME) << "Error saving json to " << fileName;
+		return false;
+	}
+	
 	return true;
-
-//	auto workspace = projectDir / (projectName + ".workspace");
-//	findandreplaceInTexfile(workspace, "emptyExample", projectName);
-//	pugi::xpath_node_set title = doc.select_nodes("//Option[@title]");
-//	if(!title.empty()){
-//		if(!title[0].node().attribute("title").set_value(projectName.c_str())){
-//			ofLogError(LOG_NAME) << "can't set title";
-//		}
-//	}
-//	fs::path project { projectDir / (projectName + ".cbp") };
-//	return doc.save_file(project.c_str());
 }
 
-void VSCodeProject::addSrc(const fs::path & srcName, const fs::path & folder, SrcType type){
-	alert ("addSrc " + srcName.string(), 35);
 
-//	pugi::xml_node node = appendValue(doc, "Unit", "filename", srcName.string());
-//	if(!node.empty()){
-//		node.child("Option").attribute("virtualFolder").set_value(folder.c_str());
-//	}
-}
-
-void VSCodeProject::addInclude(std::string includeName){
-	alert ("addInclude", 35);
-	ofLogNotice() << "adding include " << includeName;
-//	appendValue(doc, "Add", "directory", includeName);
-}
-
-void VSCodeProject::addLibrary(const LibraryBinary & lib){
-	alert ("addLibrary", 35);
-//	appendValue(doc, "Add", "library", lib.path, true);
-	// overwriteMultiple for a lib if it's there (so libsorder.make will work)
-	// this is because we might need to say libosc, then ws2_32
-}
-
-//std::string VSCodeProject::getName(){
-//	return projectName;
+//
+//void VSCodeProject::addSrc(const fs::path & srcName, const fs::path & folder, SrcType type){
+////	alert ("addSrc " + srcName.string(), 35);
 //}
 //
-//fs::path VSCodeProject::getPath(){
-//	return projectDir;
+//void VSCodeProject::addInclude(std::string includeName){
+////	alert ("addInclude", 35);
+////	ofLogNotice() << "adding include " << includeName;
+//}
+//
+//void VSCodeProject::addLibrary(const LibraryBinary & lib){
+////	alert ("addLibrary", 35);
 //}

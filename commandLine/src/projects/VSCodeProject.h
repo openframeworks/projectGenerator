@@ -17,12 +17,11 @@ public:
 	bool loadProjectFile();
 	bool saveProjectFile();
 
-	void addSrc(const fs::path & srcName, const fs::path & folder, SrcType type=DEFAULT);
-	void addInclude(std::string includeName);
-	void addLibrary(const LibraryBinary & lib);
+	void addSrc(const fs::path & srcName, const fs::path & folder, SrcType type=DEFAULT) {};
+	void addInclude(std::string includeName) {};
+	void addLibrary(const LibraryBinary & lib) {};
 
-//	std::string getName();
-//	fs::path getPath();
+	void addAddon(ofAddon & addon);
 
 	static std::string LOG_NAME;
 
