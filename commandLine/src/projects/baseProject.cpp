@@ -461,6 +461,7 @@ void baseProject::addAddon(ofAddon & addon){
 
 	for (auto & a : addon.libs) {
 		ofLogVerbose() << "adding addon libs: " << a.path;
+        // FIXME: remove
 		alert ("addlibrary " + a.path, 33);
 		addLibrary(a);
 	}

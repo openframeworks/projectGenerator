@@ -149,10 +149,9 @@ void ofAddon::addReplaceString(string & variable, string value, bool addToVariab
 }
 
 void ofAddon::addReplaceStringVector(std::vector<string> & variable, string value, string prefix, bool addToVariable){
-	
 	// alert("addReplaceStringVector val=" + value + " : prefix=" + prefix, (value == prefix) ? 33 : 32);
-	
-	if (value == prefix) return;
+
+  if (value == prefix) return;
 
 	vector<string> values;
 	if(value.find("\"")!=string::npos){
@@ -472,7 +471,7 @@ void ofAddon::parseConfig(){
 
 
 bool ofAddon::fromFS(const fs::path & path, const string & platform){
-//	alert("ofAddon::fromFS path : " + path.string());
+    // alert("ofAddon::fromFS path : " + path.string());
 	
 	clear();
 	this->platform = platform;
@@ -505,7 +504,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 //			folder = sFS.parent_path();
 //			folder = fs::path { "local_addons" } / sFS.parent_path().filename();
 			folder = fs::path { "local_addons" } / fs::relative(sFS.parent_path(), parentFolder);
-//			alert ("isLocal folder=" + folder.string(), 36);
+            // alert ("isLocal folder=" + folder.string(), 36);
 		} else {
 			sFS = fixPath(s);
 			s = sFS.string();
@@ -549,6 +548,11 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		}
 		if(platform == "vs" || platform == "msys2"){
 			getDllsRecursively(libsPath, dllsToCopy, platform);
+			
+//			alert ("ofAddon dllsToCopy", 32);
+//			for (auto & d : dllsToCopy) {
+//				cout << d << endl;
+//			}
 		}
 	}
 	
