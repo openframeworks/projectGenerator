@@ -11,7 +11,7 @@
 
 class VSCodeProject: public baseProject  {
 public:
-	VSCodeProject(std::string target) : baseProject(target) {};
+	VSCodeProject(const std::string & target) : baseProject(target) {};
 
 	bool createProjectFile();
 	bool loadProjectFile();

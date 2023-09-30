@@ -19,9 +19,9 @@ using std::vector;
 
 const fs::path templatesFolder = "scripts/templates";
 
-baseProject::baseProject(string _target){
+baseProject::baseProject(const string & _target) : target(_target) {
 	bLoaded = false;
-	target = _target;
+//	target = _target;
 }
 
 fs::path baseProject::getPlatformTemplateDir(){

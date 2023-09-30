@@ -11,7 +11,7 @@
 
 class CBWinProject: public baseProject  {
 public:
-	CBWinProject(std::string target):baseProject(target){};
+	CBWinProject(const std::string & target) : baseProject(target) {};
 
 	bool createProjectFile();
 	bool loadProjectFile();

@@ -6,8 +6,7 @@
 using nlohmann::json;
 using nlohmann::json_pointer;
 
-xcodeProject::xcodeProject(string target)
-:baseProject(target){
+xcodeProject::xcodeProject(const string & target) : baseProject(target){
 	// TODO: remove unused variables
 	if( target == "osx" ){
 		folderUUID = {

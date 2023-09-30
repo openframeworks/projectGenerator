@@ -5,7 +5,7 @@
 class AndroidStudioProject : public baseProject
 {
 public:
-	AndroidStudioProject(std::string target);
+	AndroidStudioProject(const std::string & target);
 
 	bool createProjectFile();
 	void addInclude(std::string includeName){}

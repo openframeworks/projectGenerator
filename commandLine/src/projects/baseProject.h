@@ -35,7 +35,7 @@ public:
 		}
 	};
 
-	baseProject(std::string _target);
+	baseProject(const std::string & _target);
 
 	virtual ~baseProject(){}
 

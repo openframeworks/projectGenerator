@@ -7,9 +7,7 @@
 using std::string;
 std::string AndroidStudioProject::LOG_NAME = "AndroidStudioProject";
 
-AndroidStudioProject::AndroidStudioProject(std::string target)
-	: baseProject(target){
-}
+AndroidStudioProject::AndroidStudioProject(const std::string & target) : baseProject(target) {}
 
 bool AndroidStudioProject::createProjectFile(){
 	// Make sure project name doesn't include "-"
