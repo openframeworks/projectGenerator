@@ -26,11 +26,28 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(key_value_t, path);
 std::string VSCodeProject::LOG_NAME = "VSCodeProject";
 bool VSCodeProject::createProjectFile(){
 
-	auto projectPath = projectDir / (projectName + ".code-workspace");
-	cout << projectPath << endl;
-	cout << "templatePath " << templatePath << endl;
+	auto projectWorkspace = projectDir / (projectName + ".code-workspace");
+	alert ("projectDir " + projectDir.string(), 33);
+	alert ("templatePath " + templatePath.string(), 34);
 	
-	std::string contents = R"({
+	try {
+		fs::copy(templatePath, projectDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
+	} catch(fs::filesystem_error& e) {
+		ofLogError(LOG_NAME) << "error copying folder " << templatePath << " : " << projectDir << " : " << e.what();
+		return false;
+	}
+
+	try {
+		fs::rename(projectDir / "emptyExample.code-workspace", projectWorkspace);
+	} catch(fs::filesystem_error& e) {
+		ofLogError(LOG_NAME) << "error renaming folder " << " : " << projectWorkspace << " : " << e.what();
+		return false;
+	}
+
+	std::string contents = ofBufferFromFile(projectWorkspace).getData();
+	alert (contents, 35);
+	
+	std::string contents2 = R"({
  "folders": [
 		{
 			"path": "."
