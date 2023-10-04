@@ -18,9 +18,16 @@ struct fileJson {
 	json data;
 	
 	void load() {
-		std::string contents = ofBufferFromFile(fileName).getData();
+	
+		std::ifstream ifs(fileName);
+		
+		// this cause a bizarre issue.
+//		std::string contents = ofBufferFromFile(fileName).getData();
+		alert ("loading " + fileName.string(), 35);
+		
 		try {
-			data = json::parse(contents);
+			data = json::parse(ifs);
+//			data = json::parse(contents);
 		} catch (json::parse_error& ex) {
 			ofLogError(VSCodeProject::LOG_NAME) << "JSON parse error at byte" << ex.byte;
 		}
@@ -79,35 +86,34 @@ bool VSCodeProject::loadProjectFile(){
 void VSCodeProject::addAddon(ofAddon & addon) {
 	alert("VSCodeProject::addAddon() " + addon.name, 35);
 	
-	json::json_pointer p = json::json_pointer("/folders");
-	
 	json object;
 	object["path"] = "${workspaceRoot}/../" + addon.addonPath.string();
-	
+	json::json_pointer p = json::json_pointer("/folders");
 	workspace.data[p].emplace_back( object );
 	
-	alert ("will point to pointer", 36);
-	
-//	std::cout << cppProperties.data.dump(1, '\t') << std::endl;
-
+//	alert ("will point to pointer", 36);
 	json::json_pointer p2 = json::json_pointer("/env/PROJECT_ADDON_INCLUDES");
 	if (!cppProperties.data[p2].is_array()) {
 		cppProperties.data[p2] = json::array();
 	}
 	cppProperties.data[p2].emplace_back( "${workspaceRoot}/../" + addon.addonPath.string() );
-	std::cout << cppProperties.data[p2].dump(1, '\t') << std::endl;
+
+	json::json_pointer p3 = json::json_pointer("/env/PROJECT_EXTRA_INCLUDES");
+	if (!cppProperties.data[p3].is_array()) {
+		cppProperties.data[p3] = json::array();
+	}
+	cppProperties.data[p3].emplace_back( "${workspaceRoot}/../" + addon.addonPath.string() );
+
+	//	std::cout << cppProperties.data[p2].dump(1, '\t') << std::endl;
 }
 
 
 bool VSCodeProject::saveProjectFile(){
 	alert("VSCodeProject::saveProjectFile() ");
-	
 	workspace.save();
 	cppProperties.save();
-
 	return true;
 }
-
 
 
 void VSCodeProject::addSrc(const fs::path & srcName, const fs::path & folder, SrcType type){
