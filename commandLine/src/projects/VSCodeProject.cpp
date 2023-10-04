@@ -10,28 +10,47 @@
 #include "ofLog.h"
 #include "Utils.h"
 
-//#include <iostream>
-//#include <nlohmann/json.hpp>
-
 #include "json.hpp"
 using json = nlohmann::json;
 
-struct key_value_t
-{
-  std::string path;
+struct fileJson {
+	fs::path fileName;
+	json data;
+	
+	void load() {
+		std::string contents = ofBufferFromFile(fileName).getData();
+		try {
+			data = json::parse(contents);
+		} catch (json::parse_error& ex) {
+			ofLogError(VSCodeProject::LOG_NAME) << "JSON parse error at byte" << ex.byte;
+		}
+	}
+	
+	void save() {
+		alert ("saving now " + fileName.string(), 33);
+		std::cout << data.dump(1, '\t') << std::endl;
+		
+		std::ofstream jsonFile(fileName);
+		try{
+			jsonFile << data.dump(1, '\t');
+		}catch(std::exception & e){
+			ofLogError(VSCodeProject::LOG_NAME) << "Error saving json to " << fileName << ": " << e.what();
+		}catch(...){
+			ofLogError(VSCodeProject::LOG_NAME) << "Error saving json to " << fileName;
+		}
+	}
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(key_value_t, path);
 
-json j;
+
+fileJson workspace;
+fileJson cppProperties;
 
 std::string VSCodeProject::LOG_NAME = "VSCodeProject";
 bool VSCodeProject::createProjectFile(){
-//	alert("VSCodeProject::createProjectFile() ");
-
-	auto projectWorkspace { projectDir / (projectName + ".code-workspace") };
-	alert ("projectDir " + projectDir.string(), 33);
-	alert ("templatePath " + templatePath.string(), 34);
+	workspace.fileName = projectDir / (projectName + ".code-workspace");
+	cppProperties.fileName = projectDir / ".vscode/c_cpp_properties.json";
 	
+	// Copy all files from template, recursively
 	try {
 		fs::copy(templatePath, projectDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
 	} catch(fs::filesystem_error& e) {
@@ -39,63 +58,67 @@ bool VSCodeProject::createProjectFile(){
 		return false;
 	}
 
+	// Rename Project Workspace
 	try {
-		fs::rename(projectDir / "emptyExample.code-workspace", projectWorkspace);
+		fs::rename(projectDir / "emptyExample.code-workspace", workspace.fileName);
 	} catch(fs::filesystem_error& e) {
-		ofLogError(LOG_NAME) << "error renaming folder " << " : " << projectWorkspace << " : " << e.what();
+		ofLogError(LOG_NAME) << "error renaming folder " << " : " << workspace.fileName << " : " << e.what();
 		return false;
 	}
-
-	std::string contents = ofBufferFromFile(projectWorkspace).getData();
-	j = json::parse(contents);
 	return true;
 }
 
 
 bool VSCodeProject::loadProjectFile(){
-//	alert("VSCodeProject::loadProjectFile() ");
-	json::json_pointer p = json::json_pointer("/folders");
+	workspace.load();
+	cppProperties.load();
 	return true;
 }
 
 
 void VSCodeProject::addAddon(ofAddon & addon) {
-	key_value_t kv1{ "${workspaceRoot}/../" + addon.addonPath.string() };
+	alert("VSCodeProject::addAddon() " + addon.name, 35);
+	
 	json::json_pointer p = json::json_pointer("/folders");
-	j[p].emplace_back(kv1);
+	
+	json object;
+	object["path"] = "${workspaceRoot}/../" + addon.addonPath.string();
+	
+	workspace.data[p].emplace_back( object );
+	
+	alert ("will point to pointer", 36);
+	
+//	std::cout << cppProperties.data.dump(1, '\t') << std::endl;
+
+	json::json_pointer p2 = json::json_pointer("/env/PROJECT_ADDON_INCLUDES");
+	if (!cppProperties.data[p2].is_array()) {
+		cppProperties.data[p2] = json::array();
+	}
+	cppProperties.data[p2].emplace_back( "${workspaceRoot}/../" + addon.addonPath.string() );
+	std::cout << cppProperties.data[p2].dump(1, '\t') << std::endl;
 }
 
 
 bool VSCodeProject::saveProjectFile(){
-//	alert("VSCodeProject::saveProjectFile() ");
-	std::cout << j.dump(1, '\t') << std::endl;
+	alert("VSCodeProject::saveProjectFile() ");
 	
-	auto fileName { projectDir / (projectName + ".code-workspace") };
-	std::ofstream jsonFile(fileName);
-	try{
-		jsonFile << j.dump(1, '\t');
-	}catch(std::exception & e){
-		ofLogError(LOG_NAME) << "Error saving json to " << fileName << ": " << e.what();
-		return false;
-	}catch(...){
-		ofLogError(LOG_NAME) << "Error saving json to " << fileName;
-		return false;
-	}
-	
+	workspace.save();
+	cppProperties.save();
+
 	return true;
 }
 
 
-//
-//void VSCodeProject::addSrc(const fs::path & srcName, const fs::path & folder, SrcType type){
-////	alert ("addSrc " + srcName.string(), 35);
-//}
-//
-//void VSCodeProject::addInclude(std::string includeName){
-////	alert ("addInclude", 35);
-////	ofLogNotice() << "adding include " << includeName;
-//}
-//
-//void VSCodeProject::addLibrary(const LibraryBinary & lib){
-////	alert ("addLibrary", 35);
-//}
+
+void VSCodeProject::addSrc(const fs::path & srcName, const fs::path & folder, SrcType type){
+	alert ("addSrc " + srcName.string(), 33);
+}
+
+void VSCodeProject::addInclude(std::string includeName){
+	alert ("addInclude " + includeName, 34);
+//	ofLogNotice() << "adding include " << includeName;
+}
+
+void VSCodeProject::addLibrary(const LibraryBinary & lib){
+	alert ("addLibrary " + lib.path, 35);
+}

@@ -17,9 +17,9 @@ public:
 	bool loadProjectFile();
 	bool saveProjectFile();
 
-	void addSrc(const fs::path & srcName, const fs::path & folder, SrcType type=DEFAULT) {};
-	void addInclude(std::string includeName) {};
-	void addLibrary(const LibraryBinary & lib) {};
+	void addSrc(const fs::path & srcName, const fs::path & folder, SrcType type=DEFAULT);
+	void addInclude(std::string includeName);
+	void addLibrary(const LibraryBinary & lib);
 
 	void addAddon(ofAddon & addon);
 
