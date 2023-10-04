@@ -139,58 +139,6 @@ void addPlatforms(const string & value) {
 			targets.emplace_back(p);
 		}
 	}
-
-	// FIXME: Remove
-//	for (auto & p : platforms) {
-//		if (p == "linux") {
-//			targets.emplace_back(OF_TARGET_LINUX);
-//		}
-//		else if (p == "linux64") {
-//			targets.emplace_back(OF_TARGET_LINUX64);
-//		}
-//		else if (p == "linuxarmv6l") {
-//			targets.emplace_back(OF_TARGET_LINUXARMV6L);
-//		}
-//		else if (p == "linuxarmv7l") {
-//			targets.emplace_back(OF_TARGET_LINUXARMV7L);
-//		}
-//		else if (p == "linuxaarch64") {
-//			targets.emplace_back(OF_TARGET_LINUXAARCH64);
-//		}
-//		else if (p == "msys2") {
-//			targets.emplace_back(OF_TARGET_MINGW);
-//		}
-//		else if (p == "vs") {
-//			targets.emplace_back(OF_TARGET_WINVS);
-//		}
-//		else if (p == "osx") {
-//			targets.emplace_back(OF_TARGET_OSX);
-//		}
-//		else if (p == "ios") {
-//			targets.emplace_back(OF_TARGET_IPHONE);
-//		}
-//		else if (p == "android") {
-//			targets.emplace_back(OF_TARGET_ANDROID);
-//		}
-//		else if (p == "vscode") {
-//			targets.emplace_back(OF_TARGET_VSCODE);
-//		}
-//		else if (p == "allplatforms") {
-//			targets = {
-//				OF_TARGET_LINUX,
-//				OF_TARGET_LINUX64,
-//				OF_TARGET_LINUXARMV6L,
-//				OF_TARGET_LINUXARMV7L,
-//				OF_TARGET_MINGW,
-//				OF_TARGET_WINVS,
-//				OF_TARGET_OSX,
-//				OF_TARGET_IOS,
-//				OF_TARGET_ANDROID,
-//			};
-//		}else{
-//			ofLogError() << "platform " << p << " not valid";
-//		}
-//	}
 }
 
 
