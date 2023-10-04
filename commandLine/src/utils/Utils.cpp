@@ -367,61 +367,31 @@ string getOFRootFromConfig(){
 	return filePath.getLines().begin().asString();
 }
 
-string getTargetString(ofTargetPlatform t){
-	switch (t) {
-		case OF_TARGET_OSX:
-			return "osx";
-		case OF_TARGET_MINGW:
-			return "msys2";
-		case OF_TARGET_WINVS:
-			return "vs";
-		case OF_TARGET_IOS:
-			return "ios";
-		case OF_TARGET_ANDROID:
-			return "android";
-		case OF_TARGET_LINUX:
-			return "linux";
-		case OF_TARGET_LINUX64:
-			return "linux64";
-		case OF_TARGET_LINUXARMV6L:
-			return "linuxarmv6l";
-		case OF_TARGET_LINUXARMV7L:
-			return "linuxarmv7l";
-		case OF_TARGET_LINUXAARCH64:
-			return "linuxaarch64";
-		case OF_TARGET_VSCODE:
-			return "vscode";
-		default:
-			return "";
-	}
-}
 
-unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ) {
+unique_ptr<baseProject> getTargetProject(const string & targ) {
 //	cout << "getTargetProject :" << getTargetString(targ) << endl;
-	switch (targ) {
-	case OF_TARGET_OSX:
-		return unique_ptr<xcodeProject>(new xcodeProject(getTargetString(targ)));
-	case OF_TARGET_MINGW:
-		return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
-	case OF_TARGET_WINVS:
-		return unique_ptr<visualStudioProject>(new visualStudioProject(getTargetString(targ)));
-	case OF_TARGET_IOS:
-		return unique_ptr<xcodeProject>(new xcodeProject(getTargetString(targ)));
-	case OF_TARGET_LINUX:
-		return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
-	case OF_TARGET_LINUX64:
-		return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
-	case OF_TARGET_LINUXARMV6L:
-		return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
-	case OF_TARGET_LINUXARMV7L:
-		return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
-	case OF_TARGET_LINUXAARCH64:
-		return unique_ptr<QtCreatorProject>(new QtCreatorProject(getTargetString(targ)));
-	case OF_TARGET_ANDROID:
-		return unique_ptr<AndroidStudioProject>(new AndroidStudioProject(getTargetString(targ)));
-	case OF_TARGET_VSCODE:
-		return unique_ptr<VSCodeProject>(new VSCodeProject(getTargetString(targ)));
-	default:
+//	typedef xcodeProject pgProject;
+	
+	if (targ == "osx" || targ == "ios") {
+		return unique_ptr<xcodeProject>(new xcodeProject(targ));
+	} else if (targ == "msys2") {
+		return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));
+	} else if (targ == "winvs") {
+	
+		return unique_ptr<visualStudioProject>(new visualStudioProject(targ));
+	} else if (targ == "linux" ||
+			   targ == "linux64" ||
+			   targ == "linuxarmv6l" ||
+			   targ == "linuxarmv7l" ||
+			   targ == "linuxaarch64"
+			   ) {
+	
+		return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));
+	} else if (targ == "android") {
+		return unique_ptr<AndroidStudioProject>(new AndroidStudioProject(targ));
+	} else if (targ == "vscode") {
+		return unique_ptr<VSCodeProject>(new VSCodeProject(targ));
+	} else {
 		return unique_ptr<baseProject>();
 	}
 }
