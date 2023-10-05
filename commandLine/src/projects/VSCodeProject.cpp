@@ -17,14 +17,19 @@ struct fileJson {
 	fs::path fileName;
 	json data;
 	
-	void load() {
+	void addToArray(string pointer, string value) {
+		json::json_pointer p = json::json_pointer(pointer);
+		if (!data[p].is_array()) {
+			data[p] = json::array();
+		}
+		data[p].emplace_back( value );
+	}
 	
+	void load() {
 		std::ifstream ifs(fileName);
-		
-		// this cause a bizarre issue.
+		// this cause a bizarre issue. maybe it is reading after the end of the file
 //		std::string contents = ofBufferFromFile(fileName).getData();
-		alert ("loading " + fileName.string(), 35);
-		
+//		alert ("loading " + fileName.string(), 35);
 		try {
 			data = json::parse(ifs);
 //			data = json::parse(contents);
@@ -38,13 +43,14 @@ struct fileJson {
 		std::cout << data.dump(1, '\t') << std::endl;
 		
 		std::ofstream jsonFile(fileName);
-		try{
+		try {
 			jsonFile << data.dump(1, '\t');
-		}catch(std::exception & e){
+		} catch(std::exception & e) {
 			ofLogError(VSCodeProject::LOG_NAME) << "Error saving json to " << fileName << ": " << e.what();
-		}catch(...){
-			ofLogError(VSCodeProject::LOG_NAME) << "Error saving json to " << fileName;
 		}
+//		catch(...) {
+//			ofLogError(VSCodeProject::LOG_NAME) << "Error saving json to " << fileName;
+//		}
 	}
 };
 
@@ -90,21 +96,11 @@ void VSCodeProject::addAddon(ofAddon & addon) {
 	object["path"] = "${workspaceRoot}/../" + addon.addonPath.string();
 	json::json_pointer p = json::json_pointer("/folders");
 	workspace.data[p].emplace_back( object );
-	
-//	alert ("will point to pointer", 36);
-	json::json_pointer p2 = json::json_pointer("/env/PROJECT_ADDON_INCLUDES");
-	if (!cppProperties.data[p2].is_array()) {
-		cppProperties.data[p2] = json::array();
-	}
-	cppProperties.data[p2].emplace_back( "${workspaceRoot}/../" + addon.addonPath.string() );
 
-	json::json_pointer p3 = json::json_pointer("/env/PROJECT_EXTRA_INCLUDES");
-	if (!cppProperties.data[p3].is_array()) {
-		cppProperties.data[p3] = json::array();
-	}
-	cppProperties.data[p3].emplace_back( "${workspaceRoot}/../" + addon.addonPath.string() );
+	// examples of how to add entries to json arrays
+//	cppProperties.addToArray("/env/PROJECT_ADDON_INCLUDES", "${workspaceRoot}/" + addon.addonPath.string());
+//	cppProperties.addToArray("/env/PROJECT_EXTRA_INCLUDES", "${workspaceRoot}/" + addon.addonPath.string());
 
-	//	std::cout << cppProperties.data[p2].dump(1, '\t') << std::endl;
 }
 
 
@@ -117,12 +113,12 @@ bool VSCodeProject::saveProjectFile(){
 
 
 void VSCodeProject::addSrc(const fs::path & srcName, const fs::path & folder, SrcType type){
-	alert ("addSrc " + srcName.string(), 33);
+//	alert ("addSrc " + srcName.string(), 33);
 }
 
 void VSCodeProject::addInclude(std::string includeName){
 	alert ("addInclude " + includeName, 34);
-//	ofLogNotice() << "adding include " << includeName;
+	cppProperties.addToArray("/env/PROJECT_ADDON_INCLUDES", "${workspaceRoot}/" + includeName);
 }
 
 void VSCodeProject::addLibrary(const LibraryBinary & lib){
