@@ -6,8 +6,7 @@
 using nlohmann::json;
 using nlohmann::json_pointer;
 
-xcodeProject::xcodeProject(string target)
-:baseProject(target){
+xcodeProject::xcodeProject(const string & target) : baseProject(target){
 	// TODO: remove unused variables
 	if( target == "osx" ){
 		folderUUID = {
@@ -847,6 +846,7 @@ bool xcodeProject::saveProjectFile(){
 				}
 				else {
 					thispath = thispath.substr(0, thispath.length() -1);
+//					cout << thispath << endl;
 					json::json_pointer p = json::json_pointer(thispath);
 					try {
 						// Fixing XCode one item array issue
@@ -871,10 +871,10 @@ bool xcodeProject::saveProjectFile(){
 		try{
 			jsonFile << j.dump(1, '	');
 		}catch(std::exception & e){
-			ofLogError("ofSaveJson") << "Error saving json to " << fileName << ": " << e.what();
+			ofLogError("xcodeProject::saveProjectFile") << "Error saving json to " << fileName << ": " << e.what();
 			return false;
 		}catch(...){
-			ofLogError("ofSaveJson") << "Error saving json to " << fileName;
+			ofLogError("xcodeProject::saveProjectFile") << "Error saving json to " << fileName;
 			return false;
 		}
 	}

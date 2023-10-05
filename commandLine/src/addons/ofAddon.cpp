@@ -149,9 +149,9 @@ void ofAddon::addReplaceString(string & variable, string value, bool addToVariab
 }
 
 void ofAddon::addReplaceStringVector(std::vector<string> & variable, string value, string prefix, bool addToVariable){
-	
-//	alert("addReplaceStringVector val=" + value + " : prefix=" + prefix, (value == prefix) ? 33 : 32);
-	if (value == prefix) return;
+	// alert("addReplaceStringVector val=" + value + " : prefix=" + prefix, (value == prefix) ? 33 : 32);
+
+  if (value == prefix) return;
 
 	vector<string> values;
 	if(value.find("\"")!=string::npos){

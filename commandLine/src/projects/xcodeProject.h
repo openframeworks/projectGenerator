@@ -8,7 +8,7 @@ using std::string;
 
 class xcodeProject : public baseProject {
 public:
-	xcodeProject(string target);
+	xcodeProject(const string & target);
 
 private:
 	bool createProjectFile();

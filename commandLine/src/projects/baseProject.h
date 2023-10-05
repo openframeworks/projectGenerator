@@ -35,7 +35,7 @@ public:
 		}
 	};
 
-	baseProject(std::string _target);
+	baseProject(const std::string & _target);
 
 	virtual ~baseProject(){}
 
@@ -57,6 +57,8 @@ public:
 	virtual void addAddon(std::string addon);
 	virtual void addAddon(ofAddon & addon);
 	virtual void addSrcRecursively(const fs::path & srcPath);
+	
+	bool isPlatformName(const string & platform);
 
 	std::string getName() { return projectName; }
 	fs::path getPath() { return projectDir; }

@@ -6,9 +6,7 @@
 
 std::string QtCreatorProject::LOG_NAME = "QtCreatorProject";
 
-QtCreatorProject::QtCreatorProject(std::string target)
-	: baseProject(target){
-}
+QtCreatorProject::QtCreatorProject(const std::string & target) : baseProject(target) {}
 
 bool QtCreatorProject::createProjectFile(){
 //	alert("QtCreatorProject::createProjectFile " + projectDir.string());

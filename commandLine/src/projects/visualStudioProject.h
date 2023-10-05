@@ -5,7 +5,7 @@
 class visualStudioProject : public baseProject {
 
 public:
-	visualStudioProject(std::string target):baseProject(target){};
+	visualStudioProject(const std::string & target) : baseProject(target) {};
 
 	bool createProjectFile();
 	bool loadProjectFile();

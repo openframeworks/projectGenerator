@@ -19,23 +19,19 @@ using std::vector;
 
 const fs::path templatesFolder = "scripts/templates";
 
-baseProject::baseProject(string _target){
+baseProject::baseProject(const string & _target) : target(_target) {
 	bLoaded = false;
-	target = _target;
 }
 
-fs::path baseProject::getPlatformTemplateDir(){
+fs::path baseProject::getPlatformTemplateDir() {
 	return getOFRoot() / templatesFolder / target;
 }
 
-bool isPlatformName(string file){
-	for(int platform=OF_TARGET_OSX;platform<OF_TARGET_EMSCRIPTEN+1;platform++){
-		if(file==getTargetString((ofTargetPlatform)platform)){
-			return true;
-		}
-	}
-	return false;
+
+bool baseProject::isPlatformName(const string & platform) {
+	return std::find(platformsOptions.begin(), platformsOptions.end(), platform) != platformsOptions.end();
 }
+
 
 std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const fs::path & templateDir){
 	string name = templateDir.parent_path().filename().string();

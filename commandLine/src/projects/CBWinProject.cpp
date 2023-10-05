@@ -11,6 +11,7 @@
 #include "Utils.h"
 
 std::string CBWinProject::LOG_NAME = "CBWinProject";
+
 bool CBWinProject::createProjectFile(){
 
 	auto project = projectDir / (projectName + ".cbp");
@@ -91,10 +92,3 @@ void CBWinProject::addLibrary(const LibraryBinary & lib){
 	// this is because we might need to say libosc, then ws2_32
 }
 
-//std::string CBWinProject::getName(){
-//	return projectName;
-//}
-//
-//fs::path CBWinProject::getPath(){
-//	return projectDir;
-//}
