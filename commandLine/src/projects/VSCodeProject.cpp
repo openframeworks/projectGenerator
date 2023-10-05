@@ -17,12 +17,23 @@ struct fileJson {
 	fs::path fileName;
 	json data;
 	
-	void addToArray(string pointer, string value) {
+	// only works for workspace
+	void addPath(fs::path folder) {
+		json object;
+		std::string path = folder.is_absolute() ? folder.string() : "${workspaceRoot}/../" + folder.string();
+		object["path"] = path;
+		json::json_pointer p = json::json_pointer("/folders");
+		data[p].emplace_back( object );
+	}
+	
+	void addToArray(string pointer, fs::path value) {
 		json::json_pointer p = json::json_pointer(pointer);
 		if (!data[p].is_array()) {
 			data[p] = json::array();
 		}
-		data[p].emplace_back( value );
+		
+		std::string path = fs::path(value).is_absolute() ? value.string() : "${workspaceRoot}/" + value.string();
+		data[p].emplace_back( path );
 	}
 	
 	void load() {
@@ -92,20 +103,33 @@ bool VSCodeProject::loadProjectFile(){
 void VSCodeProject::addAddon(ofAddon & addon) {
 	alert("VSCodeProject::addAddon() " + addon.name, 35);
 	
-	json object;
-	object["path"] = "${workspaceRoot}/../" + addon.addonPath.string();
-	json::json_pointer p = json::json_pointer("/folders");
-	workspace.data[p].emplace_back( object );
+//	json object;
+//	std::string path = addon.addonPath.is_absolute() ? addon.addonPath.string() : "${workspaceRoot}/../" + addon.addonPath.string();
+//	object["path"] = path;
+//	json::json_pointer p = json::json_pointer("/folders");
+//	workspace.data[p].emplace_back( object );
 
+	workspace.addPath(addon.addonPath);
 	// examples of how to add entries to json arrays
-//	cppProperties.addToArray("/env/PROJECT_ADDON_INCLUDES", "${workspaceRoot}/" + addon.addonPath.string());
-//	cppProperties.addToArray("/env/PROJECT_EXTRA_INCLUDES", "${workspaceRoot}/" + addon.addonPath.string());
+//	cppProperties.addToArray("/env/PROJECT_ADDON_INCLUDES", addon.addonPath);
+//	cppProperties.addToArray("/env/PROJECT_EXTRA_INCLUDES", addon.addonPath);
 
 }
 
 
 bool VSCodeProject::saveProjectFile(){
 	alert("VSCodeProject::saveProjectFile() ");
+	
+	alert("--- VSCodeProject::extSrcPaths() ");
+//	cout << extSrcPaths.size() << endl;
+	for (auto & e : extSrcPaths) {
+		cout << e << endl;
+		workspace.addPath(e);
+
+	}
+	alert("--- VSCodeProject::extSrcPaths() ");
+
+	
 	workspace.save();
 	cppProperties.save();
 	return true;
@@ -113,12 +137,12 @@ bool VSCodeProject::saveProjectFile(){
 
 
 void VSCodeProject::addSrc(const fs::path & srcName, const fs::path & folder, SrcType type){
-//	alert ("addSrc " + srcName.string(), 33);
+	alert ("addSrc " + srcName.string(), 33);
 }
 
 void VSCodeProject::addInclude(std::string includeName){
 	alert ("addInclude " + includeName, 34);
-	cppProperties.addToArray("/env/PROJECT_ADDON_INCLUDES", "${workspaceRoot}/" + includeName);
+	cppProperties.addToArray("/env/PROJECT_EXTRA_INCLUDES", fs::path(includeName));
 }
 
 void VSCodeProject::addLibrary(const LibraryBinary & lib){
