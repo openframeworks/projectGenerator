@@ -112,12 +112,8 @@ bool VSCodeProject::saveProjectFile(){
 //	}
 //	alert("--- VSCodeProject::extSrcPaths() ");
 
-	json::json_pointer p = json::json_pointer("/");
-	if (workspace.data[p].is_array()) {
-		json object;
-		object["openFrameworksProjectGeneratorVersion"] = getPGVersion();
-		workspace.data[p].emplace_back( object );
-	}
+	
+	workspace.data["openFrameworksProjectGeneratorVersion"] = getPGVersion();
 	
 	workspace.save();
 	cppProperties.save();
