@@ -19,8 +19,8 @@ struct fileJson {
 	
 	// only works for workspace
 	void addPath(fs::path folder) {
-		json object;
 		std::string path = folder.is_absolute() ? folder.string() : "${workspaceRoot}/../" + folder.string();
+		json object;
 		object["path"] = path;
 		json::json_pointer p = json::json_pointer("/folders");
 		data[p].emplace_back( object );
@@ -112,6 +112,13 @@ bool VSCodeProject::saveProjectFile(){
 //	}
 //	alert("--- VSCodeProject::extSrcPaths() ");
 
+	json::json_pointer p = json::json_pointer("/");
+	if (workspace.data[p].is_array()) {
+		json object;
+		object["openFrameworksProjectGeneratorVersion"] = getPGVersion();
+		workspace.data[p].emplace_back( object );
+	}
+	
 	workspace.save();
 	cppProperties.save();
 	return true;
