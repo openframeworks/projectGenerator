@@ -22,12 +22,13 @@ bool QtCreatorProject::createProjectFile(){
 	};
 	
 	for (auto & p : fromTo) {
+		// FIXME: Wrong paths here. there are some more folders like "wizard" / "openFrameworks"
 		fs::path src { templatePath / p.first };
 		fs::path dst { projectDir / p.second };
 		try {
 			fs::copy_file(src, dst, fs::copy_options::overwrite_existing);
 		} catch(fs::filesystem_error& e) {
-			ofLogError(LOG_NAME) << "error copying template file " << p.first << " : " << p.second << e.what();
+			ofLogError(LOG_NAME) << "error copying template file " << src << " : " << dst << " : " << e.what();
 			return false;
 		}
 	}

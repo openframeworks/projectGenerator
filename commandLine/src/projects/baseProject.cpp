@@ -184,7 +184,6 @@ bool baseProject::create(const fs::path & path, string templateName){
 		vector < string > fileNames;
 		getFilesRecursively(projectDir / "src", fileNames);
 
-		
 		std::sort (fileNames.begin(), fileNames.end());
 		
 //		for (auto & f : fileNames) {

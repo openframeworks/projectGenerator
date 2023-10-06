@@ -391,6 +391,8 @@ unique_ptr<baseProject> getTargetProject(const string & targ) {
 		return unique_ptr<AndroidStudioProject>(new AndroidStudioProject(targ));
 	} else if (targ == "vscode") {
 		return unique_ptr<VSCodeProject>(new VSCodeProject(targ));
+	} else if (targ == "qtcreator") {
+			return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));
 	} else {
 		return unique_ptr<baseProject>();
 	}
