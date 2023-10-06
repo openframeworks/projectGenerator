@@ -507,13 +507,13 @@ int main(int argc, char** argv){
 
 			for (auto & t : targets) {
 				ofLogNotice() << "-----------------------------------------------";
+				ofLogNotice() << "target platform is: " << t;
 				ofLogNotice() << "setting OF path to: " << ofPath;
 				if(busingEnvVar){
 					ofLogNotice() << "from PG_OF_PATH environment variable";
 				}else{
 					ofLogNotice() << "from -o option";
 				}
-				ofLogNotice() << "target platform is: " << t;
 				ofLogNotice() << "project path is: " << projectPath;
 				if(templateName != ""){
 					ofLogNotice() << "using additional template " << templateName;
