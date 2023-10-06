@@ -11,9 +11,9 @@ bool visualStudioProject::createProjectFile(){
 //	alert("visualStudioProject::createProjectFile");
 
 	solution	= projectDir / (projectName + ".sln");
-	fs::path project 	= projectDir / (projectName + ".vcxproj");
-	fs::path user 		= projectDir / (projectName + ".vcxproj.user");
-	fs::path filters	= projectDir / (projectName + ".vcxproj.filters");
+	fs::path project 	{ projectDir / (projectName + ".vcxproj") };
+	fs::path user 		{ projectDir / (projectName + ".vcxproj.user") };
+	fs::path filters	{ projectDir / (projectName + ".vcxproj.filters") };
 
 	fs::copy(templatePath / "emptyExample.vcxproj", 		project, fs::copy_options::overwrite_existing);
 	fs::copy(templatePath / "emptyExample.vcxproj.user", 	user, fs::copy_options::overwrite_existing);
@@ -35,8 +35,8 @@ bool visualStudioProject::createProjectFile(){
 
 
 	if (!fs::equivalent(getOFRoot(), fs::path{ "../../.." })) {
-		string root = getOFRoot().string() ;
-		string relRootWindows = convertStringToWindowsSeparator(root) + "\\";
+		string root { getOFRoot().string() };
+		string relRootWindows { convertStringToWindowsSeparator(root) + "\\" };
 
 		// sln has windows paths:
 //		alert ("replacing root with " + relRootWindows, 36);
@@ -59,8 +59,8 @@ bool visualStudioProject::loadProjectFile(){
 		ofLogError(LOG_NAME) << "error loading " << projectPath << " doesn't exist";
 		return false;
 	}
-	pugi::xml_parse_result result = doc.load_file(projectPath.c_str());
-	bLoaded = result.status==pugi::status_ok;
+	pugi::xml_parse_result result { doc.load_file(projectPath.c_str()) };
+	bLoaded = result.status == pugi::status_ok;
 //	alert ("visualStudioProject::loadProjectFile() " + projectPath.string() + " : " + ofToString(bLoaded));
 	return bLoaded;
 }
@@ -75,10 +75,10 @@ bool visualStudioProject::saveProjectFile(){
 	 add one entry for each additional, fixing slashes, generating new uuid.
 	 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openframeworksLib", "..\..\..\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj", "{5837595D-ACA9-485C-8E76-729040CE4B0B}"
 	 EndProject
-	*/
+	 */
 	if (!additionalvcxproj.empty()) {
 		string additionalProjects;
-//		string divider = "\r\n";
+		//		string divider = "\r\n";
 		string divider = "\n";
 		for (auto & a : additionalvcxproj) {
 			string name = a.filename().stem().string();
@@ -89,42 +89,42 @@ bool visualStudioProject::saveProjectFile(){
 			"Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \""+name+"\", \""+aString+"\", \"{"+uuid+"}\"" +
 			divider + "EndProject" + divider;
 		}
-//		string findString = "Global" + divider;
+		//		string findString = "Global" + divider;
 		string findString = "Global";
 		
 		additionalProjects += findString ;
 		
 		solution = solution.lexically_normal();
-//		findandreplaceInTexfile(solution, findString, additionalProjects);
-
+		//		findandreplaceInTexfile(solution, findString, additionalProjects);
+		
 		std::ifstream file(solution);
 		std::stringstream buffer;
 		buffer << file.rdbuf();
 		string str = buffer.str();
 		file.close();
-
+		
 		std::size_t pos = str.find(findString);
 		if (pos != std::string::npos) {
 			str.replace(pos, findString.length(), additionalProjects);
 		}
-
+		
 		std::ofstream myfile(solution);
 		myfile << str;
 		myfile.close();
 		
 		
-//		cout << fs::current_path() << endl;
-//		cout << fs::absolute(solution) << endl;
-//		cout << solution.lexically_normal() << endl;
+		//		cout << fs::current_path() << endl;
+		//		cout << fs::absolute(solution) << endl;
+		//		cout << solution.lexically_normal() << endl;
 	}
 	
-
 	
-	auto filters = projectDir / (projectName + ".vcxproj.filters");
-//	alert ("saving filters file : " + filters.string(), 35);
+	
+	auto filters { projectDir / (projectName + ".vcxproj.filters") };
+	//	alert ("saving filters file : " + filters.string(), 35);
 	bool ok1 = filterXmlDoc.save_file(filters.c_str());
-
-	auto vcxFile = projectDir / (projectName + ".vcxproj");
+	
+	auto vcxFile { projectDir / (projectName + ".vcxproj") };
 //	alert ("saving vcxFile file : " + vcxFile.string(), 35);
 	bool ok2 = doc.save_file(vcxFile.c_str());
 	
@@ -134,8 +134,8 @@ bool visualStudioProject::saveProjectFile(){
 
 void visualStudioProject::appendFilter(string folderName){
 	fixSlashOrder(folderName);
-	string uuid = generateUUID(folderName);
-	string tag = "//ItemGroup[Filter]/Filter[@Include=\"" + folderName + "\"]";
+	string uuid { generateUUID(folderName) };
+	string tag { "//ItemGroup[Filter]/Filter[@Include=\"" + folderName + "\"]" };
 	pugi::xpath_node_set set = filterXmlDoc.select_nodes(tag.c_str());
 	if (set.size() > 0){
 	//pugi::xml_node node = set[0].node();

@@ -16,7 +16,7 @@ struct LibraryBinary;
 
 static std::map <ofTargetPlatform, std::string> platformsToString {
 	{ OF_TARGET_ANDROID, "android" },
-//	{ OF_TARGET_EMSCRIPTEN, "linux" },
+//	{ OF_TARGET_EMSCRIPTEN, "" },
 	{ OF_TARGET_IOS, "ios" },
 	{ OF_TARGET_LINUX, "linux" },
 	{ OF_TARGET_LINUX64, "linux64" },

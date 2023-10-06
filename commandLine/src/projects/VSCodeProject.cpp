@@ -19,8 +19,8 @@ struct fileJson {
 	
 	// only works for workspace
 	void addPath(fs::path folder) {
-		json object;
 		std::string path = folder.is_absolute() ? folder.string() : "${workspaceRoot}/../" + folder.string();
+		json object;
 		object["path"] = path;
 		json::json_pointer p = json::json_pointer("/folders");
 		data[p].emplace_back( object );
@@ -38,38 +38,29 @@ struct fileJson {
 	
 	void load() {
 		std::ifstream ifs(fileName);
-		// this cause a bizarre issue. maybe it is reading after the end of the file
-//		std::string contents = ofBufferFromFile(fileName).getData();
-//		alert ("loading " + fileName.string(), 35);
 		try {
 			data = json::parse(ifs);
-//			data = json::parse(contents);
 		} catch (json::parse_error& ex) {
 			ofLogError(VSCodeProject::LOG_NAME) << "JSON parse error at byte" << ex.byte;
 		}
 	}
 	
 	void save() {
-		alert ("saving now " + fileName.string(), 33);
-		std::cout << data.dump(1, '\t') << std::endl;
-		
+//		alert ("saving now " + fileName.string(), 33);
+//		std::cout << data.dump(1, '\t') << std::endl;
 		std::ofstream jsonFile(fileName);
 		try {
 			jsonFile << data.dump(1, '\t');
 		} catch(std::exception & e) {
 			ofLogError(VSCodeProject::LOG_NAME) << "Error saving json to " << fileName << ": " << e.what();
 		}
-//		catch(...) {
-//			ofLogError(VSCodeProject::LOG_NAME) << "Error saving json to " << fileName;
-//		}
 	}
 };
 
-
 fileJson workspace;
 fileJson cppProperties;
-
 std::string VSCodeProject::LOG_NAME = "VSCodeProject";
+
 bool VSCodeProject::createProjectFile(){
 	workspace.fileName = projectDir / (projectName + ".code-workspace");
 	cppProperties.fileName = projectDir / ".vscode/c_cpp_properties.json";
@@ -101,13 +92,7 @@ bool VSCodeProject::loadProjectFile(){
 
 
 void VSCodeProject::addAddon(ofAddon & addon) {
-	alert("VSCodeProject::addAddon() " + addon.name, 35);
-	
-//	json object;
-//	std::string path = addon.addonPath.is_absolute() ? addon.addonPath.string() : "${workspaceRoot}/../" + addon.addonPath.string();
-//	object["path"] = path;
-//	json::json_pointer p = json::json_pointer("/folders");
-//	workspace.data[p].emplace_back( object );
+//	alert("VSCodeProject::addAddon() " + addon.name, 35);
 
 	workspace.addPath(addon.addonPath);
 	// examples of how to add entries to json arrays
@@ -118,17 +103,17 @@ void VSCodeProject::addAddon(ofAddon & addon) {
 
 
 bool VSCodeProject::saveProjectFile(){
-	alert("VSCodeProject::saveProjectFile() ");
+//	alert("VSCodeProject::saveProjectFile() ");
+//	alert("--- VSCodeProject::extSrcPaths() ");
+//	for (auto & e : extSrcPaths) {
+//		cout << e << endl;
+//		workspace.addPath(e);
+//
+//	}
+//	alert("--- VSCodeProject::extSrcPaths() ");
+
 	
-	alert("--- VSCodeProject::extSrcPaths() ");
-//	cout << extSrcPaths.size() << endl;
-	for (auto & e : extSrcPaths) {
-		cout << e << endl;
-		workspace.addPath(e);
-
-	}
-	alert("--- VSCodeProject::extSrcPaths() ");
-
+	workspace.data["openFrameworksProjectGeneratorVersion"] = getPGVersion();
 	
 	workspace.save();
 	cppProperties.save();
@@ -137,14 +122,14 @@ bool VSCodeProject::saveProjectFile(){
 
 
 void VSCodeProject::addSrc(const fs::path & srcName, const fs::path & folder, SrcType type){
-	alert ("addSrc " + srcName.string(), 33);
+//	alert ("addSrc " + srcName.string(), 33);
 }
 
 void VSCodeProject::addInclude(std::string includeName){
-	alert ("addInclude " + includeName, 34);
+//	alert ("addInclude " + includeName, 34);
 	cppProperties.addToArray("/env/PROJECT_EXTRA_INCLUDES", fs::path(includeName));
 }
 
 void VSCodeProject::addLibrary(const LibraryBinary & lib){
-	alert ("addLibrary " + lib.path, 35);
+//	alert ("addLibrary " + lib.path, 35);
 }

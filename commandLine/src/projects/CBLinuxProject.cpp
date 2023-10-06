@@ -10,7 +10,7 @@
 #include "ofLog.h"
 #include "Utils.h"
 
-std::string CBLinuxProject::LOG_NAME = "CBLinuxProject";
+std::string CBLinuxProject::LOG_NAME { "CBLinuxProject" };
 
 bool CBLinuxProject::createProjectFile(){
 	// FIXME: This only exists here, not other projects. I think it should be removed

@@ -16,18 +16,19 @@ bool QtCreatorProject::createProjectFile(){
 	
 	fs::path qbsFile { fs::path { projectName + ".qbs" } };
 	vector < std::pair <fs::path, fs::path > > fromTo {
-		{ "qtcreator.qbs",  qbsFile},
+		{ "qtcreator.qbs", qbsFile },
 		{ "Makefile", "Makefile" },
 		{ "config.make", "config.make" },
 	};
 	
 	for (auto & p : fromTo) {
-		fs::path src = templatePath / p.first;
-		fs::path dst = projectDir / p.second;
+		// FIXME: Wrong paths here. there are some more folders like "wizard" / "openFrameworks"
+		fs::path src { templatePath / p.first };
+		fs::path dst { projectDir / p.second };
 		try {
 			fs::copy_file(src, dst, fs::copy_options::overwrite_existing);
 		} catch(fs::filesystem_error& e) {
-			ofLogError(LOG_NAME) << "error copying template file " << p.first << " : " << p.second << e.what();
+			ofLogError(LOG_NAME) << "error copying template file " << src << " : " << dst << " : " << e.what();
 			return false;
 		}
 	}
@@ -36,7 +37,7 @@ bool QtCreatorProject::createProjectFile(){
 	findandreplaceInTexfile(qbsFile, "emptyExample", projectName);
 
 	// Calculate OF Root in relation to each project (recursively);
-	auto relRoot = fs::relative((fs::current_path() / getOFRoot()), projectDir);
+	auto relRoot { fs::relative((fs::current_path() / getOFRoot()), projectDir) };
 	if (!fs::equivalent(relRoot, "../../..")) {
 		string root = relRoot.string();
 		for (auto & p : fromTo) {
@@ -46,12 +47,13 @@ bool QtCreatorProject::createProjectFile(){
 	return true;
 }
 
+
 void QtCreatorProject::addSrc(const fs::path & srcFile, const fs::path & folder, baseProject::SrcType type){
 	qbsProjectFiles.insert(srcFile.string());
 }
 
-bool QtCreatorProject::loadProjectFile(){
 
+bool QtCreatorProject::loadProjectFile(){
 	fs::path file { projectDir / (projectName + ".qbs") };
 	if (!fs::exists(file)) {
 		ofLogError(LOG_NAME) << "error loading" << file << "doesn't exist";
@@ -95,6 +97,7 @@ bool QtCreatorProject::loadProjectFile(){
 	}
 	return ret;
 }
+
 
 bool QtCreatorProject::saveProjectFile(){
 	auto qbsStr = qbs.getText();
@@ -142,6 +145,7 @@ bool QtCreatorProject::saveProjectFile(){
 //	project.writeFromBuffer(qbs);
 	return true;
 }
+
 
 void QtCreatorProject::addAddon(ofAddon & addon){
 	// FIXME: I think this is unneded since this function here is triggered by baseclass::addAddon(string) which already checked if exists.
