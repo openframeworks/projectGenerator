@@ -67,6 +67,8 @@ bool VSCodeProject::createProjectFile(){
 	
 	// Copy all files from template, recursively
 	try {
+//		alert ("copy from " + templatePath.string());
+//		alert ("copy to " + projectDir.string());
 		fs::copy(templatePath, projectDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
 	} catch(fs::filesystem_error& e) {
 		ofLogError(LOG_NAME) << "error copying folder " << templatePath << " : " << projectDir << " : " << e.what();
@@ -84,6 +86,11 @@ bool VSCodeProject::createProjectFile(){
 	
 	// Rename Project Workspace
 	try {
+		
+		if (fs::exists(workspace.fileName)) {
+			
+		}
+		
 		fs::rename(projectDir / "emptyExample.code-workspace", workspace.fileName);
 	} catch(fs::filesystem_error& e) {
 		ofLogError(LOG_NAME) << "error renaming folder " << " : " << workspace.fileName << " : " << e.what();
