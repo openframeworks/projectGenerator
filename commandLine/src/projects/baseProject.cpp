@@ -111,13 +111,14 @@ bool baseProject::create(const fs::path & path, string templateName){
 //	alert("getOFRoot() " + fs::weakly_canonical(fs::absolute(getOFRoot())).string());
 //	alert("path " + path.string());
 //	alert("path " + fs::weakly_canonical(fs::absolute(path)).string());
+
 	if (ofIsPathInPath(fs::absolute(path), getOFRoot())) {
 //		alert ("bMakeRelative true", 35);
 		bMakeRelative = true;
 	} else {
 //		alert ("bMakeRelative false", 35);
 	}
-	
+
 	addons.clear();
 	extSrcPaths.clear();
 
@@ -146,7 +147,6 @@ bool baseProject::create(const fs::path & path, string templateName){
 	if(!ret) return false;
 	
 //	cout << "after return : " << templateName << endl;
-
 	if(!empty(templateName)){
 //		cout << "templateName not empty " << templateName << endl;
 //		return getOFRoot() / templatesFolder / target;

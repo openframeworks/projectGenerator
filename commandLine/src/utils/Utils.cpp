@@ -377,7 +377,7 @@ unique_ptr<baseProject> getTargetProject(const string & targ) {
 	} else if (targ == "msys2") {
 //		return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));
 		return unique_ptr<VSCodeProject>(new VSCodeProject(targ));
-	} else if (targ == "winvs") {
+	} else if (targ == "vs") {
 		return unique_ptr<visualStudioProject>(new visualStudioProject(targ));
 	} else if (targ == "linux" ||
 			   targ == "linux64" ||
