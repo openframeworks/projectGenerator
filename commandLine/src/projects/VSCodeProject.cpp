@@ -95,6 +95,7 @@ void VSCodeProject::addAddon(ofAddon & addon) {
 //	alert("VSCodeProject::addAddon() " + addon.name, 35);
 
 	workspace.addPath(addon.addonPath);
+	
 	// examples of how to add entries to json arrays
 //	cppProperties.addToArray("/env/PROJECT_ADDON_INCLUDES", addon.addonPath);
 //	cppProperties.addToArray("/env/PROJECT_EXTRA_INCLUDES", addon.addonPath);
