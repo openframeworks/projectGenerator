@@ -86,14 +86,9 @@ bool VSCodeProject::createProjectFile(){
 	
 	// Rename Project Workspace
 	try {
-		
-		if (fs::exists(workspace.fileName)) {
-			
-		}
-		
 		fs::rename(projectDir / "emptyExample.code-workspace", workspace.fileName);
 	} catch(fs::filesystem_error& e) {
-		ofLogError(LOG_NAME) << "error renaming folder " << " : " << workspace.fileName << " : " << e.what();
+		ofLogError(LOG_NAME) << "error renaming project " << " : " << workspace.fileName << " : " << e.what();
 		return false;
 	}
 	return true;
