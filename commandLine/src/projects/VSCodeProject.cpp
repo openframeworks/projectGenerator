@@ -67,15 +67,13 @@ bool VSCodeProject::createProjectFile(){
 	
 	// Copy all files from template, recursively
 	try {
-//		alert ("copy from " + templatePath.string());
-//		alert ("copy to " + projectDir.string());
 		fs::copy(templatePath, projectDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
 	} catch(fs::filesystem_error& e) {
 		ofLogError(LOG_NAME) << "error copying folder " << templatePath << " : " << projectDir << " : " << e.what();
 		return false;
 	}
 
-
+	
 	auto templateConfig { projectDir / "template.config" };
 	try {
 		fs::remove( templateConfig );
