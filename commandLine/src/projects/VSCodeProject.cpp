@@ -73,6 +73,15 @@ bool VSCodeProject::createProjectFile(){
 		return false;
 	}
 
+
+	auto templateConfig { projectDir / "template.config" };
+	try {
+		fs::remove( templateConfig );
+	} catch(fs::filesystem_error& e) {
+		ofLogError(LOG_NAME) << "error removing file " << " : " << templateConfig << " : " << e.what();
+	}
+
+	
 	// Rename Project Workspace
 	try {
 		fs::rename(projectDir / "emptyExample.code-workspace", workspace.fileName);
