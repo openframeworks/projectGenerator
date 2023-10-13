@@ -358,7 +358,30 @@ void baseProject::addAddon(string addonName){
 		addInclude(e);
 	}
 	
-	
+	// It was part exclusive of visualStudioProject. now it is part of baseProject, so dlls are copied in VSCode project and .so files in linux
+	for (auto & d : addon.dllsToCopy) {
+		ofLogVerbose() << "adding addon dlls to bin: " << d;
+		fs::path from { d };
+		fs::path to { projectDir / "bin" / from.filename() };
+		if (from.extension() == ".so") {
+			fs::path folder { projectDir / "bin" / "libs" };
+			if (!fs::exists(folder)) {
+				try {
+					fs::create_directory(folder);
+				} catch(fs::filesystem_error& e) {
+					ofLogError("baseProject::addAddon") << "error creating folder " << folder << e.what();
+				}
+			}
+//			to = projectDir / "bin" / "libs" / from.filename();
+			to = folder / from.filename();
+		}
+		
+		try {
+			fs::copy_file(from, to, fs::copy_options::overwrite_existing);
+		} catch(fs::filesystem_error& e) {
+			ofLogError("baseProject::addAddon") << "error copying template file " << from << endl << "to: " << to << endl <<  e.what();
+		}
+	}
 	
 	// MARK: - SPECIFIC for each project.
 	// XCode and VS override the base addAddon. other templates will use baseproject::addAddon(ofAddon...

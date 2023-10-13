@@ -546,13 +546,16 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 			
 
 		}
-		if(platform == "vs" || platform == "msys2"){
+//		if(platform == "vs" || platform == "msys2"){
+		if(platform == "vs" || platform == "msys2" 
+			   || platform == "vscode"
+			   || platform == "linux"
+			   || platform == "linux64"
+			   || platform == "linuxarmv6l"
+			   || platform == "linuxarmv7l"
+			   || platform == "linuxaarch64"
+		   ){
 			getDllsRecursively(libsPath, dllsToCopy, platform);
-			
-//			alert ("ofAddon dllsToCopy", 32);
-//			for (auto & d : dllsToCopy) {
-//				cout << d << endl;
-//			}
 		}
 	}
 	

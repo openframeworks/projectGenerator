@@ -238,7 +238,7 @@ void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, st
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
 
 	for (const auto & f : dirList(path)) {
-		if (fs::is_regular_file(f) && f.extension() == ".dll") {
+		if (fs::is_regular_file(f) && (f.extension() == ".dll" || f.extension() == ".so")) {
 			dlls.emplace_back(f.string());
 		}
 	}

@@ -531,26 +531,6 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 //		addSrc(addon.headersrcFiles[i],addon.filesToFolders[addon.headersrcFiles[i]],C);
 
 
-	for (auto & d : addon.dllsToCopy) {
-		ofLogVerbose() << "adding addon dlls to bin: " << d;
-//		fs::path from = addon.addonPath / d;
-		fs::path from { d };
-		fs::path to { projectDir / "bin" / from.filename() };
-		
-//		alert("copy from to " + from.string() + " : " + to.string(), 35);
-//		alert("addonPath " + addon.addonPath.string(), 36);
-//		alert("d " + d, 36);
-//		alert("copy from " + from.string(), 35);
-//		alert("copy to " + to.string(), 35);
-
-		
-		try {
-			fs::copy_file(from, to, fs::copy_options::overwrite_existing);
-		} catch(fs::filesystem_error& e) {
-			ofLogError(LOG_NAME) << "error copying template file " << from << endl << "to: " << to << endl <<  e.what();
-		}
-	}
-
 	
 
 	for (auto & a : addon.cflags) {
