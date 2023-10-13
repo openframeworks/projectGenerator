@@ -1,6 +1,6 @@
 #pragma once
 
-#define PG_VERSION "25"
+#define PG_VERSION "26"
 
 #include "ofAddon.h"
 #include "ofFileUtils.h"
