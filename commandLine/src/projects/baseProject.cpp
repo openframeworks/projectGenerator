@@ -24,7 +24,17 @@ baseProject::baseProject(const string & _target) : target(_target) {
 }
 
 fs::path baseProject::getPlatformTemplateDir() {
-	return getOFRoot() / templatesFolder / target;
+	string folder { target };
+	if ( target == "msys2"
+		|| target == "linux"
+		|| target == "linux64"
+		|| target == "linuxarmv6l"
+		|| target == "linuxarmv7l"
+		|| target == "linuxaarch64"
+	) {
+		folder = "vscode";
+	}
+	return getOFRoot() / templatesFolder / folder;
 }
 
 
