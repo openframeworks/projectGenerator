@@ -9,7 +9,7 @@
 
 #include "baseProject.h"
 
-class CBWinProject: public baseProject  {
+class CBWinProject: public baseProject {
 public:
 	CBWinProject(const std::string & target) : baseProject(target) {};
 
@@ -22,7 +22,4 @@ public:
 	void addLibrary(const LibraryBinary & lib);
 
 	static std::string LOG_NAME;
-
-private:
-
 };

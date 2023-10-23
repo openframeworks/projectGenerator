@@ -223,7 +223,7 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 				}
 			}
 
-			
+
 			if (prefix == "" || v.find(pathToOF.string()) == 0 || fs::path{v}.is_absolute()) {
 				variable.push_back( { v, "", "" } );
 			} else {
@@ -399,7 +399,7 @@ void ofAddon::parseConfig(){
 	if (!fs::exists(fileName)) return;
 
 	int lineNum = 0;
-	
+
 	for (auto & originalLine : fileToStrings(fileName)) {
 		lineNum++;
 		string line = originalLine;
@@ -471,8 +471,8 @@ void ofAddon::parseConfig(){
 
 
 bool ofAddon::fromFS(const fs::path & path, const string & platform){
-    // alert("ofAddon::fromFS path : " + path.string());
-	
+	// alert("ofAddon::fromFS path : " + path.string());
+
 	clear();
 	this->platform = platform;
 
@@ -494,9 +494,9 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 
 	// MARK: srcFiles to fs::path
 	// not possible today because there are string based exclusion functions
-	
+
 	fs::path parentFolder = path.parent_path();
-	
+
 	for (auto & s : srcFiles) {
 		fs::path sFS { s };
 		fs::path folder;
@@ -504,7 +504,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 //			folder = sFS.parent_path();
 //			folder = fs::path { "local_addons" } / sFS.parent_path().filename();
 			folder = fs::path { "local_addons" } / fs::relative(sFS.parent_path(), parentFolder);
-            // alert ("isLocal folder=" + folder.string(), 36);
+			// alert ("isLocal folder=" + folder.string(), 36);
 		} else {
 			sFS = fixPath(s);
 			s = sFS.string();
@@ -517,7 +517,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		// here addonPath is the same as path.
 		getPropsRecursively(addonPath, propsFiles, platform);
 	}
-	
+
 	// TODO: Remove comments
 //	int i = 0;
 //	for (auto & s : propsFiles) {
@@ -536,18 +536,18 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 
 	fs::path libsPath = path / "libs";
 	vector < fs::path > libFiles;
-	
+
 //	alert ("libsPath " + libsPath.string());
 	if (fs::exists(libsPath)) {
 //		alert ("exists");
 		getLibsRecursively(libsPath, libFiles, libs, platform);
 		if (platform == "osx" || platform == "ios"){
 			getFrameworksRecursively(libsPath, frameworks, platform);
-			
+
 
 		}
 //		if(platform == "vs" || platform == "msys2"){
-		if(platform == "vs" || platform == "msys2" 
+		if(platform == "vs" || platform == "msys2"
 			   || platform == "vscode"
 			   || platform == "linux"
 			   || platform == "linux64"
@@ -558,7 +558,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 			getDllsRecursively(libsPath, dllsToCopy, platform);
 		}
 	}
-	
+
 	// TODO: this is not needed even if it is local addon but project is outside OF root path
 	// Absolute paths will be used in this case too.
 	// Maybe it is the same situation for all others fixPath occurences?
@@ -582,7 +582,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		srcFiles.emplace_back(s.string());
 		filesToFolders[s.string()] = folder.string();
 	}
-	
+
 	// FIXME: This is flawed logic, frameworks acquired here will always come from filesystem, config is not yet parsed
 	// so addons will never be system.
 	for (const auto & f : frameworks) {
@@ -600,7 +600,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 			; // do we need to do anything here?
 		} else {
 			// if addon is local, it is relative to the project folder, and if it is not, it is related to the project folder, ex: addons/ofxSvg
-			
+
 			// FIXME:: Cleanup the mess
 			fs::path rel = fs::relative (f, isLocalAddon ? pathToProject : pathToOF);
 			fs::path folder = rel.parent_path();
@@ -609,16 +609,16 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 				fs::path fFS { f };
 				folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
 			}
-			
+
 //			alert (f);
 //			alert (folder.string());
 			filesToFolders[f] = folder.string();
 		}
 	}
 
-	
 
-	
+
+
 	// paths that are needed for the includes.
 	std::list < fs::path > paths;
 
@@ -638,18 +638,18 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 			paths.emplace_back( isLocalAddon ? path : fixPath(path) );
 		}
 	}
-	
 
 
-	
+
+
 	paths.sort();
 
 	for (auto & p : paths) {
 		includePaths.emplace_back(p.string());
 	}
-	
+
 	parseConfig();
-	
+
 //		alert ("--- LIST LIBS", 35);
 //		for (auto & l : libs) {
 //			alert (l.path, 35);

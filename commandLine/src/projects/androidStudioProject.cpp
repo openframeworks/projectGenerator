@@ -25,7 +25,7 @@ bool AndroidStudioProject::createProjectFile(){
 		"gradlew",
 		"gradlew.bat",
 	};
-	
+
 	for (auto & f : fileNames) {
 		fs::path to { projectDir / f };
 		if (!fs::exists(to)) {
@@ -45,7 +45,7 @@ bool AndroidStudioProject::createProjectFile(){
 	for (auto & p : { string("res") , string("srcJava"), string("gradle") }) {
 		fs::copy (templatePath / p, projectDir / p, fs::copy_options::recursive);
 	}
-	
+
 	findandreplaceInTexfile( projectDir / "res/values/strings.xml", "TEMPLATE_APP_NAME", projectName);
 
 	fs::path from { projectDir / "srcJava/cc/openframeworks/APP_NAME" };

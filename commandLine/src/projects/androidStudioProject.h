@@ -2,8 +2,7 @@
 
 #include "baseProject.h"
 
-class AndroidStudioProject : public baseProject
-{
+class AndroidStudioProject : public baseProject {
 public:
 	AndroidStudioProject(const std::string & target);
 
@@ -14,5 +13,4 @@ public:
 	bool loadProjectFile() { return false; };
 	bool saveProjectFile(){ return false; };
 	static std::string LOG_NAME;
-
 };

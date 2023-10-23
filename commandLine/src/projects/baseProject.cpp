@@ -53,7 +53,7 @@ std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const fs::path
 			auto templateConfig = std::make_unique<Template>();
 			templateConfig->dir = templateDir;
 			templateConfig->name = name;
-			
+
 			for (auto & line : fileToStrings(templateConfigFilePath)) {
 				if(ofTrim(line).front() == '#') continue;
 				auto varValue = ofSplitString(line,"+=",true,true);
@@ -100,7 +100,7 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(string target)
 			sorted.insert(f);
 		}
 	}
-	
+
 	for (auto & s : sorted) {
 		auto templateConfig = parseTemplate(s);
 		if(templateConfig){
@@ -113,10 +113,10 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(string target)
 bool baseProject::create(const fs::path & path, string templateName){
 //	alert("baseProject::create " + path.string() + " : " + templateName, 35);
 //	auto path = _path; // just because it is const
-	
-	
+
+
 	//if the files being added are inside the OF root folder, make them relative to the folder.
-	
+
 //	alert("getOFRoot() " + getOFRoot().string());
 //	alert("getOFRoot() " + fs::weakly_canonical(fs::absolute(getOFRoot())).string());
 //	alert("path " + path.string());
@@ -141,7 +141,7 @@ bool baseProject::create(const fs::path & path, string templateName){
 //	cout << "projectDir " << projectDir << endl;
 //	cout << "projectPath " << projectPath << endl;
 //	cout << "projectName = " << projectName << endl;
-//	
+//
 	bool bDoesDirExist = false;
 
 	fs::path project { projectDir / "src" };
@@ -155,7 +155,7 @@ bool baseProject::create(const fs::path & path, string templateName){
 
 	bool ret = createProjectFile();
 	if(!ret) return false;
-	
+
 //	cout << "after return : " << templateName << endl;
 	if(!empty(templateName)){
 //		cout << "templateName not empty " << templateName << endl;
@@ -195,7 +195,7 @@ bool baseProject::create(const fs::path & path, string templateName){
 		getFilesRecursively(projectDir / "src", fileNames);
 
 		std::sort (fileNames.begin(), fileNames.end());
-		
+
 //		for (auto & f : fileNames) {
 //			alert (f);
 //		}
@@ -243,7 +243,7 @@ bool baseProject::create(const fs::path & path, string templateName){
 
 bool baseProject::save(){
 	ofLog(OF_LOG_NOTICE) << "saving addons.make";
-	
+
 	std::ofstream addonsMake(projectDir / "addons.make");
 	for (auto & a : addons) {
 		if (a.isLocalAddon) {
@@ -255,7 +255,7 @@ bool baseProject::save(){
 
 	//save out params which the PG knows about to config.make
 	//we mostly use this right now for storing the external source paths
-	
+
 	vector <string> lines = fileToStrings(projectDir / "config.make");
 	std::ofstream saveConfig(projectDir / "config.make");
 
@@ -263,7 +263,7 @@ bool baseProject::save(){
 		//add the of root path
 		if( str.rfind("# OF_ROOT =", 0) == 0 || str.rfind("OF_ROOT =", 0) == 0){
 			fs::path path = getOFRoot();
-			
+
 			// FIXME: change to ofIsPathInPath
 			if( projectDir.string().rfind(getOFRoot().string(), 0) == 0) {
 				path = getOFRelPath(projectDir);
@@ -290,13 +290,13 @@ bool baseProject::isAddonInCache(const string & addonPath, const string platform
 
 void baseProject::addAddon(string addonName){
 //	alert( "baseProject::addAddon " + addonName );
-	
+
 	// FIXME : not target, yes platform.
 	#ifdef TARGET_WIN32
 //	std::replace( addonName.begin(), addonName.end(), '/', '\\' );
 	fixSlashOrder(addonName);
 	#endif
-	
+
 	ofAddon addon;
 	// MARK: Review this path here. EDIT: I think it is finally good
 
@@ -305,12 +305,12 @@ void baseProject::addAddon(string addonName){
 	} else {
 		addon.pathToOF = getOFRoot();
 	}
-	
+
 	addon.pathToProject = projectDir;
 
 	bool addonOK = false;
 	bool inCache = isAddonInCache(addonName, target);
-	
+
 	fs::path addonPath { addonName };
 
 	if (fs::exists(addonPath)) {
@@ -320,7 +320,7 @@ void baseProject::addAddon(string addonName){
 		addon.isLocalAddon = false;
 	}
 
-	
+
 	if (!inCache) {
 		addonOK = addon.fromFS(addonPath, target);
 	} else {
@@ -337,7 +337,7 @@ void baseProject::addAddon(string addonName){
 		//cache the addon so we dont have to be reading form disk all the time
 		addonsCache[target][addonName] = addon;
 	}
-	
+
 	for (auto & a : addons) {
 		if (a.name == addon.name) return;
 	}
@@ -357,17 +357,17 @@ void baseProject::addAddon(string addonName){
 			ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << d;
 		}
 	}
-	
-	
+
+
 	ofLogNotice() << "adding addon: " << addon.name;
 	addons.emplace_back(addon);
-	
+
 	for (auto & e : addon.includePaths) {
 		ofLogVerbose() << "adding addon include path: " << e;
 //		ofLog() << "adding addon include path: " << e;
 		addInclude(e);
 	}
-	
+
 	// It was part exclusive of visualStudioProject. now it is part of baseProject, so dlls are copied in VSCode project and .so files in linux
 	for (auto & d : addon.dllsToCopy) {
 		ofLogVerbose() << "adding addon dlls to bin: " << d;
@@ -385,14 +385,14 @@ void baseProject::addAddon(string addonName){
 //			to = projectDir / "bin" / "libs" / from.filename();
 			to = folder / from.filename();
 		}
-		
+
 		try {
 			fs::copy_file(from, to, fs::copy_options::overwrite_existing);
 		} catch(fs::filesystem_error& e) {
 			ofLogError("baseProject::addAddon") << "error copying template file " << from << endl << "to: " << to << endl <<  e.what();
 		}
 	}
-	
+
 	// MARK: - SPECIFIC for each project.
 	// XCode and VS override the base addAddon. other templates will use baseproject::addAddon(ofAddon...
 	addAddon(addon);
@@ -404,7 +404,7 @@ void baseProject::addAddon(string addonName){
 			ofStringReplace(d, "data/", ""); // avoid to copy files at /data/data/*
 			fs::path from { addon.addonPath / data };
 			fs::path dest { projectDir / "bin" / "data" };
-			
+
 			if(fs::exists(from)){
 				fs::path to { dest / d };
 				if (fs::is_regular_file(from)){
@@ -419,7 +419,7 @@ void baseProject::addAddon(string addonName){
 					if (!fs::exists(to)) {
 						fs::create_directory(to);
 					}
-					
+
 					try {
 						fs::copy(from, to, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
 						ofLogVerbose() << "adding addon data file: " << d << endl;
@@ -448,10 +448,10 @@ void baseProject::addAddon(ofAddon & addon){
 	}
 
 	/*
-	 
+
 	 MARK: Test this, I suppose this is only invoked when an addon is added
 	 from a dependency of another addon, and it has its own dependencies too.
-	 
+
 	 this is not possible to test easily using xcode or visualstudio project
 	 because baseProject::addAddon is only invoked when there is already dependencies in xcode addons.
 	 the only way to test this is other platforms like qbs?
@@ -489,46 +489,46 @@ void baseProject::addAddon(ofAddon & addon){
 
 	for (auto & a : addon.libs) {
 		ofLogVerbose() << "adding addon libs: " << a.path;
-        // FIXME: remove
+		// FIXME: remove
 		alert ("addlibrary " + a.path, 33);
 		addLibrary(a);
 	}
-	
+
 	for (auto & a : addon.cflags) {
 		ofLogVerbose() << "adding addon cflags: " << a;
 		addCFLAG(a);
 	}
-	
+
 	for (auto & a : addon.cppflags) {
 		ofLogVerbose() << "adding addon cppflags: " << a;
 		addCPPFLAG(a);
 	}
-	
+
 	for (auto & a : addon.ldflags) {
 		ofLogVerbose() << "adding addon ldflags: " << a;
 		addLDFLAG(a);
 	}
-	
+
 	for (auto & a : addon.srcFiles) {
 		ofLogVerbose() << "adding addon srcFiles: " << a;
 		addSrc(a, addon.filesToFolders[a]);
 	}
-	
+
 	for (auto & a : addon.csrcFiles) {
 		ofLogVerbose() << "adding addon c srcFiles: " << a;
 		addSrc(a, addon.filesToFolders[a], C);
 	}
-	
+
 	for (auto & a : addon.cppsrcFiles) {
 		ofLogVerbose() << "adding addon cpp srcFiles: " << a;
 		addSrc(a, addon.filesToFolders[a],CPP);
 	}
-	
+
 	for (auto & a : addon.objcsrcFiles) {
 		ofLogVerbose() << "adding addon objc srcFiles: " << a;
 		addSrc(a, addon.filesToFolders[a],OBJC);
 	}
-	
+
 	for (auto & a : addon.headersrcFiles) {
 		ofLogVerbose() << "adding addon header srcFiles: " << a;
 		addSrc(a, addon.filesToFolders[a],HEADER);
@@ -547,14 +547,14 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 //	alert("addSrcRecursively " + srcPath.string());
 	fs::path base = srcPath.parent_path();
 //	alert("base = " + base.string());
-	
+
 	extSrcPaths.emplace_back(srcPath);
 	vector < fs::path > srcFilesToAdd;
 	getFilesRecursively(srcPath, srcFilesToAdd);
 //	bool isRelative = ofIsPathInPath(fs::absolute(srcPath), getOFRoot());
 
 	std::unordered_set<string> uniqueIncludeFolders;
-	
+
 	for( auto & src : srcFilesToAdd){
 		fs::path parent = src.parent_path();
 		fs::path folder = parent.lexically_relative(base);

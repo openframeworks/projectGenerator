@@ -13,14 +13,14 @@ bool QtCreatorProject::createProjectFile(){
 	if (!fs::exists(projectDir)) {
 		fs::create_directory(projectDir);
 	}
-	
+
 	fs::path qbsFile { fs::path { projectName + ".qbs" } };
 	vector < std::pair <fs::path, fs::path > > fromTo {
 		{ "qtcreator.qbs", qbsFile },
 		{ "Makefile", "Makefile" },
 		{ "config.make", "config.make" },
 	};
-	
+
 	for (auto & p : fromTo) {
 		// FIXME: Wrong paths here. there are some more folders like "wizard" / "openFrameworks"
 		fs::path src { templatePath / p.first };
@@ -32,7 +32,7 @@ bool QtCreatorProject::createProjectFile(){
 			return false;
 		}
 	}
-	
+
 	// TODO: This opens twice the same file to find and replace. maybe we can make another function with std::pairs of find, replace strings
 	findandreplaceInTexfile(qbsFile, "emptyExample", projectName);
 
@@ -59,7 +59,7 @@ bool QtCreatorProject::loadProjectFile(){
 		ofLogError(LOG_NAME) << "error loading" << file << "doesn't exist";
 		return false;
 	}
-	
+
 	std::ifstream project(file);
 	auto ret = qbs.set(project);
 	// parse files in current .qbs
@@ -129,7 +129,7 @@ bool QtCreatorProject::saveProjectFile(){
 
 	// save final project
 	qbs.set(qbsStr);
-	
+
 	fs::path fileName = projectDir / (projectName + ".qbs");
 	std::ofstream projectFile(fileName);
 	try{
