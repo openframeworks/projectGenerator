@@ -1,11 +1,7 @@
-
-
-
 #include "visualStudioProject.h"
 #include "Utils.h"
 
 string visualStudioProject::LOG_NAME = "visualStudioProjectFile";
-
 
 bool visualStudioProject::createProjectFile(){
 //	alert("visualStudioProject::createProjectFile");
@@ -67,7 +63,7 @@ bool visualStudioProject::loadProjectFile(){
 
 
 bool visualStudioProject::saveProjectFile(){
-	
+
 	/*
 	 PSEUDOCODE HERE
 	 open sln project
@@ -91,43 +87,43 @@ bool visualStudioProject::saveProjectFile(){
 		}
 		//		string findString = "Global" + divider;
 		string findString = "Global";
-		
+
 		additionalProjects += findString ;
-		
+
 		solution = solution.lexically_normal();
 		//		findandreplaceInTexfile(solution, findString, additionalProjects);
-		
+
 		std::ifstream file(solution);
 		std::stringstream buffer;
 		buffer << file.rdbuf();
 		string str = buffer.str();
 		file.close();
-		
+
 		std::size_t pos = str.find(findString);
 		if (pos != std::string::npos) {
 			str.replace(pos, findString.length(), additionalProjects);
 		}
-		
+
 		std::ofstream myfile(solution);
 		myfile << str;
 		myfile.close();
-		
-		
+
+
 		//		cout << fs::current_path() << endl;
 		//		cout << fs::absolute(solution) << endl;
 		//		cout << solution.lexically_normal() << endl;
 	}
-	
-	
-	
+
+
+
 	auto filters { projectDir / (projectName + ".vcxproj.filters") };
 	//	alert ("saving filters file : " + filters.string(), 35);
 	bool ok1 = filterXmlDoc.save_file(filters.c_str());
-	
+
 	auto vcxFile { projectDir / (projectName + ".vcxproj") };
 //	alert ("saving vcxFile file : " + vcxFile.string(), 35);
 	bool ok2 = doc.save_file(vcxFile.c_str());
-	
+
 	return ok1 && ok2;
 }
 
@@ -167,13 +163,13 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 		cout << "Empty " << srcFile << " : " << folder << endl;
 		return;
 	}
-	
+
 	string srcFileString = srcFile.string();
 	fixSlashOrder(srcFileString);
 	string folderString = folder.string();
 	fixSlashOrder(folderString);
 
-	
+
 // FIXME: Convert to FS::path
 	std::vector < string > folderSubNames = ofSplitString(folderString, "\\");
 	string folderName = "";
@@ -187,7 +183,7 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 	if(type==DEFAULT){
 		if ( ext == ".h" || ext == ".hpp" || ext == ".inl" ) {
 			appendValue(doc, "ClInclude", "Include", srcFileString);
-			
+
 			pugi::xml_node node = filterXmlDoc.select_node("//ItemGroup[ClInclude]").node();
 			pugi::xml_node nodeAdded = node.append_child("ClInclude");
 			nodeAdded.append_attribute("Include").set_value(srcFileString.c_str());
@@ -336,7 +332,7 @@ void visualStudioProject::addProps(fs::path propsFile){
 }
 
 void visualStudioProject::addLibrary(const LibraryBinary & lib) {
-	
+
 	// TODO: in future change Library to FS
 //	alert ("visualStudioProject::addLibrary " + lib.path, 36);
 	auto libraryName = fs::path { lib.path };
@@ -346,12 +342,12 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 //	size_t found = libraryName.find_last_of("\\");
 //	string libFolder = libraryName.substr(0, found);
 	auto libFolder = libraryName.parent_path();
-	
+
 	string libFolderString = libFolder.string();
 	fixSlashOrder(libFolderString);
-	
+
 //    alert ("libFolderString " + libFolderString, 36);
-    
+
 	auto libName = libraryName.filename();
 
 	// ---------| invariant: libExtension is `lib`
@@ -374,7 +370,7 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	if (!libFolderString.empty()) {
 //		alert("yes " + libFolderString, 34);
 		pugi::xpath_node_set addlLibsDir = doc.select_nodes((linkPath + "AdditionalLibraryDirectories").c_str());
-		
+
 		// FIXME:
 		// this function is called many times with the same parameters, like adding openCV. about 20 times the same command
 		// addLibraryPath ..\..\..\addons\ofxOpenCv\libs\opencv\lib\vs\x64\Debug
@@ -464,7 +460,7 @@ void visualStudioProject::addDefine(string define, LibType libType) {
 
 void visualStudioProject::addAddon(ofAddon & addon) {
 //	alert ("visualStudioProject::addAddon " + addon.name);
-	
+
 	fs::path additionalFolder = addon.addonPath / (addon.name + "Lib");
 	if (fs::exists(additionalFolder)) {
 		for (const auto & entry : fs::directory_iterator(additionalFolder)) {
@@ -474,7 +470,7 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 			}
 		}
 	}
-	
+
 	for (auto & props : addon.propsFiles) {
 		ofLogVerbose() << "adding addon props: " << props;
 		addProps(props);
@@ -494,10 +490,10 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 			f.second = "other";
 		}
 	}
-	
+
 	for (auto & s : addon.srcFiles) {
 		ofLogVerbose() << "adding addon srcFiles: " << s;
-		
+
 //		cout << "addSrc s=" << s << " : " << addon.filesToFolders[s] << endl;
 		addSrc(s,addon.filesToFolders[s]);
 	}
@@ -522,7 +518,7 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 //		if(addon.filesToFolders[addon.objcsrcFiles[i]]=="") addon.filesToFolders[addon.objcsrcFiles[i]]="other";
 //		addSrc(addon.objcsrcFiles[i],addon.filesToFolders[addon.objcsrcFiles[i]],C);
 
-	
+
 	for (auto & a : addon.headersrcFiles) {
 		ofLogVerbose() << "adding addon header srcFiles: " << a;
 		addSrc(a, addon.filesToFolders[a],HEADER);
@@ -530,8 +526,6 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 //		if(addon.filesToFolders[addon.headersrcFiles[i]]=="") addon.filesToFolders[addon.headersrcFiles[i]]="other";
 //		addSrc(addon.headersrcFiles[i],addon.filesToFolders[addon.headersrcFiles[i]],C);
 
-
-	
 
 	for (auto & a : addon.cflags) {
 		ofLogVerbose() << "adding addon cflags: " << a;
@@ -544,7 +538,7 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 		addCPPFLAG(a, RELEASE_LIB);
 		addCPPFLAG(a, DEBUG_LIB);
 	}
-	
+
 	for (auto & a : addon.defines) {
 		ofLogVerbose() << "adding addon defines: " << a;
 		addDefine(a, RELEASE_LIB);

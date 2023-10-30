@@ -9,7 +9,7 @@
 
 #include "baseProject.h"
 
-class VSCodeProject: public baseProject  {
+class VSCodeProject: public baseProject {
 public:
 	VSCodeProject(const std::string & target) : baseProject(target) {};
 

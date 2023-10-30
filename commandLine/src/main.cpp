@@ -3,14 +3,9 @@
 
 #include "optionparser.h"
 #include "defines.h"
-
-#include <string>
-
-
 #include "Utils.h"
+#include <string>
 #include <set>
-
-
 
 enum optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTERNAL, VERSION };
 
@@ -129,7 +124,7 @@ bool printTemplates() {
 void addPlatforms(const string & value) {
 	targets.clear();
 	vector < string > platforms = ofSplitString(value, ",", true, true);
-	
+
 	for (auto & p : platforms) {
 		if (p == "allplatforms") {
 			for (auto & option : platformsOptions) {
@@ -202,7 +197,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 }
 
 void recursiveUpdate(const fs::path & path, const string & target) {
-    // FIXME: remove
+	// FIXME: remove
 	alert("recursiveUpdate " + path.string() );
 	if (!fs::is_directory(path)) return;
 	vector <fs::path> folders;
@@ -226,7 +221,7 @@ void recursiveUpdate(const fs::path & path, const string & target) {
 	}
 
 	fs::path ofCalcPath = fs::weakly_canonical(fs::current_path() / ofPath);
-	
+
 	for (auto & path : folders) {
 //		cout << "------" << endl;
 //		cout << path << endl;
@@ -241,8 +236,8 @@ void recursiveUpdate(const fs::path & path, const string & target) {
 		}
 		setOFRoot(ofPath);
 		fs::current_path(path);
-        //alert ("ofRoot " + ofPath.string());
-        //alert ("cwd " + path.string());
+		//alert ("ofRoot " + ofPath.string());
+		//alert ("cwd " + path.string());
 
 		updateProject(path, target, false);
 	}
@@ -404,7 +399,7 @@ int main(int argc, char** argv){
 	of::priv::initutils();
 	startTime = ofGetElapsedTimef();
 	consoleSpace();
-	
+
 	// try to get the OF_PATH as an environt variable
 	char* pPath;
 	pPath = getenv("PG_OF_PATH");
@@ -416,7 +411,7 @@ int main(int argc, char** argv){
 		busingEnvVar = true;
 		ofPath = ofPathEnv;
 	}
-	
+
 	fs::path projectPath = fs::weakly_canonical(fs::current_path() / projectName);
 	if (!fs::exists(projectPath)) {
 		mode = PG_MODE_CREATE;
@@ -449,19 +444,19 @@ int main(int argc, char** argv){
 		if (!isGoodOFPath(ofPath)) {
 			return EXIT_USAGE;
 		}
-		
+
 // alert ("ofPath before " + ofPath.string());
 // alert ("projectPath " + projectPath.string());
 		if (ofPath.is_relative()) {
 			ofPath = fs::canonical(fs::current_path() / ofPath);
-            //alert ("ofPath canonical " + ofPath.string());
+			//alert ("ofPath canonical " + ofPath.string());
 		}
-		
+
 		if (ofIsPathInPath(projectPath, ofPath)) {
 			ofPath = fs::relative(ofPath, projectPath);
 		}
 		fs::current_path(projectPath);
-        //alert ("ofPath after " + ofPath.string());
+		//alert ("ofPath after " + ofPath.string());
 		setOFRoot(ofPath);
 	}
 

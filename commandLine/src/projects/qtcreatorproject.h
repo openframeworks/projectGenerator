@@ -3,8 +3,7 @@
 #include "baseProject.h"
 #include <set>
 
-class QtCreatorProject : public baseProject
-{
+class QtCreatorProject : public baseProject {
 public:
 	QtCreatorProject(const std::string & target);
 

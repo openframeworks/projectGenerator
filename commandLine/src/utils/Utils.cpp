@@ -78,7 +78,7 @@ void findandreplaceInTexfile( const fs::path & fileName, string tFind, string tR
 		buffer << t.rdbuf();
 		string bufferStr = buffer.str();
 		t.close();
-		
+
 		findandreplace(bufferStr, tFind, tReplace);
 		std::ofstream myfile(fileName);
 		myfile << bufferStr;
@@ -102,7 +102,7 @@ bool doesTagAndAttributeExist(pugi::xml_document & doc, string tag, string attri
 
 pugi::xml_node appendValue(pugi::xml_document & doc, string tag, string attribute, string newValue, bool overwriteMultiple){
 //	alert ("appendValue");
-	
+
 	if (overwriteMultiple == true){
 		// find the existing node...
 		string expression { "//" + tag + "[@" + attribute + "='" + newValue + "']" };
@@ -135,7 +135,7 @@ pugi::xml_node appendValue(pugi::xml_document & doc, string tag, string attribut
 void getFilesRecursively(const fs::path & path, std::vector < string > & fileNames){
 //	alert ("getFilesRecursively " + path.string());
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
-	
+
 	for (const auto & f : dirList(path)) {
 		if (fs::is_regular_file(f)) {
 			fileNames.emplace_back(f.string());
@@ -195,7 +195,7 @@ void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & fol
 //		if (f.filename().c_str()[0] == '.') continue;
 //		if (f.extension() == ".framework") continue;
 //	}
-	
+
 	// TODO: disable recursion pending... it is not recursive yet.
 	if (path.extension() != ".framework") {
 		for (const auto & entry : fs::directory_iterator(path)) {
@@ -211,7 +211,7 @@ void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & fol
 
 void getFrameworksRecursively(const fs::path & path, std::vector < string > & frameworks, string platform) {
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
-	
+
 	for (const auto & f : dirList(path)) {
 		if (fs::is_directory(f)) {
 			if (f.extension() == ".framework") {
@@ -247,7 +247,7 @@ void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, st
 void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFiles, std::vector < LibraryBinary > & libLibs, string platform, string arch, string target) {
 //	cout << ">> getLibsRecursively " << path << endl;
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
-	
+
 	fs::recursive_directory_iterator it { path };
 	fs::recursive_directory_iterator last {  };
 
@@ -261,7 +261,7 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 				continue;
 			} else {
 				auto stem = f.stem();
-				
+
 //				cout << "STEM " << stem << endl;
 				auto archFound = std::find(LibraryBinary::archs.begin(), LibraryBinary::archs.end(), stem);
 				if (archFound != LibraryBinary::archs.end()) {
@@ -371,7 +371,7 @@ string getOFRootFromConfig(){
 unique_ptr<baseProject> getTargetProject(const string & targ) {
 //	cout << "getTargetProject :" << getTargetString(targ) << endl;
 //	typedef xcodeProject pgProject;
-	
+
 	if (targ == "osx" || targ == "ios") {
 		return unique_ptr<xcodeProject>(new xcodeProject(targ));
 	} else if (targ == "msys2") {
@@ -413,7 +413,7 @@ void alert(string msg, int color) {
 vector <fs::path> dirList(const fs::path & path) {
 	// map to cache recursive directory listing for subsequent usage
 	static std::map<fs::path, vector <fs::path >> dirListMap;
-	
+
 	if (dirListMap.find(path) == dirListMap.end()) {
 //		alert ("will list dir " + path.string(), 35);
 		fs::recursive_directory_iterator it { path };
@@ -438,7 +438,7 @@ vector <fs::path> dirList(const fs::path & path) {
 
 vector <fs::path> folderList(const fs::path & path) {
 	static std::map<fs::path, vector <fs::path >> folderListMap;
-	
+
 	if (folderListMap.find(path) == folderListMap.end()) {
 		fs::recursive_directory_iterator it { path };
 		fs::recursive_directory_iterator last {  };
@@ -449,7 +449,7 @@ vector <fs::path> folderList(const fs::path & path) {
 				it.disable_recursion_pending();
 				continue;
 			}
-			
+
 			if (fs::is_directory(it->path())) {
 				folderListMap[path].emplace_back(it->path());
 			}

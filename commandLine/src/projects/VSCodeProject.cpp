@@ -16,7 +16,7 @@ using json = nlohmann::json;
 struct fileJson {
 	fs::path fileName;
 	json data;
-	
+
 	// only works for workspace
 	void addPath(fs::path folder) {
 		std::string path = folder.is_absolute() ? folder.string() : "${workspaceRoot}/../" + folder.string();
@@ -25,17 +25,17 @@ struct fileJson {
 		json::json_pointer p = json::json_pointer("/folders");
 		data[p].emplace_back( object );
 	}
-	
+
 	void addToArray(string pointer, fs::path value) {
 		json::json_pointer p = json::json_pointer(pointer);
 		if (!data[p].is_array()) {
 			data[p] = json::array();
 		}
-		
+
 		std::string path = fs::path(value).is_absolute() ? value.string() : "${workspaceRoot}/" + value.string();
 		data[p].emplace_back( path );
 	}
-	
+
 	void load() {
 		std::ifstream ifs(fileName);
 		try {
@@ -44,7 +44,7 @@ struct fileJson {
 			ofLogError(VSCodeProject::LOG_NAME) << "JSON parse error at byte" << ex.byte;
 		}
 	}
-	
+
 	void save() {
 //		alert ("saving now " + fileName.string(), 33);
 //		std::cout << data.dump(1, '\t') << std::endl;
@@ -64,7 +64,7 @@ std::string VSCodeProject::LOG_NAME = "VSCodeProject";
 bool VSCodeProject::createProjectFile(){
 	workspace.fileName = projectDir / (projectName + ".code-workspace");
 	cppProperties.fileName = projectDir / ".vscode/c_cpp_properties.json";
-	
+
 	// Copy all files from template, recursively
 	try {
 		fs::copy(templatePath, projectDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
@@ -104,7 +104,7 @@ void VSCodeProject::addAddon(ofAddon & addon) {
 //	alert("VSCodeProject::addAddon() " + addon.name, 35);
 
 	workspace.addPath(addon.addonPath);
-	
+
 	// examples of how to add entries to json arrays
 //	cppProperties.addToArray("/env/PROJECT_ADDON_INCLUDES", addon.addonPath);
 //	cppProperties.addToArray("/env/PROJECT_EXTRA_INCLUDES", addon.addonPath);
@@ -122,9 +122,9 @@ bool VSCodeProject::saveProjectFile(){
 //	}
 //	alert("--- VSCodeProject::extSrcPaths() ");
 
-	
+
 	workspace.data["openFrameworksProjectGeneratorVersion"] = getPGVersion();
-	
+
 	workspace.save();
 	cppProperties.save();
 	return true;
