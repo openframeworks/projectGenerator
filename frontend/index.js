@@ -1171,8 +1171,12 @@ ipcMain.on('getOSInfo', (event) => {
     };
 });
 
-ipcMain.on('openExternal', (event, [ url ]) => {
+ipcMain.on('openExternal', (event, url) => {
     shell.openExternal(url);
+});
+
+ipcMain.on('showItemInFolder', (event, p) => {
+    shell.showItemInFolder(p);
 });
 
 ipcMain.on('firstTimeSierra', (event, command) => {

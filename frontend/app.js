@@ -535,6 +535,9 @@ function setup() {
             // update link to local project files
             $("#revealProjectFiles").prop('href', 'file:///' + path.join(project.projectPath, project.projectName).replace(/^\//, '') );
         }).trigger('change');
+        $('#revealProjectFiles').click(() => {
+            ipcRenderer.send('showItemInFolder', $('#revealProjectFiles').prop('href'));
+        });
 
         $("#projectName").on('focusout', () => {
         	$("#projectName").trigger('change');
