@@ -1,5 +1,5 @@
 {
-	"advancedMode": false,
+	"advancedMode": true,
 	"defaultOfPath": "../",
 	"defaultPlatform": "osx",
 	"defaultRelativeProjectPath": "apps/myApps",
