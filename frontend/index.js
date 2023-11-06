@@ -770,12 +770,6 @@ function updateFunction(event, update) {
     if (platformList != null) {
         platformString = `-p"${platformList.join(",")}"`;
     }
-    
-    if( hostplatform == "linux" || hostplatform == "osx" ){
-		if( Array.isArray(templateList) && templateList.length == 0 ){
-			templateList.push("vscode");
-		}
-	}
 
     if (templateList != null) {
         templateString = `-t"${templateList.join(",")}"`;
@@ -872,12 +866,6 @@ function generateFunction(event, generate) {
     if (platformList != null) {
         platformString = `-p"${platformList.join(",")}"`;
     }
-    
-    if( hostplatform == "linux" || hostplatform == "osx" ){
-		if( Array.isArray(templateList) && templateList.length == 0 ){
-			templateList.push("vscode");
-		}
-	}
 
     if (templateList != null) {
         templateString = `-t"${templateList.join(",")}"`;
