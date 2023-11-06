@@ -2,10 +2,9 @@
 
 #include "baseProject.h"
 
-class AndroidStudioProject : public baseProject
-{
+class AndroidStudioProject : public baseProject {
 public:
-	AndroidStudioProject(std::string target);
+	AndroidStudioProject(const std::string & target);
 
 	bool createProjectFile();
 	void addInclude(std::string includeName){}
@@ -14,5 +13,4 @@ public:
 	bool loadProjectFile() { return false; };
 	bool saveProjectFile(){ return false; };
 	static std::string LOG_NAME;
-
 };

@@ -14,5 +14,7 @@ contextBridge.exposeInMainWorld('ipc_wrapper', {
     },
     fs: {
         existsSync: (p) => ipcRenderer.sendSync('fs', ['existsSync', [p]]),
-    }
+    },
+    openExternal: (url) => ipcRenderer.sendSync('openExternal', url),
+    showItemInFolder: (p) => ipcRenderer.sendSync('showItemInFolder', p),
 });

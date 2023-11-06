@@ -14,6 +14,35 @@
 #include "baseProject.h"
 struct LibraryBinary;
 
+static std::map <ofTargetPlatform, std::string> platformsToString {
+	{ OF_TARGET_ANDROID, "android" },
+//	{ OF_TARGET_EMSCRIPTEN, "" },
+	{ OF_TARGET_IOS, "ios" },
+	{ OF_TARGET_LINUX, "linux" },
+	{ OF_TARGET_LINUX64, "linux64" },
+	{ OF_TARGET_LINUXARMV6L, "linuxarmv6l" },
+	{ OF_TARGET_LINUXARMV7L, "linuxarmv7l" },
+	{ OF_TARGET_LINUXAARCH64, "linuxaarch64" },
+	{ OF_TARGET_MINGW, "msys2" },
+	{ OF_TARGET_OSX, "osx" },
+	{ OF_TARGET_WINVS, "vs" },
+};
+
+
+static std::vector < std::string > platformsOptions {
+	"android",
+	"ios",
+	"linux",
+	"linux64",
+	"linuxarmv6l",
+	"linuxarmv7l",
+	"linuxaarch64",
+	"msys2",
+	"osx",
+	"vs",
+};
+
+
 namespace fs = of::filesystem;
 using std::string;
 using std::vector;
@@ -53,9 +82,7 @@ bool checkConfigExists();
 bool askOFRoot();
 string getOFRootFromConfig();
 
-string getTargetString(ofTargetPlatform t);
-
-std::unique_ptr<baseProject> getTargetProject(ofTargetPlatform targ);
+std::unique_ptr<baseProject> getTargetProject(const string & targ);
 
 template <class T>
 inline bool isInVector(T item, std::vector<T> & vec){

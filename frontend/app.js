@@ -535,6 +535,9 @@ function setup() {
             // update link to local project files
             $("#revealProjectFiles").prop('href', 'file:///' + path.join(project.projectPath, project.projectName).replace(/^\//, '') );
         }).trigger('change');
+        $('#revealProjectFiles').click(() => {
+            ipcRenderer.send('showItemInFolder', $('#revealProjectFiles').prop('href'));
+        });
 
         $("#projectName").on('focusout', () => {
         	$("#projectName").trigger('change');
@@ -1002,13 +1005,16 @@ function enableAdvancedMode(isAdvanced) {
         $('#templateSection').show();
         $('#templateSectionMulti').show();
     } else {
-        $('#platformsDropdown').addClass("disabled");
+        $('#platformsDropdown').removeClass("disabled");
         $('#platformsDropdown').dropdown('set exactly', defaultSettings.defaultPlatform);
         $('#sourceExtraSection').hide();
-        $('#templateSection').hide();
-        $('#templateSectionMulti').hide();
-        $('#templateDropdown').dropdown('set exactly', '');
-        $('#templateDropdownMulti').dropdown('set exactly', '');
+//        $('#templateSection').hide();
+//        $('#templateSectionMulti').hide();
+//        $('#templateDropdown').dropdown('set exactly', '');
+//        $('#templateDropdownMulti').dropdown('set exactly', '');
+        $('#templateSection').show();
+        $('#templateSectionMulti').show();
+
 
         $("body").removeClass('advanced');
         $('a.updateMultiMenuOption').hide();

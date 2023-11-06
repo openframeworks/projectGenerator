@@ -10,6 +10,7 @@
     <ClCompile Include="src\projects\qtcreatorproject.cpp" />
     <ClCompile Include="src\projects\visualStudioProject.cpp" />
     <ClCompile Include="src\projects\xcodeProject.cpp" />
+    <ClCompile Include="src\projects\VSCodeProject.cpp" />
     <ClCompile Include="src\utils\LibraryBinary.cpp" />
     <ClCompile Include="src\utils\Utils.cpp" />
     <ClCompile Include="src\uuidxx\src\uuidxx.cpp" />
@@ -29,6 +30,7 @@
     <ClInclude Include="src\projects\qtcreatorproject.h" />
     <ClInclude Include="src\projects\visualStudioProject.h" />
     <ClInclude Include="src\projects\xcodeProject.h" />
+    <ClInclude Include="src\projects\VSCodeProject.h" />
     <ClInclude Include="src\utils\LibraryBinary.h" />
     <ClInclude Include="src\utils\Utils.h" />
   </ItemGroup>

@@ -6,8 +6,7 @@
 using nlohmann::json;
 using nlohmann::json_pointer;
 
-xcodeProject::xcodeProject(string target)
-:baseProject(target){
+xcodeProject::xcodeProject(const string & target) : baseProject(target){
 	// TODO: remove unused variables
 	if( target == "osx" ){
 		folderUUID = {
@@ -71,9 +70,9 @@ bool xcodeProject::createProjectFile(){
 	fs::path fileTo = xcodeProject / "project.pbxproj";
 	try {
 		fs::copy_file(fileFrom, fileTo, fs::copy_options::overwrite_existing);
-    } catch(fs::filesystem_error& e) {
+	} catch(fs::filesystem_error& e) {
 		std::cout << "Could not copy " << fileFrom << " > " << fileTo << " :: " << e.what() << std::endl;
-    }
+	}
 	findandreplaceInTexfile(fileTo, "emptyExample", projectName);
 
 
@@ -84,7 +83,7 @@ bool xcodeProject::createProjectFile(){
 	} catch(fs::filesystem_error& e) {
 		std::cout << "Could not copy " << fileFrom << " > " << fileTo << " :: "  << e.what() << std::endl;
 	}
-	
+
 	fs::path binDirectory { projectDir / "bin" };
 	fs::path dataDir { binDirectory / "data" };
 
@@ -137,8 +136,8 @@ bool xcodeProject::createProjectFile(){
 //	} else {
 ////		alert ("ofIsPathInPath not");
 //	}
-	
-	
+
+
 	commands.emplace_back("# ---- PG VERSION " + getPGVersion());
 	commands.emplace_back("Add :openFrameworksProjectGeneratorVersion string " + getPGVersion());
 
@@ -154,7 +153,7 @@ bool xcodeProject::createProjectFile(){
 		commands.emplace_back("#");
 	}
 
-	
+
 	if (!fs::equivalent(getOFRoot(), fs::path{"../../.."})) {
 		string root = getOFRoot().string();
 //		alert ("fs not equivalent to ../../.. root = " + root);
@@ -268,14 +267,14 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 						fs::path filePath;
 						fs::path filePath_full { relRoot / fullPath };
 						// FIXME: known issue: doesn't handle files with spaces in name.
-						
+
 						if (fs::exists(filePath_full)) {
 							filePath = filePath_full;
 						}
 						if (fs::exists(fullPath)) {
 							filePath = fullPath;
 						}
-						
+
 						if (!filePath.empty()) {
 							commands.emplace_back("Add :objects:"+thisUUID+":path string " + filePath.string());
 						} else {
@@ -556,7 +555,7 @@ void xcodeProject::addFramework(const string & name, const fs::path & path, cons
 	}
 
 	commands.emplace_back("# ----- FRAMEWORK_SEARCH_PATHS");
-	
+
 	fs::path parentFolder { path.parent_path() };
 //	alert ("parentFolder " + parentFolder.string() );
 
@@ -650,7 +649,7 @@ void xcodeProject::addDylib(const string & name, const fs::path & path, const fs
 
 	// UUID hardcoded para PBXCopyFilesBuildPhase
 	// FIXME: hardcoded - this is the same for the next fixme. so maybe a clearer ident can make things better here.
-	
+
 	commands.emplace_back("Add :objects:E4A5B60F29BAAAE400C2D356:files: string " + buildUUID2);
 }
 
@@ -776,7 +775,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 		if (found==string::npos){
 			fs::path folder = fs::path{ "addons" } / addon.name / "frameworks";
 //			fs::path folder = addon.filesToFolders[f];
-			
+
 			if (target == "ios"){
 				addFramework( f + ".framework", "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/" +
 					f + ".framework",
@@ -820,11 +819,11 @@ bool xcodeProject::saveProjectFile(){
 		cout << ofSystem(command) << endl;
 	} else {
 		// JSON Block - Multiplatform
-		
+
 		std::ifstream contents(fileName);
 		json j = json::parse(contents);
 		contents.close();
-		
+
 		for (auto & c : commands) {
 			// readable comments enabled now.
 			if (c != "" && c[0] != '#') {
@@ -847,6 +846,7 @@ bool xcodeProject::saveProjectFile(){
 				}
 				else {
 					thispath = thispath.substr(0, thispath.length() -1);
+//					cout << thispath << endl;
 					json::json_pointer p = json::json_pointer(thispath);
 					try {
 						// Fixing XCode one item array issue
@@ -871,15 +871,15 @@ bool xcodeProject::saveProjectFile(){
 		try{
 			jsonFile << j.dump(1, '	');
 		}catch(std::exception & e){
-			ofLogError("ofSaveJson") << "Error saving json to " << fileName << ": " << e.what();
+			ofLogError("xcodeProject::saveProjectFile") << "Error saving json to " << fileName << ": " << e.what();
 			return false;
 		}catch(...){
-			ofLogError("ofSaveJson") << "Error saving json to " << fileName;
+			ofLogError("xcodeProject::saveProjectFile") << "Error saving json to " << fileName;
 			return false;
 		}
 	}
 
 //	for (auto & c : commands) cout << c << endl;
-	
+
 	return true;
 }

@@ -11,7 +11,7 @@
 
 class CBLinuxProject: public CBWinProject {
 public:
-	CBLinuxProject(std::string target):CBWinProject(target){};
+	CBLinuxProject(const std::string & target) : CBWinProject(target) {};
 
 	bool createProjectFile();
 	void addInclude(std::string includeName){};

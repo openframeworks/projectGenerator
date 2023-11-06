@@ -1,6 +1,6 @@
 #pragma once
 
-#define PG_VERSION "21"
+#define PG_VERSION "27"
 
 #include "ofAddon.h"
 #include "ofFileUtils.h"
@@ -11,12 +11,12 @@ namespace fs = of::filesystem;
 
 class baseProject {
 public:
-	enum LibType{
+	enum LibType {
 		DEBUG_LIB = 0,
 		RELEASE_LIB
 	};
 
-	enum SrcType{
+	enum SrcType {
 		DEFAULT,
 		HEADER,
 		CPP,
@@ -24,7 +24,7 @@ public:
 		OBJC
 	};
 
-	struct Template{
+	struct Template {
 		ofDirectory dir;
 		std::string name;
 		std::vector<string> platforms;
@@ -35,7 +35,7 @@ public:
 		}
 	};
 
-	baseProject(std::string _target);
+	baseProject(const std::string & _target);
 
 	virtual ~baseProject(){}
 
@@ -47,7 +47,7 @@ public:
 	virtual void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) = 0;
 	virtual void addInclude(std::string includeName) = 0;
 	virtual void addLibrary(const LibraryBinary & lib) = 0;
-	
+
 	virtual void addLDFLAG(std::string ldflag, LibType libType = RELEASE_LIB){}
 	virtual void addCFLAG(std::string cflag, LibType libType = RELEASE_LIB){} // C_FLAGS
 	virtual void addCPPFLAG(std::string cppflag, LibType libType = RELEASE_LIB){} // CXX_FLAGS
@@ -57,6 +57,8 @@ public:
 	virtual void addAddon(std::string addon);
 	virtual void addAddon(ofAddon & addon);
 	virtual void addSrcRecursively(const fs::path & srcPath);
+
+	bool isPlatformName(const string & platform);
 
 	std::string getName() { return projectName; }
 	fs::path getPath() { return projectDir; }
@@ -72,10 +74,10 @@ public:
 	fs::path templatePath;
 	std::string projectName;
 	std::string target;
-	
+
 	bool bMakeRelative = false;
 
-	
+
 	// this shouldn't be called by anyone.  call "create(...), save" etc
 private:
 
@@ -92,7 +94,7 @@ protected:
 	bool recursiveCopy(const fs::path & srcDir, const fs::path & destDir);
 
 	std::vector<ofAddon> addons;
-	std::vector<std::string> extSrcPaths;
+	std::vector<fs::path> extSrcPaths;
 
 	//cached addons - if an addon is requested more than once, avoid loading from disk as it's quite slow
 	std::unordered_map<std::string,std::unordered_map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]

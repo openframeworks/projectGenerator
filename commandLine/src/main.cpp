@@ -4,6 +4,7 @@
 #include "optionparser.h"
 #include "defines.h"
 #include "Utils.h"
+#include <string>
 #include <set>
 
 enum optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTERNAL, VERSION };
@@ -44,7 +45,7 @@ fs::path projectPath;
 fs::path ofPath;
 vector <string> addons;
 vector <fs::path> srcPaths;
-vector <ofTargetPlatform> targets;
+vector <string> targets;
 string ofPathEnv;
 string templateName;
 
@@ -72,7 +73,7 @@ bool printTemplates() {
 	if(targets.size()>1){
 	vector<vector<baseProject::Template>> allPlatformsTemplates;
 		for(auto & target: targets){
-			auto templates = getTargetProject(target)->listAvailableTemplates(getTargetString(target));
+			auto templates = getTargetProject(target)->listAvailableTemplates(target);
 			allPlatformsTemplates.emplace_back(templates);
 		}
 	std::set<baseProject::Template> commonTemplates;
@@ -107,8 +108,8 @@ bool printTemplates() {
 	}else{
 		bool templatesFound = false;
 		for(auto & target: targets){
-			ofLogNotice() << "Templates for target " << getTargetString(target);
-			auto templates = getTargetProject(target)->listAvailableTemplates(getTargetString(target));
+			ofLogNotice() << "Templates for target " << target;
+			auto templates = getTargetProject(target)->listAvailableTemplates(target);
 			for(auto & templateConfig: templates){
 				ofLogNotice() << templateConfig.name << "\t\t" << templateConfig.description;
 			}
@@ -125,50 +126,12 @@ void addPlatforms(const string & value) {
 	vector < string > platforms = ofSplitString(value, ",", true, true);
 
 	for (auto & p : platforms) {
-		if (p == "linux") {
-			targets.emplace_back(OF_TARGET_LINUX);
-		}
-		else if (p == "linux64") {
-			targets.emplace_back(OF_TARGET_LINUX64);
-		}
-		else if (p == "linuxarmv6l") {
-			targets.emplace_back(OF_TARGET_LINUXARMV6L);
-		}
-		else if (p == "linuxarmv7l") {
-			targets.emplace_back(OF_TARGET_LINUXARMV7L);
-		}
-		else if (p == "linuxaarch64") {
-			targets.emplace_back(OF_TARGET_LINUXAARCH64);
-		}
-		else if (p == "msys2") {
-			targets.emplace_back(OF_TARGET_MINGW);
-		}
-		else if (p == "vs") {
-			targets.emplace_back(OF_TARGET_WINVS);
-		}
-		else if (p == "osx") {
-			targets.emplace_back(OF_TARGET_OSX);
-		}
-		else if (p == "ios") {
-			targets.emplace_back(OF_TARGET_IPHONE);
-		}
-		else if (p == "android") {
-			targets.emplace_back(OF_TARGET_ANDROID);
-		}
-		else if (p == "allplatforms") {
-			targets = {
-				OF_TARGET_LINUX,
-				OF_TARGET_LINUX64,
-				OF_TARGET_LINUXARMV6L,
-				OF_TARGET_LINUXARMV7L,
-				OF_TARGET_MINGW,
-				OF_TARGET_WINVS,
-				OF_TARGET_OSX,
-				OF_TARGET_IOS,
-				OF_TARGET_ANDROID,
-			};
-		}else{
-			ofLogError() << "platform " << p << " not valid";
+		if (p == "allplatforms") {
+			for (auto & option : platformsOptions) {
+				targets.emplace_back(option);
+			}
+		} else {
+			targets.emplace_back(p);
 		}
 	}
 }
@@ -205,8 +168,8 @@ bool isGoodOFPath(const fs::path & path) {
 }
 
 
-void updateProject(const fs::path & path, ofTargetPlatform target, bool bConsiderParameterAddons = true) {
-//	alert("updateProject " + path.string() , 34);
+void updateProject(const fs::path & path, const string & target, bool bConsiderParameterAddons = true) {
+//    alert("updateProject path=" + path.string() , 34);
 	// bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
 	// either we read the addons.make file, or we look at the parameter list.
 	// if we are updating recursively, we *never* consider addons passed as parameters.
@@ -233,7 +196,8 @@ void updateProject(const fs::path & path, ofTargetPlatform target, bool bConside
 	}
 }
 
-void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
+void recursiveUpdate(const fs::path & path, const string & target) {
+	// FIXME: remove
 	alert("recursiveUpdate " + path.string() );
 	if (!fs::is_directory(path)) return;
 	vector <fs::path> folders;
@@ -257,7 +221,7 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 	}
 
 	fs::path ofCalcPath = fs::weakly_canonical(fs::current_path() / ofPath);
-	
+
 	for (auto & path : folders) {
 //		cout << "------" << endl;
 //		cout << path << endl;
@@ -272,8 +236,8 @@ void recursiveUpdate(const fs::path & path, ofTargetPlatform target) {
 		}
 		setOFRoot(ofPath);
 		fs::current_path(path);
-//		alert ("ofRoot " + ofPath.string());
-//		alert ("cwd " + path.string());
+		//alert ("ofRoot " + ofPath.string());
+		//alert ("cwd " + path.string());
 
 		updateProject(path, target, false);
 	}
@@ -334,7 +298,8 @@ int main(int argc, char** argv){
 	bRecursive = false;
 	bHelpRequested = false;
 	bListTemplates = false;
-	targets.emplace_back(ofGetTargetPlatform());
+	// FIXME! problem.
+	targets.emplace_back(platformsToString[ofGetTargetPlatform()]);
 	startTime = 0;
 	nProjectsUpdated = 0;
 	nProjectsCreated = 0;
@@ -434,7 +399,7 @@ int main(int argc, char** argv){
 	of::priv::initutils();
 	startTime = ofGetElapsedTimef();
 	consoleSpace();
-	
+
 	// try to get the OF_PATH as an environt variable
 	char* pPath;
 	pPath = getenv("PG_OF_PATH");
@@ -446,7 +411,7 @@ int main(int argc, char** argv){
 		busingEnvVar = true;
 		ofPath = ofPathEnv;
 	}
-	
+
 	fs::path projectPath = fs::weakly_canonical(fs::current_path() / projectName);
 	if (!fs::exists(projectPath)) {
 		mode = PG_MODE_CREATE;
@@ -479,19 +444,19 @@ int main(int argc, char** argv){
 		if (!isGoodOFPath(ofPath)) {
 			return EXIT_USAGE;
 		}
-		
-//		alert ("ofPath before " + ofPath.string());
-//		alert ("projectPath " + projectPath.string());
+
+// alert ("ofPath before " + ofPath.string());
+// alert ("projectPath " + projectPath.string());
 		if (ofPath.is_relative()) {
 			ofPath = fs::canonical(fs::current_path() / ofPath);
-//			alert ("ofPath canonical " + ofPath.string());
+			//alert ("ofPath canonical " + ofPath.string());
 		}
-		
+
 		if (ofIsPathInPath(projectPath, ofPath)) {
 			ofPath = fs::relative(ofPath, projectPath);
 		}
 		fs::current_path(projectPath);
-//		alert ("ofPath after " + ofPath.string());
+		//alert ("ofPath after " + ofPath.string());
 		setOFRoot(ofPath);
 	}
 
@@ -521,7 +486,7 @@ int main(int argc, char** argv){
 		for (auto & t : targets) {
 			ofLogNotice() << "-----------------------------------------------";
 			ofLogNotice() << "updating an existing project";
-			ofLogNotice() << "target platform is: " << getTargetString(t);
+			ofLogNotice() << "target platform is: " << t;
 
 // MARK: - RECURSIVE UPDATE
 			recursiveUpdate(projectPath, t);
@@ -537,13 +502,13 @@ int main(int argc, char** argv){
 
 			for (auto & t : targets) {
 				ofLogNotice() << "-----------------------------------------------";
+				ofLogNotice() << "target platform is: " << t;
 				ofLogNotice() << "setting OF path to: " << ofPath;
 				if(busingEnvVar){
 					ofLogNotice() << "from PG_OF_PATH environment variable";
 				}else{
 					ofLogNotice() << "from -o option";
 				}
-				ofLogNotice() << "target platform is: " << getTargetString(t);
 				ofLogNotice() << "project path is: " << projectPath;
 				if(templateName != ""){
 					ofLogNotice() << "using additional template " << templateName;

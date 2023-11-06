@@ -8,7 +8,7 @@ using std::string;
 
 class xcodeProject : public baseProject {
 public:
-	xcodeProject(string target);
+	xcodeProject(const string & target);
 
 private:
 	bool createProjectFile();
@@ -66,7 +66,7 @@ public:
 //	std::unordered_map <string, string> folderUUID ;
 	std::map < fs::path , string> folderUUID ;
 	string getFolderUUID(const fs::path & folder, bool isFolder = true, fs::path base = "");
-	
+
 	// TODO: Phase out relRoot. totally
 	fs::path relRoot = "../../..";
 };

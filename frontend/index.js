@@ -77,7 +77,7 @@ try {
             if (os.cpus()[0].model.indexOf('ARMv6') == 0) {
                 myPlatform = 'linuxarmv6l';
             } else {
-                myPlatform = 'linuxarmv7l';
+                myPlatform = 'linuxaarch64';
             }
         } else if (process.arch === 'x64') {
             myPlatform = 'linux64';
@@ -130,9 +130,10 @@ const platforms = {
     "msys2": "Windows (msys2/mingw)",
     "ios": "iOS (Xcode)",
     "android": "Android (Android Studio)",
-    "linux64": "Linux 64bit (VSCode)",
-    "linuxarmv6l": "Linux ARMv6 (Makefiles)",
-    "linuxarmv7l": "Linux ARMv7 (Makefiles)"
+    "linux64": "Linux 64 (VS Code/Make)",
+    "linuxarmv6l": "Arm 32 (VS Code/Make)",
+    "linuxaarch64": "Arm 64 (VS Code/Make)",
+    "vscode": "VS Code"
 };
 
 const bUseMoniker = settings["useDictionaryNameGenerator"];
@@ -1117,6 +1118,16 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
                 return;
             });
         }
+    } else if( hostplatform == 'osx' && arg.platform == 'vscode'){
+        if(hostplatform == 'osx'){
+            let osxPath = path.join(fullPath, projectName + '.code-workspace');
+            console.log( osxPath );
+            osxPath = "\"" + osxPath + "\"";
+
+            exec('open ' + osxPath, (error, stdout, stderr) => {
+                return;
+            });
+        }
     } else if( arg.platform == 'linux' || arg.platform == 'linux64' ){
         if(hostplatform == 'linux'){
             let linuxPath = path.join(fullPath, projectName + '.code-workspace');
@@ -1138,6 +1149,11 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
         });
     } else if( hostplatform == 'windows'){
         let windowsPath = path.join(fullPath, projectName + '.sln');
+        
+		if(arg.platform == 'vscode' ){
+			windowsPath = path.join(fullPath, projectName + '.code-workspace');
+		}
+        
         console.log( windowsPath );
         windowsPath = "\"" + windowsPath + "\"";
         exec('start ' + "\"\"" + " " + windowsPath, (error, stdout, stderr) => {
@@ -1183,8 +1199,12 @@ ipcMain.on('getOSInfo', (event) => {
     };
 });
 
-ipcMain.on('openExternal', (event, [ url ]) => {
+ipcMain.on('openExternal', (event, url) => {
     shell.openExternal(url);
+});
+
+ipcMain.on('showItemInFolder', (event, p) => {
+    shell.showItemInFolder(p);
 });
 
 ipcMain.on('firstTimeSierra', (event, command) => {
