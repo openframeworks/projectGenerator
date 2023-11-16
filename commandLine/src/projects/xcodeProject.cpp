@@ -679,9 +679,10 @@ void xcodeProject::addLDFLAG(string ldflag, LibType libType){
 }
 
 void xcodeProject::addCFLAG(string cflag, LibType libType){
+	//alert("xcodeProject::addCFLAG " + cflag);
+	//commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_CFLAGS array");
 	for (auto & c : buildConfigs) {
 		// FIXME: add array here if it doesnt exist
-		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_CFLAGS array");
 		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_CFLAGS: string " + cflag);
 	}
 }
