@@ -41,6 +41,7 @@ const vector<string> parseStates {
 	"emscripten",
 	"ios",
 	"osx",
+	"tvos",
 };
 
 // About Project settings
