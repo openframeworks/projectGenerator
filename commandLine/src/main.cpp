@@ -54,7 +54,7 @@ bool busingEnvVar;
 bool bVerbose;
 bool bAddonsPassedIn;
 bool bForce;                  // force even if things like ofRoot seem wrong of if update folder looks wonky
-int mode;                     // what mode are we in?
+pgMode mode;                     // what mode are we in?
 bool bRecursive;              // do we recurse in update mode?
 bool bHelpRequested;          // did we request help?
 bool bListTemplates;          // did we request help?
