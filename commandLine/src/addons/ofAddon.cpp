@@ -32,9 +32,18 @@ ofAddon::ofAddon(){
 }
 
 bool ofAddon::checkCorrectPlatform(const string & state) {
-	return std::find(parseStates.begin(),
-					 parseStates.end(),
-					 state) != parseStates.end();
+	if (state == "meta" || state == "common") {
+		return true;
+	}
+	if (std::find(parseStates.begin(), parseStates.end(), state) != parseStates.end()) {
+		if (platform == state) {
+			return true;
+		}
+	}
+	return false;
+//	return std::find(parseStates.begin(),
+//					 parseStates.end(),
+//					 state) != parseStates.end();
 }
 
 
@@ -328,8 +337,7 @@ void ofAddon::parseConfig(){
 			// FIXME: Remove
 			currentParseState = line;
 			
-			if (!checkCorrectPlatform(currentParseState)) {
-//			if(currentParseState == Unknown){
+			if (std::find(parseStates.begin(), parseStates.end(), currentParseState) == parseStates.end()) {
 				ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
 								<< "line " << lineNum << ": " << originalLine << "\n\t\t"
 								<< "sectionName " << currentParseState << " not recognized";
@@ -363,6 +371,7 @@ void ofAddon::parseConfig(){
 								<< "variable " << variable << " not recognized for section " << currentParseState;
 				continue;
 			}
+			
 			parseVariableValue(variable, value, addToValue, originalLine, lineNum);
 		}
 	}
