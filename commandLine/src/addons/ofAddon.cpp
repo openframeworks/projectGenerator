@@ -29,117 +29,36 @@ ofAddon::ofAddon(){
 	isLocalAddon = false;
 	pathToProject = ".";
 	pathToOF = "../../../";
-	currentParseState = Unknown;
 }
 
-ofAddon::ConfigParseState ofAddon::stateFromString(string name){
-	if(name=="meta") return Meta;
-	if(name=="common") return Common;
-	if(name=="linux64") return Linux64;
-	if(name=="linux") return Linux;
-	if(name=="msys2") return MinGW;
-	if(name=="vs") return VS;
-	if(name=="linuxarmv6l") return LinuxARMv6;
-	if(name=="linuxarmv7l") return LinuxARMv7;
-	if(name=="linuxaarch64") return LinuxAArch64;
-	if(name=="android/armeabi") return AndroidARMv5;
-	if(name=="android/armeabi-v7a") return AndroidARMv7;
-	if(name=="android/x86") return Androidx86;
-	if(name=="emscripten") return Emscripten;
-	if(name=="ios") return iOS;
-	if(name=="osx") return OSX;
-	return Unknown;
-}
-
-string ofAddon::stateName(ofAddon::ConfigParseState state){
-	switch(state){
-	case Meta:
-		return "meta";
-	case Common:
-		return "common";
-	case Linux:
-		return "linux";
-	case Linux64:
-		return "linux64";
-	case MinGW:
-		return "msys2";
-	case VS:
-		return "vs";
-	case LinuxARMv6:
-		return "linuxarmv6";
-	case LinuxARMv7:
-		return "linuxarmv7";
-	case LinuxAArch64:
-		return "linuxaarch64";
-	case AndroidARMv5:
-		return "android/armeabi";
-	case AndroidARMv7:
-		return "android/armeabi-v7a";
-	case Androidx86:
-		return "android/x86";
-	case Emscripten:
-		return "emscripten";
-	case iOS:
-		return "ios";
-	case OSX:
-		return "osx";
-	case Unknown:
-	default:
-		return "unknown";
-	}
-}
-
-bool ofAddon::checkCorrectPlatform(ConfigParseState state){
-	switch(state){
-	case Meta:
+bool ofAddon::checkCorrectPlatform(const string & state) {
+	if (state == "meta" || state == "common") {
 		return true;
-	case Common:
-		return true;
-	case Linux:
-	case Linux64:
-	case MinGW:
-	case VS:
-	case LinuxARMv6:
-	case LinuxARMv7:
-	case AndroidARMv5:
-	case AndroidARMv7:
-	case Androidx86:
-	case Emscripten:
-	case iOS:
-	case OSX:
-		return platform==stateName(state);
-	case Unknown:
-	default:
-		return false;
 	}
+	if (std::find(parseStates.begin(), parseStates.end(), state) != parseStates.end()) {
+		if (platform == state) {
+			return true;
+		}
+	}
+	return false;
+//	return std::find(parseStates.begin(),
+//					 parseStates.end(),
+//					 state) != parseStates.end();
 }
 
 
-bool ofAddon::checkCorrectVariable(string variable, ConfigParseState state){
-	switch(state){
-	case Meta:
-			return std::find(AddonMetaVariables.begin(),
-							 AddonMetaVariables.end(),
-							 variable) != AddonMetaVariables.end();
-	case Common:
-	case Linux:
-	case Linux64:
-	case MinGW:
-	case VS:
-	case LinuxARMv6:
-	case LinuxARMv7:
-	case AndroidARMv5:
-	case AndroidARMv7:
-	case Androidx86:
-	case Emscripten:
-	case iOS:
-	case OSX:
-			return std::find(AddonProjectVariables.begin(),
-							 AddonProjectVariables.end(),
-							 variable) != AddonProjectVariables.end();
-	case Unknown:
-	default:
-		return false;
+bool ofAddon::checkCorrectVariable(const string & variable, const string & state){
+	if (state == "meta") {
+		return std::find(AddonMetaVariables.begin(),
+						 AddonMetaVariables.end(),
+						 variable) != AddonMetaVariables.end();
+	}
+	else if (state == "osx") {
+		return std::find(AddonProjectVariables.begin(),
+						 AddonProjectVariables.end(),
+						 variable) != AddonProjectVariables.end();
+	} else {
+		return checkCorrectPlatform(state);
 	}
 }
 
@@ -235,7 +154,7 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 }
 
 void ofAddon::parseVariableValue(string variable, string value, bool addToValue, string line, int lineNum){
-	if(variable == ADDON_NAME){
+	if(variable == "ADDON_NAME"){
 		if(value!=name){
 			ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
 						<< "line " << lineNum << ": " << line << "\n\t\t"
@@ -252,31 +171,31 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 		addonRelPath = addonPath;
 	}
 
-	if(variable == ADDON_DESCRIPTION){
+	if(variable == "ADDON_DESCRIPTION"){
 		addReplaceString(description,value,addToValue);
 		return;
 	}
 
-	if(variable == ADDON_AUTHOR){
+	if(variable == "ADDON_AUTHOR"){
 		addReplaceString(author,value,addToValue);
 		return;
 	}
 
-	if(variable == ADDON_TAGS){
+	if(variable == "ADDON_TAGS"){
 		addReplaceStringVector(tags,value,"",addToValue);
 		return;
 	}
 
-	if(variable == ADDON_URL){
+	if(variable == "ADDON_URL"){
 		addReplaceString(url,value,addToValue);
 		return;
 	}
 
-	if(variable == ADDON_DEPENDENCIES){
+	if(variable == "ADDON_DEPENDENCIES"){
 		addReplaceStringVector(dependencies,value,"",addToValue);
 	}
 
-	if(variable == ADDON_INCLUDES){
+	if(variable == "ADDON_INCLUDES"){
 		addReplaceStringVector(includePaths, value, addonRelPath.string(), addToValue);
 	}
 
@@ -415,11 +334,13 @@ void ofAddon::parseConfig(){
 		// found section?
 		if(line[line.size()-1]==':'){
 			ofStringReplace(line,":","");
-			currentParseState = stateFromString(line);
-			if(currentParseState == Unknown){
+			// FIXME: Remove
+			currentParseState = line;
+			
+			if (std::find(parseStates.begin(), parseStates.end(), currentParseState) == parseStates.end()) {
 				ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
 								<< "line " << lineNum << ": " << originalLine << "\n\t\t"
-								<< "sectionName " << stateName(currentParseState) << " not recognized";
+								<< "sectionName " << currentParseState << " not recognized";
 			}
 			continue;
 		}
@@ -439,16 +360,18 @@ void ofAddon::parseConfig(){
 			variable = ofTrim(varValue[0]);
 			value = ofTrim(varValue[1]);
 
+			// FIXME: This seems to be meaningless
 			if(!checkCorrectPlatform(currentParseState)){
 				continue;
 			}
 
-			if(!checkCorrectVariable(variable,currentParseState)){
+			if(!checkCorrectVariable(variable, currentParseState)){
 				ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
 								<< "line " << lineNum << ": " << originalLine << "\n\t\t"
-								<< "variable " << variable << " not recognized for section " << stateName(currentParseState);
+								<< "variable " << variable << " not recognized for section " << currentParseState;
 				continue;
 			}
+			
 			parseVariableValue(variable, value, addToValue, originalLine, lineNum);
 		}
 	}
@@ -640,8 +563,6 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	}
 
 
-
-
 	paths.sort();
 
 	for (auto & p : paths) {
@@ -649,12 +570,6 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	}
 
 	parseConfig();
-
-//		alert ("--- LIST LIBS", 35);
-//		for (auto & l : libs) {
-//			alert (l.path, 35);
-//		}
-//		alert ("--- LIST LIBS", 35);
 
 	return true;
 }

@@ -16,18 +16,32 @@ using std::string;
 using std::vector;
 // #include <map>
 // About Metadata
-const string ADDON_NAME = "ADDON_NAME";
-const string ADDON_DESCRIPTION = "ADDON_DESCRIPTION";
-const string ADDON_AUTHOR = "ADDON_AUTHOR";
-const string ADDON_TAGS = "ADDON_TAGS";
-const string ADDON_URL = "ADDON_URL";
 
-const vector<string> AddonMetaVariables = {
-	ADDON_NAME,
-	ADDON_DESCRIPTION,
-	ADDON_AUTHOR,
-	ADDON_TAGS,
-	ADDON_URL,
+const vector<string> AddonMetaVariables {
+	"ADDON_NAME",
+	"ADDON_DESCRIPTION",
+	"ADDON_AUTHOR",
+	"ADDON_TAGS",
+	"ADDON_URL",
+};
+
+const vector<string> parseStates {
+	"meta",
+	"common",
+	"linux",
+	"linux64",
+	"msys2",
+	"vs",
+	"linuxarmv6l",
+	"linuxarmv7l",
+	"linuxaarch64",
+	"android/armeabi",
+	"android/armeabi-v7a",
+	"android/x86",
+	"emscripten",
+	"ios",
+	"osx",
+	"tvos",
 };
 
 // About Project settings
@@ -143,25 +157,8 @@ public:
 	}
 
 private:
-
-	enum ConfigParseState{
-		Meta,
-		Common,
-		Linux,
-		Linux64,
-		MinGW,
-		VS,
-		LinuxARMv6,
-		LinuxARMv7,
-		LinuxAArch64,
-		AndroidARMv5,
-		AndroidARMv7,
-		Androidx86,
-		Emscripten,
-		iOS,
-		OSX,
-		Unknown
-	} currentParseState;
+	
+	string currentParseState { "" };
 
 	void parseConfig();
 	void parseVariableValue(string variable, string value, bool addToValue, string line, int lineNum);
@@ -170,10 +167,8 @@ private:
 	void addReplaceStringVector(vector<LibraryBinary> & variable, string value, string prefix, bool addToVariable);
 	void exclude(vector<string> & variable, vector<string> exclusions);
 	void exclude(vector<LibraryBinary> & variable, vector<string> exclusions);
-	ConfigParseState stateFromString(string name);
-	string stateName(ConfigParseState state);
-	bool checkCorrectVariable(string variable, ConfigParseState state);
-	bool checkCorrectPlatform(ConfigParseState state);
+	bool checkCorrectVariable(const string & variable, const string & state);
+	bool checkCorrectPlatform(const string & state);
 
 	string platform;
 
