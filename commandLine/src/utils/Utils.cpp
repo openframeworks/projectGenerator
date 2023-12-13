@@ -254,6 +254,9 @@ void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, st
 
 void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFiles, std::vector < LibraryBinary > & libLibs, string platform, string arch, string target) {
 	alert ("getLibsRecursively " + path.string(), 34);
+	alert ("platform " + platform, 34);
+	alert ("arch " + arch, 34);
+	alert ("target " + target, 34);
 //	if (!fs::exists(path) || !fs::is_directory(path)) return;
 	if (!fs::exists(path) || !fs::is_directory(path)) {
 		alert ("not found!");

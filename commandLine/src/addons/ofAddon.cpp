@@ -563,7 +563,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	exclude(headersrcFiles, excludeSources);
 //	exclude(propsFiles, excludeSources);
 	exclude(frameworks, excludeFrameworks);
-	exclude(libs,excludeLibs);
+	exclude(libs, excludeLibs);
 
 	ofLogVerbose("ofAddon") << "libs after exclusions " << libs.size();
 
