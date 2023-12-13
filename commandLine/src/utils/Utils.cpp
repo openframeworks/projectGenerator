@@ -210,6 +210,7 @@ void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & fol
 }
 
 void getFrameworksRecursively(const fs::path & path, std::vector < string > & frameworks, string platform) {
+	alert ("getFrameworksRecursively " + path.string(), 34);
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
 
 	for (const auto & f : dirList(path)) {
@@ -222,7 +223,8 @@ void getFrameworksRecursively(const fs::path & path, std::vector < string > & fr
 }
 
 void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props, const string & platform) {
-//	alert("getPropsRecursively " + path.string());
+	alert ("getPropsRecursively " + path.string(), 34);
+
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
 
 	for (const auto & f : dirList(path)) {
@@ -235,6 +237,7 @@ void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props
 }
 
 void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, string platform) {
+	alert ("getDllsRecursively " + path.string(), 34);
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
 
 	for (const auto & f : dirList(path)) {
@@ -245,7 +248,7 @@ void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, st
 }
 
 void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFiles, std::vector < LibraryBinary > & libLibs, string platform, string arch, string target) {
-//	cout << ">> getLibsRecursively " << path << endl;
+	alert ("getLibsRecursively " + path.string(), 34);
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
 
 	fs::recursive_directory_iterator it { path };
