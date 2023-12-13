@@ -48,6 +48,7 @@ public:
 	virtual void addInclude(std::string includeName) = 0;
 	virtual void addLibrary(const LibraryBinary & lib) = 0;
 
+	// FIXME: change some strings to const &
 	virtual void addLDFLAG(std::string ldflag, LibType libType = RELEASE_LIB){}
 	virtual void addCFLAG(std::string cflag, LibType libType = RELEASE_LIB){} // C_FLAGS
 	virtual void addCPPFLAG(std::string cppflag, LibType libType = RELEASE_LIB){} // CXX_FLAGS

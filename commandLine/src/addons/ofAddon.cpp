@@ -200,7 +200,6 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 	}
 
 	if(variable == "ADDON_INCLUDES"){
-		alert ("ADDON_INCLUDES" + value);
 		addReplaceStringVector(includePaths, value, addonRelPath.string(), addToValue);
 	}
 
@@ -320,10 +319,7 @@ void ofAddon::parseConfig(){
 		fileName = addonPath / "addon_config.mk";
 	}
 
-	alert ("ofAddon::parseConfig " + fileName.string());
-
 	if (!fs::exists(fileName)) return;
-	alert ("ofAddon::parseConfig after return");
 
 	int lineNum = 0;
 
@@ -403,28 +399,31 @@ void ofAddon::parseConfig(){
 }
 
 void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFolder) {
-
 //	alert ("libsPath " + libsPath.string());
-	if (fs::exists(libsPath)) {
-//		alert ("exists");
-		getLibsRecursively(libsPath, libFiles, libs, platform);
-		if (platform == "osx" || platform == "ios"){
-			getFrameworksRecursively(libsPath, frameworks, platform);
-
-
-		}
-//		if(platform == "vs" || platform == "msys2"){
-		if(platform == "vs" || platform == "msys2"
-			   || platform == "vscode"
-			   || platform == "linux"
-			   || platform == "linux64"
-			   || platform == "linuxarmv6l"
-			   || platform == "linuxarmv7l"
-			   || platform == "linuxaarch64"
-		   ){
-			getDllsRecursively(libsPath, dllsToCopy, platform);
-		}
+	
+	if (!fs::exists(libsPath)) {
+		alert("file not found " + libsPath.string(), 35);
+		return;
 	}
+	
+	vector <fs::path> libFiles;
+
+	getLibsRecursively(libsPath, libFiles, libs, platform);
+	if (platform == "osx" || platform == "ios"){
+		getFrameworksRecursively(libsPath, frameworks, platform);
+	}
+	
+	if (platform == "vs" || platform == "msys2"
+		   || platform == "vscode"
+		   || platform == "linux"
+		   || platform == "linux64"
+		   || platform == "linuxarmv6l"
+		   || platform == "linuxarmv7l"
+		   || platform == "linuxaarch64"
+	   ) {
+		getDllsRecursively(libsPath, dllsToCopy, platform);
+	}
+
 
 	// TODO: this is not needed even if it is local addon but project is outside OF root path
 	// Absolute paths will be used in this case too.
@@ -486,7 +485,6 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 	
 bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	// alert("ofAddon::fromFS path : " + path.string());
-	libFiles.clear();
 	
 	clear();
 	this->platform = platform;

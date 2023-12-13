@@ -122,6 +122,7 @@ bool baseProject::create(const fs::path & path, string templateName){
 //	alert("path " + path.string());
 //	alert("path " + fs::weakly_canonical(fs::absolute(path)).string());
 
+	// FIXME: Rewrite here
 	if (ofIsPathInPath(fs::absolute(path), getOFRoot())) {
 //		alert ("bMakeRelative true", 35);
 		bMakeRelative = true;
