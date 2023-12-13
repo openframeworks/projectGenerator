@@ -435,7 +435,6 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		}
 	}
 
-	// libFiles is fs::path
 	for (auto & s : libFiles) {
 		fs::path folder;
 		if (isLocalAddon) {
