@@ -174,6 +174,7 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 	if (variable == "ADDON_ADDITIONAL_LIBS_FOLDER") {
 		alert("ADDON_ADDITIONAL_LIBS_FOLDER " + value, 36);
 		additionalLibsFolder.emplace_back(value);
+		return;
 	}
 	
 	if(variable == "ADDON_DESCRIPTION"){
@@ -381,21 +382,7 @@ void ofAddon::parseConfig(){
 		}
 	}
 
-	exclude(includePaths,excludeIncludes);
-	exclude(srcFiles, excludeSources);
-	exclude(csrcFiles,excludeSources);
-	exclude(cppsrcFiles,excludeSources);
-	exclude(objcsrcFiles,excludeSources);
-	exclude(headersrcFiles,excludeSources);
-//	exclude(propsFiles, excludeSources);
-	exclude(frameworks, excludeFrameworks);
-	exclude(libs,excludeLibs);
 
-	ofLogVerbose("ofAddon") << "libs after exclusions " << libs.size();
-
-	for (auto & lib: libs) {
-		ofLogVerbose("ofAddon") << lib.path;
-	}
 }
 
 void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFolder) {
@@ -528,6 +515,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	}
 
 
+	parseConfig();
 
 	fs::path libsPath = path / "libs";
 	parseLibsPath(libsPath, parentFolder);
@@ -563,7 +551,24 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		includePaths.emplace_back(p.string());
 	}
 
-	parseConfig();
+	
+	
+	
+	exclude(includePaths, excludeIncludes);
+	exclude(srcFiles, excludeSources);
+	exclude(csrcFiles, excludeSources);
+	exclude(cppsrcFiles, excludeSources);
+	exclude(objcsrcFiles, excludeSources);
+	exclude(headersrcFiles, excludeSources);
+//	exclude(propsFiles, excludeSources);
+	exclude(frameworks, excludeFrameworks);
+	exclude(libs,excludeLibs);
+
+	ofLogVerbose("ofAddon") << "libs after exclusions " << libs.size();
+
+	for (auto & lib: libs) {
+		ofLogVerbose("ofAddon") << lib.path;
+	}
 
 	return true;
 }
