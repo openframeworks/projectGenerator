@@ -172,7 +172,7 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 	}
 
 	if (variable == "ADDON_ADDITIONAL_LIBS_FOLDER") {
-		getLibsRecursively(value, libFiles, libs, platform);
+		additionalLibsFolder.emplace_back(value);
 	}
 	
 	if(variable == "ADDON_DESCRIPTION"){
@@ -535,7 +535,9 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	fs::path libsPath = path / "libs";
 	parseLibsPath(libsPath, parentFolder);
 
-
+	for (auto & a : additionalLibsFolder) {
+		parseLibsPath(a, parentFolder);
+	}
 
 	// paths that are needed for the includes.
 	std::list < fs::path > paths;
