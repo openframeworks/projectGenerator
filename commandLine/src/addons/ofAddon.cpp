@@ -521,7 +521,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	parseLibsPath(libsPath, parentFolder);
 
 	for (auto & a : additionalLibsFolder) {
-		parseLibsPath(path / a, parentFolder);
+		parseLibsPath(fs::weakly_canonical(path / a), parentFolder);
 	}
 
 	// paths that are needed for the includes.
