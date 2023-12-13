@@ -391,9 +391,8 @@ void ofAddon::parseConfig(){
 	exclude(libs,excludeLibs);
 
 	ofLogVerbose("ofAddon") << "libs after exclusions " << libs.size();
-	alert("libs after exclusions ");
+
 	for (auto & lib: libs) {
-		alert("libs " + lib.path);
 		ofLogVerbose("ofAddon") << lib.path;
 	}
 }
