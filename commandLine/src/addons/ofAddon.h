@@ -110,6 +110,9 @@ public:
 	ofAddon();
 
 	bool fromFS(const fs::path & path, const string & platform);
+	void parseLibsPath(const fs::path & path, const fs::path & parentFolder);
+	vector <fs::path> libFiles;
+
 //	void fromXML(string installXmlName);
 	void clear();
 

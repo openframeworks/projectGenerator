@@ -257,8 +257,8 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 }
 
 void visualStudioProject::addInclude(string includeName){
-//	alert ("addInclude " + includeName, 35);
 	fixSlashOrder(includeName);
+	alert ("addInclude " + includeName, 35);
 
 	pugi::xpath_node_set source = doc.select_nodes("//ClCompile/AdditionalIncludeDirectories");
 	for (pugi::xpath_node_set::const_iterator it = source.begin(); it != source.end(); ++it){
@@ -274,6 +274,7 @@ void visualStudioProject::addInclude(string includeName){
 		if (bAdd == true){
 			strings.emplace_back(includeName);
 			string includesNew = unsplitString(strings, ";");
+			alert ("includesNew " + includesNew);
 			node.node().first_child().set_value(includesNew.c_str());
 		}
 
@@ -334,7 +335,7 @@ void visualStudioProject::addProps(fs::path propsFile){
 void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 
 	// TODO: in future change Library to FS
-//	alert ("visualStudioProject::addLibrary " + lib.path, 36);
+	alert ("visualStudioProject::addLibrary " + lib.path, 36);
 	auto libraryName = fs::path { lib.path };
 //	fixSlashOrder(libraryName);
 
@@ -476,9 +477,9 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 		addProps(props);
 	}
 
-//	cout << "addon libs size = " << addon.libs.size() << endl;
+	cout << "addon libs size = " << addon.libs.size() << endl;
 	for(auto & lib: addon.libs){
-//		alert ("visualStudioProject::addon.libs " + lib.path);
+		alert ("visualStudioProject::addon.libs " + lib.path);
 		ofLogVerbose() << "adding addon libs: " << lib.path;
 		addLibrary(lib);
 	}

@@ -171,6 +171,10 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 		addonRelPath = addonPath;
 	}
 
+	if (variable == "ADDON_ADDITIONAL_LIBS_FOLDER") {
+		getLibsRecursively(value, libFiles, libs, platform);
+	}
+	
 	if(variable == "ADDON_DESCRIPTION"){
 		addReplaceString(description,value,addToValue);
 		return;
@@ -196,6 +200,7 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 	}
 
 	if(variable == "ADDON_INCLUDES"){
+		alert ("ADDON_INCLUDES" + value);
 		addReplaceStringVector(includePaths, value, addonRelPath.string(), addToValue);
 	}
 
@@ -315,7 +320,10 @@ void ofAddon::parseConfig(){
 		fileName = addonPath / "addon_config.mk";
 	}
 
+	alert ("ofAddon::parseConfig " + fileName.string());
+
 	if (!fs::exists(fileName)) return;
+	alert ("ofAddon::parseConfig after return");
 
 	int lineNum = 0;
 
@@ -387,78 +395,14 @@ void ofAddon::parseConfig(){
 	exclude(libs,excludeLibs);
 
 	ofLogVerbose("ofAddon") << "libs after exclusions " << libs.size();
-	for(auto & lib: libs){
+	alert("libs after exclusions ");
+	for (auto & lib: libs) {
+		alert("libs " + lib.path);
 		ofLogVerbose("ofAddon") << lib.path;
 	}
 }
 
-
-bool ofAddon::fromFS(const fs::path & path, const string & platform){
-	// alert("ofAddon::fromFS path : " + path.string());
-
-	clear();
-	this->platform = platform;
-
-	addonPath = path;
-	if (isLocalAddon) {
-		name = path.stem().string();
-	} else {
-		name = path.filename().string();
-	}
-
-	if (!fs::exists(path)) {
-		return false;
-	}
-
-	fs::path srcPath { path / "src" };
-	if (fs::exists(srcPath)) {
-		getFilesRecursively(srcPath, srcFiles);
-	}
-
-	// MARK: srcFiles to fs::path
-	// not possible today because there are string based exclusion functions
-
-	fs::path parentFolder = path.parent_path();
-
-	for (auto & s : srcFiles) {
-		fs::path sFS { s };
-		fs::path folder;
-		if (isLocalAddon) {
-//			folder = sFS.parent_path();
-//			folder = fs::path { "local_addons" } / sFS.parent_path().filename();
-			folder = fs::path { "local_addons" } / fs::relative(sFS.parent_path(), parentFolder);
-			// alert ("isLocal folder=" + folder.string(), 36);
-		} else {
-			sFS = fixPath(s);
-			s = sFS.string();
-			folder = fs::relative(sFS.parent_path(), getOFRoot());
-		}
-		filesToFolders[s] = folder.string();
-	}
-
-	if (platform == "vs" || platform == "msys2") {
-		// here addonPath is the same as path.
-		getPropsRecursively(addonPath, propsFiles, platform);
-	}
-
-	// TODO: Remove comments
-//	int i = 0;
-//	for (auto & s : propsFiles) {
-//		fs::path sFS { s };
-//		fs::path folder;
-//		if (isLocalAddon) {
-//			folder = sFS.parent_path();
-//		} else {
-//			folder = fs::relative(sFS.parent_path(), getOFRoot());
-//		}
-//		cout << s << endl;
-//		cout << folder << endl;
-//		propsFiles[i] = folder;
-//		i++;
-//	}
-
-	fs::path libsPath = path / "libs";
-	vector < fs::path > libFiles;
+void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFolder) {
 
 //	alert ("libsPath " + libsPath.string());
 	if (fs::exists(libsPath)) {
@@ -538,7 +482,58 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 			filesToFolders[f] = folder.string();
 		}
 	}
+}
+	
+bool ofAddon::fromFS(const fs::path & path, const string & platform){
+	// alert("ofAddon::fromFS path : " + path.string());
+	libFiles.clear();
+	
+	clear();
+	this->platform = platform;
 
+	addonPath = path;
+	if (isLocalAddon) {
+		name = path.stem().string();
+	} else {
+		name = path.filename().string();
+	}
+
+	if (!fs::exists(path)) {
+		return false;
+	}
+
+	fs::path srcPath { path / "src" };
+	if (fs::exists(srcPath)) {
+		getFilesRecursively(srcPath, srcFiles);
+	}
+
+	// MARK: srcFiles to fs::path
+	// not possible today because there are string based exclusion functions
+
+	fs::path parentFolder = path.parent_path();
+
+	for (auto & s : srcFiles) {
+		fs::path sFS { s };
+		fs::path folder;
+		if (isLocalAddon) {
+			folder = fs::path { "local_addons" } / fs::relative(sFS.parent_path(), parentFolder);
+		} else {
+			sFS = fixPath(s);
+			s = sFS.string();
+			folder = fs::relative(sFS.parent_path(), getOFRoot());
+		}
+		filesToFolders[s] = folder.string();
+	}
+
+	if (platform == "vs" || platform == "msys2") {
+		// here addonPath is the same as path.
+		getPropsRecursively(addonPath, propsFiles, platform);
+	}
+
+
+
+	fs::path libsPath = path / "libs";
+	parseLibsPath(libsPath, parentFolder);
 
 
 
