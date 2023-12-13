@@ -398,7 +398,7 @@ void ofAddon::parseConfig(){
 }
 
 void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFolder) {
-//	alert ("libsPath " + libsPath.string());
+	alert ("parseLibsPath " + libsPath.string(), 35);
 	
 	if (!fs::exists(libsPath)) {
 		alert("file not found " + libsPath.string(), 35);
