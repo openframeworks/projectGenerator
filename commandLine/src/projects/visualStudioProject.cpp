@@ -335,7 +335,7 @@ void visualStudioProject::addProps(fs::path propsFile){
 void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 
 	// TODO: in future change Library to FS
-	alert ("visualStudioProject::addLibrary " + lib.path, 36);
+//	alert ("visualStudioProject::addLibrary " + lib.path, 36);
 	auto libraryName = fs::path { lib.path };
 //	fixSlashOrder(libraryName);
 
@@ -477,9 +477,9 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 		addProps(props);
 	}
 
-	cout << "addon libs size = " << addon.libs.size() << endl;
+//	cout << "addon libs size = " << addon.libs.size() << endl;
 	for(auto & lib: addon.libs){
-		alert ("visualStudioProject::addon.libs " + lib.path);
+//		alert ("visualStudioProject::addon.libs " + lib.path);
 		ofLogVerbose() << "adding addon libs: " << lib.path;
 		addLibrary(lib);
 	}
