@@ -171,8 +171,7 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 		addonRelPath = addonPath;
 	}
 
-	if (variable == "ADDON_ADDITIONAL_LIBS_FOLDER") {
-//		alert("ADDON_ADDITIONAL_LIBS_FOLDER " + value, 36);
+	if (variable == "ADDON_ADDITIONAL_LIBS") {
 		additionalLibsFolder.emplace_back(value);
 		return;
 	}
