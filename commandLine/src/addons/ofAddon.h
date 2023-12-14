@@ -37,11 +37,15 @@ const vector<string> parseStates {
 	"linuxaarch64",
 	"android/armeabi",
 	"android/armeabi-v7a",
+	"android/arm64-v8a",
 	"android/x86",
+	"android/x86_64",
 	"emscripten",
 	"ios",
 	"osx",
 	"tvos",
+	"watchos",
+	"visionos",
 };
 
 // About Project settings
