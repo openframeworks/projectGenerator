@@ -30,6 +30,17 @@ jobs:
         run: sudo rm -rf /Library/Developer
       - name: Setup
         run: ./scripts/osx/setup_environment.sh
+      - name: Determine Release
+        id: vars
+        shell: bash
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+            echo "release=nightly" >> $GITHUB_ENV
+            echo "prerelease=false" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
+            echo "release=bleeding" >> $GITHUB_ENV
+            echo "prerelease=true" >> $GITHUB_ENV
+          fi
       # - name: Build CMDLINE
       #   run: ./scripts/osx/build_cmdline.sh
       # - name: Build frontend
@@ -47,13 +58,14 @@ jobs:
           GA_NOTARIZE_PROVIDER: ${{ secrets.GA_NOTARIZE_PROVIDER }}
       - name: List output directory
         run: ls -lah /
-      - name: Update Release
-        if: github.repository == 'openframeworks/projectGenerator' && github.ref == 'refs/heads/master'
+      - name: Update Release x86_64
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
         uses: IsaacShelton/update-existing-release@v1.3.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: nightly
-          release: nightly
-          prerelease: false
+          tag: ${{ env.release }}
+          release: ${{ env.release }}
+          prerelease: ${{ env.prerelease }}
           replace: false
           files: ../openFrameworks/apps/projectGenerator/frontend/dist/projectGenerator-osx.zip
+

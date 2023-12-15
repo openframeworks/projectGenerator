@@ -39,6 +39,17 @@ jobs:
             zip
             rsync
             wget
+      - name: Determine Release
+        id: vars
+        shell: bash
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+            echo "release=nightly" >> $GITHUB_ENV
+            echo "prerelease=false" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
+            echo "release=bleeding" >> $GITHUB_ENV
+            echo "prerelease=true" >> $GITHUB_ENV
+          fi
       - uses: actions/setup-node@v4
         with:
           node-version: 16   
@@ -46,6 +57,7 @@ jobs:
         shell: msys2 {0}
         run:
           ./scripts/vs/ci_install.sh
+
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.1
       - name: Build projectGenerator
@@ -67,22 +79,22 @@ jobs:
         run:
           ./scripts/vs/ci_frontend_package.sh
       - name: Update CMD Gen Release
-        if: github.repository == 'openframeworks/projectGenerator' && github.ref == 'refs/heads/master'
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
         uses: IsaacShelton/update-existing-release@v1.3.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: nightly
-          release: nightly
-          prerelease: false
+          tag: ${{ env.release }}
+          release: ${{ env.release }}
+          prerelease: ${{ env.release }}
           replace: false
           files: ../openFrameworks/apps/projectGenerator/commandLine/bin/projectGenerator-vs.zip
       - name: Update Project Gen GUI Release
-        if: github.repository == 'openframeworks/projectGenerator' && github.ref == 'refs/heads/master'
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
         uses: IsaacShelton/update-existing-release@v1.3.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: nightly
-          release: nightly
-          prerelease: false
+          tag: ${{ env.release }}
+          release: ${{ env.release }}
+          prerelease: ${{ env.release }}
           replace: false
           files: ../openFrameworks/apps/projectGenerator/frontend/dist/rojectGenerator-vs-gui.zip
