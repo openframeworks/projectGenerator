@@ -547,7 +547,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	for (auto & p : paths) {
 		includePaths.emplace_back(p.string());
 	}
-	parseConfig();
+//	parseConfig();
 
 	//
 	// FIXME: MARK: - HACK:
