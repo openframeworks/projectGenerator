@@ -1,7 +1,7 @@
 {
   "name": "project-generator",
   "productName": "projectGenerator",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "repo for testing a gui using electron for the project generator",
   "license": "MIT",
   "main": "index.js",
@@ -11,33 +11,67 @@
     "url": "https://openframeworks.cc"
   },
   "engines": {
-    "node": ">=12.20.55"
+    "node": ">=21.2.0"
   },
   "scripts": {
-    "start": "electron .",
-    "build": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --all --overwrite --electron-version=25.3.0",
-    "build:osx": "echo 'DEPRECATED: build:osx is deprecated. please use build:macos instead' && npm run build:macos",
-    "build:macos": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=25.3.0 --platform=darwin --arch=universal --osxUniversal.x64ArchFiles=Contents/Resources/app/app/projectGenerator",
-    "build:macos-m1": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=25.3.0 --platform=darwin --arch=arm64",
-    "build:linux32": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=25.3.0 --platform=linux --arch=ia32",
-    "build:linux64": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=25.3.0 --platform=linux --arch=x64",
-    "build:vs": "electron-packager . --icon=static/icon/of.ico --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=25.3.0 --platform=win32 --arch=ia32"
+    "start": "NODE_ENV=development electron .",
+    "start:prod": "NODE_ENV=production electron .",
+    "dist": "electron-builder",
+    "dist:mac:x64": "NODE_ENV=production electron-builder --mac --x64 ",
+    "dist:mac:arm64": "NODE_ENV=production electron-builder --mac --arm64",
+    "dist:mac:universal": "NODE_ENV=production electron-builder --mac --universal",
+    "dist:win64": "NODE_ENV=production electron-builder --win --x64",
+    "dist:linux": "NODE_ENV=production electron-builder --linux",
+    "dist:linux64": "NODE_ENV=production electron-builder --linux --x64",
+    "dist:linux32": "NODE_ENV=production electron-builder --linux --ia32"
   },
-  "files": [
-    "index.html",
-    "app/*",
-    "static/*"
-  ],
+  "build": {
+    "appId": "cc.openframeworks.projectGenerator.macos",
+    "productName": "projectGenerator",
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "category": "public.app-category.utilities",
+      "icon": "static/icon/of.icns",
+      "target": [
+        "dir"
+      ]
+    },
+    "win": {
+      "icon": "static/icon/of.ico"
+    },
+    "linux": {
+      "icon": "static/icon"
+    },
+    "files": [
+      "index.html",
+      "app/**/*",
+      "static/**/*",
+      "index.js",
+      "preload.js",
+      "!**/*.ts",
+      "!*.map",
+      "!package.json",
+      "!package-lock.json",
+      {
+          "from": "../dist",
+          "filter": ["**/*"]
+      }
+    ],
+    "asar": true
+  },
   "keywords": [
     "electron-app"
   ],
   "dependencies": {
     "moniker": "^0.1.2",
-    "n-readlines": "^1.0.0"
+    "n-readlines": "^1.0.1"
   },
   "devDependencies": {
-    "@types/jquery": "^2.0.60",
-    "electron": "^25.3.0",
-    "electron-packager": "^17.1.1"
+    "@types/jquery": "^3.5.29",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "electron-packager": "^17.1.2"
   }
 }

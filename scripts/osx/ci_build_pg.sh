@@ -1,6 +1,26 @@
 #!/bin/bash
 set -e
 
+CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPT_DIR="$( cd "$( dirname "${CURRENT_DIR}"/../../ )" && pwd )"
+PG_DIR="$( cd "$( dirname "${SCRIPT_DIR}/../../" )" && pwd )"
+
+OF_DIR="$( cd "$( dirname "${PG_DIR}/../../../" )" && pwd )"
+
+FRONTEND_DIR="$( cd "$( dirname "${PG_DIR}/frontend" )" && pwd )"
+
+CMDLINE_DIR="$( cd "$( dirname "${PG_DIR}/commandLine" )" && pwd )"
+
+
+echo "CURRENT_DIR:  ${CURRENT_DIR}"
+echo "SCRIPT_DIR:  ${SCRIPT_DIR}"
+echo "PG_DIR:  ${PG_DIR}"
+echo "FRONTEND_DIR:  ${FRONTEND_DIR}"
+echo "CMD_DIR:  ${CMD_DIR}"
+echo "====== OF_DIR: ${OF_DIR}"
+
+
+
 echoDots(){
 	sleep 0.1 # Waiting for a brief period first, allowing jobs returning immediatly to finish
 	while isRunning $1; do
@@ -148,12 +168,12 @@ import_certificate_travis(){
 }
 
 cd ..
-of_root=${PWD}/openFrameworks
-pg_root=${PWD}/openFrameworks/apps/projectGenerator
+of_root=${OF_DIR}
+pg_root=${PG_DIR}
 
-if [ -d "openframeworks/.git" ]; then
+if [ -d "${OF_DIR}/.git" ]; then
 	echo 'OF already cloned, using it'
-	cd openframeworks
+	cd ${OF_DIR}
 	git pull
 	# git submodule init
 	# git submodule update
@@ -161,13 +181,15 @@ if [ -d "openframeworks/.git" ]; then
 	cd ..
 	# Control will enter here if $DIRECTORY exists.
 else
+	echo "cloning of"
+	exit
 	git clone --depth=1 https://github.com/openframeworks/openFrameworks
 fi
 #git clone --depth=1 https://github.com/openframeworks/openFrameworks
 #cp not move so github actions can do cleanup without error
-cp -r projectGenerator openFrameworks/apps/
+# cp -r projectGenerator openFrameworks/apps/
 
-cd ${of_root}
+cd ${OF_DIR}
 if [ -d "libs/glfw" ]; then
 	echo 'libs installed, using them'
 else
@@ -176,45 +198,21 @@ fi
 
 
 # Compile commandline tool
-cd ${pg_root}
-echo "Building openFrameworks PG - OSX"
-xcodebuild -configuration Release -target commandLine CODE_SIGN_IDENTITY="" UseModernBuildSystem=NO -project commandLine/commandLine.xcodeproj
-ret=$?
-if [ $ret -ne 0 ]; then
-	  echo "Failed building Project Generator"
-	  exit 1
-fi
+${CURRENT_DIR}/build_cmdline.sh
 
-cd commandLine/bin/
-
-echo "Testing project generation osx";
-chmod +x projectGenerator
-./projectGenerator --recursive -posx -o../../../../ ../../../../examples/
-errorcode=$?
-if [[ $errorcode -ne 0 ]]; then
-		exit $errorcode
-fi
-
-# install electron sign globally
-# sudo npx create-react-app electron-osx-sign
-sudo npm install -g electron-osx-sign
-
-if [ -d "/Users/runner/" ]; then
-	sudo chown -R 501:20 "/Users/runner/.npm"
-fi
+# Test commandline tool
+${CURRENT_DIR}/test_cmdline.sh
 
 import_certificate
 
 # Generate electron app
-cd ${pg_root}/frontend
-npm update
-npm install > /dev/null
 
-npm run build:macos > /dev/null
+${CURRENT_DIR}/build_frontend.sh
+
 if [ -d "${pg_root}/projectGenerator-osx" ]; then
 	rm -rf ${pg_root}/projectGenerator-osx
 fi
-mv dist/projectGenerator-darwin-universal ${pg_root}/projectGenerator-osx
+mv dist/mac ${pg_root}/mac-osx
 package_app osx
 
 cd ${pg_root}/frontend
@@ -222,19 +220,9 @@ npm run build:macos > /dev/null
 if [ -d "${pg_root}/projectGenerator-ios" ]; then
 	rm -rf ${pg_root}/projectGenerator-ios
 fi
-mv dist/projectGenerator-darwin-universal ${pg_root}/projectGenerator-ios
+mv dist/mac ${pg_root}/projectGenerator-ios
 package_app ios
-
-#cd ${pg_root}/frontend
-#npm run build:osx > /dev/null
-#mv dist/projectGenerator-darwin-universal ${pg_root}/projectGenerator-android
-#package_app android
 
 rm -rf scripts/id_rsa 2> /dev/null
 rm -rf scripts/*.p12 2> /dev/null
 
-
-# pwd
-# ls -alfR
-# cd ..
-# pwd
