@@ -153,9 +153,9 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 	}
 }
 
-void ofAddon::parseVariableValue(string variable, string value, bool addToValue, string line, int lineNum){
-	if(variable == "ADDON_NAME"){
-		if(value!=name){
+void ofAddon::parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum){
+	if (variable == "ADDON_NAME"){
+		if (value != name){
 			ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
 						<< "line " << lineNum << ": " << line << "\n\t\t"
 						<< "addon name in filesystem " << name << " doesn't match with addon_config.mk " << value;
@@ -163,44 +163,38 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 		return;
 	}
 
-
-	fs::path addonRelPath;
-	if (!isLocalAddon) {
-		addonRelPath = pathToOF / "addons" / name;
-	} else {
-		addonRelPath = addonPath;
-	}
+	fs::path addonRelPath = isLocalAddon ? addonPath : (pathToOF / "addons" / name);
 
 	if (variable == "ADDON_ADDITIONAL_LIBS") {
 		additionalLibsFolder.emplace_back(value);
 		return;
 	}
 	
-	if (variable == "ADDON_DESCRIPTION") {
+	else if (variable == "ADDON_DESCRIPTION") {
 		addReplaceString(description, value, addToValue);
 		return;
 	}
 
-	if(variable == "ADDON_AUTHOR"){
+	else if(variable == "ADDON_AUTHOR"){
 		addReplaceString(author,value,addToValue);
 		return;
 	}
 
-	if(variable == "ADDON_TAGS"){
+	else if(variable == "ADDON_TAGS"){
 		addReplaceStringVector(tags,value,"",addToValue);
 		return;
 	}
 
-	if(variable == "ADDON_URL"){
+	else if(variable == "ADDON_URL"){
 		addReplaceString(url,value,addToValue);
 		return;
 	}
 
-	if(variable == "ADDON_DEPENDENCIES"){
+	else if(variable == "ADDON_DEPENDENCIES"){
 		addReplaceStringVector(dependencies,value,"",addToValue);
 	}
 
-	if(variable == "ADDON_INCLUDES"){
+	else if(variable == "ADDON_INCLUDES"){
 		addReplaceStringVector(includePaths, value, addonRelPath.string(), addToValue);
 //		alert ("ADDON_INCLUDES", 35);
 //		for (auto & i : includePaths) {
@@ -208,7 +202,7 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 //		}
 	}
 
-	if(variable == ADDON_CFLAGS){
+	else if(variable == ADDON_CFLAGS){
 		addReplaceStringVector(cflags,value,"",addToValue);
 	}
 
@@ -322,7 +316,10 @@ void ofAddon::parseConfig(){
 		(addonPath / "addon_config.mk")
 	;
 
-	if (!fs::exists(fileName)) return;
+	if (!fs::exists(fileName)) {
+		ofLogError() << "ofAddon::parseConfig() " << fileName << " not found";
+		return;
+	}
 
 	int lineNum = 0;
 
@@ -556,7 +553,15 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 //	parseConfig();
 
 	
+	for (auto & i : includePaths) {
+		cout << i << endl;
+	}
 	exclude(includePaths, excludeIncludes);
+	cout << "-----" << endl;
+	for (auto & i : includePaths) {
+		cout << i << endl;
+	}
+
 	exclude(srcFiles, excludeSources);
 	exclude(csrcFiles, excludeSources);
 	exclude(cppsrcFiles, excludeSources);
