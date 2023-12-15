@@ -52,6 +52,7 @@ package_app(){
 
 		electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
 
+		${SCRIPT_DIR}/secure.sh projectGenerator-$PLATFORM/projectGenerator.app/Contents/MacOS/projectGenerator projectGenerator-$PLATFORM
 		echo "Compressing PG app"
 		# need to upload zip of just app to apple for notarizing
 		zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM/projectGenerator.app

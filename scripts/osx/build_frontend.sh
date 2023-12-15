@@ -11,7 +11,7 @@ echo "PG_DIR:  ${PG_DIR}"
 echo "FRONTEND_DIR:  ${FRONTEND_DIR}"
 
 if [ -z "${FRONTEND_TARGET+x}" ]; then
-    FRONTEND_TARGET=mac:x64
+    FRONTEND_TARGET=mac:universal
 fi
 
 if [ -z "${BUILD_TEST+x}" ]; then
