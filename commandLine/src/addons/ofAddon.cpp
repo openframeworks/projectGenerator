@@ -202,6 +202,11 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 
 	if(variable == "ADDON_INCLUDES"){
 		addReplaceStringVector(includePaths, value, addonRelPath.string(), addToValue);
+		
+		alert ("ADDON_INCLUDES", 35);
+		for (auto & i : includePaths) {
+			cout << i << endl;
+		}
 	}
 
 	if(variable == ADDON_CFLAGS){
