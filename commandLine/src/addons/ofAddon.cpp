@@ -176,8 +176,8 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 		return;
 	}
 	
-	if(variable == "ADDON_DESCRIPTION"){
-		addReplaceString(description,value,addToValue);
+	if (variable == "ADDON_DESCRIPTION") {
+		addReplaceString(description, value, addToValue);
 		return;
 	}
 
@@ -202,82 +202,81 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 
 	if(variable == "ADDON_INCLUDES"){
 		addReplaceStringVector(includePaths, value, addonRelPath.string(), addToValue);
-		
-		alert ("ADDON_INCLUDES", 35);
-		for (auto & i : includePaths) {
-			cout << i << endl;
-		}
+//		alert ("ADDON_INCLUDES", 35);
+//		for (auto & i : includePaths) {
+//			cout << i << endl;
+//		}
 	}
 
 	if(variable == ADDON_CFLAGS){
 		addReplaceStringVector(cflags,value,"",addToValue);
 	}
 
-	if(variable == ADDON_CPPFLAGS){
+	else if(variable == ADDON_CPPFLAGS){
 		addReplaceStringVector(cppflags,value,"",addToValue);
 	}
 
-	if(variable == ADDON_LDFLAGS){
+	else if(variable == ADDON_LDFLAGS){
 		addReplaceStringVector(ldflags,value,"",addToValue);
 	}
 
-	if(variable == ADDON_LIBS){
+	else if(variable == ADDON_LIBS){
 		addReplaceStringVector(libs, value, addonRelPath.string(), addToValue);
 	}
 
-	if(variable == ADDON_DLLS_TO_COPY){
+	else if(variable == ADDON_DLLS_TO_COPY){
 		addReplaceStringVector(dllsToCopy,value,"",addToValue);
 	}
 
-	if(variable == ADDON_PKG_CONFIG_LIBRARIES){
+	else if(variable == ADDON_PKG_CONFIG_LIBRARIES){
 		addReplaceStringVector(pkgConfigLibs,value,"",addToValue);
 	}
 
-	if(variable == ADDON_FRAMEWORKS){
+	else if(variable == ADDON_FRAMEWORKS){
 		addReplaceStringVector(frameworks,value,"",addToValue);
 	}
 
-	if(variable == ADDON_SOURCES){
+	else if(variable == ADDON_SOURCES){
 		addReplaceStringVector(srcFiles, value, addonRelPath.string() ,addToValue);
 	}
 
-	if(variable == ADDON_C_SOURCES){
+	else if(variable == ADDON_C_SOURCES){
 		addReplaceStringVector(csrcFiles, value, addonRelPath.string() ,addToValue);
 	}
 
-	if(variable == ADDON_CPP_SOURCES){
+	else if(variable == ADDON_CPP_SOURCES){
 		addReplaceStringVector(cppsrcFiles, value, addonRelPath.string() ,addToValue);
 	}
 
-	if(variable == ADDON_HEADER_SOURCES){
+	else if(variable == ADDON_HEADER_SOURCES){
 		addReplaceStringVector(headersrcFiles, value, addonRelPath.string() ,addToValue);
 	}
 
-	if(variable == ADDON_OBJC_SOURCES){
+	else if(variable == ADDON_OBJC_SOURCES){
 		addReplaceStringVector(objcsrcFiles, value, addonRelPath.string() ,addToValue);
 	}
 
-	if(variable == ADDON_DATA){
+	else if(variable == ADDON_DATA){
 		addReplaceStringVector(data,value,"",addToValue);
 	}
 
-	if(variable == ADDON_LIBS_EXCLUDE){
+	else if(variable == ADDON_LIBS_EXCLUDE){
 		addReplaceStringVector(excludeLibs,value,"",addToValue);
 	}
 
-	if(variable == ADDON_SOURCES_EXCLUDE){
+	else if(variable == ADDON_SOURCES_EXCLUDE){
 		addReplaceStringVector(excludeSources,value,"",addToValue);
 	}
 
-	if(variable == ADDON_INCLUDES_EXCLUDE){
+	else if(variable == ADDON_INCLUDES_EXCLUDE){
 		addReplaceStringVector(excludeIncludes,value,"",addToValue);
 	}
 
-	if (variable == ADDON_FRAMEWORKS_EXCLUDE) {
+	else if (variable == ADDON_FRAMEWORKS_EXCLUDE) {
 		addReplaceStringVector(excludeFrameworks, value, "", addToValue);
 	}
 
-	if (variable == ADDON_DEFINES) {
+	else if (variable == ADDON_DEFINES) {
 		addReplaceStringVector(defines, value, "", addToValue);
 	}
 }
@@ -393,7 +392,6 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		return;
 	}
 	
-	vector <fs::path> libFiles;
 
 	getLibsRecursively(libsPath, libFiles, libs, platform);
 	if (platform == "osx" || platform == "ios"){
@@ -518,6 +516,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	parseConfig();
 
 	fs::path libsPath = path / "libs";
+
 	parseLibsPath(libsPath, parentFolder);
 
 	for (auto & a : additionalLibsFolder) {
@@ -552,8 +551,9 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		includePaths.emplace_back(p.string());
 	}
 
-	
-	parseConfig();
+	//
+	// FIXME: MARK: - HACK:
+//	parseConfig();
 
 	
 	exclude(includePaths, excludeIncludes);
