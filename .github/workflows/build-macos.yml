@@ -29,7 +29,7 @@ jobs:
       - name: rm-dev
         run: sudo rm -rf /Library/Developer
       - name: Setup
-        run: ./scripts/osx/setup.sh
+        run: ./scripts/osx/setup_environment.sh
       # - name: Build CMDLINE
       #   run: ./scripts/osx/build_cmdline.sh
       # - name: Build frontend
@@ -56,4 +56,4 @@ jobs:
           release: nightly
           prerelease: false
           replace: false
-          files: projectGenerator-osx.zip projectGenerator-ios.zip
+          files: ../openFrameworks/apps/projectGenerator/frontend/dist/projectGenerator-osx.zip
