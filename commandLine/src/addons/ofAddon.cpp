@@ -317,7 +317,7 @@ void ofAddon::parseConfig(){
 	;
 
 	if (!fs::exists(fileName)) {
-		ofLogError() << "ofAddon::parseConfig() " << fileName << " not found";
+		ofLogError() << "ofAddon::parseConfig() " << fileName << " not found " << ofPathToString(fileName);
 		return;
 	}
 
