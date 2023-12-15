@@ -30,7 +30,24 @@ fi
 pwd
 ls
 
-msbuild "commandLine.vcxproj" /p:configuration=release /p:platform=${PLATFORM} /p:PlatformToolset=${TOOLSET}
+CURRENT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+
+# Check if msbuild is available in PATH
+if command -v msbuild &> /dev/null; then
+    echo "msbuild is available, use it directly"
+    msbuild "commandLine.vcxproj" /p:configuration=release /p:platform=${PLATFORM} /p:PlatformToolset=${TOOLSET}
+else
+    echo "msbuild is not available, use the specified path"
+    #VS_BASE_PATH="/c/Program Files/Microsoft Visual Studio/2022/Community"
+    #MSBUILD_PATH="${VS_BASE_PATH}/MSBuild/Current/Bin/MSBuild.exe"
+
+    MSBUILD_PATH="C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe"
+    MSSTRING=commandLine.sln /p:configuration=release /p:platform=${PLATFORM} /p:PlatformToolset=${TOOLSET}
+	"${MSBUILD_PATH}" "${MSSTRING}"
+
+fi
+
 ret=$?
 if [ $ret -ne 0 ]; then
 	  echo "Failed building Project Generator"
