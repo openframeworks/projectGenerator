@@ -318,12 +318,10 @@ void ofAddon::exclude(vector<LibraryBinary> & variables, vector<string> exclusio
 }
 
 void ofAddon::parseConfig(){
-	fs::path fileName;
-	if(isLocalAddon){
-		fileName = pathToProject / addonPath / "addon_config.mk";
-	}else{
-		fileName = addonPath / "addon_config.mk";
-	}
+	fs::path fileName = isLocalAddon ?
+		(pathToProject / addonPath / "addon_config.mk") :
+		(addonPath / "addon_config.mk")
+	;
 
 	if (!fs::exists(fileName)) return;
 
@@ -385,8 +383,6 @@ void ofAddon::parseConfig(){
 			parseVariableValue(variable, value, addToValue, originalLine, lineNum);
 		}
 	}
-
-
 }
 
 void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFolder) {
@@ -557,7 +553,8 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	}
 
 	
-	
+	parseConfig();
+
 	
 	exclude(includePaths, excludeIncludes);
 	exclude(srcFiles, excludeSources);
