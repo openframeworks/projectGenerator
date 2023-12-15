@@ -19,7 +19,7 @@
     "dist": "electron-builder",
     "dist:mac:x64": "NODE_ENV=production electron-builder --mac --x64 ",
     "dist:mac:arm64": "NODE_ENV=production electron-builder --mac --arm64",
-    "dist:mac:universal": "NODE_ENV=production electron-builder --mac --universal",
+    "dist:mac:universal": "NODE_ENV=production electron-builder --mac --universal ",
     "dist:win64": "NODE_ENV=production electron-builder --win --x64",
     "dist:linux": "NODE_ENV=production electron-builder --linux",
     "dist:linux64": "NODE_ENV=production electron-builder --linux --x64",
@@ -34,9 +34,12 @@
     "mac": {
       "category": "public.app-category.utilities",
       "icon": "static/icon/of.icns",
-      "target": [
-        "dir"
-      ]
+      "target": {
+        "target": "default",
+        "arch": ["x64", "arm64"]
+      },
+      "mergeASARs": false,
+      "x64ArchFiles": "Contents/Resources/app/app/projectGenerator"
     },
     "win": {
       "icon": "static/icon/of.ico"
@@ -59,7 +62,7 @@
           "filter": ["**/*"]
       }
     ],
-    "asar": true
+    "asar": false
   },
   "keywords": [
     "electron-app"
