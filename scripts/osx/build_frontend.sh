@@ -14,9 +14,34 @@ if [ -z "${FRONTEND_TARGET+x}" ]; then
     FRONTEND_TARGET=mac:universal
 fi
 
+cd "${PG_DIR}/frontend"
+
 if [ -z "${BUILD_TEST+x}" ]; then
    BUILD_TEST=0
 fi
+
+
+if [ -z "${BUILD_TEST+x}" ]; then
+   BUILD_TEST=0
+fi
+
+# Assuming CMDLINE_DIR is already set to the correct directory path
+SOURCE_FILE="${PG_DIR}/commandLine/bin/projectGenerator"
+
+# Replace [destination_path] with the actual path where you want to copy the file
+DESTINATION_PATH="app/"
+echo "SOURCE_FILE:$SOURCE_FILE";
+# Check if the source file exists
+if [ -f "$SOURCE_FILE" ]; then
+    # File exists, proceed with copying
+    mkdir -p "$DESTINATION_PATH" # Create destination directory if it doesn't exist
+    cp "$SOURCE_FILE" "$DESTINATION_PATH"
+    echo "File copied successfully."
+else
+    # File does not exist
+    echo "Error: Source file does not exist."
+fi
+
 
 echo "====== "
 cd "${PG_DIR}/frontend"
