@@ -552,12 +552,13 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	// FIXME: MARK: - HACK:
 //	parseConfig();
 
-	
+	cout << "----- before exclude" << endl;
+
 	for (auto & i : includePaths) {
 		cout << i << endl;
 	}
 	exclude(includePaths, excludeIncludes);
-	cout << "-----" << endl;
+	cout << "----- after exclude" << endl;
 	for (auto & i : includePaths) {
 		cout << i << endl;
 	}
