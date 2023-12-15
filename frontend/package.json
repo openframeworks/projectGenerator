@@ -11,19 +11,19 @@
     "url": "https://openframeworks.cc"
   },
   "engines": {
-    "node": ">=21.2.0"
+    "node": ">=16.0.0"
   },
   "scripts": {
-    "start": "NODE_ENV=development electron .",
-    "start:prod": "NODE_ENV=production electron .",
+    "start": "electron .",
+    "start:prod": "electron .",
     "dist": "electron-builder",
-    "dist:mac:x64": "NODE_ENV=production electron-builder --mac --x64 ",
-    "dist:mac:arm64": "NODE_ENV=production electron-builder --mac --arm64",
-    "dist:mac:universal": "NODE_ENV=production electron-builder --mac --universal ",
-    "dist:win64": "NODE_ENV=production electron-builder --win --x64",
-    "dist:linux": "NODE_ENV=production electron-builder --linux",
-    "dist:linux64": "NODE_ENV=production electron-builder --linux --x64",
-    "dist:linux32": "NODE_ENV=production electron-builder --linux --ia32"
+    "dist:mac:x64": " electron-builder --mac --x64 ",
+    "dist:mac:arm64": " electron-builder --mac --arm64",
+    "dist:mac:universal": " electron-builder --mac --universal",
+    "dist:win64": "electron-builder --win --x64",
+    "dist:linux": "electron-builder --linux",
+    "dist:linux64": "electron-builder --linux --x64",
+    "dist:linux32": "electron-builder --linux --ia32"
   },
   "build": {
     "appId": "cc.openframeworks.projectGenerator.macos",
@@ -35,7 +35,7 @@
       "category": "public.app-category.utilities",
       "icon": "static/icon/of.icns",
       "target": {
-        "target": "default",
+        "target": "dir",
         "arch": ["x64", "arm64"]
       },
       "mergeASARs": false,
@@ -52,6 +52,7 @@
       "app/**/*",
       "static/**/*",
       "index.js",
+      "app.js",
       "preload.js",
       "!**/*.ts",
       "!*.map",
@@ -69,10 +70,11 @@
   ],
   "dependencies": {
     "moniker": "^0.1.2",
-    "n-readlines": "^1.0.1"
+    "n-readlines": "^1.0.1",
+    "@types/jquery": "^3.5.29"
+    
   },
   "devDependencies": {
-    "@types/jquery": "^3.5.29",
     "electron": "^28.0.0",
     "electron-builder": "^24.9.1",
     "electron-packager": "^17.1.2"

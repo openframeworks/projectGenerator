@@ -49,9 +49,9 @@ pwd
 echo "Building openFrameworks Frontend ${FRONTEND_TARGET}"
 npm install
 echo "====== install"
-npm update > /dev/null
+npm update 
 echo "====== update"
-npm run > /dev/null
+npm run
 echo "====== run"
 
 if [ "${BUILD_TEST}" == 1 ]; then

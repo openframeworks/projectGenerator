@@ -9,17 +9,17 @@
       "version": "0.2.0",
       "license": "MIT",
       "dependencies": {
+        "@types/jquery": "^3.5.29",
         "moniker": "^0.1.2",
         "n-readlines": "^1.0.1"
       },
       "devDependencies": {
-        "@types/jquery": "^3.5.29",
         "electron": "^28.0.0",
         "electron-builder": "^24.9.1",
         "electron-packager": "^17.1.2"
       },
       "engines": {
-        "node": ">=21.2.0"
+        "node": ">=16.0.0"
       }
     },
     "node_modules/@develar/schema-utils": {
@@ -439,7 +439,6 @@
       "version": "3.5.29",
       "resolved": "https://registry.npmjs.org/@types/jquery/-/jquery-3.5.29.tgz",
       "integrity": "sha512-oXQQC9X9MOPRrMhPHHOsXqeQDnWeCDT3PelUIg/Oy8FAbzSZtFHRjc7IpbfFVmpLtJ+UOoywpRsuO5Jxjybyeg==",
-      "dev": true,
       "dependencies": {
         "@types/sizzle": "*"
       }
@@ -491,8 +490,7 @@
     "node_modules/@types/sizzle": {
       "version": "2.3.8",
       "resolved": "https://registry.npmjs.org/@types/sizzle/-/sizzle-2.3.8.tgz",
-      "integrity": "sha512-0vWLNK2D5MT9dg0iOo8GlKguPAU02QjmZitPEsXRuJXU/OGIOt9vT9Fc26wtYuavLxtO45v9PGleoL9Z0k1LHg==",
-      "dev": true
+      "integrity": "sha512-0vWLNK2D5MT9dg0iOo8GlKguPAU02QjmZitPEsXRuJXU/OGIOt9vT9Fc26wtYuavLxtO45v9PGleoL9Z0k1LHg=="
     },
     "node_modules/@types/verror": {
       "version": "1.10.9",
