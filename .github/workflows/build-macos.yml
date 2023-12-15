@@ -25,8 +25,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 16
-          cache: 'npm'         
+          node-version: 16       
       - name: rm-dev
         run: sudo rm -rf /Library/Developer
       - name: Setup

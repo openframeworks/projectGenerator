@@ -41,8 +41,7 @@ jobs:
             wget
       - uses: actions/setup-node@v4
         with:
-          node-version: 16
-          cache: 'npm'     
+          node-version: 16   
       - name: Install dependencies
         shell: msys2 {0}
         run:
