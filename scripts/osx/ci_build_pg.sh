@@ -19,8 +19,6 @@ echo "FRONTEND_DIR:  ${FRONTEND_DIR}"
 echo "CMD_DIR:  ${CMD_DIR}"
 echo "====== OF_DIR: ${OF_DIR}"
 
-
-
 echoDots(){
 	sleep 0.1 # Waiting for a brief period first, allowing jobs returning immediatly to finish
 	while isRunning $1; do
@@ -168,12 +166,12 @@ import_certificate_travis(){
 }
 
 cd ..
-of_root=${OF_DIR}
-pg_root=${PG_DIR}
+of_root=${PWD}/openFrameworks
+pg_root=${PWD}/openFrameworks/apps/projectGenerator
 
-if [ -d "${OF_DIR}/.git" ]; then
+if [ -d "${of_root}/.git" ]; then
 	echo 'OF already cloned, using it'
-	cd ${OF_DIR}
+	cd ${of_root}
 	git pull
 	# git submodule init
 	# git submodule update
@@ -189,7 +187,7 @@ fi
 #cp not move so github actions can do cleanup without error
 # cp -r projectGenerator openFrameworks/apps/
 
-cd ${OF_DIR}
+cd ${of_root}
 if [ -d "libs/glfw" ]; then
 	echo 'libs installed, using them'
 else
@@ -212,7 +210,8 @@ ${CURRENT_DIR}/build_frontend.sh
 if [ -d "${pg_root}/projectGenerator-osx" ]; then
 	rm -rf ${pg_root}/projectGenerator-osx
 fi
-mv dist/mac ${pg_root}/mac-osx
+mv dist/mac ${pg_root}/projectGenerator-osx
+
 package_app osx
 
 cd ${pg_root}/frontend

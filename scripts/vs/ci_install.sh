@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 OF_ROOT=$PWD
 
 SCRIPT_DIR="${BASH_SOURCE%/*}"
