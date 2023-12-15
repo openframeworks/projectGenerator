@@ -540,7 +540,6 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 			paths.emplace_back( isLocalAddon ? path : fixPath(path) );
 		}
 	}
-	parseConfig();
 
 
 	paths.sort();
@@ -548,6 +547,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	for (auto & p : paths) {
 		includePaths.emplace_back(p.string());
 	}
+	parseConfig();
 
 	//
 	// FIXME: MARK: - HACK:
