@@ -76,7 +76,7 @@ jobs:
           npm update
           npm run dist:win64
       - name: Create projectGenerator VS GUI package
-        shell: bash
+        shell: msys2 {0}
         run:
           ../openFrameworks/apps/projectGenerator/scripts/vs/ci_frontend_package.sh
       - name: Update CMD Gen Release
