@@ -510,16 +510,9 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	}
 
 
-	parseConfig();
 
 	fs::path libsPath = path / "libs";
 
-	parseLibsPath(libsPath, parentFolder);
-
-	for (auto & a : additionalLibsFolder) {
-//		parseLibsPath(fs::weakly_canonical(path / a), parentFolder);
-		parseLibsPath((path / a), parentFolder);
-	}
 
 	// paths that are needed for the includes.
 	std::list < fs::path > paths;
@@ -539,6 +532,16 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		for (auto & path : srcFolders) {
 			paths.emplace_back( isLocalAddon ? path : fixPath(path) );
 		}
+	}
+
+	
+	parseConfig();
+
+	parseLibsPath(libsPath, parentFolder);
+
+	for (auto & a : additionalLibsFolder) {
+//		parseLibsPath(fs::weakly_canonical(path / a), parentFolder);
+		parseLibsPath((path / a), parentFolder);
 	}
 
 
