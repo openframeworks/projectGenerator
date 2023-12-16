@@ -154,6 +154,8 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 }
 
 void ofAddon::parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum){
+	
+
 	if (variable == "ADDON_NAME"){
 		if (value != name){
 			ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
@@ -195,7 +197,14 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
 	else if(variable == "ADDON_INCLUDES"){
+		if (!addToValue) {
+			alert ("CLEAR " + variable, 36);
+			alert ("value " + value, 36);
+		}
+		cout << includePaths.size() << endl;
 		addReplaceStringVector(includePaths, value, addonRelPath.string(), addToValue);
+		cout << includePaths.size() << endl;
+		cout << "----" << endl;
 //		alert ("ADDON_INCLUDES", 35);
 //		for (auto & i : includePaths) {
 //			cout << i << endl;
@@ -311,6 +320,7 @@ void ofAddon::exclude(vector<LibraryBinary> & variables, vector<string> exclusio
 }
 
 void ofAddon::parseConfig(){
+	alert ("ofAddon::parseConfig " + addonPath.string(), 33);
 	fs::path fileName = isLocalAddon ?
 		(pathToProject / addonPath / "addon_config.mk") :
 		(addonPath / "addon_config.mk")
@@ -535,7 +545,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	}
 
 	
-	parseConfig();
+//	parseConfig();
 
 	parseLibsPath(libsPath, parentFolder);
 
@@ -550,21 +560,22 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	for (auto & p : paths) {
 		includePaths.emplace_back(p.string());
 	}
-//	parseConfig();
+	
 
 	//
 	// FIXME: MARK: - HACK:
+	parseConfig();
 
-	cout << "----- before exclude " << includePaths.size()  << endl;
-
-	for (auto & i : includePaths) {
-		cout << i << endl;
-	}
+//	cout << "----- before exclude " << includePaths.size()  << endl;
+//
+//	for (auto & i : includePaths) {
+//		cout << i << endl;
+//	}
 	exclude(includePaths, excludeIncludes);
-	cout << "----- after exclude " << includePaths.size() << endl;
-	for (auto & i : includePaths) {
-		cout << i << endl;
-	}
+//	cout << "----- after exclude " << includePaths.size() << endl;
+//	for (auto & i : includePaths) {
+//		cout << i << endl;
+//	}
 
 	exclude(srcFiles, excludeSources);
 	exclude(csrcFiles, excludeSources);
