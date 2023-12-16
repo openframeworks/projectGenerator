@@ -477,6 +477,10 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	// alert("ofAddon::fromFS path : " + path.string());
 	
+	if (!fs::exists(path)) {
+		return false;
+	}
+	
 	clear();
 	this->platform = platform;
 
@@ -487,10 +491,6 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		name = path.filename().string();
 	}
 
-	if (!fs::exists(path)) {
-		return false;
-	}
-
 	fs::path srcPath { path / "src" };
 	if (fs::exists(srcPath)) {
 		getFilesRecursively(srcPath, srcFiles);
@@ -499,7 +499,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	// MARK: srcFiles to fs::path
 	// not possible today because there are string based exclusion functions
 
-	fs::path parentFolder = path.parent_path();
+	fs::path parentFolder { path.parent_path() };
 
 	for (auto & s : srcFiles) {
 		fs::path sFS { s };
@@ -514,6 +514,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		filesToFolders[s] = folder.string();
 	}
 
+	
 	if (platform == "vs" || platform == "msys2") {
 		// here addonPath is the same as path.
 		getPropsRecursively(addonPath, propsFiles, platform);
@@ -521,8 +522,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 
 
 
-	fs::path libsPath = path / "libs";
-
+	fs::path libsPath { path / "libs" };
 
 	// paths that are needed for the includes.
 	std::list < fs::path > paths;
