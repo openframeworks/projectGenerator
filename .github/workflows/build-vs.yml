@@ -68,16 +68,16 @@ jobs:
         if: github.repository == 'openframeworks/projectGenerator' && github.ref == 'refs/heads/master'
         shell: msys2 {0}
         run:
-          ./scripts/vs/ci_cmd_package.sh
+          ../openFrameworks/apps/projectGenerator/scripts/vs/ci_cmd_package.sh
 
       - name: Build projectGenerator VS GUI
         shell: msys2 {0}
         run:
-          ./scripts/vs/build_frontend.sh
+          ../openFrameworks/apps/projectGenerator/scripts/vs/build_frontend.sh
       - name: Create projectGenerator VS GUI package
         shell: msys2 {0}
         run:
-          ./scripts/vs/ci_frontend_package.sh
+          ../openFrameworks/apps/projectGenerator/scripts/vs/ci_frontend_package.sh
       - name: Update CMD Gen Release
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
         uses: IsaacShelton/update-existing-release@v1.3.2

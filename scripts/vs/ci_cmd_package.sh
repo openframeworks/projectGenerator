@@ -7,10 +7,17 @@ CMDLINE_DIR="$( cd "$( dirname "${PG_DIR}/commandLine" )" && pwd )"
 
 cd ${CMDLINE_DIR}/commandLine/bin/
 
+echo "ci_cmd_package"
 if [ -f "commandLine.exe" ]; then
     if [ -f "projectGenerator.exe" ]; then
         rm "projectGenerator.exe"
     fi
+
+    if [ -f "commandLine.exe" ]; then
+        echo "could not find commandLine.exe - build first via build_cmdline.sh"
+        exit 1
+    fi
+
     mv "commandLine.exe" "projectGenerator.exe"
 
     zip -r "projectGenerator-vs.zip" "projectGenerator.exe" "data"
