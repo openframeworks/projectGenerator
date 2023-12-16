@@ -75,6 +75,9 @@ jobs:
           npm install
           npm update
           npm run dist:win64
+          cd dist
+          pwd
+          ls
       - name: Create projectGenerator VS GUI package
         shell: msys2 {0}
         run:
