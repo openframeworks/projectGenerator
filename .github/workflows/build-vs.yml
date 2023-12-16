@@ -30,6 +30,9 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
       - uses: msys2/setup-msys2@v2
         with:
           update: true
@@ -49,15 +52,11 @@ jobs:
           elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
             echo "release=bleeding" >> $GITHUB_ENV
             echo "prerelease=true" >> $GITHUB_ENV
-          fi
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 16   
+          fi 
       - name: Install dependencies
         shell: msys2 {0}
         run:
           ./scripts/vs/ci_install.sh
-
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.1
       - name: Build projectGenerator
@@ -74,6 +73,11 @@ jobs:
         shell: msys2 {0}
         run:
           ../openFrameworks/apps/projectGenerator/scripts/vs/build_frontend.sh
+      - run: cd ../openFrameworks/apps/projectGenerator/frontend
+      - run: npm install
+      - run: npm update
+      - run: npm run
+      - run: run dist:win64
       - name: Create projectGenerator VS GUI package
         shell: msys2 {0}
         run:
