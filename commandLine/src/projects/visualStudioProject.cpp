@@ -257,8 +257,9 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 }
 
 void visualStudioProject::addInclude(string includeName){
+	alert ("visualStudioProject::addInclude " + includeName, 35);
+
 	fixSlashOrder(includeName);
-//	alert ("addInclude " + includeName, 35);
 
 	pugi::xpath_node_set source = doc.select_nodes("//ClCompile/AdditionalIncludeDirectories");
 	for (pugi::xpath_node_set::const_iterator it = source.begin(); it != source.end(); ++it){
