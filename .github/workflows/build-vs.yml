@@ -54,7 +54,7 @@ jobs:
             echo "prerelease=true" >> $GITHUB_ENV
           fi 
       - name: Install dependencies
-        shell: msys2 {0}
+        shell: bash
         run:
           ./scripts/vs/ci_install.sh
       - name: Setup MSBuild
@@ -68,18 +68,15 @@ jobs:
         shell: msys2 {0}
         run:
           ../openFrameworks/apps/projectGenerator/scripts/vs/ci_cmd_package.sh
-
-      - name: Build projectGenerator VS GUI
-        shell: msys2 {0}
-        run:
-          ../openFrameworks/apps/projectGenerator/scripts/vs/build_frontend.sh
-      - run: cd ../openFrameworks/apps/projectGenerator/frontend
-      - run: npm install
-      - run: npm update
-      - run: npm run
-      - run: run dist:win64
+      - name: Build and Package projectGenerator VS GUI
+        shell: bash
+        run: |
+          cd ../openFrameworks/apps/projectGenerator/frontend
+          npm install
+          npm update
+          npm run dist:win64
       - name: Create projectGenerator VS GUI package
-        shell: msys2 {0}
+        shell: bash
         run:
           ../openFrameworks/apps/projectGenerator/scripts/vs/ci_frontend_package.sh
       - name: Update CMD Gen Release
