@@ -46,7 +46,7 @@ jobs:
       # - name: Build frontend
       #   run: ./scripts/osx/build_frontend.sh
       - name: Setup CI setup environment
-        run: ./scripts/osx/ci_install.sh
+        run: ./scripts/osx/ci_install_core.sh
       - name: Build
         run: ./scripts/osx/ci_build_pg.sh
         env:
