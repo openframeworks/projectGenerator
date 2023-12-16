@@ -166,36 +166,6 @@ import_certificate_travis(){
 	fi
 }
 
-cd ..
-of_root=${PWD}/openFrameworks
-pg_root=${PWD}/openFrameworks/apps/projectGenerator
-
-if [ -d "${of_root}/.git" ]; then
-	echo 'OF already cloned, using it'
-	cd ${of_root}
-	git pull
-	# git submodule init
-	# git submodule update
-	# git submodule update
-	cd ..
-	# Control will enter here if $DIRECTORY exists.
-else
-	echo "cloning of"
-	exit
-	git clone --depth=1 https://github.com/openframeworks/openFrameworks
-fi
-#git clone --depth=1 https://github.com/openframeworks/openFrameworks
-#cp not move so github actions can do cleanup without error
-# cp -r projectGenerator openFrameworks/apps/
-
-cd ${of_root}
-if [ -d "libs/glfw" ]; then
-	echo 'libs installed, using them'
-else
-	scripts/osx/download_libs.sh
-fi
-
-
 # Compile commandline tool
 ${CURRENT_DIR}/build_cmdline.sh
 

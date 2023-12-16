@@ -30,6 +30,9 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
       - uses: msys2/setup-msys2@v2
         with:
           update: true
@@ -49,15 +52,11 @@ jobs:
           elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
             echo "release=bleeding" >> $GITHUB_ENV
             echo "prerelease=true" >> $GITHUB_ENV
-          fi
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 16   
+          fi 
       - name: Install dependencies
-        shell: msys2 {0}
+        shell: bash
         run:
           ./scripts/vs/ci_install.sh
-
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.1
       - name: Build projectGenerator
@@ -68,16 +67,21 @@ jobs:
         if: github.repository == 'openframeworks/projectGenerator' && github.ref == 'refs/heads/master'
         shell: msys2 {0}
         run:
-          ./scripts/vs/ci_cmd_package.sh
-
-      - name: Build projectGenerator VS GUI
-        shell: msys2 {0}
-        run:
-          ./scripts/vs/build_frontend.sh
+          ../openFrameworks/apps/projectGenerator/scripts/vs/ci_cmd_package.sh
+      - name: Build and Package projectGenerator VS GUI
+        shell: bash
+        run: |
+          cd ../openFrameworks/apps/projectGenerator/frontend
+          npm install
+          npm update
+          npm run dist:win64
+          cd dist
+          pwd
+          ls
       - name: Create projectGenerator VS GUI package
         shell: msys2 {0}
         run:
-          ./scripts/vs/ci_frontend_package.sh
+          ../openFrameworks/apps/projectGenerator/scripts/vs/ci_frontend_package.sh
       - name: Update CMD Gen Release
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
         uses: IsaacShelton/update-existing-release@v1.3.2
