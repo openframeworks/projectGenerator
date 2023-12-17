@@ -44,7 +44,10 @@ else
 	pwd 
 	ls
 fi
-cp -r projectGenerator openFrameworks/apps/
+	
+echo "copying pg to oF dir"
+cp -rv projectGenerator openFrameworks/apps/
+
 cd ${of_root}
 if [ -d "libs/glfw" ]; then
 	echo 'libs installed, using them'
