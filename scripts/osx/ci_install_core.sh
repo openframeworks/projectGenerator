@@ -26,9 +26,9 @@ echo "====== OF_DIR: ${OF_DIR}"
 cd ../../
 of_root=${PWD}/openFrameworks
 pg_root=${PWD}/openFrameworks/apps/projectGenerator
-
+pwd
 echo "ci setup - ${PWD}"
-
+ls
 if [ -d "${of_root}/.git" ]; then
 	echo 'OF already cloned, using it'
 	cd ${of_root}
@@ -42,6 +42,8 @@ else
 	echo "cloning of"
 	exit
 	git clone --depth=1 https://github.com/openframeworks/openFrameworks
+	pwd 
+	ls
 fi
 cp -r projectGenerator openFrameworks/apps/
 cd ${of_root}
@@ -51,3 +53,6 @@ else
 	echo 'downloading libs'
 	scripts/osx/download_libs.sh
 fi
+
+echo "ci install complete"
+ls
