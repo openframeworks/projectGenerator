@@ -104,4 +104,4 @@ jobs:
           release: ${{ env.release }}
           prerelease: ${{ env.release }}
           replace: false
-          files: ../openFrameworks/apps/projectGenerator/frontend/dist/rojectGenerator-vs-gui.zip
+          files: ../openFrameworks/apps/projectGenerator/frontend/dist/projectGenerator-vs-gui.zip
