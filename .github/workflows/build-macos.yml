@@ -46,7 +46,7 @@ jobs:
       - name: Setup CI setup environment
         run: ./scripts/osx/ci_install_core.sh
       - name: Build
-        run: ./scripts/osx/ci_build_pg.sh
+        run: ../openFrameworks/apps/projectGenerator/scripts/osx/ci_build_pg.sh
         env:
           DEVELOPER_DIR: "/Applications/Xcode_15.0.1.app/Contents/Developer"
           SDKROOT: "/Applications/Xcode_15.0.1.app/Contents/DeveloperPlatforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"

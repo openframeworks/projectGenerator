@@ -166,16 +166,20 @@ import_certificate_travis(){
 	fi
 }
 
+echo "build_cmdline.sh"
 # Compile commandline tool
 ${CURRENT_DIR}/build_cmdline.sh
 
+echo "test_cmdline.sh"
 # Test commandline tool
 ${CURRENT_DIR}/test_cmdline.sh
 
-import_certificate
 
+echo "import_certificate"
+import_certificate
 # Generate electron app
 
+echo "build_frontend"
 ${CURRENT_DIR}/build_frontend.sh
 
 if [ -d "${pg_root}/projectGenerator-osx" ]; then
@@ -183,14 +187,19 @@ if [ -d "${pg_root}/projectGenerator-osx" ]; then
 fi
 mv dist/mac ${pg_root}/projectGenerator-osx
 
+echo "package_app osx"
 package_app osx
 
 cd ${pg_root}/frontend
+
+echo "package_app ios"
 npm run build:macos > /dev/null
+
 if [ -d "${pg_root}/projectGenerator-ios" ]; then
 	rm -rf ${pg_root}/projectGenerator-ios
 fi
 mv dist/mac ${pg_root}/projectGenerator-ios
+echo "package_app ios"
 package_app ios
 
 rm -rf scripts/id_rsa 2> /dev/null

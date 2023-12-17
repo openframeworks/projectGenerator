@@ -23,12 +23,12 @@ echo "CMD_DIR:  ${CMD_DIR}"
 echo "====== OF_DIR: ${OF_DIR}"
 
 
-cd ..
+cd ../../
 of_root=${PWD}/openFrameworks
 pg_root=${PWD}/openFrameworks/apps/projectGenerator
-
+pwd
 echo "ci setup - ${PWD}"
-
+ls
 if [ -d "${of_root}/.git" ]; then
 	echo 'OF already cloned, using it'
 	cd ${of_root}
@@ -40,10 +40,15 @@ if [ -d "${of_root}/.git" ]; then
 	# Control will enter here if $DIRECTORY exists.
 else
 	echo "cloning of"
-	exit
 	git clone --depth=1 https://github.com/openframeworks/openFrameworks
+	pwd 
+	ls
 fi
-cp -r projectGenerator openFrameworks/apps/
+	
+echo "copying pg to oF dir"
+cp -rv projectGenerator/* openFrameworks/apps/projectGenerator/
+
+
 cd ${of_root}
 if [ -d "libs/glfw" ]; then
 	echo 'libs installed, using them'
@@ -51,3 +56,6 @@ else
 	echo 'downloading libs'
 	scripts/osx/download_libs.sh
 fi
+
+echo "ci install complete"
+ls
