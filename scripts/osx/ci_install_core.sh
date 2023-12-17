@@ -40,7 +40,6 @@ if [ -d "${of_root}/.git" ]; then
 	# Control will enter here if $DIRECTORY exists.
 else
 	echo "cloning of"
-	exit
 	git clone --depth=1 https://github.com/openframeworks/openFrameworks
 	pwd 
 	ls
