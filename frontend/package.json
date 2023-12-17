@@ -20,13 +20,13 @@
     "dist:mac:x64": " electron-builder --mac --x64 ",
     "dist:mac:arm64": " electron-builder --mac --arm64",
     "dist:mac:universal": " electron-builder --mac --universal",
-    "dist:win64": "electron-builder --win --x64",
+    "dist:win64": "electron-builder --win --x64 ",
     "dist:linux": "electron-builder --linux",
     "dist:linux64": "electron-builder --linux --x64",
     "dist:linux32": "electron-builder --linux --ia32"
   },
   "build": {
-    "appId": "cc.openframeworks.projectGenerator.macos",
+    "appId": "cc.openframeworks.projectGenerator",
     "productName": "projectGenerator",
     "directories": {
       "output": "dist"
@@ -36,16 +36,27 @@
       "icon": "static/icon/of.icns",
       "target": {
         "target": "dir",
-        "arch": ["x64", "arm64"]
+        "arch": ["x64", "arm64"],
+        "publish" : []
       },
       "mergeASARs": false,
       "x64ArchFiles": "Contents/Resources/app/app/projectGenerator"
     },
     "win": {
-      "icon": "static/icon/of.ico"
+      "icon": "static/icon/of.ico",
+      "target": {
+        "target": "dir",
+        "arch": ["x64"],
+        "publish" : []
+      },
     },
     "linux": {
-      "icon": "static/icon"
+      "icon": "static/icon",
+      "target": {
+        "target": "tar.gz",
+        "arch": ["x64", "arm64"],
+        "publish" : []
+      },
     },
     "files": [
       "index.html",
