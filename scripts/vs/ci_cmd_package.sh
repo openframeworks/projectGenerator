@@ -15,12 +15,6 @@ if [ -f "commandLine.exe" ]; then
         rm "projectGenerator.exe"
     fi
 
-    if [ -f "commandLine.exe" ]; then
-        echo "could not find commandLine.exe - build first via build_cmdline.sh"
-        ls
-        exit 1
-    fi
-
     mv "commandLine.exe" "projectGenerator.exe"
 
     zip -r "projectGenerator-vs.zip" "projectGenerator.exe" "data"
