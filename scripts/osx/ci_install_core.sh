@@ -23,7 +23,7 @@ echo "CMD_DIR:  ${CMD_DIR}"
 echo "====== OF_DIR: ${OF_DIR}"
 
 
-cd ..
+cd ../../
 of_root=${PWD}/openFrameworks
 pg_root=${PWD}/openFrameworks/apps/projectGenerator
 
