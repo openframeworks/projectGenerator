@@ -46,7 +46,8 @@ else
 fi
 	
 echo "copying pg to oF dir"
-cp -rv projectGenerator openFrameworks/apps/
+cp -rv projectGenerator/* openFrameworks/apps/projectGenerator/
+
 
 cd ${of_root}
 if [ -d "libs/glfw" ]; then
