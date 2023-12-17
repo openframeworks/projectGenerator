@@ -70,8 +70,6 @@ jobs:
           ../openFrameworks/apps/projectGenerator/scripts/vs/ci_cmd_package.sh
       - name: Build and Package projectGenerator VS GUI
         shell: bash
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd ../openFrameworks/apps/projectGenerator/frontend
           npm install
