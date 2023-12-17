@@ -3,19 +3,16 @@
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SCRIPT_DIR="$( cd "$( dirname "${CURRENT_DIR}"/../../ )" && pwd )"
 PG_DIR="$( cd "$( dirname "${SCRIPT_DIR}/../../" )" && pwd )"
-CMDLINE_DIR="$( cd "$( dirname "${PG_DIR}/commandLine" )" && pwd )"
+CMDLINE_DIR="$( cd "$( dirname "${PG_DIR}" )" && pwd )"
 
-cd ${CMDLINE_DIR}/commandLine/bin/
+cd ${PG_DIR}/commandLine/bin/
 
 echo "ci_cmd_package"
+pwd
+ls
 if [ -f "commandLine.exe" ]; then
     if [ -f "projectGenerator.exe" ]; then
         rm "projectGenerator.exe"
-    fi
-
-    if [ -f "commandLine.exe" ]; then
-        echo "could not find commandLine.exe - build first via build_cmdline.sh"
-        exit 1
     fi
 
     mv "commandLine.exe" "projectGenerator.exe"
