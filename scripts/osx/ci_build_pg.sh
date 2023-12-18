@@ -57,9 +57,16 @@ package_app(){
 
 		# Sign app
 		echo "Signing electron .app"
-		cd ${pg_root}
-		xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
-
+		echo "cd to ${PG_DIR}/projectGenerator-$PLATFORM"
+		cd ${PG_DIR}/projectGenerator-$PLATFORM
+		pwd
+		echo "Directory contents:"
+		ls
+		echo "-------------"
+		xattr -cr projectGenerator.app
+		echo "-------------"
+		echo "cd to ${PG_DIR}"
+		cd ${PG_DIR}
 		electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
 
 		${SCRIPT_DIR}/secure.sh projectGenerator-$PLATFORM/projectGenerator.app/Contents/MacOS/projectGenerator projectGenerator-$PLATFORM
@@ -76,7 +83,7 @@ package_app(){
 sign_and_upload(){
 	PLATFORM=$1
 	# Copy commandLine into electron .app
-	cd ${pg_root}
+	cd ${PG_DIR}
 	cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
 
 	sed -i -e "s/osx/$PLATFORM/g" projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/settings.json
@@ -88,7 +95,7 @@ sign_and_upload(){
    			[[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
     		# Sign app
 			echo "Signing electron .app"
-			cd ${pg_root}
+			cd ${PG_DIR}
 			xattr -cr projectGenerator-$PLATFORM/projectGenerator.app
 			# codesign --deep --force --verbose --sign "Developer ID Application: Arturo Castro" "projectGenerator-$PLATFORM/projectGenerator.app"
 
@@ -198,10 +205,10 @@ package_app osx
 # echo "package_app ios"
 # npm run build:macos > /dev/null
 
-# if [ -d "${pg_root}/projectGenerator-ios" ]; then
-# 	rm -rf ${pg_root}/projectGenerator-ios
+# if [ -d "${PG_DIR}/projectGenerator-ios" ]; then
+# 	rm -rf ${PG_DIR}/projectGenerator-ios
 # fi
-# mv dist/mac ${pg_root}/projectGenerator-ios
+# mv dist/mac ${PG_DIR}/projectGenerator-ios
 # echo "package_app ios"
 # package_app ios
 
