@@ -74,6 +74,12 @@ package_app(){
 		# need to upload zip of just app to apple for notarizing
 		zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM/projectGenerator.app
 		xcrun altool --notarize-app --primary-bundle-id "com.electron.projectgenerator" --username "${GA_APPLE_USERNAME}" -p "${GA_APPLE_PASS}" --asc-provider "${GA_NOTARIZE_PROVIDER}" --file projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip
+		mv projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip ${PG_DIR}/../../projectGenerator-$PLATFORM.zip
+		cd ${PG_DIR}/../../
+		echo "Directory contents:"
+		pwd
+		ls
+		echo "-------------"
 	else
 		echo "package_app not on master/bleeding so will not package app"	
 	fi
@@ -200,6 +206,15 @@ mv frontend/dist/mac-universal ${PG_DIR}/projectGenerator-osx
 echo "-------------"
 echo "package_app osx"
 package_app osx
+
+
+cd ${PG_DIR}/projectGenerator-osx
+
+echo "Current directory: (should be ${PG_DIR}/projectGenerator-osx"
+pwd
+echo "Directory contents:"
+ls
+echo "-------------"
 
 
 # echo "package_app ios"
