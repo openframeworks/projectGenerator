@@ -39,17 +39,46 @@ jobs:
             echo "release=bleeding" >> $GITHUB_ENV
             echo "prerelease=true" >> $GITHUB_ENV
           fi
-      # - name: Build CMDLINE
-      #   run: ./scripts/osx/build_cmdline.sh
-      # - name: Build frontend
-      #   run: ./scripts/osx/build_frontend.sh
-      - name: Setup CI setup environment
-        run: ./scripts/osx/ci_install_core.sh
-      - name: Build
-        run: ../openFrameworks/apps/projectGenerator/scripts/osx/ci_build_pg.sh
+      - name: Build PG macOS GUI and command line
+        run: |
+          echo "Current directory: (should be projectGenerator)"
+          pwd
+          echo "Directory contents:"
+          ls
+          echo "Setup CI setup environment / checkout oF "
+          ./scripts/osx/ci_install_core.sh
+      
+          echo "Current directory after moving up: (should be projectGenerator/projectGenerator)"
+          pwd
+          cd ../
+
+          echo "Current directory after moving up: (should be projectGenerator/)"
+          echo "------------------"
+          pwd
+          ls
+          echo "------------------"
+          if [ -f "openFrameworks/apps/projectGenerator/scripts/osx/ci_build_pg.sh" ]; then
+            echo "ci_build_pg.sh exists, running script..."
+            openFrameworks/apps/projectGenerator/scripts/osx/ci_build_pg.sh
+          else
+            echo "ci_build_pg.sh does not exist, checking Git status..."
+            if cd openFrameworks/apps/projectGenerator; then
+              echo "Current Git branch in projectGenerator:"
+              git rev-parse --abbrev-ref HEAD
+              echo "Latest commit hash in projectGenerator:"
+              git rev-parse HEAD
+            else
+              echo "Failed to change directory to openFrameworks/apps/projectGenerator"
+            fi
+            echo "Current directory: (should be openFrameworks/apps/projectGenerator)"
+            pwd
+            echo "Directory contents:"
+            ls
+            echo "------------------"
+            echo "Failure exit1"
+            exit 1
+          fi
         env:
-          DEVELOPER_DIR: "/Applications/Xcode_15.0.1.app/Contents/Developer"
-          SDKROOT: "/Applications/Xcode_15.0.1.app/Contents/DeveloperPlatforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
           GA_CI_SECRET: ${{ secrets.CI_SECRET }}
           CERTIFICATE_OSX_APPLICATION: ${{ secrets.CERTIFICATE_OSX_APPLICATION }}
           CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
@@ -67,5 +96,5 @@ jobs:
           release: ${{ env.release }}
           prerelease: ${{ env.prerelease }}
           replace: false
-          files: ../openFrameworks/apps/projectGenerator/frontend/dist/projectGenerator-osx.zip
+          files: openFrameworks/apps/projectGenerator/frontend/dist/projectGenerator-osx.zip
 
