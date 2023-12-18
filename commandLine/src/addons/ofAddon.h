@@ -116,6 +116,7 @@ public:
 	bool fromFS(const fs::path & path, const string & platform);
 	void parseLibsPath(const fs::path & path, const fs::path & parentFolder);
 	vector <fs::path> additionalLibsFolder;
+	vector <fs::path> libFiles;
 
 //	void fromXML(string installXmlName);
 	void clear();
@@ -168,7 +169,7 @@ private:
 	string currentParseState { "" };
 
 	void parseConfig();
-	void parseVariableValue(string variable, string value, bool addToValue, string line, int lineNum);
+	void parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum);
 	void addReplaceString(string & variable, string value, bool addToVariable);
 	void addReplaceStringVector(vector<string> & variable, string value, string prefix, bool addToVariable);
 	void addReplaceStringVector(vector<LibraryBinary> & variable, string value, string prefix, bool addToVariable);

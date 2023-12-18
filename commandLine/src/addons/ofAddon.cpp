@@ -153,9 +153,11 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 	}
 }
 
-void ofAddon::parseVariableValue(string variable, string value, bool addToValue, string line, int lineNum){
-	if(variable == "ADDON_NAME"){
-		if(value!=name){
+void ofAddon::parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum){
+	
+
+	if (variable == "ADDON_NAME"){
+		if (value != name){
 			ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
 						<< "line " << lineNum << ": " << line << "\n\t\t"
 						<< "addon name in filesystem " << name << " doesn't match with addon_config.mk " << value;
@@ -163,116 +165,117 @@ void ofAddon::parseVariableValue(string variable, string value, bool addToValue,
 		return;
 	}
 
-
-	fs::path addonRelPath;
-	if (!isLocalAddon) {
-		addonRelPath = pathToOF / "addons" / name;
-	} else {
-		addonRelPath = addonPath;
-	}
+	fs::path addonRelPath = isLocalAddon ? addonPath : (pathToOF / "addons" / name);
 
 	if (variable == "ADDON_ADDITIONAL_LIBS") {
 		additionalLibsFolder.emplace_back(value);
 		return;
 	}
 	
-	if(variable == "ADDON_DESCRIPTION"){
-		addReplaceString(description,value,addToValue);
+	else if (variable == "ADDON_DESCRIPTION") {
+		addReplaceString(description, value, addToValue);
 		return;
 	}
 
-	if(variable == "ADDON_AUTHOR"){
+	else if(variable == "ADDON_AUTHOR"){
 		addReplaceString(author,value,addToValue);
 		return;
 	}
 
-	if(variable == "ADDON_TAGS"){
+	else if(variable == "ADDON_TAGS"){
 		addReplaceStringVector(tags,value,"",addToValue);
 		return;
 	}
 
-	if(variable == "ADDON_URL"){
+	else if(variable == "ADDON_URL"){
 		addReplaceString(url,value,addToValue);
 		return;
 	}
 
-	if(variable == "ADDON_DEPENDENCIES"){
+	else if(variable == "ADDON_DEPENDENCIES"){
 		addReplaceStringVector(dependencies,value,"",addToValue);
 	}
 
-	if(variable == "ADDON_INCLUDES"){
+	else if(variable == "ADDON_INCLUDES"){
+//		if (!addToValue) {
+//			alert ("CLEAR " + variable, 36);
+//			alert ("value " + value, 36);
+//		}
+//		cout << includePaths.size() << endl;
 		addReplaceStringVector(includePaths, value, addonRelPath.string(), addToValue);
+//		cout << includePaths.size() << endl;
+//		cout << "----" << endl;
 	}
 
-	if(variable == ADDON_CFLAGS){
+	else if(variable == ADDON_CFLAGS){
 		addReplaceStringVector(cflags,value,"",addToValue);
 	}
 
-	if(variable == ADDON_CPPFLAGS){
+	else if(variable == ADDON_CPPFLAGS){
 		addReplaceStringVector(cppflags,value,"",addToValue);
 	}
 
-	if(variable == ADDON_LDFLAGS){
+	else if(variable == ADDON_LDFLAGS){
 		addReplaceStringVector(ldflags,value,"",addToValue);
 	}
 
-	if(variable == ADDON_LIBS){
+	else if(variable == ADDON_LIBS){
 		addReplaceStringVector(libs, value, addonRelPath.string(), addToValue);
 	}
 
-	if(variable == ADDON_DLLS_TO_COPY){
+	else if(variable == ADDON_DLLS_TO_COPY){
 		addReplaceStringVector(dllsToCopy,value,"",addToValue);
 	}
 
-	if(variable == ADDON_PKG_CONFIG_LIBRARIES){
+	else if(variable == ADDON_PKG_CONFIG_LIBRARIES){
 		addReplaceStringVector(pkgConfigLibs,value,"",addToValue);
 	}
 
-	if(variable == ADDON_FRAMEWORKS){
+	else if(variable == ADDON_FRAMEWORKS){
 		addReplaceStringVector(frameworks,value,"",addToValue);
 	}
 
-	if(variable == ADDON_SOURCES){
+	else if(variable == ADDON_SOURCES){
 		addReplaceStringVector(srcFiles, value, addonRelPath.string() ,addToValue);
 	}
 
-	if(variable == ADDON_C_SOURCES){
+	else if(variable == ADDON_C_SOURCES){
 		addReplaceStringVector(csrcFiles, value, addonRelPath.string() ,addToValue);
 	}
 
-	if(variable == ADDON_CPP_SOURCES){
+	else if(variable == ADDON_CPP_SOURCES){
 		addReplaceStringVector(cppsrcFiles, value, addonRelPath.string() ,addToValue);
 	}
 
-	if(variable == ADDON_HEADER_SOURCES){
+	else if(variable == ADDON_HEADER_SOURCES){
 		addReplaceStringVector(headersrcFiles, value, addonRelPath.string() ,addToValue);
 	}
 
-	if(variable == ADDON_OBJC_SOURCES){
+	else if(variable == ADDON_OBJC_SOURCES){
 		addReplaceStringVector(objcsrcFiles, value, addonRelPath.string() ,addToValue);
 	}
 
-	if(variable == ADDON_DATA){
+	else if(variable == ADDON_DATA){
 		addReplaceStringVector(data,value,"",addToValue);
 	}
 
-	if(variable == ADDON_LIBS_EXCLUDE){
+	else if(variable == ADDON_LIBS_EXCLUDE){
 		addReplaceStringVector(excludeLibs,value,"",addToValue);
 	}
 
-	if(variable == ADDON_SOURCES_EXCLUDE){
+	else if(variable == ADDON_SOURCES_EXCLUDE){
 		addReplaceStringVector(excludeSources,value,"",addToValue);
 	}
 
-	if(variable == ADDON_INCLUDES_EXCLUDE){
+	else if(variable == ADDON_INCLUDES_EXCLUDE){
 		addReplaceStringVector(excludeIncludes,value,"",addToValue);
 	}
 
-	if (variable == ADDON_FRAMEWORKS_EXCLUDE) {
+	else if (variable == ADDON_FRAMEWORKS_EXCLUDE) {
 		addReplaceStringVector(excludeFrameworks, value, "", addToValue);
 	}
 
-	if (variable == ADDON_DEFINES) {
+	else if (variable == ADDON_DEFINES) {
 		addReplaceStringVector(defines, value, "", addToValue);
 	}
 }
@@ -313,14 +316,16 @@ void ofAddon::exclude(vector<LibraryBinary> & variables, vector<string> exclusio
 }
 
 void ofAddon::parseConfig(){
-	fs::path fileName;
-	if(isLocalAddon){
-		fileName = pathToProject / addonPath / "addon_config.mk";
-	}else{
-		fileName = addonPath / "addon_config.mk";
-	}
+//	alert ("ofAddon::parseConfig " + addonPath.string(), 33);
+	fs::path fileName = isLocalAddon ?
+		(pathToProject / addonPath / "addon_config.mk") :
+		(addonPath / "addon_config.mk")
+	;
 
-	if (!fs::exists(fileName)) return;
+	if (!fs::exists(fileName)) {
+//		ofLogError() << "ofAddon::parseConfig() " << fileName << " not found " << ofPathToString(fileName);
+		return;
+	}
 
 	int lineNum = 0;
 
@@ -380,8 +385,6 @@ void ofAddon::parseConfig(){
 			parseVariableValue(variable, value, addToValue, originalLine, lineNum);
 		}
 	}
-
-
 }
 
 void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFolder) {
@@ -392,7 +395,6 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		return;
 	}
 	
-	vector <fs::path> libFiles;
 
 	getLibsRecursively(libsPath, libFiles, libs, platform);
 	if (platform == "osx" || platform == "ios"){
@@ -471,6 +473,10 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	// alert("ofAddon::fromFS path : " + path.string());
 	
+	if (!fs::exists(path)) {
+		return false;
+	}
+	
 	clear();
 	this->platform = platform;
 
@@ -481,10 +487,6 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		name = path.filename().string();
 	}
 
-	if (!fs::exists(path)) {
-		return false;
-	}
-
 	fs::path srcPath { path / "src" };
 	if (fs::exists(srcPath)) {
 		getFilesRecursively(srcPath, srcFiles);
@@ -493,7 +495,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	// MARK: srcFiles to fs::path
 	// not possible today because there are string based exclusion functions
 
-	fs::path parentFolder = path.parent_path();
+	fs::path parentFolder { path.parent_path() };
 
 	for (auto & s : srcFiles) {
 		fs::path sFS { s };
@@ -508,21 +510,15 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		filesToFolders[s] = folder.string();
 	}
 
+	
 	if (platform == "vs" || platform == "msys2") {
 		// here addonPath is the same as path.
 		getPropsRecursively(addonPath, propsFiles, platform);
 	}
 
 
-	parseConfig();
 
-	fs::path libsPath = path / "libs";
-	parseLibsPath(libsPath, parentFolder);
-
-	for (auto & a : additionalLibsFolder) {
-//		parseLibsPath(fs::weakly_canonical(path / a), parentFolder);
-		parseLibsPath((path / a), parentFolder);
-	}
+	fs::path libsPath { path / "libs" };
 
 	// paths that are needed for the includes.
 	std::list < fs::path > paths;
@@ -544,16 +540,28 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		}
 	}
 
+	
+	parseConfig();
+
+	parseLibsPath(libsPath, parentFolder);
+
+	for (auto & a : additionalLibsFolder) {
+//		parseLibsPath(fs::weakly_canonical(path / a), parentFolder);
+		parseLibsPath((path / a), parentFolder);
+	}
+
 
 	paths.sort();
 
 	for (auto & p : paths) {
 		includePaths.emplace_back(p.string());
 	}
+	
 
-	
-	
-	
+	//
+	// FIXME: MARK: - HACK:
+//	parseConfig();
+
 	exclude(includePaths, excludeIncludes);
 	exclude(srcFiles, excludeSources);
 	exclude(csrcFiles, excludeSources);

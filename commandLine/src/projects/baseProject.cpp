@@ -34,6 +34,11 @@ fs::path baseProject::getPlatformTemplateDir() {
 	) {
 		folder = "vscode";
 	}
+	
+//	if ( target == "qtcreator" ) {
+//		return getOFRoot()
+//	}
+	
 	return getOFRoot() / templatesFolder / folder;
 }
 
