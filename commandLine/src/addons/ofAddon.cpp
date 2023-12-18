@@ -197,18 +197,14 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
 	else if(variable == "ADDON_INCLUDES"){
-		if (!addToValue) {
-			alert ("CLEAR " + variable, 36);
-			alert ("value " + value, 36);
-		}
-		cout << includePaths.size() << endl;
-		addReplaceStringVector(includePaths, value, addonRelPath.string(), addToValue);
-		cout << includePaths.size() << endl;
-		cout << "----" << endl;
-//		alert ("ADDON_INCLUDES", 35);
-//		for (auto & i : includePaths) {
-//			cout << i << endl;
+//		if (!addToValue) {
+//			alert ("CLEAR " + variable, 36);
+//			alert ("value " + value, 36);
 //		}
+//		cout << includePaths.size() << endl;
+		addReplaceStringVector(includePaths, value, addonRelPath.string(), addToValue);
+//		cout << includePaths.size() << endl;
+//		cout << "----" << endl;
 	}
 
 	else if(variable == ADDON_CFLAGS){
@@ -320,14 +316,14 @@ void ofAddon::exclude(vector<LibraryBinary> & variables, vector<string> exclusio
 }
 
 void ofAddon::parseConfig(){
-	alert ("ofAddon::parseConfig " + addonPath.string(), 33);
+//	alert ("ofAddon::parseConfig " + addonPath.string(), 33);
 	fs::path fileName = isLocalAddon ?
 		(pathToProject / addonPath / "addon_config.mk") :
 		(addonPath / "addon_config.mk")
 	;
 
 	if (!fs::exists(fileName)) {
-		ofLogError() << "ofAddon::parseConfig() " << fileName << " not found " << ofPathToString(fileName);
+//		ofLogError() << "ofAddon::parseConfig() " << fileName << " not found " << ofPathToString(fileName);
 		return;
 	}
 
@@ -566,17 +562,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	// FIXME: MARK: - HACK:
 //	parseConfig();
 
-//	cout << "----- before exclude " << includePaths.size()  << endl;
-//
-//	for (auto & i : includePaths) {
-//		cout << i << endl;
-//	}
 	exclude(includePaths, excludeIncludes);
-//	cout << "----- after exclude " << includePaths.size() << endl;
-//	for (auto & i : includePaths) {
-//		cout << i << endl;
-//	}
-
 	exclude(srcFiles, excludeSources);
 	exclude(csrcFiles, excludeSources);
 	exclude(cppsrcFiles, excludeSources);

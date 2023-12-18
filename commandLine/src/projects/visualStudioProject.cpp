@@ -257,7 +257,7 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 }
 
 void visualStudioProject::addInclude(string includeName){
-	alert ("visualStudioProject::addInclude " + includeName, 35);
+//	alert ("visualStudioProject::addInclude " + includeName, 35);
 
 	fixSlashOrder(includeName);
 
