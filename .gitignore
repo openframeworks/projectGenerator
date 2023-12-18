@@ -96,3 +96,4 @@ Temporary Items
 commandLine/bin/projectGenerator*
 frontend/app/projectGenerator*
 
+commandLine/.vs/commandLine/xs
