@@ -115,4 +115,4 @@ jobs:
           release: ${{ env.release }}
           prerelease: ${{ env.prerelease }}
           replace: false
-          files: projectGenerator/projectGenerator/projectGenerator-osx.zip
+          files: projectGenerator-osx.zip
