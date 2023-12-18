@@ -85,6 +85,27 @@ jobs:
           GA_APPLE_USERNAME: ${{ secrets.GA_APPLE_USERNAME }}
           GA_APPLE_PASS: ${{ secrets.GA_APPLE_PASS }}
           GA_NOTARIZE_PROVIDER: ${{ secrets.GA_NOTARIZE_PROVIDER }}
+      - name: Check output
+        run: |
+          echo "Current directory: (should be projectGenerator)"
+          pwd
+          echo "Directory contents:"
+          ls
+          if [ -f "projectGenerator/projectGenerator-osx.zip" ]; then
+            echo "projectGenerator/projectGenerator-osx.zip found at level 1"
+          else
+            echo "projectGenerator/projectGenerator-osx.zip NOT found at level 1"
+          fi
+          if [ -f "projectGenerator/projectGenerator/projectGenerator-osx.zip" ]; then
+            echo "projectGenerator/projectGenerator/projectGenerator-osx.zip found at level 2"
+          else
+            echo "projectGenerator/projectGenerator/projectGenerator-osx.zip NOT found at level 2"
+          fi
+          if [ -f "projectGenerator-osx.zip" ]; then
+            echo "projectGenerator-osx.zip found at level 0"
+          else
+            echo "projectGenerator-osx.zip NOT found at level 0"
+          fi
       - name: Update Release x86_64
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
         uses: IsaacShelton/update-existing-release@v1.3.3
