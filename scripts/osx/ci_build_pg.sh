@@ -47,7 +47,7 @@ package_app(){
 		ls
 		echo "-------------"
 		#echo "copy cmdline PG to "
-		#cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
+		cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
 		cd ${PG_DIR}
 		pwd
 		echo "Directory contents:"
