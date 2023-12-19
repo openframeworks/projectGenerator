@@ -168,6 +168,7 @@ private:
 	
 	string currentParseState { "" };
 
+	void preParseConfig();
 	void parseConfig();
 	void parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum);
 	void addReplaceString(string & variable, string value, bool addToVariable);

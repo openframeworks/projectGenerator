@@ -315,6 +315,75 @@ void ofAddon::exclude(vector<LibraryBinary> & variables, vector<string> exclusio
 	}
 }
 
+
+void ofAddon::preParseConfig(){
+	//	alert ("ofAddon::parseConfig " + addonPath.string(), 33);
+	fs::path fileName = isLocalAddon ?
+		(pathToProject / addonPath / "addon_config.mk") :
+		(addonPath / "addon_config.mk")
+	;
+
+	if (!fs::exists(fileName)) {
+//		ofLogError() << "ofAddon::parseConfig() " << fileName << " not found " << ofPathToString(fileName);
+		return;
+	}
+	
+	for (auto & line : fileToStrings(fileName)) {
+		line = ofTrim(line);
+		
+		if (line[0]=='#' || line == "") {
+			continue;
+		} // discard comments
+
+
+		// found section?
+		if (line.back() == ':'){
+			ofStringReplace(line, ":", "");
+			currentParseState = line;
+			
+			if (std::find(parseStates.begin(), parseStates.end(), currentParseState) == parseStates.end()) {
+				ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
+//								<< "line " << lineNum << ": " << originalLine << "\n\t\t"
+								<< "sectionName " << currentParseState << " not recognized";
+			}
+			continue;
+		}
+		
+		// found Variable
+		if (line.find("=") != string::npos){
+			bool addToValue = false;
+			string variable, value;
+			vector<string> varValue;
+			if (line.find("+=") != string::npos) {
+				addToValue = true;
+				varValue = ofSplitString(line, "+=");
+			} else {
+				varValue = ofSplitString(line, "=");
+			}
+			variable = ofTrim(varValue[0]);
+			value = ofTrim(varValue[1]);
+
+			// FIXME: This seems to be meaningless
+			if(!checkCorrectPlatform(currentParseState)){
+				continue;
+			}
+
+			if(!checkCorrectVariable(variable, currentParseState)){
+				ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
+//								<< "line " << lineNum << ": " << originalLine << "\n\t\t"
+								<< "variable " << variable << " not recognized for section " << currentParseState;
+				continue;
+			}
+			
+			if (variable == "ADDON_ADDITIONAL_LIBS") {
+				additionalLibsFolder.emplace_back(value);
+//				return;
+			}
+//			parseVariableValue(variable, value, addToValue, originalLine, lineNum);
+		}
+	}
+}
+
 void ofAddon::parseConfig(){
 //	alert ("ofAddon::parseConfig " + addonPath.string(), 33);
 	fs::path fileName = isLocalAddon ?
@@ -541,7 +610,8 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	}
 
 	
-	parseConfig();
+	// FIXME: MARK: - HACK:
+	preParseConfig();
 
 	parseLibsPath(libsPath, parentFolder);
 
@@ -550,17 +620,13 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		parseLibsPath((path / a), parentFolder);
 	}
 
-
 	paths.sort();
 
 	for (auto & p : paths) {
 		includePaths.emplace_back(p.string());
 	}
 	
-
-	//
-	// FIXME: MARK: - HACK:
-//	parseConfig();
+	parseConfig();
 
 	exclude(includePaths, excludeIncludes);
 	exclude(srcFiles, excludeSources);
