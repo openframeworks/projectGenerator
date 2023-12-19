@@ -612,8 +612,8 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	
 	//
 	// FIXME: MARK: - HACK:
-	parseConfig();
-//	preParseConfig();
+//	parseConfig();
+	preParseConfig();
 
 	parseLibsPath(libsPath, parentFolder);
 
