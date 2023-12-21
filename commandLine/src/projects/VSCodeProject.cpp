@@ -37,11 +37,17 @@ struct fileJson {
 	}
 
 	void load() {
+		if (!fs::exists(fileName)) {
+			ofLogError(VSCodeProject::LOG_NAME) << "JSON file not found " << fileName;
+			return;
+		}
+		
 		std::ifstream ifs(fileName);
 		try {
 			data = json::parse(ifs);
 		} catch (json::parse_error& ex) {
 			ofLogError(VSCodeProject::LOG_NAME) << "JSON parse error at byte" << ex.byte;
+
 		}
 	}
 
