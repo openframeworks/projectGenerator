@@ -558,6 +558,8 @@ function setup() {
 
          $("#IDEButton").on("click", () => launchInIDE());
 
+         $("#FolderButton").on("click", () => launchInIDE());
+
 
          $("#verboseOption").checkbox();
          $("#verboseOption").on("change", () => {
@@ -1178,4 +1180,17 @@ function launchInIDE(){
     };
 
     ipcRenderer.send('launchProjectinIDE', project );
+}
+
+function launchFolder(){
+    const platform = getPlatformList()[0];
+
+    const project = {
+        'projectName': $("#projectName").val(),
+        'projectPath': $("#projectPath").val(),
+        'platform': platform,
+        'ofPath': $("#ofPath").val()
+    };
+
+    ipcRenderer.send('launchFolder', project );
 }

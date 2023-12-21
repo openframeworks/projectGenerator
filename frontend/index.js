@@ -1150,6 +1150,26 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
     }
 });
 
+ipcMain.on('launchFolder', (event, arg) => {
+    const { 
+        projectPath, 
+        projectName } = arg;
+    const fullPath = path.join(projectPath, projectName);
+
+    try {
+        if(fs.existsSync(fullPath) && fs.statSync(fullPath).isDirectory()) {
+            await shell.openPath(fullPath);
+            event.sender.send('launchFolderCompleted', true);
+        } else {
+            // project doesn't exist
+            event.sender.send('launchFolderCompleted', false);
+        }
+    } catch (error) {
+        console.error('Error opening folder:', error);
+        event.sender.send('launchFolderCompleted', false);
+    }
+});
+
 ipcMain.on('quit', (event, arg) => {
     app.quit();
 });
