@@ -73,7 +73,16 @@ bool VSCodeProject::createProjectFile(){
 
 	// Copy all files from template, recursively
 	try {
-		fs::copy(templatePath, projectDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
+		//dangerous as its copying src/ and bin/ into existing project files 
+		//fs::copy(templatePath, projectDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
+
+		//tmp fix for now - explicit copy of files needed 
+		fs::copy(templatePath / ".vscode", projectDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
+		fs::copy(templatePath / "Makefile", projectDir, fs::copy_options::skip_existing | fs::copy_options::recursive);
+		fs::copy(templatePath / "config.make", projectDir, fs::copy_options::skip_existing | fs::copy_options::recursive);
+		fs::copy(templatePath / "emptyExample.code-workspace", projectDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
+		fs::copy(templatePath / "template.config", projectDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
+		
 	} catch(fs::filesystem_error& e) {
 		ofLogError(LOG_NAME) << "error copying folder " << templatePath << " : " << projectDir << " : " << e.what();
 		return false;
