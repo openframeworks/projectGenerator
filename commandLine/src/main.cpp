@@ -364,7 +364,7 @@ int main(int argc, char** argv){
 	//fix as we want to treat vscode as a platform not a template 
 	if( templateName == "vscode" ){
 		templateName = "";
-		addPlatform("vscode");
+		addPlatforms("vscode");
 	}
 
 	if (options[ADDONS].count() > 0){
