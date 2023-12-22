@@ -347,11 +347,24 @@ int main(int argc, char** argv){
 		bVerbose = true;
 	}
 
+	if (options[TEMPLATE].count() > 0){
+		if (options[TEMPLATE].arg != NULL){
+			string templateString(options[TEMPLATE].arg);
+			templateName = templateString;
+		}
+	}
+
 	if (options[PLATFORMS].count() > 0){
 		if (options[PLATFORMS].arg != NULL){
 			string platformString(options[PLATFORMS].arg);
 			addPlatforms(platformString);
 		}
+	}
+
+	//fix as we want to treat vscode as a platform not a template 
+	if( templateName == "vscode" ){
+		templateName = "";
+		addPlatform("vscode");
 	}
 
 	if (options[ADDONS].count() > 0){
@@ -377,13 +390,6 @@ int main(int argc, char** argv){
 	if (options[OFPATH].count() > 0){
 		if (options[OFPATH].arg != NULL){
 			ofPath = options[OFPATH].arg;
-		}
-	}
-
-	if (options[TEMPLATE].count() > 0){
-		if (options[TEMPLATE].arg != NULL){
-			string templateString(options[TEMPLATE].arg);
-			templateName = templateString;
 		}
 	}
 
