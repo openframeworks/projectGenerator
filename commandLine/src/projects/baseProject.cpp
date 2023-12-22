@@ -151,17 +151,10 @@ bool baseProject::create(const fs::path & path, string templateName){
 	bool bDoesDirExist = false;
 
 	fs::path project { projectDir / "src" };
-	fs::path projectAltPath { projectPath / "src" };
-
-	ofLogNotice() << "DEBUG 1 - src folder path is " << project;
-	ofLogNotice() << "DEBUG 2 - src folder path should be? " << projectAltPath;
 	
 	if (fs::exists(project) && fs::is_directory(project)) {
 		bDoesDirExist = true;
 	} else {
-		ofLogNotice() << "DEBUG 3 - src folder path does not exist " << project;
-		ofLogNotice() << "DEBUG 4 - does projectAltPath path exist? " << fs::exists(projectAltPath);
-		
 		for (auto & p : { string("src") , string("bin") }) {
 			fs::copy (templatePath / p, projectDir / p, fs::copy_options::recursive);
 		}
