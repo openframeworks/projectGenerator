@@ -1150,8 +1150,8 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
     }
 });
 
-ipcMain.on('launchFolder', (event, arg) => {
-    const { 
+ipcMain.on('launchFolder', async (event, arg) => {
+    const {
         projectPath, 
         projectName } = arg;
     const fullPath = path.join(projectPath, projectName);
