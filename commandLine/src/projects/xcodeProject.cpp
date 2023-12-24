@@ -583,6 +583,101 @@ void xcodeProject::addFramework(const string & name, const fs::path & path, cons
 }
 
 
+void xcodeProject::addXCFramework(const string & name, const fs::path & path, const fs::path & folder) {
+	//	alert( "xcodeProject::addFramework " + name + " : " + path.string() + " : " + folder.string() , 33);
+
+	//	cout << "xcodeProject::addFramework " << name << " : " << path << " : " << folder << endl;
+	// name = name of the framework
+	// path = the full path (w name) of this framework
+	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
+
+	//-----------------------------------------------------------------
+	// based on the extension make some choices about what to do:
+	//-----------------------------------------------------------------
+
+	//-----------------------------------------------------------------
+	// (A) make a FILE REF
+	//-----------------------------------------------------------------
+
+	string UUID = generateUUID(name);
+
+	// encoding may be messing up for xcframeworks... so I switched to a pbx file ref without encoding fields
+	//commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
+
+	commands.emplace_back("# ----- addXCFramework name=" + name + " path=" + path.string() + " folder=" + folder.string());
+	commands.emplace_back("Add :objects:" + UUID + ":name string " + name);
+	commands.emplace_back("Add :objects:" + UUID + ":path string " + path.string());
+	commands.emplace_back("Add :objects:" + UUID + ":isa string PBXFileReference");
+	commands.emplace_back("Add :objects:" + UUID + ":lastKnownFileType string wrapper.framework");
+	//	commands.emplace_back("Add :objects:"+UUID+":sourceTree string <group>");
+	commands.emplace_back("Add :objects:" + UUID + ":sourceTree string SOURCE_ROOT");
+
+	commands.emplace_back("# ----- addXCFramework - add to build phase");
+	string buildUUID = generateUUID(name + "-build");
+	commands.emplace_back("Add :objects:" + buildUUID + ":isa string PBXBuildFile");
+	commands.emplace_back("Add :objects:" + buildUUID + ":fileRef string " + UUID);
+
+	// new - code sign frameworks on copy
+	commands.emplace_back("# ----- addXCFramework - sign on copy");
+
+	commands.emplace_back("Add :objects:" + buildUUID + ":settings:ATTRIBUTES array");
+	commands.emplace_back("Add :objects:" + buildUUID + ":settings:ATTRIBUTES: string CodeSignOnCopy");
+
+	//	this now adds the recently created object UUID to its parent folder
+	string folderUUID = getFolderUUID(folder, false);
+	commands.emplace_back("# ----- addXCFramework - add to parent folder : " + folder.string());
+	commands.emplace_back("Add :objects:" + folderUUID + ":children: string " + UUID);
+
+	//commands.emplace_back("Add :objects:"+frameworksUUID+":children array");
+	//commands.emplace_back("Add :objects:"+frameworksUUID+":children: string " + buildUUID);
+
+	// we add the second to a final build phase for copying the framework into app.   we need to make sure we *don't* do this for system frameworks
+
+	string buildUUID2;
+
+	// maybe check if path exists in path
+	if (!folder.empty()) {
+
+		buildUUID2 = generateUUID(name + "-build2");
+		commands.emplace_back("Add :objects:" + buildUUID2 + ":fileRef string " + UUID);
+		commands.emplace_back("Add :objects:" + buildUUID2 + ":isa string PBXBuildFile");
+
+		// new - code sign frameworks on copy
+		commands.emplace_back("Add :objects:" + buildUUID2 + ":settings:ATTRIBUTES array");
+		commands.emplace_back("Add :objects:" + buildUUID2 + ":settings:ATTRIBUTES: string CodeSignOnCopy");
+
+		// UUID hardcoded para PBXCopyFilesBuildPhase
+		// FIXME: hardcoded - this is the same for the next fixme. so maybe a clearer ident can make things better here.
+		commands.emplace_back("Add :objects:E4C2427710CC5ABF004149E2:files: string " + buildUUID2);
+	}
+
+	commands.emplace_back("# ----- XCFRAMEWORK_SEARCH_PATHS");
+
+	fs::path parentFolder { path.parent_path() };
+	//	alert ("parentFolder " + parentFolder.string() );
+
+	for (auto & c : buildConfigs) {
+		commands.emplace_back("Add :objects:" + c + ":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + parentFolder.string());
+	}
+
+	if (!folder.empty()) {
+		// add it to the linking phases...
+		// PBXFrameworksBuildPhase
+		// https://www.rubydoc.info/gems/xcodeproj/Xcodeproj/Project/Object/PBXFrameworksBuildPhase
+		// The phase responsible on linking with frameworks. Known as ‘Link Binary With Libraries` in the UI.
+
+		// This is what was missing. a reference in root objects to the framework, so we can add the reference to PBXFrameworksBuildPhase
+		auto tempUUID = generateUUID(name + "-InFrameworks");
+		commands.emplace_back("Add :objects:" + tempUUID + ":fileRef string " + UUID);
+		commands.emplace_back("Add :objects:" + tempUUID + ":isa string PBXBuildFile");
+
+		commands.emplace_back("# --- PBXFrameworksBuildPhase");
+		commands.emplace_back("Add :objects:E4B69B590A3A1756003C02F2:files: string " + tempUUID);
+	}
+
+}
+
+
 //void xcodeProject::addDylib(string name, string path){
 void xcodeProject::addDylib(const string & name, const fs::path & path, const fs::path & folder){
 //	alert( "xcodeProject::addDylib " + name + " : " + path.string() , 33);
@@ -799,6 +894,37 @@ void xcodeProject::addAddon(ofAddon & addon){
 			} else {
 				vector < string > pathSplit = ofSplitString(f, "/");
 				addFramework(pathSplit[pathSplit.size()-1], f, addon.filesToFolders[f]);
+			}
+		}
+	}
+
+
+	for (auto & f : addon.xcframeworks) {
+		//		alert ("xcodeproj addon.xcframeworks : " + f);
+		ofLogVerbose() << "adding addon xcframeworks: " << f;
+
+		size_t found = f.find('/');
+		if (found == string::npos) {
+			fs::path folder = fs::path { "addons" } / addon.name / "xcframeworks";
+			//			fs::path folder = addon.filesToFolders[f];
+
+			if (addon.isLocalAddon) {
+				folder = addon.addonPath / "xcframeworks";
+			}
+			addXCFramework(f + ".framework",
+				"/System/Library/Frameworks/" + f + ".framework",
+				folder);
+			
+		} else {
+			if (ofIsStringInString(f, "/System/Library")) {
+				vector<string> pathSplit = ofSplitString(f, "/");
+				addFramework(pathSplit[pathSplit.size() - 1],
+					f,
+					"addons/" + addon.name + "/frameworks");
+
+			} else {
+				vector<string> pathSplit = ofSplitString(f, "/");
+				addFramework(pathSplit[pathSplit.size() - 1], f, addon.filesToFolders[f]);
 			}
 		}
 	}
