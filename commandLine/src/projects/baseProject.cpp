@@ -34,6 +34,11 @@ fs::path baseProject::getPlatformTemplateDir() {
 	) {
 		folder = "vscode";
 	}
+	
+//	if ( target == "qtcreator" ) {
+//		return getOFRoot()
+//	}
+	
 	return getOFRoot() / templatesFolder / folder;
 }
 
@@ -146,6 +151,7 @@ bool baseProject::create(const fs::path & path, string templateName){
 	bool bDoesDirExist = false;
 
 	fs::path project { projectDir / "src" };
+	
 	if (fs::exists(project) && fs::is_directory(project)) {
 		bDoesDirExist = true;
 	} else {

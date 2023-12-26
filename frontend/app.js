@@ -558,6 +558,8 @@ function setup() {
 
          $("#IDEButton").on("click", () => launchInIDE());
 
+         $("#FolderButton").on("click", () => launchFolder());
+
 
          $("#verboseOption").checkbox();
          $("#verboseOption").on("change", () => {
@@ -959,6 +961,7 @@ function switchGenerateMode(mode) {
     if (mode == 'updateMode') {
         $("#generateButton").hide();
         $("#updateButton").show();
+        $("#folderButton").show();
         $("#missingAddonMessage").hide();
         $("#localAddonMessage").hide();
         $("#nameRandomiser").hide();
@@ -980,6 +983,7 @@ function switchGenerateMode(mode) {
 
         $("#generateButton").show();
         $("#updateButton").hide();
+        $("#folderButton").show();
         $("#missingAddonMessage").hide();
         $("#localAddonMessage").hide();
         $("#nameRandomiser").show();
@@ -1048,6 +1052,15 @@ function getPlatformList() {
     return platformValueArray;
 }
 
+function openFolder() {
+    const platformsPicked = $("#platformsDropdown  .active");
+    const platformValueArray = [];
+    for (let i = 0; i < platformsPicked.length; i++){
+        platformValueArray.push($(platformsPicked[i]).attr("data-value"));
+    }
+    return platformValueArray;
+}
+
 //----------------------------------------
 function displayModal(message) {
     $("#uiModal .content")
@@ -1060,8 +1073,10 @@ function displayModal(message) {
 
     if (message.indexOf("Success!") > -1){
         $("#IDEButton").show();
+        $("#FolderButton").show();
     } else {
         $("#IDEButton").hide();
+        $("#FolderButton").show();
     }
 
     $("#uiModal").modal('show');
@@ -1178,4 +1193,15 @@ function launchInIDE(){
     };
 
     ipcRenderer.send('launchProjectinIDE', project );
+}
+
+function launchFolder(){
+    const platform = getPlatformList()[0];
+
+    const project = {
+        'projectName': $("#projectName").val(),
+        'projectPath': $("#projectPath").val()
+    };
+
+    ipcRenderer.send('launchFolder', project );
 }

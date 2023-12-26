@@ -236,7 +236,7 @@ void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props
 	}
 }
 
-void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, string platform) {
+void getDllsRecursively(const fs::path & path, std::vector<string> & dlls, string platform) {
 //	alert ("getDllsRecursively " + path.string(), 34);
 //	if (!fs::exists(path) || !fs::is_directory(path)) return;
 	if (!fs::exists(path) || !fs::is_directory(path)) {

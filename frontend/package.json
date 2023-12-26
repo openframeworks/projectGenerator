@@ -23,7 +23,8 @@
     "dist:win64": "electron-builder --win --x64 --publish never",
     "dist:linux": "electron-builder --linux --publish never",
     "dist:linux64": "electron-builder --linux --x64 --publish never",
-    "dist:linux32": "electron-builder --linux --ia32 --publish never"
+    "dist:linux32": "electron-builder --linux --ia32 --publish never",
+    "build:linux64": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=25.3.0 --platform=linux --arch=x64"
   },
   "build": {
     "appId": "cc.openframeworks.projectGenerator",
