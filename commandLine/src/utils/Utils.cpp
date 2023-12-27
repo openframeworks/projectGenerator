@@ -23,6 +23,7 @@
 
 #ifdef TARGET_WIN32
 #include <direct.h>
+
 #define GetCurrentDir _getcwd
 #elif defined(TARGET_LINUX)
 #include <unistd.h>
@@ -164,8 +165,14 @@ bool isFolderNotCurrentPlatform(const string & folderName, const string & platfo
 			"ios",
 			"linux",
 			"linux64",
+			"linuxarmv6l",
+			"linuxarmv7l",
+			"linuxaarch64"
 			"android",
 			"iphone",
+			"watchos",
+			"emscripten",
+			"visionos",
 		};
 	}
 
@@ -197,7 +204,7 @@ void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & fol
 //	}
 
 	// TODO: disable recursion pending... it is not recursive yet.
-	if (path.extension() != ".framework") {
+	if ((path.extension() != ".framework") || (path.extension() != ".xcframework")) {
 		for (const auto & entry : fs::directory_iterator(path)) {
 			auto f = entry.path();
 			if (f.filename().c_str()[0] == '.') continue; // avoid hidden files .DS_Store .vscode .git etc
@@ -216,6 +223,19 @@ void getFrameworksRecursively(const fs::path & path, std::vector < string > & fr
 	for (const auto & f : dirList(path)) {
 		if (fs::is_directory(f)) {
 			if (f.extension() == ".framework") {
+				frameworks.emplace_back(f.string());
+			}
+		}
+	}
+}
+
+void getXCFrameworksRecursively(const fs::path & path, std::vector<string> & frameworks, string platform) {
+	alert("getXCFrameworksRecursively " + path.string(), 34);
+	if (!fs::exists(path) || !fs::is_directory(path)) return;
+
+	for (const auto & f : dirList(path)) {
+		if (fs::is_directory(f)) {
+			if (f.extension() == ".xcframework") {
 				frameworks.emplace_back(f.string());
 			}
 		}
@@ -271,7 +291,7 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 
 		if (fs::is_directory(f)) {
 			// on osx, framework is a directory, let's not parse it....
-			if (f.extension() == ".framework") {
+			if ((f.extension() == ".framework") || (f.extension() == ".xcframework")) {
 				it.disable_recursion_pending();
 				continue;
 			} else {
@@ -301,7 +321,7 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 				}
 			}
 
-			if (ext == ".a" || ext == ".lib" || ext == ".dylib" || ext == ".so" ||
+			if (ext == ".a" || ext == ".lib" || ext == ".dylib" || ext == ".so" ||  ext == ".xcframework" ||
 				(ext == ".dll" && platform != "vs")){
 				if (platformFound){
 //					libLibs.emplace_back( f, arch, target );

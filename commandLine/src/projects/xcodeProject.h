@@ -27,6 +27,7 @@ public:
 	void addDefine(string define, LibType libType = RELEASE_LIB);
 
 	void addFramework(const string & name, const fs::path & path, const fs::path & folder);
+	void addXCFramework(const string & name, const fs::path & path, const fs::path & folder);
 	void addDylib(const string & name, const fs::path & path, const fs::path & folder);
 
 	void addAddon(ofAddon & addon);
