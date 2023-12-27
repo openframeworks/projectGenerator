@@ -392,6 +392,18 @@ void baseProject::addAddon(string addonName){
 //			to = projectDir / "bin" / "libs" / from.filename();
 			to = folder / from.filename();
 		}
+		if (from.extension() == ".dll") {
+			if (d.find("x64") != std::string::npos) {
+				to = projectDir / "dll/x64" / from.filename();
+			} else if (d.find("ARM64") != std::string::npos) {
+				to = projectDir / "dll/ARM64" / from.filename();
+			} else if (d.find("ARM64EC") != std::string::npos) {
+				to = projectDir / "dll/ARM64EC" / from.filename();
+			} else {
+				// Default case if architecture is not found
+				to = projectDir / "bin" / from.filename();
+			}
+		}
 
 		try {
 			fs::copy_file(from, to, fs::copy_options::overwrite_existing);

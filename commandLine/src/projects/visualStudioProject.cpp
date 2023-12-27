@@ -6,6 +6,8 @@ string visualStudioProject::LOG_NAME = "visualStudioProjectFile";
 bool visualStudioProject::createProjectFile(){
 //	alert("visualStudioProject::createProjectFile");
 
+	ensureDllDirectoriesExist();
+
 	solution	= projectDir / (projectName + ".sln");
 	fs::path project 	{ projectDir / (projectName + ".vcxproj") };
 	fs::path user 		{ projectDir / (projectName + ".vcxproj.user") };
@@ -436,6 +438,18 @@ void visualStudioProject::addDefine(string define, LibType libType) {
 		}
 	}
 }
+
+void visualStudioProject::ensureDllDirectoriesExist() {
+	std::vector<std::string> dirs = { "dll\\x64", "dll\\ARM64", "dll\\ARM64EC" };
+	for (const auto & dir : dirs) {
+		fs::path dirPath = projectDir / dir;
+		if (!fs::exists(dirPath)) {
+			ofLogVerbose() << "adding dll folder " << dirPath;
+			fs::create_directories(dirPath);
+		}
+	}
+}
+
 
 
 void visualStudioProject::addAddon(ofAddon & addon) {
