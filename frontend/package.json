@@ -62,7 +62,6 @@
       "static/**/*",
       "index.js",
       "app.js",
-      "settings.json",
       "preload.js",
       "!**/*.ts",
       "!*.map",
