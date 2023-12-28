@@ -346,11 +346,21 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	// Determine the correct link path based on the target and architecture
 	string linkPath;
 	if (!lib.target.empty() && !lib.arch.empty()) {
-		linkPath = "//ItemDefinitionGroup[contains(@Condition,'" + lib.target + "') and contains(@Condition,'" + lib.arch + "')]/Link/";
+		if (lib.arch == "ARM64") {
+			// For ARM64, ensure it does not match ARM64EC
+			linkPath = "//ItemDefinitionGroup[contains(@Condition,'" + lib.target + "') and contains(@Condition,'ARM64') and not(contains(@Condition,'ARM64EC'))]/Link/";
+		} else {
+			// For other architectures
+			linkPath = "//ItemDefinitionGroup[contains(@Condition,'" + lib.target + "') and contains(@Condition,'" + lib.arch + "')]/Link/";
+		}
 	} else if (!lib.target.empty()) {
 		linkPath = "//ItemDefinitionGroup[contains(@Condition,'" + lib.target + "')]/Link/";
 	} else if (!lib.arch.empty()) {
-		linkPath = "//ItemDefinitionGroup[contains(@Condition,'" + lib.arch + "')]/Link/";
+		if (lib.arch == "ARM64") {
+			linkPath = "//ItemDefinitionGroup[contains(@Condition,'ARM64') and not(contains(@Condition,'ARM64EC'))]/Link/";
+		} else {
+			linkPath = "//ItemDefinitionGroup[contains(@Condition,'" + lib.arch + "')]/Link/";
+		}
 	} else {
 		linkPath = "//ItemDefinitionGroup/Link/";
 	}
@@ -358,6 +368,7 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	// Add library paths and names to the correct ItemDefinitionGroup based on the link path
 	if (!libFolderString.empty()) {
 		pugi::xpath_node_set addlLibsDir = doc.select_nodes((linkPath + "AdditionalLibraryDirectories").c_str());
+		ofLogVerbose() << "adding " << lib.arch << " lib path " << linkPath;
 		addLibraryPath(addlLibsDir, libFolderString);
 	}
 
