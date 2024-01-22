@@ -235,6 +235,10 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 		addReplaceStringVector(frameworks,value,"",addToValue);
 	}
 
+	else if (variable == ADDON_XCFRAMEWORKS) {
+		addReplaceStringVector(xcframeworks, value, "", addToValue);
+	}
+
 	else if(variable == ADDON_SOURCES){
 		addReplaceStringVector(srcFiles, value, addonRelPath.string() ,addToValue);
 	}
@@ -468,6 +472,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 	getLibsRecursively(libsPath, libFiles, libs, platform);
 	if (platform == "osx" || platform == "ios"){
 		getFrameworksRecursively(libsPath, frameworks, platform);
+		getXCFrameworksRecursively(libsPath, frameworks, platform);
 	}
 	
 	if (platform == "vs" || platform == "msys2"
@@ -505,10 +510,8 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		filesToFolders[s.string()] = folder.string();
 	}
 
-	// FIXME: This is flawed logic, frameworks acquired here will always come from filesystem, config is not yet parsed
 	// so addons will never be system.
 	for (const auto & f : frameworks) {
-//		alert ("addon::fromFS " + f , 35);
 		// knowing if we are system framework or not is important....
 		bool bIsSystemFramework = false;
 		size_t foundUnixPath = f.find('/');
@@ -522,8 +525,6 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 			; // do we need to do anything here?
 		} else {
 			// if addon is local, it is relative to the project folder, and if it is not, it is related to the project folder, ex: addons/ofxSvg
-
-			// FIXME:: Cleanup the mess
 			fs::path rel = fs::relative (f, isLocalAddon ? pathToProject : pathToOF);
 			fs::path folder = rel.parent_path();
 
@@ -532,10 +533,21 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 				folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
 			}
 
-//			alert (f);
-//			alert (folder.string());
 			filesToFolders[f] = folder.string();
 		}
+	}
+
+	for (const auto & f : xcframeworks) {
+		
+		fs::path rel = fs::relative(f, isLocalAddon ? pathToProject : pathToOF);
+		fs::path folder = rel.parent_path();
+
+		if (isLocalAddon) {
+			fs::path fFS { f };
+			folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
+		}
+
+		filesToFolders[f] = folder.string();
 	}
 }
 	
@@ -636,6 +648,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	exclude(headersrcFiles, excludeSources);
 //	exclude(propsFiles, excludeSources);
 	exclude(frameworks, excludeFrameworks);
+	exclude(xcframeworks, excludeXCFrameworks);
 	exclude(libs, excludeLibs);
 
 	ofLogVerbose("ofAddon") << "libs after exclusions " << libs.size();

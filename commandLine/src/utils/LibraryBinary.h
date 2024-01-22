@@ -7,7 +7,6 @@
 //namespace fs = of::filesystem;
 
 struct LibraryBinary {
-	// FIXME: FS (and includes)
 //	fs::path path;
 	std::string path;
 	std::string arch;

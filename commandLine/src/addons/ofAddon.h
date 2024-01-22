@@ -77,6 +77,7 @@ const string ADDON_DATA = "ADDON_DATA";
 // About Env Specific
 const string ADDON_PKG_CONFIG_LIBRARIES = "ADDON_PKG_CONFIG_LIBRARIES";
 const string ADDON_FRAMEWORKS = "ADDON_FRAMEWORKS";
+const string ADDON_XCFRAMEWORKS = "ADDON_XCFRAMEWORKS";
 const string ADDON_DLLS_TO_COPY = "ADDON_DLLS_TO_COPY";
 
 const vector<string> AddonProjectVariables = {
@@ -144,6 +145,7 @@ public:
 	vector < string > ldflags;
 	vector < string > pkgConfigLibs; 	// linux only
 	vector < string > frameworks;		// osx only
+	vector <string >  xcframeworks; // osx only
 	vector < string > data;
 	vector < string > defines;
 
@@ -185,6 +187,7 @@ private:
 	vector<string> excludeSources;
 	vector<string> excludeIncludes;
 	vector<string> excludeFrameworks;
+	vector<string> excludeXCFrameworks;
 
 	fs::path fixPath(const fs::path & path);
 };
