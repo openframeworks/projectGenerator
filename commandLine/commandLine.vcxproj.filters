@@ -14,11 +14,7 @@
     <ClCompile Include="src\utils\LibraryBinary.cpp" />
     <ClCompile Include="src\utils\Utils.cpp" />
     <ClCompile Include="src\uuidxx\src\uuidxx.cpp" />
-      <Filter>src\uuidxx\src</Filter>
-    </ClCompile>
     <ClCompile Include="src\uuidxx\src\uuidxx.h" />
-      <Filter>src\uuidxx\src</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\optionparser.h" />

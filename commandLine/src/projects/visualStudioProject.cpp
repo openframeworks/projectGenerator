@@ -6,6 +6,8 @@ string visualStudioProject::LOG_NAME = "visualStudioProjectFile";
 bool visualStudioProject::createProjectFile(){
 //	alert("visualStudioProject::createProjectFile");
 
+	ensureDllDirectoriesExist();
+
 	solution	= projectDir / (projectName + ".sln");
 	fs::path project 	{ projectDir / (projectName + ".vcxproj") };
 	fs::path user 		{ projectDir / (projectName + ".vcxproj.user") };
@@ -335,49 +337,38 @@ void visualStudioProject::addProps(fs::path propsFile){
 
 void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 
-	// TODO: in future change Library to FS
-//	alert ("visualStudioProject::addLibrary " + lib.path, 36);
 	auto libraryName = fs::path { lib.path };
-//	fixSlashOrder(libraryName);
-
-	// ok first, split path and library name.
-//	size_t found = libraryName.find_last_of("\\");
-//	string libFolder = libraryName.substr(0, found);
 	auto libFolder = libraryName.parent_path();
-
 	string libFolderString = libFolder.string();
 	fixSlashOrder(libFolderString);
-
-//    alert ("libFolderString " + libFolderString, 36);
-
 	auto libName = libraryName.filename();
 
-	// ---------| invariant: libExtension is `lib`
-
-	// paths for libraries
+	// Determine the correct link path based on the target and architecture
 	string linkPath;
 	if (!lib.target.empty() && !lib.arch.empty()) {
-		linkPath = "//ItemDefinitionGroup[contains(@Condition,'" + lib.target + "') and contains(@Condition,'" + lib.arch + "')]/Link/";
-	}
-	else if (!lib.target.empty()) {
+		if (lib.arch == "ARM64") {
+			// For ARM64, ensure it does not match ARM64EC
+			linkPath = "//ItemDefinitionGroup[contains(@Condition,'" + lib.target + "') and contains(@Condition,'ARM64') and not(contains(@Condition,'ARM64EC'))]/Link/";
+		} else {
+			// For other architectures
+			linkPath = "//ItemDefinitionGroup[contains(@Condition,'" + lib.target + "') and contains(@Condition,'" + lib.arch + "')]/Link/";
+		}
+	} else if (!lib.target.empty()) {
 		linkPath = "//ItemDefinitionGroup[contains(@Condition,'" + lib.target + "')]/Link/";
-	}
-	else if (!lib.arch.empty()) {
-		linkPath = "//ItemDefinitionGroup[contains(@Condition,'" + lib.arch + "')]/Link/";
-	}
-	else {
+	} else if (!lib.arch.empty()) {
+		if (lib.arch == "ARM64") {
+			linkPath = "//ItemDefinitionGroup[contains(@Condition,'ARM64') and not(contains(@Condition,'ARM64EC'))]/Link/";
+		} else {
+			linkPath = "//ItemDefinitionGroup[contains(@Condition,'" + lib.arch + "')]/Link/";
+		}
+	} else {
 		linkPath = "//ItemDefinitionGroup/Link/";
 	}
 
+	// Add library paths and names to the correct ItemDefinitionGroup based on the link path
 	if (!libFolderString.empty()) {
-//		alert("yes " + libFolderString, 34);
 		pugi::xpath_node_set addlLibsDir = doc.select_nodes((linkPath + "AdditionalLibraryDirectories").c_str());
-
-		// FIXME:
-		// this function is called many times with the same parameters, like adding openCV. about 20 times the same command
-		// addLibraryPath ..\..\..\addons\ofxOpenCv\libs\opencv\lib\vs\x64\Debug
-		// if we save a unique list of commands we can make this alter in the end of execution, after removing duplicity.
-		// less pugi nodes traversed.
+		ofLogVerbose() << "adding " << lib.arch << " lib path " << linkPath;
 		addLibraryPath(addlLibsDir, libFolderString);
 	}
 
@@ -458,6 +449,18 @@ void visualStudioProject::addDefine(string define, LibType libType) {
 		}
 	}
 }
+
+void visualStudioProject::ensureDllDirectoriesExist() {
+	std::vector<std::string> dirs = { "dll\\x64", "dll\\ARM64", "dll\\ARM64EC" };
+	for (const auto & dir : dirs) {
+		fs::path dirPath = projectDir / dir;
+		if (!fs::exists(dirPath)) {
+			ofLogVerbose() << "adding dll folder " << dirPath;
+			fs::create_directories(dirPath);
+		}
+	}
+}
+
 
 
 void visualStudioProject::addAddon(ofAddon & addon) {
