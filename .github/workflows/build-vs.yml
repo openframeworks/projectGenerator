@@ -18,8 +18,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-vs2019:
-    runs-on: windows-2019
+  build-vs2022:
+    runs-on: windows-2022
     strategy:
       matrix:
         include:
@@ -63,7 +63,7 @@ jobs:
       - name: Build projectGenerator CMDLine with oF
         working-directory: ${{env.GITHUB_WORKSPACE}}
         run:
-          msbuild ../openFrameworks/apps/projectGenerator/commandLine/commandLine.vcxproj /p:configuration=release /p:platform=${{ matrix.platform }} /p:PlatformToolset=v142
+          msbuild ../openFrameworks/apps/projectGenerator/commandLine/commandLine.vcxproj /p:configuration=release /p:platform=${{ matrix.platform }} /p:PlatformToolset=v143
 
       - name: Create projectGenerator cmd zip
         shell: msys2 {0}

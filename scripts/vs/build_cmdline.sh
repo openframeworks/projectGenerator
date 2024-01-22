@@ -25,7 +25,7 @@ if [ -z "${PLATFORM+x}" ]; then
 fi
 
 if [ -z "${TOOLSET+x}" ]; then
-    TOOLSET=v142
+    TOOLSET=v143
 fi
 pwd
 ls

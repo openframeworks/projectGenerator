@@ -143,6 +143,7 @@
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <AdditionalDependencies>%(AdditionalDependencies);</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
+      <AdditionalOptions>/FORCE:MULTIPLE %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -210,6 +211,7 @@
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <AdditionalDependencies>%(AdditionalDependencies);</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
+      <AdditionalOptions>/FORCE:MULTIPLE %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
