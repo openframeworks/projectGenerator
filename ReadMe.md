@@ -1,11 +1,51 @@
 # Download instructions 
 You can download packaged macOS and Windows builds here ( note Linux needs to be built per platform ):
 - https://github.com/openframeworks/projectGenerator/releases/download/nightly/projectGenerator-osx.zip
-- https://github.com/openframeworks/projectGenerator/releases/download/nightly/projectGenerator-vs.zip 
+- https://github.com/openframeworks/projectGenerator/releases/download/nightly/projectGenerator-vs-gui.zip 
+- https://github.com/openframeworks/projectGenerator/releases/download/nightly/projectGenerator-vs.zip (commmandLine)
 
 ---------------------------------------
 
-# Build instructions 
+# Build instructions with Bash Scripts 
+
+In the projectGenerator scripts folder run the scripts in order to setup environment and build
+
+
+## Visual Studio 2022 
+
+projectGenerator\scripts\vs\setup_environment.sh (first time)
+
+projectGenerator\scripts\vs\build_cmdline.sh
+- (build projectGenerator commandLine requires openFrameworks in directories above / or run from correct sub-module location)
+
+projectGenerator\scripts\vs\build_frontend.sh (Builds Electron App GUI Project Generator) 
+- requires commandLine.exe in folder. 
+- If cannot build commandLine.exe download from releases and run just this
+
+projectGenerator\scripts\vs\build_dev_frontend.sh 
+ - (Builds Electron App GUI Project Generator in DEBUG mode / Verbose and will autorun the test build) 
+
+## macOS / osx
+
+projectGenerator\scripts\osx\setup_environment.sh (first time)
+
+projectGenerator\scripts\vs\build_cmdline.sh
+- (build projectGenerator commandLine requires openFrameworks in directories above / or run from correct sub-module location)
+
+projectGenerator\scripts\vs\build_frontend.sh (Builds Electron App GUI Project Generator) 
+- requires commandLine.exe in folder. 
+- If cannot build commandLine.exe download from releases and run just this
+
+## Linux
+
+projectGenerator\scripts\linux\setup_environment.sh (first time)
+
+projectGenerator\scripts\linux\buildPG.sh
+
+
+
+# LEGAGY BUILD INSTRUCTIONS ----- (more detail)
+---------------------------------------
 
 ## Clone OF ( skip if already cloned ) 
 ```
@@ -31,7 +71,7 @@ make Release
 cp bin/projectGenerator ../frontend/app/
 
 # for windows do:
-msbuild commandLine.vcxproj /p:configuration=release /p:platform=${{ matrix.platform }} /p:PlatformToolset=v142
+msbuild commandLine.vcxproj /p:configuration=release /p:platform=${{ matrix.platform }} /p:PlatformToolset=v143
 cp commandLine.exe ../frontend/app/projectGenerator.exe
 
 # for macos 

@@ -53,7 +53,7 @@ package_app(){
 		echo "Directory contents:"
 		ls
 		echo "-------------"
-		sed -i -e "s/osx/$PLATFORM/g" projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/settings.json
+		# sed -i -e "s/osx/$PLATFORM/g" projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/settings.json
 
 		# Sign app
 		echo "Signing electron .app"
@@ -92,7 +92,7 @@ sign_and_upload(){
 	cd ${PG_DIR}
 	cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
 
-	sed -i -e "s/osx/$PLATFORM/g" projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/settings.json
+	# sed -i -e "s/osx/$PLATFORM/g" projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/settings.json
 
 	if [[ -z "${GA_CI_SECRET}" ]] ; then
 		echo " Not on main repo skipping sign and upload ";
