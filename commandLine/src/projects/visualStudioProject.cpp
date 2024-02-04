@@ -190,7 +190,7 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 			pugi::xml_node nodeAdded = node.append_child("ClInclude");
 			nodeAdded.append_attribute("Include").set_value(srcFileString.c_str());
 			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folderString.c_str());
-		} else if ( ext == ".vert" || ext == ".frag" ) {
+		} else if (ext == ".vert" || ext == ".frag") {
 			// TODO: add to None but there's no None in the original template so this fails
 			/*appendValue(doc, "None", "Include", srcFile);
 
@@ -199,6 +199,8 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
 			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());*/
 
+		} else if (ext == ".storyboard" || ext == ".mm") {
+			// Do not add files for other platforms		
 		} else{
 			appendValue(doc, "ClCompile", "Include", srcFileString);
 
@@ -251,7 +253,7 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 			break;
 		}
 		default:{
-			ofLogError() << "explicit source type " << type << " not supported yet on osx for " << srcFileString;
+			ofLogError() << "explicit source type " << type << " not supported yet on VSProject for " << srcFileString;
 			break;
 		}
 		}
