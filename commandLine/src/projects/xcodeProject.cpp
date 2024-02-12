@@ -8,7 +8,7 @@ using nlohmann::json_pointer;
 
 xcodeProject::xcodeProject(const string & target) : baseProject(target){
 	// TODO: remove unused variables
-	if( target == "osx" ){
+	if( target == "macos" ){
 		folderUUID = {
 			{ "src", 			"E4B69E1C0A3A1BDC003C02F2" },
 			{ "addons", 		"BB4B014C10F69532006C3DED" },
@@ -102,12 +102,13 @@ bool xcodeProject::createProjectFile(){
 		}
 	}
 
-	if( target == "osx" ){
+	if( target == "macos" ){
 		// TODO: TEST
 		for (auto & f : { "openFrameworks-Info.plist", "of.entitlements" }) {
 			fs::copy(templatePath / f, projectDir / f, fs::copy_options::overwrite_existing);
 		}
-	}else{
+	} else {
+		// ios
 		for (auto & f : { "ofxiOS-Info.plist", "ofxiOS_Prefix.pch" }) {
 			fs::copy(templatePath / f, projectDir / f, fs::copy_options::overwrite_existing);
 		}
@@ -121,7 +122,7 @@ bool xcodeProject::createProjectFile(){
 
 	saveScheme();
 
-	if(target=="osx"){
+	if(target == "macos"){
 		saveMakefile();
 	}
 
@@ -159,7 +160,7 @@ bool xcodeProject::createProjectFile(){
 //		alert ("fs not equivalent to ../../.. root = " + root);
 		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", root);
 		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", root);
-		if( target == "osx" ){
+		if (target == "macos") {
 			findandreplaceInTexfile(projectDir / "Makefile", "../../..", root);
 			// MARK: not needed because baseProject::save() does the same
 //			findandreplaceInTexfile(projectDir / "config.make", "../../..", root);
@@ -179,7 +180,7 @@ void xcodeProject::saveScheme(){
 	}
 	fs::create_directories(schemeFolder);
 
-	if(target=="osx"){
+	if(target=="macos"){
 		for (auto & f : { string("Release"), string("Debug") }) {
 			auto fileFrom = templatePath / ("emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample " + f + ".xcscheme");
 			auto fileTo = schemeFolder / (projectName + " " +f+ ".xcscheme");
@@ -223,8 +224,8 @@ void xcodeProject::renameProject(){ //base
 	// FIXME: review BUILT_PRODUCTS_DIR
 	commands.emplace_back("Set :objects:"+buildConfigurationListUUID+":name " + projectName);
 
-	// Just OSX here, debug app naming.
-	if( target == "osx" ){
+	// Just macos here, debug app naming.
+	if( target == "macos" ){
 		// TODO: Hardcode to variable
 		// FIXME: Debug needed in name?
 		commands.emplace_back("Set :objects:E4B69B5B0A3A1756003C02F2:path " + projectName + "Debug.app");
@@ -384,7 +385,7 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 			fileKind = "sourcecode.cpp.objcpp";
 			break;
 		default:
-			ofLogError() << "explicit source type " << type << " not supported yet on osx for " << srcFile;
+			ofLogError() << "explicit source type " << type << " not supported yet on macos for " << srcFile;
 			break;
 		}
 	}

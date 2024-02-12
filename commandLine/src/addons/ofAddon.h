@@ -42,7 +42,7 @@ const vector<string> parseStates {
 	"android/x86_64",
 	"emscripten",
 	"ios",
-	"osx",
+	"macos",
 	"tvos",
 	"watchos",
 	"visionos",
@@ -127,27 +127,27 @@ public:
 	std::unordered_map < string, string > filesToFolders;      //the addons has had, for each file,
 												//sometimes a listing of what folder to put it in, such as "addons/ofxOsc/src"
 
-	vector < string > srcFiles;
-	vector < string > csrcFiles;
-	vector < string > cppsrcFiles;
-	vector < string > headersrcFiles;
-	vector < string > objcsrcFiles;
-//	vector < string > propsFiles;
-	vector < fs::path > propsFiles;
-	vector < LibraryBinary > libs;
-	vector < string > dllsToCopy;
-	vector < string > includePaths;
+	vector <string> srcFiles;
+	vector <string> csrcFiles;
+	vector <string> cppsrcFiles;
+	vector <string> headersrcFiles;
+	vector <string> objcsrcFiles;
+//	vector <string> propsFiles;
+	vector <fs::path> propsFiles;
+	vector <LibraryBinary> libs;
+	vector <string> dllsToCopy;
+	vector <string> includePaths;
 
 	// From addon_config.mk
-	vector < string > dependencies;
-	vector < string > cflags;   // C_FLAGS
-	vector < string > cppflags; // CXX_FLAGS
-	vector < string > ldflags;
-	vector < string > pkgConfigLibs; 	// linux only
-	vector < string > frameworks;		// osx only
-	vector <string >  xcframeworks; // osx only
-	vector < string > data;
-	vector < string > defines;
+	vector <string> dependencies;
+	vector <string> cflags;   // C_FLAGS
+	vector <string> cppflags; // CXX_FLAGS
+	vector <string> ldflags;
+	vector <string> pkgConfigLibs; 	// linux only
+	vector <string> frameworks;		// macos only
+	vector <string> xcframeworks; 	// macos only
+	vector <string> data;
+	vector <string> defines;
 
 	// metadata
 	string name;

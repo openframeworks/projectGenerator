@@ -159,7 +159,7 @@ static std::vector <string> platforms;
 bool isFolderNotCurrentPlatform(const string & folderName, const string & platform){
 	if( platforms.size() == 0 ){
 		platforms = {
-			"osx",
+			"macos",
 			"msys2",
 			"vs",
 			"ios",
@@ -290,7 +290,7 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 		auto f = it->path();
 
 		if (fs::is_directory(f)) {
-			// on osx, framework is a directory, let's not parse it....
+			// on macos, framework is a directory, let's not parse it....
 			if ((f.extension() == ".framework") || (f.extension() == ".xcframework")) {
 				it.disable_recursion_pending();
 				continue;
@@ -328,11 +328,11 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 					libLibs.push_back({ f.string(), arch, target });
 
 					//TODO: THEO hack
-					if( platform == "ios" ){ //this is so we can add the osx libs for the simulator builds
+					if( platform == "ios" ){ //this is so we can add the macos libs for the simulator builds
 						string currentPath = f.string();
 						//TODO: THEO double hack this is why we need install.xml - custom ignore ofxOpenCv
 						if( currentPath.find("ofxOpenCv") == string::npos ){
-							ofStringReplace(currentPath, "ios", "osx");
+							ofStringReplace(currentPath, "ios", "macos");
 							if( fs::exists(currentPath) ){
 								libLibs.push_back({ currentPath, arch, target });
 							}
@@ -407,7 +407,7 @@ unique_ptr<baseProject> getTargetProject(const string & targ) {
 //	cout << "getTargetProject :" << getTargetString(targ) << endl;
 //	typedef xcodeProject pgProject;
 
-	if (targ == "osx" || targ == "ios") {
+	if (targ == "macos" || targ == "ios") {
 		return unique_ptr<xcodeProject>(new xcodeProject(targ));
 	} else if (targ == "msys2") {
 //		return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));

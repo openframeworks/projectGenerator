@@ -139,6 +139,12 @@ bool baseProject::create(const fs::path & path, string templateName){
 	extSrcPaths.clear();
 
 	templatePath = getPlatformTemplateDir();
+	if (!fs::exists(templatePath)) {
+		ofLogError() << "templatePath not found " << templatePath << endl;
+		std::exit(0);
+		return false;
+	}
+	
 	projectDir = path;
 	auto projectPath = fs::canonical(fs::current_path() / path);
 	projectName = projectPath.filename().string();
@@ -621,7 +627,7 @@ void baseProject::parseConfigMake(){
 			if(varValue.size()>1){
 				auto var = ofTrim(varValue[0]);
 				auto value = ofTrim(varValue[1]);
-				if (var=="PROJECT_AFTER_OSX" && target=="osx"){
+				if (var=="PROJECT_AFTER_OSX" && target=="macos"){
 					addAfterRule(value);
 				}
 			}
