@@ -131,6 +131,10 @@ void addPlatforms(const string & value) {
 				targets.emplace_back(option);
 			}
 		} else {
+			// It can be removed later when PG frontend is updated
+			if (p == "osx") {
+				p = "macos";
+			}
 			targets.emplace_back(p);
 		}
 	}
