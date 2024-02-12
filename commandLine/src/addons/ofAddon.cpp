@@ -53,7 +53,7 @@ bool ofAddon::checkCorrectVariable(const string & variable, const string & state
 						 AddonMetaVariables.end(),
 						 variable) != AddonMetaVariables.end();
 	}
-	else if (state == "osx") {
+	else if (state == "macos") {
 		return std::find(AddonProjectVariables.begin(),
 						 AddonProjectVariables.end(),
 						 variable) != AddonProjectVariables.end();
@@ -470,7 +470,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 	
 
 	getLibsRecursively(libsPath, libFiles, libs, platform);
-	if (platform == "osx" || platform == "ios"){
+	if (platform == "macos" || platform == "ios"){
 		getFrameworksRecursively(libsPath, frameworks, platform);
 		getXCFrameworksRecursively(libsPath, frameworks, platform);
 	}

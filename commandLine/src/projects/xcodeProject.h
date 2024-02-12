@@ -55,8 +55,8 @@ public:
 		"E4B69B600A3A1757003C02F2", //macOS Debug
 		"E4B69B610A3A1757003C02F2", //macOS Release
 
-		"E4B69B4E0A3A1720003C02F2", //macOS Debug SDKROOT macosx
-		"E4B69B4F0A3A1720003C02F2", //macOS Release SDKROOT macosx
+		"E4B69B4E0A3A1720003C02F2", //macOS Debug SDKROOT macos
+		"E4B69B4F0A3A1720003C02F2", //macOS Release SDKROOT macos
 	};
 
 	string buildConfigs[2] = {

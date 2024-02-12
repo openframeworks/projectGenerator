@@ -24,7 +24,7 @@ static std::map <ofTargetPlatform, std::string> platformsToString {
 	{ OF_TARGET_LINUXARMV7L, "linuxarmv7l" },
 	{ OF_TARGET_LINUXAARCH64, "linuxaarch64" },
 	{ OF_TARGET_MINGW, "msys2" },
-	{ OF_TARGET_OSX, "osx" },
+	{ OF_TARGET_OSX, "macos" },
 	{ OF_TARGET_WINVS, "vs" },
 };
 
@@ -38,7 +38,7 @@ static std::vector < std::string > platformsOptions {
 	"linuxarmv7l",
 	"linuxaarch64",
 	"msys2",
-	"osx",
+	"macos",
 	"vs",
 };
 
