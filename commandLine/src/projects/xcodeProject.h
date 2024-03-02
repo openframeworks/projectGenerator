@@ -33,8 +33,19 @@ public:
 	void addAddon(ofAddon & addon);
 	void saveScheme();
 	void renameProject();
+	
 
+	struct fileProperties {
+		bool reference = true;
+		bool addToBuildPhase = false;
+		bool codeSignOnCopy = false;
+		bool copyFilesBuildPhase = false;
+	};
 
+	string addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp);
+	void addCommand(const string & command);
+	bool debugCommands = false;
+	
 	string projRootUUID;
 	string resourcesUUID;
 	string frameworksUUID;

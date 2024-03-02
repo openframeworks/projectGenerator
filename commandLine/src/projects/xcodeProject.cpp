@@ -141,17 +141,9 @@ bool xcodeProject::createProjectFile(){
 	commands.emplace_back("# ---- PG VERSION " + getPGVersion());
 	commands.emplace_back("Add :openFrameworksProjectGeneratorVersion string " + getPGVersion());
 
-	if (fs::exists( projectDir / "App.xcconfig" )) {
-		string UUID { generateUUID( string("App.xcconfig") ) };
-		commands.emplace_back("# ---- App.xcconfig");
-		commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
-		commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
-		commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string text.xcconfig");
-		commands.emplace_back("Add :objects:"+UUID+":path string App.xcconfig");
-		commands.emplace_back("Add :objects:"+UUID+":sourceTree string <group>");
-		commands.emplace_back("Add :objects:" + folderUUID[""] + ":children: string " + UUID);
-		commands.emplace_back("#");
-	}
+	fileProperties fp;
+	addFile("App.xcconfig", "", fp);
+	addFile(fs::path{"bin"} / "data", "", fp);
 
 
 	if (!fs::equivalent(getOFRoot(), fs::path{"../../.."})) {
@@ -393,11 +385,10 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 	// (A) make a FILE REF
 	//-----------------------------------------------------------------
 
+//	string UUID = addFile(srcFile, folder);
 	string UUID { generateUUID(srcFile) };   // replace with theo's smarter system.
-
-	fs::path srcFS { srcFile };
-	string name { srcFS.filename().string() };
-	string path { srcFS.parent_path().string() };
+	string name { srcFile.filename().string() };
+	string path { srcFile.parent_path().string() };
 
 	commands.emplace_back("# ---- ADDSRC");
 	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
@@ -455,15 +446,14 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 	//-----------------------------------------------------------------
 	fs::path base;
 	fs::path src { srcFile };
-	fs::path folderFS { folder };
 
-	if (!fs::exists(folderFS)) {
+	if (!fs::exists(folder)) {
 		// cout << "folder doesn't exist " << folderFS << endl;
 		fs::path parent = src.parent_path();
-		auto nit = folderFS.end();
+		auto nit = folder.end();
 
 		base = parent;
-		fs::path folderFS2 = folderFS;
+		fs::path folderFS2 = folder;
 
 		while(base.filename() == folderFS2.filename() && base.filename() != "" && folderFS2.filename() != "") {
 			base = base.parent_path();
@@ -499,68 +489,32 @@ void xcodeProject::addFramework(const string & name, const fs::path & path, cons
 	// (A) make a FILE REF
 	//-----------------------------------------------------------------
 
-	string UUID = generateUUID( name );
-
 	// encoding may be messing up for frameworks... so I switched to a pbx file ref without encoding fields
 	//commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
 
 	commands.emplace_back("# ----- addFramework name="+name+" path="+path.string()+" folder=" +folder.string());
-	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
-	commands.emplace_back("Add :objects:"+UUID+":path string "+path.string());
-	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
-	commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string wrapper.framework");
-//	commands.emplace_back("Add :objects:"+UUID+":sourceTree string <group>");
-	commands.emplace_back("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
-
-
-	commands.emplace_back("# ----- addFramework - add to build phase");
-	string buildUUID = generateUUID(name + "-build");
-	commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
-	commands.emplace_back("Add :objects:"+buildUUID+":fileRef string "+UUID);
-
-	// new - code sign frameworks on copy
-	commands.emplace_back("# ----- addFramework - sign on copy");
-
-	commands.emplace_back("Add :objects:"+buildUUID+":settings:ATTRIBUTES array");
-	commands.emplace_back("Add :objects:"+buildUUID+":settings:ATTRIBUTES: string CodeSignOnCopy");
-
-	//	this now adds the recently created object UUID to its parent folder
-	string folderUUID = getFolderUUID(folder, false);
-	commands.emplace_back("# ----- addFramework - add to parent folder : " + folder.string());
-	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
-
-
-	//commands.emplace_back("Add :objects:"+frameworksUUID+":children array");
-	//commands.emplace_back("Add :objects:"+frameworksUUID+":children: string " + buildUUID);
-
-	// we add the second to a final build phase for copying the framework into app.   we need to make sure we *don't* do this for system frameworks
-
-	string buildUUID2;
-
-	// maybe check if path exists in path
+	
+	bool isSystemFramework = false;
 	if (!folder.empty() && !ofIsStringInString(path.string(), "/System/Library/Frameworks")
 		&& target != "ios"){
-
-		buildUUID2 = generateUUID(name + "-build2");
-		commands.emplace_back("Add :objects:"+buildUUID2+":fileRef string "+UUID);
-		commands.emplace_back("Add :objects:"+buildUUID2+":isa string PBXBuildFile");
-
-		// new - code sign frameworks on copy
-		commands.emplace_back("Add :objects:"+buildUUID2+":settings:ATTRIBUTES array");
-		commands.emplace_back("Add :objects:"+buildUUID2+":settings:ATTRIBUTES: string CodeSignOnCopy");
-
-		// UUID hardcoded para PBXCopyFilesBuildPhase
-		// FIXME: hardcoded - this is the same for the next fixme. so maybe a clearer ident can make things better here.
-		commands.emplace_back("Add :objects:E4C2427710CC5ABF004149E2:files: string " + buildUUID2);
+		isSystemFramework = true;
 	}
+	
+	fileProperties fp = {
+		.addToBuildPhase = true,
+		.codeSignOnCopy = !isSystemFramework,
+		.copyFilesBuildPhase = !isSystemFramework
+	};
+	
+	string UUID { addFile(path, folder, fp) };
 
+	
 	commands.emplace_back("# ----- FRAMEWORK_SEARCH_PATHS");
 
 	fs::path parentFolder { path.parent_path() };
-//	alert ("parentFolder " + parentFolder.string() );
 
 	for (auto & c : buildConfigs) {
-		commands.emplace_back
+		addCommand
 		("Add :objects:"+c+":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + parentFolder.string());
 	}
 
@@ -585,71 +539,33 @@ void xcodeProject::addFramework(const string & name, const fs::path & path, cons
 
 void xcodeProject::addXCFramework(const string & name, const fs::path & path, const fs::path & folder) {
 	//	alert( "xcodeProject::addFramework " + name + " : " + path.string() + " : " + folder.string() , 33);
-
+	
 	//	cout << "xcodeProject::addFramework " << name << " : " << path << " : " << folder << endl;
 	// name = name of the framework
 	// path = the full path (w name) of this framework
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
-
+	
 	//-----------------------------------------------------------------
 	// based on the extension make some choices about what to do:
 	//-----------------------------------------------------------------
-
-	//-----------------------------------------------------------------
-	// (A) make a FILE REF
-	//-----------------------------------------------------------------
-
-	string UUID = generateUUID(name);
-
-	// encoding may be messing up for xcframeworks... so I switched to a pbx file ref without encoding fields
-	//commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
-
-	commands.emplace_back("# ----- addXCFramework name=" + name + " path=" + path.string() + " folder=" + folder.string());
-	commands.emplace_back("Add :objects:" + UUID + ":name string " + name);
-	commands.emplace_back("Add :objects:" + UUID + ":path string " + path.string());
-	commands.emplace_back("Add :objects:" + UUID + ":isa string PBXFileReference");
-	commands.emplace_back("Add :objects:" + UUID + ":lastKnownFileType string wrapper.framework");
-	//	commands.emplace_back("Add :objects:"+UUID+":sourceTree string <group>");
-	commands.emplace_back("Add :objects:" + UUID + ":sourceTree string SOURCE_ROOT");
-
-	commands.emplace_back("# ----- addXCFramework - add to build phase");
-	string buildUUID = generateUUID(name + "-build");
-	commands.emplace_back("Add :objects:" + buildUUID + ":isa string PBXBuildFile");
-	commands.emplace_back("Add :objects:" + buildUUID + ":fileRef string " + UUID);
-
-	// new - code sign frameworks on copy
-	commands.emplace_back("# ----- addXCFramework - sign on copy");
-
-	commands.emplace_back("Add :objects:" + buildUUID + ":settings:ATTRIBUTES array");
-	commands.emplace_back("Add :objects:" + buildUUID + ":settings:ATTRIBUTES: string CodeSignOnCopy");
-
-	//	this now adds the recently created object UUID to its parent folder
-	string folderUUID = getFolderUUID(folder, false);
-	commands.emplace_back("# ----- addXCFramework - add to parent folder : " + folder.string());
-	commands.emplace_back("Add :objects:" + folderUUID + ":children: string " + UUID);
-
-	//commands.emplace_back("Add :objects:"+frameworksUUID+":children array");
-	//commands.emplace_back("Add :objects:"+frameworksUUID+":children: string " + buildUUID);
-
-	// we add the second to a final build phase for copying the framework into app.   we need to make sure we *don't* do this for system frameworks
-
-	string buildUUID2;
-
-	// maybe check if path exists in path
-	if (!folder.empty()) {
-
-		buildUUID2 = generateUUID(name + "-build2");
-		commands.emplace_back("Add :objects:" + buildUUID2 + ":fileRef string " + UUID);
-		commands.emplace_back("Add :objects:" + buildUUID2 + ":isa string PBXBuildFile");
-
-		// new - code sign frameworks on copy
-		commands.emplace_back("Add :objects:" + buildUUID2 + ":settings:ATTRIBUTES array");
-		commands.emplace_back("Add :objects:" + buildUUID2 + ":settings:ATTRIBUTES: string CodeSignOnCopy");
-
-		// UUID hardcoded para PBXCopyFilesBuildPhase
-		// FIXME: hardcoded - this is the same for the next fixme. so maybe a clearer ident can make things better here.
-		commands.emplace_back("Add :objects:E4C2427710CC5ABF004149E2:files: string " + buildUUID2);
+	
+	
+	addCommand("# ----- addXCFramework name=" + name + " path=" + path.string() + " folder=" + folder.string());
+	
+	
+	bool isSystemFramework = false;
+	if (!folder.empty() && !ofIsStringInString(path.string(), "/System/Library/Frameworks")
+		&& target != "ios"){
+		isSystemFramework = true;
 	}
+	
+	string UUID {
+		addFile(path, folder, {
+			.addToBuildPhase = true,
+			.codeSignOnCopy = !isSystemFramework,
+			.copyFilesBuildPhase = !isSystemFramework
+		})
+	};
 
 	commands.emplace_back("# ----- XCFRAMEWORK_SEARCH_PATHS");
 
@@ -678,7 +594,6 @@ void xcodeProject::addXCFramework(const string & name, const fs::path & path, co
 }
 
 
-//void xcodeProject::addDylib(string name, string path){
 void xcodeProject::addDylib(const string & name, const fs::path & path, const fs::path & folder){
 //	alert( "xcodeProject::addDylib " + name + " : " + path.string() , 33);
 
@@ -694,58 +609,65 @@ void xcodeProject::addDylib(const string & name, const fs::path & path, const fs
 	// (A) make a FILE REF
 	//-----------------------------------------------------------------
 
-	string UUID = generateUUID( name );
+	string UUID {
+		addFile(path, folder, {
+			.reference = true,
+			.addToBuildPhase = true,
+			.codeSignOnCopy = true,
+			.copyFilesBuildPhase = true
+		})
+	};
 
-	// encoding may be messing up for frameworks... so I switched to a pbx file ref without encoding fields
-	//commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
-	commands.emplace_back("");
-	commands.emplace_back("# ---- xcodeProject::addDylib " + name + " : " + path.string());
-	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
-	commands.emplace_back("Add :objects:"+UUID+":path string "+path.string());
-	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
-	commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string compiled.mach-o.dylib");
-	commands.emplace_back("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
-
-
-	// add to folder in xcode?
-	string folderUUID = getFolderUUID(folder, false);
-	commands.emplace_back("");
-	commands.emplace_back("# --- folderUUID " + folderUUID);
-	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
-
-
-	string buildUUID = generateUUID(name + "-build");
-	commands.emplace_back("");
-	commands.emplace_back("# --- buildUUID " + buildUUID);
-	commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
-	commands.emplace_back("Add :objects:"+buildUUID+":fileRef string "+UUID);
-	// new - code sign dylibs on copy
-	commands.emplace_back("Add :objects:"+buildUUID+":settings:ATTRIBUTES array");
-	commands.emplace_back("Add :objects:"+buildUUID+":settings:ATTRIBUTES: string CodeSignOnCopy");
-
-//	// we add one of the build refs to the list of frameworks
-//	// TENTATIVA desesperada aqui...
-//	string folderUUID = getFolderUUID(folder);
-//	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
-
+//	string UUID = generateUUID( name );
+//
+//	commands.emplace_back("");
+//	commands.emplace_back("# ---- xcodeProject::addDylib " + name + " : " + path.string());
+//	commands.emplace_back("Add :objects:"+UUID+":name string "+name);
+//	commands.emplace_back("Add :objects:"+UUID+":path string "+path.string());
+//	commands.emplace_back("Add :objects:"+UUID+":isa string PBXFileReference");
+//	commands.emplace_back("Add :objects:"+UUID+":lastKnownFileType string compiled.mach-o.dylib");
+//	commands.emplace_back("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
+//
+//
+//	// add to folder in xcode?
 //	string folderUUID = getFolderUUID(folder, false);
+//	commands.emplace_back("");
+//	commands.emplace_back("# --- folderUUID " + folderUUID);
 //	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
-
-
-	string buildUUID2 = generateUUID(name + "-build2");
-	commands.emplace_back("");
-	commands.emplace_back("# --- buildUUID2 " + buildUUID2);
-	commands.emplace_back("Add :objects:"+buildUUID2+":fileRef string "+UUID);
-	commands.emplace_back("Add :objects:"+buildUUID2+":isa string PBXBuildFile");
-
-	// new - code sign frameworks on copy
-	commands.emplace_back("Add :objects:"+buildUUID2+":settings:ATTRIBUTES array");
-	commands.emplace_back("Add :objects:"+buildUUID2+":settings:ATTRIBUTES: string CodeSignOnCopy");
-
-	// UUID hardcoded para PBXCopyFilesBuildPhase
-	// FIXME: hardcoded - this is the same for the next fixme. so maybe a clearer ident can make things better here.
-
-	commands.emplace_back("Add :objects:E4A5B60F29BAAAE400C2D356:files: string " + buildUUID2);
+//
+//
+//	string buildUUID = generateUUID(name + "-build");
+//	commands.emplace_back("");
+//	commands.emplace_back("# --- buildUUID " + buildUUID);
+//	commands.emplace_back("Add :objects:"+buildUUID+":isa string PBXBuildFile");
+//	commands.emplace_back("Add :objects:"+buildUUID+":fileRef string "+UUID);
+//	// new - code sign dylibs on copy
+//	commands.emplace_back("Add :objects:"+buildUUID+":settings:ATTRIBUTES array");
+//	commands.emplace_back("Add :objects:"+buildUUID+":settings:ATTRIBUTES: string CodeSignOnCopy");
+//
+////	// we add one of the build refs to the list of frameworks
+////	// TENTATIVA desesperada aqui...
+////	string folderUUID = getFolderUUID(folder);
+////	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
+//
+////	string folderUUID = getFolderUUID(folder, false);
+////	commands.emplace_back("Add :objects:"+folderUUID+":children: string " + UUID);
+//
+//
+//	string buildUUID2 = generateUUID(name + "-build2");
+//	commands.emplace_back("");
+//	commands.emplace_back("# --- buildUUID2 " + buildUUID2);
+//	commands.emplace_back("Add :objects:"+buildUUID2+":fileRef string "+UUID);
+//	commands.emplace_back("Add :objects:"+buildUUID2+":isa string PBXBuildFile");
+//
+//	// new - code sign frameworks on copy
+//	commands.emplace_back("Add :objects:"+buildUUID2+":settings:ATTRIBUTES array");
+//	commands.emplace_back("Add :objects:"+buildUUID2+":settings:ATTRIBUTES: string CodeSignOnCopy");
+//
+//	// UUID hardcoded para PBXCopyFilesBuildPhase
+//	// FIXME: hardcoded - this is the same for the next fixme. so maybe a clearer ident can make things better here.
+//
+//	commands.emplace_back("Add :objects:E4A5B60F29BAAAE400C2D356:files: string " + buildUUID2);
 }
 
 
@@ -1009,4 +931,82 @@ bool xcodeProject::saveProjectFile(){
 //	for (auto & c : commands) cout << c << endl;
 
 	return true;
+}
+
+
+void xcodeProject::addCommand(const string & command) {
+	if (debugCommands) {
+		alert(command);
+	}
+	commands.emplace_back(command);
+}
+
+string xcodeProject::addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp) {
+	alert("addFile " + ofToString(path));
+	string UUID = "";
+	std::map<fs::path, string> extensionToFileType {
+		{ ".xcconfig" , "text.xcconfig" },
+		{ ".framework" , "wrapper.framework" },
+		{ ".dylib" , "compiled.mach-o.dylib" },
+	};
+	if (fs::exists( projectDir / path )) {
+//		alert("exists !", 35);
+		string fileType = "file";
+		fileType = extensionToFileType[path.extension()];
+		if (fileType == "") {
+			if (fs::is_directory(path)) {
+				fileType = "folder";
+			}
+		}
+
+		UUID = generateUUID(path);
+		string name = ofPathToString(path.filename());
+//		debugCommands = true;
+		addCommand("");
+		addCommand("# -- addFile " + name);
+//		commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
+		
+//-----------------------------------------------------------------
+// (A) make a FILE REF
+//-----------------------------------------------------------------
+
+		if (fp.reference) {
+			addCommand("Add :objects:"+UUID+":isa string PBXFileReference");
+			addCommand("Add :objects:"+UUID+":sourceTree string <group>");
+		} else {
+			addCommand("Add :objects:"+UUID+":isa string PBXGroup");
+			addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
+		}
+		addCommand("Add :objects:"+UUID+":lastKnownFileType string " + fileType);
+		addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
+		addCommand("Add :objects:"+UUID+":name string " + name);
+		
+		string folderUUID = getFolderUUID(folder, false);
+		addCommand("# ---- addFileToFolder UUID " + ofPathToString(folder));
+		addCommand("Add :objects:" + folderUUID + ":children: string " + UUID);
+		addCommand("#");
+		
+		
+		string buildUUID { generateUUID(name + "-build") };
+		if (fp.addToBuildPhase) {
+			addCommand("# ---- addToBuildPhase " + buildUUID);
+			addCommand("Add :objects:"+buildUUID+":isa string PBXBuildFile");
+			addCommand("Add :objects:"+buildUUID+":fileRef string "+UUID);
+		}
+		if (fp.codeSignOnCopy) {
+			addCommand("# --- codeSignOnCopy " + buildUUID);
+			addCommand("Add :objects:"+buildUUID+":settings:ATTRIBUTES array");
+			addCommand("Add :objects:"+buildUUID+":settings:ATTRIBUTES: string CodeSignOnCopy");
+
+		}
+		
+		if (fp.copyFilesBuildPhase) {
+			addCommand("Add :objects:E4C2427710CC5ABF004149E2:files: string " + buildUUID);
+
+		}
+		
+		debugCommands = false;
+
+	}
+	return UUID;
 }
