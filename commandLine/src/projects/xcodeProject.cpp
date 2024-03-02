@@ -352,13 +352,12 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 }
 
 // FIXME: name not needed anymore.
-void xcodeProject::addFramework(const string & name, const fs::path & path, const fs::path & folder){
-	// alert( "xcodeProject::addFramework " + name + " : " + path.string() + " : " + folder.string() , 33);
-	// name = name of the framework
+void xcodeProject::addFramework(const fs::path & path, const fs::path & folder){
+	// alert( "xcodeProject::addFramework " + ofPathToString(path) + " : " + ofPathToString(folder) , 33);
 	// path = the full path (w name) of this framework
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
 
-	addCommand("# ----- addFramework name=" + name + " path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
+	addCommand("# ----- addFramework path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
 	
 	bool isSystemFramework = true;
 	if (!folder.empty() && !ofIsStringInString(path.string(), "/System/Library/Frameworks")
@@ -388,14 +387,13 @@ void xcodeProject::addFramework(const string & name, const fs::path & path, cons
 }
 
 
-void xcodeProject::addXCFramework(const string & name, const fs::path & path, const fs::path & folder) {
-	//	alert( "xcodeProject::addFramework " + name + " : " + path.string() + " : " + folder.string() , 33);
+void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder) {
+	//	alert( "xcodeProject::addFramework " + path.string() + " : " + folder.string() , 33);
 	
-	// name = name of the framework
 	// path = the full path (w name) of this framework
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
 	
-	addCommand("# ----- addXCFramework name=" + name + " path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
+	addCommand("# ----- addXCFramework path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
 	
 	
 	bool isSystemFramework = false;
@@ -581,27 +579,21 @@ void xcodeProject::addAddon(ofAddon & addon){
 //			fs::path folder = addon.filesToFolders[f];
 
 			if (target == "ios"){
-				addFramework( f + ".framework", "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/" +
+				addFramework(  "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/" +
 					f + ".framework",
 					folder);
 			} else {
 				if (addon.isLocalAddon) {
 					folder = addon.addonPath / "frameworks";
 				}
-				addFramework( f + ".framework",
-					"/System/Library/Frameworks/" + f + ".framework",
-					folder);
+				addFramework( "/System/Library/Frameworks/" + f + ".framework", folder);
 			}
 		} else {
 			if (ofIsStringInString(f, "/System/Library")){
-				vector < string > pathSplit = ofSplitString(f, "/");
-				addFramework(pathSplit[pathSplit.size()-1],
-							 f,
-							 "addons/" + addon.name + "/frameworks");
+				addFramework(f, "addons/" + addon.name + "/frameworks");
 
 			} else {
-				vector < string > pathSplit = ofSplitString(f, "/");
-				addFramework(pathSplit[pathSplit.size()-1], f, addon.filesToFolders[f]);
+				addFramework(f, addon.filesToFolders[f]);
 			}
 		}
 	}
@@ -619,20 +611,14 @@ void xcodeProject::addAddon(ofAddon & addon){
 			if (addon.isLocalAddon) {
 				folder = addon.addonPath / "xcframeworks";
 			}
-			addXCFramework(f + ".framework",
-				"/System/Library/Frameworks/" + f + ".framework",
-				folder);
+			addXCFramework("/System/Library/Frameworks/" + f + ".framework", folder);
 			
 		} else {
 			if (ofIsStringInString(f, "/System/Library")) {
-				vector<string> pathSplit = ofSplitString(f, "/");
-				addFramework(pathSplit[pathSplit.size() - 1],
-					f,
-					"addons/" + addon.name + "/frameworks");
+				addFramework(f, "addons/" + addon.name + "/frameworks");
 
 			} else {
-				vector<string> pathSplit = ofSplitString(f, "/");
-				addFramework(pathSplit[pathSplit.size() - 1], f, addon.filesToFolders[f]);
+				addFramework(f, addon.filesToFolders[f]);
 			}
 		}
 	}
