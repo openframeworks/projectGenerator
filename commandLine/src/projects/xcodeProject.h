@@ -40,6 +40,10 @@ public:
 		bool addToBuildPhase = false;
 		bool codeSignOnCopy = false;
 		bool copyFilesBuildPhase = false;
+		bool linkBinaryWithLibraries = false;
+		bool addToBuildResource = false;
+		bool addToResources = false;
+		bool frameworksBuildPhase = false;
 	};
 
 	string addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp);
