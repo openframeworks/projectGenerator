@@ -28,7 +28,7 @@ public:
 
 	void addFramework(const fs::path & path, const fs::path & folder);
 	void addXCFramework(const fs::path & path, const fs::path & folder);
-	void addDylib(const string & name, const fs::path & path, const fs::path & folder);
+	void addDylib(const fs::path & path, const fs::path & folder);
 
 	void addAddon(ofAddon & addon);
 	void saveScheme();

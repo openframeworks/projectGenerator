@@ -303,17 +303,19 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 //	cout << "xcodeProject::addSrc " << srcFile << " : " << folder << endl;
 	string ext = ofPathToString(srcFile.extension());
 
-	bool addToResources = false;
 	
-	fileProperties fp = fileProperties{
-		.reference = true,
-		.addToBuildPhase = true,
-		.codeSignOnCopy = false,
-		.copyFilesBuildPhase = false,
-		.linkBinaryWithLibraries = false,
-		.addToBuildResource = false,
-		.addToResources = false,
-	};
+//	{
+//		.reference = true,
+//		.addToBuildPhase = true,
+//		.codeSignOnCopy = false,
+//		.copyFilesBuildPhase = false,
+//		.linkBinaryWithLibraries = false,
+//		.addToBuildResource = false,
+//		.addToResources = false,
+//	};
+	fileProperties fp;
+	fp.addToBuildPhase = true;
+
 	
 	if( type == DEFAULT ){
 //		if ( ext == ".cpp" || ext == ".cc" || ext == ".cxx" || ext == ".c" ) {
@@ -321,7 +323,6 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 //		}
 		if (ext == ".h" || ext == ".hpp"){
 			fp.addToBuildPhase = false;
-//			addToResources = false;
 		}
 		else if (ext == ".xib"){
 			fp.addToBuildPhase	= false;
@@ -366,16 +367,14 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder){
 		isSystemFramework = false;
 	}
 	
+	fileProperties fp;
+	fp.addToBuildPhase = true;
+	fp.codeSignOnCopy = !isSystemFramework;
+	fp.copyFilesBuildPhase = !isSystemFramework;
+	fp.frameworksBuildPhase = (target != "ios" && !folder.empty());
+	
 	string UUID {
-		addFile(path, folder,
-			{
-				.reference = true,
-				.addToBuildPhase = true,
-				.codeSignOnCopy = !isSystemFramework,
-				.copyFilesBuildPhase = !isSystemFramework,
-				.frameworksBuildPhase = (target != "ios" && !folder.empty())
-			}
-		)
+		addFile(path, folder, fp)
 	};
 
 	commands.emplace_back("# ----- FRAMEWORK_SEARCH_PATHS");
@@ -403,14 +402,14 @@ void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder
 		isSystemFramework = true;
 	}
 	
+	fileProperties fp;
+	fp.addToBuildPhase = true;
+	fp.codeSignOnCopy = !isSystemFramework;
+	fp.copyFilesBuildPhase = !isSystemFramework;
+	fp.frameworksBuildPhase = (target != "ios" && !folder.empty());
+	
 	string UUID {
-		addFile(path, folder, {
-			.reference = true,
-			.addToBuildPhase = true,
-			.codeSignOnCopy = !isSystemFramework,
-			.copyFilesBuildPhase = !isSystemFramework,
-			.frameworksBuildPhase = !folder.empty()
-		})
+		addFile(path, folder, fp)
 	};
 
 	commands.emplace_back("# ----- XCFRAMEWORK_SEARCH_PATHS");
@@ -439,21 +438,18 @@ void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder
 }
 
 
-void xcodeProject::addDylib(const string & name, const fs::path & path, const fs::path & folder){
-//	alert( "xcodeProject::addDylib " + name + " : " + path.string() , 33);
+void xcodeProject::addDylib(const fs::path & path, const fs::path & folder){
+	//	alert( "xcodeProject::addDylib " + ofPathToString(path) , 33);
 
-	// name = name of the dylib
 	// path = the full path (w name) of this framework
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
 
-	string UUID {
-		addFile(path, folder, {
-			.reference = true,
-			.addToBuildPhase = true,
-			.codeSignOnCopy = true,
-			.copyFilesBuildPhase = true
-		})
-	};
+	fileProperties fp;
+	fp.addToBuildPhase = true;
+	fp.codeSignOnCopy = true;
+	fp.copyFilesBuildPhase = true;
+	
+	addFile(path, folder, fp);
 }
 
 
@@ -540,7 +536,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 		fs::path folder = dylibPath.parent_path().lexically_relative(addon.pathToOF);
 //		cout << "dylibPath " << dylibPath << endl;
 		if (dylibPath.extension() == ".dylib") {
-			addDylib(dylibPath.filename().string(), dylibPath, folder);
+			addDylib(dylibPath, folder);
 		}
 	}
 
