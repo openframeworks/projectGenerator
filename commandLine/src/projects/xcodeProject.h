@@ -44,6 +44,7 @@ public:
 		bool addToBuildResource = false;
 		bool addToResources = false;
 		bool frameworksBuildPhase = false;
+		bool isSrc = false;
 	};
 
 	string addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp);

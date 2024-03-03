@@ -147,7 +147,7 @@ bool xcodeProject::createProjectFile(){
 
 
 	if (!fs::equivalent(getOFRoot(), fs::path{"../../.."})) {
-		string root = getOFRoot().string();
+		string root { ofPathToString(getOFRoot()) }; 
 //		alert ("fs not equivalent to ../../.. root = " + root);
 		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", root);
 		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", root);
@@ -237,7 +237,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 	// If folder UUID exists just return it.
 	// in this case it is not found, so it creates UUID for the entire path
 	if ( folderUUID.find(folder) == folderUUID.end() ) { // NOT FOUND
-		vector < string > folders = ofSplitString(folder.string(), "/", true);
+		vector < string > folders = ofSplitString(ofPathToString(folder), "/", true);
 		string lastFolderUUID = projRootUUID;
 
 		if (folders.size()){
@@ -268,7 +268,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 						}
 
 						if (!filePath.empty()) {
-							commands.emplace_back("Add :objects:"+thisUUID+":path string " + filePath.string());
+							commands.emplace_back("Add :objects:"+thisUUID+":path string " + ofPathToString(filePath));
 						} else {
 //							cout << ">>>>> filePath empty " << endl;
 						}
@@ -315,7 +315,7 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 //	};
 	fileProperties fp;
 	fp.addToBuildPhase = true;
-
+	fp.isSrc = true;
 	
 	if( type == DEFAULT ){
 //		if ( ext == ".cpp" || ext == ".cc" || ext == ".cxx" || ext == ".c" ) {
@@ -362,7 +362,7 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder){
 	addCommand("# ----- addFramework path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
 	
 	bool isSystemFramework = true;
-	if (!folder.empty() && !ofIsStringInString(path.string(), "/System/Library/Frameworks")
+	if (!folder.empty() && !ofIsStringInString(ofPathToString(path), "/System/Library/Frameworks")
 		&& target != "ios"){
 		isSystemFramework = false;
 	}
@@ -397,7 +397,7 @@ void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder
 	
 	
 	bool isSystemFramework = false;
-	if (!folder.empty() && !ofIsStringInString(path.string(), "/System/Library/Frameworks")
+	if (!folder.empty() && !ofIsStringInString(ofPathToString(path), "/System/Library/Frameworks")
 		&& target != "ios"){
 		isSystemFramework = true;
 	}
@@ -608,6 +608,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 			if (addon.isLocalAddon) {
 				folder = addon.addonPath / "xcframeworks";
 			}
+			// MARK: Is this ok to call .framework?
 			addXCFramework("/System/Library/Frameworks/" + f + ".framework", folder);
 			
 		} else {
@@ -628,7 +629,7 @@ bool xcodeProject::saveProjectFile(){
 
 	if (usePlistBuddy) {
 		//	PLISTBUDDY - Mac only
-		string command = "/usr/libexec/PlistBuddy " + fileName.string();
+		string command = "/usr/libexec/PlistBuddy " + ofPathToString(fileName);
 		string allCommands = "";
 		for (auto & c : commands) {
 			command += " -c \"" + c + "\"";
@@ -737,7 +738,7 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		{ ".xcconfig" , "text.xcconfig" },
 	};
 	if (fs::exists( projectDir / path )) {
-//		alert("exists !", 35);
+
 		string fileType = "file";
 		fileType = extensionToFileType[path.extension()];
 		if (fileType == "") {
@@ -747,20 +748,11 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		}
 
 		UUID = generateUUID(path);
-		string name = ofPathToString(path.filename());
 		
 //		debugCommands = true;
 		addCommand("");
-		addCommand("# -- addFile " + name);
-//		commands.emplace_back("Add :objects:"+UUID+":fileEncoding string 4");
-		
-		//-----------------------------------------------------------------
-		// based on the extension make some choices about what to do:
-		//-----------------------------------------------------------------
+		addCommand("# -- addFile " + ofPathToString(path));
 
-//-----------------------------------------------------------------
-// (A) make a FILE REF
-//-----------------------------------------------------------------
 		// encoding may be messing up for frameworks... so I switched to a pbx file ref without encoding fields
 		
 //		if (fp.reference) {
@@ -773,15 +765,41 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
 		addCommand("Add :objects:"+UUID+":lastKnownFileType string " + fileType);
 		addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
-		addCommand("Add :objects:"+UUID+":name string " + name);
 		
-		string folderUUID = getFolderUUID(folder, false);
+		string folderUUID;
+		if (fp.isSrc) {
+			string name = ofPathToString(path.filename());
+			addCommand("Add :objects:"+UUID+":name string " + name);
+		
+//			fs::path base;
+//			fs::path src { path };
+//			fs::path folderFS { folder };
+//
+//			if (!fs::exists(folderFS)) {
+//				// cout << "folder doesn't exist " << folderFS << endl;
+//				fs::path parent = src.parent_path();
+//				auto nit = folderFS.end();
+//
+//				base = parent;
+//				fs::path folderFS2 = folderFS;
+//
+//				while(base.filename() == folderFS2.filename() && base.filename() != "" && folderFS2.filename() != "") {
+//					base = base.parent_path();
+//					folderFS2 = folderFS2.parent_path();
+//				}
+//			}
+//
+//			folderUUID = getFolderUUID(folder, true, base);
+//			alert("isSrc " + ofPathToString(folder) + " : " + ofPathToString(base), 33);
+		} else {
+			folderUUID = getFolderUUID(folder, false);
+		}
+		folderUUID = getFolderUUID(folder, false);
 		addCommand("# ---- addFileToFolder UUID " + ofPathToString(folder));
 		addCommand("Add :objects:" + folderUUID + ":children: string " + UUID);
-		addCommand("#");
 		
 		
-		string buildUUID { generateUUID(name + "-build") };
+		string buildUUID { generateUUID(ofPathToString(path) + "-build") };
 		// If any other option is true, add buildUUID entries.
 		if (fp.addToBuildPhase ||
 			fp.codeSignOnCopy ||
@@ -839,9 +857,7 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 			addCommand("Add :objects:E4B69B590A3A1756003C02F2:files: string " + buildUUID);
 
 		}
-
 		debugCommands = false;
-
 	}
 	return UUID;
 }

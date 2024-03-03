@@ -145,7 +145,7 @@ public:
 	vector < string > ldflags;
 	vector < string > pkgConfigLibs; 	// linux only
 	vector < string > frameworks;		// osx only
-	vector <string >  xcframeworks; // osx only
+	vector < string > xcframeworks; // osx only
 	vector < string > data;
 	vector < string > defines;
 
