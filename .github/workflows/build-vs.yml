@@ -58,7 +58,7 @@ jobs:
         run:
           ./scripts/vs/ci_install.sh
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v2
 
       - name: Build projectGenerator CMDLine with oF
         working-directory: ${{env.GITHUB_WORKSPACE}}
