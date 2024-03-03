@@ -305,11 +305,12 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 
 	bool addToResources = false;
 	
-	fileProperties fp {
+	fileProperties fp = fileProperties{
 		.reference = true,
 		.addToBuildPhase = true,
 		.codeSignOnCopy = false,
 		.copyFilesBuildPhase = false,
+		.linkBinaryWithLibraries = false,
 		.addToBuildResource = false,
 		.addToResources = false,
 	};
