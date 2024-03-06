@@ -94,7 +94,7 @@ void ofAddon::addReplaceStringVector(std::vector<string> & variable, string valu
 					string varName = varMatch[2].str();
 					string varValue;
 					if(varName == "OF_ROOT"){
-						varValue = pathToOF.string();
+						varValue = ofPathToString(pathToOF);
 					}else if(getenv(varName.c_str())){
 						varValue = getenv(varName.c_str());
 					}
@@ -103,11 +103,11 @@ void ofAddon::addReplaceStringVector(std::vector<string> & variable, string valu
 				}
 			}
 
-			if(prefix=="" || values[i].find(pathToOF.string())==0 || fs::path{values[i]}.is_absolute()) {
-				variable.push_back(values[i]);
+			if(prefix=="" || values[i].find(ofPathToString(pathToOF))==0 || fs::path{values[i]}.is_absolute()) {
+				variable.emplace_back(values[i]);
 			} else {
 				fs::path p = fs::path{ prefix } / values[i];
-				variable.push_back(p.string());
+				variable.emplace_back(ofPathToString(p));
 			}
 		}
 	}
@@ -133,7 +133,7 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 					string varName = varMatch[2].str();
 					string varValue;
 					if(varName == "OF_ROOT"){
-						varValue = pathToOF.string();
+						varValue = ofPathToString(pathToOF);
 					}else if(getenv(varName.c_str())){
 						varValue = getenv(varName.c_str());
 					}
@@ -143,11 +143,11 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 			}
 
 
-			if (prefix == "" || v.find(pathToOF.string()) == 0 || fs::path{v}.is_absolute()) {
+			if (prefix == "" || v.find(ofPathToString(pathToOF)) == 0 || fs::path{v}.is_absolute()) {
 				variable.push_back( { v, "", "" } );
 			} else {
 				fs::path p = fs::path { prefix } / v;
-				variable.push_back( { p.string(), "", "" } );
+				variable.push_back( { ofPathToString(p), "", "" } );
 			}
 		}
 	}
@@ -202,7 +202,7 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 //			alert ("value " + value, 36);
 //		}
 //		cout << includePaths.size() << endl;
-		addReplaceStringVector(includePaths, value, addonRelPath.string(), addToValue);
+		addReplaceStringVector(includePaths, value, ofPathToString(addonRelPath), addToValue);
 //		cout << includePaths.size() << endl;
 //		cout << "----" << endl;
 	}
@@ -220,7 +220,7 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
 	else if(variable == ADDON_LIBS){
-		addReplaceStringVector(libs, value, addonRelPath.string(), addToValue);
+		addReplaceStringVector(libs, value, ofPathToString(addonRelPath), addToValue);
 	}
 
 	else if(variable == ADDON_DLLS_TO_COPY){
@@ -240,23 +240,23 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
 	else if(variable == ADDON_SOURCES){
-		addReplaceStringVector(srcFiles, value, addonRelPath.string() ,addToValue);
+		addReplaceStringVector(srcFiles, value, ofPathToString(addonRelPath) ,addToValue);
 	}
 
 	else if(variable == ADDON_C_SOURCES){
-		addReplaceStringVector(csrcFiles, value, addonRelPath.string() ,addToValue);
+		addReplaceStringVector(csrcFiles, value, ofPathToString(addonRelPath) ,addToValue);
 	}
 
 	else if(variable == ADDON_CPP_SOURCES){
-		addReplaceStringVector(cppsrcFiles, value, addonRelPath.string() ,addToValue);
+		addReplaceStringVector(cppsrcFiles, value, ofPathToString(addonRelPath) ,addToValue);
 	}
 
 	else if(variable == ADDON_HEADER_SOURCES){
-		addReplaceStringVector(headersrcFiles, value, addonRelPath.string() ,addToValue);
+		addReplaceStringVector(headersrcFiles, value, ofPathToString(addonRelPath) ,addToValue);
 	}
 
 	else if(variable == ADDON_OBJC_SOURCES){
-		addReplaceStringVector(objcsrcFiles, value, addonRelPath.string() ,addToValue);
+		addReplaceStringVector(objcsrcFiles, value, ofPathToString(addonRelPath) ,addToValue);
 	}
 
 	else if(variable == ADDON_DATA){
@@ -472,7 +472,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 	getLibsRecursively(libsPath, libFiles, libs, platform);
 	if (platform == "osx" || platform == "ios"){
 		getFrameworksRecursively(libsPath, frameworks, platform);
-		getXCFrameworksRecursively(libsPath, frameworks, platform);
+		getXCFrameworksRecursively(libsPath, xcframeworks, platform);
 	}
 	
 	if (platform == "vs" || platform == "msys2"
@@ -493,7 +493,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 	if (!isLocalAddon) {
 		for (auto & l : libs) {
 //			alert("fixpath before " + l.path);
-			l.path = fixPath(l.path).string();
+			l.path = ofPathToString(fixPath(l.path));
 //			alert("fixpath after  " + l.path);
 		}
 	}
@@ -506,8 +506,9 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 			folder = fs::relative(s.parent_path(), getOFRoot());
 			s = fixPath(s);
 		}
-		srcFiles.emplace_back(s.string());
-		filesToFolders[s.string()] = folder.string();
+		string f { ofPathToString(s) };
+		srcFiles.emplace_back(f);
+		filesToFolders[f] = ofPathToString(folder);
 	}
 
 	// so addons will never be system.
@@ -533,7 +534,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 				folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
 			}
 
-			filesToFolders[f] = folder.string();
+			filesToFolders[f] = ofPathToString(folder);
 		}
 	}
 
@@ -547,7 +548,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 			folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
 		}
 
-		filesToFolders[f] = folder.string();
+		filesToFolders[f] = ofPathToString(folder);
 	}
 }
 	
@@ -562,11 +563,8 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	this->platform = platform;
 
 	addonPath = path;
-	if (isLocalAddon) {
-		name = path.stem().string();
-	} else {
-		name = path.filename().string();
-	}
+
+	name = isLocalAddon ? ofPathToString(path.stem()) : ofPathToString(path.filename());
 
 	fs::path srcPath { path / "src" };
 	if (fs::exists(srcPath)) {
@@ -579,16 +577,16 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	fs::path parentFolder { path.parent_path() };
 
 	for (auto & s : srcFiles) {
-		fs::path sFS { s };
 		fs::path folder;
 		if (isLocalAddon) {
+			fs::path sFS { s };
 			folder = fs::path { "local_addons" } / fs::relative(sFS.parent_path(), parentFolder);
 		} else {
-			sFS = fixPath(s);
-			s = sFS.string();
+			fs::path sFS { fixPath(s) };
+			s = ofPathToString( sFS );
 			folder = fs::relative(sFS.parent_path(), getOFRoot());
 		}
-		filesToFolders[s] = folder.string();
+		filesToFolders[s] = ofPathToString(folder);
 	}
 
 	
@@ -635,7 +633,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	paths.sort();
 
 	for (auto & p : paths) {
-		includePaths.emplace_back(p.string());
+		includePaths.emplace_back( ofPathToString(p) );
 	}
 	
 	parseConfig();

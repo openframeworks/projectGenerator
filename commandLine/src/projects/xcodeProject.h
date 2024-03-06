@@ -26,15 +26,31 @@ public:
 	void addAfterRule(string script);
 	void addDefine(string define, LibType libType = RELEASE_LIB);
 
-	void addFramework(const string & name, const fs::path & path, const fs::path & folder);
-	void addXCFramework(const string & name, const fs::path & path, const fs::path & folder);
-	void addDylib(const string & name, const fs::path & path, const fs::path & folder);
+	void addFramework(const fs::path & path, const fs::path & folder);
+	void addXCFramework(const fs::path & path, const fs::path & folder);
+	void addDylib(const fs::path & path, const fs::path & folder);
 
 	void addAddon(ofAddon & addon);
 	void saveScheme();
 	void renameProject();
+	
 
+	struct fileProperties {
+		bool reference = true;
+		bool addToBuildPhase = false;
+		bool codeSignOnCopy = false;
+		bool copyFilesBuildPhase = false;
+		bool linkBinaryWithLibraries = false;
+		bool addToBuildResource = false;
+		bool addToResources = false;
+		bool frameworksBuildPhase = false;
+		bool isSrc = false;
+	};
 
+	string addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp);
+	void addCommand(const string & command);
+	bool debugCommands = false;
+	
 	string projRootUUID;
 	string resourcesUUID;
 	string frameworksUUID;
