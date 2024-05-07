@@ -2,6 +2,7 @@
 #include "ofLog.h"
 #include "ofFileUtils.h"
 #include "Utils.h"
+#include "ofUtils.h"
 #include <regex>
 
 std::string AndroidStudioProject::LOG_NAME = "AndroidStudioProject";

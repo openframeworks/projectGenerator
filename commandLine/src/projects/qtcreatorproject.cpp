@@ -2,6 +2,7 @@
 #include "ofLog.h"
 #include "ofFileUtils.h"
 #include "Utils.h"
+#include "ofUtils.h"
 #include <regex>
 
 std::string QtCreatorProject::LOG_NAME = "QtCreatorProject";

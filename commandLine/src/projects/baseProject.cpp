@@ -11,6 +11,7 @@
 #include "ofLog.h"
 #include "Utils.h"
 #include "ofConstants.h"
+#include "ofUtils.h"
 #include <list>
 #include <set>
 #include <unordered_set>
