@@ -1,5 +1,6 @@
 #include "visualStudioProject.h"
 #include "Utils.h"
+#include "ofUtils.h"
 
 string visualStudioProject::LOG_NAME = "visualStudioProjectFile";
 

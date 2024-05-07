@@ -3,6 +3,7 @@
 
 #include "optionparser.h"
 #include "defines.h"
+#include "ofUtils.h"
 #include "Utils.h"
 #include <string>
 #include <set>

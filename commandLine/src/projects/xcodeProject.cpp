@@ -1,5 +1,6 @@
 #include "xcodeProject.h"
 #include "Utils.h"
+#include "ofUtils.h"
 #include "json.hpp"
 #include <iostream>
 
