@@ -13,8 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-osx:
-    runs-on: macos-13
+  build-macos:
+    runs-on: macos-latest
     strategy:
       matrix:
         cfg:
@@ -108,7 +108,7 @@ jobs:
           fi
       - name: Update Release x86_64
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
-        uses: IsaacShelton/update-existing-release@v1.3.3
+        uses: IsaacShelton/update-existing-release@v1.3.4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ env.release }}
