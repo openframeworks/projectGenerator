@@ -745,6 +745,8 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		if (fileType == "") {
 			if (fs::is_directory(path)) {
 				fileType = "folder";
+			} else {
+				return {};
 			}
 		}
 
