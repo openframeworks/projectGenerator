@@ -11,10 +11,13 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-    
+
+env:
+  ccache: ccache
+
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         cfg:
@@ -25,6 +28,11 @@ jobs:
     - name: Install libunwind
       run:  sudo apt-get install libunwind-dev
     - uses: actions/checkout@v4
+    - name: ccache
+      uses: hendrikmuhs/ccache-action@v1.2.12
+      with:
+        # key: ${{ matrix.os }}-${{ matrix.type }}
+        key: ${{ matrix.os }}-${{ matrix.cfg.target }}
     - name: Build
       run:
         ./scripts/linux/buildPG.sh;
