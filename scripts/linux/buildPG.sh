@@ -13,7 +13,7 @@ export LC_ALL=C
 OF_ROOT=./
 
 cd ${OF_ROOT}/apps/projectGenerator
-make Release -C ./commandLine
+make -j2 Release -C ./commandLine
 ret=$?
 if [ $ret -ne 0 ]; then
       echo "Failed building Project Generator"
