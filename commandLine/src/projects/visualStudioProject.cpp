@@ -172,6 +172,10 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 	string folderString = folder.string();
 	fixSlashOrder(folderString);
 
+	// Made to address ofxGstreamer - adds some core files
+	if (folderString == "") {
+		folderString = "other";
+	}
 
 // FIXME: Convert to FS::path
 	std::vector < string > folderSubNames = ofSplitString(folderString, "\\");
