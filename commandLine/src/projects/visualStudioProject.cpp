@@ -458,7 +458,7 @@ void visualStudioProject::addDefine(string define, LibType libType) {
 }
 
 void visualStudioProject::ensureDllDirectoriesExist() {
-	std::vector<std::string> dirs = { "dll\\x64", "dll\\ARM64", "dll\\ARM64EC" };
+	std::vector<fs::path> dirs { "dll/x64", "dll/ARM64", "dll/ARM64EC" };
 	for (const auto & dir : dirs) {
 		fs::path dirPath = projectDir / dir;
 		if (!fs::exists(dirPath)) {
