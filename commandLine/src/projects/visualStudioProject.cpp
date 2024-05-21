@@ -44,7 +44,7 @@ bool visualStudioProject::createProjectFile(){
 	// user
 	copyTemplateFiles.push_back({
 		templatePath / "emptyExample.vcxproj.user",
-		projectDir / (projectName + ".vcxproj"),
+		projectDir / (projectName + ".vcxproj.user"),
 		{{ "emptyExample", projectName }}
 
 	});
