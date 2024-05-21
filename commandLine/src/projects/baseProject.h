@@ -5,8 +5,9 @@
 #include "ofAddon.h"
 #include "ofFileUtils.h"
 #include "pugixml.hpp"
-
 #include <map>
+
+
 namespace fs = of::filesystem;
 
 class baseProject {
@@ -79,6 +80,9 @@ public:
 	bool bMakeRelative = false;
 
 
+
+
+
 	// this shouldn't be called by anyone.  call "create(...), save" etc
 private:
 
@@ -100,4 +104,73 @@ protected:
 	//cached addons - if an addon is requested more than once, avoid loading from disk as it's quite slow
 	std::unordered_map<std::string,std::unordered_map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]
 	bool isAddonInCache(const std::string & addonPath, const std::string platform); //is this addon in the mem cache?
+	
+	static void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+		if(from.empty())
+			return;
+		size_t start_pos = 0;
+		while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+			str.replace(start_pos, from.length(), to);
+			start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+		}
+	}
+
+	struct copyTemplateFile {
+	public:
+		fs::path from;
+		fs::path to;
+		std::vector <std::pair <string, string> > findReplaces;
+		
+		bool run() {
+			// needed for mingw only. maybe a ifdef here.
+			if (fs::exists(from)) {
+#if defined(__MINGW32__) || defined(__MINGW64__)
+				if (fs::exists(to)) {
+					fs::remove(to);
+				}
+#endif
+
+				if (findReplaces.size()) {
+					// Load file, replace contents, write to destination.
+					
+					std::ifstream fileFrom(from);
+					std::string contents((std::istreambuf_iterator<char>(fileFrom)), std::istreambuf_iterator<char>());
+					fileFrom.close();
+
+					for (auto & f : findReplaces) {
+						replaceAll(contents, f.first, f.second);
+					}
+					
+					std::ofstream fileTo(to);
+					try{
+						fileTo << contents;
+					}catch(std::exception & e){
+						std::cout << "Error saving to " << to << " : " << e.what() << std::endl;
+						return false;
+					}catch(...){
+						std::cout << "Error saving to " << to << std::endl;
+						return false;
+					}
+					
+				} else {
+					// straight copy
+					try {
+						fs::copy(from, to, fs::copy_options::overwrite_existing);
+					}
+					catch(fs::filesystem_error & e) {
+						std::cout << "error copying template file " << from << " : " << to << std::endl;
+						std::cout << e.what() << std::endl;
+						return false;
+					}
+				}
+			} else {
+				return false;
+			}
+
+			return true;
+//			std::cout << "----" << std::endl;
+		}
+	};
+
+	vector <copyTemplateFile> copyTemplateFiles;
 };
