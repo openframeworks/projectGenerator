@@ -9,17 +9,77 @@ bool visualStudioProject::createProjectFile(){
 
 	ensureDllDirectoriesExist();
 
-	solution	= projectDir / (projectName + ".sln");
-	fs::path project 	{ projectDir / (projectName + ".vcxproj") };
-	fs::path user 		{ projectDir / (projectName + ".vcxproj.user") };
-	fs::path filters	{ projectDir / (projectName + ".vcxproj.filters") };
+	solution = projectDir / (projectName + ".sln");
 
-	fs::copy(templatePath / "emptyExample.vcxproj", 		project, fs::copy_options::overwrite_existing);
-	fs::copy(templatePath / "emptyExample.vcxproj.user", 	user, fs::copy_options::overwrite_existing);
-	fs::copy(templatePath / "emptyExample.sln", 			solution, fs::copy_options::overwrite_existing);
-	fs::copy(templatePath / "emptyExample.vcxproj.filters", filters, fs::copy_options::overwrite_existing);
+//	findandreplaceInTexfile(solution, "emptyExample", projectName);
+//	findandreplaceInTexfile(user, "emptyExample", projectName);
+//	findandreplaceInTexfile(project, "emptyExample", projectName);
+	
+	std::pair <string, string> replacements;
+	if (!fs::equivalent(getOFRoot(), fs::path{ "../../.." })) {
+		string root { getOFRoot().string() };
+		string relRootWindows { convertStringToWindowsSeparator(root) + "\\" };
+		replacements = { "..\\..\\..\\", relRootWindows };
+	} else {
+//		cout << "equivalent to default ../../.." << endl;
+	}
+	
+	// solution
+	copyTemplateFiles.push_back({
+		templatePath / "emptyExample.sln",
+		projectDir / (projectName + ".sln"),
+		{
+			{ "emptyExample", projectName },
+			replacements
+		}
+	});
+	// project
+	copyTemplateFiles.push_back({
+		templatePath / "emptyExample.vcxproj",
+		projectDir / (projectName + ".vcxproj"),
+		{
+			{ "emptyExample", projectName },
+			replacements
+		}
 
-	fs::copy(templatePath / "icon.rc", projectDir / "icon.rc", fs::copy_options::overwrite_existing);
+	});
+	// user
+	copyTemplateFiles.push_back({
+		templatePath / "emptyExample.vcxproj.user",
+		projectDir / (projectName + ".vcxproj"),
+		{{ "emptyExample", projectName }}
+
+	});
+
+	// filters
+	copyTemplateFiles.push_back({
+		templatePath / "emptyExample.vcxproj.filters",
+		projectDir / (projectName + ".vcxproj.filters")
+	});
+
+	// icon
+	copyTemplateFiles.push_back({
+		templatePath / "icon.rc",
+		projectDir / "icon.rc"
+	});
+
+	for (auto & c : copyTemplateFiles) {
+		c.run();
+	}
+
+	// fs::path project 	{ projectDir / (projectName + ".vcxproj") };
+	// fs::path user 		{ projectDir / (projectName + ".vcxproj.user") };
+	// fs::path filters	{ projectDir / (projectName + ".vcxproj.filters") };
+
+	// fs::copy(templatePath / "emptyExample.vcxproj", 		project, fs::copy_options::overwrite_existing);
+	// fs::copy(templatePath / "emptyExample.vcxproj.user", 	user, fs::copy_options::overwrite_existing);
+	// fs::copy(templatePath / "emptyExample.sln", 			solution, fs::copy_options::overwrite_existing);
+	// fs::copy(templatePath / "emptyExample.vcxproj.filters", filters, fs::copy_options::overwrite_existing);
+	// fs::copy(templatePath / "icon.rc", projectDir / "icon.rc", fs::copy_options::overwrite_existing);
+
+	// after copy, after all execution
+
+	 fs::path filters { projectDir / (projectName + ".vcxproj.filters") };
 
 	pugi::xml_parse_result result = filterXmlDoc.load_file(filters.c_str());
 	if (result.status==pugi::status_ok) {
@@ -28,25 +88,25 @@ bool visualStudioProject::createProjectFile(){
 		ofLogVerbose() << "problem loading filter ";
 	}
 
-	findandreplaceInTexfile(solution, "emptyExample", projectName);
-	findandreplaceInTexfile(user, "emptyExample", projectName);
-	findandreplaceInTexfile(project, "emptyExample", projectName);
+	// findandreplaceInTexfile(solution, "emptyExample", projectName);
+	// findandreplaceInTexfile(user, "emptyExample", projectName);
+	// findandreplaceInTexfile(project, "emptyExample", projectName);
 
 
-	if (!fs::equivalent(getOFRoot(), fs::path{ "../../.." })) {
-		string root { getOFRoot().string() };
-		string relRootWindows { convertStringToWindowsSeparator(root) + "\\" };
-
-		// sln has windows paths:
-//		alert ("replacing root with " + relRootWindows, 36);
-		findandreplaceInTexfile(solution, "..\\..\\..\\", relRootWindows);
-
-		// vcx has unixy paths:
-		//..\..\..\libs
-		findandreplaceInTexfile(project, "..\\..\\..\\", relRootWindows);
-	} else {
-//		cout << "equivalent to default ../../.." << endl;
-	}
+//	if (!fs::equivalent(getOFRoot(), fs::path{ "../../.." })) {
+//		string root { getOFRoot().string() };
+//		string relRootWindows { convertStringToWindowsSeparator(root) + "\\" };
+//
+//		// sln has windows paths:
+////		alert ("replacing root with " + relRootWindows, 36);
+//		findandreplaceInTexfile(solution, "..\\..\\..\\", relRootWindows);
+//
+//		// vcx has unixy paths:
+//		//..\..\..\libs
+//		findandreplaceInTexfile(project, "..\\..\\..\\", relRootWindows);
+//	} else {
+////		cout << "equivalent to default ../../.." << endl;
+//	}
 
 	return true;
 }
@@ -205,7 +265,7 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());*/
 
 		} else if (ext == ".storyboard" || ext == ".mm") {
-			// Do not add files for other platforms		
+			// Do not add files for other platforms
 		} else{
 			appendValue(doc, "ClCompile", "Include", srcFileString);
 
