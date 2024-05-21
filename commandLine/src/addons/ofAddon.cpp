@@ -355,11 +355,11 @@ void ofAddon::preParseConfig(){
 		
 		// found Variable
 		if (line.find("=") != string::npos){
-			bool addToValue = false;
+//			bool addToValue = false;
 			string variable, value;
 			vector<string> varValue;
 			if (line.find("+=") != string::npos) {
-				addToValue = true;
+//				addToValue = true;
 				varValue = ofSplitString(line, "+=");
 			} else {
 				varValue = ofSplitString(line, "=");
