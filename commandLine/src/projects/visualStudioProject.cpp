@@ -46,7 +46,6 @@ bool visualStudioProject::createProjectFile(){
 		templatePath / "emptyExample.vcxproj.user",
 		projectDir / (projectName + ".vcxproj.user"),
 		{{ "emptyExample", projectName }}
-
 	});
 
 	// filters

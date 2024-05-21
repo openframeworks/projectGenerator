@@ -85,6 +85,9 @@ bool VSCodeProject::createProjectFile(){
 	}
 #endif
 	
+
+
+	
 	// Copy all files from template, recursively
 	try {
 		//dangerous as its copying src/ and bin/ into existing project files 
@@ -92,32 +95,49 @@ bool VSCodeProject::createProjectFile(){
 
 		//tmp fix for now - explicit copy of files needed 
 		fs::copy(templatePath / ".vscode", projectDir / ".vscode", fs::copy_options::overwrite_existing | fs::copy_options::recursive);
-		fs::copy(templatePath / "Makefile", projectDir, fs::copy_options::skip_existing | fs::copy_options::recursive);
-		fs::copy(templatePath / "config.make", projectDir, fs::copy_options::skip_existing | fs::copy_options::recursive);
-		fs::copy(templatePath / "emptyExample.code-workspace", projectDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
-		fs::copy(templatePath / "template.config", projectDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
+//		fs::copy(templatePath / "Makefile", projectDir, fs::copy_options::overwrite_existing);
+//		fs::copy(templatePath / "config.make", projectDir, fs::copy_options::overwrite_existing);
+//		fs::copy(templatePath / "emptyExample.code-workspace", projectDir, fs::copy_options::overwrite_existing);
+//		fs::copy(templatePath / "template.config", projectDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
 		
 	} catch(fs::filesystem_error& e) {
 		ofLogError(LOG_NAME) << "error copying folder " << templatePath << " : " << projectDir << " : " << e.what();
 		return false;
 	}
+	
+	copyTemplateFiles.push_back({
+		templatePath / "Makefile",
+		projectDir / "Makefile"
+	});
+	copyTemplateFiles.push_back({
+		templatePath / "config.make",
+		projectDir / "config.make"
+	});
+	copyTemplateFiles.push_back({
+		templatePath / "emptyExample.code-workspace",
+		projectDir / workspace.fileName
+	});
 
-
-	auto templateConfig { projectDir / "template.config" };
-	try {
-		fs::remove( templateConfig );
-	} catch(fs::filesystem_error& e) {
-		ofLogError(LOG_NAME) << "error removing file " << " : " << templateConfig << " : " << e.what();
+	for (auto & c : copyTemplateFiles) {
+		c.run();
 	}
+
+
+//	auto templateConfig { projectDir / "template.config" };
+//	try {
+//		fs::remove( templateConfig );
+//	} catch(fs::filesystem_error& e) {
+//		ofLogError(LOG_NAME) << "error removing file " << " : " << templateConfig << " : " << e.what();
+//	}
 
 
 	// Rename Project Workspace
-	try {
-		fs::rename(projectDir / "emptyExample.code-workspace", workspace.fileName);
-	} catch(fs::filesystem_error& e) {
-		ofLogError(LOG_NAME) << "error renaming project " << " : " << workspace.fileName << " : " << e.what();
-		return false;
-	}
+//	try {
+//		fs::rename(projectDir / "emptyExample.code-workspace", workspace.fileName);
+//	} catch(fs::filesystem_error& e) {
+//		ofLogError(LOG_NAME) << "error renaming project " << " : " << workspace.fileName << " : " << e.what();
+//		return false;
+//	}
 	return true;
 }
 
