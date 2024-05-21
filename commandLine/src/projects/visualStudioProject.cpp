@@ -180,7 +180,7 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 // FIXME: Convert to FS::path
 	std::vector < string > folderSubNames = ofSplitString(folderString, "\\");
 	string folderName = "";
-	for (int i = 0; i < folderSubNames.size(); i++){
+	for (auto i = 0; i < folderSubNames.size(); i++){
 		if (i != 0) folderName += "\\";
 		folderName += folderSubNames[i];
 		appendFilter(folderName);
@@ -335,9 +335,10 @@ void visualStudioProject::addProps(fs::path propsFile){
 	string path = propsFile.string();
 	fixSlashOrder(path);
 	pugi::xpath_node_set items = doc.select_nodes("//ImportGroup");
-	for (int i = 0; i < items.size(); i++) {
+	for (auto & item : items) {
+		// FIXME: needed?
 		pugi::xml_node additionalOptions;
-		items[i].node().append_child("Import").append_attribute("Project").set_value(path.c_str());
+		item.node().append_child("Import").append_attribute("Project").set_value(path.c_str());
 	}
 //	auto check = doc.select_nodes("//ImportGroup/Import/Project");
 }
@@ -389,20 +390,21 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 
 void visualStudioProject::addCFLAG(string cflag, LibType libType){
 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
-	for(int i=0;i<items.size();i++){
+	// FIXME: iterator
+	for (auto & item : items) {
 		pugi::xml_node additionalOptions;
 		bool found=false;
-		string condition(items[i].node().attribute("Condition").value());
+		string condition(item.node().attribute("Condition").value());
 		if (libType == RELEASE_LIB && condition.find("Release") != string::npos) {
-			additionalOptions = items[i].node().child("ClCompile").child("AdditionalOptions");
+			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
 			found = true;
 		}else if(libType==DEBUG_LIB && condition.find("Debug") != string::npos){
-			additionalOptions = items[i].node().child("ClCompile").child("AdditionalOptions");
+			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
 			found = true;
 		}
 		if(!found) continue;
 		if(!additionalOptions){
-			items[i].node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(cflag.c_str());
+			item.node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(cflag.c_str());
 		}else{
 			additionalOptions.set_value((string(additionalOptions.value()) + " " + cflag).c_str());
 		}
@@ -412,20 +414,20 @@ void visualStudioProject::addCFLAG(string cflag, LibType libType){
 
 void visualStudioProject::addCPPFLAG(string cppflag, LibType libType){
 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
-	for(int i=0;i<items.size();i++){
+	for (auto & item : items) {
 		pugi::xml_node additionalOptions;
 		bool found=false;
-		string condition(items[i].node().attribute("Condition").value());
+		string condition(item.node().attribute("Condition").value());
 		if(libType==RELEASE_LIB && condition.find("Debug") != string::npos){
-			additionalOptions = items[i].node().child("ClCompile").child("AdditionalOptions");
+			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
 			found = true;
 		}else if(libType==DEBUG_LIB && condition.find("Release") != string::npos){
-			additionalOptions = items[i].node().child("ClCompile").child("AdditionalOptions");
+			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
 			found = true;
 		}
 		if(!found) continue;
 		if(!additionalOptions){
-			items[i].node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(cppflag.c_str());
+			item.node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(cppflag.c_str());
 		}else{
 			additionalOptions.set_value((string(additionalOptions.value()) + " " + cppflag).c_str());
 		}
@@ -435,21 +437,21 @@ void visualStudioProject::addCPPFLAG(string cppflag, LibType libType){
 
 void visualStudioProject::addDefine(string define, LibType libType) {
 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
-	for (int i = 0; i<items.size(); i++) {
+	for (auto & item : items) {
 		pugi::xml_node additionalOptions;
 		bool found = false;
-		string condition(items[i].node().attribute("Condition").value());
+		string condition(item.node().attribute("Condition").value());
 		if (libType == RELEASE_LIB && condition.find("Debug") != string::npos) {
-			additionalOptions = items[i].node().child("ClCompile").child("AdditionalOptions");
+			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
 			found = true;
 		}
 		else if (libType == DEBUG_LIB && condition.find("Release") != string::npos) {
-			additionalOptions = items[i].node().child("ClCompile").child("AdditionalOptions");
+			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
 			found = true;
 		}
 		if (!found) continue;
 		if (!additionalOptions) {
-			items[i].node().child("ClCompile").append_child("PreprocessorDefinitions").append_child(pugi::node_pcdata).set_value(define.c_str());
+			item.node().child("ClCompile").append_child("PreprocessorDefinitions").append_child(pugi::node_pcdata).set_value(define.c_str());
 		}
 		else {
 			additionalOptions.set_value((string(additionalOptions.value()) + " " + define).c_str());
