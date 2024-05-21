@@ -8,17 +8,13 @@ bool visualStudioProject::createProjectFile(){
 //	alert("visualStudioProject::createProjectFile");
 
 	ensureDllDirectoriesExist();
-
 	solution = projectDir / (projectName + ".sln");
 
-//	findandreplaceInTexfile(solution, "emptyExample", projectName);
-//	findandreplaceInTexfile(user, "emptyExample", projectName);
-//	findandreplaceInTexfile(project, "emptyExample", projectName);
-	
 	std::pair <string, string> replacements;
 	if (!fs::equivalent(getOFRoot(), fs::path{ "../../.." })) {
 		string root { getOFRoot().string() };
 		string relRootWindows { convertStringToWindowsSeparator(root) + "\\" };
+		
 		replacements = { "..\\..\\..\\", relRootWindows };
 	} else {
 //		cout << "equivalent to default ../../.." << endl;
@@ -33,6 +29,7 @@ bool visualStudioProject::createProjectFile(){
 			replacements
 		}
 	});
+	
 	// project
 	copyTemplateFiles.push_back({
 		templatePath / "emptyExample.vcxproj",
@@ -43,6 +40,7 @@ bool visualStudioProject::createProjectFile(){
 		}
 
 	});
+	
 	// user
 	copyTemplateFiles.push_back({
 		templatePath / "emptyExample.vcxproj.user",
@@ -67,17 +65,6 @@ bool visualStudioProject::createProjectFile(){
 		c.run();
 	}
 
-	// fs::path project 	{ projectDir / (projectName + ".vcxproj") };
-	// fs::path user 		{ projectDir / (projectName + ".vcxproj.user") };
-	// fs::path filters	{ projectDir / (projectName + ".vcxproj.filters") };
-
-	// fs::copy(templatePath / "emptyExample.vcxproj", 		project, fs::copy_options::overwrite_existing);
-	// fs::copy(templatePath / "emptyExample.vcxproj.user", 	user, fs::copy_options::overwrite_existing);
-	// fs::copy(templatePath / "emptyExample.sln", 			solution, fs::copy_options::overwrite_existing);
-	// fs::copy(templatePath / "emptyExample.vcxproj.filters", filters, fs::copy_options::overwrite_existing);
-	// fs::copy(templatePath / "icon.rc", projectDir / "icon.rc", fs::copy_options::overwrite_existing);
-
-	// after copy, after all execution
 
 	 fs::path filters { projectDir / (projectName + ".vcxproj.filters") };
 
@@ -87,27 +74,6 @@ bool visualStudioProject::createProjectFile(){
 	} else {
 		ofLogVerbose() << "problem loading filter ";
 	}
-
-	// findandreplaceInTexfile(solution, "emptyExample", projectName);
-	// findandreplaceInTexfile(user, "emptyExample", projectName);
-	// findandreplaceInTexfile(project, "emptyExample", projectName);
-
-
-//	if (!fs::equivalent(getOFRoot(), fs::path{ "../../.." })) {
-//		string root { getOFRoot().string() };
-//		string relRootWindows { convertStringToWindowsSeparator(root) + "\\" };
-//
-//		// sln has windows paths:
-////		alert ("replacing root with " + relRootWindows, 36);
-//		findandreplaceInTexfile(solution, "..\\..\\..\\", relRootWindows);
-//
-//		// vcx has unixy paths:
-//		//..\..\..\libs
-//		findandreplaceInTexfile(project, "..\\..\\..\\", relRootWindows);
-//	} else {
-////		cout << "equivalent to default ../../.." << endl;
-//	}
-
 	return true;
 }
 

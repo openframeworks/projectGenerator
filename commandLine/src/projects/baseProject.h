@@ -124,9 +124,11 @@ protected:
 		bool run() {
 			// needed for mingw only. maybe a ifdef here.
 			if (fs::exists(from)) {
+#if defined(__MINGW32__) || defined(__MINGW64__)
 				if (fs::exists(to)) {
 					fs::remove(to);
 				}
+#endif
 
 				if (findReplaces.size()) {
 					// Load file, replace contents, write to destination.
