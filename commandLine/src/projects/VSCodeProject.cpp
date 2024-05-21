@@ -73,8 +73,6 @@ fileJson cppProperties;
 std::string VSCodeProject::LOG_NAME = "VSCodeProject";
 
 bool VSCodeProject::createProjectFile(){
-	workspace.fileName = projectDir / (projectName + ".code-workspace");
-	cppProperties.fileName = projectDir / ".vscode/c_cpp_properties.json";
 
 #if defined(__MINGW32__) || defined(__MINGW64__)
 	try {
@@ -85,25 +83,20 @@ bool VSCodeProject::createProjectFile(){
 	}
 #endif
 	
-
-
-	
 	// Copy all files from template, recursively
-	try {
-		//dangerous as its copying src/ and bin/ into existing project files 
-		//fs::copy(templatePath, projectDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
+	//dangerous as its copying src/ and bin/ into existing project files
+	//fs::copy(templatePath, projectDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
 
-		//tmp fix for now - explicit copy of files needed 
+	try {
 		fs::copy(templatePath / ".vscode", projectDir / ".vscode", fs::copy_options::overwrite_existing | fs::copy_options::recursive);
-//		fs::copy(templatePath / "Makefile", projectDir, fs::copy_options::overwrite_existing);
-//		fs::copy(templatePath / "config.make", projectDir, fs::copy_options::overwrite_existing);
-//		fs::copy(templatePath / "emptyExample.code-workspace", projectDir, fs::copy_options::overwrite_existing);
-//		fs::copy(templatePath / "template.config", projectDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
-		
 	} catch(fs::filesystem_error& e) {
 		ofLogError(LOG_NAME) << "error copying folder " << templatePath << " : " << projectDir << " : " << e.what();
 		return false;
 	}
+	
+	
+	workspace.fileName = projectDir / (projectName + ".code-workspace");
+	cppProperties.fileName = projectDir / ".vscode/c_cpp_properties.json";
 	
 	copyTemplateFiles.push_back({
 		templatePath / "Makefile",
@@ -121,23 +114,7 @@ bool VSCodeProject::createProjectFile(){
 	for (auto & c : copyTemplateFiles) {
 		c.run();
 	}
-
-
-//	auto templateConfig { projectDir / "template.config" };
-//	try {
-//		fs::remove( templateConfig );
-//	} catch(fs::filesystem_error& e) {
-//		ofLogError(LOG_NAME) << "error removing file " << " : " << templateConfig << " : " << e.what();
-//	}
-
-
-	// Rename Project Workspace
-//	try {
-//		fs::rename(projectDir / "emptyExample.code-workspace", workspace.fileName);
-//	} catch(fs::filesystem_error& e) {
-//		ofLogError(LOG_NAME) << "error renaming project " << " : " << workspace.fileName << " : " << e.what();
-//		return false;
-//	}
+	
 	return true;
 }
 
@@ -162,18 +139,7 @@ void VSCodeProject::addAddon(ofAddon & addon) {
 
 
 bool VSCodeProject::saveProjectFile(){
-//	alert("VSCodeProject::saveProjectFile() ");
-//	alert("--- VSCodeProject::extSrcPaths() ");
-//	for (auto & e : extSrcPaths) {
-//		cout << e << endl;
-//		workspace.addPath(e);
-//
-//	}
-//	alert("--- VSCodeProject::extSrcPaths() ");
-
-
 	workspace.data["openFrameworksProjectGeneratorVersion"] = getPGVersion();
-
 	workspace.save();
 	cppProperties.save();
 	return true;
