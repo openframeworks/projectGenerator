@@ -76,6 +76,15 @@ bool VSCodeProject::createProjectFile(){
 	workspace.fileName = projectDir / (projectName + ".code-workspace");
 	cppProperties.fileName = projectDir / ".vscode/c_cpp_properties.json";
 
+#if defined(__MINGW32__) || defined(__MINGW64__)
+	try {
+		fs::remove_all(projectDir / ".vscode");
+	} catch(fs::filesystem_error& e) {
+		ofLogError(LOG_NAME) << "error removing folder .vscode " << e.what();
+		return false;
+	}
+#endif
+	
 	// Copy all files from template, recursively
 	try {
 		//dangerous as its copying src/ and bin/ into existing project files 
