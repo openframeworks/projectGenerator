@@ -365,12 +365,15 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder){
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
 
 	addCommand("# ----- addFramework path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
+//	alert("# ----- addFramework path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
 	
 	bool isSystemFramework = true;
 	if (!folder.empty() && !ofIsStringInString(ofPathToString(path), "/System/Library/Frameworks")
 		&& target != "ios"){
 		isSystemFramework = false;
 	}
+	
+//	alert ("isSystem? " + ofToString(isSystemFramework), 31);
 	
 	fileProperties fp;
 	fp.addToBuildPhase = true;
@@ -572,7 +575,6 @@ void xcodeProject::addAddon(ofAddon & addon){
 	}
 
 	for (auto & f : addon.frameworks) {
-//		alert ("xcodeproj addon.frameworks : " + f);
 		ofLogVerbose() << "adding addon frameworks: " << f;
 
 		size_t found=f.find('/');
@@ -772,11 +774,11 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
 		addCommand("Add :objects:"+UUID+":lastKnownFileType string " + fileType);
 		addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
-		
+		addCommand("Add :objects:"+UUID+":name string " + ofPathToString(path.filename()));
+
 		string folderUUID;
 		if (fp.isSrc) {
-			string name = ofPathToString(path.filename());
-			addCommand("Add :objects:"+UUID+":name string " + name);
+//			addCommand("Add :objects:"+UUID+":name string " + ofPathToString(path.filename()));
 		
 //			fs::path base;
 //			fs::path src { path };
@@ -845,10 +847,9 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		}
 		
 		if (fp.addToBuildResource) {
-			string mediaAssetsUUID = "9936F60E1BFA4DEE00891288";
+			string mediaAssetsUUID { "9936F60E1BFA4DEE00891288" };
 			addCommand("# ---- addToBuildResource");
 			addCommand("Add :objects:"+mediaAssetsUUID+":files: string " + UUID);
-
 		}
 		
 		if (fp.addToResources) {
@@ -862,8 +863,18 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		if (fp.frameworksBuildPhase) {
 			addCommand("# ---- frameworksBuildPhase " + buildUUID);
 			addCommand("Add :objects:E4B69B590A3A1756003C02F2:files: string " + buildUUID);
+		}
+		
+		if (path.extension() == ".framework") {
+			addCommand("# ---- Frameworks Folder " + UUID);
+			addCommand("Add :objects:901808C02053638E004A7774:children: string " + UUID);
+
+			addCommand("# ---- PBXFrameworksBuildPhase " + buildUUID);
+			addCommand("Add :objects:1D60588F0D05DD3D006BFB54:files: string " + buildUUID);
 
 		}
+		
+		
 		debugCommands = false;
 	}
 	return UUID;
