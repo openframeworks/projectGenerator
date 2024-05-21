@@ -246,7 +246,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 		string lastFolderUUID = projRootUUID;
 
 		if (folders.size()){
-			for (auto a=0; a<folders.size(); a++) {
+			for (std::size_t a=0; a<folders.size(); a++) {
 				vector <string> joinFolders;
 				joinFolders.assign(folders.begin(), folders.begin() + (a+1));
 				string fullPath = ofJoinString(joinFolders, "/");
