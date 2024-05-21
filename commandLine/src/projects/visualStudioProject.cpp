@@ -180,7 +180,7 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 // FIXME: Convert to FS::path
 	std::vector < string > folderSubNames = ofSplitString(folderString, "\\");
 	string folderName = "";
-	for (auto i = 0; i < folderSubNames.size(); i++){
+	for (std::size_t i = 0; i < folderSubNames.size(); i++){
 		if (i != 0) folderName += "\\";
 		folderName += folderSubNames[i];
 		appendFilter(folderName);

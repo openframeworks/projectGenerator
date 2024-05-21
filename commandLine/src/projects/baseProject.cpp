@@ -280,7 +280,7 @@ bool baseProject::save(){
 		}
 		// replace this section with our external paths
 		else if( extSrcPaths.size() && str.rfind("# PROJECT_EXTERNAL_SOURCE_PATHS =", 0) == 0 ){
-			for(auto d = 0; d < extSrcPaths.size(); d++){
+			for(std::size_t d = 0; d < extSrcPaths.size(); d++){
 				ofLog(OF_LOG_VERBOSE) << " adding PROJECT_EXTERNAL_SOURCE_PATHS to config" << extSrcPaths[d].generic_string() << std::endl;
 				saveConfig << "PROJECT_EXTERNAL_SOURCE_PATHS" << (d == 0 ? " = " : " += ") << extSrcPaths[d].generic_string() << std::endl;
 			}
