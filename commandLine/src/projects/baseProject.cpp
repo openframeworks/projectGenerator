@@ -143,12 +143,12 @@ bool baseProject::create(const fs::path & path, string templateName){
 	projectDir = path;
 	auto projectPath = fs::canonical(fs::current_path() / path);
 	projectName = projectPath.filename().string();
-
-//	cout << "templatePath " << templatePath << endl;
-//	cout << "projectDir " << projectDir << endl;
-//	cout << "projectPath " << projectPath << endl;
-//	cout << "projectName = " << projectName << endl;
-//
+	
+	
+	// we had this in some projects. if we decide to keep this is the place
+	//	if (!fs::exists(projectDir)) {
+	//		fs::create_directory(projectDir);
+	//	}
 	bool bDoesDirExist = false;
 
 	fs::path project { projectDir / "src" };
@@ -156,11 +156,12 @@ bool baseProject::create(const fs::path & path, string templateName){
 	if (fs::exists(project) && fs::is_directory(project)) {
 		bDoesDirExist = true;
 	} else {
-		for (auto & p : { string("src") , string("bin") }) {
+		for (auto & p : { fs::path("src") , fs::path("bin") }) {
 			fs::copy (templatePath / p, projectDir / p, fs::copy_options::recursive);
 		}
 	}
 
+	
 	bool ret = createProjectFile();
 	if(!ret) return false;
 

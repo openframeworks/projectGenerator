@@ -14,9 +14,6 @@ bool AndroidStudioProject::createProjectFile(){
 	std::string packageName { projectName };
 	ofStringReplace(packageName, "-", "");
 
-	if (!fs::exists(projectDir)) {
-		fs::create_directory(projectDir);
-	}
 
 	std::vector <std::string> fileNames {
 		"build.gradle",
