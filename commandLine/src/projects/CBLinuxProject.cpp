@@ -13,11 +13,6 @@
 std::string CBLinuxProject::LOG_NAME { "CBLinuxProject" };
 
 bool CBLinuxProject::createProjectFile(){
-	// FIXME: This only exists here, not other projects. I think it should be removed
-	if (!fs::exists(projectDir)) {
-		fs::create_directory(projectDir);
-	}
-
 	vector < std::pair <fs::path, fs::path > > fromTo {
 		{ templatePath / ("emptyExample_" + target + ".cbp"),   		projectDir / (projectName + ".cbp") },
 		{ templatePath / ("emptyExample_" + target + ".workspace"), 	projectDir / (projectName + ".workspace") },

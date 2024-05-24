@@ -11,9 +11,6 @@ QtCreatorProject::QtCreatorProject(const std::string & target) : baseProject(tar
 
 bool QtCreatorProject::createProjectFile(){
 //	alert("QtCreatorProject::createProjectFile " + projectDir.string());
-	if (!fs::exists(projectDir)) {
-		fs::create_directory(projectDir);
-	}
 
 	fs::path qbsFile { fs::path { projectName + ".qbs" } };
 	vector < std::pair <fs::path, fs::path > > fromTo {
