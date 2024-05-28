@@ -8,31 +8,7 @@
 #include <string>
 #include <set>
 
-std::string getPlatformString() {
-#ifdef __linux__
-	string arch = exec("uname -m");
-	if (
-		arch == "armv6l" ||
-		arch == "armv7l" ||
-		arch == "aarch64" ||
-		) {
-			return "linux" + arch;
-		}
-	else {
-		return "linux64";
-	}
-#elif defined(__WIN32__)
-	#if defined(__MINGW32__) || defined(__MINGW64__)
-		return "msys2";
-	#else
-		return "vs";
-	#endif
-#elif defined(__APPLE_CC__)
-	return "osx";
-#else
-	return {};
-#endif
-}
+
 
 
 enum optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTERNAL, VERSION };
