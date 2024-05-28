@@ -61,7 +61,7 @@ jobs:
         run: |
           # echo "Current directory after moving up: (should be projectGenerator/projectGenerator)"
           # pwd
-          # cd ../
+          cd ../
 
           # echo "Current directory after moving up: (should be projectGenerator/)"
           # echo "------------------"
