@@ -265,7 +265,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 
 						if (!filePath.empty()) {
 							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(filePath));
-//							alert(commands.back(), 33);
+							alert(commands.back(), 33);
 						} else {
 //							cout << ">>>>> filePath empty " << endl;
 						}
@@ -275,15 +275,15 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 
 					addCommand("Add :objects:"+thisUUID+":isa string PBXGroup");
 					addCommand("Add :objects:"+thisUUID+":children array");
-					
-					if (folder.begin()->string() == "addons") {
-						addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
-						fs::path addonFolder { fs::path(fullPath).filename() };
-						addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(addonFolder));
-						// alert ("group " + folder.string() + " : " + base.string() + " : " + addonFolder.string(), 32);
-					} else {
-						addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
-					}
+
+					addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
+					fs::path addonFolder { fs::path(fullPath).filename() };
+					addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(addonFolder));
+
+//					if (folder.begin()->string() == "addons") {
+//					} else {
+//						addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
+//					}
 
 					// And this new object is cointained in parent hierarchy, or even projRootUUID
 					addCommand("Add :objects:"+lastFolderUUID+":children: string " + thisUUID);
@@ -686,7 +686,7 @@ void xcodeProject::addCommand(const string & command) {
 }
 
 string xcodeProject::addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp) {
-//	alert("addFile " + ofPathToString(path) + " : " + ofPathToString(folder) , 31);
+	alert("addFile " + ofPathToString(path) + " : " + ofPathToString(folder) , 31);
 //	alert("reference " + ofToString(fp.reference));
 //	alert("addToBuildPhase " + ofToString(fp.addToBuildPhase));
 //	alert("codeSignOnCopy " + ofToString(fp.codeSignOnCopy));
