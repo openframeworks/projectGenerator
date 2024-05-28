@@ -36,6 +36,7 @@ public:
 	
 
 	struct fileProperties {
+		bool absolute = false;
 		bool reference = true;
 		bool addToBuildPhase = false;
 		bool codeSignOnCopy = false;

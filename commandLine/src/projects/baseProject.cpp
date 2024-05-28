@@ -225,15 +225,6 @@ bool baseProject::create(const fs::path & path, string templateName){
 			}
 		}
 
-		// only add unique paths
-//		vector < fs::path > paths;
-//		for (auto & f : fileNames) {
-//			auto dir = fs::path(f).parent_path().filename();
-//			if (std::find(paths.begin(), paths.end(), dir) == paths.end()) {
-//				paths.emplace_back(dir);
-//				addInclude(dir.string());
-//			}
-//		}
 
 		// FIXME: Port to std::list, so no comparison is needed.
 		// only add unique paths

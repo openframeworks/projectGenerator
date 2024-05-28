@@ -17,9 +17,9 @@ xcodeProject::xcodeProject(const string & target) : baseProject(target){
 		folderUUID = {
 			{ "src", 			"E4B69E1C0A3A1BDC003C02F2" },
 			{ "addons", 		"BB4B014C10F69532006C3DED" },
-			{ "openFrameworks", 		"191EF70929D778A400F35F26" },
-			// { "localAddons",	"6948EE371B920CB800B5AC1A" },
+			{ "openFrameworks", "191EF70929D778A400F35F26" },
 			{ "", 				"E4B69B4A0A3A1720003C02F2" }
+			// { "localAddons",	"6948EE371B920CB800B5AC1A" },
 		};
 
 		buildConfigurationListUUID = "E4B69B5A0A3A1756003C02F2";
@@ -47,8 +47,8 @@ xcodeProject::xcodeProject(const string & target) : baseProject(target){
 		folderUUID = {
 			{ "src", 			"E4D8936A11527B74007E1F53" },
 			{ "addons", 		"BB16F26B0F2B646B00518274" },
-			// { "localAddons", 	"6948EE371B920CB800B5AC1A" },
 			{ "", 				"29B97314FDCFA39411CA2CEA" }
+			// { "localAddons", 	"6948EE371B920CB800B5AC1A" },
 		};
 
 		buildConfigurationListUUID = "1D6058900D05DD3D006BFB54"; //check
@@ -81,11 +81,31 @@ bool xcodeProject::createProjectFile(){
 		templatePath / "Project.xcconfig",
 		projectDir / "Project.xcconfig"
 	});
+	
+	if (target == "osx") {
+		// TODO: TEST
+		for (auto & f : { "openFrameworks-Info.plist", "of.entitlements" }) {
+			copyTemplateFiles.push_back({ templatePath / f, projectDir / f });
+		}
+	} else {
+		for (auto & f : { "ofxiOS-Info.plist", "ofxiOS_Prefix.pch" }) {
+			copyTemplateFiles.push_back({ templatePath / f, projectDir / f });
+		}
+
+		fs::path from = templatePath / "mediaAssets";
+		fs::path to = projectDir / "mediaAssets";
+		if (!fs::exists(to)) {
+			fs::copy(from, to, fs::copy_options::recursive);
+		}
+	}
+
+	saveScheme();
 
 	for (auto & c : copyTemplateFiles) {
 		c.run();
 	}
-
+	
+	
 	fs::path binDirectory { projectDir / "bin" };
 	fs::path dataDir { binDirectory / "data" };
 
@@ -104,26 +124,9 @@ bool xcodeProject::createProjectFile(){
 		}
 	}
 
-	if( target == "osx" ){
-		// TODO: TEST
-		for (auto & f : { "openFrameworks-Info.plist", "of.entitlements" }) {
-			fs::copy(templatePath / f, projectDir / f, fs::copy_options::overwrite_existing);
-		}
-	}else{
-		for (auto & f : { "ofxiOS-Info.plist", "ofxiOS_Prefix.pch" }) {
-			fs::copy(templatePath / f, projectDir / f, fs::copy_options::overwrite_existing);
-		}
 
-		fs::path from = templatePath / "mediaAssets";
-		fs::path to = projectDir / "mediaAssets";
-		if (!fs::exists(to)) {
-			fs::copy(from, to, fs::copy_options::recursive);
-		}
-	}
 
-	saveScheme();
-
-	if(target=="osx"){
+	if(target == "osx"){
 		saveMakefile();
 	}
 
@@ -138,15 +141,19 @@ bool xcodeProject::createProjectFile(){
 //	} else {
 ////		alert ("ofIsPathInPath not");
 //	}
-
-
+	
 	addCommand("# ---- PG VERSION " + getPGVersion());
 	addCommand("Add :openFrameworksProjectGeneratorVersion string " + getPGVersion());
 
 	fileProperties fp;
 	addFile("App.xcconfig", "", fp);
+
+	fp.absolute = true;
 	addFile(fs::path{"bin"} / "data", "", fp);
 
+	// adding src folder as a reference : doesnt work
+//	fp.addToBuildPhase = true;
+//	addFile(fs::path{"src"}, "", fp);
 
 	if (!fs::equivalent(getOFRoot(), fs::path{"../../.."})) {
 		string root { ofPathToString(getOFRoot()) }; 
@@ -173,24 +180,27 @@ void xcodeProject::saveScheme(){
 	}
 	fs::create_directories(schemeFolder);
 
-	if(target=="osx"){
-		for (auto & f : { string("Release"), string("Debug") }) {
-			auto fileFrom = templatePath / ("emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample " + f + ".xcscheme");
-			auto fileTo = schemeFolder / (projectName + " " +f+ ".xcscheme");
-			fs::copy(fileFrom, fileTo);
-			findandreplaceInTexfile(fileTo, "emptyExample", projectName);
+	if (target == "osx") {
+		for (auto & f : { "Release", "Debug" }) {
+			copyTemplateFiles.push_back({
+				templatePath / ("emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample " + string(f) + ".xcscheme"),
+				schemeFolder / (projectName + " " +f+ ".xcscheme"),
+				{{ "emptyExample", projectName }}
+			});
 		}
 
-		auto fileTo = projectDir / (projectName + ".xcodeproj/project.xcworkspace");
-		auto fileFrom = templatePath / "emptyExample.xcodeproj/project.xcworkspace";
-		fs::copy(fileFrom, fileTo);
-	}else{
+		copyTemplateFiles.push_back({
+			projectDir / (projectName + ".xcodeproj/project.xcworkspace"),
+			templatePath / "emptyExample.xcodeproj/project.xcworkspace"
+		});
+	} else {
 
 		// MARK:- IOS sector;
-		auto fileFrom = templatePath / "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme";
-		auto fileTo = schemeFolder / (projectName + ".xcscheme");
-		fs::copy(fileFrom, fileTo);
-		findandreplaceInTexfile(fileTo, "emptyExample", projectName);
+		copyTemplateFiles.push_back({
+			templatePath / "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme",
+			schemeFolder / (projectName + ".xcscheme"),
+			{{ "emptyExample", projectName }}
+		});
 	}
 }
 
@@ -749,11 +759,14 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 //		}
 		addCommand("Add :objects:"+UUID+":fileEncoding string 4");
 		addCommand("Add :objects:"+UUID+":isa string PBXFileReference");
-//		addCommand("Add :objects:"+UUID+":sourceTree string <group>");
-		addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
 		addCommand("Add :objects:"+UUID+":lastKnownFileType string " + fileType);
-		addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
 		addCommand("Add :objects:"+UUID+":name string " + ofPathToString(path.filename()));
+		if (fp.absolute) {
+			addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
+			addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
+		} else {
+			addCommand("Add :objects:"+UUID+":sourceTree string <group>");
+		}
 
 		string folderUUID;
 		if (fp.isSrc) {
