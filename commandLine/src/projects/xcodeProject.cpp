@@ -680,7 +680,7 @@ void xcodeProject::addCommand(const string & command) {
 }
 
 string xcodeProject::addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp) {
-	alert("addFile " + ofPathToString(path) + " : " + ofPathToString(folder) , 31);
+	//alert("addFile " + ofPathToString(path) + " : " + ofPathToString(folder) , 31);
 
 	string UUID = "";
 	std::map<fs::path, string> extensionToFileType {
