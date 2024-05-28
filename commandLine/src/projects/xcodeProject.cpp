@@ -386,7 +386,7 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder){
 //	alert ("isSystem? " + ofToString(isSystemFramework), 31);
 	
 	fileProperties fp;
-	fp.addToBuildPhase = true;
+//	fp.addToBuildPhase = true;
 	fp.codeSignOnCopy = !isSystemFramework;
 	fp.copyFilesBuildPhase = !isSystemFramework;
 	fp.frameworksBuildPhase = (target != "ios" && !folder.empty());
@@ -421,7 +421,7 @@ void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder
 	}
 	
 	fileProperties fp;
-	fp.addToBuildPhase = true;
+//	fp.addToBuildPhase = true;
 	fp.codeSignOnCopy = !isSystemFramework;
 	fp.copyFilesBuildPhase = !isSystemFramework;
 	fp.frameworksBuildPhase = (target != "ios" && !folder.empty());
