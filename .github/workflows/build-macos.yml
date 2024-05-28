@@ -48,27 +48,26 @@ jobs:
             echo "release=bleeding" >> $GITHUB_ENV
             echo "prerelease=true" >> $GITHUB_ENV
           fi
-      - name: Build PG macOS GUI and command line
+      - name: PWD and LS
         run: |
           echo "Current directory: (should be projectGenerator)"
           pwd
-          echo "##[group]Directory contents:"
+          echo "Directory contents:"
           ls
-          echo "##[endgroup]"
-
-          echo "##[group]Setup CI setup environment / checkout oF "
+      - name: Setup CI setup environment / checkout oF
+        run: |
           ./scripts/osx/ci_install_core.sh
-          echo "##[endgroup]"
-      
-          echo "Current directory after moving up: (should be projectGenerator/projectGenerator)"
-          pwd
-          cd ../
+      - name: Build PG macOS GUI and command line
+        run: |
+          # echo "Current directory after moving up: (should be projectGenerator/projectGenerator)"
+          # pwd
+          # cd ../
 
-          echo "Current directory after moving up: (should be projectGenerator/)"
-          echo "------------------"
-          pwd
-          ls
-          echo "------------------"
+          # echo "Current directory after moving up: (should be projectGenerator/)"
+          # echo "------------------"
+          # pwd
+          # ls
+          # echo "------------------"
           if [ -f "openFrameworks/apps/projectGenerator/scripts/osx/ci_build_pg.sh" ]; then
             echo "##[group]ci_build_pg.sh exists, running script..."
             openFrameworks/apps/projectGenerator/scripts/osx/ci_build_pg.sh
