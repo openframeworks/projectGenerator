@@ -314,7 +314,6 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 
 void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type){
 //	alert ("addSrc " + ofPathToString(srcFile) + " : " + ofPathToString(folder), 31);
-//	cout << "xcodeProject::addSrc " << srcFile << " : " << folder << endl;
 	string ext = ofPathToString(srcFile.extension());
 
 //		.reference = true,
@@ -330,9 +329,6 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 	fp.isSrc = true;
 	
 	if( type == DEFAULT ){
-//		if ( ext == ".cpp" || ext == ".cc" || ext == ".cxx" || ext == ".c" ) {
-//			addToResources = false;
-//		}
 		if (ext == ".h" || ext == ".hpp"){
 			fp.addToBuildPhase = false;
 		}
@@ -372,7 +368,6 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder){
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
 
 	addCommand("# ----- addFramework path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
-//	alert("# ----- addFramework path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
 	
 	bool isSystemFramework = true;
 	if (!folder.empty() && !ofIsStringInString(ofPathToString(path), "/System/Library/Frameworks")
@@ -380,21 +375,16 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder){
 		isSystemFramework = false;
 	}
 	
-//	alert ("isSystem? " + ofToString(isSystemFramework), 31);
-	
 	fileProperties fp;
-//	fp.addToBuildPhase = true;
 	fp.codeSignOnCopy = !isSystemFramework;
 	fp.copyFilesBuildPhase = !isSystemFramework;
 	fp.frameworksBuildPhase = (target != "ios" && !folder.empty());
 
-	// alert( "xcodeProject::addFramework " + ofPathToString(path) + " : " + ofToString(fp.frameworksBuildPhase) , 33);
 	string UUID {
 		addFile(path, folder, fp)
 	};
 
 	addCommand("# ----- FRAMEWORK_SEARCH_PATHS");
-
 	string parent { ofPathToString(path.parent_path()) };
 
 	for (auto & c : buildConfigs) {
@@ -410,7 +400,6 @@ void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
 	
 	addCommand("# ----- addXCFramework path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
-	
 	
 	bool isSystemFramework = false;
 	if (!folder.empty() && !ofIsStringInString(ofPathToString(path), "/System/Library/Frameworks")
@@ -429,28 +418,11 @@ void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder
 	};
 
 	addCommand("# ----- XCFRAMEWORK_SEARCH_PATHS");
-
 	string parent { ofPathToString(path.parent_path()) };
 
 	for (auto & c : buildConfigs) {
 		addCommand("Add :objects:" + c + ":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + parent);
 	}
-
-//	if (!folder.empty()) {
-//		// add it to the linking phases...
-//		// PBXFrameworksBuildPhase
-//		// https://www.rubydoc.info/gems/xcodeproj/Xcodeproj/Project/Object/PBXFrameworksBuildPhase
-//		// The phase responsible on linking with frameworks. Known as ‘Link Binary With Libraries` in the UI.
-//
-//		// This is what was missing. a reference in root objects to the framework, so we can add the reference to PBXFrameworksBuildPhase
-//		auto tempUUID = generateUUID(name + "-InFrameworks");
-//		addCommand("Add :objects:" + tempUUID + ":fileRef string " + UUID);
-//		addCommand("Add :objects:" + tempUUID + ":isa string PBXBuildFile");
-//
-//		addCommand("# --- PBXFrameworksBuildPhase");
-//		addCommand("Add :objects:E4B69B590A3A1756003C02F2:files: string " + tempUUID);
-//	}
-
 }
 
 
@@ -472,14 +444,12 @@ void xcodeProject::addDylib(const fs::path & path, const fs::path & folder){
 void xcodeProject::addInclude(string includeName){
 	//alert("addInclude " + includeName);
 	for (auto & c : buildConfigs) {
-		string s = "Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName;
 		addCommand("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
 	}
 }
 
 void xcodeProject::addLibrary(const LibraryBinary & lib){
 //	alert( "xcodeProject::addLibrary " + lib.path , 33);
-	//	alert("addLibrary " + lib.path , 35);
 	for (auto & c : buildConfigs) {
 		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + lib.path);
 	}
@@ -494,7 +464,6 @@ void xcodeProject::addLDFLAG(string ldflag, LibType libType){
 
 void xcodeProject::addCFLAG(string cflag, LibType libType){
 	//alert("xcodeProject::addCFLAG " + cflag);
-	//addCommand("Add :objects:"+c+":buildSettings:OTHER_CFLAGS array");
 	for (auto & c : buildConfigs) {
 		// FIXME: add array here if it doesnt exist
 		addCommand("Add :objects:"+c+":buildSettings:OTHER_CFLAGS: string " + cflag);
@@ -531,7 +500,6 @@ void xcodeProject::addAfterRule(string rule){
 	// ofStringReplace(rule, "\"", "\\\"");
 	// addCommand("Add :objects:"+afterPhaseUUID+":shellScript string \"" + rule + "\"");
 	addCommand("Add :objects:"+afterPhaseUUID+":shellScript string " + rule);
-
 
 	// adding this phase to build phases array
 	// TODO: Check if nit needs another buildConfigurationListUUID for debug.
@@ -733,7 +701,6 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 //	alert("codeSignOnCopy " + ofToString(fp.codeSignOnCopy));
 //	alert("copyFilesBuildPhase " + ofToString(fp.copyFilesBuildPhase));
 
-
 	string UUID = "";
 	std::map<fs::path, string> extensionToFileType {
 		{ ".framework" , "wrapper.framework" },
@@ -753,7 +720,6 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		{ ".xcconfig" , "text.xcconfig" },
 	};
 	
-	
 //	cout << "will check if exists " << (projectDir / path) << endl;
 	if (fs::exists( projectDir / path )) {
 //		cout << "OK exists" << endl;
@@ -772,7 +738,6 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 
 		UUID = generateUUID(path);
 		
-//		debugCommands = true;
 		addCommand("");
 		addCommand("# -- addFile " + ofPathToString(path));
 
@@ -831,8 +796,8 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 				fp.codeSignOnCopy ||
 				fp.copyFilesBuildPhase ||
 				fp.addToBuildResource ||
-				fp.addToResources ||
-				fp.frameworksBuildPhase
+				fp.addToResources 
+				//|| fp.frameworksBuildPhase ~ I've just removed this one, favoring -InFrameworks
 			) {
 			addCommand("# ---- addToBuildPhase " + buildUUID);
 			addCommand("Add :objects:"+buildUUID+":isa string PBXBuildFile");
@@ -878,21 +843,12 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		}
 		
 		if (fp.frameworksBuildPhase) { // Link Binary With Libraries
-			string buildUUID { generateUUID(ofPathToString(path) + "-build") };
-			addCommand("# ---- addToBuildPhase " + buildUUID);
-			addCommand("Add :objects:"+buildUUID+":isa string PBXBuildFile");
-			addCommand("Add :objects:"+buildUUID+":fileRef string "+UUID);
-
 			auto tempUUID = generateUUID(ofPathToString(path) + "-InFrameworks");
 			addCommand("Add :objects:" + tempUUID + ":fileRef string " + UUID);
 			addCommand("Add :objects:" + tempUUID + ":isa string PBXBuildFile");
-//
+
 			addCommand("# --- PBXFrameworksBuildPhase");
 			addCommand("Add :objects:E4B69B590A3A1756003C02F2:files: string " + tempUUID);
-
-
-			//  addCommand("# ---- frameworksBuildPhase " + buildUUID);
-			//  addCommand("Add :objects:E4B69B590A3A1756003C02F2:files: string " + buildUUID);
 		}
 		
 		if (path.extension() == ".framework") {
@@ -902,8 +858,6 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 			addCommand("# ---- PBXFrameworksBuildPhase " + buildUUID);
 			addCommand("Add :objects:1D60588F0D05DD3D006BFB54:files: string " + buildUUID);
 		}
-		
-		
 		debugCommands = false;
 	}
 	return UUID;
