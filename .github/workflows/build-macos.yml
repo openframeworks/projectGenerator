@@ -69,9 +69,8 @@ jobs:
           # ls
           # echo "------------------"
           if [ -f "openFrameworks/apps/projectGenerator/scripts/osx/ci_build_pg.sh" ]; then
-            echo "##[group]ci_build_pg.sh exists, running script..."
+            echo "ci_build_pg.sh exists, running script..."
             openFrameworks/apps/projectGenerator/scripts/osx/ci_build_pg.sh
-            echo "##[endgroup]"
 
           else
             echo "ci_build_pg.sh does not exist, checking Git status..."
