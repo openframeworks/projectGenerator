@@ -17,9 +17,9 @@ xcodeProject::xcodeProject(const string & target) : baseProject(target){
 		folderUUID = {
 			{ "src", 			"E4B69E1C0A3A1BDC003C02F2" },
 			{ "addons", 		"BB4B014C10F69532006C3DED" },
-			{ "openFrameworks", 		"191EF70929D778A400F35F26" },
-			// { "localAddons",	"6948EE371B920CB800B5AC1A" },
+			{ "openFrameworks", "191EF70929D778A400F35F26" },
 			{ "", 				"E4B69B4A0A3A1720003C02F2" }
+			// { "localAddons",	"6948EE371B920CB800B5AC1A" },
 		};
 
 		buildConfigurationListUUID = "E4B69B5A0A3A1756003C02F2";
@@ -47,8 +47,8 @@ xcodeProject::xcodeProject(const string & target) : baseProject(target){
 		folderUUID = {
 			{ "src", 			"E4D8936A11527B74007E1F53" },
 			{ "addons", 		"BB16F26B0F2B646B00518274" },
-			// { "localAddons", 	"6948EE371B920CB800B5AC1A" },
 			{ "", 				"29B97314FDCFA39411CA2CEA" }
+			// { "localAddons", 	"6948EE371B920CB800B5AC1A" },
 		};
 
 		buildConfigurationListUUID = "1D6058900D05DD3D006BFB54"; //check
@@ -71,47 +71,33 @@ bool xcodeProject::createProjectFile(){
 	}
 	fs::create_directories(xcodeProject);
 
+	// if project is outside OF, rootReplacements is set to be used in XCode and make
+	if (!fs::equivalent(getOFRoot(), fs::path{"../../.."})) {
+		string root { ofPathToString(getOFRoot()) };
+		rootReplacements = { "../../..", root };
+	}
+	
 	copyTemplateFiles.push_back({
 		templatePath / "emptyExample.xcodeproj" / "project.pbxproj",
 		xcodeProject / "project.pbxproj",
-		{{ "emptyExample", projectName }}
+		{{ "emptyExample", projectName },
+		rootReplacements }
 	});
 
 	copyTemplateFiles.push_back({
 		templatePath / "Project.xcconfig",
-		projectDir / "Project.xcconfig"
+		projectDir / "Project.xcconfig",
+		{ rootReplacements }
 	});
-
-	for (auto & c : copyTemplateFiles) {
-		c.run();
-	}
-
-	fs::path binDirectory { projectDir / "bin" };
-	fs::path dataDir { binDirectory / "data" };
-
-	if (!fs::exists(binDirectory)) {
-		cout << "creating dataDir " << dataDir << endl;
-		fs::create_directories(dataDir);
-	}
-
-	if (fs::exists(binDirectory)) {
-		// originally only on IOS
-		//this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
-		// TODO: Test on IOS
-		fs::path srcDataDir { templatePath / "bin" / "data" };
-		if (fs::exists(srcDataDir) && fs::is_directory(srcDataDir)) {
-			baseProject::recursiveCopyContents(srcDataDir, dataDir);
-		}
-	}
-
-	if( target == "osx" ){
+	
+	if (target == "osx") {
 		// TODO: TEST
 		for (auto & f : { "openFrameworks-Info.plist", "of.entitlements" }) {
-			fs::copy(templatePath / f, projectDir / f, fs::copy_options::overwrite_existing);
+			copyTemplateFiles.push_back({ templatePath / f, projectDir / f });
 		}
-	}else{
+	} else {
 		for (auto & f : { "ofxiOS-Info.plist", "ofxiOS_Prefix.pch" }) {
-			fs::copy(templatePath / f, projectDir / f, fs::copy_options::overwrite_existing);
+			copyTemplateFiles.push_back({ templatePath / f, projectDir / f });
 		}
 
 		fs::path from = templatePath / "mediaAssets";
@@ -123,44 +109,45 @@ bool xcodeProject::createProjectFile(){
 
 	saveScheme();
 
-	if(target=="osx"){
+	if(target == "osx"){
 		saveMakefile();
 	}
+	
+	// Execute all file copy and replacements, including ones in saveScheme, saveMakefile
+	for (auto & c : copyTemplateFiles) {
+		c.run();
+	}
+	
+	
+	
+	// NOW only files being copied
+	
+	fs::path projectDataDir { projectDir / "bin" / "data" };
 
-	// Calculate OF Root in relation to each project (recursively);
-//	fs::path relRoot { getOFRoot() };
+	if (!fs::exists(projectDataDir)) {
+		cout << "creating dataDir " << projectDataDir << endl;
+		fs::create_directories(projectDataDir);
+	}
 
-//	// FIXME: maybe not needed anymore
-//	if (ofIsPathInPath(projectDir, getOFRoot())) {
-//		setOFRoot(fs::relative(getOFRoot(), projectDir));
-////		relRoot = fs::relative(getOFRoot(), projectDir);
-////		alert ("relRoot = " + relRoot.string());
-//	} else {
-////		alert ("ofIsPathInPath not");
-//	}
-
+	if (fs::exists(projectDataDir)) {
+		// originally only on IOS
+		//this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
+		// TODO: Test on IOS
+		fs::path templateDataDir { templatePath / "bin" / "data" };
+		if (fs::exists(templateDataDir) && fs::is_directory(templateDataDir)) {
+			baseProject::recursiveCopyContents(templateDataDir, projectDataDir);
+		}
+	}
 
 	addCommand("# ---- PG VERSION " + getPGVersion());
 	addCommand("Add :openFrameworksProjectGeneratorVersion string " + getPGVersion());
 
 	fileProperties fp;
 	addFile("App.xcconfig", "", fp);
+
+	fp.absolute = true;
 	addFile(fs::path{"bin"} / "data", "", fp);
 
-
-	if (!fs::equivalent(getOFRoot(), fs::path{"../../.."})) {
-		string root { ofPathToString(getOFRoot()) }; 
-//		alert ("fs not equivalent to ../../.. root = " + root);
-		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", root);
-		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", root);
-		if( target == "osx" ){
-			findandreplaceInTexfile(projectDir / "Makefile", "../../..", root);
-			// MARK: not needed because baseProject::save() does the same
-//			findandreplaceInTexfile(projectDir / "config.make", "../../..", root);
-		}
-	} else {
-//		alert ("fs equivalent " + relRoot.string());
-	}
 	return true;
 }
 
@@ -173,38 +160,43 @@ void xcodeProject::saveScheme(){
 	}
 	fs::create_directories(schemeFolder);
 
-	if(target=="osx"){
-		for (auto & f : { string("Release"), string("Debug") }) {
-			auto fileFrom = templatePath / ("emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample " + f + ".xcscheme");
-			auto fileTo = schemeFolder / (projectName + " " +f+ ".xcscheme");
-			fs::copy(fileFrom, fileTo);
-			findandreplaceInTexfile(fileTo, "emptyExample", projectName);
+	if (target == "osx") {
+		for (auto & f : { "Release", "Debug" }) {
+			copyTemplateFiles.push_back({
+				templatePath / ("emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample " + string(f) + ".xcscheme"),
+				schemeFolder / (projectName + " " +f+ ".xcscheme"),
+				{{ "emptyExample", projectName }}
+			});
 		}
 
-		auto fileTo = projectDir / (projectName + ".xcodeproj/project.xcworkspace");
-		auto fileFrom = templatePath / "emptyExample.xcodeproj/project.xcworkspace";
-		fs::copy(fileFrom, fileTo);
-	}else{
+		copyTemplateFiles.push_back({
+			projectDir / (projectName + ".xcodeproj/project.xcworkspace"),
+			templatePath / "emptyExample.xcodeproj/project.xcworkspace"
+		});
+	} else {
 
 		// MARK:- IOS sector;
-		auto fileFrom = templatePath / "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme";
-		auto fileTo = schemeFolder / (projectName + ".xcscheme");
-		fs::copy(fileFrom, fileTo);
-		findandreplaceInTexfile(fileTo, "emptyExample", projectName);
+		copyTemplateFiles.push_back({
+			templatePath / "emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample.xcscheme",
+			schemeFolder / (projectName + ".xcscheme"),
+			{{ "emptyExample", projectName }}
+		});
 	}
 }
 
 void xcodeProject::saveMakefile(){
 //	alert ("saveMakefile " , 35);
-	for (auto & f : { "Makefile", "config.make" }) {
-		fs::path fileFrom = templatePath / f;
-		fs::path fileTo = projectDir / f;
-		// Always overwrite for now, so we can have the original file from template before substituting anything
-		// if (!fs::exists(fileTo))
-		{
-			fs::copy(fileFrom, fileTo, fs::copy_options::overwrite_existing);
-		}
-	}
+	copyTemplateFiles.push_back({
+		templatePath / "Makefile",
+		projectDir / "Makefile",
+		{ rootReplacements }
+	});
+	copyTemplateFiles.push_back({
+		templatePath / "config.make",
+		projectDir / "config.make"
+	});
+
+
 }
 
 bool xcodeProject::loadProjectFile(){ //base
@@ -286,8 +278,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 					
 					if (folder.begin()->string() == "addons") {
 						addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
-//						fs::path addonFolder = fs::relative(fullPath, "addons");
-						fs::path addonFolder = fs::path(fullPath).filename();
+						fs::path addonFolder { fs::path(fullPath).filename() };
 						addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(addonFolder));
 						// alert ("group " + folder.string() + " : " + base.string() + " : " + addonFolder.string(), 32);
 					} else {
@@ -749,11 +740,14 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 //		}
 		addCommand("Add :objects:"+UUID+":fileEncoding string 4");
 		addCommand("Add :objects:"+UUID+":isa string PBXFileReference");
-//		addCommand("Add :objects:"+UUID+":sourceTree string <group>");
-		addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
 		addCommand("Add :objects:"+UUID+":lastKnownFileType string " + fileType);
-		addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
 		addCommand("Add :objects:"+UUID+":name string " + ofPathToString(path.filename()));
+		if (fp.absolute) {
+			addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
+			addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
+		} else {
+			addCommand("Add :objects:"+UUID+":sourceTree string <group>");
+		}
 
 		string folderUUID;
 		if (fp.isSrc) {
