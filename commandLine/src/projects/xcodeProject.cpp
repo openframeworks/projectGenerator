@@ -289,9 +289,10 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 					
 					if (folder.begin()->string() == "addons") {
 						commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string <group>");
-						fs::path addonFolder = fs::relative(folder, "addons");
+//						fs::path addonFolder = fs::relative(fullPath, "addons");
+						fs::path addonFolder = fs::path(fullPath).filename();
 						commands.emplace_back("Add :objects:"+thisUUID+":path string " + ofPathToString(addonFolder));
-//						alert ("group " + folder.string() + " : " + base.string() + " : " + addonFolder.string(), 32);
+						alert ("group " + folder.string() + " : " + base.string() + " : " + addonFolder.string(), 32);
 					} else {
 						commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
 					}
