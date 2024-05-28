@@ -71,6 +71,7 @@ bool xcodeProject::createProjectFile(){
 	}
 	fs::create_directories(xcodeProject);
 
+	// if project is outside OF, rootReplacements is set to be used in XCode and make
 	if (!fs::equivalent(getOFRoot(), fs::path{"../../.."})) {
 		string root { ofPathToString(getOFRoot()) };
 		rootReplacements = { "../../..", root };
@@ -82,9 +83,6 @@ bool xcodeProject::createProjectFile(){
 		{{ "emptyExample", projectName },
 		rootReplacements }
 	});
-	
-//	findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", root);
-
 
 	copyTemplateFiles.push_back({
 		templatePath / "Project.xcconfig",
@@ -115,27 +113,11 @@ bool xcodeProject::createProjectFile(){
 		saveMakefile();
 	}
 	
+	// Execute all file copy and replacements, including ones in saveScheme, saveMakefile
 	for (auto & c : copyTemplateFiles) {
 		c.run();
 	}
 	
-	
-//	if (!fs::equivalent(getOFRoot(), fs::path{"../../.."})) {
-//		string root { ofPathToString(getOFRoot()) };
-////		alert ("fs not equivalent to ../../.. root = " + root);
-//		rootReplacements = { "../../..", root };
-//		
-////		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", root);
-////		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", root);
-//		if( target == "osx" ){
-//			findandreplaceInTexfile(projectDir / "Makefile", "../../..", root);
-//			// MARK: not needed because baseProject::save() does the same
-////			findandreplaceInTexfile(projectDir / "config.make", "../../..", root);
-//		}
-//	} else {
-////		alert ("fs equivalent " + relRoot.string());
-//	}
-//	
 	
 	
 	// NOW only files being copied
@@ -165,7 +147,6 @@ bool xcodeProject::createProjectFile(){
 
 	fp.absolute = true;
 	addFile(fs::path{"bin"} / "data", "", fp);
-
 
 	return true;
 }
@@ -297,8 +278,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 					
 					if (folder.begin()->string() == "addons") {
 						addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
-//						fs::path addonFolder = fs::relative(fullPath, "addons");
-						fs::path addonFolder = fs::path(fullPath).filename();
+						fs::path addonFolder { fs::path(fullPath).filename() };
 						addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(addonFolder));
 						// alert ("group " + folder.string() + " : " + base.string() + " : " + addonFolder.string(), 32);
 					} else {
