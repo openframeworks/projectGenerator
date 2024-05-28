@@ -52,10 +52,13 @@ jobs:
         run: |
           echo "Current directory: (should be projectGenerator)"
           pwd
-          echo "Directory contents:"
+          echo "##[group]Directory contents:"
           ls
-          echo "Setup CI setup environment / checkout oF "
+          echo "##[endgroup]"
+
+          echo "##[group]Setup CI setup environment / checkout oF "
           ./scripts/osx/ci_install_core.sh
+          echo "##[endgroup]"
       
           echo "Current directory after moving up: (should be projectGenerator/projectGenerator)"
           pwd
@@ -67,8 +70,10 @@ jobs:
           ls
           echo "------------------"
           if [ -f "openFrameworks/apps/projectGenerator/scripts/osx/ci_build_pg.sh" ]; then
-            echo "ci_build_pg.sh exists, running script..."
+            echo "##[group]ci_build_pg.sh exists, running script..."
             openFrameworks/apps/projectGenerator/scripts/osx/ci_build_pg.sh
+            echo "##[endgroup]"
+
           else
             echo "ci_build_pg.sh does not exist, checking Git status..."
             if cd openFrameworks/apps/projectGenerator; then
