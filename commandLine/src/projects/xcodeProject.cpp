@@ -280,11 +280,6 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 					fs::path addonFolder { fs::path(fullPath).filename() };
 					addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(addonFolder));
 
-//					if (folder.begin()->string() == "addons") {
-//					} else {
-//						addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
-//					}
-
 					// And this new object is cointained in parent hierarchy, or even projRootUUID
 					addCommand("Add :objects:"+lastFolderUUID+":children: string " + thisUUID);
 
@@ -673,7 +668,6 @@ bool xcodeProject::saveProjectFile(){
 	}
 
 //	for (auto & c : commands) cout << c << endl;
-
 	return true;
 }
 
@@ -687,10 +681,6 @@ void xcodeProject::addCommand(const string & command) {
 
 string xcodeProject::addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp) {
 	alert("addFile " + ofPathToString(path) + " : " + ofPathToString(folder) , 31);
-//	alert("reference " + ofToString(fp.reference));
-//	alert("addToBuildPhase " + ofToString(fp.addToBuildPhase));
-//	alert("codeSignOnCopy " + ofToString(fp.codeSignOnCopy));
-//	alert("copyFilesBuildPhase " + ofToString(fp.copyFilesBuildPhase));
 
 	string UUID = "";
 	std::map<fs::path, string> extensionToFileType {
