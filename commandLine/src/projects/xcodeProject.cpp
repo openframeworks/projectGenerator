@@ -71,22 +71,19 @@ bool xcodeProject::createProjectFile(){
 	}
 	fs::create_directories(xcodeProject);
 
-	fs::path fileFrom = templatePath / "emptyExample.xcodeproj" / "project.pbxproj";
-	fs::path fileTo = xcodeProject / "project.pbxproj";
-	try {
-		fs::copy_file(fileFrom, fileTo, fs::copy_options::overwrite_existing);
-	} catch(fs::filesystem_error& e) {
-		std::cout << "Could not copy " << fileFrom << " > " << fileTo << " :: " << e.what() << std::endl;
-	}
-	findandreplaceInTexfile(fileTo, "emptyExample", projectName);
+	copyTemplateFiles.push_back({
+		templatePath / "emptyExample.xcodeproj" / "project.pbxproj",
+		xcodeProject / "project.pbxproj",
+		{{ "emptyExample", projectName }}
+	});
 
+	copyTemplateFiles.push_back({
+		templatePath / "Project.xcconfig",
+		projectDir / "Project.xcconfig"
+	});
 
-	fileFrom = templatePath / "Project.xcconfig";
-	fileTo = projectDir / "Project.xcconfig";
-	try {
-		fs::copy_file(fileFrom, fileTo, fs::copy_options::overwrite_existing);
-	} catch(fs::filesystem_error& e) {
-		std::cout << "Could not copy " << fileFrom << " > " << fileTo << " :: "  << e.what() << std::endl;
+	for (auto & c : copyTemplateFiles) {
+		c.run();
 	}
 
 	fs::path binDirectory { projectDir / "bin" };
@@ -143,8 +140,8 @@ bool xcodeProject::createProjectFile(){
 //	}
 
 
-	commands.emplace_back("# ---- PG VERSION " + getPGVersion());
-	commands.emplace_back("Add :openFrameworksProjectGeneratorVersion string " + getPGVersion());
+	addCommand("# ---- PG VERSION " + getPGVersion());
+	addCommand("Add :openFrameworksProjectGeneratorVersion string " + getPGVersion());
 
 	fileProperties fp;
 	addFile("App.xcconfig", "", fp);
@@ -218,18 +215,19 @@ bool xcodeProject::loadProjectFile(){ //base
 
 void xcodeProject::renameProject(){ //base
 	// FIXME: review BUILT_PRODUCTS_DIR
-	commands.emplace_back("Set :objects:"+buildConfigurationListUUID+":name " + projectName);
+	addCommand("Set :objects:"+buildConfigurationListUUID+":name " + projectName);
 
 	// Just OSX here, debug app naming.
 	if( target == "osx" ){
 		// TODO: Hardcode to variable
 		// FIXME: Debug needed in name?
-		commands.emplace_back("Set :objects:E4B69B5B0A3A1756003C02F2:path " + projectName + "Debug.app");
+		addCommand("Set :objects:E4B69B5B0A3A1756003C02F2:path " + projectName + "Debug.app");
 	}
 }
 
 string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::path base) {
-//	alert ("xcodeProject::getFolderUUID " + folder.string() + " : base=" + base.string());
+//	alert ("xcodeProject::getFolderUUID " + folder.string() + " : isfolder=" + ofToString(isFolder) + " : base=" + base.string());
+//	alert ("xcodeProject::getFolderUUID " + folder.begin()->string() + " : base=" + base.string());
 	/*
 	TODO: Change key of folderUUID to base + folder, so "src" in additional source folders
 	doesn't get confused with "src" from project.
@@ -242,6 +240,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 	// If folder UUID exists just return it.
 	// in this case it is not found, so it creates UUID for the entire path
 	if ( folderUUID.find(folder) == folderUUID.end() ) { // NOT FOUND
+//		alert ("xcodeProject::getFolderUUID " + folder.string() + " : isfolder=" + ofToString(isFolder) + " : base=" + base.string());
 		vector < string > folders = ofSplitString(ofPathToString(folder), "/", true);
 		string lastFolderUUID = projRootUUID;
 
@@ -258,8 +257,8 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 					folderUUID[fullPath] = thisUUID;
 
 					// here we add an UUID for the group (folder) and we initialize an array to receive children (files or folders inside)
-					commands.emplace_back("");
-					commands.emplace_back("Add :objects:"+thisUUID+":name string " + folders[a]);
+					addCommand("");
+					addCommand("Add :objects:"+thisUUID+":name string " + folders[a]);
 					if (isFolder) {
 						fs::path filePath;
 						fs::path filePath_full { relRoot / fullPath };
@@ -273,7 +272,8 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 						}
 
 						if (!filePath.empty()) {
-							commands.emplace_back("Add :objects:"+thisUUID+":path string " + ofPathToString(filePath));
+							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(filePath));
+//							alert(commands.back(), 33);
 						} else {
 //							cout << ">>>>> filePath empty " << endl;
 						}
@@ -281,13 +281,21 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 //						cout << "isFolder false" << endl;
 					}
 
-					commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
-					commands.emplace_back("Add :objects:"+thisUUID+":children array");
-//					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string <group>");
-					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
+					addCommand("Add :objects:"+thisUUID+":isa string PBXGroup");
+					addCommand("Add :objects:"+thisUUID+":children array");
+					
+					if (folder.begin()->string() == "addons") {
+						addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
+//						fs::path addonFolder = fs::relative(fullPath, "addons");
+						fs::path addonFolder = fs::path(fullPath).filename();
+						addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(addonFolder));
+						// alert ("group " + folder.string() + " : " + base.string() + " : " + addonFolder.string(), 32);
+					} else {
+						addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
+					}
 
 					// And this new object is cointained in parent hierarchy, or even projRootUUID
-					commands.emplace_back("Add :objects:"+lastFolderUUID+":children: string " + thisUUID);
+					addCommand("Add :objects:"+lastFolderUUID+":children: string " + thisUUID);
 
 					// keep this UUID as parent for the next folder.
 					lastFolderUUID = thisUUID;
@@ -305,11 +313,9 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 }
 
 void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type){
-//	cout << "xcodeProject::addSrc " << srcFile << " : " << folder << endl;
+//	alert ("addSrc " + ofPathToString(srcFile) + " : " + ofPathToString(folder), 31);
 	string ext = ofPathToString(srcFile.extension());
 
-	
-//	{
 //		.reference = true,
 //		.addToBuildPhase = true,
 //		.codeSignOnCopy = false,
@@ -317,15 +323,12 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 //		.linkBinaryWithLibraries = false,
 //		.addToBuildResource = false,
 //		.addToResources = false,
-//	};
+
 	fileProperties fp;
 	fp.addToBuildPhase = true;
 	fp.isSrc = true;
 	
 	if( type == DEFAULT ){
-//		if ( ext == ".cpp" || ext == ".cc" || ext == ".cxx" || ext == ".c" ) {
-//			addToResources = false;
-//		}
 		if (ext == ".h" || ext == ".hpp"){
 			fp.addToBuildPhase = false;
 		}
@@ -365,7 +368,6 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder){
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
 
 	addCommand("# ----- addFramework path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
-//	alert("# ----- addFramework path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
 	
 	bool isSystemFramework = true;
 	if (!folder.empty() && !ofIsStringInString(ofPathToString(path), "/System/Library/Frameworks")
@@ -373,24 +375,20 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder){
 		isSystemFramework = false;
 	}
 	
-//	alert ("isSystem? " + ofToString(isSystemFramework), 31);
-	
 	fileProperties fp;
-	fp.addToBuildPhase = true;
 	fp.codeSignOnCopy = !isSystemFramework;
 	fp.copyFilesBuildPhase = !isSystemFramework;
 	fp.frameworksBuildPhase = (target != "ios" && !folder.empty());
-	
+
 	string UUID {
 		addFile(path, folder, fp)
 	};
 
-	commands.emplace_back("# ----- FRAMEWORK_SEARCH_PATHS");
-
+	addCommand("# ----- FRAMEWORK_SEARCH_PATHS");
 	string parent { ofPathToString(path.parent_path()) };
 
 	for (auto & c : buildConfigs) {
-		commands.emplace_back("Add :objects:" + c + ":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + parent);
+		addCommand("Add :objects:" + c + ":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + parent);
 	}
 }
 
@@ -403,7 +401,6 @@ void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder
 	
 	addCommand("# ----- addXCFramework path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
 	
-	
 	bool isSystemFramework = false;
 	if (!folder.empty() && !ofIsStringInString(ofPathToString(path), "/System/Library/Frameworks")
 		&& target != "ios"){
@@ -411,7 +408,7 @@ void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder
 	}
 	
 	fileProperties fp;
-	fp.addToBuildPhase = true;
+//	fp.addToBuildPhase = true;
 	fp.codeSignOnCopy = !isSystemFramework;
 	fp.copyFilesBuildPhase = !isSystemFramework;
 	fp.frameworksBuildPhase = (target != "ios" && !folder.empty());
@@ -420,29 +417,12 @@ void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder
 		addFile(path, folder, fp)
 	};
 
-	commands.emplace_back("# ----- XCFRAMEWORK_SEARCH_PATHS");
-
+	addCommand("# ----- XCFRAMEWORK_SEARCH_PATHS");
 	string parent { ofPathToString(path.parent_path()) };
 
 	for (auto & c : buildConfigs) {
-		commands.emplace_back("Add :objects:" + c + ":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + parent);
+		addCommand("Add :objects:" + c + ":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + parent);
 	}
-
-//	if (!folder.empty()) {
-//		// add it to the linking phases...
-//		// PBXFrameworksBuildPhase
-//		// https://www.rubydoc.info/gems/xcodeproj/Xcodeproj/Project/Object/PBXFrameworksBuildPhase
-//		// The phase responsible on linking with frameworks. Known as ‘Link Binary With Libraries` in the UI.
-//
-//		// This is what was missing. a reference in root objects to the framework, so we can add the reference to PBXFrameworksBuildPhase
-//		auto tempUUID = generateUUID(name + "-InFrameworks");
-//		commands.emplace_back("Add :objects:" + tempUUID + ":fileRef string " + UUID);
-//		commands.emplace_back("Add :objects:" + tempUUID + ":isa string PBXBuildFile");
-//
-//		commands.emplace_back("# --- PBXFrameworksBuildPhase");
-//		commands.emplace_back("Add :objects:E4B69B590A3A1756003C02F2:files: string " + tempUUID);
-//	}
-
 }
 
 
@@ -464,39 +444,36 @@ void xcodeProject::addDylib(const fs::path & path, const fs::path & folder){
 void xcodeProject::addInclude(string includeName){
 	//alert("addInclude " + includeName);
 	for (auto & c : buildConfigs) {
-		string s = "Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName;
-		commands.emplace_back("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
+		addCommand("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
 	}
 }
 
 void xcodeProject::addLibrary(const LibraryBinary & lib){
 //	alert( "xcodeProject::addLibrary " + lib.path , 33);
-	//	alert("addLibrary " + lib.path , 35);
 	for (auto & c : buildConfigs) {
-		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + lib.path);
+		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + lib.path);
 	}
 }
 
 void xcodeProject::addLDFLAG(string ldflag, LibType libType){
 //	alert( "xcodeProject::addLDFLAG " + ldflag , 34);
 	for (auto & c : buildConfigs) {
-		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ldflag);
+		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ldflag);
 	}
 }
 
 void xcodeProject::addCFLAG(string cflag, LibType libType){
 	//alert("xcodeProject::addCFLAG " + cflag);
-	//commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_CFLAGS array");
 	for (auto & c : buildConfigs) {
 		// FIXME: add array here if it doesnt exist
-		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_CFLAGS: string " + cflag);
+		addCommand("Add :objects:"+c+":buildSettings:OTHER_CFLAGS: string " + cflag);
 	}
 }
 
 void xcodeProject::addDefine(string define, LibType libType){
 	for (auto & c : buildConfigs) {
 		// FIXME: add array here if it doesnt exist
-		commands.emplace_back("Add :objects:"+c+":buildSettings:GCC_PREPROCESSOR_DEFINITIONS: string " + define);
+		addCommand("Add :objects:"+c+":buildSettings:GCC_PREPROCESSOR_DEFINITIONS: string " + define);
 	}
 }
 
@@ -504,30 +481,29 @@ void xcodeProject::addDefine(string define, LibType libType){
 void xcodeProject::addCPPFLAG(string cppflag, LibType libType){
 	for (auto & c : buildConfigs) {
 		// FIXME: add array here if it doesnt exist
-		commands.emplace_back("Add :objects:"+c+":buildSettings:OTHER_CPLUSPLUSFLAGS: string " + cppflag);
+		addCommand("Add :objects:"+c+":buildSettings:OTHER_CPLUSPLUSFLAGS: string " + cppflag);
 	}
 }
 
 void xcodeProject::addAfterRule(string rule){
 	// return;
 //	cout << ">>>>>> addAfterRule " << rule << endl;
-	commands.emplace_back("Add :objects:"+afterPhaseUUID+":buildActionMask string 2147483647");
-	// commands.emplace_back("Add :objects:"+afterPhaseUUID+":files array");
-	// commands.emplace_back("Add :objects:"+afterPhaseUUID+":inputPaths array");
-	commands.emplace_back("Add :objects:"+afterPhaseUUID+":isa string PBXShellScriptBuildPhase");
-	// commands.emplace_back("Add :objects:"+afterPhaseUUID+":outputPaths array");
-	commands.emplace_back("Add :objects:"+afterPhaseUUID+":runOnlyForDeploymentPostprocessing string 0");
-	commands.emplace_back("Add :objects:"+afterPhaseUUID+":shellPath string /bin/sh");
-	commands.emplace_back("Add :objects:"+afterPhaseUUID+":showEnvVarsInLog string 0");
+	addCommand("Add :objects:"+afterPhaseUUID+":buildActionMask string 2147483647");
+	// addCommand("Add :objects:"+afterPhaseUUID+":files array");
+	// addCommand("Add :objects:"+afterPhaseUUID+":inputPaths array");
+	addCommand("Add :objects:"+afterPhaseUUID+":isa string PBXShellScriptBuildPhase");
+	// addCommand("Add :objects:"+afterPhaseUUID+":outputPaths array");
+	addCommand("Add :objects:"+afterPhaseUUID+":runOnlyForDeploymentPostprocessing string 0");
+	addCommand("Add :objects:"+afterPhaseUUID+":shellPath string /bin/sh");
+	addCommand("Add :objects:"+afterPhaseUUID+":showEnvVarsInLog string 0");
 
 	// ofStringReplace(rule, "\"", "\\\"");
-	// commands.emplace_back("Add :objects:"+afterPhaseUUID+":shellScript string \"" + rule + "\"");
-	commands.emplace_back("Add :objects:"+afterPhaseUUID+":shellScript string " + rule);
-
+	// addCommand("Add :objects:"+afterPhaseUUID+":shellScript string \"" + rule + "\"");
+	addCommand("Add :objects:"+afterPhaseUUID+":shellScript string " + rule);
 
 	// adding this phase to build phases array
 	// TODO: Check if nit needs another buildConfigurationListUUID for debug.
-	commands.emplace_back("Add :objects:"+buildConfigurationListUUID+":buildPhases: string " + afterPhaseUUID);
+	addCommand("Add :objects:"+buildConfigurationListUUID+":buildPhases: string " + afterPhaseUUID);
 }
 
 void xcodeProject::addAddon(ofAddon & addon){
@@ -719,12 +695,11 @@ void xcodeProject::addCommand(const string & command) {
 }
 
 string xcodeProject::addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp) {
-//	alert("addFile " + ofToString(path), 31);
+//	alert("addFile " + ofPathToString(path) + " : " + ofPathToString(folder) , 31);
 //	alert("reference " + ofToString(fp.reference));
 //	alert("addToBuildPhase " + ofToString(fp.addToBuildPhase));
 //	alert("codeSignOnCopy " + ofToString(fp.codeSignOnCopy));
 //	alert("copyFilesBuildPhase " + ofToString(fp.copyFilesBuildPhase));
-
 
 	string UUID = "";
 	std::map<fs::path, string> extensionToFileType {
@@ -744,21 +719,25 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		{ ".info" , "text.plist.xml" },
 		{ ".xcconfig" , "text.xcconfig" },
 	};
+	
+//	cout << "will check if exists " << (projectDir / path) << endl;
 	if (fs::exists( projectDir / path )) {
-
+//		cout << "OK exists" << endl;
+		bool isFolder = false;
 		string fileType = "file";
 		fileType = extensionToFileType[path.extension()];
 		if (fileType == "") {
 			if (fs::is_directory(path)) {
 				fileType = "folder";
+				isFolder = true;
 			} else {
+				// Break here if fileType is not set. and it is not a folder
 				return {};
 			}
 		}
 
 		UUID = generateUUID(path);
 		
-//		debugCommands = true;
 		addCommand("");
 		addCommand("# -- addFile " + ofPathToString(path));
 
@@ -778,6 +757,7 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 
 		string folderUUID;
 		if (fp.isSrc) {
+//			alert("fp isSrc!", 31);
 //			addCommand("Add :objects:"+UUID+":name string " + ofPathToString(path.filename()));
 		
 //			fs::path base;
@@ -801,37 +781,33 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 //			folderUUID = getFolderUUID(folder, true, base);
 //			alert("isSrc " + ofPathToString(folder) + " : " + ofPathToString(base), 33);
 		} else {
-			folderUUID = getFolderUUID(folder, false);
+			folderUUID = getFolderUUID(folder, isFolder);
 		}
-		folderUUID = getFolderUUID(folder, false);
+//		isFolder = true;
+		folderUUID = getFolderUUID(folder, isFolder);
 		addCommand("# ---- addFileToFolder UUID " + ofPathToString(folder));
 		addCommand("Add :objects:" + folderUUID + ":children: string " + UUID);
 		
 		
 		string buildUUID { generateUUID(ofPathToString(path) + "-build") };
 		// If any other option is true, add buildUUID entries.
-		if (fp.addToBuildPhase ||
-			fp.codeSignOnCopy ||
-			fp.copyFilesBuildPhase ||
-			fp.addToBuildResource ||
-			fp.addToResources ||
-			fp.frameworksBuildPhase
+		if (
+				fp.addToBuildPhase ||
+				fp.codeSignOnCopy ||
+				fp.copyFilesBuildPhase ||
+				fp.addToBuildResource ||
+				fp.addToResources 
+				//|| fp.frameworksBuildPhase ~ I've just removed this one, favoring -InFrameworks
 			) {
 			addCommand("# ---- addToBuildPhase " + buildUUID);
 			addCommand("Add :objects:"+buildUUID+":isa string PBXBuildFile");
 			addCommand("Add :objects:"+buildUUID+":fileRef string "+UUID);
 		}
 		
-		if (fp.addToBuildPhase) {
+		if (fp.addToBuildPhase) { // Compile Sources
 			// Not sure if it applies to everything, applies to srcFile.
 			addCommand("# ---- addToBuildPhase");
 			addCommand("Add :objects:"+buildActionMaskUUID+":files: string " + buildUUID);
-		}
-		
-		if (fp.codeSignOnCopy) {
-			addCommand("# ---- codeSignOnCopy " + buildUUID);
-			addCommand("Add :objects:"+buildUUID+":settings:ATTRIBUTES array");
-			addCommand("Add :objects:"+buildUUID+":settings:ATTRIBUTES: string CodeSignOnCopy");
 		}
 		
 		if (fp.copyFilesBuildPhase) {
@@ -844,6 +820,12 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 				addCommand("# ---- copyPhase Executables " + buildUUID);
 				addCommand("Add :objects:E4A5B60F29BAAAE400C2D356:files: string " + buildUUID);
 			}
+		}
+		
+		if (fp.codeSignOnCopy) {
+			addCommand("# ---- codeSignOnCopy " + buildUUID);
+			addCommand("Add :objects:"+buildUUID+":settings:ATTRIBUTES array");
+			addCommand("Add :objects:"+buildUUID+":settings:ATTRIBUTES: string CodeSignOnCopy");
 		}
 		
 		if (fp.addToBuildResource) {
@@ -860,9 +842,13 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 			}
 		}
 		
-		if (fp.frameworksBuildPhase) {
-			addCommand("# ---- frameworksBuildPhase " + buildUUID);
-			addCommand("Add :objects:E4B69B590A3A1756003C02F2:files: string " + buildUUID);
+		if (fp.frameworksBuildPhase) { // Link Binary With Libraries
+			auto tempUUID = generateUUID(ofPathToString(path) + "-InFrameworks");
+			addCommand("Add :objects:" + tempUUID + ":fileRef string " + UUID);
+			addCommand("Add :objects:" + tempUUID + ":isa string PBXBuildFile");
+
+			addCommand("# --- PBXFrameworksBuildPhase");
+			addCommand("Add :objects:E4B69B590A3A1756003C02F2:files: string " + tempUUID);
 		}
 		
 		if (path.extension() == ".framework") {
@@ -871,10 +857,7 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 
 			addCommand("# ---- PBXFrameworksBuildPhase " + buildUUID);
 			addCommand("Add :objects:1D60588F0D05DD3D006BFB54:files: string " + buildUUID);
-
 		}
-		
-		
 		debugCommands = false;
 	}
 	return UUID;
