@@ -71,15 +71,25 @@ bool xcodeProject::createProjectFile(){
 	}
 	fs::create_directories(xcodeProject);
 
+	if (!fs::equivalent(getOFRoot(), fs::path{"../../.."})) {
+		string root { ofPathToString(getOFRoot()) };
+		rootReplacements = { "../../..", root };
+	}
+	
 	copyTemplateFiles.push_back({
 		templatePath / "emptyExample.xcodeproj" / "project.pbxproj",
 		xcodeProject / "project.pbxproj",
-		{{ "emptyExample", projectName }}
+		{{ "emptyExample", projectName },
+		rootReplacements }
 	});
+	
+//	findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", root);
+
 
 	copyTemplateFiles.push_back({
 		templatePath / "Project.xcconfig",
-		projectDir / "Project.xcconfig"
+		projectDir / "Project.xcconfig",
+		{ rootReplacements }
 	});
 	
 	if (target == "osx") {
@@ -101,47 +111,52 @@ bool xcodeProject::createProjectFile(){
 
 	saveScheme();
 
+	if(target == "osx"){
+		saveMakefile();
+	}
+	
 	for (auto & c : copyTemplateFiles) {
 		c.run();
 	}
 	
 	
-	fs::path binDirectory { projectDir / "bin" };
-	fs::path dataDir { binDirectory / "data" };
+//	if (!fs::equivalent(getOFRoot(), fs::path{"../../.."})) {
+//		string root { ofPathToString(getOFRoot()) };
+////		alert ("fs not equivalent to ../../.. root = " + root);
+//		rootReplacements = { "../../..", root };
+//		
+////		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", root);
+////		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", root);
+//		if( target == "osx" ){
+//			findandreplaceInTexfile(projectDir / "Makefile", "../../..", root);
+//			// MARK: not needed because baseProject::save() does the same
+////			findandreplaceInTexfile(projectDir / "config.make", "../../..", root);
+//		}
+//	} else {
+////		alert ("fs equivalent " + relRoot.string());
+//	}
+//	
+	
+	
+	// NOW only files being copied
+	
+	fs::path projectDataDir { projectDir / "bin" / "data" };
 
-	if (!fs::exists(binDirectory)) {
-		cout << "creating dataDir " << dataDir << endl;
-		fs::create_directories(dataDir);
+	if (!fs::exists(projectDataDir)) {
+		cout << "creating dataDir " << projectDataDir << endl;
+		fs::create_directories(projectDataDir);
 	}
 
-	if (fs::exists(binDirectory)) {
+	if (fs::exists(projectDataDir)) {
 		// originally only on IOS
 		//this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
 		// TODO: Test on IOS
-		fs::path srcDataDir { templatePath / "bin" / "data" };
-		if (fs::exists(srcDataDir) && fs::is_directory(srcDataDir)) {
-			baseProject::recursiveCopyContents(srcDataDir, dataDir);
+		fs::path templateDataDir { templatePath / "bin" / "data" };
+		if (fs::exists(templateDataDir) && fs::is_directory(templateDataDir)) {
+			baseProject::recursiveCopyContents(templateDataDir, projectDataDir);
 		}
 	}
 
-
-
-	if(target == "osx"){
-		saveMakefile();
-	}
-
-	// Calculate OF Root in relation to each project (recursively);
-//	fs::path relRoot { getOFRoot() };
-
-//	// FIXME: maybe not needed anymore
-//	if (ofIsPathInPath(projectDir, getOFRoot())) {
-//		setOFRoot(fs::relative(getOFRoot(), projectDir));
-////		relRoot = fs::relative(getOFRoot(), projectDir);
-////		alert ("relRoot = " + relRoot.string());
-//	} else {
-////		alert ("ofIsPathInPath not");
-//	}
-	
 	addCommand("# ---- PG VERSION " + getPGVersion());
 	addCommand("Add :openFrameworksProjectGeneratorVersion string " + getPGVersion());
 
@@ -151,23 +166,7 @@ bool xcodeProject::createProjectFile(){
 	fp.absolute = true;
 	addFile(fs::path{"bin"} / "data", "", fp);
 
-	// adding src folder as a reference : doesnt work
-//	fp.addToBuildPhase = true;
-//	addFile(fs::path{"src"}, "", fp);
 
-	if (!fs::equivalent(getOFRoot(), fs::path{"../../.."})) {
-		string root { ofPathToString(getOFRoot()) }; 
-//		alert ("fs not equivalent to ../../.. root = " + root);
-		findandreplaceInTexfile(projectDir / (projectName + ".xcodeproj/project.pbxproj"), "../../..", root);
-		findandreplaceInTexfile(projectDir / "Project.xcconfig", "../../..", root);
-		if( target == "osx" ){
-			findandreplaceInTexfile(projectDir / "Makefile", "../../..", root);
-			// MARK: not needed because baseProject::save() does the same
-//			findandreplaceInTexfile(projectDir / "config.make", "../../..", root);
-		}
-	} else {
-//		alert ("fs equivalent " + relRoot.string());
-	}
 	return true;
 }
 
@@ -206,15 +205,17 @@ void xcodeProject::saveScheme(){
 
 void xcodeProject::saveMakefile(){
 //	alert ("saveMakefile " , 35);
-	for (auto & f : { "Makefile", "config.make" }) {
-		fs::path fileFrom = templatePath / f;
-		fs::path fileTo = projectDir / f;
-		// Always overwrite for now, so we can have the original file from template before substituting anything
-		// if (!fs::exists(fileTo))
-		{
-			fs::copy(fileFrom, fileTo, fs::copy_options::overwrite_existing);
-		}
-	}
+	copyTemplateFiles.push_back({
+		templatePath / "Makefile",
+		projectDir / "Makefile",
+		{ rootReplacements }
+	});
+	copyTemplateFiles.push_back({
+		templatePath / "config.make",
+		projectDir / "config.make"
+	});
+
+
 }
 
 bool xcodeProject::loadProjectFile(){ //base

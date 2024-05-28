@@ -87,4 +87,7 @@ public:
 
 	// TODO: Phase out relRoot. totally
 	fs::path relRoot = "../../..";
+	
+	std::pair<string, string> rootReplacements;
+
 };
