@@ -229,7 +229,8 @@ void xcodeProject::renameProject(){ //base
 }
 
 string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::path base) {
-//	alert ("xcodeProject::getFolderUUID " + folder.string() + " : base=" + base.string());
+//	alert ("xcodeProject::getFolderUUID " + folder.string() + " : isfolder=" + ofToString(isFolder) + " : base=" + base.string());
+//	alert ("xcodeProject::getFolderUUID " + folder.begin()->string() + " : base=" + base.string());
 	/*
 	TODO: Change key of folderUUID to base + folder, so "src" in additional source folders
 	doesn't get confused with "src" from project.
@@ -242,6 +243,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 	// If folder UUID exists just return it.
 	// in this case it is not found, so it creates UUID for the entire path
 	if ( folderUUID.find(folder) == folderUUID.end() ) { // NOT FOUND
+//		alert ("xcodeProject::getFolderUUID " + folder.string() + " : isfolder=" + ofToString(isFolder) + " : base=" + base.string());
 		vector < string > folders = ofSplitString(ofPathToString(folder), "/", true);
 		string lastFolderUUID = projRootUUID;
 
@@ -274,6 +276,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 
 						if (!filePath.empty()) {
 							commands.emplace_back("Add :objects:"+thisUUID+":path string " + ofPathToString(filePath));
+//							alert(commands.back(), 33);
 						} else {
 //							cout << ">>>>> filePath empty " << endl;
 						}
@@ -283,8 +286,15 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 
 					commands.emplace_back("Add :objects:"+thisUUID+":isa string PBXGroup");
 					commands.emplace_back("Add :objects:"+thisUUID+":children array");
-//					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string <group>");
-					commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
+					
+					if (folder.begin()->string() == "addons") {
+						commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string <group>");
+						fs::path addonFolder = fs::relative(folder, "addons");
+						commands.emplace_back("Add :objects:"+thisUUID+":path string " + ofPathToString(addonFolder));
+//						alert ("group " + folder.string() + " : " + base.string() + " : " + addonFolder.string(), 32);
+					} else {
+						commands.emplace_back("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
+					}
 
 					// And this new object is cointained in parent hierarchy, or even projRootUUID
 					commands.emplace_back("Add :objects:"+lastFolderUUID+":children: string " + thisUUID);
@@ -305,11 +315,10 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 }
 
 void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type){
+//	alert ("addSrc " + ofPathToString(srcFile) + " : " + ofPathToString(folder), 31);
 //	cout << "xcodeProject::addSrc " << srcFile << " : " << folder << endl;
 	string ext = ofPathToString(srcFile.extension());
 
-	
-//	{
 //		.reference = true,
 //		.addToBuildPhase = true,
 //		.codeSignOnCopy = false,
@@ -317,7 +326,7 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 //		.linkBinaryWithLibraries = false,
 //		.addToBuildResource = false,
 //		.addToResources = false,
-//	};
+
 	fileProperties fp;
 	fp.addToBuildPhase = true;
 	fp.isSrc = true;
@@ -719,7 +728,7 @@ void xcodeProject::addCommand(const string & command) {
 }
 
 string xcodeProject::addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp) {
-//	alert("addFile " + ofToString(path), 31);
+//	alert("addFile " + ofPathToString(path) + " : " + ofPathToString(folder) , 31);
 //	alert("reference " + ofToString(fp.reference));
 //	alert("addToBuildPhase " + ofToString(fp.addToBuildPhase));
 //	alert("codeSignOnCopy " + ofToString(fp.codeSignOnCopy));
@@ -744,14 +753,20 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		{ ".info" , "text.plist.xml" },
 		{ ".xcconfig" , "text.xcconfig" },
 	};
+	
+	
+//	cout << "will check if exists " << (projectDir / path) << endl;
 	if (fs::exists( projectDir / path )) {
-
+//		cout << "OK exists" << endl;
+		bool isFolder = false;
 		string fileType = "file";
 		fileType = extensionToFileType[path.extension()];
 		if (fileType == "") {
 			if (fs::is_directory(path)) {
 				fileType = "folder";
+				isFolder = true;
 			} else {
+				// Break here if fileType is not set. and it is not a folder
 				return {};
 			}
 		}
@@ -778,6 +793,7 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 
 		string folderUUID;
 		if (fp.isSrc) {
+//			alert("fp isSrc!", 31);
 //			addCommand("Add :objects:"+UUID+":name string " + ofPathToString(path.filename()));
 		
 //			fs::path base;
@@ -801,9 +817,10 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 //			folderUUID = getFolderUUID(folder, true, base);
 //			alert("isSrc " + ofPathToString(folder) + " : " + ofPathToString(base), 33);
 		} else {
-			folderUUID = getFolderUUID(folder, false);
+			folderUUID = getFolderUUID(folder, isFolder);
 		}
-		folderUUID = getFolderUUID(folder, false);
+//		isFolder = true;
+		folderUUID = getFolderUUID(folder, isFolder);
 		addCommand("# ---- addFileToFolder UUID " + ofPathToString(folder));
 		addCommand("Add :objects:" + folderUUID + ":children: string " + UUID);
 		

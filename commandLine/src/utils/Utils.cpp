@@ -218,7 +218,7 @@ void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & fol
 }
 
 void getFrameworksRecursively(const fs::path & path, std::vector < string > & frameworks, string platform) {
-	alert ("getFrameworksRecursively " + path.string(), 34);
+//	alert ("getFrameworksRecursively " + path.string(), 34);
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
 
 	for (const auto & f : dirList(path)) {
@@ -231,7 +231,7 @@ void getFrameworksRecursively(const fs::path & path, std::vector < string > & fr
 }
 
 void getXCFrameworksRecursively(const fs::path & path, std::vector<string> & frameworks, string platform) {
-	alert("getXCFrameworksRecursively " + path.string(), 34);
+//	alert("getXCFrameworksRecursively " + path.string(), 34);
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
 
 	for (const auto & f : dirList(path)) {
