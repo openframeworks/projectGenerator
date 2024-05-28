@@ -14,20 +14,9 @@
 #include "baseProject.h"
 struct LibraryBinary;
 
-static std::map <ofTargetPlatform, std::string> platformsToString {
-	{ OF_TARGET_ANDROID, "android" },
-//	{ OF_TARGET_EMSCRIPTEN, "" },
-	{ OF_TARGET_IOS, "ios" },
-	{ OF_TARGET_LINUX, "linux" },
-	{ OF_TARGET_LINUX64, "linux64" },
-	{ OF_TARGET_LINUXARMV6L, "linuxarmv6l" },
-	{ OF_TARGET_LINUXARMV7L, "linuxarmv7l" },
-	{ OF_TARGET_LINUXAARCH64, "linuxaarch64" },
-	{ OF_TARGET_MINGW, "msys2" },
-	{ OF_TARGET_OSX, "osx" },
-	{ OF_TARGET_WINVS, "vs" },
-};
+std::string exec(const char* cmd);
 
+std::string getPlatformString();
 
 static std::vector < std::string > platformsOptions {
 	"android",

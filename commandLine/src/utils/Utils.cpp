@@ -36,6 +36,57 @@
 
 using std::unique_ptr;
 
+std::string exec(const char* cmd) {
+	std::array<char, 128> buffer;
+	std::string result;
+
+	auto pipe = popen(cmd, "r"); // get rid of shared_ptr
+
+	if (!pipe) throw std::runtime_error("popen() failed!");
+
+	while (!feof(pipe)) {
+		if (fgets(buffer.data(), buffer.size(), pipe) != nullptr)
+			result += buffer.data();
+	}
+
+	auto rc = pclose(pipe);
+
+	if (rc == EXIT_SUCCESS) { // == 0
+
+	} else if (rc == EXIT_FAILURE) {  // EXIT_FAILURE is not used by all programs, maybe needs some adaptation.
+
+	}
+	// trim last line break
+	result.pop_back();
+	return result;
+}
+
+std::string getPlatformString() {
+#ifdef __linux__
+	string arch = exec("uname -m");
+	if (
+		arch == "armv6l" ||
+		arch == "armv7l" ||
+		arch == "aarch64" ||
+		) {
+			return "linux" + arch;
+		}
+	else {
+		return "linux64";
+	}
+#elif defined(__WIN32__)
+	#if defined(__MINGW32__) || defined(__MINGW64__)
+		return "msys2";
+	#else
+		return "vs";
+	#endif
+#elif defined(__APPLE_CC__)
+	return "osx";
+#else
+	return {};
+#endif
+}
+
 string generateUUID(const string & input){
 	return uuidxx::uuid::Generate().ToString(false);
 }

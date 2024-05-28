@@ -8,6 +8,9 @@
 #include <string>
 #include <set>
 
+
+
+
 enum optionIndex { UNKNOWN, HELP, PLUS, RECURSIVE, LISTTEMPLATES, PLATFORMS, ADDONS, OFPATH, VERBOSE, TEMPLATE, DRYRUN, SRCEXTERNAL, VERSION };
 
 constexpr option::Descriptor usage[] =
@@ -299,8 +302,9 @@ int main(int argc, char** argv){
 	bRecursive = false;
 	bHelpRequested = false;
 	bListTemplates = false;
+	targets.emplace_back(getPlatformString());
 	// FIXME! problem.
-	targets.emplace_back(platformsToString[ofGetTargetPlatform()]);
+//	targets.emplace_back(platformsToString[ofGetTargetPlatform()]);
 	startTime = 0;
 	nProjectsUpdated = 0;
 	nProjectsCreated = 0;
