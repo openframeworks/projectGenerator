@@ -139,21 +139,11 @@ bool xcodeProject::createProjectFile(){
 		}
 	}
 
-	addCommand("# ---- PG VERSION " + getPGVersion());
-	addCommand("Add :openFrameworksProjectGeneratorVersion string " + getPGVersion());
-
-	fileProperties fp;
-	addFile("App.xcconfig", "", fp);
-
-	fp.absolute = true;
-	addFile(fs::path{"bin"} / "data", "", fp);
-
 	return true;
 }
 
 void xcodeProject::saveScheme(){
 	auto schemeFolder = projectDir / ( projectName + ".xcodeproj" ) / "xcshareddata/xcschemes";
-//	alert ("saveScheme " + schemeFolder.string());
 
 	if (fs::exists(schemeFolder)) {
 		fs::remove_all(schemeFolder);
@@ -185,19 +175,15 @@ void xcodeProject::saveScheme(){
 }
 
 void xcodeProject::saveMakefile(){
-//	alert ("saveMakefile " , 35);
 	copyTemplateFiles.push_back({
-		templatePath / "Makefile",
-		projectDir / "Makefile",
+		templatePath / "Makefile", projectDir / "Makefile",
 		{ rootReplacements }
 	});
 	copyTemplateFiles.push_back({
-		templatePath / "config.make",
-		projectDir / "config.make"
+		templatePath / "config.make", projectDir / "config.make"
 	});
-
-
 }
+
 
 bool xcodeProject::loadProjectFile(){ //base
 	renameProject();
@@ -205,6 +191,7 @@ bool xcodeProject::loadProjectFile(){ //base
 	return true;
 }
 
+// FIXME: mover pra dentro do loadProjectfile
 void xcodeProject::renameProject(){ //base
 	// FIXME: review BUILT_PRODUCTS_DIR
 	addCommand("Set :objects:"+buildConfigurationListUUID+":name " + projectName);
@@ -219,7 +206,6 @@ void xcodeProject::renameProject(){ //base
 
 string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::path base) {
 //	alert ("xcodeProject::getFolderUUID " + folder.string() + " : isfolder=" + ofToString(isFolder) + " : base=" + base.string());
-//	alert ("xcodeProject::getFolderUUID " + folder.begin()->string() + " : base=" + base.string());
 	/*
 	TODO: Change key of folderUUID to base + folder, so "src" in additional source folders
 	doesn't get confused with "src" from project.
@@ -276,9 +262,19 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 					addCommand("Add :objects:"+thisUUID+":isa string PBXGroup");
 					addCommand("Add :objects:"+thisUUID+":children array");
 
-					addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
-					fs::path addonFolder { fs::path(fullPath).filename() };
-					addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(addonFolder));
+					if (lastFolderUUID == projRootUUID) {
+						alert("THIS IS ROOT ");
+						cout << "base " << base.string() << endl;
+						cout << "fullPath " << fullPath << endl;
+						
+						addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
+						addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(base));
+
+					} else {
+						addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
+						fs::path addonFolder { fs::path(fullPath).filename() };
+						addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(addonFolder));
+					}
 
 					// And this new object is cointained in parent hierarchy, or even projRootUUID
 					addCommand("Add :objects:"+lastFolderUUID+":children: string " + thisUUID);
@@ -592,6 +588,18 @@ void xcodeProject::addAddon(ofAddon & addon){
 }
 
 bool xcodeProject::saveProjectFile(){
+	
+	addCommand("# ---- PG VERSION " + getPGVersion());
+	addCommand("Add :openFrameworksProjectGeneratorVersion string " + getPGVersion());
+
+	fileProperties fp;
+	addFile("App.xcconfig", "", fp);
+
+	fp.absolute = true;
+	addFile(fs::path{"bin"} / "data", "", fp);
+
+//	alert ("saveProjectFile", 31);
+	
 	fs::path fileName = projectDir / (projectName + ".xcodeproj/project.pbxproj");
 //	alert("xcodeProject::saveProjectFile() begin " + fileName.string());
 	bool usePlistBuddy = false;
@@ -728,6 +736,8 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 //		} else {
 //			addCommand("Add :objects:"+UUID+":isa string PBXGroup");
 //		}
+		
+		// This is adding a file. any file.
 		addCommand("Add :objects:"+UUID+":fileEncoding string 4");
 		addCommand("Add :objects:"+UUID+":isa string PBXFileReference");
 		addCommand("Add :objects:"+UUID+":lastKnownFileType string " + fileType);
@@ -739,37 +749,20 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 			addCommand("Add :objects:"+UUID+":sourceTree string <group>");
 		}
 
+		auto rootDir = folder.root_directory();
 		string folderUUID;
-		if (fp.isSrc) {
-//			alert("fp isSrc!", 31);
-//			addCommand("Add :objects:"+UUID+":name string " + ofPathToString(path.filename()));
-		
-//			fs::path base;
-//			fs::path src { path };
-//			fs::path folderFS { folder };
-//
-//			if (!fs::exists(folderFS)) {
-//				// cout << "folder doesn't exist " << folderFS << endl;
-//				fs::path parent = src.parent_path();
-//				auto nit = folderFS.end();
-//
-//				base = parent;
-//				fs::path folderFS2 = folderFS;
-//
-//				while(base.filename() == folderFS2.filename() && base.filename() != "" && folderFS2.filename() != "") {
-//					base = base.parent_path();
-//					folderFS2 = folderFS2.parent_path();
-//				}
-//			}
-//
-//			folderUUID = getFolderUUID(folder, true, base);
-//			alert("isSrc " + ofPathToString(folder) + " : " + ofPathToString(base), 33);
+		if (rootDir != "addons" && rootDir != "src") {
+//			alert("addFile path:" + ofPathToString(path) + " folder:" + ofPathToString(folder) , 31);
+			auto base = path.parent_path();
+			folderUUID = getFolderUUID(folder, isFolder, base);
+
 		} else {
 			folderUUID = getFolderUUID(folder, isFolder);
 		}
-//		isFolder = true;
-		folderUUID = getFolderUUID(folder, isFolder);
-		addCommand("# ---- addFileToFolder UUID " + ofPathToString(folder));
+//		string folderUUID = getFolderUUID(folder, isFolder);
+
+		addCommand("# ---- addFileToFolder UUID : " + ofPathToString(folder));
+//		alert (commands.back());
 		addCommand("Add :objects:" + folderUUID + ":children: string " + UUID);
 		
 		
