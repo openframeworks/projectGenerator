@@ -206,25 +206,30 @@ void xcodeProject::renameProject(){ //base
 
 // FIXME: Double check if isFolder is even being used. Remove it if not
 string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::path base) {
-//	alert ("xcodeProject::getFolderUUID " + folder.string() + " : isfolder=" + ofToString(isFolder) + " : base=" + base.string());
-	/*
-	TODO: Change key of folderUUID to base + folder, so "src" in additional source folders
-	doesn't get confused with "src" from project.
-	this can work but fullPath variable has to follow the same pattern
-	fs::path keyFS = base / folder;
-	 */
+//	alert ("xcodeProject::getFolderUUID "+folder.string()+" : isfolder="+ofToString(isFolder)+" : base="+ base.string());
+	
+//	TODO: Change key of folderUUID to base + folder, so "src" in additional source folders
+//	doesn't get confused with "src" from project.
+//	this can work but fullPath variable has to follow the same pattern
+//	fs::path keyFS = base / folder;
 
-	string UUID { "" };
+//	auto rootDir = folder.root_directory();
+//	fs::path rootDir = *folder.begin();
+//	bool useBase = (rootDir != "addons" && rootDir != "src");
+//	
+////	auto fullPathFolder = useBase ? base / folder : folder;
+//	auto fullPathFolder = useBase ? base : folder;
+//	cout << "folder " << folder << endl;
+//	cout << "base " << base << endl;
+//	cout << "rootDir " << rootDir << endl;
+//	cout << "useBase " << useBase << endl;
+	
+	bool useBase = false;
+	auto fullPathFolder = folder;
+
 
 	// If folder UUID exists just return it.
 	// in this case it is not found, so it creates UUID for the entire path
-	
-	
-//	std::map <fs::path, string> folderUUID ;
-	
-//	auto fullPathFolder = base / folder;
-	auto fullPathFolder = folder;
-	
 	if ( folderUUID.find(fullPathFolder) == folderUUID.end() ) { // NOT FOUND
 //		alert ("xcodeProject::getFolderUUID " + folder.string() + " : isfolder=" + ofToString(isFolder) + " : base=" + base.string());
 		
@@ -233,8 +238,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 
 		if (folders.size()){
 			for (std::size_t a=0; a<folders.size(); a++) {
-//				fs::path fullPath = base;
-				fs::path fullPath;
+				fs::path fullPath { useBase ? base : "" };
 				
 				vector <fs::path> joinFolders = std::vector(folders.begin(), folders.begin() + (a+1));
 				for (auto & j : joinFolders) {
@@ -244,12 +248,14 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 				// Query if path is already stored. if not execute this following block
 				if ( folderUUID.find(fullPath) == folderUUID.end() ) {
 					// cout << "creating" << endl;
+					alert ("creating UUID for path " + fullPath.string(), 31);
 					string thisUUID = generateUUID(fullPath);
 					folderUUID[fullPath] = thisUUID;
 
 					// here we add an UUID for the group (folder) and we initialize an array to receive children (files or folders inside)
 					addCommand("");
 					addCommand("Add :objects:"+thisUUID+":name string " + ofPathToString(folders[a]));
+//					alert (commands.back());
 					
 					// FIXME: voltar desde aqui.
 					if (isFolder) {
@@ -297,12 +303,11 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 				}
 			}
 		}
-		UUID = lastFolderUUID;
+		return lastFolderUUID;
 	} else {
 		// Folder already exists, only return it.
-		UUID = folderUUID[folder];
+		return folderUUID[fullPathFolder];
 	}
-	return UUID;
 }
 
 void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type){
@@ -661,8 +666,8 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 			addCommand("Add :objects:"+UUID+":sourceTree string <group>");
 		}
 
-		auto rootDir = folder.root_directory();
 		string folderUUID;
+		auto rootDir = folder.root_directory();
 		if (rootDir != "addons" && rootDir != "src") {
 //			alert("addFile path:" + ofPathToString(path) + " folder:" + ofPathToString(folder) , 31);
 			auto base = path.parent_path();
@@ -671,12 +676,9 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		} else {
 			folderUUID = getFolderUUID(folder, isFolder);
 		}
-//		string folderUUID = getFolderUUID(folder, isFolder);
 
 		addCommand("# ---- addFileToFolder UUID : " + ofPathToString(folder));
-//		alert (commands.back());
 		addCommand("Add :objects:" + folderUUID + ":children: string " + UUID);
-		
 		
 		string buildUUID { generateUUID(ofPathToString(path) + "-build") };
 		// If any other option is true, add buildUUID entries.

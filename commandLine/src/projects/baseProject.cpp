@@ -364,6 +364,7 @@ void baseProject::addAddon(string addonName){
 
 	for (auto & e : addon.includePaths) {
 		ofLogVerbose() << "adding addon include path: " << e;
+//		alert ("adding addon include path: " + e, 34);
 //		ofLog() << "adding addon include path: " << e;
 		addInclude(e);
 	}

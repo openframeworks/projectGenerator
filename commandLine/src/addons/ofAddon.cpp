@@ -291,14 +291,28 @@ void ofAddon::exclude(vector<string> & variables, vector<string> exclusions){
 		ofStringReplace(exclusion,".","\\.");
 		ofStringReplace(exclusion,"%",".*");
 		exclusion =".*"+ exclusion;
+//		alert ("ofAddon::exclude " +exclusion, 31);
 
 		std::regex findVar(exclusion);
 		std::smatch varMatch;
+//		alert ("vars size " + ofToString(variables.size()));
+//		for (auto & v : variables) {
+//			alert ("\t" + v, 32);
+//		}
 		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const string & variable){
 			auto forwardSlashedVariable = variable;
 			ofStringReplace(forwardSlashedVariable, "\\", "/");
+//			bool exclude = std::regex_search(forwardSlashedVariable, varMatch, findVar);
+//			if (exclude) {
+//				alert ("variable removed : " + variable, 31);
+//			}
 			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
 		}), variables.end());
+		
+//		alert ("vars size " + ofToString(variables.size()));
+//		for (auto & v : variables) {
+//			alert ("\t" + v, 32);
+//		}
 	}
 }
 
@@ -553,7 +567,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 }
 	
 bool ofAddon::fromFS(const fs::path & path, const string & platform){
-	// alert("ofAddon::fromFS path : " + path.string());
+	//alert("ofAddon::fromFS path : " + path.string(), 33);
 	
 	if (!fs::exists(path)) {
 		return false;
@@ -639,6 +653,12 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	parseConfig();
 
 	exclude(includePaths, excludeIncludes);
+	
+	// Dimitre. I've added this here to exclude some srcFiles from addons,
+	// ofxAssimpModelLoader was adding some files from libs/assimp/include/assimp/port/AndroidJNI
+	// even when the folder was excluded from includePaths
+	exclude(srcFiles, excludeIncludes);
+	
 	exclude(srcFiles, excludeSources);
 	exclude(csrcFiles, excludeSources);
 	exclude(cppsrcFiles, excludeSources);
