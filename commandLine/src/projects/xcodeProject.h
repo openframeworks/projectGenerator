@@ -82,7 +82,7 @@ public:
 	};
 
 //	std::unordered_map <string, string> folderUUID ;
-	std::map < fs::path , string> folderUUID ;
+	std::map <fs::path, string> folderUUID ;
 	string getFolderUUID(const fs::path & folder, bool isFolder = true, fs::path base = "");
 
 	// TODO: Phase out relRoot. totally

@@ -558,7 +558,7 @@ void baseProject::addAddon(ofAddon & addon){
 
 
 void baseProject::addSrcRecursively(const fs::path & srcPath){
-	alert("addSrcRecursively " + srcPath.string(), 32);
+//	alert("addSrcRecursively " + srcPath.string(), 32);
 	ofLog() << "using additional source folder " << srcPath.string();
 //	alert("--");
 
@@ -569,13 +569,10 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 
 	std::unordered_set<string> uniqueIncludeFolders;
 	fs::path base = srcPath.parent_path();
-//	alert("base = " + base.string());
 
 	for( auto & src : srcFilesToAdd){
 		fs::path parent = src.parent_path();
 		fs::path folder = parent.lexically_relative(base);
-
-//		alert ("addSrc file:" + src.string() + " -- folder:" + folder.string(), 35);
 		addSrc(src.string(), folder.string());
 		if (parent.string() != "") {
 			uniqueIncludeFolders.insert(parent.string());
@@ -584,7 +581,6 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 
 	for(auto & i : uniqueIncludeFolders){
 		ofLogVerbose() << " adding search include paths for folder " << i;
-		alert ("uniqueIncludeFolders " + i);
 		addInclude(i);
 	}
 }
