@@ -265,7 +265,8 @@ bool baseProject::save(){
 
 			// FIXME: change to ofIsPathInPath
 			if( projectDir.string().rfind(getOFRoot().string(), 0) == 0) {
-				path = getOFRelPath(projectDir);
+				path = fs::relative(getOFRoot(), projectDir);
+
 			}
 			saveConfig << "OF_ROOT = " << path.generic_string() << std::endl;
 		}

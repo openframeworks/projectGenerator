@@ -6,7 +6,6 @@
  */
 
 #include "VSCodeProject.h"
-//#include "ofFileUtils.h"
 #include "ofLog.h"
 #include "Utils.h"
 #if !defined(TARGET_MINGW)

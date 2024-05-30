@@ -375,24 +375,6 @@ void setOFRoot(const fs::path & path){
 	OFRoot = path;
 }
 
-fs::path getOFRelPath(const fs::path & from) {
-	return fs::relative(getOFRoot(), from);
-}
-
-bool checkConfigExists(){
-	return fs::exists(getUserHomeDir()  / ".ofprojectgenerator/config");
-}
-
-
-// Unused. remove?
-string getOFRootFromConfig(){
-	if(!checkConfigExists()) return "";
-	ofFile configFile( getUserHomeDir() / ".ofprojectgenerator/config",ofFile::ReadOnly);
-	ofBuffer filePath = configFile.readToBuffer();
-	return filePath.getLines().begin().asString();
-}
-
-
 unique_ptr<baseProject> getTargetProject(const string & targ) {
 //	cout << "getTargetProject :" << getTargetString(targ) << endl;
 //	typedef xcodeProject pgProject;

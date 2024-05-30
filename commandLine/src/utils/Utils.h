@@ -76,11 +76,6 @@ void splitFromFirst(string toSplit, string deliminator, string & first, string &
 void fixSlashOrder(string & toFix);
 string unsplitString (std::vector < string > strings, string deliminator );
 
-fs::path getOFRelPath(const fs::path & from);
-
-bool checkConfigExists();
-string getOFRootFromConfig();
-
 std::unique_ptr<baseProject> getTargetProject(const string & targ);
 
 template <class T>
