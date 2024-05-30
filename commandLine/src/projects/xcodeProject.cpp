@@ -610,34 +610,15 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 string xcodeProject::addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp) {
 	//alert("addFile " + ofPathToString(path) + " : " + ofPathToString(folder) , 31);
-
-	std::map<fs::path, string> extensionToFileType {
-		{ ".framework" , "wrapper.framework" },
-		{ ".dylib" , "compiled.mach-o.dylib" },
-		
-		{ ".cpp" , "sourcecode.cpp.cpp" },
-		{ ".c" , "sourcecode.cpp.c" },
-		{ ".h" , "sourcecode.cpp.h" },
-		{ ".hpp" , "sourcecode.cpp.h" },
-		{ ".mm" , "sourcecode.cpp.objcpp" },
-		{ ".m" , "sourcecode.cpp.objcpp" },
-		
-		{ ".xib" , "file.xib" },
-		{ ".metal" , "file.metal" },
-		{ ".xcconfig" , "text.xcconfig" },
-
-		{ ".entitlements" , "text.plist.entitlements" },
-		{ ".plist" , "text.plist.xml" },
-	};
 	
-	string UUID = "";
+	string UUID { "" };
 
 //	cout << "will check if exists " << (projectDir / path) << endl;
 //	if (fs::exists( projectDir / path )) 
 	{
 //		cout << "OK exists" << endl;
 		bool isFolder = false;
-		string fileType = "file";
+		string fileType { "file" };
 		fileType = extensionToFileType[path.extension()];
 		
 
@@ -771,8 +752,7 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 
 
 void xcodeProject::addCommand(const string & command) {
-	if (debugCommands) 
-	{
+	if (debugCommands) {
 		alert(command, 31);
 	}
 	commands.emplace_back(command);

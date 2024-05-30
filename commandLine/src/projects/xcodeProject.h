@@ -93,5 +93,23 @@ public:
 	std::pair<string, string> rootReplacements;
 	
 
+	std::map<fs::path, string> extensionToFileType {
+		{ ".framework" , "wrapper.framework" },
+		{ ".dylib" , "compiled.mach-o.dylib" },
+		
+		{ ".cpp" , "sourcecode.cpp.cpp" },
+		{ ".c" , "sourcecode.cpp.c" },
+		{ ".h" , "sourcecode.cpp.h" },
+		{ ".hpp" , "sourcecode.cpp.h" },
+		{ ".mm" , "sourcecode.cpp.objcpp" },
+		{ ".m" , "sourcecode.cpp.objcpp" },
+		
+		{ ".xib" , "file.xib" },
+		{ ".metal" , "file.metal" },
+		{ ".xcconfig" , "text.xcconfig" },
+
+		{ ".entitlements" , "text.plist.entitlements" },
+		{ ".plist" , "text.plist.xml" },
+	};
 
 };
