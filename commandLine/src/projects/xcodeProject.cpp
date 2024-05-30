@@ -235,6 +235,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 		
 		vector <fs::path> folders = std::vector(folder.begin(), folder.end());
 		string lastFolderUUID = projRootUUID;
+		string lastFolder = "";
 
 		if (folders.size()){
 			for (std::size_t a=0; a<folders.size(); a++) {
@@ -254,7 +255,10 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 
 					// here we add an UUID for the group (folder) and we initialize an array to receive children (files or folders inside)
 					addCommand("");
-					addCommand("Add :objects:"+thisUUID+":name string " + ofPathToString(folders[a]));
+					
+					string folderName = ofPathToString(folders[a]);
+					lastFolder = folderName;
+					addCommand("Add :objects:"+thisUUID+":name string " + folderName);
 //					alert (commands.back());
 					
 					// FIXME: voltar desde aqui.
@@ -283,7 +287,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 					addCommand("Add :objects:"+thisUUID+":isa string PBXGroup");
 					addCommand("Add :objects:"+thisUUID+":children array");
 
-					if (lastFolderUUID == projRootUUID) {
+					if (lastFolderUUID == projRootUUID) { //|| lastFolder == "additionalSources"
 						addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
 						addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(base));
 
@@ -607,7 +611,6 @@ void xcodeProject::addAddon(ofAddon & addon){
 string xcodeProject::addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp) {
 	//alert("addFile " + ofPathToString(path) + " : " + ofPathToString(folder) , 31);
 
-	string UUID = "";
 	std::map<fs::path, string> extensionToFileType {
 		{ ".framework" , "wrapper.framework" },
 		{ ".dylib" , "compiled.mach-o.dylib" },
@@ -627,14 +630,19 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		{ ".plist" , "text.plist.xml" },
 	};
 	
+	string UUID = "";
+
 //	cout << "will check if exists " << (projectDir / path) << endl;
-	if (fs::exists( projectDir / path )) {
+//	if (fs::exists( projectDir / path )) 
+	{
 //		cout << "OK exists" << endl;
 		bool isFolder = false;
 		string fileType = "file";
 		fileType = extensionToFileType[path.extension()];
+		
+
 		if (fileType == "") {
-			if (fs::is_directory(path)) {
+			if (fs::is_directory(path) || fp.isGroupWithoutFolder) {
 				fileType = "folder";
 				isFolder = true;
 			} else {
@@ -657,16 +665,23 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		
 		// This is adding a file. any file.
 		addCommand("Add :objects:"+UUID+":fileEncoding string 4");
-		addCommand("Add :objects:"+UUID+":isa string PBXFileReference");
+		if (fp.isGroupWithoutFolder) {
+			addCommand("Add :objects:"+UUID+":isa string PBXGroup");
+		} else {
+			addCommand("Add :objects:"+UUID+":isa string PBXFileReference");
+		}
 		addCommand("Add :objects:"+UUID+":lastKnownFileType string " + fileType);
 		addCommand("Add :objects:"+UUID+":name string " + ofPathToString(path.filename()));
+	
 		if (fp.absolute) {
 			addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
-			addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
+			if (fs::exists( projectDir / path )) {
+				addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
+			}
 		} else {
 			addCommand("Add :objects:"+UUID+":sourceTree string <group>");
 		}
-
+		
 		string folderUUID;
 		auto rootDir = folder.root_directory();
 		if (rootDir != "addons" && rootDir != "src") {
@@ -765,20 +780,25 @@ void xcodeProject::addCommand(const string & command) {
 
 
 bool xcodeProject::saveProjectFile(){
+
 //	debugCommands = true;
 
 	addCommand("# ---- PG VERSION " + getPGVersion());
 	addCommand("Add :openFrameworksProjectGeneratorVersion string " + getPGVersion());
 
 	fileProperties fp;
+//	fp.isGroupWithoutFolder = true;
+//	addFile("additionalSources", "", fp);
+//	fp.isGroupWithoutFolder = false;
 //	addFile("openFrameworks-Info.plist", "", fp);
 //	addFile("of.entitlements", "", fp);
 //	addFile("Project.xcconfig", "", fp);
 	addFile("App.xcconfig", "", fp);
 	fp.absolute = true;
-	addFile("../../../libs/openframeworks", "", fp);
+//	addFile("../../../libs/openframeworks", "", fp);
  	addFile(fs::path{"bin"} / "data", "", fp);
-	
+
+
 //	debugCommands = false;
 	
 	fs::path fileName { projectDir / (projectName + ".xcodeproj/project.pbxproj") };

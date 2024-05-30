@@ -35,7 +35,6 @@ public:
 	void addAddon(ofAddon & addon);
 	void saveScheme();
 	void renameProject();
-	
 
 	struct fileProperties {
 		bool absolute = false;
@@ -48,8 +47,10 @@ public:
 		bool addToResources = false;
 		bool frameworksBuildPhase = false;
 		bool isSrc = false;
+		
+		bool isGroupWithoutFolder = false;
 	};
-
+	
 	string addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp);
 	void addCommand(const string & command);
 	
@@ -90,5 +91,7 @@ public:
 	fs::path relRoot = "../../..";
 	
 	std::pair<string, string> rootReplacements;
+	
+
 
 };

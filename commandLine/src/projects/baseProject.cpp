@@ -301,7 +301,7 @@ void baseProject::addAddon(string addonName){
 	// MARK: Review this path here. EDIT: I think it is finally good
 
 	if (bMakeRelative) {
-		addon.pathToOF = getOFRelPath(projectDir);
+		addon.pathToOF = fs::relative(getOFRoot(), projectDir);
 	} else {
 		addon.pathToOF = getOFRoot();
 	}
@@ -573,7 +573,8 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 
 	for( auto & src : srcFilesToAdd){
 		fs::path parent = src.parent_path();
-		fs::path folder = fs::path("additional") / parent.lexically_relative(base);
+//		fs::path folder = fs::path("additionalSources") / parent.lexically_relative(base);
+		fs::path folder = parent.lexically_relative(base);
 		addSrc(src, folder);
 		if (parent.string() != "") {
 			uniqueIncludeFolders.insert(parent.string());
@@ -582,7 +583,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 
 	for(auto & i : uniqueIncludeFolders){
 		ofLogVerbose() << " adding search include paths for folder " << i;
-		alert("addInclude " + i, 31);
+//		alert("addInclude " + i, 31);
 		addInclude(i);
 	}
 }
