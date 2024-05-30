@@ -42,7 +42,6 @@ static std::vector < std::string > platformsOptions {
 	"vs",
 };
 
-
 namespace fs = of::filesystem;
 using std::string;
 using std::vector;
@@ -80,7 +79,6 @@ string unsplitString (std::vector < string > strings, string deliminator );
 fs::path getOFRelPath(const fs::path & from);
 
 bool checkConfigExists();
-bool askOFRoot();
 string getOFRootFromConfig();
 
 std::unique_ptr<baseProject> getTargetProject(const string & targ);

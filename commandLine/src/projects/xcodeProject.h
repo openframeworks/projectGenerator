@@ -15,8 +15,10 @@ private:
 	bool loadProjectFile();
 	bool saveProjectFile();
 	void saveMakefile();
+	bool debugCommands = false;
 
 public:
+
 	void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT);
 	void addInclude(string includeName);
 	void addLibrary(const LibraryBinary & lib);
@@ -50,7 +52,6 @@ public:
 
 	string addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp);
 	void addCommand(const string & command);
-	bool debugCommands = false;
 	
 	string projRootUUID;
 	string resourcesUUID;

@@ -214,7 +214,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 //	fs::path keyFS = base / folder;
 
 //	auto rootDir = folder.root_directory();
-//	fs::path rootDir = *folder.begin();
+//	fs::path rootDir = *base.begin();
 //	bool useBase = (rootDir != "addons" && rootDir != "src");
 //	
 ////	auto fullPathFolder = useBase ? base / folder : folder;
@@ -223,7 +223,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 //	cout << "base " << base << endl;
 //	cout << "rootDir " << rootDir << endl;
 //	cout << "useBase " << useBase << endl;
-	
+//	
 	bool useBase = false;
 	auto fullPathFolder = folder;
 
@@ -248,7 +248,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 				// Query if path is already stored. if not execute this following block
 				if ( folderUUID.find(fullPath) == folderUUID.end() ) {
 					// cout << "creating" << endl;
-					alert ("creating UUID for path " + fullPath.string(), 31);
+//					alert ("creating UUID for path " + fullPath.string(), 31);
 					string thisUUID = generateUUID(fullPath);
 					folderUUID[fullPath] = thisUUID;
 
@@ -621,9 +621,10 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		
 		{ ".xib" , "file.xib" },
 		{ ".metal" , "file.metal" },
-		{ ".entitlements" , "text.plist.entitlements" },
-		{ ".info" , "text.plist.xml" },
 		{ ".xcconfig" , "text.xcconfig" },
+
+		{ ".entitlements" , "text.plist.entitlements" },
+		{ ".plist" , "text.plist.xml" },
 	};
 	
 //	cout << "will check if exists " << (projectDir / path) << endl;
@@ -749,40 +750,38 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 			addCommand("# ---- PBXFrameworksBuildPhase " + buildUUID);
 			addCommand("Add :objects:1D60588F0D05DD3D006BFB54:files: string " + buildUUID);
 		}
-		debugCommands = false;
 	}
 	return UUID;
 }
 
 
 void xcodeProject::addCommand(const string & command) {
-	if (debugCommands) {
-		alert(command);
+	if (debugCommands) 
+	{
+		alert(command, 31);
 	}
 	commands.emplace_back(command);
 }
 
 
 bool xcodeProject::saveProjectFile(){
-	alert ("--- saveProjectFile", 31);
-	for (auto & f : folderUUID) {
-		cout << f.first << " : " << f.second << endl;
-	}
-	alert ("--- saveProjectFile", 31);
+//	debugCommands = true;
 
 	addCommand("# ---- PG VERSION " + getPGVersion());
 	addCommand("Add :openFrameworksProjectGeneratorVersion string " + getPGVersion());
 
 	fileProperties fp;
+//	addFile("openFrameworks-Info.plist", "", fp);
+//	addFile("of.entitlements", "", fp);
+//	addFile("Project.xcconfig", "", fp);
 	addFile("App.xcconfig", "", fp);
-
 	fp.absolute = true;
-	addFile(fs::path{"bin"} / "data", "", fp);
-
-//	alert ("saveProjectFile", 31);
+	addFile("../../../libs/openframeworks", "", fp);
+ 	addFile(fs::path{"bin"} / "data", "", fp);
+	
+//	debugCommands = false;
 	
 	fs::path fileName { projectDir / (projectName + ".xcodeproj/project.pbxproj") };
-//	alert("xcodeProject::saveProjectFile() begin " + fileName.string());
 	bool usePlistBuddy = false;
 
 	if (usePlistBuddy) {

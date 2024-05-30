@@ -383,17 +383,6 @@ bool checkConfigExists(){
 	return fs::exists(getUserHomeDir()  / ".ofprojectgenerator/config");
 }
 
-// FIXME: remove everything because this function is never used. (FS)
-bool askOFRoot(){
-	ofFileDialogResult res = ofSystemLoadDialog("Select the folder of your openFrameworks install",true);
-	if (res.fileName == "" || res.filePath == "") return false;
-
-	ofDirectory config(getUserHomeDir() / ".ofprojectgenerator");
-	config.create(true);
-	ofFile configFile(getUserHomeDir() / ".ofprojectgenerator/config",ofFile::WriteOnly);
-	configFile << res.filePath;
-	return true;
-}
 
 // Unused. remove?
 string getOFRootFromConfig(){

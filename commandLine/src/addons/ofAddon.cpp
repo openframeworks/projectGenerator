@@ -6,7 +6,6 @@
  */
 
 #include "ofUtils.h"
-#include "ofFileUtils.h"
 #include "ofAddon.h"
 #include "Utils.h"
 #include <list>
