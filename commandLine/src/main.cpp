@@ -377,6 +377,7 @@ int main(int argc, char ** argv) {
 		}
 	}
 
+	// Additional Src Paths
 	if (options[SRCEXTERNAL].count() > 0) {
 		if (options[SRCEXTERNAL].arg != NULL) {
 			string srcString(options[SRCEXTERNAL].arg);
@@ -384,7 +385,7 @@ int main(int argc, char ** argv) {
 			for (auto & s : ofSplitString(srcString, ",", true, true)) {
 				s = ofFilePath::removeTrailingSlash(s);
 				srcPaths.emplace_back(s);
-				//alert ("additional src folder : " + s);
+//				alert ("external source folder : " + s, 31);
 			}
 		}
 	}

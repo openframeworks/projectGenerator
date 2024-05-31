@@ -573,8 +573,8 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 
 	for( auto & src : srcFilesToAdd){
 		fs::path parent = src.parent_path();
-//		fs::path folder = fs::path("additionalSources") / parent.lexically_relative(base);
-		fs::path folder = parent.lexically_relative(base);
+		fs::path folder = fs::path("external_sources") / parent.lexically_relative(base);
+//		fs::path folder = parent.lexically_relative(base);
 		addSrc(src, folder);
 		if (parent.string() != "") {
 			uniqueIncludeFolders.insert(parent.string());

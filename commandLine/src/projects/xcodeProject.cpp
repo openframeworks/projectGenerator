@@ -276,11 +276,12 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 
 					addCommand("Add :objects:"+thisUUID+":isa string PBXGroup");
 
-					if (folderName == "additionalSources" || folderName == "local_addons") {
+					if (folderName == "external_sources" || folderName == "local_addons") {
 						addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
 					}
 					else {
-						if (lastFolderUUID == projRootUUID || lastFolder == "additionalSources" || lastFolder == "local_addons") { //
+						if (lastFolderUUID == projRootUUID ||
+							lastFolder == "external_sources" || lastFolder == "local_addons") { //
 
 							// Base folders can be in a different depth,
 							// so we cut folders to point to the right path
