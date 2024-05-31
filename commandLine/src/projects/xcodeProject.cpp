@@ -238,7 +238,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 				// Query if partial path is already stored. if not execute this following block
 				if ( folderUUID.find(fullPath) != folderUUID.end() ) {
 					lastFolderUUID = folderUUID[fullPath];
-					lastFolder = folderFromUUID[lastFolderUUID];
+					lastFolder = ofPathToString(folderFromUUID[lastFolderUUID]);
 				}
 
 				else {

@@ -495,8 +495,6 @@ std::string getPGVersion() {
 
 
 bool ofIsPathInPath(const std::filesystem::path & path, const std::filesystem::path & base) {
-//	alert ("ofIsPathInPath " + base.string() + " : " + path.string(), 35);
 	auto rel = std::filesystem::relative(path, base);
-//	cout << (!rel.empty() && rel.native()[0] != '.') << endl;
 	return !rel.empty() && rel.native()[0] != '.';
 }
