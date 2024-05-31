@@ -316,7 +316,7 @@ void baseProject::addAddon(string addonName){
 	if (fs::exists(addonPath)) {
 		addon.isLocalAddon = true;
 	} else {
-		addonPath = fs::path(getOFRoot()) / "addons" / addonName;
+		addonPath = getOFRoot() / "addons" / addonName;
 		addon.isLocalAddon = false;
 	}
 
