@@ -211,20 +211,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 //	TODO: Change key of folderUUID to base + folder, so "src" in additional source folders
 //	doesn't get confused with "src" from project.
 //	this can work but fullPath variable has to follow the same pattern
-//	fs::path keyFS = base / folder;
 
-//	auto rootDir = folder.root_directory();
-//	fs::path rootDir = *base.begin();
-//	bool useBase = (rootDir != "addons" && rootDir != "src");
-//	
-////	auto fullPathFolder = useBase ? base / folder : folder;
-//	auto fullPathFolder = useBase ? base : folder;
-//	cout << "folder " << folder << endl;
-//	cout << "base " << base << endl;
-//	cout << "rootDir " << rootDir << endl;
-//	cout << "useBase " << useBase << endl;
-//	
-	bool useBase = false;
 	auto fullPathFolder = folder;
 
 	// If folder UUID exists just return it.
@@ -241,7 +228,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 		if (folders.size()){
 			// Iterating every folder from full path
 			for (std::size_t a=0; a<folders.size(); a++) {
-				fs::path fullPath { useBase ? base : "" };
+				fs::path fullPath { "" };
 
 				vector <fs::path> joinFolders = std::vector(folders.begin(), folders.begin() + (a+1));
 				for (auto & j : joinFolders) {
@@ -265,7 +252,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 					
 					// FIXME: Inspect if this is really being used
 					if (isFolder) {
-						alert("INSIDE " , 31);
+//						alert("INSIDE " , 31);
 						fs::path filePath;
 						fs::path filePath_full { relRoot / fullPath };
 						// FIXME: known issue: doesn't handle files with spaces in name.
@@ -295,8 +282,6 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 					else {
 						if (lastFolderUUID == projRootUUID || lastFolder == "additionalSources" || lastFolder == "local_addons") { //
 
-//							alert ("xcodeProject::getFolderUUID " + folder.string() + " : isfolder=" + ofToString(isFolder) + " : base=" + base.string());
-
 							// Base folders can be in a different depth,
 							// so we cut folders to point to the right path
 							fs::path base2 { base };
@@ -305,11 +290,6 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 								base2 = base2.parent_path();
 							}
 							
-//							alert ("lastfolder = " + lastFolder, 31);
-//							alert("folder = " + folder.string(), 32);
-//							alert("base = " + base.string(), 32);
-//							alert("base2 = " + base2.string(), 32);
-
 							addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
 							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(base2));
 						} else {
@@ -327,7 +307,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 					// keep this UUID as parent for the next folder.
 					lastFolderUUID = thisUUID;
 					lastFolder = folderName;
-				} 
+				}
 			}
 		}
 		return lastFolderUUID;
