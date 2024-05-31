@@ -139,21 +139,11 @@ bool xcodeProject::createProjectFile(){
 		}
 	}
 
-	addCommand("# ---- PG VERSION " + getPGVersion());
-	addCommand("Add :openFrameworksProjectGeneratorVersion string " + getPGVersion());
-
-	fileProperties fp;
-	addFile("App.xcconfig", "", fp);
-
-	fp.absolute = true;
-	addFile(fs::path{"bin"} / "data", "", fp);
-
 	return true;
 }
 
 void xcodeProject::saveScheme(){
 	auto schemeFolder = projectDir / ( projectName + ".xcodeproj" ) / "xcshareddata/xcschemes";
-//	alert ("saveScheme " + schemeFolder.string());
 
 	if (fs::exists(schemeFolder)) {
 		fs::remove_all(schemeFolder);
@@ -185,19 +175,15 @@ void xcodeProject::saveScheme(){
 }
 
 void xcodeProject::saveMakefile(){
-//	alert ("saveMakefile " , 35);
 	copyTemplateFiles.push_back({
-		templatePath / "Makefile",
-		projectDir / "Makefile",
+		templatePath / "Makefile", projectDir / "Makefile",
 		{ rootReplacements }
 	});
 	copyTemplateFiles.push_back({
-		templatePath / "config.make",
-		projectDir / "config.make"
+		templatePath / "config.make", projectDir / "config.make"
 	});
-
-
 }
+
 
 bool xcodeProject::loadProjectFile(){ //base
 	renameProject();
@@ -205,6 +191,7 @@ bool xcodeProject::loadProjectFile(){ //base
 	return true;
 }
 
+// FIXME: mover pra dentro do loadProjectfile
 void xcodeProject::renameProject(){ //base
 	// FIXME: review BUILT_PRODUCTS_DIR
 	addCommand("Set :objects:"+buildConfigurationListUUID+":name " + projectName);
@@ -217,41 +204,55 @@ void xcodeProject::renameProject(){ //base
 	}
 }
 
+// FIXME: Double check if isFolder is even being used. Remove it if not
 string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::path base) {
-//	alert ("xcodeProject::getFolderUUID " + folder.string() + " : isfolder=" + ofToString(isFolder) + " : base=" + base.string());
-//	alert ("xcodeProject::getFolderUUID " + folder.begin()->string() + " : base=" + base.string());
-	/*
-	TODO: Change key of folderUUID to base + folder, so "src" in additional source folders
-	doesn't get confused with "src" from project.
-	this can work but fullPath variable has to follow the same pattern
-	fs::path keyFS = base / folder;
-	 */
+//	alert ("xcodeProject::getFolderUUID "+folder.string()+" : isfolder="+ofToString(isFolder)+" : base="+ base.string());
+	
+//	TODO: Change key of folderUUID to base + folder, so "src" in additional source folders
+//	doesn't get confused with "src" from project.
+//	this can work but fullPath variable has to follow the same pattern
 
-	string UUID { "" };
+	auto fullPathFolder = folder;
 
 	// If folder UUID exists just return it.
-	// in this case it is not found, so it creates UUID for the entire path
-	if ( folderUUID.find(folder) == folderUUID.end() ) { // NOT FOUND
-//		alert ("xcodeProject::getFolderUUID " + folder.string() + " : isfolder=" + ofToString(isFolder) + " : base=" + base.string());
-		vector < string > folders = ofSplitString(ofPathToString(folder), "/", true);
+	if ( folderUUID.find(fullPathFolder) != folderUUID.end() ) { // NOT FOUND
+		return folderUUID[fullPathFolder];
+	}
+	else {
+		// in this case it is not found, so it creates UUID for the entire path
+
+		vector <fs::path> folders = std::vector(folder.begin(), folder.end());
 		string lastFolderUUID = projRootUUID;
+		string lastFolder = "";
 
 		if (folders.size()){
+			// Iterating every folder from full path
 			for (std::size_t a=0; a<folders.size(); a++) {
-				vector <string> joinFolders;
-				joinFolders.assign(folders.begin(), folders.begin() + (a+1));
-				string fullPath = ofJoinString(joinFolders, "/");
+				fs::path fullPath { "" };
 
-				// Query if path is already stored. if not execute this following block
-				if ( folderUUID.find(fullPath) == folderUUID.end() ) {
-					// cout << "creating" << endl;
+				vector <fs::path> joinFolders = std::vector(folders.begin(), folders.begin() + (a+1));
+				for (auto & j : joinFolders) {
+					fullPath /= j;
+				}
+
+				// Query if partial path is already stored. if not execute this following block
+				if ( folderUUID.find(fullPath) != folderUUID.end() ) {
+					lastFolderUUID = folderUUID[fullPath];
+					lastFolder = ofPathToString(folderFromUUID[lastFolderUUID]);
+				}
+
+				else {
 					string thisUUID = generateUUID(fullPath);
 					folderUUID[fullPath] = thisUUID;
+					folderFromUUID[thisUUID] = fullPath;
 
-					// here we add an UUID for the group (folder) and we initialize an array to receive children (files or folders inside)
 					addCommand("");
-					addCommand("Add :objects:"+thisUUID+":name string " + folders[a]);
+					string folderName = ofPathToString(folders[a]);
+					addCommand("Add :objects:"+thisUUID+":name string " + folderName);
+					
+					// FIXME: Inspect if this is really being used
 					if (isFolder) {
+//						alert("INSIDE " , 31);
 						fs::path filePath;
 						fs::path filePath_full { relRoot / fullPath };
 						// FIXME: known issue: doesn't handle files with spaces in name.
@@ -265,7 +266,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 
 						if (!filePath.empty()) {
 							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(filePath));
-							alert(commands.back(), 33);
+//							alert(commands.back(), 33);
 						} else {
 //							cout << ">>>>> filePath empty " << endl;
 						}
@@ -274,28 +275,44 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 					}
 
 					addCommand("Add :objects:"+thisUUID+":isa string PBXGroup");
+
+					if (folderName == "external_sources" || folderName == "local_addons") {
+						addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
+					}
+					else {
+						if (lastFolderUUID == projRootUUID ||
+							lastFolder == "external_sources" || lastFolder == "local_addons") { //
+
+							// Base folders can be in a different depth,
+							// so we cut folders to point to the right path
+							fs::path base2 { base };
+							int diff = folders.size() - (a+1);
+							for (int x=0; x<diff; x++) {
+								base2 = base2.parent_path();
+							}
+							
+							addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
+							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(base2));
+						} else {
+							addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
+							fs::path addonFolder { fs::path(fullPath).filename() };
+							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(addonFolder));
+						}
+					}
+
 					addCommand("Add :objects:"+thisUUID+":children array");
 
-					addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
-					fs::path addonFolder { fs::path(fullPath).filename() };
-					addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(addonFolder));
-
-					// And this new object is cointained in parent hierarchy, or even projRootUUID
+					// Add this new folder to its parent, projRootUUID if root
 					addCommand("Add :objects:"+lastFolderUUID+":children: string " + thisUUID);
 
 					// keep this UUID as parent for the next folder.
 					lastFolderUUID = thisUUID;
-				} else {
-					lastFolderUUID = folderUUID[fullPath];
+					lastFolder = folderName;
 				}
 			}
 		}
-		UUID = lastFolderUUID;
-	} else {
-		// Folder already exists, only return it.
-		UUID = folderUUID[folder];
+		return lastFolderUUID;
 	}
-	return UUID;
 }
 
 void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type){
@@ -340,7 +357,6 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 			fp.addToResources = true;
 		}
 	} 
-
 
 	string UUID {
 		addFile(srcFile, folder, fp)
@@ -591,124 +607,23 @@ void xcodeProject::addAddon(ofAddon & addon){
 	}
 }
 
-bool xcodeProject::saveProjectFile(){
-	fs::path fileName = projectDir / (projectName + ".xcodeproj/project.pbxproj");
-//	alert("xcodeProject::saveProjectFile() begin " + fileName.string());
-	bool usePlistBuddy = false;
-
-	if (usePlistBuddy) {
-		//	PLISTBUDDY - Mac only
-		string command = "/usr/libexec/PlistBuddy " + ofPathToString(fileName);
-		string allCommands = "";
-		for (auto & c : commands) {
-			command += " -c \"" + c + "\"";
-			allCommands += c + "\n";
-		}
-		cout << ofSystem(command) << endl;
-	} else {
-		// JSON Block - Multiplatform
-
-		std::ifstream contents(fileName);
-		json j = json::parse(contents);
-		contents.close();
-
-		for (auto & c : commands) {
-			// readable comments enabled now.
-			if (c != "" && c[0] != '#') {
-				vector<string> cols = ofSplitString(c, " ");
-				string thispath = cols[1];
-				ofStringReplace(thispath, ":", "/");
-
-				if (thispath.substr(thispath.length() -1) != "/") {
-					//if (cols[0] == "Set") {
-					json::json_pointer p = json::json_pointer(thispath);
-					if (cols[2] == "string") {
-						// find position after find word
-						auto stringStart = c.find("string ") + 7;
-						j[p] = c.substr(stringStart);
-						// j[p] = cols[3];
-					}
-					else if (cols[2] == "array") {
-						j[p] = {};
-					}
-				}
-				else {
-					thispath = thispath.substr(0, thispath.length() -1);
-//					cout << thispath << endl;
-					json::json_pointer p = json::json_pointer(thispath);
-					try {
-						// Fixing XCode one item array issue
-						if (!j[p].is_array()) {
-							auto v = j[p];
-							j[p] = json::array();
-							if (!v.is_null()) {
-								j[p].emplace_back(v);
-							}
-						}
-						j[p].emplace_back(cols[3]);
-
-					} catch (std::exception & e) {
-						cout << "json error " << endl;
-						cout << e.what() << endl;
-					}
-				}
-			}
-		}
-
-		std::ofstream jsonFile(fileName);
-		try{
-			jsonFile << j.dump(1, '	');
-		}catch(std::exception & e){
-			ofLogError("xcodeProject::saveProjectFile") << "Error saving json to " << fileName << ": " << e.what();
-			return false;
-		}catch(...){
-			ofLogError("xcodeProject::saveProjectFile") << "Error saving json to " << fileName;
-			return false;
-		}
-	}
-
-//	for (auto & c : commands) cout << c << endl;
-	return true;
-}
-
-
-void xcodeProject::addCommand(const string & command) {
-	if (debugCommands) {
-		alert(command);
-	}
-	commands.emplace_back(command);
-}
 
 string xcodeProject::addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp) {
 	//alert("addFile " + ofPathToString(path) + " : " + ofPathToString(folder) , 31);
-
-	string UUID = "";
-	std::map<fs::path, string> extensionToFileType {
-		{ ".framework" , "wrapper.framework" },
-		{ ".dylib" , "compiled.mach-o.dylib" },
-		
-		{ ".cpp" , "sourcecode.cpp.cpp" },
-		{ ".c" , "sourcecode.cpp.c" },
-		{ ".h" , "sourcecode.cpp.h" },
-		{ ".hpp" , "sourcecode.cpp.h" },
-		{ ".mm" , "sourcecode.cpp.objcpp" },
-		{ ".m" , "sourcecode.cpp.objcpp" },
-		
-		{ ".xib" , "file.xib" },
-		{ ".metal" , "file.metal" },
-		{ ".entitlements" , "text.plist.entitlements" },
-		{ ".info" , "text.plist.xml" },
-		{ ".xcconfig" , "text.xcconfig" },
-	};
 	
+	string UUID { "" };
+
 //	cout << "will check if exists " << (projectDir / path) << endl;
-	if (fs::exists( projectDir / path )) {
+//	if (fs::exists( projectDir / path )) 
+	{
 //		cout << "OK exists" << endl;
 		bool isFolder = false;
-		string fileType = "file";
+		string fileType { "file" };
 		fileType = extensionToFileType[path.extension()];
+		
+
 		if (fileType == "") {
-			if (fs::is_directory(path)) {
+			if (fs::is_directory(path) || fp.isGroupWithoutFolder) {
 				fileType = "folder";
 				isFolder = true;
 			} else {
@@ -728,50 +643,41 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 //		} else {
 //			addCommand("Add :objects:"+UUID+":isa string PBXGroup");
 //		}
+		
+		// This is adding a file. any file.
 		addCommand("Add :objects:"+UUID+":fileEncoding string 4");
-		addCommand("Add :objects:"+UUID+":isa string PBXFileReference");
+		if (fp.isGroupWithoutFolder) {
+			addCommand("Add :objects:"+UUID+":isa string PBXGroup");
+		} else {
+			addCommand("Add :objects:"+UUID+":isa string PBXFileReference");
+		}
 		addCommand("Add :objects:"+UUID+":lastKnownFileType string " + fileType);
 		addCommand("Add :objects:"+UUID+":name string " + ofPathToString(path.filename()));
+	
 		if (fp.absolute) {
 			addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
-			addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
+			if (fs::exists( projectDir / path )) {
+				addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
+			}
 		} else {
 			addCommand("Add :objects:"+UUID+":sourceTree string <group>");
 		}
-
-		string folderUUID;
-		if (fp.isSrc) {
-//			alert("fp isSrc!", 31);
-//			addCommand("Add :objects:"+UUID+":name string " + ofPathToString(path.filename()));
 		
-//			fs::path base;
-//			fs::path src { path };
-//			fs::path folderFS { folder };
-//
-//			if (!fs::exists(folderFS)) {
-//				// cout << "folder doesn't exist " << folderFS << endl;
-//				fs::path parent = src.parent_path();
-//				auto nit = folderFS.end();
-//
-//				base = parent;
-//				fs::path folderFS2 = folderFS;
-//
-//				while(base.filename() == folderFS2.filename() && base.filename() != "" && folderFS2.filename() != "") {
-//					base = base.parent_path();
-//					folderFS2 = folderFS2.parent_path();
-//				}
-//			}
-//
-//			folderUUID = getFolderUUID(folder, true, base);
-//			alert("isSrc " + ofPathToString(folder) + " : " + ofPathToString(base), 33);
+		string folderUUID;
+		auto rootDir = folder.root_directory();
+		if (rootDir != "addons" && rootDir != "src") {
+//			alert("addFile path:" + ofPathToString(path) + " folder:" + ofPathToString(folder) , 31);
+			auto base = path.parent_path();
+			folderUUID = getFolderUUID(folder, isFolder, base);
+
 		} else {
 			folderUUID = getFolderUUID(folder, isFolder);
 		}
-//		isFolder = true;
 		folderUUID = getFolderUUID(folder, isFolder);
-		addCommand("# ---- addFileToFolder UUID " + ofPathToString(folder));
+
+
+		addCommand("# ---- addFileToFolder UUID : " + ofPathToString(folder));
 		addCommand("Add :objects:" + folderUUID + ":children: string " + UUID);
-		
 		
 		string buildUUID { generateUUID(ofPathToString(path) + "-build") };
 		// If any other option is true, add buildUUID entries.
@@ -842,7 +748,116 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 			addCommand("# ---- PBXFrameworksBuildPhase " + buildUUID);
 			addCommand("Add :objects:1D60588F0D05DD3D006BFB54:files: string " + buildUUID);
 		}
-		debugCommands = false;
 	}
 	return UUID;
+}
+
+
+void xcodeProject::addCommand(const string & command) {
+	if (debugCommands) {
+		alert(command, 31);
+	}
+	commands.emplace_back(command);
+}
+
+
+bool xcodeProject::saveProjectFile(){
+
+//	debugCommands = true;
+
+	addCommand("# ---- PG VERSION " + getPGVersion());
+	addCommand("Add :openFrameworksProjectGeneratorVersion string " + getPGVersion());
+
+	fileProperties fp;
+//	fp.isGroupWithoutFolder = true;
+//	addFile("additionalSources", "", fp);
+//	fp.isGroupWithoutFolder = false;
+//	addFile("openFrameworks-Info.plist", "", fp);
+//	addFile("of.entitlements", "", fp);
+//	addFile("Project.xcconfig", "", fp);
+	addFile("App.xcconfig", "", fp);
+	fp.absolute = true;
+//	addFile("../../../libs/openframeworks", "", fp);
+ 	addFile(fs::path{"bin"} / "data", "", fp);
+
+
+//	debugCommands = false;
+	
+	fs::path fileName { projectDir / (projectName + ".xcodeproj/project.pbxproj") };
+	bool usePlistBuddy = false;
+
+	if (usePlistBuddy) {
+		//	PLISTBUDDY - Mac only
+		string command = "/usr/libexec/PlistBuddy " + ofPathToString(fileName);
+		string allCommands = "";
+		for (auto & c : commands) {
+			command += " -c \"" + c + "\"";
+			allCommands += c + "\n";
+		}
+		cout << ofSystem(command) << endl;
+	} else {
+		// JSON Block - Multiplatform
+
+		std::ifstream contents(fileName);
+		json j { json::parse(contents) };
+		contents.close();
+
+		for (auto & c : commands) {
+			// readable comments enabled now.
+			if (c != "" && c[0] != '#') {
+				vector<string> cols { ofSplitString(c, " ") };
+				string thispath { cols[1] };
+				ofStringReplace(thispath, ":", "/");
+
+				if (thispath.substr(thispath.length() -1) != "/") {
+					//if (cols[0] == "Set") {
+					json::json_pointer p { json::json_pointer(thispath) };
+					if (cols[2] == "string") {
+						// find position after find word
+						auto stringStart { c.find("string ") + 7 };
+						j[p] = c.substr(stringStart);
+						// j[p] = cols[3];
+					}
+					else if (cols[2] == "array") {
+						j[p] = {};
+					}
+				}
+				else {
+					thispath = thispath.substr(0, thispath.length() -1);
+//					cout << thispath << endl;
+					json::json_pointer p { json::json_pointer(thispath) };
+					try {
+						// Fixing XCode one item array issue
+						if (!j[p].is_array()) {
+							auto v { j[p] };
+							j[p] = json::array();
+							if (!v.is_null()) {
+								j[p].emplace_back(v);
+							}
+						}
+						j[p].emplace_back(cols[3]);
+
+					} catch (std::exception & e) {
+						cout << "json error " << endl;
+						cout << e.what() << endl;
+					}
+				}
+			}
+		}
+
+		std::ofstream jsonFile(fileName);
+		try {
+			jsonFile << j.dump(1, '	');
+		} catch(std::exception & e) {
+			ofLogError("xcodeProject::saveProjectFile") << "Error saving json to " << fileName << ": " << e.what();
+			return false;
+		} catch(...) {
+			ofLogError("xcodeProject::saveProjectFile") << "Error saving json to " << fileName;
+			return false;
+		}
+		jsonFile.close();
+	}
+
+//	for (auto & c : commands) cout << c << endl;
+	return true;
 }

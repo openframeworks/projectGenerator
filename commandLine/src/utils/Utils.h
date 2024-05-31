@@ -14,6 +14,12 @@
 #include "baseProject.h"
 struct LibraryBinary;
 
+namespace fs = of::filesystem;
+using std::string;
+using std::vector;
+using std::cout;
+using std::endl;
+
 static std::map <ofTargetPlatform, std::string> platformsToString {
 	{ OF_TARGET_ANDROID, "android" },
 //	{ OF_TARGET_EMSCRIPTEN, "" },
@@ -28,7 +34,6 @@ static std::map <ofTargetPlatform, std::string> platformsToString {
 	{ OF_TARGET_WINVS, "vs" },
 };
 
-
 static std::vector < std::string > platformsOptions {
 	"android",
 	"ios",
@@ -41,13 +46,6 @@ static std::vector < std::string > platformsOptions {
 	"osx",
 	"vs",
 };
-
-
-namespace fs = of::filesystem;
-using std::string;
-using std::vector;
-using std::cout;
-using std::endl;
 
 string generateUUID(const string & input);
 string generateUUID(const fs::path & path);
@@ -76,12 +74,6 @@ void splitFromFirst(string toSplit, string deliminator, string & first, string &
 
 void fixSlashOrder(string & toFix);
 string unsplitString (std::vector < string > strings, string deliminator );
-
-fs::path getOFRelPath(const fs::path & from);
-
-bool checkConfigExists();
-bool askOFRoot();
-string getOFRootFromConfig();
 
 std::unique_ptr<baseProject> getTargetProject(const string & targ);
 

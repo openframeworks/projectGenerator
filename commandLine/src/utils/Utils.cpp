@@ -375,35 +375,6 @@ void setOFRoot(const fs::path & path){
 	OFRoot = path;
 }
 
-fs::path getOFRelPath(const fs::path & from) {
-	return fs::relative(getOFRoot(), from);
-}
-
-bool checkConfigExists(){
-	return fs::exists(getUserHomeDir()  / ".ofprojectgenerator/config");
-}
-
-// FIXME: remove everything because this function is never used. (FS)
-bool askOFRoot(){
-	ofFileDialogResult res = ofSystemLoadDialog("Select the folder of your openFrameworks install",true);
-	if (res.fileName == "" || res.filePath == "") return false;
-
-	ofDirectory config(getUserHomeDir() / ".ofprojectgenerator");
-	config.create(true);
-	ofFile configFile(getUserHomeDir() / ".ofprojectgenerator/config",ofFile::WriteOnly);
-	configFile << res.filePath;
-	return true;
-}
-
-// Unused. remove?
-string getOFRootFromConfig(){
-	if(!checkConfigExists()) return "";
-	ofFile configFile( getUserHomeDir() / ".ofprojectgenerator/config",ofFile::ReadOnly);
-	ofBuffer filePath = configFile.readToBuffer();
-	return filePath.getLines().begin().asString();
-}
-
-
 unique_ptr<baseProject> getTargetProject(const string & targ) {
 //	cout << "getTargetProject :" << getTargetString(targ) << endl;
 //	typedef xcodeProject pgProject;
@@ -524,8 +495,6 @@ std::string getPGVersion() {
 
 
 bool ofIsPathInPath(const std::filesystem::path & path, const std::filesystem::path & base) {
-//	alert ("ofIsPathInPath " + base.string() + " : " + path.string(), 35);
 	auto rel = std::filesystem::relative(path, base);
-//	cout << (!rel.empty() && rel.native()[0] != '.') << endl;
 	return !rel.empty() && rel.native()[0] != '.';
 }

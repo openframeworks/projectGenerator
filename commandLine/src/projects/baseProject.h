@@ -1,12 +1,11 @@
 #pragma once
 
-#define PG_VERSION "41"
+#define PG_VERSION "43"
 
 #include "ofAddon.h"
-#include "ofFileUtils.h"
 #include "pugixml.hpp"
 #include <map>
-
+#include <fstream>
 
 namespace fs = of::filesystem;
 
@@ -26,7 +25,8 @@ public:
 	};
 
 	struct Template {
-		ofDirectory dir;
+//		ofDirectory dir;
+		fs::path dir;
 		std::string name;
 		std::vector<string> platforms;
 		std::string description;
