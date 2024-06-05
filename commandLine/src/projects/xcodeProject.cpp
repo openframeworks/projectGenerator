@@ -47,7 +47,8 @@ xcodeProject::xcodeProject(const string & target) : baseProject(target){
 		folderUUID = {
 			{ "src", 			"E4D8936A11527B74007E1F53" },
 			{ "addons", 		"BB16F26B0F2B646B00518274" },
-			{ "", 				"29B97314FDCFA39411CA2CEA" }
+			{ "", 				"29B97314FDCFA39411CA2CEA" },
+			{ "Frameworks", 	"901808C02053638E004A7774" }
 			// { "localAddons", 	"6948EE371B920CB800B5AC1A" },
 		};
 
@@ -390,6 +391,8 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder){
 	}
 	
 	fileProperties fp;
+	fp.absolute = isSystemFramework;
+	
 	fp.codeSignOnCopy = !isSystemFramework;
 	fp.copyFilesBuildPhase = !isSystemFramework;
 	fp.frameworksBuildPhase = (target != "ios" && !folder.empty());
@@ -568,21 +571,23 @@ void xcodeProject::addAddon(ofAddon & addon){
 		ofLogVerbose() << "adding addon frameworks: " << f;
 
 		size_t found=f.find('/');
-		if (found==string::npos){
+		if (found==string::npos) { // This path doesn't have slashes
 			fs::path folder = fs::path{ "addons" } / addon.name / "frameworks";
 //			fs::path folder = addon.filesToFolders[f];
 
 			if (target == "ios"){
-				addFramework(  "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/" +
-					f + ".framework",
-					folder);
+				addFramework(  "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/" + f + ".framework",
+//					folder
+					"Frameworks"
+					);
 			} else {
 				if (addon.isLocalAddon) {
 					folder = addon.addonPath / "frameworks";
 				}
 				addFramework( "/System/Library/Frameworks/" + f + ".framework", folder);
 			}
-		} else {
+		} 
+		else {
 			if (ofIsStringInString(f, "/System/Library")){
 				addFramework(f, "addons/" + addon.name + "/frameworks");
 
