@@ -291,7 +291,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 								base2 = base2.parent_path();
 							}
 							
-							alert("OWWW ta tirando", 31);
+						
 							addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
 							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(base2));
 						} else {
@@ -302,8 +302,6 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 					}
 
 					addCommand("Add :objects:"+thisUUID+":children array");
-<<<<<<< Updated upstream
-=======
                     
                     if (folder.begin()->string() == "addons" || folder.begin()->string() == "src") {
                         addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
@@ -311,11 +309,9 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
                         addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(addonFolder));
                         // alert ("group " + folder.string() + " : " + base.string() + " : " + addonFolder.string(), 32);
                     } else {
-						alert("OWWW ta tirando 2 ", 31);
                         addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
                     }
 
->>>>>>> Stashed changes
 
 					// Add this new folder to its parent, projRootUUID if root
 					addCommand("Add :objects:"+lastFolderUUID+":children: string " + thisUUID);
@@ -670,8 +666,6 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		addCommand("Add :objects:"+UUID+":name string " + ofPathToString(path.filename()));
 	
 		if (fp.absolute) {
-			alert("OWWW ta tirando 3 ", 31);
-			alert(commands.back(), 31);
 
 			addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
 			if (fs::exists( projectDir / path )) {
