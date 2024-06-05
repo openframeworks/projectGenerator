@@ -18,6 +18,9 @@
 		"7F2BBCD1-F22D-454A-9100-33D1C12BEA70" /* androidStudioProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "FFD740F7-8E04-4563-A856-D4E402AF9C0E" /* androidStudioProject.cpp */; };
 		"B07B8E19-F9DE-4E97-8833-859CD9267D30" /* LibraryBinary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "1EFA4702-B4F3-4556-9C12-4FE21FD503D0" /* LibraryBinary.cpp */; };
 		"BCE6F361-0F3D-41FF-978D-B5ED6676D90B" /* LICENSE in Sources */ = {isa = PBXBuildFile; fileRef = "C97ACCE3-5F0E-4BEC-8BA9-2A532D9EA2E3" /* LICENSE */; };
+		BF879F5D2C0F7CEB00200951 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF879F5C2C0F7CEB00200951 /* AVFoundation.framework */; };
+		BF879F5F2C0F7ED500200951 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF879F5E2C0F7ED500200951 /* Foundation.framework */; };
+		BF879F642C0F801100200951 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF879F632C0F801100200951 /* SystemConfiguration.framework */; };
 		"C2428661-BDEC-41D7-8150-C9BA5EE86C0C" /* visualStudioProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "7BB75687-3F31-4D10-BE6A-C7918D1A678D" /* visualStudioProject.cpp */; };
 		"DBD7E2AC-672A-4FD9-B0A4-DF24111D17FB" /* xcodeProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "4CC7F503-61FC-435C-BA93-F9C1E6D46ABE" /* xcodeProject.cpp */; };
 		E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E4B69E1D0A3A1BDC003C02F2 /* main.cpp */; };
@@ -72,6 +75,9 @@
 		"9314E210-0C9D-4025-9840-CD8122E2DC3D" /* LibraryBinary.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = LibraryBinary.h; path = src/utils/LibraryBinary.h; sourceTree = SOURCE_ROOT; };
 		"9FAE80C7-5F2A-4E9D-9487-9E2667DE93DA" /* Utils.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = Utils.h; path = src/utils/Utils.h; sourceTree = SOURCE_ROOT; };
 		"AB662ACC-8DC1-4C81-A360-52F4CBF8DFF9" /* App.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = App.xcconfig; sourceTree = "<group>"; };
+		BF879F5C2C0F7CEB00200951 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		BF879F5E2C0F7ED500200951 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		BF879F632C0F801100200951 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		"C0FADDD2-1DFA-4DC4-AC81-5877E59E42BF" /* ofAddon.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = ofAddon.h; path = src/addons/ofAddon.h; sourceTree = SOURCE_ROOT; };
 		"C5A3016A-B663-4FE7-B6E6-421C5F168447" /* qtcreatorproject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = qtcreatorproject.cpp; path = src/projects/qtcreatorproject.cpp; sourceTree = SOURCE_ROOT; };
 		"C97ACCE3-5F0E-4BEC-8BA9-2A532D9EA2E3" /* LICENSE */ = {isa = PBXFileReference; explicitFileType = file; fileEncoding = 4; name = LICENSE; path = src/uuidxx/license/LICENSE; sourceTree = SOURCE_ROOT; };
@@ -92,6 +98,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF879F642C0F801100200951 /* SystemConfiguration.framework in Frameworks */,
+				BF879F5F2C0F7ED500200951 /* Foundation.framework in Frameworks */,
+				BF879F5D2C0F7CEB00200951 /* AVFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -173,6 +182,16 @@
 			path = ../../../addons;
 			sourceTree = "<group>";
 		};
+		BF879F5B2C0F7CEB00200951 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BF879F632C0F801100200951 /* SystemConfiguration.framework */,
+				BF879F5E2C0F7ED500200951 /* Foundation.framework */,
+				BF879F5C2C0F7CEB00200951 /* AVFoundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		"C833E973-D2D2-4055-A99B-34CB61CC572D" /* uuidxx */ = {
 			isa = PBXGroup;
 			children = (
@@ -194,6 +213,7 @@
 				BB4B014C10F69532006C3DED /* addons */,
 				E4B69B5B0A3A1756003C02F2 /* commandLineDebug.app */,
 				"AB662ACC-8DC1-4C81-A360-52F4CBF8DFF9" /* App.xcconfig */,
+				BF879F5B2C0F7CEB00200951 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
