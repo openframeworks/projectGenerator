@@ -46,6 +46,8 @@ fi
 echo "====== "
 cd "${PG_DIR}/frontend"
 pwd 
+echo "NPM audit project"
+npm audit fix
 echo "Building openFrameworks Frontend ${FRONTEND_TARGET}"
 npm install
 echo "====== install"

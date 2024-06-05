@@ -301,6 +301,16 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 					}
 
 					addCommand("Add :objects:"+thisUUID+":children array");
+                    
+                    if (folder.begin()->string() == "addons") {
+                        addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
+                        fs::path addonFolder { fs::path(fullPath).filename() };
+                        addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(addonFolder));
+                        // alert ("group " + folder.string() + " : " + base.string() + " : " + addonFolder.string(), 32);
+                    } else {
+                        addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
+                    }
+
 
 					// Add this new folder to its parent, projRootUUID if root
 					addCommand("Add :objects:"+lastFolderUUID+":children: string " + thisUUID);
@@ -357,6 +367,7 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 			fp.addToResources = true;
 		}
 	} 
+    
 
 	string UUID {
 		addFile(srcFile, folder, fp)
@@ -423,7 +434,7 @@ void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder
 	string parent { ofPathToString(path.parent_path()) };
 
 	for (auto & c : buildConfigs) {
-		addCommand("Add :objects:" + c + ":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + parent);
+		addCommand("Add :objects:" + c + ":buildSettings:XFRAMEWORK_SEARCH_PATHS: string " + parent);
 	}
 }
 
