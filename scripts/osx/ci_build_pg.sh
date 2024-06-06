@@ -84,7 +84,7 @@ package_app(){
 			xcrun notarytool --version
 			xcrun notarytool history
 			echo "NOTORIZATION --"
-			xcrun notarytool submit projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip --primary-bundle-id "com.electron.projectgenerator" --apple-id "${APPLE_ID}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
+			xcrun notarytool submit "projectGenerator-${PLATFORM}/projectGenerator-${PLATFORM}.zip" --apple-id "${APPLE_ID}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
 		fi
 
 		mv projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip ${PG_DIR}/../../../projectGenerator/projectGenerator-$PLATFORM.zip
@@ -131,7 +131,7 @@ sign_and_upload(){
 			xcrun notarytool --version
 			xcrun notarytool history
 			TEAM_ID="HC25N2E7UT"
-			xcrun notarytool submit projectGenerator-$PLATFORM/projectGenerator.app.zip --primary-bundle-id "com.electron.projectgenerator" --apple-id "${GA_APPLE_USERNAME}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
+			xcrun notarytool submit "projectGenerator-${PLATFORM}/projectGenerator-${PLATFORM}.app.zip" --apple-id "${GA_APPLE_USERNAME}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
 			
 			# Upload to OF CI server
 			echo "Uploading $PLATFORM PG to CI servers"
