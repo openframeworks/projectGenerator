@@ -37,7 +37,7 @@ echoDots(){
 
 package_app(){
 	if [[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
-
+		echo "package_app --"
 		PLATFORM=$1
 		# Copy commandLine into electron .app
 		cd ${PG_DIR}
@@ -67,16 +67,27 @@ package_app(){
 		echo "-------------"
 		echo "cd to ${PG_DIR}"
 		cd ${PG_DIR}
-		electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
 
+		TEAM_ID="HC25N2E7UT"
+		APPLE_ID="theo@theowatson.com"
+		echo "GA_APPLE_USERNAME: ${GA_APPLE_USERNAME}"
+		# echo "--identity=3rd Party Mac Developer Application: ${APPLE_ID} (${TEAM_ID})"
+		if [[ ("${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" || "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/bleeding") && "$TRAVIS_PULL_REQUEST" == "false" ]] || 
+   			[[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
+			electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --hardenedRuntime=true --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
+		fi
 		${SCRIPT_DIR}/secure.sh projectGenerator-$PLATFORM/projectGenerator.app/Contents/MacOS/projectGenerator projectGenerator-$PLATFORM
 		echo "Compressing PG app"
 		# need to upload zip of just app to apple for notarizing
 		zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM/projectGenerator.app
-		xcrun notarytool --version
-		xcrun notarytool history
-		echo "SKIPPING NOTORIZATION --"
-		# xcrun notarytool submit projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip --primary-bundle-id "com.electron.projectgenerator" --apple-id "${GA_APPLE_USERNAME}" --team-id "${GA_TEAM_ID}" --password "${GA_APPLE_PASS}"
+		if [[ ("${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" || "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/bleeding") && "$TRAVIS_PULL_REQUEST" == "false" ]] || 
+   			[[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
+			xcrun notarytool --version
+			xcrun notarytool history
+			echo "NOTORIZATION --"
+			xcrun notarytool submit projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip --primary-bundle-id "com.electron.projectgenerator" --apple-id "${APPLE_ID}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
+		fi
+
 		mv projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip ${PG_DIR}/../../../projectGenerator/projectGenerator-$PLATFORM.zip
 		cd ${PG_DIR}/../../../projectGenerator
 		echo "Final Directory contents: ${PG_DIR}/../../../projectGenerator"
@@ -90,6 +101,7 @@ package_app(){
 
 
 sign_and_upload(){
+	echo "sign_and_upload --"
 	PLATFORM=$1
 	# Copy commandLine into electron .app
 	cd ${PG_DIR}
@@ -115,8 +127,13 @@ sign_and_upload(){
 
 			# need to upload zip of just app to apple for notarizing
 			zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator.app.zip projectGenerator-$PLATFORM/projectGenerator.app
-			xcrun altool --notarize-app --primary-bundle-id "com.electron.projectgenerator" --username "${GA_APPLE_USERNAME}" -p "${GA_APPLE_PASS}" --asc-provider "${GA_NOTARIZE_PROVIDER}" --file projectGenerator-$PLATFORM/projectGenerator.app.zip
-
+			# xcrun altool --notarize-app --primary-bundle-id "com.electron.projectgenerator" --username "${GA_APPLE_USERNAME}" -p "${GA_APPLE_PASS}" --asc-provider "${GA_NOTARIZE_PROVIDER}" --file projectGenerator-$PLATFORM/projectGenerator.app.zip
+			echo "NOTORIZATION --"
+			xcrun notarytool --version
+			xcrun notarytool history
+			TEAM_ID="HC25N2E7UT"
+			xcrun notarytool submit projectGenerator-$PLATFORM/projectGenerator.app.zip --primary-bundle-id "com.electron.projectgenerator" --apple-id "${GA_APPLE_USERNAME}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
+			
 			# Upload to OF CI server
 			echo "Uploading $PLATFORM PG to CI servers"
 
