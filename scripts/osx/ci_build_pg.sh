@@ -77,7 +77,9 @@ package_app(){
 		xcrun notarytool history
 		echo "NOTORIZATION --"
 		TEAM_ID="HC25N2E7UT"
-		xcrun notarytool submit projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip --primary-bundle-id "com.electron.projectgenerator" --apple-id "${GA_APPLE_USERNAME}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
+		APPLE_ID="theo@theowatson.com"
+		echo "GA_APPLE_USERNAME: ${GA_APPLE_USERNAME}"
+		xcrun notarytool submit projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip --primary-bundle-id "com.electron.projectgenerator" --apple-id "${APPLE_ID}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
 		mv projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip ${PG_DIR}/../../../projectGenerator/projectGenerator-$PLATFORM.zip
 		cd ${PG_DIR}/../../../projectGenerator
 		echo "Final Directory contents: ${PG_DIR}/../../../projectGenerator"

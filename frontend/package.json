@@ -37,7 +37,10 @@
       "icon": "static/icon/of.icns",
       "target": {
         "target": "dir",
-        "arch": ["x64", "arm64" ]
+        "arch": [
+          "x64",
+          "arm64"
+        ]
       },
       "mergeASARs": false,
       "x64ArchFiles": "Contents/Resources/app/app/projectGenerator"
@@ -46,14 +49,19 @@
       "icon": "static/icon/of.ico",
       "target": {
         "target": "dir",
-        "arch": ["x64"]
+        "arch": [
+          "x64"
+        ]
       }
     },
     "linux": {
       "icon": "static/icon",
       "target": {
         "target": "tar.gz",
-        "arch": ["x64", "arm64"]
+        "arch": [
+          "x64",
+          "arm64"
+        ]
       }
     },
     "files": [
@@ -68,8 +76,10 @@
       "!package.json",
       "!package-lock.json",
       {
-          "from": "../dist",
-          "filter": ["**/*"]
+        "from": "../dist",
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "asar": false
@@ -78,10 +88,10 @@
     "electron-app"
   ],
   "dependencies": {
+    "@types/jquery": "^3.5.29",
+    "modclean": "^3.0.0-beta.1",
     "moniker": "^0.1.2",
-    "n-readlines": "^1.0.1",
-    "@types/jquery": "^3.5.29"
-    
+    "n-readlines": "^1.0.1"
   },
   "devDependencies": {
     "electron": "^28.0.0",

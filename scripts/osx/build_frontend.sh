@@ -53,6 +53,9 @@ npm install
 echo "====== install"
 npm update 
 echo "====== update"
+npm install -g clean-modules
+clean-modules -y
+echo "====== clean"
 npm run
 echo "====== run"
 
