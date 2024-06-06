@@ -81,9 +81,6 @@ package_app(){
 		zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM/projectGenerator.app
 		if [[ ("${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" || "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/bleeding") && "$TRAVIS_PULL_REQUEST" == "false" ]] || 
    			[[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
-			xcrun notarytool --version
-			xcrun notarytool history
-			echo "NOTORIZATION --"
 			xcrun notarytool submit "projectGenerator-${PLATFORM}/projectGenerator-${PLATFORM}.zip" --apple-id "${APPLE_ID}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
 		fi
 
@@ -127,9 +124,6 @@ sign_and_upload(){
 			# need to upload zip of just app to apple for notarizing
 			zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator.app.zip projectGenerator-$PLATFORM/projectGenerator.app
 			# xcrun altool --notarize-app --primary-bundle-id "com.electron.projectgenerator" --username "${GA_APPLE_USERNAME}" -p "${GA_APPLE_PASS}" --asc-provider "${GA_NOTARIZE_PROVIDER}" --file projectGenerator-$PLATFORM/projectGenerator.app.zip
-			echo "NOTORIZATION --"
-			xcrun notarytool --version
-			xcrun notarytool history
 			TEAM_ID="HC25N2E7UT"
 			xcrun notarytool submit "projectGenerator-${PLATFORM}/projectGenerator-${PLATFORM}.app.zip" --apple-id "${GA_APPLE_USERNAME}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
 			
