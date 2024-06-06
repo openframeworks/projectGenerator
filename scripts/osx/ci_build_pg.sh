@@ -71,7 +71,8 @@ package_app(){
 		TEAM_ID="HC25N2E7UT"
 		APPLE_ID="theo@theowatson.com"
 		echo "GA_APPLE_USERNAME: ${GA_APPLE_USERNAME}"
-		electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements --identity="3rd Party Mac Developer Application: ${APPLE_ID} (${TEAM_ID})"
+		echo "--identity=3rd Party Mac Developer Application: ${APPLE_ID} (${TEAM_ID})"
+		#electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --hardenedRuntime=true --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
 
 		${SCRIPT_DIR}/secure.sh projectGenerator-$PLATFORM/projectGenerator.app/Contents/MacOS/projectGenerator projectGenerator-$PLATFORM
 		echo "Compressing PG app"
