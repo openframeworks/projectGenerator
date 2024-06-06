@@ -67,7 +67,11 @@ package_app(){
 		echo "-------------"
 		echo "cd to ${PG_DIR}"
 		cd ${PG_DIR}
-		electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
+
+		TEAM_ID="HC25N2E7UT"
+		APPLE_ID="theo@theowatson.com"
+		echo "GA_APPLE_USERNAME: ${GA_APPLE_USERNAME}"
+		electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements --identity="3rd Party Mac Developer Application: ${APPLE_ID} (${TEAM_ID})"
 
 		${SCRIPT_DIR}/secure.sh projectGenerator-$PLATFORM/projectGenerator.app/Contents/MacOS/projectGenerator projectGenerator-$PLATFORM
 		echo "Compressing PG app"
@@ -76,9 +80,6 @@ package_app(){
 		xcrun notarytool --version
 		xcrun notarytool history
 		echo "NOTORIZATION --"
-		TEAM_ID="HC25N2E7UT"
-		APPLE_ID="theo@theowatson.com"
-		echo "GA_APPLE_USERNAME: ${GA_APPLE_USERNAME}"
 		xcrun notarytool submit projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip --primary-bundle-id "com.electron.projectgenerator" --apple-id "${APPLE_ID}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
 		mv projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip ${PG_DIR}/../../../projectGenerator/projectGenerator-$PLATFORM.zip
 		cd ${PG_DIR}/../../../projectGenerator
