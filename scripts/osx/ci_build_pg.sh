@@ -37,7 +37,7 @@ echoDots(){
 
 package_app(){
 	if [[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
-
+		echo "package_app --"
 		PLATFORM=$1
 		# Copy commandLine into electron .app
 		cd ${PG_DIR}
@@ -75,8 +75,9 @@ package_app(){
 		zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM/projectGenerator.app
 		xcrun notarytool --version
 		xcrun notarytool history
-		echo "SKIPPING NOTORIZATION --"
-		# xcrun notarytool submit projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip --primary-bundle-id "com.electron.projectgenerator" --apple-id "${GA_APPLE_USERNAME}" --team-id "${GA_TEAM_ID}" --password "${GA_APPLE_PASS}"
+		echo "NOTORIZATION --"
+		TEAM_ID="HC25N2E7UT"
+		xcrun notarytool submit projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip --primary-bundle-id "com.electron.projectgenerator" --apple-id "${GA_APPLE_USERNAME}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
 		mv projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip ${PG_DIR}/../../../projectGenerator/projectGenerator-$PLATFORM.zip
 		cd ${PG_DIR}/../../../projectGenerator
 		echo "Final Directory contents: ${PG_DIR}/../../../projectGenerator"
@@ -90,6 +91,7 @@ package_app(){
 
 
 sign_and_upload(){
+	echo "sign_and_upload --"
 	PLATFORM=$1
 	# Copy commandLine into electron .app
 	cd ${PG_DIR}
@@ -115,8 +117,13 @@ sign_and_upload(){
 
 			# need to upload zip of just app to apple for notarizing
 			zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator.app.zip projectGenerator-$PLATFORM/projectGenerator.app
-			xcrun altool --notarize-app --primary-bundle-id "com.electron.projectgenerator" --username "${GA_APPLE_USERNAME}" -p "${GA_APPLE_PASS}" --asc-provider "${GA_NOTARIZE_PROVIDER}" --file projectGenerator-$PLATFORM/projectGenerator.app.zip
-
+			# xcrun altool --notarize-app --primary-bundle-id "com.electron.projectgenerator" --username "${GA_APPLE_USERNAME}" -p "${GA_APPLE_PASS}" --asc-provider "${GA_NOTARIZE_PROVIDER}" --file projectGenerator-$PLATFORM/projectGenerator.app.zip
+			echo "NOTORIZATION --"
+			xcrun notarytool --version
+			xcrun notarytool history
+			TEAM_ID="HC25N2E7UT"
+			xcrun notarytool submit projectGenerator-$PLATFORM/projectGenerator.app.zip --primary-bundle-id "com.electron.projectgenerator" --apple-id "${GA_APPLE_USERNAME}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
+			
 			# Upload to OF CI server
 			echo "Uploading $PLATFORM PG to CI servers"
 
