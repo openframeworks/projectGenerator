@@ -71,17 +71,23 @@ package_app(){
 		TEAM_ID="HC25N2E7UT"
 		APPLE_ID="theo@theowatson.com"
 		echo "GA_APPLE_USERNAME: ${GA_APPLE_USERNAME}"
-		echo "--identity=3rd Party Mac Developer Application: ${APPLE_ID} (${TEAM_ID})"
-		#electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --hardenedRuntime=true --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
-
+		# echo "--identity=3rd Party Mac Developer Application: ${APPLE_ID} (${TEAM_ID})"
+		if [[ ("${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" || "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/bleeding") && "$TRAVIS_PULL_REQUEST" == "false" ]] || 
+   			[[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
+			electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --hardenedRuntime=true --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
+		fi
 		${SCRIPT_DIR}/secure.sh projectGenerator-$PLATFORM/projectGenerator.app/Contents/MacOS/projectGenerator projectGenerator-$PLATFORM
 		echo "Compressing PG app"
 		# need to upload zip of just app to apple for notarizing
 		zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM/projectGenerator.app
-		xcrun notarytool --version
-		xcrun notarytool history
-		echo "NOTORIZATION --"
-		xcrun notarytool submit projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip --primary-bundle-id "com.electron.projectgenerator" --apple-id "${APPLE_ID}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
+		if [[ ("${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" || "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/bleeding") && "$TRAVIS_PULL_REQUEST" == "false" ]] || 
+   			[[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
+			xcrun notarytool --version
+			xcrun notarytool history
+			echo "NOTORIZATION --"
+			xcrun notarytool submit projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip --primary-bundle-id "com.electron.projectgenerator" --apple-id "${APPLE_ID}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
+		fi
+
 		mv projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip ${PG_DIR}/../../../projectGenerator/projectGenerator-$PLATFORM.zip
 		cd ${PG_DIR}/../../../projectGenerator
 		echo "Final Directory contents: ${PG_DIR}/../../../projectGenerator"
