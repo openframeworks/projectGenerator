@@ -784,7 +784,7 @@ bool xcodeProject::saveProjectFile(){
 //	debugCommands = true;
 
 	addCommand("# ---- PG VERSION " + getPGVersion());
-	addCommand("Add :_openFrameworksProjectGeneratorVersion string " + getPGVersion());
+	addCommand("Add :a_OFProjectGeneratorVersion string " + getPGVersion());
 
 	fileProperties fp;
 //	fp.isGroupWithoutFolder = true;

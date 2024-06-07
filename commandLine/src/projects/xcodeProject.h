@@ -98,6 +98,7 @@ public:
 
 	std::map<fs::path, string> extensionToFileType {
 		{ ".framework" , "wrapper.framework" },
+		{ ".xcframework" , "wrapper.framework" },
 		{ ".dylib" , "compiled.mach-o.dylib" },
 		
 		{ ".cpp" , "sourcecode.cpp.cpp" },
