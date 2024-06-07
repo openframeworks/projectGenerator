@@ -719,7 +719,8 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		}
 		
 		if (fp.copyFilesBuildPhase) {
-			if (path.extension() == ".framework") {
+			// If we are going to add xcframeworks to copy files -> destination frameworks, we should include here
+			if (path.extension() == ".framework" || path.extension() == ".xcframework") {
 				// copy to frameworks
 				addCommand("# ---- copyPhase Frameworks " + buildUUID);
 				addCommand("Add :objects:E4C2427710CC5ABF004149E2:files: string " + buildUUID);
