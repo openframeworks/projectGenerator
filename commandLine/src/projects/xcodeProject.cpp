@@ -6,6 +6,9 @@
 #else
 	#include <nlohmann/json.hpp> // MSYS2 : use of system-installed include
 #endif
+#ifdef __APPLE__
+#include <cstdlib>  // std::system
+#endif
 #include <iostream>
 
 using nlohmann::json;
@@ -134,10 +137,26 @@ bool xcodeProject::createProjectFile(){
 		// originally only on IOS
 		//this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
 		// TODO: Test on IOS
+        fs::path templateBinDir { templatePath / "bin" };
 		fs::path templateDataDir { templatePath / "bin" / "data" };
 		if (fs::exists(templateDataDir) && fs::is_directory(templateDataDir)) {
 			baseProject::recursiveCopyContents(templateDataDir, projectDataDir);
 		}
+        if (fs::exists(templateBinDir) && fs::is_directory(templateBinDir)) {
+#ifdef __APPLE__
+            try {
+                //  extended attributes on macOS
+                std::string command = "xattr -w com.apple.xcode.CreatedByBuildSystem true " + templateBinDir.string();
+                if (std::system(command.c_str()) != 0) {
+                    std::cerr << "Failed to set extended attributes on " <<  templateBinDir.string() << std::endl;
+                } else {
+                    std::cout << "xattr set correctly for bin" << endl;
+                }
+            } catch (const std::exception& e) {
+                std::cout << e.what() << std::endl;
+            }
+#endif
+        }
 	}
 
 	return true;
@@ -418,16 +437,11 @@ void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder
 	
 	addCommand("# ----- addXCFramework path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
 	
-	bool isSystemFramework = false;
-	if (!folder.empty() && !ofIsStringInString(ofPathToString(path), "/System/Library/Frameworks")
-		&& target != "ios"){
-		isSystemFramework = true;
-	}
 	
 	fileProperties fp;
 //	fp.addToBuildPhase = true;
-	fp.codeSignOnCopy = !isSystemFramework;
-	fp.copyFilesBuildPhase = !isSystemFramework;
+	fp.codeSignOnCopy = true;
+	fp.copyFilesBuildPhase = true;
 	fp.frameworksBuildPhase = (target != "ios" && !folder.empty());
 	
 	string UUID {
@@ -438,7 +452,7 @@ void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder
 	string parent { ofPathToString(path.parent_path()) };
 
 	for (auto & c : buildConfigs) {
-		addCommand("Add :objects:" + c + ":buildSettings:XFRAMEWORK_SEARCH_PATHS: string " + parent);
+		addCommand("Add :objects:" + c + ":buildSettings:XCFRAMEWORK_SEARCH_PATHS: string " + parent);
 	}
 }
 
@@ -611,14 +625,13 @@ void xcodeProject::addAddon(ofAddon & addon){
 				folder = addon.addonPath / "xcframeworks";
 			}
 			// MARK: Is this ok to call .framework?
-			addXCFramework("/System/Library/Frameworks/" + f + ".framework", folder);
+			addXCFramework("/System/Library/Frameworks/" + f + ".xcframework", folder);
 			
 		} else {
 			if (ofIsStringInString(f, "/System/Library")) {
-				addFramework(f, "addons/" + addon.name + "/frameworks");
-
+                addXCFramework(f, "addons/" + addon.name + "/xcframeworks");
 			} else {
-				addFramework(f, addon.filesToFolders[f]);
+                addXCFramework(f, addon.filesToFolders[f]);
 			}
 		}
 	}
@@ -719,7 +732,10 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		}
 		
 		if (fp.copyFilesBuildPhase) {
-			if (path.extension() == ".framework") {
+			// If we are going to add xcframeworks to copy files -> destination frameworks, we should include here
+//			if (path.extension() == ".framework" || path.extension() == ".xcframework") {
+			// This now includes both .framework and .xcframework
+			if (fileType == "wrapper.framework" ||  fileType == ".xcframework") {
 				// copy to frameworks
 				addCommand("# ---- copyPhase Frameworks " + buildUUID);
 				addCommand("Add :objects:E4C2427710CC5ABF004149E2:files: string " + buildUUID);
@@ -784,7 +800,7 @@ bool xcodeProject::saveProjectFile(){
 //	debugCommands = true;
 
 	addCommand("# ---- PG VERSION " + getPGVersion());
-	addCommand("Add :_openFrameworksProjectGeneratorVersion string " + getPGVersion());
+	addCommand("Add :a_OFProjectGeneratorVersion string " + getPGVersion());
 
 	fileProperties fp;
 //	fp.isGroupWithoutFolder = true;

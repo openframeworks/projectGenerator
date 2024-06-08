@@ -29,14 +29,21 @@ fi
 SOURCE_FILE="${PG_DIR}/commandLine/bin/projectGenerator"
 
 # Replace [destination_path] with the actual path where you want to copy the file
-DESTINATION_PATH="app/"
+DESTINATION_PATH="app"
 echo "SOURCE_FILE:$SOURCE_FILE";
+
+
 # Check if the source file exists
 if [ -f "$SOURCE_FILE" ]; then
-    # File exists, proceed with copying
-    mkdir -p "$DESTINATION_PATH" # Create destination directory if it doesn't exist
-    cp "$SOURCE_FILE" "$DESTINATION_PATH"
-    echo "File copied successfully."
+   echo "File exists, proceed with copying"
+   echo "check destination:[$DESTINATION_PATH/projectGenerator]"
+   if [ -f "${DESTINATION_PATH}/projectGenerator" ]; then
+      echo "projectGenerator File exists at DESTINATION_PATH - rm old"
+      rm -f "${DESTINATION_PATH}/projectGenerator"
+   fi
+   mkdir -p "$DESTINATION_PATH" # Create destination directory if it doesn't exist
+   cp -X "$SOURCE_FILE" "$DESTINATION_PATH/"
+   echo "File copied successfully."
 else
     # File does not exist
     echo "Error: Source file does not exist."
