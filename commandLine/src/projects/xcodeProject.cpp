@@ -418,6 +418,7 @@ void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder
 	
 	addCommand("# ----- addXCFramework path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
 	
+	// FIXME: Hey Dan I've noticed this has the inverted logic of isSystemFramework in the function addFramework
 	bool isSystemFramework = false;
 	if (!folder.empty() && !ofIsStringInString(ofPathToString(path), "/System/Library/Frameworks")
 		&& target != "ios"){
@@ -438,6 +439,7 @@ void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder
 	string parent { ofPathToString(path.parent_path()) };
 
 	for (auto & c : buildConfigs) {
+		// FIXME:  Dan Maybe there is a typo here in XFRAMEWORK
 		addCommand("Add :objects:" + c + ":buildSettings:XFRAMEWORK_SEARCH_PATHS: string " + parent);
 	}
 }
@@ -719,7 +721,10 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		}
 		
 		if (fp.copyFilesBuildPhase) {
-			if (path.extension() == ".framework") {
+			// If we are going to add xcframeworks to copy files -> destination frameworks, we should include here
+//			if (path.extension() == ".framework" || path.extension() == ".xcframework") {
+			// This now includes both .framework and .xcframework
+			if (fileType == "wrapper.framework") {
 				// copy to frameworks
 				addCommand("# ---- copyPhase Frameworks " + buildUUID);
 				addCommand("Add :objects:E4C2427710CC5ABF004149E2:files: string " + buildUUID);
@@ -784,7 +789,7 @@ bool xcodeProject::saveProjectFile(){
 //	debugCommands = true;
 
 	addCommand("# ---- PG VERSION " + getPGVersion());
-	addCommand("Add :_openFrameworksProjectGeneratorVersion string " + getPGVersion());
+	addCommand("Add :a_OFProjectGeneratorVersion string " + getPGVersion());
 
 	fileProperties fp;
 //	fp.isGroupWithoutFolder = true;
