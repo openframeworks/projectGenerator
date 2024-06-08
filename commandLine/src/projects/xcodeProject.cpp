@@ -6,6 +6,9 @@
 #else
 	#include <nlohmann/json.hpp> // MSYS2 : use of system-installed include
 #endif
+#ifdef __APPLE__
+#include <cstdlib>  // std::system
+#endif
 #include <iostream>
 
 using nlohmann::json;
@@ -134,10 +137,26 @@ bool xcodeProject::createProjectFile(){
 		// originally only on IOS
 		//this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
 		// TODO: Test on IOS
+        fs::path templateBinDir { templatePath / "bin" };
 		fs::path templateDataDir { templatePath / "bin" / "data" };
 		if (fs::exists(templateDataDir) && fs::is_directory(templateDataDir)) {
 			baseProject::recursiveCopyContents(templateDataDir, projectDataDir);
 		}
+        if (fs::exists(templateBinDir) && fs::is_directory(templateBinDir)) {
+#ifdef __APPLE__
+            try {
+                //  extended attributes on macOS
+                std::string command = "xattr -w com.apple.xcode.CreatedByBuildSystem true " + templateBinDir.string();
+                if (std::system(command.c_str()) != 0) {
+                    std::cerr << "Failed to set extended attributes on " <<  templateBinDir.string() << std::endl;
+                } else {
+                    std::cout << "xattr set correctly for bin" << endl;
+                }
+            } catch (const std::exception& e) {
+                std::cout << e.what() << std::endl;
+            }
+#endif
+        }
 	}
 
 	return true;
