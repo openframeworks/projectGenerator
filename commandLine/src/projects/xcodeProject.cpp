@@ -418,17 +418,11 @@ void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder
 	
 	addCommand("# ----- addXCFramework path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
 	
-	// FIXME: Hey Dan I've noticed this has the inverted logic of isSystemFramework in the function addFramework
-	bool isSystemFramework = false;
-	if (!folder.empty() && !ofIsStringInString(ofPathToString(path), "/System/Library/Frameworks")
-		&& target != "ios"){
-		isSystemFramework = true;
-	}
 	
 	fileProperties fp;
 //	fp.addToBuildPhase = true;
-	fp.codeSignOnCopy = !isSystemFramework;
-	fp.copyFilesBuildPhase = !isSystemFramework;
+	fp.codeSignOnCopy = true;
+	fp.copyFilesBuildPhase = true;
 	fp.frameworksBuildPhase = (target != "ios" && !folder.empty());
 	
 	string UUID {
@@ -439,8 +433,7 @@ void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder
 	string parent { ofPathToString(path.parent_path()) };
 
 	for (auto & c : buildConfigs) {
-		// FIXME:  Dan Maybe there is a typo here in XFRAMEWORK
-		addCommand("Add :objects:" + c + ":buildSettings:XFRAMEWORK_SEARCH_PATHS: string " + parent);
+		addCommand("Add :objects:" + c + ":buildSettings:XCFRAMEWORK_SEARCH_PATHS: string " + parent);
 	}
 }
 
@@ -613,14 +606,13 @@ void xcodeProject::addAddon(ofAddon & addon){
 				folder = addon.addonPath / "xcframeworks";
 			}
 			// MARK: Is this ok to call .framework?
-			addXCFramework("/System/Library/Frameworks/" + f + ".framework", folder);
+			addXCFramework("/System/Library/Frameworks/" + f + ".xcframework", folder);
 			
 		} else {
 			if (ofIsStringInString(f, "/System/Library")) {
-				addFramework(f, "addons/" + addon.name + "/frameworks");
-
+                addXCFramework(f, "addons/" + addon.name + "/xcframeworks");
 			} else {
-				addFramework(f, addon.filesToFolders[f]);
+                addXCFramework(f, addon.filesToFolders[f]);
 			}
 		}
 	}
@@ -724,7 +716,7 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 			// If we are going to add xcframeworks to copy files -> destination frameworks, we should include here
 //			if (path.extension() == ".framework" || path.extension() == ".xcframework") {
 			// This now includes both .framework and .xcframework
-			if (fileType == "wrapper.framework") {
+			if (fileType == "wrapper.framework" ||  fileType == ".xcframework") {
 				// copy to frameworks
 				addCommand("# ---- copyPhase Frameworks " + buildUUID);
 				addCommand("Add :objects:E4C2427710CC5ABF004149E2:files: string " + buildUUID);
