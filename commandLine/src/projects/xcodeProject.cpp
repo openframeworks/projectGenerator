@@ -799,8 +799,8 @@ bool xcodeProject::saveProjectFile(){
 
 //	debugCommands = true;
 
-	addCommand("# ---- PG VERSION " + getPGVersion());
-	addCommand("Add :a_OFProjectGeneratorVersion string " + getPGVersion());
+//	addCommand("# ---- PG VERSION " + getPGVersion());
+//	addCommand("Add :a_OFProjectGeneratorVersion string " + getPGVersion());
 
 	fileProperties fp;
 //	fp.isGroupWithoutFolder = true;
@@ -838,6 +838,9 @@ bool xcodeProject::saveProjectFile(){
 		json j { json::parse(contents) };
 		contents.close();
 
+		j["_OFProjectGeneratorVersion"] = getPGVersion();
+
+		
 		for (auto & c : commands) {
 			// readable comments enabled now.
 			if (c != "" && c[0] != '#') {
@@ -881,6 +884,7 @@ bool xcodeProject::saveProjectFile(){
 			}
 		}
 
+		
 		std::ofstream jsonFile(fileName);
 		try {
 			jsonFile << j.dump(1, '	');
