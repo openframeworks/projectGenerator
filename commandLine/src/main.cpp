@@ -457,7 +457,6 @@ int main(int argc, char ** argv) {
 			ofPath = fs::canonical(fs::current_path() / ofPath);
 			//alert ("ofPath canonical " + ofPath.string());
 		}
-
 		if (ofIsPathInPath(projectPath, ofPath)) {
 			ofPath = fs::relative(ofPath, projectPath);
 		}
