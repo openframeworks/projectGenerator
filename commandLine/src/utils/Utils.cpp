@@ -164,6 +164,8 @@ bool isFolderNotCurrentPlatform(const string & folderName, const string & platfo
 			"msys2",
 			"vs",
 			"ios",
+            "macos",
+            "tvos",
 			"linux",
 			"linux64",
 			"linuxarmv6l",
@@ -198,12 +200,6 @@ void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & fol
 
 	// TODO: This can be converted to recursive_directory, but we have to review if the function isFolderNotCurrentPlatform works correctly in this case.
 
-//	for (const auto & entry : fs::recursive_directory_iterator(path)) {
-//		auto f = entry.path();
-//		if (f.filename().c_str()[0] == '.') continue;
-//		if (f.extension() == ".framework") continue;
-//	}
-
 	// TODO: disable recursion pending... it is not recursive yet.
 	if ((path.extension() != ".framework") || (path.extension() != ".xcframework")) {
 		for (const auto & entry : fs::directory_iterator(path)) {
@@ -224,20 +220,32 @@ void getFrameworksRecursively(const fs::path & path, std::vector < string > & fr
 	for (const auto & f : dirList(path)) {
 		if (fs::is_directory(f)) {
 			if (f.extension() == ".framework") {
-				frameworks.emplace_back(f.string());
+                bool platformFound = false;
+                if (!platform.empty() && f.string().find(platform) != std::string::npos) {
+                   platformFound = true;
+                }
+                if(platformFound) {
+                    frameworks.emplace_back(f.string());
+                }
 			}
 		}
 	}
 }
 
-void getXCFrameworksRecursively(const fs::path & path, std::vector<string> & frameworks, string platform) {
+void getXCFrameworksRecursively(const fs::path & path, std::vector<string> & xcframeworks, string platform) {
 //	alert("getXCFrameworksRecursively " + path.string(), 34);
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
 
 	for (const auto & f : dirList(path)) {
 		if (fs::is_directory(f)) {
 			if (f.extension() == ".xcframework") {
-				frameworks.emplace_back(f.string());
+                bool platformFound = false;
+                if (!platform.empty() && f.string().find(platform) != std::string::npos) {
+                   platformFound = true;
+                }
+                if(platformFound) {
+                    xcframeworks.emplace_back(f.string());
+                }
 			}
 		}
 	}
@@ -297,8 +305,6 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 				continue;
 			} else {
 				auto stem = f.stem();
-
-//				cout << "STEM " << stem << endl;
 				auto archFound = std::find(LibraryBinary::archs.begin(), LibraryBinary::archs.end(), stem);
 				if (archFound != LibraryBinary::archs.end()) {
 					arch = *archFound;
@@ -321,24 +327,15 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 					}
 				}
 			}
+            
+            if (!platform.empty() && f.string().find(platform) != std::string::npos) {
+               platformFound = true;
+            }
 
-			if (ext == ".a" || ext == ".lib" || ext == ".dylib" || ext == ".so" ||  ext == ".xcframework" ||
+			if (ext == ".a" || ext == ".lib" || ext == ".dylib" || ext == ".so" ||  ext == ".xcframework" || ext == ".framework" ||
 				(ext == ".dll" && platform != "vs")){
 				if (platformFound){
-//					libLibs.emplace_back( f, arch, target );
 					libLibs.push_back({ f.string(), arch, target });
-
-					//TODO: THEO hack
-					if( platform == "ios" ){ //this is so we can add the osx libs for the simulator builds
-						string currentPath = f.string();
-						//TODO: THEO double hack this is why we need install.xml - custom ignore ofxOpenCv
-						if( currentPath.find("ofxOpenCv") == string::npos ){
-							ofStringReplace(currentPath, "ios", "osx");
-							if( fs::exists(currentPath) ){
-								libLibs.push_back({ currentPath, arch, target });
-							}
-						}
-					}
 				}
 			} else if (ext == ".h" || ext == ".hpp" || ext == ".c" || ext == ".cpp" || ext == ".cc" || ext == ".cxx" || ext == ".m" || ext == ".mm"){
 				libFiles.emplace_back(f);

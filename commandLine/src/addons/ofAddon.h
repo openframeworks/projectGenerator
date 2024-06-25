@@ -44,6 +44,7 @@ const vector<string> parseStates {
 	"ios",
 	"osx",
 	"tvos",
+    "macos",
 	"watchos",
 	"visionos",
 };

@@ -129,6 +129,7 @@ const platforms = {
     "vs": "Windows (Visual Studio)",
     "msys2": "Windows (msys2/mingw)",
     "ios": "iOS (Xcode)",
+    "macos": "Mega iOS/tvOS/macOS (Xcode)",
     "android": "Android (Android Studio)",
     "linux64": "Linux 64 (VS Code/Make)",
     "linuxarmv6l": "Arm 32 (VS Code/Make)",
@@ -1096,7 +1097,7 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
     }
 
     // // launch xcode
-    if( arg.platform == 'osx' || arg.platform == 'ios'){
+    if( arg.platform == 'osx' || arg.platform == 'ios' || arg.platform == 'macos' || || arg.platform == 'tvos' ){
         if(hostplatform == 'osx'){
             let osxPath = path.join(fullPath, projectName + '.xcodeproj');
             console.log( osxPath );

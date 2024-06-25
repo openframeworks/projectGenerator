@@ -475,17 +475,18 @@ void ofAddon::parseConfig(){
 
 void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFolder) {
 //	alert ("parseLibsPath " + libsPath.string(), 35);
-	
 	if (!fs::exists(libsPath)) {
 //		alert("file not found " + libsPath.string(), 35);
 		return;
 	}
-	
 
 	getLibsRecursively(libsPath, libFiles, libs, platform);
-	if (platform == "osx" || platform == "ios"){
-		getFrameworksRecursively(libsPath, frameworks, platform);
-		getXCFrameworksRecursively(libsPath, xcframeworks, platform);
+	if (platform == "osx"  ||
+        platform == "ios"  ||
+        platform == "tvos" ||
+        platform == "macos"){
+            getFrameworksRecursively(libsPath, frameworks, platform);
+            getXCFrameworksRecursively(libsPath, xcframeworks, platform);
 	}
 	
 	if (platform == "vs" || platform == "msys2"
@@ -496,7 +497,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		   || platform == "linuxarmv7l"
 		   || platform == "linuxaarch64"
 	   ) {
-		getDllsRecursively(libsPath, dllsToCopy, platform);
+            getDllsRecursively(libsPath, dllsToCopy, platform);
 	}
 
 
