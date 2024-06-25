@@ -52,6 +52,9 @@ jobs:
           elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
             echo "release=bleeding" >> $GITHUB_ENV
             echo "prerelease=true" >> $GITHUB_ENV
+          else
+            echo "RELEASE=nightly" >> $GITHUB_ENV
+            echo "PRERELEASE=false" >> $GITHUB_ENV
           fi 
       - name: Install dependencies
         shell: bash
