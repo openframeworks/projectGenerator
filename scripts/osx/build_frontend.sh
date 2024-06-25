@@ -32,6 +32,10 @@ SOURCE_FILE="${PG_DIR}/commandLine/bin/projectGenerator"
 DESTINATION_PATH="app"
 echo "SOURCE_FILE:$SOURCE_FILE";
 
+if [ ! -f "$SOURCE_FILE" ]; then
+   SOURCE_FILE="${PG_DIR}/commandLine/bin/commandLine.app/contents/MacOS/commandLine"
+fi
+
 
 # Check if the source file exists
 if [ -f "$SOURCE_FILE" ]; then
@@ -42,7 +46,7 @@ if [ -f "$SOURCE_FILE" ]; then
       rm -f "${DESTINATION_PATH}/projectGenerator"
    fi
    mkdir -p "$DESTINATION_PATH" # Create destination directory if it doesn't exist
-   cp -X "$SOURCE_FILE" "$DESTINATION_PATH/"
+   cp -X "$SOURCE_FILE" "$DESTINATION_PATH/projectGenerator"
    echo "File copied successfully."
 else
     # File does not exist
