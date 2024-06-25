@@ -66,7 +66,7 @@ void getFilesRecursively(const fs::path & path, std::vector < string > & fileNam
 void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileNames);
 void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFiles, std::vector < LibraryBinary > & libLibs, string platform = "", string arch = "", string target = "");
 void getFrameworksRecursively(const fs::path & path, std::vector < string > & frameworks,  string platform = "" );
-void getXCFrameworksRecursively(const fs::path & path, std::vector<string> & frameworks, string platform = "");
+void getXCFrameworksRecursively(const fs::path & path, std::vector<string> & xcframeworks, string platform = "");
 void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props, const string & platform);
 void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, string platform);
 
