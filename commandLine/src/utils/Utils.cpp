@@ -220,9 +220,9 @@ void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & fol
 			auto f = entry.path();
 			if (f.filename().c_str()[0] == '.') continue; // avoid hidden files .DS_Store .vscode .git etc
             bool shouldCheckPlatform = true;
-            if (countSubdirectories(f) > 2 && f.string().find("src") != std::string::npos) {
+            if (fs::is_directory(f) && countSubdirectories(f) > 2 && f.string().find("src") != std::string::npos) {
                 shouldCheckPlatform = false;
-                cout << "getFoldersRecursively shouldCheckPlatform = false" << f.filename().string() << endl;
+//                cout << "getFoldersRecursively shouldCheckPlatform = false : " << f.filename().string() << endl;
             }
             
             if (fs::is_directory(f) && (!shouldCheckPlatform || !isFolderNotCurrentPlatform(f.filename().string(), platform))) {

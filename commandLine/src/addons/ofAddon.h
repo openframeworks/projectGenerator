@@ -41,6 +41,7 @@ const vector<string> parseStates {
 	"android/x86",
 	"android/x86_64",
 	"emscripten",
+    "android",
 	"ios",
 	"osx",
 	"tvos",
