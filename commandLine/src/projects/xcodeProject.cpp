@@ -94,7 +94,7 @@ bool xcodeProject::createProjectFile(){
 		{ rootReplacements }
 	});
 	
-	if (target == "osx") {
+	if (target == "osx" || target == "macos") {
 		// TODO: TEST
 		for (auto & f : { "openFrameworks-Info.plist", "of.entitlements" }) {
 			copyTemplateFiles.push_back({ templatePath / f, projectDir / f });
@@ -113,7 +113,7 @@ bool xcodeProject::createProjectFile(){
 
 	saveScheme();
 
-	if(target == "osx"){
+	if(target == "osx" || target == "macos"){
 		saveMakefile();
 	}
 	
@@ -838,7 +838,8 @@ bool xcodeProject::saveProjectFile(){
 		json j { json::parse(contents) };
 		contents.close();
 
-		j["_OFProjectGeneratorVersion"] = getPGVersion();
+		json jversion = getPGVersion();
+		j["_OFProjectGeneratorVersion"] = jversion;
 
 		
 		for (auto & c : commands) {
