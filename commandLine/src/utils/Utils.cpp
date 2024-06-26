@@ -170,7 +170,7 @@ bool isFolderNotCurrentPlatform(const string & folderName, const string & platfo
 			"linux64",
 			"linuxarmv6l",
 			"linuxarmv7l",
-			"linuxaarch64"
+			"linuxaarch64",
 			"android",
 			"iphone",
 			"watchos",
@@ -180,9 +180,15 @@ bool isFolderNotCurrentPlatform(const string & folderName, const string & platfo
 	}
 
 	for (auto & p : platforms) {
-		if( folderName == p && folderName != platform ){
-			return true;
-		}
+        if (folderName == p) {
+            if (folderName == "win32" && (platform == "vs" || platform == "mysys2") ) {
+                return false;
+            }
+            if (folderName == "posix" && (platform != "vs" && platform != "mysys2") ) {
+                return false;
+            }
+            return folderName != platform;
+        }
 	}
 	return false;
 }

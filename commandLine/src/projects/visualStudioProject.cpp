@@ -529,6 +529,7 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 			f.second = "other";
 		}
 	}
+    
 
 	for (auto & s : addon.srcFiles) {
 		ofLogVerbose() << "adding addon srcFiles: " << s;
