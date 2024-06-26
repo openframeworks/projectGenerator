@@ -176,6 +176,8 @@ bool isFolderNotCurrentPlatform(const string & folderName, const string & platfo
 			"watchos",
 			"emscripten",
 			"visionos",
+            "posix",
+            "win32"
 		};
 	}
 
