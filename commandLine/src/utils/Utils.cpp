@@ -177,16 +177,18 @@ bool isFolderNotCurrentPlatform(const string & folderName, const string & platfo
 			"emscripten",
 			"visionos",
             "posix",
-            "win32"
+            "win32",
 		};
 	}
 
 	for (auto & p : platforms) {
         if (folderName == p) {
             if (folderName == "win32" && (platform == "vs" || platform == "mysys2") ) {
+                cout << "isFolderNotCurrentPlatform win32 for vs/msys2 return false" << folderName << " platformCheck:" << p << endl;
                 return false;
             }
             if (folderName == "posix" && (platform != "vs" && platform != "mysys2") ) {
+                cout << "isFolderNotCurrentPlatform posix for !vs/msys2 return false" << folderName << " platformCheck:" << p << endl;
                 return false;
             }
             return folderName != platform;
@@ -201,6 +203,10 @@ void splitFromFirst(string toSplit, string deliminator, string & first, string &
 	second = toSplit.substr(found+deliminator.size());
 }
 
+int countSubdirectories(const fs::path &path) {
+    return std::distance(path.begin(), path.end());
+}
+
 // TODO
 void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & folderNames, string platform){
 	if (!fs::exists(path)) return;
@@ -213,9 +219,15 @@ void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & fol
 		for (const auto & entry : fs::directory_iterator(path)) {
 			auto f = entry.path();
 			if (f.filename().c_str()[0] == '.') continue; // avoid hidden files .DS_Store .vscode .git etc
-			if (fs::is_directory(f)  && isFolderNotCurrentPlatform(f.string(), platform) == false ) {
-				getFoldersRecursively(f, folderNames, platform);
-			}
+            bool shouldCheckPlatform = true;
+            if (countSubdirectories(f) > 2 && f.string().find("src") != std::string::npos) {
+                shouldCheckPlatform = false;
+                cout << "getFoldersRecursively shouldCheckPlatform = false" << f.filename().string() << endl;
+            }
+            
+            if (fs::is_directory(f) && (!shouldCheckPlatform || !isFolderNotCurrentPlatform(f.filename().string(), platform))) {
+                getFoldersRecursively(f, folderNames, platform);
+            }
 		}
 		folderNames.emplace_back(path.string());
 	}

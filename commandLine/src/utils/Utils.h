@@ -60,7 +60,7 @@ void findandreplaceInTexfile (const fs::path & fileName, string tFind, string tR
 
 bool doesTagAndAttributeExist(pugi::xml_document & doc, string tag, string attribute, string newValue);
 pugi::xml_node appendValue(pugi::xml_document & doc, string tag, string attribute, string newValue, bool addMultiple = false);
-
+int countSubdirectories(const fs::path &path);
 void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & folderNames, string platform);
 void getFilesRecursively(const fs::path & path, std::vector < string > & fileNames);
 void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileNames);
