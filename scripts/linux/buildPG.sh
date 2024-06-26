@@ -1,17 +1,25 @@
 #!/bin/bash
 set -e
+echo "##[group]Clone OF";
 cd ..
 git clone --depth=1 https://github.com/openframeworks/openFrameworks
 cp -r projectGenerator openFrameworks/apps/
+echo "##[endgroup]";
 
 cd openFrameworks
 
+echo "##[group]Install Dependencies";
 sudo ./scripts/linux/ubuntu/install_dependencies.sh -y;
+echo "##[endgroup]";
+
+echo "##[group]Download Libs";
 scripts/linux/download_libs.sh
+echo "##[endgroup]";
 
 export LC_ALL=C
 OF_ROOT=./
 
+echo "##[group]Build PG";
 cd ${OF_ROOT}/apps/projectGenerator
 make -j2 Release -C ./commandLine
 ret=$?
@@ -19,16 +27,18 @@ if [ $ret -ne 0 ]; then
       echo "Failed building Project Generator"
       exit 1
 fi
+echo "##[endgroup]";
 
 cd commandLine/bin/
 
-echo "Testing project generation linux 64";
+echo "##[group]Testing project generation linux 64";
 chmod +x projectGenerator
 ./projectGenerator --recursive -plinux64 -tvscode -o../../../../ ../../../../examples/
 errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
         exit $errorcode
 fi
+echo "##[endgroup]";
 
 # if [[ -z "${GA_CI_SECRET}" ]] ; then
 #     echo "Not on main repo skipping sign and upload";
