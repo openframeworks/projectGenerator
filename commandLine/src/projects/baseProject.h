@@ -1,6 +1,6 @@
 #pragma once
 
-#define PG_VERSION "51"
+#define PG_VERSION "52"
 
 #include "ofAddon.h"
 #include "pugixml.hpp"
