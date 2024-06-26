@@ -47,6 +47,9 @@ jobs:
           elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
             echo "release=bleeding" >> $GITHUB_ENV
             echo "prerelease=true" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "release=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+            echo "prerelease=false" >> $GITHUB_ENV
           else
             echo "release=nightly" >> $GITHUB_ENV
             echo "prerelease=false" >> $GITHUB_ENV

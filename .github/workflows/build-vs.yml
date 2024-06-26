@@ -52,6 +52,9 @@ jobs:
           elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
             echo "release=bleeding" >> $GITHUB_ENV
             echo "prerelease=true" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "release=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+            echo "prerelease=false" >> $GITHUB_ENV
           else
             echo "release=nightly" >> $GITHUB_ENV
             echo "prerelease=false" >> $GITHUB_ENV
@@ -96,7 +99,7 @@ jobs:
           tag: ${{ env.release }}
           release: ${{ env.release }}
           prerelease: ${{ env.release }}
-          replace: true
+          replace: false
           files: ../openFrameworks/apps/projectGenerator/commandLine/bin/projectGenerator-vs.zip
       - name: Update Project Gen GUI Release
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
@@ -106,5 +109,5 @@ jobs:
           tag: ${{ env.release }}
           release: ${{ env.release }}
           prerelease: ${{ env.release }}
-          replace: true
+          replace: false
           files: ../openFrameworks/apps/projectGenerator/frontend/dist/projectGenerator-vs-gui.zip
