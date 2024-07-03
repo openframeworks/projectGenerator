@@ -45,11 +45,13 @@ jobs:
       run: ls -lah ./../openFrameworks/apps/projectGenerator/commandLine/bin
     - name: Test Artefact zip
       run: |
-        tar -cjf ./../openFrameworks/apps/projectGenerator/commandLine/bin/artefact.tar.bz2 -C ./../openFrameworks/apps/projectGenerator/commandLine/bin projectGenerator data
+        cd ./../openFrameworks/apps/projectGenerator/commandLine/bin
+        tar -cjf artefact.tar.bz2 projectGenerator data libfmod.so
+        mv artefact.tar.bz2 ../../../../../
     - name: Upload binaries as Artefact
       uses: actions/upload-artifact@v4
       with:
         name: project-Generator-linux
-        path: ./../openFrameworks/apps/projectGenerator/commandLine/bin/artefact.tar.bz2
+        path: artefact.tar.bz2
         retention-days: 1
         
