@@ -45,7 +45,7 @@ jobs:
       run: ls -lah ./../openFrameworks/apps/projectGenerator/commandLine/bin
     - name: Test Artefact zip
       run: |
-        tar -cjf ./../openFrameworks/apps/projectGenerator/commandLine/bin/artefact.tar.bz2 -C ./../openFrameworks/apps/projectGenerator/commandLine/bin 
+        tar -cjf ./../openFrameworks/apps/projectGenerator/commandLine/bin/artefact.tar.bz2 -C ./../openFrameworks/apps/projectGenerator/commandLine/bin/projectGenerator 
     - name: Upload binaries as Artefact
       uses: actions/upload-artifact@v4
       with:

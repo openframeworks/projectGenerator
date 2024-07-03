@@ -65,7 +65,7 @@ if [ -d "libs/glfw" ]; then
 	echo 'libs installed, using them'
 else
 	echo 'downloading libs'
-	scripts/osx/download_libs.sh
+	scripts/osx/download_latest_libs.sh
 fi
 
 
