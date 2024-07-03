@@ -14,6 +14,7 @@ concurrency:
 
 env:
   ccache: ccache
+  GA_CI_SECRET: ${{ secrets.CI_SECRET }}
 
 jobs:
   build-linux:
@@ -31,13 +32,24 @@ jobs:
     - name: ccache
       uses: hendrikmuhs/ccache-action@v1.2.12
       with:
-        # key: ${{ matrix.os }}-${{ matrix.type }}
         key: ${{ matrix.os }}-${{ matrix.cfg.target }}
     - name: Install
       run:
         ./scripts/linux/ci_install_core.sh
+    - name: List directory
+      run: ls -lah ./
     - name: Build
       run:
-        ./scripts/linux/buildPG.sh;
-      env:
-        GA_CI_SECRET: ${{ secrets.CI_SECRET }}
+        ./openFrameworks/apps/projectGenerator/scripts/linux/buildPG.sh;
+    - name: List output directory
+      run: ls -lah openFrameworks/apps/projectGenerator/commandLine/bin
+    - name: Test Artefact zip
+      run: |
+        tar -cjf openFrameworks/apps/projectGenerator/commandLine/bin/artefact.tar.bz2 -C openFrameworks/apps/projectGenerator/commandLine/bin 
+    - name: Upload binaries as Artefact
+      uses: actions/upload-artifact@v4
+      with:
+        name: project-Generator-linux
+        path: openFrameworks/apps/projectGenerator/commandLine/bin/artefact.tar.bz2
+        retention-days: 1
+        
