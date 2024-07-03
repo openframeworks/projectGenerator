@@ -61,11 +61,12 @@ pwd
 echo "Directory ../ contents:"
 ls
 
+sudo ./scripts/linux/ubuntu/install_dependencies.sh -y;
 if [ -d "libs/glfw" ]; then
 	echo 'libs installed, using them'
 else
 	echo 'downloading libs'
-	scripts/osx/download_latest_libs.sh
+	scripts/linux/download_libs.sh
 fi
 
 
