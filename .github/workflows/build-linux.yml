@@ -33,6 +33,9 @@ jobs:
       with:
         # key: ${{ matrix.os }}-${{ matrix.type }}
         key: ${{ matrix.os }}-${{ matrix.cfg.target }}
+    - name: Install
+      run:
+        ./scripts/linux/ci_install_core.sh
     - name: Build
       run:
         ./scripts/linux/buildPG.sh;
