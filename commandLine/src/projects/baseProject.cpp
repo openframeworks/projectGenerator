@@ -34,7 +34,7 @@ fs::path baseProject::getPlatformTemplateDir() {
 	) {
 		folder = "vscode";
 	}
-	
+    
 //	if ( target == "qtcreator" ) {
 //		return getOFRoot()
 //	}
@@ -139,6 +139,8 @@ bool baseProject::create(const fs::path & path, string templateName){
 	extSrcPaths.clear();
 
 	templatePath = getPlatformTemplateDir();
+    
+    ofLogNotice() << "templatePath: [" << templatePath << "]";
 	projectDir = path;
 	auto projectPath = fs::canonical(fs::current_path() / path);
 	projectName = projectPath.filename().string();

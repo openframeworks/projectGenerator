@@ -6,6 +6,8 @@
 
 using std::string;
 
+
+
 class xcodeProject : public baseProject {
 public:
 	xcodeProject(const string & target);
@@ -16,6 +18,8 @@ private:
 	bool saveProjectFile();
 	void saveMakefile();
 	bool debugCommands = false;
+    
+    static std::string LOG_NAME;
 
 public:
 
