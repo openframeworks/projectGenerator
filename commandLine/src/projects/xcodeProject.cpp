@@ -14,6 +14,8 @@
 using nlohmann::json;
 using nlohmann::json_pointer;
 
+string xcodeProject::LOG_NAME = "xcodeProjectFile";
+
 xcodeProject::xcodeProject(const string & target) : baseProject(target){
 	// TODO: remove unused variables
 	if( target == "osx" ){
@@ -384,7 +386,7 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 			fp.addToResources = true;
 		}
 		else if( target == "ios" ){
-			fp.addToBuildPhase	= false;
+			fp.addToBuildPhase	= true;
 			fp.addToResources = true;
 		}
 	} 
@@ -835,7 +837,14 @@ bool xcodeProject::saveProjectFile(){
 		// JSON Block - Multiplatform
 
 		std::ifstream contents(fileName);
-		json j { json::parse(contents) };
+        json j;
+        try {
+            j = { json::parse(contents) };
+        } catch (json::parse_error& ex) {
+            ofLogError(xcodeProject::LOG_NAME) << "JSON parse error at byte" << ex.byte;
+            ofLogError(xcodeProject::LOG_NAME) << "fileName" << fileName;
+        }
+
 		contents.close();
 
 		json jversion = getPGVersion();
@@ -851,16 +860,22 @@ bool xcodeProject::saveProjectFile(){
 
 				if (thispath.substr(thispath.length() -1) != "/") {
 					//if (cols[0] == "Set") {
-					json::json_pointer p { json::json_pointer(thispath) };
-					if (cols[2] == "string") {
-						// find position after find word
-						auto stringStart { c.find("string ") + 7 };
-						j[p] = c.substr(stringStart);
-						// j[p] = cols[3];
-					}
-					else if (cols[2] == "array") {
-						j[p] = {};
-					}
+                    try {
+                        json::json_pointer p { json::json_pointer(thispath) };
+                        if (cols[2] == "string") {
+                            // find position after find word
+                            auto stringStart { c.find("string ") + 7 };
+                            j[p] = c.substr(stringStart);
+                            // j[p] = cols[3];
+                        }
+                        else if (cols[2] == "array") {
+                            j[p] = {};
+                        }
+                    } catch (std::exception & e) {
+                        cout << "xcodeProject saveProjectFile() first json error " << endl;
+                        cout << e.what() << endl;
+                        cout << " error at this path: " << thispath << endl;
+                    }
 				}
 				else {
 					thispath = thispath.substr(0, thispath.length() -1);
@@ -878,8 +893,9 @@ bool xcodeProject::saveProjectFile(){
 						j[p].emplace_back(cols[3]);
 
 					} catch (std::exception & e) {
-						cout << "json error " << endl;
+						cout << "xcodeProject saveProjectFile() json error " << endl;
 						cout << e.what() << endl;
+                        cout << " error at this path: " << thispath << endl;
 					}
 				}
 			}
