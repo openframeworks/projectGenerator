@@ -446,8 +446,11 @@ int main(int argc, char ** argv) {
         ofLogError() << "No valid OF path found... please use -o or --ofPath or set a PG_OF_PATH environment variable: " << startPath.string();
         return EXIT_FAILURE;
     } else {
-        ofPath = foundOFPath.string();
-        ofLogNotice() << "Found OF path: " << ofPath;
+        if (!ofPath.empty() && isGoodOFPath(ofPath)) {
+            ofLogNotice() << "ofPath set and valid using " << ofPath;
+        } else {
+            ofPath = foundOFPath.string();
+        }
     }
     
     if (!ofPath.empty()) {
@@ -458,7 +461,6 @@ int main(int argc, char ** argv) {
         if (ofIsPathInPath(projectPath, ofPath)) {
             ofPath = fs::relative(ofPath, projectPath);
         }
-        fs::current_path(projectPath);
         setOFRoot(ofPath);
     }
 
