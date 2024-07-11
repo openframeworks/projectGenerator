@@ -165,14 +165,36 @@ bool isGoodProjectPath(fs::path path) {
 
 bool isGoodOFPath(const fs::path & path) {
 	if (!fs::is_directory(path)) {
-		ofLogError() << "ofPath seems wrong... not a directory " << path.string();
+//		ofLogVerbose() << "ofPath: not a directory: " << path.string();
 		return false;
 	}
 	bool bHasTemplates = containsFolder(path, "scripts");
-	if (!bHasTemplates) ofLogError() << "ofPath seems wrong... no scripts / templates directory " << path.string();
+    bHasTemplates = bHasTemplates && containsFolder(path, "addons");
+    bHasTemplates = bHasTemplates && containsFolder(path, "libs");
+//	if (!bHasTemplates) ofLogVerbose() << "ofPath no addons / libs / scripts / templates directory " << path.string();
 	return bHasTemplates;
 }
 
+fs::path findOFPathUpwards(const fs::path & startPath) {
+    fs::path currentPath = startPath;
+//    ofLogNotice() << "startPath: " << currentPath.string();
+    if (currentPath.empty() || currentPath == currentPath.root_path()) {
+        ofLogError() << "Starting path is empty or root path, cannot find OF path.";
+        return fs::path();
+    }
+    while (!currentPath.empty() && currentPath != currentPath.root_path()) {
+//        ofLogWarning() << "currentPath: " << currentPath.string();
+        if (isGoodOFPath(currentPath)) {
+//            ofLogWarning() << "isGoodOFPath: " << currentPath.string();
+            return currentPath;
+        } else {
+//            ofLogWarning() << "not good OF Path: " << currentPath.string();
+        }
+        currentPath = currentPath.parent_path();
+    }
+    ofLogError() << "No valid OF path found... please use -o or --ofPath or set a PG_OF_PATH environment variable: " << startPath.string();
+    return fs::path();
+}
 void updateProject(const fs::path & path, const string & target, bool bConsiderParameterAddons = true) {
 	//    alert("updateProject path=" + path.string() , 34);
 	// bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
@@ -293,7 +315,7 @@ int main(int argc, char ** argv) {
 	bAddonsPassedIn = false;
 	bDryRun = false;
 	busingEnvVar = false;
-	bVerbose = false;
+	bVerbose = true;
 	mode = PG_MODE_NONE;
 	bForce = false;
 	bRecursive = false;
@@ -409,62 +431,36 @@ int main(int argc, char ** argv) {
 	consoleSpace();
 
 	// try to get the OF_PATH as an environt variable
-	char * pPath;
-	pPath = getenv("PG_OF_PATH");
-	if (pPath != NULL) {
-		ofPathEnv = string(pPath);
-	}
+    std::string ofPath;
+    std::string ofPathEnv = std::getenv("PG_OF_PATH") ? std::getenv("PG_OF_PATH") : "";
 
-	if (ofPath == "" && ofPathEnv != "") {
-		busingEnvVar = true;
-		ofPath = ofPathEnv;
-	}
+    if (ofPath.empty() && !ofPathEnv.empty()) {
+        ofPath = ofPathEnv;
+    }
+    
+    fs::path startPath = ofFilePath::getCurrentExeDirFS();
+    //ofFilePath::getAbsolutePathFS(fs::current_path(), false);
+//    ofLogNotice() << "startPath: " << startPath.string();
+    fs::path foundOFPath = findOFPathUpwards(startPath);
+    if (foundOFPath.empty()) {
+        ofLogError() << "No valid OF path found... please use -o or --ofPath or set a PG_OF_PATH environment variable: " << startPath.string();
+        return EXIT_FAILURE;
+    } else {
+        ofPath = foundOFPath.string();
+        ofLogNotice() << "Found OF path: " << ofPath;
+    }
 
-	fs::path projectPath = fs::weakly_canonical(fs::current_path() / projectName);
-	if (!fs::exists(projectPath)) {
-		mode = PG_MODE_CREATE;
-		// FIXME: Maybe it is best not to create anything here, unless specified by parameter
-		if (!fs::exists(projectPath.parent_path())) {
-			consoleSpace();
-			ofLog() << "Folder doesn't exist " << projectPath.parent_path() << endl;
-			consoleSpace();
-			return EXIT_USAGE;
-		}
-		fs::create_directory(projectPath);
-	} else {
-		mode = PG_MODE_UPDATE;
-	}
+    fs::path projectPath = fs::weakly_canonical(fs::current_path() / projectName);
 
-	if (ofPath.empty()) {
-		consoleSpace();
-		ofLogError() << "no OF path set... please use -o or --ofPath or set a PG_OF_PATH environment variable";
-		consoleSpace();
+    // Verify that projectPath is not root and exists
+    if (!projectPath.empty() && projectPath != projectPath.root_path() && fs::exists(projectPath)) {
+        fs::create_directory(projectPath);
+    } else {
+        ofLogError() << "Invalid or non-existent project path: " << projectPath;
+        return EXIT_FAILURE;
+    }
 
-		//------------------------------------ fix me
-		//printHelp();
-		//return
-
-		return EXIT_USAGE;
-	} else {
-
-		if (!isGoodOFPath(ofPath)) {
-			return EXIT_USAGE;
-		}
-
-		// alert ("ofPath before " + ofPath.string());
-		// alert ("projectPath " + projectPath.string());
-		if (ofPath.is_relative()) {
-			ofPath = fs::canonical(fs::current_path() / ofPath);
-			//alert ("ofPath canonical " + ofPath.string());
-		}
-		if (ofIsPathInPath(projectPath, ofPath)) {
-			ofPath = fs::relative(ofPath, projectPath);
-		}
-		fs::current_path(projectPath);
-		//alert ("ofPath after " + ofPath.string());
-		setOFRoot(ofPath);
-	}
-
+    
 	if (bListTemplates) {
 		auto ret = printTemplates();
 		consoleSpace();
