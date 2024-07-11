@@ -459,7 +459,8 @@ int main(int argc, char ** argv) {
             return EXIT_USAGE;
         }
         if (ofIsPathInPath(projectPath, ofPath)) {
-            ofPath = fs::relative(ofPath, projectPath);
+            fs::path path = fs::relative(ofPath, projectPath);
+            ofPath = path.string();
         }
         setOFRoot(ofPath);
     }
