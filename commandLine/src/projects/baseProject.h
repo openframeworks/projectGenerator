@@ -208,13 +208,13 @@ protected:
                    }
                }
 
-               std::string mergedContents = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n";
+            std::string mergedContents = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n";
                for (const auto& entry : existingMap) {
-                   mergedContents += "    <key>" + entry.first + "</key>\n";
+                   mergedContents += "\t<key>" + entry.first + "</key>\n";
                    if (entry.second == "true" || entry.second == "false") {
-                       mergedContents += "    <" + entry.second + "/>\n";
+                       mergedContents += "\t<" + entry.second + "/>\n";
                    } else {
-                       mergedContents += "    <string>" + entry.second + "</string>\n";
+                       mergedContents += "\t<string>" + entry.second + "</string>\n";
                    }
                }
                mergedContents += "</dict>\n</plist>\n";
