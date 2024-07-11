@@ -442,12 +442,24 @@ int main(int argc, char ** argv) {
     //ofFilePath::getAbsolutePathFS(fs::current_path(), false);
 //    ofLogNotice() << "startPath: " << startPath.string();
     fs::path foundOFPath = findOFPathUpwards(startPath);
-    if (foundOFPath.empty()) {
+    if (foundOFPath.empty() && ofPath.empty()) {
         ofLogError() << "No valid OF path found... please use -o or --ofPath or set a PG_OF_PATH environment variable: " << startPath.string();
         return EXIT_FAILURE;
     } else {
         ofPath = foundOFPath.string();
         ofLogNotice() << "Found OF path: " << ofPath;
+    }
+    
+    if (!ofPath.empty()) {
+
+        if (!isGoodOFPath(ofPath)) {
+            return EXIT_USAGE;
+        }
+        if (ofIsPathInPath(projectPath, ofPath)) {
+            ofPath = fs::relative(ofPath, projectPath);
+        }
+        fs::current_path(projectPath);
+        setOFRoot(ofPath);
     }
 
     fs::path projectPath = fs::weakly_canonical(fs::current_path() / projectName);
