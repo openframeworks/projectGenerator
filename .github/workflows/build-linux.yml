@@ -52,6 +52,7 @@ jobs:
           else
             echo "release=nightly" >> $GITHUB_ENV
             echo "prerelease=false" >> $GITHUB_ENV
+          fi
       
       - name: Install
         run: ./scripts/linux/ci_install_core.sh
