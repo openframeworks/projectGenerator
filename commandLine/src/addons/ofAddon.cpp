@@ -265,6 +265,10 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	else if(variable == ADDON_LIBS_EXCLUDE){
 		addReplaceStringVector(excludeLibs,value,"",addToValue);
 	}
+    
+    else if(variable == ADDON_LIBS_DIR){
+        addReplaceStringVector(libsPaths,value,"",addToValue);
+    }
 
 	else if(variable == ADDON_SOURCES_EXCLUDE){
 		addReplaceStringVector(excludeSources,value,"",addToValue);
@@ -638,6 +642,11 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	preParseConfig();
 
 	parseLibsPath(libsPath, parentFolder);
+    
+    // lib paths are directories to parse for libs
+    for (auto & a : libsPaths) {
+        parseLibsPath((path / a), parentFolder);
+    }
 
 	for (auto & a : additionalLibsFolder) {
 //		parseLibsPath(fs::weakly_canonical(path / a), parentFolder);
@@ -685,6 +694,7 @@ void ofAddon::clear(){
 	propsFiles.clear();
 	libs.clear();
 	includePaths.clear();
+    libsPaths.clear();
 	name.clear();
 }
 

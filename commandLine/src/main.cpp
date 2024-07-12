@@ -456,7 +456,10 @@ int main(int argc, char ** argv) {
     if (!ofPath.empty()) {
 
         if (!isGoodOFPath(ofPath)) {
-            return EXIT_USAGE;
+            foundOFPath = findOFPathUpwards(ofPath);
+            if (foundOFPath.empty()) {
+                return EXIT_USAGE;
+            }
         }
         if (ofIsPathInPath(projectPath, ofPath)) {
             fs::path path = fs::relative(ofPath, projectPath);

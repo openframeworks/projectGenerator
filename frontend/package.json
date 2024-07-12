@@ -1,8 +1,8 @@
 {
-  "name": "project-generator",
+  "name": "projectGenerator",
   "productName": "projectGenerator",
-  "version": "0.2.0",
-  "description": "repo for testing a gui using electron for the project generator",
+  "version": "0.58.0",
+  "description": "Build electron GUI openFrameworks projectGenerator",
   "license": "MIT",
   "main": "index.js",
   "repository": "github:openframeworks/projectGenerator",
@@ -21,9 +21,12 @@
     "dist:mac:arm64": " electron-builder --mac --arm64 --publish never",
     "dist:mac:universal": " electron-builder --mac --universal --publish never",
     "dist:win64": "electron-builder --win --x64 --publish never",
+    "dist:win:arm64": "electron-builder --win --arm64 --publish never", 
     "dist:linux": "electron-builder --linux --publish never",
     "dist:linux64": "electron-builder --linux --x64 --publish never",
     "dist:linux32": "electron-builder --linux --ia32 --publish never",
+    "dist:linux:armv7l": "electron-builder --linux --armv7l --publish never",
+    "dist:linux:arm64": "electron-builder --linux --arm64 --publish never",
     "build:linux64": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=25.3.0 --platform=linux --arch=x64"
   },
   "build": {
@@ -50,7 +53,8 @@
       "target": {
         "target": "dir",
         "arch": [
-          "x64"
+          "x64",
+          "arm64"
         ]
       }
     },
@@ -60,7 +64,8 @@
         "target": "tar.gz",
         "arch": [
           "x64",
-          "arm64"
+          "arm64",
+          "armv7l"
         ]
       }
     },

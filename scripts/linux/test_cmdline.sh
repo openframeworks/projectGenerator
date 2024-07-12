@@ -18,21 +18,12 @@ echo "Building Project Generator"
 
 export LC_ALL=C
 cd ${OF_DIR}/apps/projectGenerator
-make -j2 Release -C ./commandLine
-
-ret=$?
-if [ $ret -ne 0 ]; then
-      echo "Failed building Project Generator"
-      exit 1
-fi
-
 cd commandLine/bin/
-echo "Testing project generation linux 64";
+echo "Testing projectGenerator for [linux64]";
 chmod +x projectGenerator
 ./projectGenerator --recursive -plinux64 -tvscode -o../../../../ ../../../../examples/
 errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
         exit $errorcode
 fi
-
-echo "Success projectGenerator linux";
+echo "Successful projectGenerator tests for [linux64]";

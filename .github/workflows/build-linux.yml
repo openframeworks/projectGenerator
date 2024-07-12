@@ -3,10 +3,10 @@ name: build-linux
 on:
   push:
     paths-ignore:
-    - '**/README.md'
+      - '**/README.md'
   pull_request:
     paths-ignore:
-    - '**/README.md'
+      - '**/README.md'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,36 +22,85 @@ jobs:
     strategy:
       matrix:
         cfg:
-        - {target: linux}
+          - {target: linux}
     env:
-     TARGET: ${{matrix.cfg.target}}
+      TARGET: ${{ matrix.cfg.target }}
     steps:
-    - name: Install libunwind
-      run:  sudo apt-get install libunwind-dev
-    - uses: actions/checkout@v4
-    - name: ccache
-      uses: hendrikmuhs/ccache-action@v1.2.12
-      with:
-        key: ${{ matrix.os }}-${{ matrix.cfg.target }}
-    - name: Install
-      run:
-        ./scripts/linux/ci_install_core.sh
-    - name: List directory
-      run: ls -lah ./
-    - name: Build
-      run:
-        ./../openFrameworks/apps/projectGenerator/scripts/linux/buildPG.sh;
-    - name: List output directory
-      run: ls -lah ./../openFrameworks/apps/projectGenerator/commandLine/bin
-    - name: Test Artefact zip
-      run: |
-        cd ./../openFrameworks/apps/projectGenerator/commandLine/bin
-        tar -cjf artefact.tar.bz2 projectGenerator data libfmod.so
-        mv artefact.tar.bz2 ../../../../../
-    - name: Upload binaries as Artefact
-      uses: actions/upload-artifact@v4
-      with:
-        name: project-Generator-linux
-        path: artefact.tar.bz2
-        retention-days: 1
-        
+      - name: Install libunwind
+        run: sudo apt-get install libunwind-dev wget2
+      
+      - uses: actions/checkout@v4
+      
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.12
+        with:
+          key: ${{ matrix.cfg.target }}
+      
+      - name: Determine Release
+        id: vars
+        shell: bash
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+            echo "release=nightly" >> $GITHUB_ENV
+            echo "prerelease=false" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
+            echo "release=bleeding" >> $GITHUB_ENV
+            echo "prerelease=true" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "release=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+            echo "prerelease=false" >> $GITHUB_ENV
+          else
+            echo "release=nightly" >> $GITHUB_ENV
+            echo "prerelease=false" >> $GITHUB_ENV
+          fi
+      
+      - name: Install
+        run: ./scripts/linux/ci_install_core.sh
+      
+      - name: List directory
+        run: ls -lah ./
+      
+      - name: Build
+        run: ./../openFrameworks/apps/projectGenerator/scripts/linux/build_cmdline.sh
+
+      - name: Test cmdline 
+        run: ./../openFrameworks/apps/projectGenerator/scripts/linux/test_cmdline.sh
+      
+      - name: List output directory
+        run: ls -lah ./../openFrameworks/apps/projectGenerator/commandLine/bin
+
+      - name: copy commandLine to frontend
+        run: |
+          cp ./../openFrameworks/apps/projectGenerator/commandLine/bin/projectGenerator ./../openFrameworks/apps/projectGenerator/frontend/app/projectGenerator
+          chmod 755 ./../openFrameworks/apps/projectGenerator/commandLine/bin/projectGenerator
+          
+      - name: Build and Package projectGenerator Linux GUI
+        shell: bash
+        run: |
+          cd ../openFrameworks/apps/projectGenerator/frontend
+          npm install
+          npm update
+          npm run dist:linux64
+          cd dist
+          pwd
+          ls
+      - name: List output frontend dist dir
+        run: ls -lah ./../openFrameworks/apps/projectGenerator/frontend/dist
+      - name: copy gui
+        run: |
+          cd ./../openFrameworks/apps/projectGenerator/frontend/dist
+          mv projectGenerator-0.58.0.tar.gz ./../../../../../projectGenerator-0.58.0.tar.gz
+      
+      - name: Test Artefact zip
+        run: |
+          cd ./../openFrameworks/apps/projectGenerator/commandLine/bin
+          tar -cjf artefact.tar.bz2 projectGenerator data libfmod.so
+          mv artefact.tar.bz2 ./../../../../../artefact.tar.bz2
+      - name: List output top
+        run: ls -lah ./
+      - name: Upload binaries as Artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-Generator-linux
+          path: artefact.tar.bz2 projectGenerator-0.58.0.tar.gz
+          retention-days: 1

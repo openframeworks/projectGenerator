@@ -28,5 +28,18 @@
 	<string>This app needs to access the microphone</string>
 	<key>NSHighResolutionCapable</key>
 	<string>${HIGH_RESOLUTION_CAPABLE}</string>
+	<key>NSFileProviderDomainUsageDescription</key>
+	<string>projectGenerator needs to access the File folder as can be run against projects in Files</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>projectGenerator needs to access the Desktop folder as run from there against projects stored there</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>projectGenerator needs to access the downloads folder as run from there against projects downloaded</string>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>projectGenerator needs to access the Documents folder to manage projects stored there.</string>
+	<key>NSFullDiskAccessUsageDescription</key>
+	<string>projectGenerator needs full disk access to manage projects across all directories on the system.</string>
+	
 </dict>
 </plist>

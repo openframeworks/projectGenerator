@@ -70,6 +70,7 @@ const string ADDON_OBJC_SOURCES = "ADDON_OBJC_SOURCES";
 
 // About Exclude
 const string ADDON_LIBS_EXCLUDE = "ADDON_LIBS_EXCLUDE";
+const string ADDON_LIBS_DIR = "ADDON_LIBS_DIR";
 const string ADDON_SOURCES_EXCLUDE = "ADDON_SOURCES_EXCLUDE";
 const string ADDON_INCLUDES_EXCLUDE = "ADDON_INCLUDES_EXCLUDE";
 const string ADDON_FRAMEWORKS_EXCLUDE = "ADDON_FRAMEWORKS_EXCLUDE";
@@ -99,6 +100,7 @@ const vector<string> AddonProjectVariables = {
 	ADDON_OBJC_SOURCES,
 
 	ADDON_LIBS_EXCLUDE,
+    ADDON_LIBS_DIR,
 	ADDON_SOURCES_EXCLUDE,
 	ADDON_INCLUDES_EXCLUDE,
 	ADDON_FRAMEWORKS_EXCLUDE,
@@ -139,6 +141,7 @@ public:
 	vector < LibraryBinary > libs;
 	vector < string > dllsToCopy;
 	vector < string > includePaths;
+    vector < string > libsPaths;
 
 	// From addon_config.mk
 	vector < string > dependencies;
@@ -150,6 +153,8 @@ public:
 	vector < string > xcframeworks; // osx only
 	vector < string > data;
 	vector < string > defines;
+    
+    vector < string > definesCMAKE;
 
 	// metadata
 	string name;

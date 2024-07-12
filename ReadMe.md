@@ -1,3 +1,14 @@
+# openFrameworks projectGenerator 
+
+[![build-linux](https://github.com/openframeworks/projectGenerator/actions/workflows/build-linux.yml/badge.svg)](https://github.com/openframeworks/projectGenerator/actions/workflows/build-linux.yml) [![build-vs](https://github.com/openframeworks/projectGenerator/actions/workflows/build-vs.yml/badge.svg)](https://github.com/openframeworks/projectGenerator/actions/workflows/build-vs.yml) [![build-macos](https://github.com/openframeworks/projectGenerator/actions/workflows/build-macos.yml/badge.svg)](https://github.com/openframeworks/projectGenerator/actions/workflows/build-macos.yml)
+
+# Builds the cmdline and GUI project generators for openFrameworks
+
+- the commandLine projectGenerator (pure openFrameworks)
+- the projectGenerator GUI app (electron) distributed in releases
+
+---------------------------------------
+
 # Download instructions 
 You can download packaged macOS and Windows builds here ( note Linux needs to be built per platform ):
 - https://github.com/openframeworks/projectGenerator/releases/download/nightly/projectGenerator-osx.zip

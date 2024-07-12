@@ -76,6 +76,11 @@ jobs:
         run:
           ../openFrameworks/apps/projectGenerator/scripts/vs/ci_cmd_package.sh
 
+      - name: Test cmdline 
+        shell: msys2 {0}
+        run: 
+          ../openFrameworks/apps/projectGenerator/scripts/vs/test_cmdline.sh
+
       - name: Build and Package projectGenerator VS GUI
         shell: bash
         run: |

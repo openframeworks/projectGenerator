@@ -500,6 +500,10 @@ void baseProject::addAddon(ofAddon & addon){
 	for(auto & lib: addon.libs){
 		ofLogVerbose("baseProject") << lib.path;
 	}
+    
+    for(auto & lib: addon.libsPaths){
+        ofLogVerbose("adding lib paths") << lib.c_str();
+    }
 
 	for (auto & a : addon.includePaths) {
 		ofLogVerbose() << "adding addon include path: " << a;
