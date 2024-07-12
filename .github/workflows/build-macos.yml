@@ -122,7 +122,7 @@ jobs:
             echo "projectGenerator-osx.zip NOT found at level 0"
           fi
       - name: Test cmdline 
-        run: openFrameworks/apps/projectGenerator/scripts/osx/test_cmdline.sh
+        run: ../openFrameworks/apps/projectGenerator/scripts/osx/test_cmdline.sh
       - name: Update Release x86_64
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
         uses: IsaacShelton/update-existing-release@v1.3.4
