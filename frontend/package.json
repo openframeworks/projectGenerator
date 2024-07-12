@@ -1,8 +1,8 @@
 {
-  "name": "project-generator",
+  "name": "projectGenerator",
   "productName": "projectGenerator",
   "version": "0.58.0",
-  "description": "repo for testing a gui using electron for the project generator",
+  "description": "Build electron GUI openFrameworks projectGenerator",
   "license": "MIT",
   "main": "index.js",
   "repository": "github:openframeworks/projectGenerator",

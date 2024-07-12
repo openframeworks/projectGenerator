@@ -32,11 +32,6 @@ SOURCE_FILE="${PG_DIR}/commandLine/bin/projectGenerator"
 DESTINATION_PATH="app"
 echo "SOURCE_FILE:$SOURCE_FILE";
 
-if [ ! -f "$SOURCE_FILE" ]; then
-   SOURCE_FILE="${PG_DIR}/commandLine/bin/commandLine.app/contents/MacOS/commandLine"
-fi
-
-
 # Check if the source file exists
 if [ -f "$SOURCE_FILE" ]; then
    echo "File exists, proceed with copying"
