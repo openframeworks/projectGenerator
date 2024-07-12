@@ -192,7 +192,7 @@ fs::path findOFPathUpwards(const fs::path & startPath) {
         }
         currentPath = currentPath.parent_path();
     }
-    ofLogError() << "No valid OF path found... please use -o or --ofPath or set a PG_OF_PATH environment variable: " << startPath.string();
+//    ofLogError() << "No valid OF path found... please use -o or --ofPath or set a PG_OF_PATH environment variable: " << startPath.string();
     return fs::path();
 }
 void updateProject(const fs::path & path, const string & target, bool bConsiderParameterAddons = true) {
