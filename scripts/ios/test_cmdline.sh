@@ -13,12 +13,11 @@ echo "CMD_DIR:  ${CMD_DIR}"
 echo "====== ${CMD_DIR}"
 # Compile commandline tool
 cd "${CMD_DIR}/bin"
-echo "Testing project generation ios [${CMD_DIR}/bin] oF:[${OF_DIR}]";
+echo "Testing projectGenerator [ios] - will need to pull macOS xcframeworks to test this";
 chmod +x projectGenerator
-# ./projectGenerator
-# ./projectGenerator -o${OF_DIR} -p"osx" -l
 ./projectGenerator --recursive -p"ios" -o../../../../ ../../../../examples/ios
 errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
 		exit $errorcode
 fi
+echo "Successful projectGenerator tests for [ios]";

@@ -18,6 +18,8 @@ echo "Building Project Generator"
 
 export LC_ALL=C
 cd ${OF_DIR}/apps/projectGenerator
+
+# current makefile
 make -j2 Release -C ./commandLine
 
 ret=$?
@@ -25,10 +27,4 @@ if [ $ret -ne 0 ]; then
       echo "Failed building Project Generator"
       exit 1
 fi
-
-cd commandLine/bin/
-echo "Testing project generation linux 64";
-chmod +x projectGenerator
-./projectGenerator --recursive -plinux64 -tvscode -o../../../../ ../../../../examples/
-=
-echo "Success built projectGenerator linux";
+echo "Successfly built projectGenerator for [linux64]";

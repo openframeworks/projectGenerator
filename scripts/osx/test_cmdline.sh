@@ -13,10 +13,11 @@ echo "CMD_DIR:  ${CMD_DIR}"
 echo "====== ${CMD_DIR}"
 # Compile commandline tool
 cd "${CMD_DIR}/bin"
-echo "Testing project generation osx";
+echo "Testing projectGenerator [osx]";
 chmod +x projectGenerator
 ./projectGenerator --recursive -posx -o../../../../ ../../../../examples/
 errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
 		exit $errorcode
 fi
+echo "Successful projectGenerator tests for [osx]";
