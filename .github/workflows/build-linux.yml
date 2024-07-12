@@ -3,10 +3,10 @@ name: build-linux
 on:
   push:
     paths-ignore:
-    - '**/README.md'
+      - '**/README.md'
   pull_request:
     paths-ignore:
-    - '**/README.md'
+      - '**/README.md'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,18 +22,21 @@ jobs:
     strategy:
       matrix:
         cfg:
-        - {target: linux64}
+          - {target: linux}
     env:
-     TARGET: ${{matrix.cfg.target}}
+      TARGET: ${{ matrix.cfg.target }}
     steps:
-    - name: Install libunwind
-      run:  sudo apt-get install libunwind-dev wget2
-    - uses: actions/checkout@v4
-    - name: ccache
-      uses: hendrikmuhs/ccache-action@v1.2.12
-      with:
-        key: ${{ matrix.os }}-${{ matrix.cfg.target }}
-    - name: Determine Release
+      - name: Install libunwind
+        run: sudo apt-get install libunwind-dev wget2
+      
+      - uses: actions/checkout@v4
+      
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.12
+        with:
+          key: ${{ matrix.cfg.target }}
+      
+      - name: Determine Release
         id: vars
         shell: bash
         run: |
@@ -49,19 +52,20 @@ jobs:
           else
             echo "release=nightly" >> $GITHUB_ENV
             echo "prerelease=false" >> $GITHUB_ENV
-          fi 
-
-    - name: Install
-      run:
-        ./scripts/linux/ci_install_core.sh
-    - name: List directory
-      run: ls -lah ./
-    - name: Build
-      run:
-        ./../openFrameworks/apps/projectGenerator/scripts/linux/buildPG.sh;
-    - name: List output directory
-      run: ls -lah ./../openFrameworks/apps/projectGenerator/commandLine/bin
-    - name: Build and Package projectGenerator Linux GUI
+      
+      - name: Install
+        run: ./scripts/linux/ci_install_core.sh
+      
+      - name: List directory
+        run: ls -lah ./
+      
+      - name: Build
+        run: ./../openFrameworks/apps/projectGenerator/scripts/linux/buildPG.sh
+      
+      - name: List output directory
+        run: ls -lah ./../openFrameworks/apps/projectGenerator/commandLine/bin
+      
+      - name: Build and Package projectGenerator Linux GUI
         shell: bash
         run: |
           cd ../openFrameworks/apps/projectGenerator/frontend
@@ -71,15 +75,16 @@ jobs:
           cd dist
           pwd
           ls
-    - name: Test Artefact zip
-      run: |
-        cd ./../openFrameworks/apps/projectGenerator/commandLine/bin
-        tar -cjf artefact.tar.bz2 projectGenerator data libfmod.so
-        mv artefact.tar.bz2 ../../../../../
-    - name: Upload binaries as Artefact
-      uses: actions/upload-artifact@v4
-      with:
-        name: project-Generator-linux
-        path: artefact.tar.bz2
-        retention-days: 1
-        
+      
+      - name: Test Artefact zip
+        run: |
+          cd ./../openFrameworks/apps/projectGenerator/commandLine/bin
+          tar -cjf artefact.tar.bz2 projectGenerator data libfmod.so
+          mv artefact.tar.bz2 ../../../../../
+      
+      - name: Upload binaries as Artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-Generator-linux
+          path: artefact.tar.bz2
+          retention-days: 1
