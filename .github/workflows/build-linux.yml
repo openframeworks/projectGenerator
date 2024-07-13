@@ -69,7 +69,7 @@ jobs:
       - name: List output directory
         run: ls -lah ./../openFrameworks/apps/projectGenerator/commandLine/bin
 
-      - name: copy commandLine to frontend
+      - name: Copy commandLine to frontend
         run: |
           cp ./../openFrameworks/apps/projectGenerator/commandLine/bin/projectGenerator ./../openFrameworks/apps/projectGenerator/frontend/app/projectGenerator
           chmod 755 ./../openFrameworks/apps/projectGenerator/commandLine/bin/projectGenerator
@@ -84,24 +84,30 @@ jobs:
           cd dist
           pwd
           ls
+
       - name: List output frontend dist dir
         run: ls -lah ./../openFrameworks/apps/projectGenerator/frontend/dist
-      - name: copy gui
+
+      - name: Copy GUI tarball to root directory
         run: |
           cd ./../openFrameworks/apps/projectGenerator/frontend/dist
-          mv projectGenerator-0.58.0.tar.gz ./../../../../../../projectGenerator/projectGenerator-0.58.0.tar.gz
+          mv projectGenerator-0.58.0.tar.gz $GITHUB_WORKSPACE/projectGenerator-0.58.0.tar.gz
       
       - name: Test Artefact zip
         run: |
           cd ./../openFrameworks/apps/projectGenerator/commandLine/bin/
           ls -la
           tar -cjf artefact.tar.bz2 projectGenerator
-          mv artefact.tar.bz2 ./../../../../../../projectGenerator/artefact.tar.bz2
+          mv artefact.tar.bz2 $GITHUB_WORKSPACE/artefact.tar.bz2
+
       - name: List output top
-        run: ls -lah ./
+        run: ls -lah $GITHUB_WORKSPACE
+
       - name: Upload binaries as Artefact
         uses: actions/upload-artifact@v4
         with:
           name: project-Generator-linux
-          path: artefact.tar.bz2 projectGenerator-0.58.0.tar.gz
+          path: |
+            $GITHUB_WORKSPACE/artefact.tar.bz2
+            $GITHUB_WORKSPACE/projectGenerator-0.58.0.tar.gz
           retention-days: 1
