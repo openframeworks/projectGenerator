@@ -91,23 +91,35 @@ jobs:
       - name: Copy GUI tarball to root directory
         run: |
           cd ./../openFrameworks/apps/projectGenerator/frontend/dist
-          mv projectGenerator-0.58.0.tar.gz $GITHUB_WORKSPACE/projectGenerator-0.58.0.tar.gz
+          mv projectGenerator-0.58.0.tar.gz $GITHUB_WORKSPACE/projectGenerator-linux-gui.gz
       
       - name: Test Artefact zip
         run: |
           cd ./../openFrameworks/apps/projectGenerator/commandLine/bin/
           ls -la
-          tar -cjf artefact.tar.bz2 projectGenerator
-          mv artefact.tar.bz2 $GITHUB_WORKSPACE/artefact.tar.bz2
+          tar -cjf projectGenerator-linux.tar.bz2 projectGenerator
+          mv projectGenerator-linux.tar.bz2 $GITHUB_WORKSPACE/projectGenerator-linux.tar.bz2
 
       - name: List output top
         run: ls -lah $GITHUB_WORKSPACE
 
-      - name: Upload binaries as Artefact
-        uses: actions/upload-artifact@v4
+      - name: Update CMD Gen Release
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
+        uses: IsaacShelton/update-existing-release@v1.3.4
         with:
-          name: project-Generator-linux
-          path: |
-            $GITHUB_WORKSPACE/artefact.tar.bz2
-            $GITHUB_WORKSPACE/projectGenerator-0.58.0.tar.gz
-          retention-days: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ env.release }}
+          release: ${{ env.release }}
+          prerelease: ${{ env.release }}
+          replace: false
+          files: projectGenerator-linux.tar.bz2
+      - name: Update Project Gen GUI Release
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
+        uses: IsaacShelton/update-existing-release@v1.3.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ env.release }}
+          release: ${{ env.release }}
+          prerelease: ${{ env.release }}
+          replace: false
+          files: projectGenerator-linux-gui.gz
