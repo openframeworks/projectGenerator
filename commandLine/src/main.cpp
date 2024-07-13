@@ -9,21 +9,21 @@
 #include <string>
 
 enum optionIndex { UNKNOWN,
-    HELP,
-    PLUS,
-    RECURSIVE,
-    LISTTEMPLATES,
-    PLATFORMS,
-    ADDONS,
-    OFPATH,
-    VERBOSE,
-    TEMPLATE,
-    DRYRUN,
-    SRCEXTERNAL,
-    VERSION,
-    GET_OFPATH,
-    GET_HOST_PLATFORM,
-    COMMAND
+	HELP,
+	PLUS,
+	RECURSIVE,
+	LISTTEMPLATES,
+	PLATFORMS,
+	ADDONS,
+	OFPATH,
+	VERBOSE,
+	TEMPLATE,
+	DRYRUN,
+	SRCEXTERNAL,
+	VERSION,
+	GET_OFPATH,
+	GET_HOST_PLATFORM,
+	COMMAND
 };
 
 constexpr option::Descriptor usage[] = {
@@ -207,36 +207,37 @@ bool isGoodProjectPath(fs::path path) {
 
 bool isGoodOFPath(const fs::path & path) {
 	if (!fs::is_directory(path)) {
-//		ofLogVerbose() << "ofPath: not a directory: " << path.string();
+	//		ofLogVerbose() << "ofPath: not a directory: " << path.string();
 		return false;
 	}
 	bool bHasTemplates = containsFolder(path, "scripts");
-    bHasTemplates = bHasTemplates && containsFolder(path, "addons");
-    bHasTemplates = bHasTemplates && containsFolder(path, "libs");
-//	if (!bHasTemplates) ofLogVerbose() << "ofPath no addons / libs / scripts / templates directory " << path.string();
+	bHasTemplates = bHasTemplates && containsFolder(path, "addons");
+	bHasTemplates = bHasTemplates && containsFolder(path, "libs");
+	//	if (!bHasTemplates) ofLogVerbose() << "ofPath no addons / libs / scripts / templates directory " << path.string();
 	return bHasTemplates;
 }
 
 fs::path findOFPathUpwards(const fs::path & startPath) {
-    fs::path currentPath = startPath;
-//    ofLogNotice() << "startPath: " << currentPath.string();
-    if (currentPath.empty() || currentPath == currentPath.root_path()) {
-        ofLogError() << "Starting path is empty or root path, cannot find OF path.";
-        return fs::path();
-    }
-    while (!currentPath.empty() && currentPath != currentPath.root_path()) {
-//        ofLogWarning() << "currentPath: " << currentPath.string();
-        if (isGoodOFPath(currentPath)) {
-//            ofLogWarning() << "isGoodOFPath: " << currentPath.string();
-            return currentPath;
-        } else {
-//            ofLogWarning() << "not good OF Path: " << currentPath.string();
-        }
-        currentPath = currentPath.parent_path();
-    }
-//    ofLogError() << "No valid OF path found... please use -o or --ofPath or set a PG_OF_PATH environment variable: " << startPath.string();
-    return fs::path();
+	fs::path currentPath = startPath;
+	//    ofLogNotice() << "startPath: " << currentPath.string();
+	if (currentPath.empty() || currentPath == currentPath.root_path()) {
+		ofLogError() << "Starting path is empty or root path, cannot find OF path.";
+		return fs::path();
+	}
+	while (!currentPath.empty() && currentPath != currentPath.root_path()) {
+	//        ofLogWarning() << "currentPath: " << currentPath.string();
+		if (isGoodOFPath(currentPath)) {
+	//            ofLogWarning() << "isGoodOFPath: " << currentPath.string();
+			return currentPath;
+		} else {
+	//            ofLogWarning() << "not good OF Path: " << currentPath.string();
+		}
+		currentPath = currentPath.parent_path();
+	}
+	//    ofLogError() << "No valid OF path found... please use -o or --ofPath or set a PG_OF_PATH environment variable: " << startPath.string();
+	return fs::path();
 }
+
 void updateProject(const fs::path & path, const string & target, bool bConsiderParameterAddons = true) {
 	//    alert("updateProject path=" + path.string() , 34);
 	// bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
@@ -436,8 +437,6 @@ int main(int argc, char ** argv) {
         bVerbose = true;
     }
 
-	
-
 	// templates:
 	if (options[LISTTEMPLATES].count() > 0) {
 		bListTemplates = true;
@@ -456,34 +455,34 @@ int main(int argc, char ** argv) {
         return EXIT_OK;
     }
     
-    int updated = updateOFPath();
-    
-    if (options[HELP] || argc == 0) {
-        ofLogError() << "No arguments";
-        printHelp();
-        return EXIT_OK;
-    }
-    
-    if (options[COMMAND].count() > 0) {
-        if (options[COMMAND].arg != NULL) {
-            string argument(options[COMMAND].arg);
-            handleCommand(argument);
-        } else {
-            ofLogError() << "Custom command requires an argument";
-            return EXIT_USAGE;
-        }
-        return EXIT_OK;
-    }
-    
-    if (options[GET_OFPATH].count() > 0) {
-        getOFRoot();
-        return EXIT_OK;
-    }
-    
-    if (options[GET_HOST_PLATFORM].count() > 0) {
-        ofLogNotice() << ofGetTargetPlatform();
-        return EXIT_OK;
-    }
+	int updated = updateOFPath();
+
+	if (options[HELP] || argc == 0) {
+		ofLogError() << "No arguments";
+		printHelp();
+		return EXIT_OK;
+	}
+
+	if (options[COMMAND].count() > 0) {
+		if (options[COMMAND].arg != NULL) {
+			string argument(options[COMMAND].arg);
+			handleCommand(argument);
+		} else {
+			ofLogError() << "Custom command requires an argument";
+			return EXIT_USAGE;
+		}
+		return EXIT_OK;
+	}
+
+	if (options[GET_OFPATH].count() > 0) {
+		getOFRoot();
+		return EXIT_OK;
+	}
+
+	if (options[GET_HOST_PLATFORM].count() > 0) {
+		ofLogNotice() << ofGetTargetPlatform();
+		return EXIT_OK;
+	}
     
 	if (options[TEMPLATE].count() > 0) {
 		if (options[TEMPLATE].arg != NULL) {
