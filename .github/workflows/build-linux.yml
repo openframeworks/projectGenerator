@@ -89,14 +89,14 @@ jobs:
       - name: copy gui
         run: |
           cd ./../openFrameworks/apps/projectGenerator/frontend/dist
-          mv projectGenerator-0.58.0.tar.gz ./../../../../../projectGenerator-0.58.0.tar.gz
+          mv projectGenerator-0.58.0.tar.gz ./../../../../../../projectGenerator/projectGenerator-0.58.0.tar.gz
       
       - name: Test Artefact zip
         run: |
           cd ./../openFrameworks/apps/projectGenerator/commandLine/bin/
           ls -la
           tar -cjf artefact.tar.bz2 projectGenerator
-          mv artefact.tar.bz2 ./../../../../../artefact.tar.bz2
+          mv artefact.tar.bz2 ./../../../../../../projectGenerator/artefact.tar.bz2
       - name: List output top
         run: ls -lah ./
       - name: Upload binaries as Artefact
