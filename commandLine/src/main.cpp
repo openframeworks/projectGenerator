@@ -134,6 +134,10 @@ std::string normalizePath(const std::string& path) {
     return std::filesystem::weakly_canonical(path).string();
 }
 
+std::filesystem::path normalizePath(const std::filesystem::path& path) {
+    return std::filesystem::weakly_canonical(path).string();
+}
+
 void addPlatforms(const string & value) {
 	targets.clear();
 	vector<string> platforms = ofSplitString(value, ",", true, true);
