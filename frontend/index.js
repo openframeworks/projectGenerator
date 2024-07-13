@@ -104,8 +104,12 @@ for(const key in templateSettings) {
 const hostplatform = (() => {
     if (/^win/.test(process.platform)) {
         return 'windows';
+    } else if (process.platform === "win32") {
+        return 'windows';
     } else if (process.platform === "darwin") {
         return 'osx';
+    } else if (process.platform === "linux64") {
+        return 'linux64';
     } else if (process.platform === "linux") {
         return 'linux';
     }
@@ -169,7 +173,7 @@ if (!path.isAbsolute(defaultOfPath)) {
     // arturo, this may differ on linux, if putting ../ in settings doesn't work for the default path
     // take a look at this...
 
-    if (hostplatform == "windows" || hostplatform == "linux"){
+    if (hostplatform == "windows" || hostplatform == "linux" || hostplatform == "linux64" ){
     	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../"), defaultOfPath));
     } else if(hostplatform == "osx"){
     	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../../../"), defaultOfPath));
@@ -1219,5 +1223,43 @@ ipcMain.on('showItemInFolder', (event, p) => {
 ipcMain.on('firstTimeSierra', (event, command) => {
     exec(command, (error, stdout, stderr) => {
         console.log(stdout, stderr);
+    });
+});
+
+ipcMain.on('command', (event, customArg) => {
+    const pgApp = getPgPath();
+    const command = `${pgApp} -c "${customArg}"`;
+
+    exec(command, { maxBuffer: Infinity }, (error, stdout, stderr) => {
+        if (error) {
+            event.sender.send('commandResult', {
+                success: false,
+                message: error.message
+            });
+        } else {
+            event.sender.send('commandResult', {
+                success: true,
+                message: stdout
+            });
+        }
+    });
+});
+
+ipcMain.on('getOFPath', (event, customArg) => {
+    const pgApp = getPgPath();
+    const command = `${pgApp} - "${customArg}"`;
+
+    exec(command, { maxBuffer: Infinity }, (error, stdout, stderr) => {
+        if (error) {
+            event.sender.send('ofPathResult', {
+                success: false,
+                message: error.message
+            });
+        } else {
+            event.sender.send('ofPathResult', {
+                success: true,
+                message: stdout
+            });
+        }
     });
 });

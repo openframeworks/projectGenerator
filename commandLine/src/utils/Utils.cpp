@@ -410,7 +410,6 @@ unique_ptr<baseProject> getTargetProject(const string & targ) {
 			   targ == "linuxarmv7l" ||
 			   targ == "linuxaarch64"
 			   ) {
-//		return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));
 		return unique_ptr<VSCodeProject>(new VSCodeProject(targ));
 	} 
 	else if (targ == "android") {
