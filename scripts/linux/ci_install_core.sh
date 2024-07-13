@@ -69,6 +69,7 @@ else
 	scripts/linux/download_libs.sh
 fi
 
+scripts/linux/removeFMOD.sh
 
 echo "ci install complete ---"
 
