@@ -152,7 +152,7 @@ bool xcodeProject::createProjectFile(){
                 if (std::system(command.c_str()) != 0) {
                     std::cerr << "Failed to set extended attributes on " <<  templateBinDir.string() << std::endl;
                 } else {
-                    std::cout << "xattr set correctly for bin" << endl;
+                    ofLogVerbose("xcodeProject") << "xattr set correctly for /bin" << endl;
                 }
             } catch (const std::exception& e) {
                 std::cout << e.what() << std::endl;
