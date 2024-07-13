@@ -401,6 +401,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = "";
+				ENABLE_USER_SELECTED_FILES = readwrite;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_DYNAMIC_NO_PIC = NO;
 				HEADER_SEARCH_PATHS = (
@@ -414,7 +415,13 @@
 					src/uuidxx/src,
 				);
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSDesktopFolderUsageDescription = "projectGenerator needs to access the Desktop folder as run from there against projects stored there";
+				INFOPLIST_KEY_NSDocumentsFolderUsageDescription = "projectGenerator needs to access the Documents folder to manage projects stored there.";
+				INFOPLIST_KEY_NSDownloadsFolderUsageDescription = "projectGenerator needs to access the downloads folder as run from there against projects downloaded there";
+				INFOPLIST_KEY_NSFileProviderPresenceUsageDescription = "projectGenerator needs to access the File folder as can be run against projects in Files";
+				INFOPLIST_KEY_NSNetworkVolumesUsageDescription = "projectGenerator needs to access the Network volumes as can be run against projects on network drives";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LINK_WITH_STANDARD_LIBRARIES = YES;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(OF_CORE_LIBS)",
@@ -435,6 +442,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = YES;
 				DEVELOPMENT_TEAM = "";
+				ENABLE_USER_SELECTED_FILES = readwrite;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
 					"$(OF_CORE_HEADERS)",
@@ -447,7 +455,13 @@
 					src/uuidxx/src,
 				);
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSDesktopFolderUsageDescription = "projectGenerator needs to access the Desktop folder as run from there against projects stored there";
+				INFOPLIST_KEY_NSDocumentsFolderUsageDescription = "projectGenerator needs to access the Documents folder to manage projects stored there.";
+				INFOPLIST_KEY_NSDownloadsFolderUsageDescription = "projectGenerator needs to access the downloads folder as run from there against projects downloaded there";
+				INFOPLIST_KEY_NSFileProviderPresenceUsageDescription = "projectGenerator needs to access the File folder as can be run against projects in Files";
+				INFOPLIST_KEY_NSNetworkVolumesUsageDescription = "projectGenerator needs to access the Network volumes as can be run against projects on network drives";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LINK_WITH_STANDARD_LIBRARIES = YES;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(OF_CORE_LIBS)",

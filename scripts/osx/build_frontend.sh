@@ -48,12 +48,26 @@ if [ -f "$SOURCE_FILE" ]; then
    if command -v rsync &> /dev/null; then
       rsync -avzp "$SOURCE_FILE" "$DESTINATION_PATH/projectGenerator"
    else
-      cp -X "$SOURCE_FILE" "$DESTINATION_PATH/projectGenerator"
+      cp -aX "$SOURCE_FILE" "$DESTINATION_PATH/projectGenerator"
    fi
    echo "File copied successfully."
 else
     # File does not exist
     echo "Error: Source file does not exist."
+fi
+
+if [ -z "${IDENTITY+x}" ]; then
+   IDENTITY="-"
+fi
+codesign --verify --deep --verbose=2 "$DESTINATION_PATH/projectGenerator"
+SIGN_STATUS=$?
+if [ $SIGN_STATUS -ne 0 ]; then
+    echo "Code signing is required. Signing the application..."
+    codesign --sign "$IDENTITY" --deep --force --verbose --entitlements $PG_DIR/scripts/osx/PG.entitlements "$DESTINATION_PATH/projectGenerator"
+    echo "Verifying the new code signature..."
+    codesign --verify --deep --verbose=2 "$DESTINATION_PATH/projectGenerator"
+else
+    echo "Application is already code-signed and valid"
 fi
 
 
