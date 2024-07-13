@@ -436,11 +436,7 @@ int main(int argc, char ** argv) {
         bVerbose = true;
     }
 
-	if (options[HELP] || argc == 0) {
-		ofLogError() << "No arguments";
-		printHelp();
-		return EXIT_OK;
-	}
+	
 
 	// templates:
 	if (options[LISTTEMPLATES].count() > 0) {
@@ -460,7 +456,13 @@ int main(int argc, char ** argv) {
         return EXIT_OK;
     }
     
-    updateOFPath();
+    int updated = updateOFPath();
+    
+    if (options[HELP] || argc == 0) {
+        ofLogError() << "No arguments";
+        printHelp();
+        return EXIT_OK;
+    }
     
     if (options[COMMAND].count() > 0) {
         if (options[COMMAND].arg != NULL) {

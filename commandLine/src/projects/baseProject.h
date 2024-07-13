@@ -153,7 +153,7 @@ protected:
                 } else {
                     // straight copy
                     try {
-                        fs::copy(from, to, fs::copy_options::skip_existing);
+                        fs::copy(from, to, fs::copy_options::overwrite_existing);
                     }
                     catch(fs::filesystem_error & e) {
                         std::cout << "error copying template file " << from << " : " << to << std::endl;
@@ -166,73 +166,6 @@ protected:
             }
 
             return true;
-        }
-
-
-       std::string mergePlistFiles(const std::string& existingContents, const std::string& templateContents) {
-           pugi::xml_document existingDoc;
-               existingDoc.load_string(existingContents.c_str());
-
-               pugi::xml_document templateDoc;
-               templateDoc.load_string(templateContents.c_str());
-
-               pugi::xml_node existingDict = existingDoc.child("plist").child("dict");
-               pugi::xml_node templateDict = templateDoc.child("plist").child("dict");
-
-               std::map<std::string, std::string> existingMap;
-               std::map<std::string, std::string> templateMap;
-
-               for (pugi::xml_node node = existingDict.first_child(); node; node = node.next_sibling("key")) {
-                   std::string key = node.child_value();
-                   std::string value;
-                   pugi::xml_node valueNode = node.next_sibling();
-                   if (std::string(valueNode.name()) == "string") {
-                       value = valueNode.child_value();
-                   } else {
-                       value = valueNode.name();
-                   }
-                   existingMap[key] = value;
-               }
-
-               for (pugi::xml_node node = templateDict.first_child(); node; node = node.next_sibling("key")) {
-                   std::string key = node.child_value();
-                   std::string value;
-                   pugi::xml_node valueNode = node.next_sibling();
-                   if (std::string(valueNode.name()) == "string") {
-                       value = valueNode.child_value();
-                   } else {
-                       value = valueNode.name();
-                   }
-                   templateMap[key] = value;
-               }
-
-               for (const auto& entry : templateMap) {
-                   if (existingMap.find(entry.first) == existingMap.end()) {
-                       existingMap[entry.first] = entry.second;
-                   }
-               }
-
-            std::string mergedContents = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n";
-               for (const auto& entry : existingMap) {
-                   mergedContents += "\t<key>" + entry.first + "</key>\n";
-                   if (entry.second == "true" || entry.second == "false") {
-                       mergedContents += "\t<" + entry.second + "/>\n";
-                   } else {
-                       mergedContents += "\t<string>" + entry.second + "</string>\n";
-                   }
-                   
-               }
-               mergedContents += "</dict>\n</plist>\n";
-
-               return mergedContents;
-       }
-
-        void replaceAll(std::string& str, const std::string& from, const std::string& to) {
-            size_t startPos = 0;
-            while ((startPos = str.find(from, startPos)) != std::string::npos) {
-                str.replace(startPos, from.length(), to);
-                startPos += to.length();
-            }
         }
 	};
 
