@@ -9,18 +9,22 @@
 #include <string>
 
 enum optionIndex { UNKNOWN,
-	HELP,
-	PLUS,
-	RECURSIVE,
-	LISTTEMPLATES,
-	PLATFORMS,
-	ADDONS,
-	OFPATH,
-	VERBOSE,
-	TEMPLATE,
-	DRYRUN,
-	SRCEXTERNAL,
-	VERSION };
+    HELP,
+    PLUS,
+    RECURSIVE,
+    LISTTEMPLATES,
+    PLATFORMS,
+    ADDONS,
+    OFPATH,
+    VERBOSE,
+    TEMPLATE,
+    DRYRUN,
+    SRCEXTERNAL,
+    VERSION,
+    GET_OFPATH,
+    GET_HOST_PLATFORM,
+    COMMAND
+};
 
 constexpr option::Descriptor usage[] = {
 	{ UNKNOWN, 0, "", "", option::Arg::None, "Options:\n" },
@@ -35,6 +39,9 @@ constexpr option::Descriptor usage[] = {
 	{ DRYRUN, 0, "d", "dryrun", option::Arg::None, "  --dryrun, -d  \tdry run, don't change files" },
 	{ SRCEXTERNAL, 0, "s", "source", option::Arg::Optional, "  --source, -s  \trelative or absolute path to source or include folders external to the project (such as ../../../../common_utils/" },
 	{ VERSION, 0, "w", "version", option::Arg::None, "  --version, -w  \treturn the current version" },
+    { GET_OFPATH, 0, "g", "getofpath", option::Arg::None, "  --getofpath, -g  \treturn the current ofPath" },
+    { GET_HOST_PLATFORM, 0, "h", "gethost", option::Arg::None, "  --gethost, -h  \treturn the current host platform" },
+    { COMMAND, 0, "c", "command", option::Arg::None, "  --command, -c \truns command" },
 	{ 0, 0, 0, 0, 0, 0 }
 };
 
@@ -77,6 +84,10 @@ void consoleSpace() {
 
 void printVersion() {
 	std::cout << OFPROJECTGENERATOR_MAJOR_VERSION << "." << OFPROJECTGENERATOR_MINOR_VERSION << "." << OFPROJECTGENERATOR_PATCH_VERSION << std::endl;
+}
+
+void printOFPath() {
+    std::cout << ofPath.string() << endl;
 }
 
 bool printTemplates() {
@@ -151,6 +162,15 @@ std::filesystem::path normalizePath(const std::filesystem::path& path) {
         return std::filesystem::path("");
     }
 }
+
+void handleCommand(const std::string& args) {
+    if (args == "ping") {
+        std::cout << "pong" << args << std::endl;
+    } else {
+        std::cout << "Unknown custom command: " << args << std::endl;
+    }
+}
+
 
 void addPlatforms(const string & value) {
 	targets.clear();
@@ -292,6 +312,52 @@ void recursiveUpdate(const fs::path & path, const string & target) {
 	}
 }
 
+int updateOFPath() {
+    std::string ofPath;
+    std::string ofPathEnv = std::getenv("PG_OF_PATH") ? std::getenv("PG_OF_PATH") : "";
+
+    if ((ofPath.empty() && !ofPathEnv.empty()) ||
+        (!ofPath.empty() && !isGoodOFPath(ofPath) && !ofPathEnv.empty())) {
+        ofPath = normalizePath(ofPathEnv);;
+        ofLogNotice() << "PG_OF_PATH set: ofPath [" << ofPath << "]";
+    }
+    
+    fs::path startPath = normalizePath(ofFilePath::getCurrentExeDirFS());
+    //ofFilePath::getAbsolutePathFS(fs::current_path(), false);
+//    ofLogNotice() << "startPath: " << startPath.string();
+    fs::path foundOFPath = findOFPathUpwards(startPath);
+    if (foundOFPath.empty() && ofPath.empty()) {
+        ofLogError() << "oF path not found: please use -o or --ofPath or set 'PG_OF_PATH' environment var. Auto up folders from :[" << startPath.string() << "]";
+        return EXIT_FAILURE;
+    } else {
+        if (!ofPath.empty() && isGoodOFPath(ofPath)) {
+            ofLogNotice() << "ofPath set and valid using [" << ofPath << "]";
+        } else {
+            if(isGoodOFPath(foundOFPath))
+            ofPath = foundOFPath.string();
+            ofLogNotice() << "ofPath auto-found and valid using [" << ofPath << "]";
+        }
+    }
+    
+    if (!ofPath.empty()) {
+        if (!isGoodOFPath(ofPath)) {
+            foundOFPath = findOFPathUpwards(ofPath);
+            if (foundOFPath.empty()) {
+                ofLogNotice() << "ofPath not valid. [" << ofPath << "] auto-find ofPath failed also...";
+                return EXIT_USAGE;
+            }
+        }
+//        if (ofIsPathInPath(projectPath, ofPath)) {
+//            fs::path path = fs::relative(ofPath, projectPath);
+//            ofPath = path.string();
+//        }
+        ofPath = normalizePath(ofPath);
+        setOFRoot(ofPath);
+    }
+    
+    return EXIT_OK;
+}
+
 void printHelp() {
 	consoleSpace();
 
@@ -365,6 +431,10 @@ int main(int argc, char ** argv) {
 	if (parse.error()) {
 		return 1;
 	}
+    
+    if (options[VERBOSE].count() > 0) {
+        bVerbose = true;
+    }
 
 	if (options[HELP] || argc == 0) {
 		ofLogError() << "No arguments";
@@ -384,15 +454,35 @@ int main(int argc, char ** argv) {
 	if (options[DRYRUN].count() > 0) {
 		bDryRun = true;
 	}
-	if (options[VERSION].count() > 0) {
-		printVersion();
-		return EXIT_OK;
-	}
-
-	if (options[VERBOSE].count() > 0) {
-		bVerbose = true;
-	}
-
+    
+    if (options[VERSION].count() > 0) {
+        printVersion();
+        return EXIT_OK;
+    }
+    
+    updateOFPath();
+    
+    if (options[COMMAND].count() > 0) {
+        if (options[COMMAND].arg != NULL) {
+            string argument(options[COMMAND].arg);
+            handleCommand(argument);
+        } else {
+            ofLogError() << "Custom command requires an argument";
+            return EXIT_USAGE;
+        }
+        return EXIT_OK;
+    }
+    
+    if (options[GET_OFPATH].count() > 0) {
+        getOFRoot();
+        return EXIT_OK;
+    }
+    
+    if (options[GET_HOST_PLATFORM].count() > 0) {
+        ofLogNotice() << ofGetTargetPlatform();
+        return EXIT_OK;
+    }
+    
 	if (options[TEMPLATE].count() > 0) {
 		if (options[TEMPLATE].arg != NULL) {
 			string templateString(options[TEMPLATE].arg);
@@ -456,48 +546,7 @@ int main(int argc, char ** argv) {
 	consoleSpace();
 
 	// try to get the OF_PATH as an environt variable
-    std::string ofPath;
-    std::string ofPathEnv = std::getenv("PG_OF_PATH") ? std::getenv("PG_OF_PATH") : "";
-
-    if ((ofPath.empty() && !ofPathEnv.empty()) ||
-        (!ofPath.empty() && !isGoodOFPath(ofPath) && !ofPathEnv.empty())) {
-        ofPath = normalizePath(ofPathEnv);;
-        ofLogNotice() << "PG_OF_PATH set: ofPath [" << ofPath << "]";
-    }
     
-    fs::path startPath = normalizePath(ofFilePath::getCurrentExeDirFS());
-    //ofFilePath::getAbsolutePathFS(fs::current_path(), false);
-//    ofLogNotice() << "startPath: " << startPath.string();
-    fs::path foundOFPath = findOFPathUpwards(startPath);
-    if (foundOFPath.empty() && ofPath.empty()) {
-        ofLogError() << "oF path not found: please use -o or --ofPath or set 'PG_OF_PATH' environment var. Auto up folders from :[" << startPath.string() << "]";
-        return EXIT_FAILURE;
-    } else {
-        if (!ofPath.empty() && isGoodOFPath(ofPath)) {
-            ofLogNotice() << "ofPath set and valid using [" << ofPath << "]";
-        } else {
-            if(isGoodOFPath(foundOFPath))
-            ofPath = foundOFPath.string();
-            ofLogNotice() << "ofPath auto-found and valid using [" << ofPath << "]";
-        }
-    }
-    
-    if (!ofPath.empty()) {
-        if (!isGoodOFPath(ofPath)) {
-            foundOFPath = findOFPathUpwards(ofPath);
-            if (foundOFPath.empty()) {
-                ofLogNotice() << "ofPath not valid. [" << ofPath << "] auto-find ofPath failed also...";
-                return EXIT_USAGE;
-            }
-        }
-//        if (ofIsPathInPath(projectPath, ofPath)) {
-//            fs::path path = fs::relative(ofPath, projectPath);
-//            ofPath = path.string();
-//        }
-        
-        ofPath = normalizePath(ofPath);
-        setOFRoot(ofPath);
-    }
 
     fs::path projectPath = fs::weakly_canonical(fs::current_path() / projectName);
 
@@ -505,7 +554,7 @@ int main(int argc, char ** argv) {
     if (!projectPath.empty() && projectPath != projectPath.root_path() && fs::exists(projectPath)) {
         fs::create_directory(projectPath);
     } else {
-        ofLogError() << "Invalid or non-existent project path: " << projectPath;
+        ofLogError() << "Invalid or non-existent project path: [" << projectPath << "]";
         return EXIT_FAILURE;
     }
 
@@ -551,14 +600,14 @@ int main(int argc, char ** argv) {
 
 			for (auto & t : targets) {
 				ofLogNotice() << "-----------------------------------------------";
-				ofLogNotice() << "target platform is: " << t;
-				ofLogNotice() << "setting OF path to: " << ofPath;
+				ofLogNotice() << "target platform is: [" << t << "]";
+                ofLogNotice() << "setting OF path to: [" << ofPath << "]";
 				if (busingEnvVar) {
 					ofLogNotice() << "from PG_OF_PATH environment variable";
 				} else {
 					ofLogNotice() << "from -o option";
 				}
-				ofLogNotice() << "project path is: " << projectPath;
+				ofLogNotice() << "project path is: [" << projectPath << "]";
 				if (templateName != "") {
 					ofLogNotice() << "using additional template " << templateName;
 				}
