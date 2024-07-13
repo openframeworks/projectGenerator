@@ -46,8 +46,14 @@ package_app(){
 		echo "Directory contents:"
 		ls
 		echo "-------------"
-		#echo "copy cmdline PG to "
-		cp -X commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
+		echo "copy cmdline PG from app contents (signed)"
+		if command -v rsync &> /dev/null; then
+			rsync -avzp "commandLine/bin/commandLine.app/Contents/MacOS/commandLine" "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator" 2> /dev/null
+		else
+			cp -aX commandLine/bin/commandLine.app/Contents/MacOS/commandLine projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
+		fi
+
+
 		cd ${PG_DIR}
 		pwd
 		echo "Directory contents:"
@@ -97,7 +103,7 @@ package_app(){
 
 
 sign_and_upload(){
-	echo "sign_and_upload --"
+	echo "  sign_and_upload --"
 	PLATFORM=$1
 	# Copy commandLine into electron .app
 	cd ${PG_DIR}
@@ -150,7 +156,7 @@ sign_and_upload(){
 
 import_certificate(){
 
-	echo "import_certificate"
+	echo "  import_certificate"
 
 	if [[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" && -n "${CERTIFICATE_OSX_APPLICATION}" ]]; then
 		echo "Decoding signing certificates"
@@ -183,20 +189,20 @@ import_certificate(){
 
 }
 
-echo "build_cmdline.sh"
+echo "  build_cmdline.sh"
 # Compile commandline tool
 ${CURRENT_DIR}/build_cmdline.sh
 
-echo "test_cmdline.sh"
+echo "  test_cmdline.sh"
 # Test commandline tool
 ${CURRENT_DIR}/test_cmdline.sh
 
 
-echo "import_certificate"
+echo "  import_certificate"
 import_certificate
 # Generate electron app
 
-echo "build_frontend"
+echo "  build_frontend"
 ${CURRENT_DIR}/build_frontend.sh
 
 echo "Current directory: (should be projectGenerator)"
@@ -217,7 +223,7 @@ echo "-------------"
 mv frontend/dist/mac-universal ${PG_DIR}/projectGenerator-osx
 
 echo "-------------"
-echo "package_app osx"
+echo "  package_app osx"
 package_app osx
 
 # echo "package_app ios"
@@ -230,7 +236,7 @@ package_app osx
 # echo "package_app ios"
 # package_app ios
 
-echo "for security remove keys maybe imported"
+echo "  for security remove keys maybe imported"
 rm -rf scripts/id_rsa 2> /dev/null
 rm -rf scripts/*.p12 2> /dev/null
 

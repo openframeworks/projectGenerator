@@ -15,7 +15,27 @@ echo "====== ${CMD_DIR}"
 cd "${CMD_DIR}/bin"
 echo "Testing projectGenerator [osx]";
 chmod +x projectGenerator
-./projectGenerator --recursive -posx -o../../../../ ../../../../examples/
+
+codesign --verify --deep --verbose=2 "./projectGenerator"
+SIGN_STATUS=$?
+if [ $SIGN_STATUS -ne 0 ]; then
+    echo "Code signing is required. Signing the application..."
+    codesign --sign "-" --deep --force --verbose --entitlements $PG_DIR/scripts/osx/PG.entitlements "./projectGenerator"
+    echo "Verifying the new code signature..."
+    codesign --verify --deep --verbose=2 "./projectGenerator"
+else
+    echo "Application is already code-signed and valid"
+fi
+
+echo "Test auto path:"
+./projectGenerator --recursive -posx ../../../../examples/templates
+
+
+echo "Test all"
+./projectGenerator --recursive -posx -o../../../../ ../../../../examples/ ./projectGenerator 
+
+
+
 errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
 		exit $errorcode

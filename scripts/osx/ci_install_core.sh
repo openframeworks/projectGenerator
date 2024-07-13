@@ -86,7 +86,11 @@ ls
 echo "------------------"
 mkdir -p openFrameworks/apps/projectGenerator
 
-rsync -av --exclude='.git/' --exclude='.ccache/' projectGenerator/ openFrameworks/apps/projectGenerator/
+if command -v rsync &> /dev/null; then
+	rsync -avzp --exclude='.git/' --exclude='.ccache/' projectGenerator/ openFrameworks/apps/projectGenerator/
+else
+	cp -X projectGenerator/ openFrameworks/apps/projectGenerator/ 2> /dev/null
+fi
 
 echo "------------------"
 

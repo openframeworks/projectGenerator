@@ -389,6 +389,7 @@ fs::path getOFRoot(){
 }
 
 void setOFRoot(const fs::path & path){
+    ofLogNotice() << "OFRoot set: [" << path << "].";
 	OFRoot = path;
 }
 

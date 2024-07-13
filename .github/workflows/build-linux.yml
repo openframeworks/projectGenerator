@@ -69,7 +69,7 @@ jobs:
       - name: List output directory
         run: ls -lah ./../openFrameworks/apps/projectGenerator/commandLine/bin
 
-      - name: copy commandLine to frontend
+      - name: Copy commandLine to frontend
         run: |
           cp ./../openFrameworks/apps/projectGenerator/commandLine/bin/projectGenerator ./../openFrameworks/apps/projectGenerator/frontend/app/projectGenerator
           chmod 755 ./../openFrameworks/apps/projectGenerator/commandLine/bin/projectGenerator
@@ -84,23 +84,42 @@ jobs:
           cd dist
           pwd
           ls
+
       - name: List output frontend dist dir
         run: ls -lah ./../openFrameworks/apps/projectGenerator/frontend/dist
-      - name: copy gui
+
+      - name: Copy GUI tarball to root directory
         run: |
           cd ./../openFrameworks/apps/projectGenerator/frontend/dist
-          mv projectGenerator-0.58.0.tar.gz ./../../../../../projectGenerator-0.58.0.tar.gz
+          mv projectGenerator-0.58.0.tar.gz $GITHUB_WORKSPACE/projectGenerator-linux-gui.gz
       
       - name: Test Artefact zip
         run: |
-          cd ./../openFrameworks/apps/projectGenerator/commandLine/bin
-          tar -cjf artefact.tar.bz2 projectGenerator data libfmod.so
-          mv artefact.tar.bz2 ./../../../../../artefact.tar.bz2
+          cd ./../openFrameworks/apps/projectGenerator/commandLine/bin/
+          ls -la
+          tar -cjf projectGenerator-linux.tar.bz2 projectGenerator
+          mv projectGenerator-linux.tar.bz2 $GITHUB_WORKSPACE/projectGenerator-linux.tar.bz2
+
       - name: List output top
-        run: ls -lah ./
-      - name: Upload binaries as Artefact
-        uses: actions/upload-artifact@v4
+        run: ls -lah $GITHUB_WORKSPACE
+
+      - name: Update CMD Gen Release
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
+        uses: IsaacShelton/update-existing-release@v1.3.4
         with:
-          name: project-Generator-linux
-          path: artefact.tar.bz2 projectGenerator-0.58.0.tar.gz
-          retention-days: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ env.release }}
+          release: ${{ env.release }}
+          prerelease: ${{ env.release }}
+          replace: false
+          files: projectGenerator-linux.tar.bz2
+      - name: Update Project Gen GUI Release
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
+        uses: IsaacShelton/update-existing-release@v1.3.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ env.release }}
+          release: ${{ env.release }}
+          prerelease: ${{ env.release }}
+          replace: false
+          files: projectGenerator-linux-gui.gz

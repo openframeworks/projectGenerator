@@ -28,7 +28,7 @@ OF_ROOT = ../../..
 # None
 APPNAME = projectGenerator
 #PROJECT_AFTER_OSX = cp "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME" "$TARGET_BUILD_DIR/commandLinePG"; rm -rf "$TARGET_BUILD_DIR/$PRODUCT_NAME.app";	mv "$TARGET_BUILD_DIR/commandLinePG" "$TARGET_BUILD_DIR/projectGenerator"
-PROJECT_AFTER_OSX = if test -f "$TARGET_BUILD_DIR/projectGenerator"; then rm "$TARGET_BUILD_DIR/projectGenerator"; fi;  cp "$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME" "$TARGET_BUILD_DIR/projectGenerator"
+PROJECT_AFTER_OSX="if test -f \"$TARGET_BUILD_DIR/projectGenerator\"; then rm \"$TARGET_BUILD_DIR/projectGenerator\"; fi; rsync -avzp \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\" \"$TARGET_BUILD_DIR/projectGenerator\"; chmod 755 \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\"; chmod 755 \"$TARGET_BUILD_DIR/projectGenerator\""
 
 ################################################################################
 # PROJECT EXTERNAL SOURCE PATHS
@@ -164,9 +164,9 @@ PLATFORM_CORE_EXCLUSIONS += ../../../libs/rtAudio%
 # unable to remove because ofURLFileLoaderImpl is being used by ofImage, which is being used by ofUtils
 #PLATFORM_CORE_EXCLUSIONS += ../../../libs/curl%
 
-#PLATFORM_CORE_EXCLUSIONS += ../../../libs/fmod%
-#PLATFORM_CORE_EXCLUSIONS += ../../../libs/freetype%
-#PLATFORM_CORE_EXCLUSIONS += ../../../libs/FreeImage%
+PLATFORM_CORE_EXCLUSIONS += ../../../libs/fmod%
+# PLATFORM_CORE_EXCLUSIONS += ../../../libs/freetype%
+# PLATFORM_CORE_EXCLUSIONS += ../../../libs/FreeImage%
 
 # ../../../libs/openFrameworks/utils/ofConstants.h:192:11: fatal error: 'GL/glew.h' file not found
 #PLATFORM_CORE_EXCLUSIONS += ../../../libs/glew%
@@ -179,6 +179,10 @@ PLATFORM_CORE_EXCLUSIONS += ../../../libs/rtAudio%
 
 # inside ofImage inside ofUtils
 #PLATFORM_CORE_EXCLUSIONS += ../../../libs/uriparser%
+
+export OF_NO_FMOD=1
+export USER_PREPROCESSOR_DEFINITIONS="OF_NO_FMOD=1"
+export LIB_FMOD=""
 
 # Uncomment/comment below to switch between C++11 and C++17 ( or newer ). On macOS C++17 needs 10.15 or above.
 export MAC_OS_MIN_VERSION = 10.15

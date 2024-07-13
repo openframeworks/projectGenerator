@@ -130,6 +130,28 @@ bool printTemplates() {
 	}
 }
 
+std::string normalizePath(const std::string& path) {
+    try {
+        auto value = std::filesystem::weakly_canonical(path).string();
+        return value;
+    } catch (const std::exception& ex) {
+        std::cout << "Canonical path for [" << path << "] threw exception:\n"
+                  << ex.what() << '\n';
+        return "";
+    }
+}
+
+std::filesystem::path normalizePath(const std::filesystem::path& path) {
+    try {
+        auto value = std::filesystem::weakly_canonical(path);
+        return value;
+    } catch (const std::exception& ex) {
+        std::cout << "Canonical path for [" << path << "] threw exception:\n"
+                  << ex.what() << '\n';
+        return std::filesystem::path("");
+    }
+}
+
 void addPlatforms(const string & value) {
 	targets.clear();
 	vector<string> platforms = ofSplitString(value, ",", true, true);
@@ -192,7 +214,7 @@ fs::path findOFPathUpwards(const fs::path & startPath) {
         }
         currentPath = currentPath.parent_path();
     }
-    ofLogError() << "No valid OF path found... please use -o or --ofPath or set a PG_OF_PATH environment variable: " << startPath.string();
+//    ofLogError() << "No valid OF path found... please use -o or --ofPath or set a PG_OF_PATH environment variable: " << startPath.string();
     return fs::path();
 }
 void updateProject(const fs::path & path, const string & target, bool bConsiderParameterAddons = true) {
@@ -225,7 +247,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 
 void recursiveUpdate(const fs::path & path, const string & target) {
 	// FIXME: remove
-	alert("recursiveUpdate " + path.string());
+	alert("recursiveUpdate:" + path.string() + "]");
 	if (!fs::is_directory(path)) return;
 	vector<fs::path> folders;
 
@@ -261,7 +283,7 @@ void recursiveUpdate(const fs::path & path, const string & target) {
 				ofPath = fs::relative(ofCalcPath, path);
 			}
 		}
-		setOFRoot(ofPath);
+//		setOFRoot(ofPath);
 		fs::current_path(path);
 		//alert ("ofRoot " + ofPath.string());
 		//alert ("cwd " + path.string());
@@ -415,6 +437,9 @@ int main(int argc, char ** argv) {
 	if (options[OFPATH].count() > 0) {
 		if (options[OFPATH].arg != NULL) {
 			ofPath = options[OFPATH].arg;
+            ofLogNotice() << "ofPath arg [" << ofPath << "]";
+            ofPath = normalizePath(ofPath);
+            ofLogNotice() << "ofPath normalised arg [" << ofPath << "]";
 		}
 	}
 
@@ -434,37 +459,43 @@ int main(int argc, char ** argv) {
     std::string ofPath;
     std::string ofPathEnv = std::getenv("PG_OF_PATH") ? std::getenv("PG_OF_PATH") : "";
 
-    if (ofPath.empty() && !ofPathEnv.empty()) {
-        ofPath = ofPathEnv;
+    if ((ofPath.empty() && !ofPathEnv.empty()) ||
+        (!ofPath.empty() && !isGoodOFPath(ofPath) && !ofPathEnv.empty())) {
+        ofPath = normalizePath(ofPathEnv);;
+        ofLogNotice() << "PG_OF_PATH set: ofPath [" << ofPath << "]";
     }
     
-    fs::path startPath = ofFilePath::getCurrentExeDirFS();
+    fs::path startPath = normalizePath(ofFilePath::getCurrentExeDirFS());
     //ofFilePath::getAbsolutePathFS(fs::current_path(), false);
 //    ofLogNotice() << "startPath: " << startPath.string();
     fs::path foundOFPath = findOFPathUpwards(startPath);
     if (foundOFPath.empty() && ofPath.empty()) {
-        ofLogError() << "No valid OF path found... please use -o or --ofPath or set a PG_OF_PATH environment variable: " << startPath.string();
+        ofLogError() << "oF path not found: please use -o or --ofPath or set 'PG_OF_PATH' environment var. Auto up folders from :[" << startPath.string() << "]";
         return EXIT_FAILURE;
     } else {
         if (!ofPath.empty() && isGoodOFPath(ofPath)) {
-            ofLogNotice() << "ofPath set and valid using " << ofPath;
+            ofLogNotice() << "ofPath set and valid using [" << ofPath << "]";
         } else {
+            if(isGoodOFPath(foundOFPath))
             ofPath = foundOFPath.string();
+            ofLogNotice() << "ofPath auto-found and valid using [" << ofPath << "]";
         }
     }
     
     if (!ofPath.empty()) {
-
         if (!isGoodOFPath(ofPath)) {
             foundOFPath = findOFPathUpwards(ofPath);
             if (foundOFPath.empty()) {
+                ofLogNotice() << "ofPath not valid. [" << ofPath << "] auto-find ofPath failed also...";
                 return EXIT_USAGE;
             }
         }
-        if (ofIsPathInPath(projectPath, ofPath)) {
-            fs::path path = fs::relative(ofPath, projectPath);
-            ofPath = path.string();
-        }
+//        if (ofIsPathInPath(projectPath, ofPath)) {
+//            fs::path path = fs::relative(ofPath, projectPath);
+//            ofPath = path.string();
+//        }
+        
+        ofPath = normalizePath(ofPath);
         setOFRoot(ofPath);
     }
 
