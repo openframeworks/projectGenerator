@@ -93,8 +93,9 @@ jobs:
       
       - name: Test Artefact zip
         run: |
-          cd ./../openFrameworks/apps/projectGenerator/commandLine/bin
-          tar -cjf artefact.tar.bz2 projectGenerator data libfmod.so
+          cd ./../openFrameworks/apps/projectGenerator/commandLine/bin/
+          ls -la
+          tar -cjf artefact.tar.bz2 projectGenerator
           mv artefact.tar.bz2 ./../../../../../artefact.tar.bz2
       - name: List output top
         run: ls -lah ./
