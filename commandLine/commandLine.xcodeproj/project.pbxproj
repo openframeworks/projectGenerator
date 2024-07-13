@@ -304,10 +304,11 @@
 		};
 		928F60851B6710B200E2D791 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test -f \"$TARGET_BUILD_DIR/projectGenerator\"; then rm \"$TARGET_BUILD_DIR/projectGenerator\"; fi;  \ncp \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\" \"$TARGET_BUILD_DIR/projectGenerator\"\nchmod 755 \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\" \"$TARGET_BUILD_DIR/projectGenerator\"\n";
+			shellScript = "if test -f \"$TARGET_BUILD_DIR/projectGenerator\"; then rm \"$TARGET_BUILD_DIR/projectGenerator\"; fi;  \nrsync -avzp \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\" \"$TARGET_BUILD_DIR/projectGenerator\"\nchmod 755 \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\" \nchmod 755 \"$TARGET_BUILD_DIR/projectGenerator\"\n";
 			showEnvVarsInLog = 0;
 		};
 		E42962A92163ECCD00A6A9E2 /* Run Script — Compile OF */ = {

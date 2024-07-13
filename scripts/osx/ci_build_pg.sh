@@ -47,7 +47,14 @@ package_app(){
 		ls
 		echo "-------------"
 		#echo "copy cmdline PG to "
-		cp -X commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
+
+		if command -v rsync &> /dev/null; then
+			rsync -avzp "commandLine/bin/projectGenerator" "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator" 2> /dev/null
+		else
+			cp -X commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
+		fi
+
+
 		cd ${PG_DIR}
 		pwd
 		echo "Directory contents:"

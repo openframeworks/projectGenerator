@@ -20,7 +20,6 @@ if [ -z "${BUILD_TEST+x}" ]; then
    BUILD_TEST=0
 fi
 
-
 if [ -z "${BUILD_TEST+x}" ]; then
    BUILD_TEST=0
 fi
@@ -46,7 +45,11 @@ if [ -f "$SOURCE_FILE" ]; then
       rm -f "${DESTINATION_PATH}/projectGenerator"
    fi
    mkdir -p "$DESTINATION_PATH" # Create destination directory if it doesn't exist
-   cp -X "$SOURCE_FILE" "$DESTINATION_PATH/projectGenerator"
+   if command -v rsync &> /dev/null; then
+      rsync -avzp "$SOURCE_FILE" "$DESTINATION_PATH/projectGenerator"
+   else
+      cp -X "$SOURCE_FILE" "$DESTINATION_PATH/projectGenerator"
+   fi
    echo "File copied successfully."
 else
     # File does not exist
