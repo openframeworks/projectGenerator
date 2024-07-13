@@ -131,11 +131,25 @@ bool printTemplates() {
 }
 
 std::string normalizePath(const std::string& path) {
-    return std::filesystem::weakly_canonical(path).string();
+    try {
+        auto value = std::filesystem::weakly_canonical(path).string();
+        return value;
+    } catch (const std::exception& ex) {
+        std::cout << "Canonical path for [" << path << "] threw exception:\n"
+                  << ex.what() << '\n';
+        return "";
+    }
 }
 
 std::filesystem::path normalizePath(const std::filesystem::path& path) {
-    return std::filesystem::weakly_canonical(path).string();
+    try {
+        auto value = std::filesystem::weakly_canonical(path);
+        return value;
+    } catch (const std::exception& ex) {
+        std::cout << "Canonical path for [" << path << "] threw exception:\n"
+                  << ex.what() << '\n';
+        return std::filesystem::path("");
+    }
 }
 
 void addPlatforms(const string & value) {
