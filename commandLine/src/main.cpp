@@ -7,6 +7,7 @@
 #include "optionparser.h"
 #include <set>
 #include <string>
+#include <cstdlib>
 
 enum optionIndex { UNKNOWN,
 	HELP,
@@ -315,13 +316,26 @@ void recursiveUpdate(const fs::path & path, const string & target) {
 
 int updateOFPath() {
     std::string ofPath;
-    std::string ofPathEnv = std::getenv("PG_OF_PATH") ? std::getenv("PG_OF_PATH") : "";
+	std::string ofPathEnv;
+	#ifdef _WIN32
+		char* envValue = nullptr;
+		size_t len = 0;
+		if (_dupenv_s(&envValue, &len, "PG_OF_PATH") == 0 && envValue != nullptr) {
+			ofPathEnv = std::string(envValue);
+			free(envValue);
+		}
+	#else
+		const char* envValue = std::getenv("PG_OF_PATH");
+		if (envValue) {
+			ofPathEnv = std::string(envValue);
+		}
+	#endif
 
-    if ((ofPath.empty() && !ofPathEnv.empty()) ||
-        (!ofPath.empty() && !isGoodOFPath(ofPath) && !ofPathEnv.empty())) {
-        ofPath = normalizePath(ofPathEnv);;
-        ofLogNotice() << "PG_OF_PATH set: ofPath [" << ofPath << "]";
-    }
+	if ((ofPath.empty() && !ofPathEnv.empty()) ||
+		(!ofPath.empty() && !isGoodOFPath(ofPath) && !ofPathEnv.empty())) {
+		ofPath = normalizePath(ofPathEnv);
+		ofLogNotice() << "PG_OF_PATH set: ofPath [" << ofPath << "]";
+	}
     
     fs::path startPath = normalizePath(ofFilePath::getCurrentExeDirFS());
     //ofFilePath::getAbsolutePathFS(fs::current_path(), false);
