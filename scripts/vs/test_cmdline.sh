@@ -20,4 +20,19 @@ errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
 		exit $errorcode
 fi
+
+echo "test out of folder -o [vs]";
+if ! command -v rsync &> /dev/null
+then      
+    cp -a ./projectGenerator ../../../../../  
+else
+    rsync -azp ./projectGenerator ../../../../../  
+fi
+cd ../../../../../ 
+pwd
+./projectGenerator --recursive -pvs -o"./openFrameworks" ./openFrameworks/examples/
+errorcode=$?
+if [[ $errorcode -ne 0 ]]; then
+		exit $errorcode
+fi
 echo "Successful projectGenerator tests for [vs]";
