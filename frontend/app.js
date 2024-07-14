@@ -535,6 +535,9 @@ function setup() {
             // update link to local project files
             $("#revealProjectFiles").prop('href', 'file:///' + path.join(project.projectPath, project.projectName).replace(/^\//, '') );
         }).trigger('change');
+        $('#revealProjectFiles').click(() => {
+            ipcRenderer.send('showItemInFolder', $('#revealProjectFiles').prop('href'));
+        });
 
         $("#projectName").on('focusout', () => {
         	$("#projectName").trigger('change');
@@ -554,6 +557,8 @@ function setup() {
         });
 
          $("#IDEButton").on("click", () => launchInIDE());
+
+         $("#FolderButton").on("click", () => launchFolder());
 
 
          $("#verboseOption").checkbox();
@@ -614,14 +619,14 @@ function setup() {
             }
         });
     
-        /* Stuff for the console setting (removed from UI)
+        /* Stuff for the console setting (removed from UI) */
         $("#consoleToggle").on("change", function () {
             enableConsole( $(this).is(':checked') );
-        });*/
+        });
         // enable console? (hiddens setting)
-        // if(defaultSettings['showConsole']){ $("body").addClass('enableConsole'); }
-        // $("#showConsole").on('click', function(){ $('body').addClass('showConsole'); });
-        // $("#hideConsole").on('click', function(){ $('body').removeClass('showConsole'); });
+        if(defaultSettings['showConsole']){ $("body").addClass('enableConsole'); }
+        $("#showConsole").on('click', function(){ $('body').addClass('showConsole'); });
+        $("#hideConsole").on('click', function(){ $('body').removeClass('showConsole'); });
 
         // initialise the overall-use modal
         $("#uiModal").modal({
@@ -681,7 +686,7 @@ function setup() {
                 e.stopPropagation();
                 e.preventDefault();
                 closeDragInputModal( e );
-            }
+            } 
         });
 
         // listen for drag events
@@ -956,11 +961,14 @@ function switchGenerateMode(mode) {
     if (mode == 'updateMode') {
         $("#generateButton").hide();
         $("#updateButton").show();
+        $("#folderButton").show();
         $("#missingAddonMessage").hide();
         $("#localAddonMessage").hide();
         $("#nameRandomiser").hide();
         $("#revealProjectFiles").show();
         $("#adons-refresh-icon").hide();
+        $("#consoleContainer").hide();
+        $("#extraContainer").hide();
 
         console.log('Switching GenerateMode to Update...');
 
@@ -977,11 +985,14 @@ function switchGenerateMode(mode) {
 
         $("#generateButton").show();
         $("#updateButton").hide();
+        $("#folderButton").show();
         $("#missingAddonMessage").hide();
         $("#localAddonMessage").hide();
         $("#nameRandomiser").show();
         $("#revealProjectFiles").hide();
         $("#adons-refresh-icon").hide();
+        $("#consoleContainer").hide();
+        $("#extraContainer").hide();
 
         console.log('Switching GenerateMode to Create...');
     }
@@ -1001,24 +1012,35 @@ function enableAdvancedMode(isAdvanced) {
         $('#sourceExtraSection').show();
         $('#templateSection').show();
         $('#templateSectionMulti').show();
+         $('#commandInput').show();
+        $('#commandButton').show();
+        $('#ofPathButton').show();
+
     } else {
-        $('#platformsDropdown').addClass("disabled");
+        $('#platformsDropdown').removeClass("disabled");
         $('#platformsDropdown').dropdown('set exactly', defaultSettings.defaultPlatform);
         $('#sourceExtraSection').hide();
-        $('#templateSection').hide();
-        $('#templateSectionMulti').hide();
-        $('#templateDropdown').dropdown('set exactly', '');
-        $('#templateDropdownMulti').dropdown('set exactly', '');
+//        $('#templateSection').hide();
+//        $('#templateSectionMulti').hide();
+//        $('#templateDropdown').dropdown('set exactly', '');
+//        $('#templateDropdownMulti').dropdown('set exactly', '');
+        $('#templateSection').show();
+        $('#templateSectionMulti').show();
 
+        $('#commandInput').disable();
+        $('#commandButton').disable();
+        $('#ofPathButton').disable();
         $("body").removeClass('advanced');
         $('a.updateMultiMenuOption').hide();
     }
+    enableConsole(isAdvanced);
     defaultSettings.advancedMode = isAdvanced;
     saveDefaultSettings();
     //$("#advancedToggle").prop('checked', defaultSettings['advancedMode'] );
 }
 
-/* Stuff for the console setting (removed from UI)
+/* Stuff for the console setting (removed from UI) */
+
 function enableConsole( showConsole ){
 	if( showConsole ) {
 		// this has to be in body for CSS reasons
@@ -1030,10 +1052,19 @@ function enableConsole( showConsole ){
 	defaultSettings['showConsole'] = showConsole;
 	saveDefaultSettings();
 	$("#consoleToggle").prop('checked', defaultSettings['showConsole'] );
-}*/
+}
 
 //----------------------------------------
 function getPlatformList() {
+    const platformsPicked = $("#platformsDropdown  .active");
+    const platformValueArray = [];
+    for (let i = 0; i < platformsPicked.length; i++){
+        platformValueArray.push($(platformsPicked[i]).attr("data-value"));
+    }
+    return platformValueArray;
+}
+
+function openFolder() {
     const platformsPicked = $("#platformsDropdown  .active");
     const platformValueArray = [];
     for (let i = 0; i < platformsPicked.length; i++){
@@ -1054,8 +1085,10 @@ function displayModal(message) {
 
     if (message.indexOf("Success!") > -1){
         $("#IDEButton").show();
+        $("#FolderButton").show();
     } else {
         $("#IDEButton").hide();
+        $("#FolderButton").show();
     }
 
     $("#uiModal").modal('show');
@@ -1173,3 +1206,48 @@ function launchInIDE(){
 
     ipcRenderer.send('launchProjectinIDE', project );
 }
+
+function launchFolder(){
+    const platform = getPlatformList()[0];
+
+    const project = {
+        'projectName': $("#projectName").val(),
+        'projectPath': $("#projectPath").val()
+    };
+
+    ipcRenderer.send('launchFolder', project );
+}
+
+try {
+    document.getElementById('commandButton').addEventListener('click', () => {
+        const customArg = document.getElementById('commandInput').value;
+        ipcRenderer.send('command', customArg);
+    });
+} catch (error) {
+    console.error('An error occurred while setting up the event listener:', error);
+}
+
+ipcRenderer.on('commandResult', (event, result) => {
+    if (result.success) {
+        console.log('Command executed successfully:', result.message);
+    } else {
+        console.error('Command execution failed:', result.message);
+    }
+});
+
+try {
+    document.getElementById('ofPathButton').addEventListener('click', () => {
+        const customArg = document.getElementById('ofPathButton').value;
+        ipcRenderer.send('getOFPath', customArg);
+    });
+} catch (error) {
+    console.error('An error occurred while setting up the event listener:', error);
+}
+
+ipcRenderer.on('ofPathResult', (event, result) => {
+    if (result.success) {
+        console.log('ofPath:', result.message);
+    } else {
+        console.error('ofPath: failed:', result.message);
+    }
+});

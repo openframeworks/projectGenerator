@@ -6,22 +6,22 @@
  */
 
 #include "CBWinProject.h"
-#include "ofFileUtils.h"
 #include "ofLog.h"
 #include "Utils.h"
 
 std::string CBWinProject::LOG_NAME = "CBWinProject";
+
 bool CBWinProject::createProjectFile(){
 
 	auto project = projectDir / (projectName + ".cbp");
 	auto workspace = projectDir / (projectName + ".workspace");
-	
+
 	vector < std::pair <fs::path, fs::path > > fromTo {
 		{ templatePath / "emptyExample.cbp",   		projectDir / (projectName + ".cbp") },
 		{ templatePath / "emptyExample.workspace", 	projectDir / (projectName + ".workspace") },
 		{ templatePath / "icon.rc", 	projectDir / "icon.rc" },
 	};
-	
+
 	for (auto & p : fromTo) {
 		try {
 			fs::copy_file(p.first, p.second, fs::copy_options::overwrite_existing);
@@ -30,10 +30,10 @@ bool CBWinProject::createProjectFile(){
 			return false;
 		}
 	}
-	
+
 	// Calculate OF Root in relation to each project (recursively);
 	auto relRoot = fs::relative((fs::current_path() / getOFRoot()), projectDir);
-	
+
 	if (!fs::equivalent(relRoot, "../../..")) {
 		string root = relRoot.string();
 
@@ -91,10 +91,3 @@ void CBWinProject::addLibrary(const LibraryBinary & lib){
 	// this is because we might need to say libosc, then ws2_32
 }
 
-//std::string CBWinProject::getName(){
-//	return projectName;
-//}
-//
-//fs::path CBWinProject::getPath(){
-//	return projectDir;
-//}

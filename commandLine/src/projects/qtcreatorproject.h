@@ -1,12 +1,12 @@
 #pragma once
 
+#include "ofFileUtils.h" // ofBuffer
 #include "baseProject.h"
 #include <set>
 
-class QtCreatorProject : public baseProject
-{
+class QtCreatorProject : public baseProject {
 public:
-	QtCreatorProject(std::string target);
+	QtCreatorProject(const std::string & target);
 
 	bool createProjectFile();
 	void addInclude(std::string includeName){}

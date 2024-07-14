@@ -6,17 +6,23 @@
 
 using std::string;
 
+
+
 class xcodeProject : public baseProject {
 public:
-	xcodeProject(string target);
+	xcodeProject(const string & target);
 
 private:
 	bool createProjectFile();
 	bool loadProjectFile();
 	bool saveProjectFile();
 	void saveMakefile();
+	bool debugCommands = false;
+    
+    static std::string LOG_NAME;
 
 public:
+
 	void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT);
 	void addInclude(string includeName);
 	void addLibrary(const LibraryBinary & lib);
@@ -26,14 +32,32 @@ public:
 	void addAfterRule(string script);
 	void addDefine(string define, LibType libType = RELEASE_LIB);
 
-	void addFramework(const string & name, const fs::path & path, const fs::path & folder);
-	void addDylib(const string & name, const fs::path & path, const fs::path & folder);
+	void addFramework(const fs::path & path, const fs::path & folder);
+	void addXCFramework(const fs::path & path, const fs::path & folder);
+	void addDylib(const fs::path & path, const fs::path & folder);
 
 	void addAddon(ofAddon & addon);
 	void saveScheme();
 	void renameProject();
 
-
+	struct fileProperties {
+		bool absolute = false;
+		bool reference = true;
+		bool addToBuildPhase = false;
+		bool codeSignOnCopy = false;
+		bool copyFilesBuildPhase = false;
+		bool linkBinaryWithLibraries = false;
+		bool addToBuildResource = false;
+		bool addToResources = false;
+		bool frameworksBuildPhase = false;
+		bool isSrc = false;
+		
+		bool isGroupWithoutFolder = false;
+	};
+	
+	string addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp);
+	void addCommand(const string & command);
+	
 	string projRootUUID;
 	string resourcesUUID;
 	string frameworksUUID;
@@ -64,9 +88,36 @@ public:
 	};
 
 //	std::unordered_map <string, string> folderUUID ;
-	std::map < fs::path , string> folderUUID ;
-	string getFolderUUID(const fs::path & folder, bool isFolder = true, fs::path base = "");
+	std::map <fs::path, string> folderUUID ;
+	// Temporary
+	std::map <string, fs::path> folderFromUUID ;
 	
+	string getFolderUUID(const fs::path & folder, bool isFolder = true, fs::path base = "");
+
 	// TODO: Phase out relRoot. totally
 	fs::path relRoot = "../../..";
+	
+	std::pair<string, string> rootReplacements;
+	
+
+	std::map<fs::path, string> extensionToFileType {
+		{ ".framework" , "wrapper.framework" },
+		{ ".xcframework" , "wrapper.xcframework" },
+		{ ".dylib" , "compiled.mach-o.dylib" },
+		
+		{ ".cpp" , "sourcecode.cpp.cpp" },
+		{ ".c" , "sourcecode.cpp.c" },
+		{ ".h" , "sourcecode.cpp.h" },
+		{ ".hpp" , "sourcecode.cpp.h" },
+		{ ".mm" , "sourcecode.cpp.objcpp" },
+		{ ".m" , "sourcecode.cpp.objcpp" },
+		
+		{ ".xib" , "file.xib" },
+		{ ".metal" , "file.metal" },
+		{ ".xcconfig" , "text.xcconfig" },
+
+		{ ".entitlements" , "text.plist.entitlements" },
+		{ ".plist" , "text.plist.xml" },
+	};
+
 };

@@ -77,7 +77,7 @@ try {
             if (os.cpus()[0].model.indexOf('ARMv6') == 0) {
                 myPlatform = 'linuxarmv6l';
             } else {
-                myPlatform = 'linuxarmv7l';
+                myPlatform = 'linuxaarch64';
             }
         } else if (process.arch === 'x64') {
             myPlatform = 'linux64';
@@ -104,8 +104,12 @@ for(const key in templateSettings) {
 const hostplatform = (() => {
     if (/^win/.test(process.platform)) {
         return 'windows';
+    } else if (process.platform === "win32") {
+        return 'windows';
     } else if (process.platform === "darwin") {
         return 'osx';
+    } else if (process.platform === "linux64") {
+        return 'linux64';
     } else if (process.platform === "linux") {
         return 'linux';
     }
@@ -126,13 +130,15 @@ const addonsToSkip = [
 
 const platforms = {
     "osx": "OS X (Xcode)",
-    "vs": "Windows (Visual Studio 2017)",
+    "vs": "Windows (Visual Studio)",
     "msys2": "Windows (msys2/mingw)",
     "ios": "iOS (Xcode)",
+    "macos": "Mega iOS/tvOS/macOS (Xcode)",
     "android": "Android (Android Studio)",
-    "linux64": "Linux 64-bit (qtCreator)",
-    "linuxarmv6l": "Linux ARMv6 (Makefiles)",
-    "linuxarmv7l": "Linux ARMv7 (Makefiles)"
+    "linux64": "Linux 64 (VS Code/Make)",
+    "linuxarmv6l": "Arm 32 (VS Code/Make)",
+    "linuxaarch64": "Arm 64 (VS Code/Make)",
+    "vscode": "VS Code"
 };
 
 const bUseMoniker = settings["useDictionaryNameGenerator"];
@@ -167,7 +173,7 @@ if (!path.isAbsolute(defaultOfPath)) {
     // arturo, this may differ on linux, if putting ../ in settings doesn't work for the default path
     // take a look at this...
 
-    if (hostplatform == "windows" || hostplatform == "linux"){
+    if (hostplatform == "windows" || hostplatform == "linux" || hostplatform == "linux64" ){
     	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../"), defaultOfPath));
     } else if(hostplatform == "osx"){
     	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../../../"), defaultOfPath));
@@ -1095,7 +1101,7 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
     }
 
     // // launch xcode
-    if( arg.platform == 'osx' || 'ios'){
+    if( arg.platform == 'osx' || arg.platform == 'ios' || arg.platform == 'macos' || arg.platform == 'tvos' ){
         if(hostplatform == 'osx'){
             let osxPath = path.join(fullPath, projectName + '.xcodeproj');
             console.log( osxPath );
@@ -1105,9 +1111,19 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
                 return;
             });
         }
+    } else if( hostplatform == 'osx' && arg.platform == 'vscode'){
+        if(hostplatform == 'osx'){
+            let osxPath = path.join(fullPath, projectName + '.code-workspace');
+            console.log( osxPath );
+            osxPath = "\"" + osxPath + "\"";
+
+            exec('open ' + osxPath, (error, stdout, stderr) => {
+                return;
+            });
+        }
     } else if( arg.platform == 'linux' || arg.platform == 'linux64' ){
         if(hostplatform == 'linux'){
-            let linuxPath = path.join(fullPath, projectName + '.qbs');
+            let linuxPath = path.join(fullPath, projectName + '.code-workspace');
             linuxPath = linuxPath.replace(/ /g, '\\ ');
             console.log( linuxPath );
             exec('xdg-open ' + linuxPath, (error, stdout, stderr) => {
@@ -1126,11 +1142,36 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
         });
     } else if( hostplatform == 'windows'){
         let windowsPath = path.join(fullPath, projectName + '.sln');
+        
+		if(arg.platform == 'vscode' ){
+			windowsPath = path.join(fullPath, projectName + '.code-workspace');
+		}
+        
         console.log( windowsPath );
         windowsPath = "\"" + windowsPath + "\"";
         exec('start ' + "\"\"" + " " + windowsPath, (error, stdout, stderr) => {
             return;
         });
+    }
+});
+
+ipcMain.on('launchFolder', async (event, arg) => {
+    const {
+        projectPath, 
+        projectName } = arg;
+    const fullPath = path.join(projectPath, projectName);
+
+    try {
+        if(fs.existsSync(fullPath) && fs.statSync(fullPath).isDirectory()) {
+            await shell.openPath(fullPath);
+            event.sender.send('launchFolderCompleted', true);
+        } else {
+            // project doesn't exist
+            event.sender.send('launchFolderCompleted', false);
+        }
+    } catch (error) {
+        console.error('Error opening folder:', error);
+        event.sender.send('launchFolderCompleted', false);
     }
 });
 
@@ -1171,12 +1212,54 @@ ipcMain.on('getOSInfo', (event) => {
     };
 });
 
-ipcMain.on('openExternal', (event, [ url ]) => {
+ipcMain.on('openExternal', (event, url) => {
     shell.openExternal(url);
+});
+
+ipcMain.on('showItemInFolder', (event, p) => {
+    shell.showItemInFolder(p);
 });
 
 ipcMain.on('firstTimeSierra', (event, command) => {
     exec(command, (error, stdout, stderr) => {
         console.log(stdout, stderr);
+    });
+});
+
+ipcMain.on('command', (event, customArg) => {
+    const pgApp = getPgPath();
+    const command = `${pgApp} -c "${customArg}"`;
+
+    exec(command, { maxBuffer: Infinity }, (error, stdout, stderr) => {
+        if (error) {
+            event.sender.send('commandResult', {
+                success: false,
+                message: error.message
+            });
+        } else {
+            event.sender.send('commandResult', {
+                success: true,
+                message: stdout
+            });
+        }
+    });
+});
+
+ipcMain.on('getOFPath', (event, customArg) => {
+    const pgApp = getPgPath();
+    const command = `${pgApp} - "${customArg}"`;
+
+    exec(command, { maxBuffer: Infinity }, (error, stdout, stderr) => {
+        if (error) {
+            event.sender.send('ofPathResult', {
+                success: false,
+                message: error.message
+            });
+        } else {
+            event.sender.send('ofPathResult', {
+                success: true,
+                message: stdout
+            });
+        }
     });
 });

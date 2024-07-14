@@ -5,7 +5,7 @@
 class visualStudioProject : public baseProject {
 
 public:
-	visualStudioProject(std::string target):baseProject(target){};
+	visualStudioProject(const std::string & target) : baseProject(target) {};
 
 	bool createProjectFile();
 	bool loadProjectFile();
@@ -18,7 +18,7 @@ public:
 	void addCFLAG(std::string cflag, LibType libType = RELEASE_LIB); // C
 	void addCPPFLAG(std::string cppflag, LibType libType = RELEASE_LIB); // C++
 	void addDefine(std::string define, LibType libType = RELEASE_LIB);
-
+	void ensureDllDirectoriesExist();
 	void addAddon(ofAddon & addon);
 
 	static std::string LOG_NAME;

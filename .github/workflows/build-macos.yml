@@ -3,60 +3,133 @@ name: build-macos
 on:
   push:
     paths-ignore:
-    - '**/README.md'
+      - '**/README.md'
   pull_request:
     paths-ignore:
-    - '**/README.md'
+      - '**/README.md'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  ccache: ccache
+
 jobs:
-  build-osx:
-    runs-on: macos-12
+  build-macos:
+    runs-on: macos-latest
     strategy:
-        matrix:
-          cfg:
-          - {target: osx}
+      matrix:
+        cfg:
+          - { target: osx }
     env:
-     TARGET: ${{matrix.cfg.target}}
+      TARGET: ${{ matrix.cfg.target }}
     steps:
-    - uses: actions/checkout@v3
-    # - name: Cache OF
-    #   id: cache-of
-    #   uses: actions/cache@v3
-    #   env:
-    #     cache-name: cache-keep-of
-    #   with:
-    #     path: |
-    #       /Users/runner/work/projectGenerator/openFrameworks/**
-    #     key: ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-${{ hashFiles('openFrameworks/**/*.cpp') }}
-    #     restore-keys: |
-    #       ${{ runner.os }}-${{matrix.cfg.opt}}-${{ env.cache-name }}-          
-    - name: rm-dev
-      run: sudo rm -rf /Library/Developer
-    - name: Build
-      run:
-        ./scripts/osx/buildPG.sh;
-      env:
-        DEVELOPER_DIR: "/Applications/Xcode_13.4.1.app/Contents/Developer"
-        SDKROOT: "/Applications/Xcode_13.4.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
-        # DEVELOPER_DIR: "/Applications/Xcode_14.2.app/Contents/Developer"
-        # SDKROOT: "/Applications/Xcode_14.2.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
-        GA_CI_SECRET: ${{ secrets.CI_SECRET }}
-        CERTIFICATE_OSX_APPLICATION: ${{ secrets.CERTIFICATE_OSX_APPLICATION }}
-        CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
-        GA_APPLE_USERNAME: ${{ secrets.GA_APPLE_USERNAME }}
-        GA_APPLE_PASS: ${{ secrets.GA_APPLE_PASS }}
-        GA_NOTARIZE_PROVIDER: ${{ secrets.GA_NOTARIZE_PROVIDER }}
-    - name: Update Release
-      if: github.repository == 'openframeworks/projectGenerator' && github.ref == 'refs/heads/master'
-      uses: IsaacShelton/update-existing-release@v1.3.2
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        tag: nightly
-        release: nightly
-        prerelease: false
-        replace: false
-        files: ../openFrameworks/apps/projectGenerator/projectGenerator-osx/projectGenerator-osx.zip ../openFrameworks/apps/projectGenerator/projectGenerator-ios/projectGenerator-ios.zip
+      - uses: actions/checkout@v4
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.12
+        with:
+          # key: ${{ matrix.os }}-${{ matrix.type }}
+          key: ${{ matrix.os }}-${{ matrix.cfg.target }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 16
+      - name: Setup
+        run: ./scripts/osx/setup_environment.sh
+      - name: Determine Release
+        id: vars
+        shell: bash
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+            echo "release=nightly" >> $GITHUB_ENV
+            echo "prerelease=false" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
+            echo "release=bleeding" >> $GITHUB_ENV
+            echo "prerelease=true" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "release=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+            echo "prerelease=false" >> $GITHUB_ENV
+          else
+            echo "release=nightly" >> $GITHUB_ENV
+            echo "prerelease=false" >> $GITHUB_ENV
+          fi
+      - name: Build PG macOS GUI and command line
+        run: |
+          echo "Current directory: (should be projectGenerator)"
+          pwd
+          echo "Directory contents:"
+          ls
+          echo "Setup CI setup environment / checkout oF "
+          ./scripts/osx/ci_install_core.sh
+      
+          echo "Current directory after moving up: (should be projectGenerator/projectGenerator)"
+          pwd
+          cd ../
+
+          echo "Current directory after moving up: (should be projectGenerator/)"
+          echo "------------------"
+          pwd
+          ls
+          echo "------------------"
+          if [ -f "openFrameworks/apps/projectGenerator/scripts/osx/ci_build_pg.sh" ]; then
+            echo "ci_build_pg.sh exists, running script..."
+            openFrameworks/apps/projectGenerator/scripts/osx/ci_build_pg.sh
+          else
+            echo "ci_build_pg.sh does not exist, checking Git status..."
+            if cd openFrameworks/apps/projectGenerator; then
+              echo "Current Git branch in projectGenerator:"
+              git rev-parse --abbrev-ref HEAD
+              echo "Latest commit hash in projectGenerator:"
+              git rev-parse HEAD
+            else
+              echo "Failed to change directory to openFrameworks/apps/projectGenerator"
+            fi
+            echo "Current directory: (should be openFrameworks/apps/projectGenerator)"
+            pwd
+            echo "Directory contents:"
+            ls
+            echo "------------------"
+            echo "Failure exit1"
+            exit 1
+          fi
+        env:
+          GA_CI_SECRET: ${{ secrets.CI_SECRET }}
+          CERTIFICATE_OSX_APPLICATION: ${{ secrets.CERTIFICATE_OSX_APPLICATION }}
+          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+          GA_APPLE_USERNAME: ${{ secrets.GA_APPLE_USERNAME }}
+          GA_APPLE_PASS: ${{ secrets.GA_APPLE_PASS }}
+          GA_NOTARIZE_PROVIDER: ${{ secrets.GA_NOTARIZE_PROVIDER }}
+      - name: Check output
+        run: |
+          echo "Current directory: (should be projectGenerator)"
+          pwd
+          echo "Directory contents:"
+          ls
+          if [ -f "projectGenerator/projectGenerator-osx.zip" ]; then
+            echo "projectGenerator/projectGenerator-osx.zip found at level 1"
+          else
+            echo "projectGenerator/projectGenerator-osx.zip NOT found at level 1"
+          fi
+          if [ -f "projectGenerator/projectGenerator/projectGenerator-osx.zip" ]; then
+            echo "projectGenerator/projectGenerator/projectGenerator-osx.zip found at level 2"
+          else
+            echo "projectGenerator/projectGenerator/projectGenerator-osx.zip NOT found at level 2"
+          fi
+          if [ -f "projectGenerator-osx.zip" ]; then
+            echo "projectGenerator-osx.zip found at level 0"
+          else
+            echo "projectGenerator-osx.zip NOT found at level 0"
+          fi
+      - name: Test cmdline 
+        run: ../openFrameworks/apps/projectGenerator/scripts/osx/test_cmdline.sh
+      - name: Update Release x86_64
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
+        uses: IsaacShelton/update-existing-release@v1.3.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ env.release }}
+          release: ${{ env.release }}
+          prerelease: ${{ env.prerelease }}
+          replace: false
+          files: projectGenerator-osx.zip

@@ -4,31 +4,31 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\addons\ofAddon.cpp" />
     <ClCompile Include="src\projects\androidStudioProject.cpp" />
+    <ClCompile Include="src\projects\android2024.cpp" />
     <ClCompile Include="src\projects\baseProject.cpp" />
     <ClCompile Include="src\projects\CBLinuxProject.cpp" />
     <ClCompile Include="src\projects\CBWinProject.cpp" />
     <ClCompile Include="src\projects\qtcreatorproject.cpp" />
     <ClCompile Include="src\projects\visualStudioProject.cpp" />
     <ClCompile Include="src\projects\xcodeProject.cpp" />
+    <ClCompile Include="src\projects\VSCodeProject.cpp" />
     <ClCompile Include="src\utils\LibraryBinary.cpp" />
     <ClCompile Include="src\utils\Utils.cpp" />
     <ClCompile Include="src\uuidxx\src\uuidxx.cpp" />
-      <Filter>src\uuidxx\src</Filter>
-    </ClCompile>
     <ClCompile Include="src\uuidxx\src\uuidxx.h" />
-      <Filter>src\uuidxx\src</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\optionparser.h" />
     <ClInclude Include="src\addons\ofAddon.h" />
     <ClInclude Include="src\projects\androidStudioProject.h" />
+    <ClInclude Include="src\projects\android2024.h" />
     <ClInclude Include="src\projects\baseProject.h" />
     <ClInclude Include="src\projects\CBLinuxProject.h" />
     <ClInclude Include="src\projects\CBWinProject.h" />
     <ClInclude Include="src\projects\qtcreatorproject.h" />
     <ClInclude Include="src\projects\visualStudioProject.h" />
     <ClInclude Include="src\projects\xcodeProject.h" />
+    <ClInclude Include="src\projects\VSCodeProject.h" />
     <ClInclude Include="src\utils\LibraryBinary.h" />
     <ClInclude Include="src\utils\Utils.h" />
   </ItemGroup>

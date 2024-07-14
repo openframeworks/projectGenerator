@@ -7,10 +7,10 @@
 //
 
 #include "baseProject.h"
-#include "ofFileUtils.h"
 #include "ofLog.h"
 #include "Utils.h"
 #include "ofConstants.h"
+#include "ofUtils.h"
 #include <list>
 #include <set>
 #include <unordered_set>
@@ -19,23 +19,34 @@ using std::vector;
 
 const fs::path templatesFolder = "scripts/templates";
 
-baseProject::baseProject(string _target){
+baseProject::baseProject(const string & _target) : target(_target) {
 	bLoaded = false;
-	target = _target;
 }
 
-fs::path baseProject::getPlatformTemplateDir(){
-	return getOFRoot() / templatesFolder / target;
-}
-
-bool isPlatformName(string file){
-	for(int platform=OF_TARGET_OSX;platform<OF_TARGET_EMSCRIPTEN+1;platform++){
-		if(file==getTargetString((ofTargetPlatform)platform)){
-			return true;
-		}
+fs::path baseProject::getPlatformTemplateDir() {
+	string folder { target };
+	if ( target == "msys2"
+		|| target == "linux"
+		|| target == "linux64"
+		|| target == "linuxarmv6l"
+		|| target == "linuxarmv7l"
+		|| target == "linuxaarch64"
+	) {
+		folder = "vscode";
 	}
-	return false;
+    
+//	if ( target == "qtcreator" ) {
+//		return getOFRoot()
+//	}
+	
+	return getOFRoot() / templatesFolder / folder;
 }
+
+
+bool baseProject::isPlatformName(const string & platform) {
+	return std::find(platformsOptions.begin(), platformsOptions.end(), platform) != platformsOptions.end();
+}
+
 
 std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const fs::path & templateDir){
 	string name = templateDir.parent_path().filename().string();
@@ -47,7 +58,7 @@ std::unique_ptr<baseProject::Template> baseProject::parseTemplate(const fs::path
 			auto templateConfig = std::make_unique<Template>();
 			templateConfig->dir = templateDir;
 			templateConfig->name = name;
-			
+
 			for (auto & line : fileToStrings(templateConfigFilePath)) {
 				if(ofTrim(line).front() == '#') continue;
 				auto varValue = ofSplitString(line,"+=",true,true);
@@ -94,7 +105,7 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(string target)
 			sorted.insert(f);
 		}
 	}
-	
+
 	for (auto & s : sorted) {
 		auto templateConfig = parseTemplate(s);
 		if(templateConfig){
@@ -107,50 +118,55 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(string target)
 bool baseProject::create(const fs::path & path, string templateName){
 //	alert("baseProject::create " + path.string() + " : " + templateName, 35);
 //	auto path = _path; // just because it is const
-	
-	
+
+
 	//if the files being added are inside the OF root folder, make them relative to the folder.
-	
+
 //	alert("getOFRoot() " + getOFRoot().string());
 //	alert("getOFRoot() " + fs::weakly_canonical(fs::absolute(getOFRoot())).string());
 //	alert("path " + path.string());
 //	alert("path " + fs::weakly_canonical(fs::absolute(path)).string());
+
+	// FIXME: Rewrite here
 	if (ofIsPathInPath(fs::absolute(path), getOFRoot())) {
 //		alert ("bMakeRelative true", 35);
 		bMakeRelative = true;
 	} else {
 //		alert ("bMakeRelative false", 35);
 	}
-	
+
 	addons.clear();
 	extSrcPaths.clear();
 
 	templatePath = getPlatformTemplateDir();
+    
+    ofLogNotice() << "templatePath: [" << templatePath << "]";
 	projectDir = path;
 	auto projectPath = fs::canonical(fs::current_path() / path);
 	projectName = projectPath.filename().string();
-
-//	cout << "templatePath " << templatePath << endl;
-//	cout << "projectDir " << projectDir << endl;
-//	cout << "projectPath " << projectPath << endl;
-//	cout << "projectName = " << projectName << endl;
-//	
+	
+	
+	// we had this in some projects. if we decide to keep this is the place
+	//	if (!fs::exists(projectDir)) {
+	//		fs::create_directory(projectDir);
+	//	}
 	bool bDoesDirExist = false;
 
 	fs::path project { projectDir / "src" };
+	
 	if (fs::exists(project) && fs::is_directory(project)) {
 		bDoesDirExist = true;
 	} else {
-		for (auto & p : { string("src") , string("bin") }) {
+		for (auto & p : { fs::path("src") , fs::path("bin") }) {
 			fs::copy (templatePath / p, projectDir / p, fs::copy_options::recursive);
 		}
 	}
 
+	
 	bool ret = createProjectFile();
 	if(!ret) return false;
-	
-//	cout << "after return : " << templateName << endl;
 
+//	cout << "after return : " << templateName << endl;
 	if(!empty(templateName)){
 //		cout << "templateName not empty " << templateName << endl;
 //		return getOFRoot() / templatesFolder / target;
@@ -188,9 +204,8 @@ bool baseProject::create(const fs::path & path, string templateName){
 		vector < string > fileNames;
 		getFilesRecursively(projectDir / "src", fileNames);
 
-		
 		std::sort (fileNames.begin(), fileNames.end());
-		
+
 //		for (auto & f : fileNames) {
 //			alert (f);
 //		}
@@ -211,15 +226,6 @@ bool baseProject::create(const fs::path & path, string templateName){
 			}
 		}
 
-		// only add unique paths
-//		vector < fs::path > paths;
-//		for (auto & f : fileNames) {
-//			auto dir = fs::path(f).parent_path().filename();
-//			if (std::find(paths.begin(), paths.end(), dir) == paths.end()) {
-//				paths.emplace_back(dir);
-//				addInclude(dir.string());
-//			}
-//		}
 
 		// FIXME: Port to std::list, so no comparison is needed.
 		// only add unique paths
@@ -238,7 +244,7 @@ bool baseProject::create(const fs::path & path, string templateName){
 
 bool baseProject::save(){
 	ofLog(OF_LOG_NOTICE) << "saving addons.make";
-	
+
 	std::ofstream addonsMake(projectDir / "addons.make");
 	for (auto & a : addons) {
 		if (a.isLocalAddon) {
@@ -250,7 +256,7 @@ bool baseProject::save(){
 
 	//save out params which the PG knows about to config.make
 	//we mostly use this right now for storing the external source paths
-	
+
 	vector <string> lines = fileToStrings(projectDir / "config.make");
 	std::ofstream saveConfig(projectDir / "config.make");
 
@@ -258,18 +264,19 @@ bool baseProject::save(){
 		//add the of root path
 		if( str.rfind("# OF_ROOT =", 0) == 0 || str.rfind("OF_ROOT =", 0) == 0){
 			fs::path path = getOFRoot();
-			
+
 			// FIXME: change to ofIsPathInPath
 			if( projectDir.string().rfind(getOFRoot().string(), 0) == 0) {
-				path = getOFRelPath(projectDir);
+				path = fs::relative(getOFRoot(), projectDir);
+
 			}
-			saveConfig << "OF_ROOT = " << path.string() << std::endl;
+			saveConfig << "OF_ROOT = " << path.generic_string() << std::endl;
 		}
 		// replace this section with our external paths
 		else if( extSrcPaths.size() && str.rfind("# PROJECT_EXTERNAL_SOURCE_PATHS =", 0) == 0 ){
-			for(int d = 0; d < extSrcPaths.size(); d++){
-				ofLog(OF_LOG_VERBOSE) << " adding PROJECT_EXTERNAL_SOURCE_PATHS to config" << extSrcPaths[d] << std::endl;
-				saveConfig << "PROJECT_EXTERNAL_SOURCE_PATHS" << (d == 0 ? " = " : " += ") << extSrcPaths[d] << std::endl;
+			for(std::size_t d = 0; d < extSrcPaths.size(); d++){
+				ofLog(OF_LOG_VERBOSE) << " adding PROJECT_EXTERNAL_SOURCE_PATHS to config" << extSrcPaths[d].generic_string() << std::endl;
+				saveConfig << "PROJECT_EXTERNAL_SOURCE_PATHS" << (d == 0 ? " = " : " += ") << extSrcPaths[d].generic_string() << std::endl;
 			}
 		} else {
 		   saveConfig << str << std::endl;
@@ -285,37 +292,37 @@ bool baseProject::isAddonInCache(const string & addonPath, const string platform
 
 void baseProject::addAddon(string addonName){
 //	alert( "baseProject::addAddon " + addonName );
-	
+
 	// FIXME : not target, yes platform.
 	#ifdef TARGET_WIN32
 //	std::replace( addonName.begin(), addonName.end(), '/', '\\' );
 	fixSlashOrder(addonName);
 	#endif
-	
+
 	ofAddon addon;
 	// MARK: Review this path here. EDIT: I think it is finally good
 
 	if (bMakeRelative) {
-		addon.pathToOF = getOFRelPath(projectDir);
+		addon.pathToOF = fs::relative(getOFRoot(), projectDir);
 	} else {
 		addon.pathToOF = getOFRoot();
 	}
-	
+
 	addon.pathToProject = projectDir;
 
 	bool addonOK = false;
 	bool inCache = isAddonInCache(addonName, target);
-	
+
 	fs::path addonPath { addonName };
 
 	if (fs::exists(addonPath)) {
 		addon.isLocalAddon = true;
 	} else {
-		addonPath = fs::path(getOFRoot()) / "addons" / addonName;
+		addonPath = getOFRoot() / "addons" / addonName;
 		addon.isLocalAddon = false;
 	}
 
-	
+
 	if (!inCache) {
 		addonOK = addon.fromFS(addonPath, target);
 	} else {
@@ -332,7 +339,7 @@ void baseProject::addAddon(string addonName){
 		//cache the addon so we dont have to be reading form disk all the time
 		addonsCache[target][addonName] = addon;
 	}
-	
+
 	for (auto & a : addons) {
 		if (a.name == addon.name) return;
 	}
@@ -352,19 +359,59 @@ void baseProject::addAddon(string addonName){
 			ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << d;
 		}
 	}
-	
-	
+
+
 	ofLogNotice() << "adding addon: " << addon.name;
 	addons.emplace_back(addon);
-	
+
 	for (auto & e : addon.includePaths) {
 		ofLogVerbose() << "adding addon include path: " << e;
+//		alert ("adding addon include path: " + e, 34);
 //		ofLog() << "adding addon include path: " << e;
 		addInclude(e);
 	}
-	
-	
-	
+
+	// It was part exclusive of visualStudioProject. now it is part of baseProject, so dlls are copied in VSCode project and .so files in linux
+	for (auto & d : addon.dllsToCopy) {
+		ofLogVerbose() << "adding addon dlls to bin: " << d;
+		fs::path from { d };
+		fs::path to { projectDir / "bin" / from.filename() };
+		if (from.extension() == ".so") {
+			fs::path folder { projectDir / "bin" / "libs" };
+			if (!fs::exists(folder)) {
+				try {
+					fs::create_directory(folder);
+				} catch(fs::filesystem_error& e) {
+					ofLogError("baseProject::addAddon") << "error creating folder " << folder << e.what();
+				}
+			}
+//			to = projectDir / "bin" / "libs" / from.filename();
+			to = folder / from.filename();
+		}
+		if (from.extension() == ".dll") {
+			if (d.find("x64") != std::string::npos) {
+				to = projectDir / "dll/x64" / from.filename();
+				ofLogVerbose() << "adding addon dlls to dll/x64: " << d;
+			} else if (d.find("ARM64EC") != std::string::npos) {
+				to = projectDir / "dll/ARM64EC" / from.filename();
+				ofLogVerbose() << "adding addon dlls to dll/ARM64EC: " << d;
+			} else if (d.find("ARM64") != std::string::npos) {
+				to = projectDir / "dll/ARM64" / from.filename();
+				ofLogVerbose() << "adding addon dlls to dll/ARM64: " << d;
+			} else {
+				// Default case if architecture is not found
+				to = projectDir / "bin" / from.filename();
+				ofLogVerbose() << "adding addon dlls to bin: " << d;
+			}
+		}
+
+		try {
+			fs::copy_file(from, to, fs::copy_options::overwrite_existing);
+		} catch(fs::filesystem_error& e) {
+			ofLogError("baseProject::addAddon") << "error copying template file " << from << endl << "to: " << to << endl <<  e.what();
+		}
+	}
+
 	// MARK: - SPECIFIC for each project.
 	// XCode and VS override the base addAddon. other templates will use baseproject::addAddon(ofAddon...
 	addAddon(addon);
@@ -376,7 +423,7 @@ void baseProject::addAddon(string addonName){
 			ofStringReplace(d, "data/", ""); // avoid to copy files at /data/data/*
 			fs::path from { addon.addonPath / data };
 			fs::path dest { projectDir / "bin" / "data" };
-			
+
 			if(fs::exists(from)){
 				fs::path to { dest / d };
 				if (fs::is_regular_file(from)){
@@ -391,7 +438,7 @@ void baseProject::addAddon(string addonName){
 					if (!fs::exists(to)) {
 						fs::create_directory(to);
 					}
-					
+
 					try {
 						fs::copy(from, to, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
 						ofLogVerbose() << "adding addon data file: " << d << endl;
@@ -420,10 +467,10 @@ void baseProject::addAddon(ofAddon & addon){
 	}
 
 	/*
-	 
+
 	 MARK: Test this, I suppose this is only invoked when an addon is added
 	 from a dependency of another addon, and it has its own dependencies too.
-	 
+
 	 this is not possible to test easily using xcode or visualstudio project
 	 because baseProject::addAddon is only invoked when there is already dependencies in xcode addons.
 	 the only way to test this is other platforms like qbs?
@@ -453,6 +500,10 @@ void baseProject::addAddon(ofAddon & addon){
 	for(auto & lib: addon.libs){
 		ofLogVerbose("baseProject") << lib.path;
 	}
+    
+    for(auto & lib: addon.libsPaths){
+        ofLogVerbose("adding lib paths") << lib.c_str();
+    }
 
 	for (auto & a : addon.includePaths) {
 		ofLogVerbose() << "adding addon include path: " << a;
@@ -461,45 +512,46 @@ void baseProject::addAddon(ofAddon & addon){
 
 	for (auto & a : addon.libs) {
 		ofLogVerbose() << "adding addon libs: " << a.path;
+		// FIXME: remove
 		alert ("addlibrary " + a.path, 33);
 		addLibrary(a);
 	}
-	
+
 	for (auto & a : addon.cflags) {
 		ofLogVerbose() << "adding addon cflags: " << a;
 		addCFLAG(a);
 	}
-	
+
 	for (auto & a : addon.cppflags) {
 		ofLogVerbose() << "adding addon cppflags: " << a;
 		addCPPFLAG(a);
 	}
-	
+
 	for (auto & a : addon.ldflags) {
 		ofLogVerbose() << "adding addon ldflags: " << a;
 		addLDFLAG(a);
 	}
-	
+
 	for (auto & a : addon.srcFiles) {
 		ofLogVerbose() << "adding addon srcFiles: " << a;
 		addSrc(a, addon.filesToFolders[a]);
 	}
-	
+
 	for (auto & a : addon.csrcFiles) {
 		ofLogVerbose() << "adding addon c srcFiles: " << a;
 		addSrc(a, addon.filesToFolders[a], C);
 	}
-	
+
 	for (auto & a : addon.cppsrcFiles) {
 		ofLogVerbose() << "adding addon cpp srcFiles: " << a;
 		addSrc(a, addon.filesToFolders[a],CPP);
 	}
-	
+
 	for (auto & a : addon.objcsrcFiles) {
 		ofLogVerbose() << "adding addon objc srcFiles: " << a;
 		addSrc(a, addon.filesToFolders[a],OBJC);
 	}
-	
+
 	for (auto & a : addon.headersrcFiles) {
 		ofLogVerbose() << "adding addon header srcFiles: " << a;
 		addSrc(a, addon.filesToFolders[a],HEADER);
@@ -513,25 +565,23 @@ void baseProject::addAddon(ofAddon & addon){
 
 
 void baseProject::addSrcRecursively(const fs::path & srcPath){
+//	alert("addSrcRecursively " + srcPath.string(), 32);
 	ofLog() << "using additional source folder " << srcPath.string();
 //	alert("--");
-//	alert("addSrcRecursively " + srcPath.string());
-	fs::path base = srcPath.parent_path();
-//	alert("base = " + base.string());
-	
-	extSrcPaths.emplace_back(srcPath.string());
+
+	extSrcPaths.emplace_back(srcPath);
 	vector < fs::path > srcFilesToAdd;
 	getFilesRecursively(srcPath, srcFilesToAdd);
 //	bool isRelative = ofIsPathInPath(fs::absolute(srcPath), getOFRoot());
 
 	std::unordered_set<string> uniqueIncludeFolders;
-	
+	fs::path base = srcPath.parent_path();
+
 	for( auto & src : srcFilesToAdd){
 		fs::path parent = src.parent_path();
-		fs::path folder = parent.lexically_relative(base);
-
-		//		alert ("addSrc file:" + src.string() + " -- folder:" + folder.string(), 35);
-		addSrc(src.string(), folder.string());
+		fs::path folder = fs::path("external_sources") / parent.lexically_relative(base);
+//		fs::path folder = parent.lexically_relative(base);
+		addSrc(src, folder);
 		if (parent.string() != "") {
 			uniqueIncludeFolders.insert(parent.string());
 		}
@@ -539,6 +589,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 
 	for(auto & i : uniqueIncludeFolders){
 		ofLogVerbose() << " adding search include paths for folder " << i;
+//		alert("addInclude " + i, 31);
 		addInclude(i);
 	}
 }

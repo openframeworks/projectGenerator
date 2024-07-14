@@ -16,18 +16,38 @@ using std::string;
 using std::vector;
 // #include <map>
 // About Metadata
-const string ADDON_NAME = "ADDON_NAME";
-const string ADDON_DESCRIPTION = "ADDON_DESCRIPTION";
-const string ADDON_AUTHOR = "ADDON_AUTHOR";
-const string ADDON_TAGS = "ADDON_TAGS";
-const string ADDON_URL = "ADDON_URL";
 
-const vector<string> AddonMetaVariables = {
-	ADDON_NAME,
-	ADDON_DESCRIPTION,
-	ADDON_AUTHOR,
-	ADDON_TAGS,
-	ADDON_URL,
+const vector<string> AddonMetaVariables {
+	"ADDON_NAME",
+	"ADDON_DESCRIPTION",
+	"ADDON_AUTHOR",
+	"ADDON_TAGS",
+	"ADDON_URL",
+};
+
+const vector<string> parseStates {
+	"meta",
+	"common",
+	"linux",
+	"linux64",
+	"msys2",
+	"vs",
+	"linuxarmv6l",
+	"linuxarmv7l",
+	"linuxaarch64",
+	"android/armeabi",
+	"android/armeabi-v7a",
+	"android/arm64-v8a",
+	"android/x86",
+	"android/x86_64",
+	"emscripten",
+    "android",
+	"ios",
+	"osx",
+	"tvos",
+    "macos",
+	"watchos",
+	"visionos",
 };
 
 // About Project settings
@@ -50,6 +70,7 @@ const string ADDON_OBJC_SOURCES = "ADDON_OBJC_SOURCES";
 
 // About Exclude
 const string ADDON_LIBS_EXCLUDE = "ADDON_LIBS_EXCLUDE";
+const string ADDON_LIBS_DIR = "ADDON_LIBS_DIR";
 const string ADDON_SOURCES_EXCLUDE = "ADDON_SOURCES_EXCLUDE";
 const string ADDON_INCLUDES_EXCLUDE = "ADDON_INCLUDES_EXCLUDE";
 const string ADDON_FRAMEWORKS_EXCLUDE = "ADDON_FRAMEWORKS_EXCLUDE";
@@ -59,6 +80,7 @@ const string ADDON_DATA = "ADDON_DATA";
 // About Env Specific
 const string ADDON_PKG_CONFIG_LIBRARIES = "ADDON_PKG_CONFIG_LIBRARIES";
 const string ADDON_FRAMEWORKS = "ADDON_FRAMEWORKS";
+const string ADDON_XCFRAMEWORKS = "ADDON_XCFRAMEWORKS";
 const string ADDON_DLLS_TO_COPY = "ADDON_DLLS_TO_COPY";
 
 const vector<string> AddonProjectVariables = {
@@ -78,6 +100,7 @@ const vector<string> AddonProjectVariables = {
 	ADDON_OBJC_SOURCES,
 
 	ADDON_LIBS_EXCLUDE,
+    ADDON_LIBS_DIR,
 	ADDON_SOURCES_EXCLUDE,
 	ADDON_INCLUDES_EXCLUDE,
 	ADDON_FRAMEWORKS_EXCLUDE,
@@ -96,6 +119,10 @@ public:
 	ofAddon();
 
 	bool fromFS(const fs::path & path, const string & platform);
+	void parseLibsPath(const fs::path & path, const fs::path & parentFolder);
+	vector <fs::path> additionalLibsFolder;
+	vector <fs::path> libFiles;
+
 //	void fromXML(string installXmlName);
 	void clear();
 
@@ -114,6 +141,7 @@ public:
 	vector < LibraryBinary > libs;
 	vector < string > dllsToCopy;
 	vector < string > includePaths;
+    vector < string > libsPaths;
 
 	// From addon_config.mk
 	vector < string > dependencies;
@@ -122,8 +150,11 @@ public:
 	vector < string > ldflags;
 	vector < string > pkgConfigLibs; 	// linux only
 	vector < string > frameworks;		// osx only
+	vector < string > xcframeworks; // osx only
 	vector < string > data;
 	vector < string > defines;
+    
+    vector < string > definesCMAKE;
 
 	// metadata
 	string name;
@@ -143,37 +174,19 @@ public:
 	}
 
 private:
+	
+	string currentParseState { "" };
 
-	enum ConfigParseState{
-		Meta,
-		Common,
-		Linux,
-		Linux64,
-		MinGW,
-		VS,
-		LinuxARMv6,
-		LinuxARMv7,
-		LinuxAArch64,
-		AndroidARMv5,
-		AndroidARMv7,
-		Androidx86,
-		Emscripten,
-		iOS,
-		OSX,
-		Unknown
-	} currentParseState;
-
+	void preParseConfig();
 	void parseConfig();
-	void parseVariableValue(string variable, string value, bool addToValue, string line, int lineNum);
+	void parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum);
 	void addReplaceString(string & variable, string value, bool addToVariable);
 	void addReplaceStringVector(vector<string> & variable, string value, string prefix, bool addToVariable);
 	void addReplaceStringVector(vector<LibraryBinary> & variable, string value, string prefix, bool addToVariable);
 	void exclude(vector<string> & variable, vector<string> exclusions);
 	void exclude(vector<LibraryBinary> & variable, vector<string> exclusions);
-	ConfigParseState stateFromString(string name);
-	string stateName(ConfigParseState state);
-	bool checkCorrectVariable(string variable, ConfigParseState state);
-	bool checkCorrectPlatform(ConfigParseState state);
+	bool checkCorrectVariable(const string & variable, const string & state);
+	bool checkCorrectPlatform(const string & state);
 
 	string platform;
 
@@ -181,6 +194,7 @@ private:
 	vector<string> excludeSources;
 	vector<string> excludeIncludes;
 	vector<string> excludeFrameworks;
-	
+	vector<string> excludeXCFrameworks;
+
 	fs::path fixPath(const fs::path & path);
 };

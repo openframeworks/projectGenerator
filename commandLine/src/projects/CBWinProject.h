@@ -9,9 +9,9 @@
 
 #include "baseProject.h"
 
-class CBWinProject: public baseProject  {
+class CBWinProject: public baseProject {
 public:
-	CBWinProject(std::string target):baseProject(target){};
+	CBWinProject(const std::string & target) : baseProject(target) {};
 
 	bool createProjectFile();
 	bool loadProjectFile();
@@ -21,11 +21,5 @@ public:
 	void addInclude(std::string includeName);
 	void addLibrary(const LibraryBinary & lib);
 
-//	std::string getName();
-//	fs::path getPath();
-
 	static std::string LOG_NAME;
-
-private:
-
 };

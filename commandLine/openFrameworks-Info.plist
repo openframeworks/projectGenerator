@@ -3,32 +3,43 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<string>${DEVELOPMENT_LANGUAGE}</string>
 	<key>CFBundleExecutable</key>
-	<string>$(EXECUTABLE_NAME)</string>
+	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIconFile</key>
-	<string>$(ICON_NAME)</string>
+	<string>${ICON_NAME}</string>
 	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<string>${PRODUCT_BUNDLE_IDENTIFIER}</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>$(TARGET_NAME)</string>
+	<string>${TARGET_NAME}</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleShortVersionString</key>
-	<string>$(VERSION)</string>
+	<string>${MARKETING_VERSION}</string>
 	<key>CFBundleVersion</key>
-	<string>$(VERSION)</string>
-	<key>LSApplicationCategoryType</key>
-	<string>public.app-category.graphics-design</string>
+	<string>${CURRENT_PROJECT_VERSION}</string>
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs to access the camera</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app needs to access the microphone</string>
 	<key>NSHighResolutionCapable</key>
-	<false/>
+	<string>${HIGH_RESOLUTION_CAPABLE}</string>
+	<key>NSFileProviderDomainUsageDescription</key>
+	<string>projectGenerator needs to access the File folder as can be run against projects in Files</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>projectGenerator needs to access the Desktop folder as run from there against projects stored there</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>projectGenerator needs to access the downloads folder as run from there against projects downloaded</string>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>projectGenerator needs to access the Documents folder to manage projects stored there.</string>
+	<key>NSFullDiskAccessUsageDescription</key>
+	<string>projectGenerator needs full disk access to manage projects across all directories on the system.</string>
+	
 </dict>
 </plist>
