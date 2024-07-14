@@ -37,7 +37,7 @@ echoDots(){
 
 package_app(){
 	if [[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
-
+		echo "package_app --"
 		PLATFORM=$1
 		# Copy commandLine into electron .app
 		cd ${PG_DIR}
@@ -46,8 +46,14 @@ package_app(){
 		echo "Directory contents:"
 		ls
 		echo "-------------"
-		#echo "copy cmdline PG to "
-		cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
+		echo "copy cmdline PG from app contents (signed)"
+		if command -v rsync &> /dev/null; then
+			rsync -avzp "commandLine/bin/commandLine.app/Contents/MacOS/commandLine" "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator" 2> /dev/null
+		else
+			cp -aX commandLine/bin/commandLine.app/Contents/MacOS/commandLine projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
+		fi
+
+
 		cd ${PG_DIR}
 		pwd
 		echo "Directory contents:"
@@ -67,13 +73,23 @@ package_app(){
 		echo "-------------"
 		echo "cd to ${PG_DIR}"
 		cd ${PG_DIR}
-		electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
 
+		TEAM_ID="HC25N2E7UT"
+		APPLE_ID="theo@theowatson.com"
+		# echo "--identity=3rd Party Mac Developer Application: ${APPLE_ID} (${TEAM_ID})"
+		if [[ ("${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" || "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/bleeding") && "$TRAVIS_PULL_REQUEST" == "false" ]] || 
+   			[[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
+			electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
+		fi
 		${SCRIPT_DIR}/secure.sh projectGenerator-$PLATFORM/projectGenerator.app/Contents/MacOS/projectGenerator projectGenerator-$PLATFORM
 		echo "Compressing PG app"
 		# need to upload zip of just app to apple for notarizing
 		zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM/projectGenerator.app
-		xcrun notarytool --notarize-app --primary-bundle-id "com.electron.projectgenerator" --username "${GA_APPLE_USERNAME}" -p "${GA_APPLE_PASS}" --asc-provider "${GA_NOTARIZE_PROVIDER}" --file projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip
+		if [[ ("${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" || "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/bleeding") && "$TRAVIS_PULL_REQUEST" == "false" ]] || 
+   			[[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
+			xcrun notarytool submit "projectGenerator-${PLATFORM}/projectGenerator-${PLATFORM}.zip" --apple-id "${APPLE_ID}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
+		fi
+
 		mv projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip ${PG_DIR}/../../../projectGenerator/projectGenerator-$PLATFORM.zip
 		cd ${PG_DIR}/../../../projectGenerator
 		echo "Final Directory contents: ${PG_DIR}/../../../projectGenerator"
@@ -87,6 +103,7 @@ package_app(){
 
 
 sign_and_upload(){
+	echo "  sign_and_upload --"
 	PLATFORM=$1
 	# Copy commandLine into electron .app
 	cd ${PG_DIR}
@@ -112,8 +129,10 @@ sign_and_upload(){
 
 			# need to upload zip of just app to apple for notarizing
 			zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator.app.zip projectGenerator-$PLATFORM/projectGenerator.app
-			xcrun altool --notarize-app --primary-bundle-id "com.electron.projectgenerator" --username "${GA_APPLE_USERNAME}" -p "${GA_APPLE_PASS}" --asc-provider "${GA_NOTARIZE_PROVIDER}" --file projectGenerator-$PLATFORM/projectGenerator.app.zip
-
+			# xcrun altool --notarize-app --primary-bundle-id "com.electron.projectgenerator" --username "${GA_APPLE_USERNAME}" -p "${GA_APPLE_PASS}" --asc-provider "${GA_NOTARIZE_PROVIDER}" --file projectGenerator-$PLATFORM/projectGenerator.app.zip
+			TEAM_ID="HC25N2E7UT"
+			xcrun notarytool submit "projectGenerator-${PLATFORM}/projectGenerator-${PLATFORM}.app.zip" --apple-id "${GA_APPLE_USERNAME}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
+			
 			# Upload to OF CI server
 			echo "Uploading $PLATFORM PG to CI servers"
 
@@ -137,7 +156,7 @@ sign_and_upload(){
 
 import_certificate(){
 
-	echo "import_certificate"
+	echo "  import_certificate"
 
 	if [[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" && -n "${CERTIFICATE_OSX_APPLICATION}" ]]; then
 		echo "Decoding signing certificates"
@@ -208,7 +227,7 @@ echo "-------------"
 mv frontend/dist/mac-universal ${PG_DIR}/projectGenerator-osx
 
 echo "-------------"
-echo "package_app osx"
+echo "  package_app osx"
 package_app osx
 
 # echo "package_app ios"
@@ -221,7 +240,7 @@ package_app osx
 # echo "package_app ios"
 # package_app ios
 
-echo "for security remove keys maybe imported"
+echo "  for security remove keys maybe imported"
 rm -rf scripts/id_rsa 2> /dev/null
 rm -rf scripts/*.p12 2> /dev/null
 

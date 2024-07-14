@@ -6,7 +6,6 @@
  */
 
 #include "ofUtils.h"
-#include "ofFileUtils.h"
 #include "ofAddon.h"
 #include "Utils.h"
 #include <list>
@@ -266,6 +265,10 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	else if(variable == ADDON_LIBS_EXCLUDE){
 		addReplaceStringVector(excludeLibs,value,"",addToValue);
 	}
+    
+    else if(variable == ADDON_LIBS_DIR){
+        addReplaceStringVector(libsPaths,value,"",addToValue);
+    }
 
 	else if(variable == ADDON_SOURCES_EXCLUDE){
 		addReplaceStringVector(excludeSources,value,"",addToValue);
@@ -291,14 +294,28 @@ void ofAddon::exclude(vector<string> & variables, vector<string> exclusions){
 		ofStringReplace(exclusion,".","\\.");
 		ofStringReplace(exclusion,"%",".*");
 		exclusion =".*"+ exclusion;
+//		alert ("ofAddon::exclude " +exclusion, 31);
 
 		std::regex findVar(exclusion);
 		std::smatch varMatch;
+//		alert ("vars size " + ofToString(variables.size()));
+//		for (auto & v : variables) {
+//			alert ("\t" + v, 32);
+//		}
 		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const string & variable){
 			auto forwardSlashedVariable = variable;
 			ofStringReplace(forwardSlashedVariable, "\\", "/");
+//			bool exclude = std::regex_search(forwardSlashedVariable, varMatch, findVar);
+//			if (exclude) {
+//				alert ("variable removed : " + variable, 31);
+//			}
 			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
 		}), variables.end());
+		
+//		alert ("vars size " + ofToString(variables.size()));
+//		for (auto & v : variables) {
+//			alert ("\t" + v, 32);
+//		}
 	}
 }
 
@@ -462,17 +479,18 @@ void ofAddon::parseConfig(){
 
 void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFolder) {
 //	alert ("parseLibsPath " + libsPath.string(), 35);
-	
 	if (!fs::exists(libsPath)) {
 //		alert("file not found " + libsPath.string(), 35);
 		return;
 	}
-	
 
 	getLibsRecursively(libsPath, libFiles, libs, platform);
-	if (platform == "osx" || platform == "ios"){
-		getFrameworksRecursively(libsPath, frameworks, platform);
-		getXCFrameworksRecursively(libsPath, xcframeworks, platform);
+	if (platform == "osx"  ||
+        platform == "ios"  ||
+        platform == "tvos" ||
+        platform == "macos"){
+            getFrameworksRecursively(libsPath, frameworks, platform);
+            getXCFrameworksRecursively(libsPath, xcframeworks, platform);
 	}
 	
 	if (platform == "vs" || platform == "msys2"
@@ -483,7 +501,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		   || platform == "linuxarmv7l"
 		   || platform == "linuxaarch64"
 	   ) {
-		getDllsRecursively(libsPath, dllsToCopy, platform);
+            getDllsRecursively(libsPath, dllsToCopy, platform);
 	}
 
 
@@ -553,7 +571,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 }
 	
 bool ofAddon::fromFS(const fs::path & path, const string & platform){
-	// alert("ofAddon::fromFS path : " + path.string());
+	//alert("ofAddon::fromFS path : " + path.string(), 33);
 	
 	if (!fs::exists(path)) {
 		return false;
@@ -624,6 +642,11 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	preParseConfig();
 
 	parseLibsPath(libsPath, parentFolder);
+    
+    // lib paths are directories to parse for libs
+    for (auto & a : libsPaths) {
+        parseLibsPath((path / a), parentFolder);
+    }
 
 	for (auto & a : additionalLibsFolder) {
 //		parseLibsPath(fs::weakly_canonical(path / a), parentFolder);
@@ -639,6 +662,12 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	parseConfig();
 
 	exclude(includePaths, excludeIncludes);
+	
+	// Dimitre. I've added this here to exclude some srcFiles from addons,
+	// ofxAssimpModelLoader was adding some files from libs/assimp/include/assimp/port/AndroidJNI
+	// even when the folder was excluded from includePaths
+	exclude(srcFiles, excludeIncludes);
+	
 	exclude(srcFiles, excludeSources);
 	exclude(csrcFiles, excludeSources);
 	exclude(cppsrcFiles, excludeSources);
@@ -665,6 +694,7 @@ void ofAddon::clear(){
 	propsFiles.clear();
 	libs.clear();
 	includePaths.clear();
+    libsPaths.clear();
 	name.clear();
 }
 

@@ -3,10 +3,10 @@ name: build-linux
 on:
   push:
     paths-ignore:
-    - '**/README.md'
+      - '**/README.md'
   pull_request:
     paths-ignore:
-    - '**/README.md'
+      - '**/README.md'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -14,6 +14,7 @@ concurrency:
 
 env:
   ccache: ccache
+  GA_CI_SECRET: ${{ secrets.CI_SECRET }}
 
 jobs:
   build-linux:
@@ -21,20 +22,104 @@ jobs:
     strategy:
       matrix:
         cfg:
-        - {target: linux}
+          - {target: linux}
     env:
-     TARGET: ${{matrix.cfg.target}}
+      TARGET: ${{ matrix.cfg.target }}
     steps:
-    - name: Install libunwind
-      run:  sudo apt-get install libunwind-dev
-    - uses: actions/checkout@v4
-    - name: ccache
-      uses: hendrikmuhs/ccache-action@v1.2.12
-      with:
-        # key: ${{ matrix.os }}-${{ matrix.type }}
-        key: ${{ matrix.os }}-${{ matrix.cfg.target }}
-    - name: Build
-      run:
-        ./scripts/linux/buildPG.sh;
-      env:
-        GA_CI_SECRET: ${{ secrets.CI_SECRET }}
+      - name: Install libunwind
+        run: sudo apt-get install libunwind-dev wget2
+      
+      - uses: actions/checkout@v4
+      
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.12
+        with:
+          key: ${{ matrix.cfg.target }}
+      
+      - name: Determine Release
+        id: vars
+        shell: bash
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+            echo "release=nightly" >> $GITHUB_ENV
+            echo "prerelease=false" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
+            echo "release=bleeding" >> $GITHUB_ENV
+            echo "prerelease=true" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "release=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+            echo "prerelease=false" >> $GITHUB_ENV
+          else
+            echo "release=nightly" >> $GITHUB_ENV
+            echo "prerelease=false" >> $GITHUB_ENV
+          fi
+      
+      - name: Install
+        run: ./scripts/linux/ci_install_core.sh
+      
+      - name: List directory
+        run: ls -lah ./
+      
+      - name: Build
+        run: ./../openFrameworks/apps/projectGenerator/scripts/linux/build_cmdline.sh
+
+      - name: Test cmdline 
+        run: ./../openFrameworks/apps/projectGenerator/scripts/linux/test_cmdline.sh
+      
+      - name: List output directory
+        run: ls -lah ./../openFrameworks/apps/projectGenerator/commandLine/bin
+
+      - name: Copy commandLine to frontend
+        run: |
+          cp ./../openFrameworks/apps/projectGenerator/commandLine/bin/projectGenerator ./../openFrameworks/apps/projectGenerator/frontend/app/projectGenerator
+          chmod 755 ./../openFrameworks/apps/projectGenerator/commandLine/bin/projectGenerator
+          
+      - name: Build and Package projectGenerator Linux GUI
+        shell: bash
+        run: |
+          cd ../openFrameworks/apps/projectGenerator/frontend
+          npm install
+          npm update
+          npm run dist:linux64
+          cd dist
+          pwd
+          ls
+
+      - name: List output frontend dist dir
+        run: ls -lah ./../openFrameworks/apps/projectGenerator/frontend/dist
+
+      - name: Copy GUI tarball to root directory
+        run: |
+          cd ./../openFrameworks/apps/projectGenerator/frontend/dist
+          mv projectGenerator-0.61.0.tar.gz $GITHUB_WORKSPACE/projectGenerator-linux-gui.gz
+      
+      - name: Test Artefact zip
+        run: |
+          cd ./../openFrameworks/apps/projectGenerator/commandLine/bin/
+          ls -la
+          tar -cjf projectGenerator-linux.tar.bz2 projectGenerator
+          mv projectGenerator-linux.tar.bz2 $GITHUB_WORKSPACE/projectGenerator-linux.tar.bz2
+
+      - name: List output top
+        run: ls -lah $GITHUB_WORKSPACE
+
+      - name: Update CMD Gen Release
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
+        uses: IsaacShelton/update-existing-release@v1.3.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ env.release }}
+          release: ${{ env.release }}
+          prerelease: ${{ env.release }}
+          replace: false
+          files: projectGenerator-linux.tar.bz2
+      - name: Update Project Gen GUI Release
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
+        uses: IsaacShelton/update-existing-release@v1.3.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ env.release }}
+          release: ${{ env.release }}
+          prerelease: ${{ env.release }}
+          replace: false
+          files: projectGenerator-linux-gui.gz

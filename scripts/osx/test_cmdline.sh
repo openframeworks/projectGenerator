@@ -13,10 +13,49 @@ echo "CMD_DIR:  ${CMD_DIR}"
 echo "====== ${CMD_DIR}"
 # Compile commandline tool
 cd "${CMD_DIR}/bin"
-echo "Testing project generation osx";
+echo "Testing projectGenerator [osx]";
 chmod +x projectGenerator
-./projectGenerator --recursive -posx -o../../../../ ../../../../examples/
+
+codesign --verify --deep --verbose=2 "./projectGenerator"
+SIGN_STATUS=$?
+if [ $SIGN_STATUS -ne 0 ]; then
+    echo "Code signing is required. Signing the application..."
+    codesign --sign "-" --deep --force --verbose --entitlements $PG_DIR/scripts/osx/PG.entitlements "./projectGenerator"
+    echo "Verifying the new code signature..."
+    codesign --verify --deep --verbose=2 "./projectGenerator"
+else
+    echo "Application is already code-signed and valid"
+fi
+
+echo "Test auto path:"
+./projectGenerator --recursive -posx ../../../../examples/templates
+
+
+echo "Test all"
+./projectGenerator --recursive -posx -o../../../../ ../../../../examples/ ./projectGenerator 
+
+
+echo "test out of folder -o [vs]";
+rm -rf ../../../../../pg2
+mkdir -p  ../../../../../pg2
+if ! command -v rsync &> /dev/null
+then      
+    cp -a ./projectGenerator ../../../../../pg2 
+else
+    rsync -azp ./projectGenerator ../../../../../pg2
+fi
+cd ../../../../../pg2
+ls -a
+pwd
+./projectGenerator --recursive -pvs -o"./../openFrameworks" ./../openFrameworks/examples/
+errorcode=$?
+if [[ $errorcode -ne 0 ]]; then
+        exit $errorcode
+fi
+
+
 errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
 		exit $errorcode
 fi
+echo "Successful projectGenerator tests for [osx]";

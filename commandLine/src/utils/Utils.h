@@ -14,10 +14,17 @@
 #include "baseProject.h"
 struct LibraryBinary;
 
+namespace fs = of::filesystem;
+using std::string;
+using std::vector;
+using std::cout;
+using std::endl;
+
 static std::map <ofTargetPlatform, std::string> platformsToString {
 	{ OF_TARGET_ANDROID, "android" },
 //	{ OF_TARGET_EMSCRIPTEN, "" },
 	{ OF_TARGET_IOS, "ios" },
+    { OF_TARGET_MACOS, "macos" },
 	{ OF_TARGET_LINUX, "linux" },
 	{ OF_TARGET_LINUX64, "linux64" },
 	{ OF_TARGET_LINUXARMV6L, "linuxarmv6l" },
@@ -27,7 +34,6 @@ static std::map <ofTargetPlatform, std::string> platformsToString {
 	{ OF_TARGET_OSX, "osx" },
 	{ OF_TARGET_WINVS, "vs" },
 };
-
 
 static std::vector < std::string > platformsOptions {
 	"android",
@@ -42,13 +48,6 @@ static std::vector < std::string > platformsOptions {
 	"vs",
 };
 
-
-namespace fs = of::filesystem;
-using std::string;
-using std::vector;
-using std::cout;
-using std::endl;
-
 string generateUUID(const string & input);
 string generateUUID(const fs::path & path);
 
@@ -62,13 +61,13 @@ void findandreplaceInTexfile (const fs::path & fileName, string tFind, string tR
 
 bool doesTagAndAttributeExist(pugi::xml_document & doc, string tag, string attribute, string newValue);
 pugi::xml_node appendValue(pugi::xml_document & doc, string tag, string attribute, string newValue, bool addMultiple = false);
-
+int countSubdirectories(const fs::path &path);
 void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & folderNames, string platform);
 void getFilesRecursively(const fs::path & path, std::vector < string > & fileNames);
 void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileNames);
 void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFiles, std::vector < LibraryBinary > & libLibs, string platform = "", string arch = "", string target = "");
 void getFrameworksRecursively(const fs::path & path, std::vector < string > & frameworks,  string platform = "" );
-void getXCFrameworksRecursively(const fs::path & path, std::vector<string> & frameworks, string platform = "");
+void getXCFrameworksRecursively(const fs::path & path, std::vector<string> & xcframeworks, string platform = "");
 void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props, const string & platform);
 void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, string platform);
 
@@ -76,12 +75,6 @@ void splitFromFirst(string toSplit, string deliminator, string & first, string &
 
 void fixSlashOrder(string & toFix);
 string unsplitString (std::vector < string > strings, string deliminator );
-
-fs::path getOFRelPath(const fs::path & from);
-
-bool checkConfigExists();
-bool askOFRoot();
-string getOFRootFromConfig();
 
 std::unique_ptr<baseProject> getTargetProject(const string & targ);
 

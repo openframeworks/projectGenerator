@@ -11,7 +11,7 @@ echo "PG_DIR:  ${PG_DIR}"
 echo "FRONTEND_DIR:  ${FRONTEND_DIR}"
 
 if [ -z "${FRONTEND_TARGET+x}" ]; then
-    FRONTEND_TARGET=mac:universal
+    FRONTEND_TARGET=linux64
 fi
 
 cd "${PG_DIR}/frontend"
@@ -19,6 +19,7 @@ cd "${PG_DIR}/frontend"
 if [ -z "${BUILD_TEST+x}" ]; then
    BUILD_TEST=0
 fi
+
 
 if [ -z "${BUILD_TEST+x}" ]; then
    BUILD_TEST=0
@@ -31,11 +32,6 @@ SOURCE_FILE="${PG_DIR}/commandLine/bin/projectGenerator"
 DESTINATION_PATH="app"
 echo "SOURCE_FILE:$SOURCE_FILE";
 
-if [ ! -f "$SOURCE_FILE" ]; then
-   SOURCE_FILE="${PG_DIR}/commandLine/bin/commandLine.app/contents/MacOS/commandLine"
-fi
-
-
 # Check if the source file exists
 if [ -f "$SOURCE_FILE" ]; then
    echo "File exists, proceed with copying"
@@ -45,29 +41,11 @@ if [ -f "$SOURCE_FILE" ]; then
       rm -f "${DESTINATION_PATH}/projectGenerator"
    fi
    mkdir -p "$DESTINATION_PATH" # Create destination directory if it doesn't exist
-   if command -v rsync &> /dev/null; then
-      rsync -avzp "$SOURCE_FILE" "$DESTINATION_PATH/projectGenerator"
-   else
-      cp -aX "$SOURCE_FILE" "$DESTINATION_PATH/projectGenerator"
-   fi
+   cp -X "$SOURCE_FILE" "$DESTINATION_PATH/projectGenerator"
    echo "File copied successfully."
 else
     # File does not exist
     echo "Error: Source file does not exist."
-fi
-
-if [ -z "${IDENTITY+x}" ]; then
-   IDENTITY="-"
-fi
-codesign --verify --deep --verbose=2 "$DESTINATION_PATH/projectGenerator"
-SIGN_STATUS=$?
-if [ $SIGN_STATUS -ne 0 ]; then
-    echo "Code signing is required. Signing the application..."
-    codesign --sign "$IDENTITY" --deep --force --verbose --entitlements $PG_DIR/scripts/osx/PG.entitlements "$DESTINATION_PATH/projectGenerator"
-    echo "Verifying the new code signature..."
-    codesign --verify --deep --verbose=2 "$DESTINATION_PATH/projectGenerator"
-else
-    echo "Application is already code-signed and valid"
 fi
 
 

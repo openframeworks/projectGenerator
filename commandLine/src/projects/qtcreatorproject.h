@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ofFileUtils.h" // ofBuffer
 #include "baseProject.h"
 #include <set>
 
