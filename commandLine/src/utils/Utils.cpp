@@ -63,7 +63,7 @@ std::string execute_popen(const char* cmd) {
 
 std::string getPlatformString() {
 #ifdef __linux__
-	string arch = exec("uname -m");
+	string arch = execute_popen("uname -m");
 	if (
 		arch == "armv6l" ||
 		arch == "armv7l" ||
