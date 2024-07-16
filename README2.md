@@ -2,12 +2,23 @@
 
 [![build-linux](https://github.com/openframeworks/projectGenerator/actions/workflows/build-linux.yml/badge.svg)](https://github.com/openframeworks/projectGenerator/actions/workflows/build-linux.yml) [![build-vs](https://github.com/openframeworks/projectGenerator/actions/workflows/build-vs.yml/badge.svg)](https://github.com/openframeworks/projectGenerator/actions/workflows/build-vs.yml) [![build-macos](https://github.com/openframeworks/projectGenerator/actions/workflows/build-macos.yml/badge.svg)](https://github.com/openframeworks/projectGenerator/actions/workflows/build-macos.yml)
 
-# Builds the cmdline and GUI project generators for openFrameworks
+
+# Project Generator
+## Builds the cmdline and GUI project generators for openFrameworks
+
+The project Generator, also known as _PG_,
+is a utility tool to facilitate the creation of new openFrameworks projects,
+in multiple platforms.
 
 - the commandLine projectGenerator (pure openFrameworks)
 - the projectGenerator GUI app (electron) distributed in releases
 
+The content in this page is primarily target at developers willing to contribute to the code base.
+If you are working with openFrameworks and would like to use the Project Generator, check the
+instructions in [Create in a new project](https://openframeworks.cc/learning/01_basics/create_a_new_project/).
+
 ---------------------------------------
+
 
 # Download instructions 
 You can download packaged macOS and Windows builds here ( note Linux needs to be built per platform ):
@@ -26,10 +37,10 @@ In the projectGenerator scripts folder run the scripts in order to setup environ
 
 projectGenerator\scripts\vs\setup_environment.sh (first time)
 
-projectGenerator\scripts\vs\build_cmdline.sh
+```projectGenerator\scripts\vs\build_cmdline.sh```
 - (build projectGenerator commandLine requires openFrameworks in directories above / or run from correct sub-module location)
 
-projectGenerator\scripts\vs\build_frontend.sh (Builds Electron App GUI Project Generator) 
+```projectGenerator\scripts\vs\build_frontend.sh``` (Builds Electron App GUI Project Generator) 
 - requires commandLine.exe in folder. 
 - If cannot build commandLine.exe download from releases and run just this
 
@@ -40,19 +51,30 @@ projectGenerator\scripts\vs\build_dev_frontend.sh
 
 projectGenerator\scripts\osx\setup_environment.sh (first time)
 
-projectGenerator\scripts\vs\build_cmdline.sh
+```projectGenerator\scripts\vs\build_cmdline.sh```
 - (build projectGenerator commandLine requires openFrameworks in directories above / or run from correct sub-module location)
 
-projectGenerator\scripts\vs\build_frontend.sh (Builds Electron App GUI Project Generator) 
+```projectGenerator\scripts\vs\build_frontend.sh``` (Builds Electron App GUI Project Generator) 
 - requires commandLine.exe in folder. 
 - If cannot build commandLine.exe download from releases and run just this
 
 ## Linux
 
-projectGenerator\scripts\linux\setup_environment.sh (first time)
+```projectGenerator\scripts\linux\setup_environment.sh``` (first time)
+```projectGenerator\scripts\linux\build_cmdline.sh```
+```projectGenerator\scripts\linux\build_frontend.sh```
 
-projectGenerator\scripts\linux\buildPG.sh
 
+## Contributing
+
+The project generator is available in two flavors:
+
+- A command line utility tool. This option is the most versatile and provides all features.
+  See more information [here](/commandLine/README.md).
+
+- A user-interface, which works for the most typical scenarios. See more information in
+the [front-end](/frontend/README.md) folder.  
+ ![project generator front-end](/frontend/screenshot.png)
 
 
 # LEGAGY BUILD INSTRUCTIONS ----- (more detail)
