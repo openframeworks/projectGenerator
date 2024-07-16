@@ -425,8 +425,7 @@ int main(int argc, char ** argv) {
 	bHelpRequested = false;
 	bListTemplates = false;
 	targets.emplace_back(getPlatformString());
-	// FIXME! problem.
-//	targets.emplace_back(platformsToString[ofGetTargetPlatform()]);
+
 	startTime = 0;
 	nProjectsUpdated = 0;
 	nProjectsCreated = 0;
