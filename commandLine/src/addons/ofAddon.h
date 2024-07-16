@@ -131,17 +131,17 @@ public:
 	std::unordered_map < string, string > filesToFolders;      //the addons has had, for each file,
 												//sometimes a listing of what folder to put it in, such as "addons/ofxOsc/src"
 
-	vector < string > srcFiles;
-	vector < string > csrcFiles;
-	vector < string > cppsrcFiles;
-	vector < string > headersrcFiles;
-	vector < string > objcsrcFiles;
+	vector < fs::path > srcFiles;
+	vector < fs::path > csrcFiles;
+	vector < fs::path > cppsrcFiles;
+	vector < fs::path > headersrcFiles;
+	vector < fs::path > objcsrcFiles;
 //	vector < string > propsFiles;
 	vector < fs::path > propsFiles;
 	vector < LibraryBinary > libs;
-	vector < string > dllsToCopy;
-	vector < string > includePaths;
-    vector < string > libsPaths;
+	vector < fs::path > dllsToCopy;
+	vector < fs::path > includePaths;
+    vector < fs::path > libsPaths;
 
 	// From addon_config.mk
 	vector < string > dependencies;
@@ -182,8 +182,10 @@ private:
 	void parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum);
 	void addReplaceString(string & variable, string value, bool addToVariable);
 	void addReplaceStringVector(vector<string> & variable, string value, string prefix, bool addToVariable);
+	void addReplaceStringVector(vector<fs::path> & variable, string value, string prefix, bool addToVariable);
 	void addReplaceStringVector(vector<LibraryBinary> & variable, string value, string prefix, bool addToVariable);
 	void exclude(vector<string> & variable, vector<string> exclusions);
+	void exclude(vector<fs::path> & variable, vector<string> exclusions);
 	void exclude(vector<LibraryBinary> & variable, vector<string> exclusions);
 	bool checkCorrectVariable(const string & variable, const string & state);
 	bool checkCorrectPlatform(const string & state);

@@ -69,7 +69,7 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 void getFrameworksRecursively(const fs::path & path, std::vector < string > & frameworks,  string platform = "" );
 void getXCFrameworksRecursively(const fs::path & path, std::vector<string> & xcframeworks, string platform = "");
 void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props, const string & platform);
-void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, string platform);
+void getDllsRecursively(const fs::path & path, std::vector < fs::path > & dlls, string platform);
 
 void splitFromFirst(string toSplit, string deliminator, string & first, string & second);
 

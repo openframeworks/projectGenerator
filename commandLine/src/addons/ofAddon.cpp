@@ -112,6 +112,52 @@ void ofAddon::addReplaceStringVector(std::vector<string> & variable, string valu
 	}
 }
 
+void ofAddon::addReplaceStringVector(std::vector<fs::path> & variable, string value, string prefix, bool addToVariable){
+	// alert("addReplaceStringVector val=" + value + " : prefix=" + prefix, (value == prefix) ? 33 : 32);
+
+  if (value == prefix) return;
+
+	vector<string> values;
+	if(value.find("\"")!=string::npos){
+		values = ofSplitString(value,"\"",true,true);
+	}else{
+		values = ofSplitString(value," ",true,true);
+	}
+
+	if(!addToVariable) variable.clear();
+	//value : -F$(OF_ROOT)/addons/ofxSyphon/libs/Syphon/lib/osx/
+
+	//	std::regex findVar("(?<=\\$\().+(?=\\))");
+	//	std::regex findVar("\\$\\(.+\\)");
+	//	(\$\()(.+)(\)) // now three capture groups here. we use only the second
+	std::regex findVar("(\\$\\()(.+)(\\))");
+	for(int i=0;i<(int)values.size();i++){
+		if(values[i]!=""){
+			std::smatch varMatch;
+			if(std::regex_search(values[i], varMatch, findVar)) {
+				if (varMatch.size() > 2) {
+					string varName = varMatch[2].str();
+					string varValue;
+					if(varName == "OF_ROOT"){
+						varValue = ofPathToString(pathToOF);
+					}else if(getenv(varName.c_str())){
+						varValue = getenv(varName.c_str());
+					}
+					ofStringReplace(values[i],"$("+varName+")",varValue);
+					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << values[i] << std::endl;
+				}
+			}
+
+			if(prefix=="" || values[i].find(ofPathToString(pathToOF))==0 || fs::path{values[i]}.is_absolute()) {
+				variable.emplace_back(fs::path{values[i]});
+			} else {
+				fs::path p = fs::path{ prefix } / values[i];
+				variable.emplace_back(p);
+			}
+		}
+	}
+}
+
 void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string value, string prefix, bool addToVariable) {
 	vector<string> values;
 	if (value.find("\"") != string::npos) {
@@ -287,7 +333,6 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 }
 
-// TODO: exclude based on vector of fs::path
 void ofAddon::exclude(vector<string> & variables, vector<string> exclusions){
 	for(auto & exclusion: exclusions){
 		ofStringReplace(exclusion,"\\","/");
@@ -302,6 +347,38 @@ void ofAddon::exclude(vector<string> & variables, vector<string> exclusions){
 //		for (auto & v : variables) {
 //			alert ("\t" + v, 32);
 //		}
+		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const string & variable){
+			auto forwardSlashedVariable = variable;
+			ofStringReplace(forwardSlashedVariable, "\\", "/");
+//			bool exclude = std::regex_search(forwardSlashedVariable, varMatch, findVar);
+//			if (exclude) {
+//				alert ("variable removed : " + variable, 31);
+//			}
+			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
+		}), variables.end());
+		
+//		alert ("vars size " + ofToString(variables.size()));
+//		for (auto & v : variables) {
+//			alert ("\t" + v, 32);
+//		}
+	}
+}
+
+void ofAddon::exclude(vector<fs::path> & variables, vector<string> exclusions){
+	for(auto & exclusion: exclusions){
+		ofStringReplace(exclusion,"\\","/");
+		ofStringReplace(exclusion,".","\\.");
+		ofStringReplace(exclusion,"%",".*");
+		exclusion =".*"+ exclusion;
+//		alert ("ofAddon::exclude " +exclusion, 31);
+
+		std::regex findVar(exclusion);
+		std::smatch varMatch;
+//		alert ("vars size " + ofToString(variables.size()));
+//		for (auto & v : variables) {
+//			alert ("\t" + v, 32);
+//		}
+		
 		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const string & variable){
 			auto forwardSlashedVariable = variable;
 			ofStringReplace(forwardSlashedVariable, "\\", "/");

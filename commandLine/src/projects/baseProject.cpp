@@ -398,13 +398,13 @@ void baseProject::addAddon(string addonName){
 			to = folder / from.filename();
 		}
 		if (from.extension() == ".dll") {
-			if (d.find("x64") != std::string::npos) {
+			if (d.string().find("x64") != std::string::npos) {
 				to = projectDir / "dll/x64" / from.filename();
 				ofLogVerbose() << "adding addon dlls to dll/x64: " << d;
-			} else if (d.find("ARM64EC") != std::string::npos) {
+			} else if (d.string().find("ARM64EC") != std::string::npos) {
 				to = projectDir / "dll/ARM64EC" / from.filename();
 				ofLogVerbose() << "adding addon dlls to dll/ARM64EC: " << d;
-			} else if (d.find("ARM64") != std::string::npos) {
+			} else if (d.string().find("ARM64") != std::string::npos) {
 				to = projectDir / "dll/ARM64" / from.filename();
 				ofLogVerbose() << "adding addon dlls to dll/ARM64: " << d;
 			} else {
