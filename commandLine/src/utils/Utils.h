@@ -14,6 +14,10 @@
 #include "baseProject.h"
 struct LibraryBinary;
 
+std::string execute_popen(const char* cmd);
+
+std::string getPlatformString();
+
 namespace fs = of::filesystem;
 using std::string;
 using std::vector;
