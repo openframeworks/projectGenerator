@@ -247,7 +247,7 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 //			alert ("value " + value, 36);
 //		}
 //		cout << includePaths.size() << endl;
-		addReplaceStringVector(includePaths, value, ofPathToString(addonRelPath), addToValue);
+		addReplaceStringVector(includePaths, value, addonRelPath, addToValue);
 //		cout << includePaths.size() << endl;
 //		cout << "----" << endl;
 	}
@@ -265,7 +265,7 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
 	else if(variable == ADDON_LIBS){
-		addReplaceStringVector(libs, value, ofPathToString(addonRelPath), addToValue);
+		addReplaceStringVector(libs, value, addonRelPath, addToValue);
 	}
 
 	else if(variable == ADDON_DLLS_TO_COPY){
@@ -285,23 +285,23 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
 	else if(variable == ADDON_SOURCES){
-		addReplaceStringVector(srcFiles, value, ofPathToString(addonRelPath) ,addToValue);
+		addReplaceStringVector(srcFiles, value, addonRelPath ,addToValue);
 	}
 
 	else if(variable == ADDON_C_SOURCES){
-		addReplaceStringVector(csrcFiles, value, ofPathToString(addonRelPath) ,addToValue);
+		addReplaceStringVector(csrcFiles, value, addonRelPath, addToValue);
 	}
 
 	else if(variable == ADDON_CPP_SOURCES){
-		addReplaceStringVector(cppsrcFiles, value, ofPathToString(addonRelPath) ,addToValue);
+		addReplaceStringVector(cppsrcFiles, value, addonRelPath ,addToValue);
 	}
 
 	else if(variable == ADDON_HEADER_SOURCES){
-		addReplaceStringVector(headersrcFiles, value, ofPathToString(addonRelPath) ,addToValue);
+		addReplaceStringVector(headersrcFiles, value, addonRelPath, addToValue);
 	}
 
 	else if(variable == ADDON_OBJC_SOURCES){
-		addReplaceStringVector(objcsrcFiles, value, ofPathToString(addonRelPath) ,addToValue);
+		addReplaceStringVector(objcsrcFiles, value, addonRelPath, addToValue);
 	}
 
 	else if(variable == ADDON_DATA){
@@ -406,7 +406,7 @@ void ofAddon::exclude(vector<LibraryBinary> & variables, vector<string> exclusio
 		std::regex findVar(exclusion);
 		std::smatch varMatch;
 		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const LibraryBinary & variable){
-			auto forwardSlashedVariable = variable.path;
+			auto forwardSlashedVariable = variable.path.string();
 			ofStringReplace(forwardSlashedVariable, "\\", "/");
 			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
 		}), variables.end());
@@ -679,10 +679,10 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 			folder = fs::path { "local_addons" } / fs::relative(sFS.parent_path(), parentFolder);
 		} else {
 			fs::path sFS { fixPath(s) };
-			s = ofPathToString( sFS );
+			s = sFS;
 			folder = fs::relative(sFS.parent_path(), getOFRoot());
 		}
-		filesToFolders[s] = ofPathToString(folder);
+		filesToFolders[s] = folder;
 	}
 
 	

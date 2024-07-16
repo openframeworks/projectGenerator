@@ -484,7 +484,7 @@ void xcodeProject::addInclude(string includeName){
 void xcodeProject::addLibrary(const LibraryBinary & lib){
 //	alert( "xcodeProject::addLibrary " + lib.path , 33);
 	for (auto & c : buildConfigs) {
-		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + lib.path);
+		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + lib.path.string());
 	}
 }
 

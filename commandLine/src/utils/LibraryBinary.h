@@ -3,12 +3,12 @@
 #include <string>
 #include <vector>
 
-//#include "ofConstants.h"
-//namespace fs = of::filesystem;
+#include "ofConstants.h"
+namespace fs = of::filesystem;
 
 struct LibraryBinary {
-//	fs::path path;
-	std::string path;
+	fs::path path;
+//	std::string path;
 	std::string arch;
 	std::string target;
 

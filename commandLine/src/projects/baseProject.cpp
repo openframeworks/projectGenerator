@@ -143,9 +143,8 @@ bool baseProject::create(const fs::path & path, string templateName){
 	auto projectPath = fs::canonical(fs::current_path() / path);
 	
 	projectDir = path;
-	ofLogNotice() << "projectPath: [" << projectPath << "]";
 	projectPath = normalizePath(projectPath);
-	ofLogNotice() << "projectPathN: [" << projectPath << "]";
+	ofLogNotice() << "projectPath: [" << projectPath << "]";
 	
 	projectName = projectPath.filename().string();
 	
@@ -522,7 +521,7 @@ void baseProject::addAddon(ofAddon & addon){
 	for (auto & a : addon.libs) {
 		ofLogVerbose() << "adding addon libs: " << a.path;
 		// FIXME: remove
-		alert ("addlibrary " + a.path, 33);
+		alert ("addlibrary path:" + a.path.string(), 33);
 		addLibrary(a);
 	}
 
