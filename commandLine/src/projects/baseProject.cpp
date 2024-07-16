@@ -138,11 +138,15 @@ bool baseProject::create(const fs::path & path, string templateName){
 	addons.clear();
 	extSrcPaths.clear();
 
-	templatePath = getPlatformTemplateDir();
-    
+	templatePath = normalizePath(getPlatformTemplateDir());
     ofLogNotice() << "templatePath: [" << templatePath << "]";
-	projectDir = path;
 	auto projectPath = fs::canonical(fs::current_path() / path);
+	
+	projectDir = path;
+	ofLogNotice() << "projectPath: [" << projectPath << "]";
+	projectPath = normalizePath(projectPath);
+	ofLogNotice() << "projectPathN: [" << projectPath << "]";
+	
 	projectName = projectPath.filename().string();
 	
 	
@@ -172,6 +176,8 @@ bool baseProject::create(const fs::path & path, string templateName){
 //		return getOFRoot() / templatesFolder / target;
 
 		fs::path templateDir = getOFRoot() / templatesFolder / templateName;
+		ofLogNotice() << "templateDir: [" << templateDir << "]";
+		templateDir = normalizePath(templateDir);
 //		alert("templateDir " + templateDir.string());
 
 		auto templateConfig = parseTemplate(templateDir);
@@ -264,11 +270,9 @@ bool baseProject::save(){
 		//add the of root path
 		if( str.rfind("# OF_ROOT =", 0) == 0 || str.rfind("OF_ROOT =", 0) == 0){
 			fs::path path = getOFRoot();
-
 			// FIXME: change to ofIsPathInPath
 			if( projectDir.string().rfind(getOFRoot().string(), 0) == 0) {
 				path = fs::relative(getOFRoot(), projectDir);
-
 			}
 			saveConfig << "OF_ROOT = " << path.generic_string() << std::endl;
 		}
@@ -307,7 +311,12 @@ void baseProject::addAddon(string addonName){
 	} else {
 		addon.pathToOF = getOFRoot();
 	}
-
+	ofLogVerbose() << "addon.addonPath to: [" << addon.addonPath << "]";
+	ofLogVerbose() << "addon.pathToOF: [" << addon.pathToOF << "]";
+	
+	addon.pathToOF = normalizePath(addon.pathToOF);
+	addon.addonPath = normalizePath(addon.addonPath);
+	
 	addon.pathToProject = projectDir;
 
 	bool addonOK = false;

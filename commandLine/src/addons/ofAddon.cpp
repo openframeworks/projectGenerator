@@ -582,6 +582,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 
 	addonPath = path;
 
+	
 	name = isLocalAddon ? ofPathToString(path.stem()) : ofPathToString(path.filename());
 
 	fs::path srcPath { path / "src" };
@@ -705,5 +706,5 @@ fs::path ofAddon::fixPath(const fs::path & path) {
 	 but the problem is fs::relative actually calculate symlink paths, modifying filename.
 	 which is not good for macos dylibs, like ofxHapPlayer, so I had to replace with the original filename back
 	 */
-	return ( pathToOF / fs::relative(path, getOFRoot()) ).parent_path() / path.filename();
+	return normalizePath(( pathToOF / fs::relative(path, getOFRoot()) ).parent_path() / path.filename());
 }
