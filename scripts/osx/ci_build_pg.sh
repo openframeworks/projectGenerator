@@ -189,21 +189,25 @@ import_certificate(){
 
 }
 
-echo "  build_cmdline.sh"
+echo "##[group]build_cmdline.sh"
 # Compile commandline tool
 ${CURRENT_DIR}/build_cmdline.sh
+echo "##[endgroup]"
 
-echo "  test_cmdline.sh"
+echo "##[group]test_cmdline.sh"
 # Test commandline tool
 ${CURRENT_DIR}/test_cmdline.sh
+echo "##[endgroup]"
 
 
-echo "  import_certificate"
+echo "##[group]import_certificate"
 import_certificate
 # Generate electron app
+echo "##[endgroup]"
 
-echo "  build_frontend"
+echo "##[group]build_frontend"
 ${CURRENT_DIR}/build_frontend.sh
+echo "##[endgroup]"
 
 echo "Current directory: (should be projectGenerator)"
 pwd
