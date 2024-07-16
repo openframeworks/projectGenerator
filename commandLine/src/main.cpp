@@ -561,10 +561,63 @@ int main(int argc, char ** argv) {
 	consoleSpace();
 
 	// try to get the OF_PATH as an environt variable
-    
+	char* pPath;
+	pPath = getenv("PG_OF_PATH");
+	if (pPath != NULL) {
+		ofPathEnv = string(pPath);
+	}
 
-    fs::path projectPath = fs::weakly_canonical(fs::current_path() / projectName);
+	if (ofPath == "" && ofPathEnv != "") {
+		busingEnvVar = true;
+		ofPath = ofPathEnv;
+	}
 
+	fs::path projectPath = fs::weakly_canonical(fs::current_path() / projectName);
+	if (!fs::exists(projectPath)) {
+		mode = PG_MODE_CREATE;
+		// FIXME: Maybe it is best not to create anything here, unless specified by parameter
+		if (!fs::exists(projectPath.parent_path())) {
+			consoleSpace();
+			ofLogError() << "Folder doesn't exist " << projectPath.parent_path() << endl;
+			consoleSpace();
+			return EXIT_USAGE;
+
+		}
+		fs::create_directory(projectPath);
+	} else {
+		mode = PG_MODE_UPDATE;
+	}
+
+
+	if (ofPath.empty()) {
+		consoleSpace();
+		ofLogError() << "no OF path set... please use -o or --ofPath or set a PG_OF_PATH environment variable";
+		consoleSpace();
+
+		//------------------------------------ fix me
+		//printHelp();
+		//return
+
+		return EXIT_USAGE;
+	} else {
+
+		if (!isGoodOFPath(ofPath)) {
+			return EXIT_USAGE;
+		}
+
+//		alert ("ofPath before " + ofPath.string());
+//		alert ("projectPath " + projectPath.string());
+		if (ofPath.is_relative()) {
+			ofPath = fs::canonical(fs::current_path() / ofPath);
+//			alert ("ofPath canonical " + ofPath.string());
+		}
+
+		if (ofIsPathInPath(projectPath, ofPath)) {
+			ofPath = fs::relative(ofPath, projectPath);
+		}
+		fs::current_path(projectPath);
+		setOFRoot(ofPath);
+	}
     // Verify that projectPath is not root and exists
     if (!projectPath.empty() && projectPath != projectPath.root_path() && fs::exists(projectPath)) {
         fs::create_directory(projectPath);
