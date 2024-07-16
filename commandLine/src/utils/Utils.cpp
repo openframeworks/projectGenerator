@@ -34,13 +34,19 @@
 #include <limits.h>		/* PATH_MAX */
 #endif
 
+#include <array>
+
 using std::unique_ptr;
 
 std::string execute_popen(const char* cmd) {
 	std::array<char, 128> buffer;
 	std::string result;
 
-	auto pipe = popen(cmd, "r"); // get rid of shared_ptr
+#ifdef _WIN32
+	auto pipe = _popen(cmd, "r");
+#else
+	auto pipe = popen(cmd, "r");
+#endif
 
 	if (!pipe) throw std::runtime_error("popen() failed!");
 
