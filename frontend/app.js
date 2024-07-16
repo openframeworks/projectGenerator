@@ -619,14 +619,14 @@ function setup() {
             }
         });
     
-        /* Stuff for the console setting (removed from UI)
+        /* Stuff for the console setting (removed from UI) */
         $("#consoleToggle").on("change", function () {
             enableConsole( $(this).is(':checked') );
-        });*/
+        });
         // enable console? (hiddens setting)
-        // if(defaultSettings['showConsole']){ $("body").addClass('enableConsole'); }
-        // $("#showConsole").on('click', function(){ $('body').addClass('showConsole'); });
-        // $("#hideConsole").on('click', function(){ $('body').removeClass('showConsole'); });
+        if(defaultSettings['showConsole']){ $("body").addClass('enableConsole'); }
+        $("#showConsole").on('click', function(){ $('body').addClass('showConsole'); });
+        $("#hideConsole").on('click', function(){ $('body').removeClass('showConsole'); });
 
         // initialise the overall-use modal
         $("#uiModal").modal({
@@ -686,7 +686,7 @@ function setup() {
                 e.stopPropagation();
                 e.preventDefault();
                 closeDragInputModal( e );
-            }
+            } 
         });
 
         // listen for drag events
@@ -967,6 +967,8 @@ function switchGenerateMode(mode) {
         $("#nameRandomiser").hide();
         $("#revealProjectFiles").show();
         $("#adons-refresh-icon").hide();
+        $("#consoleContainer").hide();
+        $("#extraContainer").hide();
 
         console.log('Switching GenerateMode to Update...');
 
@@ -989,6 +991,8 @@ function switchGenerateMode(mode) {
         $("#nameRandomiser").show();
         $("#revealProjectFiles").hide();
         $("#adons-refresh-icon").hide();
+        $("#consoleContainer").hide();
+        $("#extraContainer").hide();
 
         console.log('Switching GenerateMode to Create...');
     }
@@ -1008,6 +1012,10 @@ function enableAdvancedMode(isAdvanced) {
         $('#sourceExtraSection').show();
         $('#templateSection').show();
         $('#templateSectionMulti').show();
+         $('#commandInput').show();
+        $('#commandButton').show();
+        $('#ofPathButton').show();
+
     } else {
         $('#platformsDropdown').removeClass("disabled");
         $('#platformsDropdown').dropdown('set exactly', defaultSettings.defaultPlatform);
@@ -1019,16 +1027,20 @@ function enableAdvancedMode(isAdvanced) {
         $('#templateSection').show();
         $('#templateSectionMulti').show();
 
-
+        $('#commandInput').disable();
+        $('#commandButton').disable();
+        $('#ofPathButton').disable();
         $("body").removeClass('advanced');
         $('a.updateMultiMenuOption').hide();
     }
+    enableConsole(isAdvanced);
     defaultSettings.advancedMode = isAdvanced;
     saveDefaultSettings();
     //$("#advancedToggle").prop('checked', defaultSettings['advancedMode'] );
 }
 
-/* Stuff for the console setting (removed from UI)
+/* Stuff for the console setting (removed from UI) */
+
 function enableConsole( showConsole ){
 	if( showConsole ) {
 		// this has to be in body for CSS reasons
@@ -1040,7 +1052,7 @@ function enableConsole( showConsole ){
 	defaultSettings['showConsole'] = showConsole;
 	saveDefaultSettings();
 	$("#consoleToggle").prop('checked', defaultSettings['showConsole'] );
-}*/
+}
 
 //----------------------------------------
 function getPlatformList() {
@@ -1205,3 +1217,37 @@ function launchFolder(){
 
     ipcRenderer.send('launchFolder', project );
 }
+
+try {
+    document.getElementById('commandButton').addEventListener('click', () => {
+        const customArg = document.getElementById('commandInput').value;
+        ipcRenderer.send('command', customArg);
+    });
+} catch (error) {
+    console.error('An error occurred while setting up the event listener:', error);
+}
+
+ipcRenderer.on('commandResult', (event, result) => {
+    if (result.success) {
+        console.log('Command executed successfully:', result.message);
+    } else {
+        console.error('Command execution failed:', result.message);
+    }
+});
+
+try {
+    document.getElementById('ofPathButton').addEventListener('click', () => {
+        const customArg = document.getElementById('ofPathButton').value;
+        ipcRenderer.send('getOFPath', customArg);
+    });
+} catch (error) {
+    console.error('An error occurred while setting up the event listener:', error);
+}
+
+ipcRenderer.on('ofPathResult', (event, result) => {
+    if (result.success) {
+        console.log('ofPath:', result.message);
+    } else {
+        console.error('ofPath: failed:', result.message);
+    }
+});

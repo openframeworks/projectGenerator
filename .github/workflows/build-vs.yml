@@ -52,6 +52,12 @@ jobs:
           elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
             echo "release=bleeding" >> $GITHUB_ENV
             echo "prerelease=true" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "release=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+            echo "prerelease=false" >> $GITHUB_ENV
+          else
+            echo "release=nightly" >> $GITHUB_ENV
+            echo "prerelease=false" >> $GITHUB_ENV
           fi 
       - name: Install dependencies
         shell: bash
@@ -70,6 +76,11 @@ jobs:
         run:
           ../openFrameworks/apps/projectGenerator/scripts/vs/ci_cmd_package.sh
 
+      - name: Test cmdline 
+        shell: msys2 {0}
+        run: 
+          ../openFrameworks/apps/projectGenerator/scripts/vs/test_cmdline.sh
+
       - name: Build and Package projectGenerator VS GUI
         shell: bash
         run: |
@@ -87,7 +98,7 @@ jobs:
 
       - name: Update CMD Gen Release
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
-        uses: IsaacShelton/update-existing-release@v1.3.3
+        uses: IsaacShelton/update-existing-release@v1.3.4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ env.release }}

@@ -61,11 +61,12 @@ pwd
 echo "Directory ../ contents:"
 ls
 
+sudo ./scripts/linux/ubuntu/install_dependencies.sh -y;
 if [ -d "libs/glfw" ]; then
 	echo 'libs installed, using them'
 else
 	echo 'downloading libs'
-	scripts/osx/download_latest_libs.sh
+	scripts/linux/download_libs.sh
 fi
 
 
@@ -86,11 +87,7 @@ ls
 echo "------------------"
 mkdir -p openFrameworks/apps/projectGenerator
 
-if command -v rsync &> /dev/null; then
-	rsync -avzp --exclude='.git/' --exclude='.ccache/' projectGenerator/ openFrameworks/apps/projectGenerator/
-else
-	cp -X projectGenerator/ openFrameworks/apps/projectGenerator/ 2> /dev/null
-fi
+rsync -av --exclude='.git/' projectGenerator/ openFrameworks/apps/projectGenerator/
 
 echo "------------------"
 

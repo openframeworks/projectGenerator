@@ -6,7 +6,6 @@
  */
 
 #include "CBLinuxProject.h"
-#include "ofFileUtils.h"
 #include "ofLog.h"
 #include "Utils.h"
 

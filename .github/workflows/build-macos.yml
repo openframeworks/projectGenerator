@@ -47,28 +47,37 @@ jobs:
           elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
             echo "release=bleeding" >> $GITHUB_ENV
             echo "prerelease=true" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "release=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+            echo "prerelease=false" >> $GITHUB_ENV
+          else
+            echo "release=nightly" >> $GITHUB_ENV
+            echo "prerelease=false" >> $GITHUB_ENV
           fi
-      - name: Build PG macOS GUI and command line
+      - name: PWD and LS
         run: |
           echo "Current directory: (should be projectGenerator)"
           pwd
           echo "Directory contents:"
           ls
-          echo "Setup CI setup environment / checkout oF "
+      - name: Setup CI setup environment / checkout oF
+        run: |
           ./scripts/osx/ci_install_core.sh
-      
-          echo "Current directory after moving up: (should be projectGenerator/projectGenerator)"
-          pwd
+      - name: Build PG macOS GUI and command line
+        run: |
+          # echo "Current directory after moving up: (should be projectGenerator/projectGenerator)"
+          # pwd
           cd ../
 
-          echo "Current directory after moving up: (should be projectGenerator/)"
-          echo "------------------"
-          pwd
-          ls
-          echo "------------------"
+          # echo "Current directory after moving up: (should be projectGenerator/)"
+          # echo "------------------"
+          # pwd
+          # ls
+          # echo "------------------"
           if [ -f "openFrameworks/apps/projectGenerator/scripts/osx/ci_build_pg.sh" ]; then
             echo "ci_build_pg.sh exists, running script..."
             openFrameworks/apps/projectGenerator/scripts/osx/ci_build_pg.sh
+
           else
             echo "ci_build_pg.sh does not exist, checking Git status..."
             if cd openFrameworks/apps/projectGenerator; then
@@ -115,6 +124,8 @@ jobs:
           else
             echo "projectGenerator-osx.zip NOT found at level 0"
           fi
+      - name: Test cmdline 
+        run: ../openFrameworks/apps/projectGenerator/scripts/osx/test_cmdline.sh
       - name: Update Release x86_64
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
         uses: IsaacShelton/update-existing-release@v1.3.4

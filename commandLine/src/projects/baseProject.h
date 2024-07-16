@@ -1,12 +1,15 @@
 #pragma once
 
-#define PG_VERSION "42"
+#define PG_VERSION "63"
 
 #include "ofAddon.h"
-#include "ofFileUtils.h"
 #include "pugixml.hpp"
 #include <map>
-
+#include <iostream>
+#include <fstream>
+#include <filesystem>
+#include <string>
+#include <vector>
 
 namespace fs = of::filesystem;
 
@@ -26,7 +29,8 @@ public:
 	};
 
 	struct Template {
-		ofDirectory dir;
+//		ofDirectory dir;
+		fs::path dir;
 		std::string name;
 		std::vector<string> platforms;
 		std::string description;
@@ -121,55 +125,48 @@ protected:
 		fs::path to;
 		std::vector <std::pair <string, string> > findReplaces;
 		
-		bool run() {
-			// needed for mingw only. maybe a ifdef here.
-			if (fs::exists(from)) {
-#if defined(__MINGW32__) || defined(__MINGW64__)
-				if (fs::exists(to)) {
-					fs::remove(to);
-				}
-#endif
+        bool run() {
+            // needed for mingw only. maybe a ifdef here.
+            if (fs::exists(from)) {
+                if (findReplaces.size()) {
+                    // Load file, replace contents, write to destination.
+                    
+                    std::ifstream fileFrom(from);
+                    std::string contents((std::istreambuf_iterator<char>(fileFrom)), std::istreambuf_iterator<char>());
+                    fileFrom.close();
 
-				if (findReplaces.size()) {
-					// Load file, replace contents, write to destination.
-					
-					std::ifstream fileFrom(from);
-					std::string contents((std::istreambuf_iterator<char>(fileFrom)), std::istreambuf_iterator<char>());
-					fileFrom.close();
+                    for (auto & f : findReplaces) {
+                        replaceAll(contents, f.first, f.second);
+                    }
+                    
+                    std::ofstream fileTo(to);
+                    try{
+                        fileTo << contents;
+                    }catch(std::exception & e){
+                        std::cout << "Error saving to " << to << " : " << e.what() << std::endl;
+                        return false;
+                    }catch(...){
+                        std::cout << "Error saving to " << to << std::endl;
+                        return false;
+                    }
+                    
+                } else {
+                    // straight copy
+                    try {
+                        fs::copy(from, to, fs::copy_options::overwrite_existing);
+                    }
+                    catch(fs::filesystem_error & e) {
+                        std::cout << "error copying template file " << from << " : " << to << std::endl;
+                        std::cout << e.what() << std::endl;
+                        return false;
+                    }
+                }
+            } else {
+                return false;
+            }
 
-					for (auto & f : findReplaces) {
-						replaceAll(contents, f.first, f.second);
-					}
-					
-					std::ofstream fileTo(to);
-					try{
-						fileTo << contents;
-					}catch(std::exception & e){
-						std::cout << "Error saving to " << to << " : " << e.what() << std::endl;
-						return false;
-					}catch(...){
-						std::cout << "Error saving to " << to << std::endl;
-						return false;
-					}
-					
-				} else {
-					// straight copy
-					try {
-						fs::copy(from, to, fs::copy_options::overwrite_existing);
-					}
-					catch(fs::filesystem_error & e) {
-						std::cout << "error copying template file " << from << " : " << to << std::endl;
-						std::cout << e.what() << std::endl;
-						return false;
-					}
-				}
-			} else {
-				return false;
-			}
-
-			return true;
-//			std::cout << "----" << std::endl;
-		}
+            return true;
+        }
 	};
 
 	vector <copyTemplateFile> copyTemplateFiles;

@@ -10,15 +10,15 @@ bool visualStudioProject::createProjectFile(){
 	ensureDllDirectoriesExist();
 	solution = projectDir / (projectName + ".sln");
 
-	std::pair <string, string> replacements;
-	if (!fs::equivalent(getOFRoot(), fs::path{ "../../.." })) {
-		string root { getOFRoot().string() };
-		string relRootWindows { convertStringToWindowsSeparator(root) + "\\" };
-		
-		replacements = { "..\\..\\..\\", relRootWindows };
-	} else {
-//		cout << "equivalent to default ../../.." << endl;
-	}
+//	std::pair <string, string> replacements;
+//	if (!fs::equivalent(getOFRoot(), fs::path{ "../../.." })) {
+//		string root { getOFRoot().string() };
+//		string relRootWindows { convertStringToWindowsSeparator(root) + "\\" };
+//		
+//		replacements = { "..\\..\\..\\", relRootWindows };
+//	} else {
+////		cout << "equivalent to default ../../.." << endl;
+//	}
 	
 	// solution
 	copyTemplateFiles.push_back({
@@ -26,7 +26,7 @@ bool visualStudioProject::createProjectFile(){
 		projectDir / (projectName + ".sln"),
 		{
 			{ "emptyExample", projectName },
-			replacements
+			//replacements
 		}
 	});
 	
@@ -36,7 +36,7 @@ bool visualStudioProject::createProjectFile(){
 		projectDir / (projectName + ".vcxproj"),
 		{
 			{ "emptyExample", projectName },
-			replacements
+			//replacements
 		}
 
 	});
@@ -529,6 +529,7 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 			f.second = "other";
 		}
 	}
+    
 
 	for (auto & s : addon.srcFiles) {
 		ofLogVerbose() << "adding addon srcFiles: " << s;

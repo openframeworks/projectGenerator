@@ -87,11 +87,11 @@ echo "====== clean"
 npm run
 echo "====== run"
 
-if [ "${BUILD_TEST}" == 1 ]; then
+# if [ "${BUILD_TEST}" == 1 ]; then
    npm run start:prod
    echo "====== start:prod"
-fi
+# fi
 
-npm run dist:${FRONTEND_TARGET}
-echo "====== dist:${FRONTEND_TARGET}"
+# npm run dist:${FRONTEND_TARGET}
+# echo "====== dist:${FRONTEND_TARGET}"
 
