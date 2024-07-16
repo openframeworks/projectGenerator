@@ -55,7 +55,12 @@ std::string execute_popen(const char* cmd) {
 			result += buffer.data();
 	}
 
+#ifdef _WIN32
+	auto rc = _pclose(pipe);
+#else
 	auto rc = pclose(pipe);
+#endif
+
 
 	if (rc == EXIT_SUCCESS) { // == 0
 
