@@ -94,16 +94,7 @@ private:
 	virtual bool loadProjectFile()=0;
 	virtual bool saveProjectFile()=0;
 	
-	std::filesystem::path normalizePath(const std::filesystem::path& path) {
-		try {
-			auto value = std::filesystem::weakly_canonical(path);
-			return value;
-		} catch (const std::exception& ex) {
-			std::cout << "Canonical path for [" << path << "] threw exception:\n"
-					  << ex.what() << '\n';
-			return std::filesystem::path("");
-		}
-	}
+	
 
 	// virtual void renameProject();
 	// this should get called at the end.
@@ -115,6 +106,17 @@ protected:
 
 	std::vector<ofAddon> addons;
 	std::vector<fs::path> extSrcPaths;
+	
+	std::filesystem::path normalizePath(const std::filesystem::path& path) {
+		try {
+			auto value = std::filesystem::weakly_canonical(path);
+			return value;
+		} catch (const std::exception& ex) {
+			std::cout << "Canonical path for [" << path << "] threw exception:\n"
+					  << ex.what() << '\n';
+			return std::filesystem::path("");
+		}
+	}
 
 	//cached addons - if an addon is requested more than once, avoid loading from disk as it's quite slow
 	std::unordered_map<std::string,std::unordered_map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]

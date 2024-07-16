@@ -269,7 +269,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 
 void recursiveUpdate(const fs::path & path, const string & target) {
 	// FIXME: remove
-	alert("recursiveUpdate:" + path.string() + "]");
+	alert("recursiveUpdate:[" + path.string() + "]");
 	if (!fs::is_directory(path)) return;
 	vector<fs::path> folders;
 
@@ -338,6 +338,7 @@ int updateOFPath() {
 	}
     
     fs::path startPath = normalizePath(ofFilePath::getCurrentExeDir());
+	ofLogNotice() << "progjectGenerator cmd path: [" << startPath << "] ";
     //ofFilePath::getAbsolutePathFS(fs::current_path(), false);
 //    ofLogNotice() << "startPath: " << startPath.string();
     fs::path foundOFPath = findOFPathUpwards(startPath);
@@ -542,9 +543,9 @@ int main(int argc, char ** argv) {
 	if (options[OFPATH].count() > 0) {
 		if (options[OFPATH].arg != NULL) {
 			ofPath = options[OFPATH].arg;
-            ofLogNotice() << "ofPath arg [" << ofPath << "]";
+            ofLogNotice() << "ofPath arg: [" << ofPath << "]";
             ofPath = normalizePath(ofPath);
-            ofLogNotice() << "ofPath normalised arg [" << ofPath << "]";
+            ofLogNotice() << "ofPath normalised arg: [" << ofPath << "]";
 		}
 	}
 

@@ -488,6 +488,7 @@ void visualStudioProject::ensureDllDirectoriesExist() {
 	std::vector<fs::path> dirs { "dll\\x64", "dll\\ARM64", "dll\\ARM64EC" };
 	for (const auto & dir : dirs) {
 		fs::path dirPath = projectDir / dir;
+		dirPath = normalizePath(dirPath);
 		if (!fs::exists(dirPath)) {
 			ofLogVerbose() << "adding dll folder: [" << dirPath << "]";
 			fs::create_directories(dirPath);
@@ -511,14 +512,14 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 	}
 
 	for (auto & props : addon.propsFiles) {
-		ofLogVerbose() << "adding addon props: " << props;
+		ofLogVerbose() << "adding addon props: [" << props << "]";
 		addProps(props);
 	}
 
 //	cout << "addon libs size = " << addon.libs.size() << endl;
 	for(auto & lib: addon.libs){
 //		alert ("visualStudioProject::addon.libs " + lib.path);
-		ofLogVerbose() << "adding addon libs: " << lib.path;
+		ofLogVerbose() << "adding addon libs: [" << lib.path << "]";;
 		addLibrary(lib);
 	}
 
@@ -532,27 +533,28 @@ void visualStudioProject::addAddon(ofAddon & addon) {
     
 
 	for (auto & s : addon.srcFiles) {
-		ofLogVerbose() << "adding addon srcFiles: " << s;
+		s = normalizePath( s);
+		ofLogVerbose() << "adding addon srcFiles: [" << s << "]";;
 
 //		cout << "addSrc s=" << s << " : " << addon.filesToFolders[s] << endl;
 		addSrc(s,addon.filesToFolders[s]);
 	}
 
 	for (auto & a : addon.csrcFiles) {
-		ofLogVerbose() << "adding addon c srcFiles: " << a;
+		ofLogVerbose() << "adding addon c srcFiles: [" << a << "]";;
 		addSrc(a, addon.filesToFolders[a], C);
 	}
 //		if(addon.filesToFolders[addon.csrcFiles[i]]=="") addon.filesToFolders[addon.csrcFiles[i]]="other";
 
 	for (auto & a : addon.cppsrcFiles) {
-		ofLogVerbose() << "adding addon cpp srcFiles: " << a;
+		ofLogVerbose() << "adding addon cpp srcFiles: [" << a << "]";
 		addSrc(a, addon.filesToFolders[a],CPP);
 	}
 //		if(addon.filesToFolders[addon.cppsrcFiles[i]]=="") addon.filesToFolders[addon.cppsrcFiles[i]]="other";
 //		addSrc(addon.cppsrcFiles[i],addon.filesToFolders[addon.cppsrcFiles[i]],C);
 
 	for (auto & a : addon.objcsrcFiles) {
-		ofLogVerbose() << "adding addon objc srcFiles: " << a;
+		ofLogVerbose() << "adding addon objc srcFiles: [" << a << "]";
 		addSrc(a, addon.filesToFolders[a],OBJC);
 	}
 //		if(addon.filesToFolders[addon.objcsrcFiles[i]]=="") addon.filesToFolders[addon.objcsrcFiles[i]]="other";
@@ -560,7 +562,7 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 
 
 	for (auto & a : addon.headersrcFiles) {
-		ofLogVerbose() << "adding addon header srcFiles: " << a;
+		ofLogVerbose() << "adding addon header srcFiles: [" << a << "]";
 		addSrc(a, addon.filesToFolders[a],HEADER);
 	}
 //		if(addon.filesToFolders[addon.headersrcFiles[i]]=="") addon.filesToFolders[addon.headersrcFiles[i]]="other";
@@ -568,19 +570,19 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 
 
 	for (auto & a : addon.cflags) {
-		ofLogVerbose() << "adding addon cflags: " << a;
+		ofLogVerbose() << "adding addon cflags: [" << a << "]";;
 		addCFLAG(a, RELEASE_LIB);
 		addCFLAG(a, DEBUG_LIB);
 	}
 
 	for (auto & a : addon.cppflags) {
-		ofLogVerbose() << "adding addon cppflags: " << a;
+		ofLogVerbose() << "adding addon cppflags: [" << a << "]";;
 		addCPPFLAG(a, RELEASE_LIB);
 		addCPPFLAG(a, DEBUG_LIB);
 	}
 
 	for (auto & a : addon.defines) {
-		ofLogVerbose() << "adding addon defines: " << a;
+		ofLogVerbose() << "adding addon defines: [" << a << "]";;
 		addDefine(a, RELEASE_LIB);
 		addDefine(a, DEBUG_LIB);
 	}
