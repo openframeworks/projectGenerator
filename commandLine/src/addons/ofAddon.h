@@ -188,6 +188,8 @@ private:
 	void addReplaceStringVectorPath(std::vector<std::filesystem::path> &variable, const std::filesystem::path &value, const std::filesystem::path &prefix, bool addToVariable);
 	void addReplaceStringVectorPath(std::vector<std::filesystem::path> &variable, const std::string &value, const std::filesystem::path &prefix, bool addToVariable);
 	void addReplaceStringVector(std::vector<LibraryBinary> &variable, const std::string &value, const std::string &prefix, bool addToVariable);
+	void addReplaceStringVectorPath(std::vector<LibraryBinary> &variable, const std::string &value,  const fs::path &prefix, bool addToVariable);
+
 	void exclude(vector<string> & variable, vector<string> exclusions);
 	void exclude(vector<fs::path> & variable, vector<string> exclusions);
 	void exclude(vector<LibraryBinary> & variable, vector<string> exclusions);

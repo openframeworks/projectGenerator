@@ -60,6 +60,7 @@ bool ofAddon::checkCorrectVariable(const string & variable, const string & state
 		return checkCorrectPlatform(state);
 	}
 }
+
 void ofAddon::addReplaceString(std::string &variable, const std::string &value, bool addToVariable) {
 	if (addToVariable) variable += value;
 	else variable = value;
@@ -150,7 +151,7 @@ void ofAddon::addReplaceStringVectorPath(std::vector<fs::path> &variable, const 
 }
 
 void ofAddon::addReplaceStringVectorPath(std::vector<fs::path> &variable, const std::string &value, const fs::path &prefix, bool addToVariable) {
-	addReplaceStringVectorPath(variable, fs::path(value), prefix, addToVariable);
+	addReplaceStringVectorPath(variable, fs::path(value), prefix.string(), addToVariable);
 }
 
 void ofAddon::addReplaceStringVectorPath(std::vector<fs::path> &variable, const fs::path &value, const fs::path &prefix, bool addToVariable) {
@@ -188,6 +189,43 @@ void ofAddon::addReplaceStringVectorPath(std::vector<fs::path> &variable, const 
 			} else {
 				fs::path p = fs::path{prefix} / val;
 				variable.emplace_back(p);
+			}
+		}
+	}
+}
+void ofAddon::addReplaceStringVectorPath(std::vector<LibraryBinary> &variable, const std::string &value,  const fs::path &prefix, bool addToVariable) {
+	std::vector<std::string> values;
+	if (value.find("\"") != std::string::npos) {
+		values = ofSplitString(value, "\"", true, true);
+	} else {
+		values = ofSplitString(value, " ", true, true);
+	}
+
+	if (!addToVariable) variable.clear();
+	std::regex findVar("(\\$\\()(.+)(\\))");
+
+	for (auto &v : values) {
+		if (v != "") {
+			std::smatch varMatch;
+			if (std::regex_search(v, varMatch, findVar)) {
+				if (varMatch.size() > 2) {
+					std::string varName = varMatch[2].str();
+					std::string varValue;
+					if (varName == "OF_ROOT") {
+						varValue = ofPathToString(pathToOF);
+					} else if (!ofGetEnv(varName.c_str()).empty()) {
+						varValue = ofGetEnv(varName.c_str());
+					}
+					ofStringReplace(v, "$(" + varName + ")", varValue);
+					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << v;
+				}
+			}
+
+			if (prefix.empty() || v.find(ofPathToString(pathToOF)) == 0 || fs::path{v}.is_absolute()) {
+				variable.push_back({v, "", ""});
+			} else {
+				fs::path p = fs::path{prefix / v };
+				variable.push_back({ofPathToString(p), "", ""});
 			}
 		}
 	}
@@ -298,7 +336,7 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
 	else if(variable == ADDON_LIBS){
-		addReplaceStringVector(libs, value, addonRelPath, addToValue);
+		addReplaceStringVectorPath(libs, value, addonRelPath, addToValue);
 	}
 
 	else if(variable == ADDON_DLLS_TO_COPY){
