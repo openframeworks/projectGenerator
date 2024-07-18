@@ -338,9 +338,9 @@ int updateOFPath(std::filesystem::path path) {
 		setofPath(ofPathEnv);
 		ofLogNotice() << "PG_OF_PATH set: ofPath [" << ofPath << "]";
 	}
-    
-    fs::path startPath = normalizePath(ofFilePath::getCurrentExeDir());
-	ofLogNotice() << "progjectGenerator cmd path: [" << startPath << "] ";
+	of::filesystem::path exePath = ofFilePath::getCurrentExeDir();
+    fs::path startPath = normalizePath(exePath);
+	ofLogNotice() << "projectGenerator cmd path: {" << startPath << "] }";
     //ofFilePath::getAbsolutePathFS(fs::current_path(), false);
 //    ofLogNotice() << "startPath: " << startPath.string();
     fs::path foundOFPath = findOFPathUpwards(startPath);
