@@ -47,15 +47,31 @@ fi
 cd ../../../../../pg2
 ls -a
 pwd
-./projectGenerator --recursive -pvs -o"./../openFrameworks" ./../openFrameworks/examples/
+./projectGenerator --recursive -posx -o"./../openFrameworks" ./../openFrameworks/examples/
+errorcode=$?
+if [[ $errorcode -ne 0 ]]; then
+        exit $errorcode
+fi
+
+echo "Test generate new just name"
+./projectGenerator -o"../openFrameworks" -p"osx" "testingGenerate"
+errorcode=$?
+if [[ $errorcode -ne 0 ]]; then
+		exit $errorcode
+fi
+echo "Test generate new / update full path"
+./projectGenerator -o"../openFrameworks" -p"osx" "../../../../apps/myApps/testingGenerate"
+errorcode=$?
+if [[ $errorcode -ne 0 ]]; then
+        exit $errorcode
+fi
+
+echo "Test generate full path"
+./projectGenerator -o"../openFrameworks" -p"osx" "../../../../apps/myApps/testingGenerate2"
 errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
         exit $errorcode
 fi
 
 
-errorcode=$?
-if [[ $errorcode -ne 0 ]]; then
-		exit $errorcode
-fi
 echo "Successful projectGenerator tests for [osx]";
