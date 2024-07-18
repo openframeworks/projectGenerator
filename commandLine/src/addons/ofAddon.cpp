@@ -455,8 +455,8 @@ void ofAddon::excludePath(vector<std::filesystem::path> & variables, vector<stri
 //			alert ("\t" + v, 32);
 //		}
 		
-		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const string & variable){
-			auto forwardSlashedVariable = variable;
+		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const std::filesystem::path & variable){
+			std::string forwardSlashedVariable = variable.string();
 			ofStringReplace(forwardSlashedVariable, "\\", "/");
 //			bool exclude = std::regex_search(forwardSlashedVariable, varMatch, findVar);
 //			if (exclude) {
@@ -487,8 +487,8 @@ void ofAddon::excludePath(vector<std::filesystem::path> & variables, vector<std:
 //			alert ("\t" + v, 32);
 //		}
 		
-		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const string & variable){
-			auto forwardSlashedVariable = variable;
+		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const std::filesystem::path & variable){
+			std::string forwardSlashedVariable = variable.string();
 			ofStringReplace(forwardSlashedVariable, "\\", "/");
 //			bool exclude = std::regex_search(forwardSlashedVariable, varMatch, findVar);
 //			if (exclude) {
