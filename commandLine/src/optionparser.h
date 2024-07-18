@@ -1366,6 +1366,8 @@ struct Parser::Action {
 	virtual bool perform(Option &) {
 		return true;
 	}
+	
+	virtual ~Action(){}
 
 	/**
    * @brief Called by Parser::workhorse() after finishing the parse.
@@ -1666,6 +1668,8 @@ struct PrintUsageImplementation {
    * @brief Interface for Functors that write (part of) a string somewhere.
    */
 	struct IStringWriter {
+		
+		virtual ~IStringWriter() {}
 		/**
 	 * @brief Writes the given number of chars beginning at the given pointer somewhere.
 	 */
@@ -1685,6 +1689,7 @@ struct PrintUsageImplementation {
 		virtual void operator()(const char * str, int size) {
 			(*write)(str, size);
 		}
+		virtual ~FunctionWriter(){}
 
 		FunctionWriter(Function * w)
 			: write(w) {
@@ -1703,6 +1708,7 @@ struct PrintUsageImplementation {
 		virtual void operator()(const char * str, int size) {
 			ostream.write(str, size);
 		}
+		virtual ~OStreamWriter(){}
 
 		OStreamWriter(OStream & o)
 			: ostream(o) {
