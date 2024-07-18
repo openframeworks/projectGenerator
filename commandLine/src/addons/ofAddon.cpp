@@ -112,50 +112,54 @@ void ofAddon::addReplaceStringVector(std::vector<string> & variable, string valu
 	}
 }
 
+void ofAddon::addReplaceStringVector(std::vector<fs::path> & variable, fs::path value, string prefix, bool addToVariable){
+	if (value == prefix) return;
+
+	  vector<string> values;
+	  if(value.string().find("\"")!=string::npos){
+		  values = ofSplitString(value,"\"",true,true);
+	  }else{
+		  values = ofSplitString(value," ",true,true);
+	  }
+
+	  if(!addToVariable) variable.clear();
+	  //value : -F$(OF_ROOT)/addons/ofxSyphon/libs/Syphon/lib/osx/
+
+	  //	std::regex findVar("(?<=\\$\().+(?=\\))");
+	  //	std::regex findVar("\\$\\(.+\\)");
+	  //	(\$\()(.+)(\)) // now three capture groups here. we use only the second
+	  std::regex findVar("(\\$\\()(.+)(\\))");
+	  for(int i=0;i<(int)values.size();i++){
+		  if(values[i]!=""){
+			  std::smatch varMatch;
+			  if(std::regex_search(values[i], varMatch, findVar)) {
+				  if (varMatch.size() > 2) {
+					  string varName = varMatch[2].str();
+					  string varValue;
+					  if(varName == "OF_ROOT"){
+						  varValue = ofPathToString(pathToOF);
+					  }else if(ofGetEnv(varName.c_str()).empty()){
+						  varValue = ofGetEnv(varName.c_str());
+					  }
+					  ofStringReplace(values[i],"$("+varName+")",varValue);
+					  ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << values[i] << std::endl;
+				  }
+			  }
+
+			  if(prefix=="" || values[i].find(ofPathToString(pathToOF))==0 || fs::path{values[i]}.is_absolute()) {
+				  variable.emplace_back(fs::path{values[i]});
+			  } else {
+				  fs::path p = fs::path{ prefix } / values[i];
+				  variable.emplace_back(p);
+			  }
+		  }
+	  }
+	}
+
 void ofAddon::addReplaceStringVector(std::vector<fs::path> & variable, string value, string prefix, bool addToVariable){
 	// alert("addReplaceStringVector val=" + value + " : prefix=" + prefix, (value == prefix) ? 33 : 32);
-
-  if (value == prefix) return;
-
-	vector<string> values;
-	if(value.find("\"")!=string::npos){
-		values = ofSplitString(value,"\"",true,true);
-	}else{
-		values = ofSplitString(value," ",true,true);
-	}
-
-	if(!addToVariable) variable.clear();
-	//value : -F$(OF_ROOT)/addons/ofxSyphon/libs/Syphon/lib/osx/
-
-	//	std::regex findVar("(?<=\\$\().+(?=\\))");
-	//	std::regex findVar("\\$\\(.+\\)");
-	//	(\$\()(.+)(\)) // now three capture groups here. we use only the second
-	std::regex findVar("(\\$\\()(.+)(\\))");
-	for(int i=0;i<(int)values.size();i++){
-		if(values[i]!=""){
-			std::smatch varMatch;
-			if(std::regex_search(values[i], varMatch, findVar)) {
-				if (varMatch.size() > 2) {
-					string varName = varMatch[2].str();
-					string varValue;
-					if(varName == "OF_ROOT"){
-						varValue = ofPathToString(pathToOF);
-					}else if(ofGetEnv(varName.c_str()).empty()){
-						varValue = ofGetEnv(varName.c_str());
-					}
-					ofStringReplace(values[i],"$("+varName+")",varValue);
-					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << values[i] << std::endl;
-				}
-			}
-
-			if(prefix=="" || values[i].find(ofPathToString(pathToOF))==0 || fs::path{values[i]}.is_absolute()) {
-				variable.emplace_back(fs::path{values[i]});
-			} else {
-				fs::path p = fs::path{ prefix } / values[i];
-				variable.emplace_back(p);
-			}
-		}
-	}
+	addReplaceStringVector(variable, fs::path(value), prefix, addToVariable);
+  
 }
 
 void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string value, string prefix, bool addToVariable) {

@@ -10,6 +10,7 @@
 #include "ofConstants.h"
 #include "LibraryBinary.h"
 #include <unordered_map>
+#include <filesystem>
 
 namespace fs = of::filesystem;
 using std::string;
@@ -183,6 +184,7 @@ private:
 	void addReplaceString(string & variable, string value, bool addToVariable);
 	void addReplaceStringVector(vector<string> & variable, string value, string prefix, bool addToVariable);
 	void addReplaceStringVector(vector<fs::path> & variable, string value, string prefix, bool addToVariable);
+	void addReplaceStringVector(vector<fs::path> & variable, fs::path value, string prefix, bool addToVariable);
 	void addReplaceStringVector(vector<LibraryBinary> & variable, string value, string prefix, bool addToVariable);
 	void exclude(vector<string> & variable, vector<string> exclusions);
 	void exclude(vector<fs::path> & variable, vector<string> exclusions);

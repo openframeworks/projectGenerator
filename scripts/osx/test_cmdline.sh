@@ -60,14 +60,14 @@ if [[ $errorcode -ne 0 ]]; then
 		exit $errorcode
 fi
 echo "Test generate new / update full path"
-./projectGenerator -o"../openFrameworks" -p"osx" "../../../../apps/myApps/testingGenerate"
+./projectGenerator -o"../openFrameworks" -p"osx" "../openFrameworks/apps/myApps/testingGenerate"
 errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
         exit $errorcode
 fi
 
 echo "Test generate full path"
-./projectGenerator -o"../openFrameworks" -p"osx" "../../../../apps/myApps/testingGenerate2"
+./projectGenerator -o"../openFrameworks" -p"osx" "openFrameworks/apps/myApps/testingGenerate2"
 errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
         exit $errorcode

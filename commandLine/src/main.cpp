@@ -65,6 +65,7 @@ int nProjectsCreated;
 
 fs::path projectPath;
 fs::path defaultAppPath = { "apps/myApps" };
+fs::path generatorPath;
 fs::path ofPath;
 vector<string> addons;
 vector<fs::path> srcPaths;
@@ -339,7 +340,9 @@ int updateOFPath(std::filesystem::path path) {
 		ofLogNotice() << "PG_OF_PATH set: ofPath [" << ofPath << "]";
 	}
 	of::filesystem::path exePath = ofFilePath::getCurrentExeDir();
+	
     fs::path startPath = normalizePath(exePath);
+	generatorPath = startPath;
 	ofLogNotice() << "projectGenerator cmd path: {" << startPath << "] }";
     //ofFilePath::getAbsolutePathFS(fs::current_path(), false);
 //    ofLogNotice() << "startPath: " << startPath.string();
@@ -590,8 +593,10 @@ int main(int argc, char ** argv) {
 		ofLogNotice() << " projectPath.empty: [" << projectPath << "]";
 		projectPath = fs::weakly_canonical( getOFRoot() / defaultAppPath / projectName);
 		ofLogNotice() << " projectPath path: [" << projectPath << "]";
-	} else if(!projectPath.empty() && ( projectPath == projectPath.root_path() ||
-									   fs::weakly_canonical( projectPath.root_path() / projectName ) == projectPath)){
+	} else if(projectPath == projectPath.root_path() || // if projectPath == "/"
+									   fs::weakly_canonical( projectPath.root_path() / projectName ) == projectPath || // or /projectName
+			  fs::weakly_canonical( generatorPath / projectName ) == projectPath // or generatorPath/projectName
+			  ){
 		ofLogNotice() << " fs::weakly_canonical( [" << fs::weakly_canonical( projectPath.root_path() / projectName ) << "]";
 		ofLogNotice() << " projectPath.root_path(): [" << projectPath.root_path() << "]";
 		ofLogNotice() << " projectPath path: [" << projectPath << "]";
@@ -608,10 +613,10 @@ int main(int argc, char ** argv) {
     if (!fs::exists(projectPath)) {
 		try {
 			ofLogNotice() << " creating projectPath directory.";
-			fs::create_directory(projectPath);
+			fs::create_directories(projectPath);
 		} catch (const std::exception& ex) {
-			messageError( "Canonical path for ["+ projectPath.string() + "] threw exception:\n"
-			+ ex.what() +'\n');
+			messageError( "fs::create_directory failed, \"projectPath\": { \""+ projectPath.string() + "\" }, \"exception\": \""
+			+ ex.what() + "\"");
 			return EXIT_FAILURE;
 		}
     } else {
