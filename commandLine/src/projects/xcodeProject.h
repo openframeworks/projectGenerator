@@ -24,7 +24,7 @@ private:
 public:
 
 	void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT);
-	void addInclude(string includeName);
+	void addInclude(const fs::path & includeName);
 	void addLibrary(const LibraryBinary & lib);
 	void addLDFLAG(string ldflag, LibType libType = RELEASE_LIB);
 	void addCFLAG(string cflag, LibType libType = RELEASE_LIB); // Other C Flags

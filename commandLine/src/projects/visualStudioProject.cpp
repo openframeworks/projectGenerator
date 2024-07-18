@@ -290,16 +290,16 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 	}
 }
 
-void visualStudioProject::addInclude(string includeName){
+void visualStudioProject::addInclude(const fs::path & includeName){
 //	alert ("visualStudioProject::addInclude " + includeName, 35);
-
-	fixSlashOrder(includeName);
+	string inc = includeName.string();
+	fixSlashOrder(inc);
 
 	pugi::xpath_node_set source = doc.select_nodes("//ClCompile/AdditionalIncludeDirectories");
 	for (pugi::xpath_node_set::const_iterator it = source.begin(); it != source.end(); ++it){
 		pugi::xpath_node node = *it;
-		string includes = node.node().first_child().value();
-		std::vector < string > strings = ofSplitString(includes, ";");
+		std::string includes = node.node().first_child().value();
+		std::vector < std::string > strings = ofSplitString(includes, ";");
 		bool bAdd = true;
 		for (int i = 0; i < (int)strings.size(); i++){
 			if (strings[i].compare(includeName) == 0){
@@ -308,7 +308,7 @@ void visualStudioProject::addInclude(string includeName){
 		}
 		if (bAdd == true){
 			strings.emplace_back(includeName);
-			string includesNew = unsplitString(strings, ";");
+			std::string includesNew = unsplitString(strings, ";");
 //			alert ("includesNew " + includesNew);
 			node.node().first_child().set_value(includesNew.c_str());
 		}

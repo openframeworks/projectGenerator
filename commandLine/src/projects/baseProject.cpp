@@ -206,7 +206,7 @@ bool baseProject::create(const fs::path & _path, string templateName){
 	parseConfigMake();
 
 	if (bDoesDirExist){
-		vector < string > fileNames;
+		vector <  fs::path > fileNames;
 		getFilesRecursively(projectDir / "src", fileNames);
 
 		std::sort (fileNames.begin(), fileNames.end());
@@ -233,7 +233,7 @@ bool baseProject::create(const fs::path & _path, string templateName){
 			if (std::find(paths.begin(), paths.end(), rel) == paths.end()) {
 				paths.emplace_back(rel);
 //				alert ("rel = " + rel.string());
-				addInclude(rel.string());
+				addInclude(rel);
 			}
 		}
 	}
@@ -575,7 +575,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 	getFilesRecursively(srcPath, srcFilesToAdd);
 //	bool isRelative = ofIsPathInPath(fs::absolute(srcPath), getOFRoot());
 
-	std::unordered_set<string> uniqueIncludeFolders;
+	std::unordered_set<fs::path> uniqueIncludeFolders;
 	fs::path base = srcPath.parent_path();
 
 	for( auto & src : srcFilesToAdd){
@@ -584,7 +584,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 //		fs::path folder = parent.lexically_relative(base);
 		addSrc(src, folder);
 		if (parent.string() != "") {
-			uniqueIncludeFolders.insert(parent.string());
+			uniqueIncludeFolders.insert(parent);
 		}
 	}
 

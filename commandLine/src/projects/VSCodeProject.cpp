@@ -149,9 +149,9 @@ void VSCodeProject::addSrc(const fs::path & srcName, const fs::path & folder, Sr
 //	alert ("addSrc " + srcName.string(), 33);
 }
 
-void VSCodeProject::addInclude(std::string includeName){
+void VSCodeProject::addInclude(const fs::path & includeName){
 //	alert ("addInclude " + includeName, 34);
-	cppProperties.addToArray("/env/PROJECT_EXTRA_INCLUDES", fs::path(includeName));
+	cppProperties.addToArray("/env/PROJECT_EXTRA_INCLUDES", includeName);
 }
 
 void VSCodeProject::addLibrary(const LibraryBinary & lib){

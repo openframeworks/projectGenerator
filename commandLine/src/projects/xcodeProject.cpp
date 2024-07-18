@@ -474,10 +474,10 @@ void xcodeProject::addDylib(const fs::path & path, const fs::path & folder){
 }
 
 
-void xcodeProject::addInclude(string includeName){
+void xcodeProject::addInclude(const fs::path & includeName){
 	//alert("addInclude " + includeName);
 	for (auto & c : buildConfigs) {
-		addCommand("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
+		addCommand("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName.string());
 	}
 }
 

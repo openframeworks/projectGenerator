@@ -50,7 +50,7 @@ public:
 	bool save();
 
 	virtual void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) = 0;
-	virtual void addInclude(std::string includeName) = 0;
+	virtual void addInclude(const fs::path & includeName) = 0;
 	virtual void addLibrary(const LibraryBinary & lib) = 0;
 
 	// FIXME: change some strings to const &

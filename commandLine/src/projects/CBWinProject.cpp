@@ -80,9 +80,9 @@ void CBWinProject::addSrc(const fs::path & srcName, const fs::path & folder, Src
 	}
 }
 
-void CBWinProject::addInclude(std::string includeName){
-	ofLogNotice() << "adding include " << includeName;
-	appendValue(doc, "Add", "directory", includeName);
+void CBWinProject::addInclude(const fs::path & includeName){
+	ofLogNotice() << "adding include " << includeName.string();
+	appendValue(doc, "Add", "directory", includeName.string());
 }
 
 void CBWinProject::addLibrary(const LibraryBinary & lib){
