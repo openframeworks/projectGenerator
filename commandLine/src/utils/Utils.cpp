@@ -341,7 +341,7 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 
 			if(platform!=""){
 				std::vector<string> splittedPath = ofSplitString(f.string(), fs::path("/").make_preferred().string());
-				for(int j=0;j<(int)splittedPath.size();j++){
+				for(size_t j=0;j<splittedPath.size();j++){
 					if(splittedPath[j]==platform){
 						platformFound = true;
 					}
@@ -375,7 +375,7 @@ void fixSlashOrder(string & toFix){
 
 string unsplitString (std::vector < string > strings, string deliminator ){
 	string result;
-	for (int i = 0; i < (int)strings.size(); i++){
+	for (size_t i = 0; i < strings.size(); i++){
 		if (i != 0) result += deliminator;
 		result += strings[i];
 	}

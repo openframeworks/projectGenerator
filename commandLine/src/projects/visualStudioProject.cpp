@@ -301,7 +301,7 @@ void visualStudioProject::addInclude(const fs::path & includeName){
 		std::string includes = node.node().first_child().value();
 		std::vector < std::string > strings = ofSplitString(includes, ";");
 		bool bAdd = true;
-		for (int i = 0; i < (int)strings.size(); i++){
+		for (size_t i = 0; i < strings.size(); i++){
 			if (strings[i].compare(includeName) == 0){
 				bAdd = false;
 			}
@@ -323,7 +323,7 @@ void addLibraryPath(const pugi::xpath_node_set & nodes, string libFolder) {
 		string includes = node.node().first_child().value();
 		std::vector < string > strings = ofSplitString(includes, ";");
 		bool bAdd = true;
-		for (int i = 0; i < (int)strings.size(); i++) {
+		for (size_t i = 0; i < strings.size(); i++) {
 			if (strings[i].compare(libFolder) == 0) {
 				bAdd = false;
 			}
@@ -341,7 +341,7 @@ void addLibraryName(const pugi::xpath_node_set & nodes, string libName) {
 		string includes = node.node().first_child().value();
 		std::vector < string > strings = ofSplitString(includes, ";");
 		bool bAdd = true;
-		for (int i = 0; i < (int)strings.size(); i++) {
+		for (size_t i = 0; i < strings.size(); i++) {
 			if (strings[i].compare(libName) == 0) {
 				bAdd = false;
 			}

@@ -17,7 +17,6 @@
 		"653DA9D7-3254-4370-BF70-E18AF5925484" /* CBLinuxProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "546BDD51-ACDD-44C1-9C31-E1F3AD19A245" /* CBLinuxProject.cpp */; };
 		"7F2BBCD1-F22D-454A-9100-33D1C12BEA70" /* androidStudioProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "FFD740F7-8E04-4563-A856-D4E402AF9C0E" /* androidStudioProject.cpp */; };
 		"B07B8E19-F9DE-4E97-8833-859CD9267D30" /* LibraryBinary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "1EFA4702-B4F3-4556-9C12-4FE21FD503D0" /* LibraryBinary.cpp */; };
-		"BCE6F361-0F3D-41FF-978D-B5ED6676D90B" /* LICENSE in Sources */ = {isa = PBXBuildFile; fileRef = "C97ACCE3-5F0E-4BEC-8BA9-2A532D9EA2E3" /* LICENSE */; };
 		BF879F5D2C0F7CEB00200951 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF879F5C2C0F7CEB00200951 /* AVFoundation.framework */; };
 		BF879F5F2C0F7ED500200951 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF879F5E2C0F7ED500200951 /* Foundation.framework */; };
 		BF879F642C0F801100200951 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF879F632C0F801100200951 /* SystemConfiguration.framework */; };
@@ -29,13 +28,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		E4A5B60F29BAAAE400C2D356 /* CopyFiles */ = {
+		E4A5B60F29BAAAE400C2D356 /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
 			);
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		E4C2427710CC5ABF004149E2 /* CopyFiles */ = {
@@ -80,7 +80,6 @@
 		BF879F632C0F801100200951 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		"C0FADDD2-1DFA-4DC4-AC81-5877E59E42BF" /* ofAddon.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = ofAddon.h; path = src/addons/ofAddon.h; sourceTree = SOURCE_ROOT; };
 		"C5A3016A-B663-4FE7-B6E6-421C5F168447" /* qtcreatorproject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = qtcreatorproject.cpp; path = src/projects/qtcreatorproject.cpp; sourceTree = SOURCE_ROOT; };
-		"C97ACCE3-5F0E-4BEC-8BA9-2A532D9EA2E3" /* LICENSE */ = {isa = PBXFileReference; explicitFileType = file; fileEncoding = 4; name = LICENSE; path = src/uuidxx/license/LICENSE; sourceTree = SOURCE_ROOT; };
 		"D702C774-BADC-41A5-9514-0DDE6F672015" /* qtcreatorproject.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = qtcreatorproject.h; path = src/projects/qtcreatorproject.h; sourceTree = SOURCE_ROOT; };
 		"D8A84D0F-1123-44F7-9D8D-79F8E2A0BFF4" /* CBWinProject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = CBWinProject.cpp; path = src/projects/CBWinProject.cpp; sourceTree = SOURCE_ROOT; };
 		"DDA07621-E95C-4267-B1B9-0127E0215328" /* CBLinuxProject.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = CBLinuxProject.h; path = src/projects/CBLinuxProject.h; sourceTree = SOURCE_ROOT; };
@@ -139,15 +138,6 @@
 			path = src/uuidxx/src;
 			sourceTree = SOURCE_ROOT;
 		};
-		"80BBF826-6CED-4AC0-BE8A-F26D4DA76758" /* license */ = {
-			isa = PBXGroup;
-			children = (
-				"C97ACCE3-5F0E-4BEC-8BA9-2A532D9EA2E3" /* LICENSE */,
-			);
-			name = license;
-			path = src/uuidxx/license;
-			sourceTree = SOURCE_ROOT;
-		};
 		"95A2C282-B703-4B16-954F-52D5D7E45686" /* projects */ = {
 			isa = PBXGroup;
 			children = (
@@ -195,7 +185,6 @@
 		"C833E973-D2D2-4055-A99B-34CB61CC572D" /* uuidxx */ = {
 			isa = PBXGroup;
 			children = (
-				"80BBF826-6CED-4AC0-BE8A-F26D4DA76758" /* license */,
 				"5ADF2746-0CB3-4659-A163-144916333A53" /* src */,
 			);
 			name = uuidxx;
@@ -244,7 +233,7 @@
 				E4B69B580A3A1756003C02F2 /* Sources */,
 				E4B69B590A3A1756003C02F2 /* Frameworks */,
 				E4C2427710CC5ABF004149E2 /* CopyFiles */,
-				E4A5B60F29BAAAE400C2D356 /* CopyFiles */,
+				E4A5B60F29BAAAE400C2D356 /* Copy Files */,
 				19B789C429E5AB4A0082E9B8 /* ShellScript */,
 				928F60851B6710B200E2D791 /* ShellScript */,
 			);
@@ -286,6 +275,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		19B789C429E5AB4A0082E9B8 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -348,7 +338,6 @@
 				"DBD7E2AC-672A-4FD9-B0A4-DF24111D17FB" /* xcodeProject.cpp in Sources */,
 				"B07B8E19-F9DE-4E97-8833-859CD9267D30" /* LibraryBinary.cpp in Sources */,
 				"317CCC6B-35DE-4343-B4DC-3C797333928C" /* Utils.cpp in Sources */,
-				"BCE6F361-0F3D-41FF-978D-B5ED6676D90B" /* LICENSE in Sources */,
 				"2BC33EEF-CBDE-4E2E-9E0C-DB9AA6E0FE66" /* uuidxx.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -397,6 +386,8 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "c++23";
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
+				CLANG_WARN_VEXING_PARSE = YES_ERROR;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
@@ -405,8 +396,11 @@
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
+				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(OF_CORE_HEADERS)",
 					src,
@@ -441,6 +435,8 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "c++23";
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
+				CLANG_WARN_VEXING_PARSE = YES_ERROR;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
@@ -448,8 +444,11 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
+				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(OF_CORE_HEADERS)",
 					src,

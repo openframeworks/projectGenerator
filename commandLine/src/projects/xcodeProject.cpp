@@ -249,13 +249,20 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 
 		if (folders.size()){
 			// Iterating every folder from full path
-			for (std::size_t a=0; a<folders.size(); a++) {
-				fs::path fullPath { "" };
+			for (std::size_t a = 0; a < folders.size(); a++) {
+				fs::path fullPath{""};
+				
+				std::vector<fs::path> joinFolders;
+				joinFolders.reserve(a + 1); // Reserve / avoid reallocations
 
-				vector <fs::path> joinFolders = std::vector(folders.begin(), folders.begin() + (a+1));
-				for (auto & j : joinFolders) {
+				for (std::size_t i = 0; i <= a; ++i) {
+					joinFolders.push_back(folders[i]);
+				}
+
+				for (const auto& j : joinFolders) {
 					fullPath /= j;
 				}
+			
 
 				// Query if partial path is already stored. if not execute this following block
 				if ( folderUUID.find(fullPath) != folderUUID.end() ) {
