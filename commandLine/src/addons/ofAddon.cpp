@@ -66,6 +66,11 @@ void ofAddon::addReplaceString(std::string &variable, const std::string &value, 
 	else variable = value;
 }
 
+void ofAddon::addReplaceStringVector(std::vector<std::string> &variable, const std::string &value,const std::filesystem::path &prefix, bool addToVariable) {
+	addReplaceStringVector(variable, value, prefix.string(), addToVariable);
+}
+
+
 void ofAddon::addReplaceStringVector(std::vector<std::string> &variable, const std::string &value, const std::string &prefix, bool addToVariable) {
 	if (value == prefix) return;
 
@@ -299,7 +304,7 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
 	else if(variable == "ADDON_TAGS"){
-		addReplaceStringVector(tags,value,"",addToValue);
+		addReplaceStringVector(tags,value,emptyString,addToValue);
 		return;
 	}
 
@@ -309,7 +314,7 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
 	else if(variable == "ADDON_DEPENDENCIES"){
-		addReplaceStringVector(dependencies,value,"",addToValue);
+		addReplaceStringVector(dependencies,value,emptyString,addToValue);
 	}
 
 	else if(variable == "ADDON_INCLUDES"){
@@ -324,15 +329,15 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
 	else if(variable == ADDON_CFLAGS){
-		addReplaceStringVector(cflags,value,"",addToValue);
+		addReplaceStringVector(cflags,value,emptyString,addToValue);
 	}
 
 	else if(variable == ADDON_CPPFLAGS){
-		addReplaceStringVector(cppflags,value,"",addToValue);
+		addReplaceStringVector(cppflags,value,emptyString,addToValue);
 	}
 
 	else if(variable == ADDON_LDFLAGS){
-		addReplaceStringVector(ldflags,value,"",addToValue);
+		addReplaceStringVector(ldflags,value,emptyString,addToValue);
 	}
 
 	else if(variable == ADDON_LIBS){
@@ -344,7 +349,7 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
 	else if(variable == ADDON_PKG_CONFIG_LIBRARIES){
-		addReplaceStringVector(pkgConfigLibs,value,"",addToValue);
+		addReplaceStringVector(pkgConfigLibs,value,emptyString,addToValue);
 	}
 
 	else if(variable == ADDON_FRAMEWORKS){
@@ -376,11 +381,11 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
 	else if(variable == ADDON_DATA){
-		addReplaceStringVector(data,value,"",addToValue);
+		addReplaceStringVector(data,value,emptyString,addToValue);
 	}
 
 	else if(variable == ADDON_LIBS_EXCLUDE){
-		addReplaceStringVector(excludeLibs,value,"",addToValue);
+		addReplaceStringVector(excludeLibs,value,emptyString,addToValue);
 	}
     
     else if(variable == ADDON_LIBS_DIR){
@@ -388,19 +393,19 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
     }
 
 	else if(variable == ADDON_SOURCES_EXCLUDE){
-		addReplaceStringVector(excludeSources,value,"",addToValue);
+		addReplaceStringVector(excludeSources,value,emptyString,addToValue);
 	}
 
 	else if(variable == ADDON_INCLUDES_EXCLUDE){
-		addReplaceStringVector(excludeIncludes,value,"",addToValue);
+		addReplaceStringVector(excludeIncludes,value,emptyString,addToValue);
 	}
 
 	else if (variable == ADDON_FRAMEWORKS_EXCLUDE) {
-		addReplaceStringVector(excludeFrameworks, value, "", addToValue);
+		addReplaceStringVector(excludeFrameworks, value, emptyString, addToValue);
 	}
 
 	else if (variable == ADDON_DEFINES) {
-		addReplaceStringVector(defines, value, "", addToValue);
+		addReplaceStringVector(defines, value, emptyString, addToValue);
 	}
 }
 

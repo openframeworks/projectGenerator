@@ -117,7 +117,10 @@ class ofAddon {
 
 public:
 
-	ofAddon();
+	ofAddon() = default;
+	ofAddon(const ofAddon& other) = default;
+	ofAddon& operator=(const ofAddon& other) = default;
+
 
 	bool fromFS(const fs::path & path, const string & platform);
 	void parseLibsPath(const fs::path & path, const fs::path & parentFolder);
@@ -177,12 +180,14 @@ public:
 private:
 	
 	string currentParseState { "" };
+	const string emptyString = { "" };
 	void preParseConfig();
 	void parseConfig();
 	void parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum);
 	void parseVariableValue(const fs::path & variable, const string & value, bool addToValue, const string & line, int lineNum);
 	void addReplaceString(std::string &variable, const std::string &value, bool addToVariable);
 	void addReplaceStringVector(std::vector<std::string> &variable, const std::string &value, const std::string &prefix, bool addToVariable);
+	void addReplaceStringVector(std::vector<std::string> &variable, const std::string &value, const std::filesystem::path &prefix, bool addToVariable);
 	void addReplaceStringVectorPath(std::vector<std::filesystem::path> &variable, const std::string &value, const std::string &prefix, bool addToVariable);
 	void addReplaceStringVectorPath(std::vector<std::filesystem::path> &variable, const std::filesystem::path &value, const std::string &prefix, bool addToVariable);
 	void addReplaceStringVectorPath(std::vector<std::filesystem::path> &variable, const std::filesystem::path &value, const std::filesystem::path &prefix, bool addToVariable);
