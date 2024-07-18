@@ -425,7 +425,7 @@ int main(int argc, char ** argv) {
 	bAddonsPassedIn = false;
 	bDryRun = false;
 	busingEnvVar = false;
-	bVerbose = true;
+	bVerbose = false;
 	mode = PG_MODE_NONE;
 	bForce = false;
 	bRecursive = false;
@@ -586,22 +586,20 @@ int main(int argc, char ** argv) {
 	}
 
     fs::path projectPath = fs::weakly_canonical(fs::current_path() / projectName);
-	ofLogNotice() << " projectPath path: [" << projectPath << "] root_path: [" << projectPath.root_path() << "]";
+	ofLogVerbose() << " projectPath path: [" << projectPath << "] root_path: [" << projectPath.root_path() << "]";
 	ofLogNotice() << " ofPath path: [" << ofPath << "]";
 	ofLogNotice() << " ofRoot path: [" << getOFRoot()  << "]";
 	if(projectPath.empty() ) {
-		ofLogNotice() << " projectPath.empty: [" << projectPath << "]";
 		projectPath = fs::weakly_canonical( getOFRoot() / defaultAppPath / projectName);
-		ofLogNotice() << " projectPath path: [" << projectPath << "]";
+		ofLogNotice() << " projectPath.empty() path now: [" << projectPath << "]";
 	} else if(projectPath == projectPath.root_path() || // if projectPath == "/"
 									   fs::weakly_canonical( projectPath.root_path() / projectName ) == projectPath || // or /projectName
 			  fs::weakly_canonical( generatorPath / projectName ) == projectPath // or generatorPath/projectName
 			  ){
-		ofLogNotice() << " fs::weakly_canonical( [" << fs::weakly_canonical( projectPath.root_path() / projectName ) << "]";
-		ofLogNotice() << " projectPath.root_path(): [" << projectPath.root_path() << "]";
-		ofLogNotice() << " projectPath path: [" << projectPath << "]";
+		ofLogVerbose() << " fs::weakly_canonical( [" << fs::weakly_canonical( projectPath.root_path() / projectName ) << "]";
+		ofLogVerbose() << " projectPath.root_path(): [" << projectPath.root_path() << "]";
 		projectPath = fs::weakly_canonical( getOFRoot() / defaultAppPath / projectName);
-		ofLogNotice() << " projectPath path: [" << projectPath << "]";
+		ofLogNotice() << " projectPath issue managed, path now: [" << projectPath << "]";
 	} else {
 		ofLogNotice() << " projectPath path: [" << projectPath << "]";
 	}
