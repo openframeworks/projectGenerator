@@ -181,11 +181,13 @@ private:
 	void parseConfig();
 	void parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum);
 	void parseVariableValue(const fs::path & variable, const string & value, bool addToValue, const string & line, int lineNum);
-	void addReplaceString(string & variable, string value, bool addToVariable);
-	void addReplaceStringVector(vector<string> & variable, string value, string prefix, bool addToVariable);
-	void addReplaceStringVector(vector<fs::path> & variable, string value, string prefix, bool addToVariable);
-	void addReplaceStringVector(vector<fs::path> & variable, fs::path value, string prefix, bool addToVariable);
-	void addReplaceStringVector(vector<LibraryBinary> & variable, string value, string prefix, bool addToVariable);
+	void addReplaceString(std::string &variable, const std::string &value, bool addToVariable);
+	void addReplaceStringVector(std::vector<std::string> &variable, const std::string &value, const std::string &prefix, bool addToVariable);
+	void addReplaceStringVectorPath(std::vector<std::filesystem::path> &variable, const std::string &value, const std::string &prefix, bool addToVariable);
+	void addReplaceStringVectorPath(std::vector<std::filesystem::path> &variable, const std::filesystem::path &value, const std::string &prefix, bool addToVariable);
+	void addReplaceStringVectorPath(std::vector<std::filesystem::path> &variable, const std::filesystem::path &value, const std::filesystem::path &prefix, bool addToVariable);
+	void addReplaceStringVectorPath(std::vector<std::filesystem::path> &variable, const std::string &value, const std::filesystem::path &prefix, bool addToVariable);
+	void addReplaceStringVector(std::vector<LibraryBinary> &variable, const std::string &value, const std::string &prefix, bool addToVariable);
 	void exclude(vector<string> & variable, vector<string> exclusions);
 	void exclude(vector<fs::path> & variable, vector<string> exclusions);
 	void exclude(vector<LibraryBinary> & variable, vector<string> exclusions);
