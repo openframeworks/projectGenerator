@@ -743,9 +743,6 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 		getFilesRecursively(srcPath, srcFiles);
 	}
 
-	// MARK: srcFiles to fs::path
-	// not possible today because there are string based exclusion functions
-
 	fs::path parentFolder { path.parent_path() };
 
 	for (auto & s : srcFiles) {

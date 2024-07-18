@@ -117,9 +117,8 @@ class ofAddon {
 
 public:
 
-	ofAddon() = default;
+	ofAddon();
 	ofAddon(const ofAddon& other) = default;
-	ofAddon& operator=(const ofAddon& other) = default;
 
 
 	bool fromFS(const fs::path & path, const string & platform);
@@ -131,8 +130,7 @@ public:
 	void clear();
 
 	// this is source files:
-	// FIXME: map using fs::path, fs::path
-	std::unordered_map < string, string > filesToFolders;      //the addons has had, for each file,
+	std::unordered_map < fs::path, fs::path > filesToFolders;      //the addons has had, for each file,
 												//sometimes a listing of what folder to put it in, such as "addons/ofxOsc/src"
 
 	vector < fs::path > srcFiles;
@@ -180,7 +178,7 @@ public:
 private:
 	
 	string currentParseState { "" };
-	const string emptyString = { "" };
+	string emptyString = { "" };
 	void preParseConfig();
 	void parseConfig();
 	void parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum);
