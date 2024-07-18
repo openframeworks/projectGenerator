@@ -4,6 +4,8 @@
 #include "Utils.h"
 #include "defines.h"
 #include "ofUtils.h"
+#include "ofFileUtils.h"
+#include "ofSystemUtils.h"
 #include "optionparser.h"
 #include <set>
 #include <string>
