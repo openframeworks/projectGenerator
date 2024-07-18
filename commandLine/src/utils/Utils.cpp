@@ -389,8 +389,21 @@ fs::path getOFRoot(){
 }
 
 void setOFRoot(const fs::path & path){
-    ofLogNotice() << "OFRoot set: [" << path << "].";
+    ofLogNotice() << "ofRoot set: [" << path << "].";
 	OFRoot = path;
+}
+
+void messageError(const string & targ) {
+	ofLogError() << "{ \"errorMessage: \"" << targ << "\", \"status:\" \"EXIT_FAILURE\" }";
+}
+void messageReturn(const string & targ) {
+	ofLogNotice() << "{ \"message: \"" << targ << "\" }";
+}
+void messageReturn(const string & key, const string & value) {
+	ofLogNotice() << "{ \""<< key << ": \"" << value << "\" }";
+}
+void messageExtra(const string & targ) {
+	ofLogVerbose() << "{ \"detail: \"" << targ << "\" }";
 }
 
 unique_ptr<baseProject> getTargetProject(const string & targ) {

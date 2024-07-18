@@ -94,8 +94,8 @@ void ofAddon::addReplaceStringVector(std::vector<string> & variable, string valu
 					string varValue;
 					if(varName == "OF_ROOT"){
 						varValue = ofPathToString(pathToOF);
-					}else if(getenv(varName.c_str())){
-						varValue = getenv(varName.c_str());
+					}else if(ofGetEnv(varName.c_str()).empty()){
+						varValue = ofGetEnv(varName.c_str());
 					}
 					ofStringReplace(values[i],"$("+varName+")",varValue);
 					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << values[i] << std::endl;
@@ -140,8 +140,8 @@ void ofAddon::addReplaceStringVector(std::vector<fs::path> & variable, string va
 					string varValue;
 					if(varName == "OF_ROOT"){
 						varValue = ofPathToString(pathToOF);
-					}else if(getenv(varName.c_str())){
-						varValue = getenv(varName.c_str());
+					}else if(ofGetEnv(varName.c_str()).empty()){
+						varValue = ofGetEnv(varName.c_str());
 					}
 					ofStringReplace(values[i],"$("+varName+")",varValue);
 					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << values[i] << std::endl;
@@ -179,8 +179,8 @@ void ofAddon::addReplaceStringVector(vector<LibraryBinary> & variable, string va
 					string varValue;
 					if(varName == "OF_ROOT"){
 						varValue = ofPathToString(pathToOF);
-					}else if(getenv(varName.c_str())){
-						varValue = getenv(varName.c_str());
+					}else if(ofGetEnv(varName.c_str()).empty()){
+						varValue = ofGetEnv(varName.c_str());
 					}
 					ofStringReplace(v,"$("+varName+")",varValue);
 					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << v << std::endl;

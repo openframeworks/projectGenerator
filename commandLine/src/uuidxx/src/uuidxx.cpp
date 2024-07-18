@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 #include <string.h>
+#include <cstdio>
 
 using namespace uuidxx;
 
@@ -57,8 +58,12 @@ uuid::uuid (const char *uuidString)
 std::string uuid::ToString(bool withBraces) const
 {
 	char buffer[39];
-	sprintf(buffer, "%s%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X%s", withBraces ? "{" : "", Uuid.Data1, Uuid.Data2, Uuid.Data3, Uuid.Data4[0], Uuid.Data4[1], Uuid.Data4[2], Uuid.Data4[3], Uuid.Data4[4], Uuid.Data4[5], Uuid.Data4[6], Uuid.Data4[7], withBraces ? "}" : "");
-	return buffer;
+	snprintf(buffer, sizeof(buffer), "%s%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X%s",
+				 withBraces ? "{" : "", Uuid.Data1, Uuid.Data2, Uuid.Data3,
+				 Uuid.Data4[0], Uuid.Data4[1], Uuid.Data4[2], Uuid.Data4[3],
+				 Uuid.Data4[4], Uuid.Data4[5], Uuid.Data4[6], Uuid.Data4[7],
+				 withBraces ? "}" : "");
+		return std::string(buffer);
 }
 
 uuid uuid::FromString(const char *uuidString)

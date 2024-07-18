@@ -78,6 +78,11 @@ string unsplitString (std::vector < string > strings, string deliminator );
 
 std::unique_ptr<baseProject> getTargetProject(const string & targ);
 
+void messageError(const string & targ);
+void messageReturn(const string & targ);
+void messageReturn(const string & key, const string & value);
+void messageExtra(const string & targ);
+
 template <class T>
 inline bool isInVector(T item, std::vector<T> & vec){
 	bool bIsInVector = false;

@@ -115,9 +115,9 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(string target)
 	return templates;
 }
 
-bool baseProject::create(const fs::path & path, string templateName){
+bool baseProject::create(const fs::path & _path, string templateName){
 //	alert("baseProject::create " + path.string() + " : " + templateName, 35);
-//	auto path = _path; // just because it is const
+	auto path = _path; // just because it is const
 
 
 	//if the files being added are inside the OF root folder, make them relative to the folder.
@@ -126,14 +126,17 @@ bool baseProject::create(const fs::path & path, string templateName){
 //	alert("getOFRoot() " + fs::weakly_canonical(fs::absolute(getOFRoot())).string());
 //	alert("path " + path.string());
 //	alert("path " + fs::weakly_canonical(fs::absolute(path)).string());
+	
+	cout << endl;
+	ofLogNotice() << "create project " << path;
 
 	// FIXME: Rewrite here
-	if (ofIsPathInPath(fs::absolute(path), getOFRoot())) {
-//		alert ("bMakeRelative true", 35);
-		bMakeRelative = true;
-	} else {
-//		alert ("bMakeRelative false", 35);
-	}
+//	if (ofIsPathInPath(fs::absolute(path), getOFRoot())) {
+////		alert ("bMakeRelative true", 35);
+//		bMakeRelative = true;
+//	} else {
+////		alert ("bMakeRelative false", 35);
+//	}
 
 	addons.clear();
 	extSrcPaths.clear();
@@ -147,7 +150,6 @@ bool baseProject::create(const fs::path & path, string templateName){
 	ofLogNotice() << "projectPath: [" << projectPath << "]";
 	
 	projectName = projectPath.filename().string();
-	
 	
 	// we had this in some projects. if we decide to keep this is the place
 	//	if (!fs::exists(projectDir)) {
@@ -164,8 +166,6 @@ bool baseProject::create(const fs::path & path, string templateName){
 			fs::copy (templatePath / p, projectDir / p, fs::copy_options::recursive);
 		}
 	}
-
-	
 	bool ret = createProjectFile();
 	if(!ret) return false;
 
@@ -210,11 +210,6 @@ bool baseProject::create(const fs::path & path, string templateName){
 		getFilesRecursively(projectDir / "src", fileNames);
 
 		std::sort (fileNames.begin(), fileNames.end());
-
-//		for (auto & f : fileNames) {
-//			alert (f);
-//		}
-
 		for (auto & f : fileNames) {
 			fs::path rel { fs::relative(f, projectDir) };
 			fs::path folder { rel.parent_path() };
@@ -230,8 +225,6 @@ bool baseProject::create(const fs::path & path, string templateName){
 			} else {
 			}
 		}
-
-
 		// FIXME: Port to std::list, so no comparison is needed.
 		// only add unique paths
 		vector < fs::path > paths;
