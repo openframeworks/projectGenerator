@@ -440,7 +440,7 @@ void ofAddon::exclude(vector<string> & variables, vector<string> exclusions){
 	}
 }
 
-void ofAddon::exclude(vector<fs::path> & variables, vector<string> exclusions){
+void ofAddon::exclude(vector<std::filesystem::path> & variables, vector<string> exclusions){
 	for(auto & exclusion: exclusions){
 		ofStringReplace(exclusion,"\\","/");
 		ofStringReplace(exclusion,".","\\.");
@@ -471,6 +471,40 @@ void ofAddon::exclude(vector<fs::path> & variables, vector<string> exclusions){
 //		}
 	}
 }
+void ofAddon::exclude(vector<std::filesystem::path> & variables, vector<std::filesystem::path> exclusions){
+	for(auto & exclusion: exclusions){
+		string excluse = exclusion.string();
+		ofStringReplace(excluse,"\\","/");
+		ofStringReplace(excluse,".","\\.");
+		ofStringReplace(excluse,"%",".*");
+		excluse =".*"+ excluse;
+//		alert ("ofAddon::exclude " +exclusion, 31);
+
+		std::regex findVar(excluse);
+		std::smatch varMatch;
+//		alert ("vars size " + ofToString(variables.size()));
+//		for (auto & v : variables) {
+//			alert ("\t" + v, 32);
+//		}
+		
+		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const string & variable){
+			auto forwardSlashedVariable = variable;
+			ofStringReplace(forwardSlashedVariable, "\\", "/");
+//			bool exclude = std::regex_search(forwardSlashedVariable, varMatch, findVar);
+//			if (exclude) {
+//				alert ("variable removed : " + variable, 31);
+//			}
+			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
+		}), variables.end());
+		
+//		alert ("vars size " + ofToString(variables.size()));
+//		for (auto & v : variables) {
+//			alert ("\t" + v, 32);
+//		}
+	}
+}
+
+
 
 void ofAddon::exclude(vector<LibraryBinary> & variables, vector<string> exclusions) {
 	for(auto & exclusion: exclusions){
@@ -664,7 +698,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 	if (!isLocalAddon) {
 		for (auto & l : libs) {
 //			alert("fixpath before " + l.path);
-			l.path = ofPathToString(fixPath(l.path));
+			l.path = fixPath(l.path);
 //			alert("fixpath after  " + l.path);
 		}
 	}
@@ -678,8 +712,8 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 			s = fixPath(s);
 		}
 		string f { ofPathToString(s) };
-		srcFiles.emplace_back(f);
-		filesToFolders[f] = ofPathToString(folder);
+		srcFiles.emplace_back(s);
+		filesToFolders[f] = folder;
 	}
 
 	// so addons will never be system.
@@ -705,7 +739,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 				folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
 			}
 
-			filesToFolders[f] = ofPathToString(folder);
+			filesToFolders[f] = folder;
 		}
 	}
 
@@ -719,7 +753,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 			folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
 		}
 
-		filesToFolders[f] = ofPathToString(folder);
+		filesToFolders[f] = folder;
 	}
 }
 	
@@ -807,7 +841,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	paths.sort();
 
 	for (auto & p : paths) {
-		includePaths.emplace_back( ofPathToString(p) );
+		includePaths.emplace_back(p);
 	}
 	
 	parseConfig();

@@ -194,7 +194,8 @@ private:
 	void addReplaceStringVectorPath(std::vector<LibraryBinary> &variable, const std::string &value,  const fs::path &prefix, bool addToVariable);
 
 	void exclude(vector<string> & variable, vector<string> exclusions);
-	void exclude(vector<fs::path> & variable, vector<string> exclusions);
+	void exclude(vector<std::filesystem::path> & variable, vector<string> exclusions);
+	void exclude(vector<std::filesystem::path> & variable, vector<std::filesystem::path> exclusions);
 	void exclude(vector<LibraryBinary> & variable, vector<string> exclusions);
 	bool checkCorrectVariable(const string & variable, const string & state);
 	bool checkCorrectPlatform(const string & state);
