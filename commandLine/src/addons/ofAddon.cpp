@@ -440,7 +440,7 @@ void ofAddon::exclude(vector<string> & variables, vector<string> exclusions){
 	}
 }
 
-void ofAddon::exclude(vector<std::filesystem::path> & variables, vector<string> exclusions){
+void ofAddon::excludePath(vector<std::filesystem::path> & variables, vector<string> exclusions){
 	for(auto & exclusion: exclusions){
 		ofStringReplace(exclusion,"\\","/");
 		ofStringReplace(exclusion,".","\\.");
@@ -471,7 +471,7 @@ void ofAddon::exclude(vector<std::filesystem::path> & variables, vector<string> 
 //		}
 	}
 }
-void ofAddon::exclude(vector<std::filesystem::path> & variables, vector<std::filesystem::path> exclusions){
+void ofAddon::excludePath(vector<std::filesystem::path> & variables, vector<std::filesystem::path> exclusions){
 	for(auto & exclusion: exclusions){
 		string excluse = exclusion.string();
 		ofStringReplace(excluse,"\\","/");
@@ -846,18 +846,18 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	
 	parseConfig();
 
-	exclude(includePaths, excludeIncludes);
+	excludePath(includePaths, excludeIncludes);
 	
 	// Dimitre. I've added this here to exclude some srcFiles from addons,
 	// ofxAssimpModelLoader was adding some files from libs/assimp/include/assimp/port/AndroidJNI
 	// even when the folder was excluded from includePaths
-	exclude(srcFiles, excludeIncludes);
+	excludePath(srcFiles, excludeIncludes);
 	
-	exclude(srcFiles, excludeSources);
-	exclude(csrcFiles, excludeSources);
-	exclude(cppsrcFiles, excludeSources);
-	exclude(objcsrcFiles, excludeSources);
-	exclude(headersrcFiles, excludeSources);
+	excludePath(srcFiles, excludeSources);
+	excludePath(csrcFiles, excludeSources);
+	excludePath(cppsrcFiles, excludeSources);
+	excludePath(objcsrcFiles, excludeSources);
+	excludePath(headersrcFiles, excludeSources);
 //	exclude(propsFiles, excludeSources);
 	exclude(frameworks, excludeFrameworks);
 	exclude(xcframeworks, excludeXCFrameworks);
