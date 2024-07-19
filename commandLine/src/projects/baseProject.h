@@ -1,10 +1,6 @@
 #pragma once
 
-<<<<<<< Updated upstream
-#define PG_VERSION "62"
-=======
-#define PG_VERSION "64"
->>>>>>> Stashed changes
+#define PG_VERSION "63"
 
 #include "ofAddon.h"
 #include "pugixml.hpp"
