@@ -337,7 +337,7 @@ int updateOFPath() {
 		ofLogNotice() << "PG_OF_PATH set: ofPath [" << ofPath << "]";
 	}
     
-    fs::path startPath = normalizePath(ofFilePath::getCurrentExeDirFS());
+    fs::path startPath = normalizePath(ofFilePath::getCurrentExeDir());
     //ofFilePath::getAbsolutePathFS(fs::current_path(), false);
 //    ofLogNotice() << "startPath: " << startPath.string();
     fs::path foundOFPath = findOFPathUpwards(startPath);
