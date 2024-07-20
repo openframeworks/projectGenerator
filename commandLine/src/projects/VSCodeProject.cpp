@@ -42,7 +42,7 @@ struct fileJson {
 
 	void load() {
 		if (!fs::exists(fileName)) {
-			ofLogError(VSCodeProject::LOG_NAME) << "JSON file not found " << fileName;
+			ofLogError(VSCodeProject::LOG_NAME) << "JSON file not found " << fileName.string();
 			return;
 		}
 		
@@ -51,7 +51,7 @@ struct fileJson {
 			data = json::parse(ifs);
 		} catch (json::parse_error& ex) {
 			ofLogError(VSCodeProject::LOG_NAME) << "JSON parse error at byte" << ex.byte;
-			ofLogError(VSCodeProject::LOG_NAME) << "fileName" << fileName;
+			ofLogError(VSCodeProject::LOG_NAME) << "fileName" << fileName.string();
 		}
 	}
 
@@ -62,7 +62,7 @@ struct fileJson {
 		try {
 			jsonFile << data.dump(1, '\t');
 		} catch(std::exception & e) {
-			ofLogError(VSCodeProject::LOG_NAME) << "Error saving json to " << fileName << ": " << e.what();
+			ofLogError(VSCodeProject::LOG_NAME) << "Error saving json to " << fileName.string() << ": " << e.what();
 		}
 	}
 };
@@ -89,25 +89,25 @@ bool VSCodeProject::createProjectFile(){
 	try {
 		fs::copy(templatePath / ".vscode", projectDir / ".vscode", fs::copy_options::overwrite_existing | fs::copy_options::recursive);
 	} catch(fs::filesystem_error& e) {
-		ofLogError(LOG_NAME) << "error copying folder " << templatePath << " : " << projectDir << " : " << e.what();
+		ofLogError(LOG_NAME) << "error copying folder " << templatePath.string() << " : " << projectDir.string() << " : " << e.what();
 		return false;
 	}
 	
 	
-	workspace.fileName = projectDir / (projectName + ".code-workspace");
-	cppProperties.fileName = projectDir / ".vscode/c_cpp_properties.json";
+	workspace.fileName = fs::path {
+		projectDir / (projectName + ".code-workspace")};
+	cppProperties.fileName = fs::path {
+		projectDir / ".vscode/c_cpp_properties.json"
+	};
 	
-	copyTemplateFiles.push_back({
-		templatePath / "Makefile",
-		projectDir / "Makefile"
+	copyTemplateFiles.push_back({ fs::path { templatePath / "Makefile" },
+		fs::path { projectDir / "Makefile" }
 	});
-	copyTemplateFiles.push_back({
-		templatePath / "config.make",
-		projectDir / "config.make"
+	copyTemplateFiles.push_back({ fs::path { templatePath / "config.make" },
+		fs::path { projectDir / "config.make" }
 	});
-	copyTemplateFiles.push_back({
-		templatePath / "emptyExample.code-workspace",
-		projectDir / workspace.fileName
+	copyTemplateFiles.push_back({ fs::path { templatePath / "emptyExample.code-workspace" },
+		fs::path { projectDir / workspace.fileName }
 	});
 
 	for (auto & c : copyTemplateFiles) {

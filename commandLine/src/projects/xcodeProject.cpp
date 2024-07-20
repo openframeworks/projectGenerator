@@ -315,7 +315,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 							// Base folders can be in a different depth,
 							// so we cut folders to point to the right path
 							fs::path base2 { base };
-							int diff = folders.size() - (a+1);
+							size_t diff = folders.size() - (a+1);
 							for (int x=0; x<diff; x++) {
 								base2 = base2.parent_path();
 							}
@@ -484,14 +484,14 @@ void xcodeProject::addDylib(const fs::path & path, const fs::path & folder){
 void xcodeProject::addInclude(const fs::path & includeName){
 	//alert("addInclude " + includeName);
 	for (auto & c : buildConfigs) {
-		addCommand("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName.string());
+		addCommand("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + ofPathToString(includeName));
 	}
 }
 
 void xcodeProject::addLibrary(const LibraryBinary & lib){
 //	alert( "xcodeProject::addLibrary " + lib.path , 33);
 	for (auto & c : buildConfigs) {
-		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + lib.path.string());
+		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ofPathToString(lib.path));
 	}
 }
 
@@ -550,7 +550,10 @@ void xcodeProject::addAddon(ofAddon & addon){
 	//	alert("xcodeProject addAddon string :: " + addon.name, 31);
 
 	// Files listed alphabetically on XCode navigator.
-	std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), std::less<string>());
+	
+	std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), [](const fs::path & a, const fs::path & b) {
+		return a.string() < b.string();
+	});
 
 	for (auto & e : addon.libs) {
 		ofLogVerbose() << "adding addon libs: " << e.path;

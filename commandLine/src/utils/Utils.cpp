@@ -352,12 +352,11 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
                platformFound = true;
             }
 
-			if (ext == ".a" || ext == ".lib" || ext == ".dylib" || ext == ".so" ||  ext == ".xcframework" || ext == ".framework" ||
-				(ext == ".dll" && platform != "vs")){
+			if (ext.string() == ".a" || ext.string() == ".lib" || ext.string() == ".dylib" || ext.string() == ".so" || ext.string() == ".xcframework" || ext.string() == ".framework" || (ext.string() == ".dll" && platform != "vs")) {
 				if (platformFound){
 					libLibs.push_back({ f.string(), arch, target });
 				}
-			} else if (ext == ".h" || ext == ".hpp" || ext == ".c" || ext == ".cpp" || ext == ".cc" || ext == ".cxx" || ext == ".m" || ext == ".mm"){
+			} else if (ext.string() == ".h" || ext.string() == ".hpp" || ext.string() == ".c" || ext.string() == ".cpp" || ext.string() == ".cc" || ext.string() == ".cxx" || ext.string() == ".m" || ext.string() == ".mm") {
 				libFiles.emplace_back(f);
 			}
 		}
@@ -389,7 +388,7 @@ fs::path getOFRoot(){
 }
 
 void setOFRoot(const fs::path & path){
-    ofLogNotice() << "ofRoot set: [" << path << "].";
+	ofLogNotice() << "ofRoot set: [" << path.string() << "].";
 	OFRoot = path;
 }
 
@@ -486,7 +485,7 @@ vector <fs::path> folderList(const fs::path & path) {
 
 		for(; it != last; ++it) {
 			// this wont' allow hidden directories files like .git to be added, and stop recursivity at this folder level.
-			if ( it->path().filename().c_str()[0] == '.' || it->path().extension() == ".framework" ) {
+			if (it->path().filename().c_str()[0] == '.' || it->path().extension().string() == ".framework") {
 				it.disable_recursion_pending();
 				continue;
 			}

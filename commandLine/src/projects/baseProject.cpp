@@ -209,7 +209,9 @@ bool baseProject::create(const fs::path & _path, string templateName){
 		vector <  fs::path > fileNames;
 		getFilesRecursively(projectDir / "src", fileNames);
 
-		std::sort (fileNames.begin(), fileNames.end());
+		std::sort(fileNames.begin(), fileNames.end(), [](const fs::path & a, const fs::path & b) {
+			return a.string() < b.string();
+		});
 		for (auto & f : fileNames) {
 			fs::path rel { fs::relative(f, projectDir) };
 			fs::path folder { rel.parent_path() };
@@ -303,8 +305,8 @@ void baseProject::addAddon(string addonName){
 	} else {
 		addon.pathToOF = getOFRoot();
 	}
-	ofLogVerbose() << "addon.addonPath to: [" << addon.addonPath << "]";
-	ofLogVerbose() << "addon.pathToOF: [" << addon.pathToOF << "]";
+	ofLogVerbose() << "addon.addonPath to: [" << addon.addonPath.string() << "]";
+	ofLogVerbose() << "addon.pathToOF: [" << addon.pathToOF.string() << "]";
 	
 	addon.pathToOF = normalizePath(addon.pathToOF);
 	addon.addonPath = normalizePath(addon.addonPath);
@@ -319,7 +321,7 @@ void baseProject::addAddon(string addonName){
 	if (fs::exists(addonPath)) {
 		addon.isLocalAddon = true;
 	} else {
-		addonPath = getOFRoot() / "addons" / addonName;
+		addonPath = fs::path { getOFRoot() / "addons" / addonName };
 		addon.isLocalAddon = false;
 	}
 
@@ -391,17 +393,17 @@ void baseProject::addAddon(string addonName){
 		}
 		if (from.extension() == ".dll") {
 			if (d.string().find("x64") != std::string::npos) {
-				to = projectDir / "dll/x64" / from.filename();
+				to = fs::path { projectDir / "dll/x64" / from.filename() };
 				ofLogVerbose() << "adding addon dlls to dll/x64: " << d;
 			} else if (d.string().find("ARM64EC") != std::string::npos) {
-				to = projectDir / "dll/ARM64EC" / from.filename();
+				to = fs::path { projectDir / "dll/ARM64EC" / from.filename()};
 				ofLogVerbose() << "adding addon dlls to dll/ARM64EC: " << d;
 			} else if (d.string().find("ARM64") != std::string::npos) {
-				to = projectDir / "dll/ARM64" / from.filename();
+				to = fs::path { projectDir / "dll/ARM64" / from.filename() };
 				ofLogVerbose() << "adding addon dlls to dll/ARM64: " << d;
 			} else {
 				// Default case if architecture is not found
-				to = projectDir / "bin" / from.filename();
+				to = fs::path { projectDir / "bin" / from.filename() };
 				ofLogVerbose() << "adding addon dlls to bin: " << d;
 			}
 		}
@@ -432,7 +434,7 @@ void baseProject::addAddon(string addonName){
 						fs::copy_file(from, to, fs::copy_options::overwrite_existing);
 						ofLogVerbose() << "adding addon data file: " << d << endl;
 					} catch(fs::filesystem_error& e) {
-						ofLogWarning() << "Can not add addon data file: " << to << " :: " << e.what() << std::endl;;
+						ofLogWarning() << "Can not add addon data file: " << to.string() << " :: " << e.what() << std::endl;;
 					}
 
 				} else if (fs::is_directory(from)) {
@@ -444,7 +446,7 @@ void baseProject::addAddon(string addonName){
 						fs::copy(from, to, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
 						ofLogVerbose() << "adding addon data file: " << d << endl;
 					} catch(fs::filesystem_error& e) {
-						ofLogWarning() << "Can not add addon data file: " << to << " :: " << e.what() << std::endl;
+						ofLogWarning() << "Can not add addon data file: " << to.string() << " :: " << e.what() << std::endl;
 					}
 				}
 			} else {
@@ -499,20 +501,20 @@ void baseProject::addAddon(ofAddon & addon){
 
 	ofLogVerbose("baseProject") << "libs in addAddon " << addon.libs.size();
 	for(auto & lib: addon.libs){
-		ofLogVerbose("baseProject") << lib.path;
+		ofLogVerbose("baseProject") << lib.path.string();
 	}
     
     for(auto & lib: addon.libsPaths){
-        ofLogVerbose("adding lib paths") << lib.c_str();
+		ofLogVerbose("adding lib paths") << lib.string();
     }
 
 	for (auto & a : addon.includePaths) {
-		ofLogVerbose() << "adding addon include path: " << a;
+		ofLogVerbose() << "adding addon include path: " << a.string();
 		addInclude(a);
 	}
 
 	for (auto & a : addon.libs) {
-		ofLogVerbose() << "adding addon libs: " << a.path;
+		ofLogVerbose() << "adding addon libs: " << a.path.string();
 		// FIXME: remove
 		alert ("addlibrary path:" + a.path.string(), 33);
 		addLibrary(a);
@@ -534,27 +536,27 @@ void baseProject::addAddon(ofAddon & addon){
 	}
 
 	for (auto & a : addon.srcFiles) {
-		ofLogVerbose() << "adding addon srcFiles: " << a;
+		ofLogVerbose() << "adding addon srcFiles: " << a.string();
 		addSrc(a, addon.filesToFolders[a]);
 	}
 
 	for (auto & a : addon.csrcFiles) {
-		ofLogVerbose() << "adding addon c srcFiles: " << a;
+		ofLogVerbose() << "adding addon c srcFiles: " << a.string();
 		addSrc(a, addon.filesToFolders[a], C);
 	}
 
 	for (auto & a : addon.cppsrcFiles) {
-		ofLogVerbose() << "adding addon cpp srcFiles: " << a;
+		ofLogVerbose() << "adding addon cpp srcFiles: " << a.string();
 		addSrc(a, addon.filesToFolders[a],CPP);
 	}
 
 	for (auto & a : addon.objcsrcFiles) {
-		ofLogVerbose() << "adding addon objc srcFiles: " << a;
+		ofLogVerbose() << "adding addon objc srcFiles: " << a.string();
 		addSrc(a, addon.filesToFolders[a],OBJC);
 	}
 
 	for (auto & a : addon.headersrcFiles) {
-		ofLogVerbose() << "adding addon header srcFiles: " << a;
+		ofLogVerbose() << "adding addon header srcFiles: " << a.string();
 		addSrc(a, addon.filesToFolders[a],HEADER);
 	}
 
@@ -589,7 +591,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 	}
 
 	for(auto & i : uniqueIncludeFolders){
-		ofLogVerbose() << " adding search include paths for folder " << i;
+		ofLogVerbose() << " adding search include paths for folder " << i.string();
 //		alert("addInclude " + i, 31);
 		addInclude(i);
 	}

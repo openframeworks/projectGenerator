@@ -7,8 +7,13 @@
 namespace fs = of::filesystem;
 
 struct LibraryBinary {
+
+	LibraryBinary(fs::path p, std::string a, std::string t) {
+		path = p;
+		arch = a;
+		target = t;
+	}
 	fs::path path;
-//	std::string path;
 	std::string arch;
 	std::string target;
 

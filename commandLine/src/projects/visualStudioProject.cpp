@@ -302,7 +302,7 @@ void visualStudioProject::addInclude(const fs::path & includeName){
 		std::vector < std::string > strings = ofSplitString(includes, ";");
 		bool bAdd = true;
 		for (size_t i = 0; i < strings.size(); i++){
-			if (strings[i].compare(includeName) == 0){
+			if (strings[i].compare(includeName.string()) == 0){
 				bAdd = false;
 			}
 		}
