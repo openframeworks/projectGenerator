@@ -307,7 +307,7 @@ void visualStudioProject::addInclude(const fs::path & includeName){
 			}
 		}
 		if (bAdd == true){
-			strings.emplace_back(includeName);
+			strings.emplace_back(includeName.string());
 			std::string includesNew = unsplitString(strings, ";");
 //			alert ("includesNew " + includesNew);
 			node.node().first_child().set_value(includesNew.c_str());
