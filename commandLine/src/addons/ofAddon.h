@@ -130,7 +130,7 @@ public:
 	void clear();
 
 	// this is source files:
-	std::unordered_map < fs::path, fs::path > filesToFolders;      //the addons has had, for each file,
+	std::unordered_map < fs::path, fs::path > filesToFolders = {};      //the addons has had, for each file,
 												//sometimes a listing of what folder to put it in, such as "addons/ofxOsc/src"
 
 	vector < fs::path > srcFiles;
