@@ -166,11 +166,10 @@ public:
 	string author;
 	vector<string> tags;
 	string url;
-
-
-	fs::path pathToOF;
-	fs::path pathToProject;
-	bool isLocalAddon; // set to true if the addon path is realtive to the project instead of in OF/addons/
+	
+	fs::path pathToOF = fs::path { "../../../ "};
+	fs::path pathToProject = fs::path { "." };
+	bool isLocalAddon = false; // set to true if the addon path is realtive to the project instead of in OF/addons/
 
 	bool operator <(const ofAddon & addon) const{
 		return addon.name < name;
