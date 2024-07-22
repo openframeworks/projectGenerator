@@ -585,6 +585,9 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 	for (auto & e : addon.srcFiles) {
 		ofLogVerbose() << "adding addon srcFiles: " << e;
+		if(!addon.filesToFolders.contains(e)) {
+			addon.filesToFolders[e] = fs::path { "" };
+		}
 		addSrc(e,addon.filesToFolders[e]);
 	}
 

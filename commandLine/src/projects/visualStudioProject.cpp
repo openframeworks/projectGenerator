@@ -533,21 +533,28 @@ void visualStudioProject::addAddon(ofAddon & addon) {
     
 
 	for (auto & s : addon.srcFiles) {
-		s = normalizePath( s);
+		//s = normalizePath( s);
 		ofLogVerbose() << "adding addon srcFiles: [" << s << "]";;
-
-//		cout << "addSrc s=" << s << " : " << addon.filesToFolders[s] << endl;
-		addSrc(s,addon.filesToFolders[s]);
+		if(!addon.filesToFolders.contains(s)) {
+			addon.filesToFolders[s] = fs::path { "" };
+		}
+		addSrc(s, addon.filesToFolders[s]);
 	}
 
 	for (auto & a : addon.csrcFiles) {
-		ofLogVerbose() << "adding addon c srcFiles: [" << a << "]";;
+		ofLogVerbose() << "adding addon c srcFiles: [" << a << "]";
+		if(!addon.filesToFolders.contains(a)) {
+			addon.filesToFolders[a] = fs::path { "" };
+		}
 		addSrc(a, addon.filesToFolders[a], C);
 	}
 //		if(addon.filesToFolders[addon.csrcFiles[i]]=="") addon.filesToFolders[addon.csrcFiles[i]]="other";
 
 	for (auto & a : addon.cppsrcFiles) {
 		ofLogVerbose() << "adding addon cpp srcFiles: [" << a << "]";
+		if(!addon.filesToFolders.contains(a)) {
+			addon.filesToFolders[a] = fs::path { "" };
+		}
 		addSrc(a, addon.filesToFolders[a],CPP);
 	}
 //		if(addon.filesToFolders[addon.cppsrcFiles[i]]=="") addon.filesToFolders[addon.cppsrcFiles[i]]="other";
@@ -555,6 +562,9 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 
 	for (auto & a : addon.objcsrcFiles) {
 		ofLogVerbose() << "adding addon objc srcFiles: [" << a << "]";
+		if(!addon.filesToFolders.contains(a)) {
+			addon.filesToFolders[a] = fs::path { "" };
+		}
 		addSrc(a, addon.filesToFolders[a],OBJC);
 	}
 //		if(addon.filesToFolders[addon.objcsrcFiles[i]]=="") addon.filesToFolders[addon.objcsrcFiles[i]]="other";
@@ -563,6 +573,9 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 
 	for (auto & a : addon.headersrcFiles) {
 		ofLogVerbose() << "adding addon header srcFiles: [" << a << "]";
+		if(!addon.filesToFolders.contains(a)) {
+			addon.filesToFolders[a] = fs::path { "" };
+		}
 		addSrc(a, addon.filesToFolders[a],HEADER);
 	}
 //		if(addon.filesToFolders[addon.headersrcFiles[i]]=="") addon.filesToFolders[addon.headersrcFiles[i]]="other";

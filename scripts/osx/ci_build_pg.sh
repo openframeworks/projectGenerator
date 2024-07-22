@@ -37,7 +37,7 @@ echoDots(){
 
 package_app(){
 	if [[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
-		echo "package_app --"
+		echo "package_app -- $POSTFIX"
 		PLATFORM=$1
 		# Copy commandLine into electron .app
 		cd ${PG_DIR}
@@ -48,9 +48,9 @@ package_app(){
 		echo "-------------"
 		echo "copy cmdline PG from app contents (signed)"
 		if command -v rsync &> /dev/null; then
-			rsync -avzp "commandLine/bin/commandLine.app/Contents/MacOS/commandLine" "projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator" 2> /dev/null
+			rsync -avzp "commandLine/bin/commandLine.app/Contents/MacOS/commandLine" "projectGenerator-$PLATFORM$POSTFIX/projectGenerator.app/Contents/Resources/app/app/projectGenerator" 2> /dev/null
 		else
-			cp -aX commandLine/bin/commandLine.app/Contents/MacOS/commandLine projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
+			cp -aX commandLine/bin/commandLine.app/Contents/MacOS/commandLine projectGenerator-$PLATFORM$POSTFIX/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
 		fi
 
 
@@ -63,8 +63,8 @@ package_app(){
 
 		# Sign app
 		echo "Signing electron .app"
-		echo "cd to ${PG_DIR}/projectGenerator-$PLATFORM"
-		cd ${PG_DIR}/projectGenerator-$PLATFORM
+		echo "cd to ${PG_DIR}/projectGenerator-${PLATFORM}${POSTFIX}"
+		cd ${PG_DIR}/projectGenerator-${PLATFORM}${POSTFIX}
 		pwd
 		echo "Directory contents:"
 		ls
@@ -79,18 +79,18 @@ package_app(){
 		# echo "--identity=3rd Party Mac Developer Application: ${APPLE_ID} (${TEAM_ID})"
 		if [[ ("${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" || "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/bleeding") && "$TRAVIS_PULL_REQUEST" == "false" ]] || 
    			[[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
-			electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
+			electron-osx-sign projectGenerator-${PLATFORM}${POSTFIX}/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
 		fi
-		${SCRIPT_DIR}/secure.sh projectGenerator-$PLATFORM/projectGenerator.app/Contents/MacOS/projectGenerator projectGenerator-$PLATFORM
+		${SCRIPT_DIR}/secure.sh projectGenerator-${PLATFORM}${POSTFIX}/projectGenerator.app/Contents/MacOS/projectGenerator projectGenerator-${PLATFORM}${POSTFIX}
 		echo "Compressing PG app"
 		# need to upload zip of just app to apple for notarizing
-		zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM/projectGenerator.app
+		zip --symlinks -r -q projectGenerator-$PLATFORM$POSTFIX/projectGenerator-$PLATFORM$POSTFIX.zip projectGenerator-$PLATFORM$POSTFIX/projectGenerator.app
 		if [[ ("${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" || "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/bleeding") && "$TRAVIS_PULL_REQUEST" == "false" ]] || 
    			[[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
-			xcrun notarytool submit "projectGenerator-${PLATFORM}/projectGenerator-${PLATFORM}.zip" --apple-id "${APPLE_ID}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
+			xcrun notarytool submit "projectGenerator-${PLATFORM}${POSTFIX}/projectGenerator-${PLATFORM}${POSTFIX}.zip" --apple-id "${APPLE_ID}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
 		fi
 
-		mv projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip ${PG_DIR}/../../../projectGenerator/projectGenerator-$PLATFORM.zip
+		mv projectGenerator-${PLATFORM}${POSTFIX}/projectGenerator-${PLATFORM}${POSTFIX}.zip ${PG_DIR}/../../../projectGenerator/projectGenerator-${PLATFORM}${POSTFIX}.zip
 		cd ${PG_DIR}/../../../projectGenerator
 		echo "Final Directory contents: ${PG_DIR}/../../../projectGenerator"
 		pwd
@@ -224,7 +224,15 @@ pwd
 echo "Directory contents:"
 ls
 echo "-------------"
-mv frontend/dist/mac-universal ${PG_DIR}/projectGenerator-osx
+if [ -d "${MACOS_ARM64}" ]; then
+	POSTFIX="_arm64"
+	mv frontend/dist/mac-arm64 ${PG_DIR}/projectGenerator-osx$POSTFIX
+else
+	POSTFIX=""
+	mv frontend/dist/mac-universal ${PG_DIR}/projectGenerator-osx
+fi
+
+
 
 echo "-------------"
 echo "  package_app osx"
