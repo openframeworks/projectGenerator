@@ -451,6 +451,7 @@ int main(int argc, char ** argv) {
 	option::Parser parse(usage, argc, argv, &options[0], &buffer[0]);
 
 	if (parse.error()) {
+		messageError("Parse error for arguments");
 		return 1;
 	}
     
@@ -585,20 +586,20 @@ int main(int argc, char ** argv) {
 		return EXIT_USAGE;
 	}
 
-    fs::path projectPath = fs::weakly_canonical(fs::current_path() / projectName);
+    fs::path projectPath = normalizePath(fs::weakly_canonical(fs::current_path() / projectName));
 	ofLogVerbose() << " projectPath path: [" << projectPath << "] root_path: [" << projectPath.root_path() << "]";
 	ofLogNotice() << " ofPath path: [" << ofPath << "]";
 	ofLogNotice() << " ofRoot path: [" << getOFRoot()  << "]";
 	if(projectPath.empty() ) {
-		projectPath = fs::weakly_canonical( getOFRoot() / defaultAppPath / projectName);
+		projectPath = normalizePath(fs::weakly_canonical( getOFRoot() / defaultAppPath / projectName));
 		ofLogNotice() << " projectPath.empty() path now: [" << projectPath << "]";
 	} else if(projectPath == projectPath.root_path() || // if projectPath == "/"
-									   fs::weakly_canonical( projectPath.root_path() / projectName ) == projectPath || // or /projectName
-			  fs::weakly_canonical( generatorPath / projectName ) == projectPath // or generatorPath/projectName
+			  normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName )) == projectPath || // or /projectName
+			  normalizePath(fs::weakly_canonical( generatorPath / projectName )) == projectPath // or generatorPath/projectName
 			  ){
 		ofLogVerbose() << " fs::weakly_canonical( [" << fs::weakly_canonical( projectPath.root_path() / projectName ) << "]";
 		ofLogVerbose() << " projectPath.root_path(): [" << projectPath.root_path() << "]";
-		projectPath = fs::weakly_canonical( getOFRoot() / defaultAppPath / projectName);
+		projectPath =  normalizePath(fs::weakly_canonical( getOFRoot() / defaultAppPath / projectName));
 		ofLogNotice() << " projectPath issue managed, path now: [" << projectPath << "]";
 	} else {
 		ofLogNotice() << " projectPath path: [" << projectPath << "]";
