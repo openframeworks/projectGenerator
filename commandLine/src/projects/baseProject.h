@@ -121,7 +121,7 @@ protected:
 	}
 
 	//cached addons - if an addon is requested more than once, avoid loading from disk as it's quite slow
-	std::unordered_map<std::string,std::unordered_map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]
+	std::map<std::string,std::map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]
 	bool isAddonInCache(const std::string & addonPath, const std::string platform); //is this addon in the mem cache?
 	
 	static void replaceAll(std::string& str, const std::string& from, const std::string& to) {
