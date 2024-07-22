@@ -117,20 +117,21 @@ class ofAddon {
 
 public:
 
-	ofAddon();
-	ofAddon(const ofAddon& other) = default;
+	ofAddon() = default;
+	ofAddon(const ofAddon& other);
 
 
 	bool fromFS(const fs::path & path, const string & platform);
 	void parseLibsPath(const fs::path & path, const fs::path & parentFolder);
-	vector <fs::path> additionalLibsFolder;
-	vector <fs::path> libFiles;
+	
 
 //	void fromXML(string installXmlName);
 	void clear();
 
+	vector <fs::path> additionalLibsFolder;
+	vector <fs::path> libFiles;
 	// this is source files:
-	std::unordered_map < fs::path, fs::path > filesToFolders = {};      //the addons has had, for each file,
+	std::unordered_map < fs::path, fs::path > filesToFolders;      //the addons has had, for each file,
 												//sometimes a listing of what folder to put it in, such as "addons/ofxOsc/src"
 
 	vector < fs::path > srcFiles;

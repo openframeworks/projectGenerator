@@ -24,10 +24,55 @@ vector<string> splitStringOnceByLeft(const string &source, const string &delimit
 	return res;
 }
 
-ofAddon::ofAddon(){
-	isLocalAddon = false;
-	pathToProject = fs::path { "." };
-	pathToOF = fs::path { "../../../ "};
+//ofAddon::ofAddon(){
+//	isLocalAddon = false;
+//	pathToProject = fs::path { "." };
+//	pathToOF = fs::path { "../../../ "};
+//	= std::unordered_map<fs::path, fs::path>();
+//}
+
+ofAddon::ofAddon(const ofAddon& other)
+	: additionalLibsFolder(other.additionalLibsFolder),
+	  libFiles(other.libFiles),
+	  filesToFolders(other.filesToFolders),
+	  srcFiles(other.srcFiles),
+	  csrcFiles(other.csrcFiles),
+	  cppsrcFiles(other.cppsrcFiles),
+	  headersrcFiles(other.headersrcFiles),
+	  objcsrcFiles(other.objcsrcFiles),
+	  propsFiles(other.propsFiles),
+	  libs(other.libs),
+	  dllsToCopy(other.dllsToCopy),
+	  includePaths(other.includePaths),
+	  libsPaths(other.libsPaths),
+	  dependencies(other.dependencies),
+	  cflags(other.cflags),
+	  cppflags(other.cppflags),
+	  ldflags(other.ldflags),
+	  pkgConfigLibs(other.pkgConfigLibs),
+	  frameworks(other.frameworks),
+	  xcframeworks(other.xcframeworks),
+	  data(other.data),
+	  defines(other.defines),
+	  definesCMAKE(other.definesCMAKE),
+	  name(other.name),
+	  addonPath(other.addonPath),
+	  description(other.description),
+	  author(other.author),
+	  tags(other.tags),
+	  url(other.url),
+	  pathToOF(other.pathToOF),
+	  pathToProject(other.pathToProject),
+	  isLocalAddon(other.isLocalAddon),
+	  currentParseState(other.currentParseState),
+	  emptyString(other.emptyString),
+	  platform(other.platform),
+	  excludeLibs(other.excludeLibs),
+	  excludeSources(other.excludeSources),
+	  excludeIncludes(other.excludeIncludes),
+	  excludeFrameworks(other.excludeFrameworks),
+	  excludeXCFrameworks(other.excludeXCFrameworks)
+{
 }
 
 bool ofAddon::checkCorrectPlatform(const string & state) {
