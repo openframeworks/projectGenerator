@@ -13,7 +13,6 @@
 #include "ofUtils.h"
 #include <list>
 #include <set>
-#include <unordered_set>
 using std::string;
 using std::vector;
 
@@ -577,7 +576,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 	getFilesRecursively(srcPath, srcFilesToAdd);
 //	bool isRelative = ofIsPathInPath(fs::absolute(srcPath), getOFRoot());
 
-	std::unordered_set<fs::path> uniqueIncludeFolders;
+	std::set<fs::path> uniqueIncludeFolders;
 	fs::path base = srcPath.parent_path();
 
 	for( auto & src : srcFilesToAdd){
