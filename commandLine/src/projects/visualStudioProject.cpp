@@ -535,7 +535,7 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 	for (auto & s : addon.srcFiles) {
 		//s = normalizePath( s);
 		ofLogVerbose() << "adding addon srcFiles: [" << s << "]";;
-		if(!addon.filesToFolders.contains(s)) {
+		if(addon.filesToFolders.find(s) == addon.filesToFolders.end()) {
 			addon.filesToFolders[s] = fs::path { "" };
 		}
 		addSrc(s, addon.filesToFolders[s]);
@@ -543,7 +543,7 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 
 	for (auto & a : addon.csrcFiles) {
 		ofLogVerbose() << "adding addon c srcFiles: [" << a << "]";
-		if(!addon.filesToFolders.contains(a)) {
+		if(addon.filesToFolders.find(a) == addon.filesToFolders.end()) {
 			addon.filesToFolders[a] = fs::path { "" };
 		}
 		addSrc(a, addon.filesToFolders[a], C);
@@ -552,7 +552,7 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 
 	for (auto & a : addon.cppsrcFiles) {
 		ofLogVerbose() << "adding addon cpp srcFiles: [" << a << "]";
-		if(!addon.filesToFolders.contains(a)) {
+		if(addon.filesToFolders.find(a) == addon.filesToFolders.end()) {
 			addon.filesToFolders[a] = fs::path { "" };
 		}
 		addSrc(a, addon.filesToFolders[a],CPP);
@@ -562,7 +562,7 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 
 	for (auto & a : addon.objcsrcFiles) {
 		ofLogVerbose() << "adding addon objc srcFiles: [" << a << "]";
-		if(!addon.filesToFolders.contains(a)) {
+		if(addon.filesToFolders.find(a) == addon.filesToFolders.end()) {
 			addon.filesToFolders[a] = fs::path { "" };
 		}
 		addSrc(a, addon.filesToFolders[a],OBJC);
@@ -573,9 +573,6 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 
 	for (auto & a : addon.headersrcFiles) {
 		ofLogVerbose() << "adding addon header srcFiles: [" << a << "]";
-		if(!addon.filesToFolders.contains(a)) {
-			addon.filesToFolders[a] = fs::path { "" };
-		}
 		addSrc(a, addon.filesToFolders[a],HEADER);
 	}
 //		if(addon.filesToFolders[addon.headersrcFiles[i]]=="") addon.filesToFolders[addon.headersrcFiles[i]]="other";

@@ -9,7 +9,8 @@
 
 #include "ofConstants.h"
 #include "LibraryBinary.h"
-#include <unordered_map>
+#include <map>
+#include <iostream>
 #include <filesystem>
 
 namespace fs = of::filesystem;
@@ -131,7 +132,7 @@ public:
 	vector <fs::path> additionalLibsFolder;
 	vector <fs::path> libFiles;
 	// this is source files:
-	std::unordered_map < fs::path, fs::path > filesToFolders;      //the addons has had, for each file,
+	std::map < fs::path, fs::path > filesToFolders;      //the addons has had, for each file,
 												//sometimes a listing of what folder to put it in, such as "addons/ofxOsc/src"
 
 	vector < fs::path > srcFiles;
