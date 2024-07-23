@@ -170,7 +170,7 @@ protected:
                 } else {
                     // straight copy
                     try {
-                        fs::copy(from, to, fs::copy_options::overwrite_existing);
+                        fs::copy(from, to, fs::copy_options::update_existing);
                     }
                     catch(fs::filesystem_error & e) {
                         std::cout << "error copying template file " << from << " : " << to << std::endl;
