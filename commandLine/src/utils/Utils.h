@@ -105,7 +105,11 @@ fs::path getUserHomeDir();
 std::string getPGVersion();
 
 bool ofIsPathInPath(const fs::path & path, const fs::path & base);
+void createBackup(const fs::path &path);
 
+std::string normalizePath(const std::string& path);
+
+std::filesystem::path normalizePath(const std::filesystem::path& path);
 
 /*
  Idea: create an object to hold the origin and destination files, with renames where needed

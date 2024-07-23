@@ -527,3 +527,44 @@ bool ofIsPathInPath(const std::filesystem::path & path, const std::filesystem::p
 	auto rel = std::filesystem::relative(path, base);
 	return !rel.empty() && rel.native()[0] != '.';
 }
+
+
+void createBackup(const fs::path &path) {
+	fs::path backupDir = path.parent_path() / "backup";
+	fs::path backupFile = backupDir / (path.filename().string() + ".bak");
+	if (!fs::exists(backupDir)) {
+		fs::create_directories(backupDir);
+	}
+	if (fs::exists(path)) {
+		try {
+			fs::copy_file(path, backupFile, fs::copy_options::overwrite_existing);
+			ofLogNotice() << "Backup created at: " << backupFile;
+		} catch (const std::exception &ex) {
+			ofLogError() << "Failed to create backup: " << ex.what();
+		}
+	} else {
+		ofLogWarning() << "Project file does not exist, no backup created.";
+	}
+}
+
+std::string normalizePath(const std::string& path) {
+	try {
+		auto value = std::filesystem::weakly_canonical(path).string();
+		return value;
+	} catch (const std::exception& ex) {
+		std::cout << "Canonical path for [" << path << "] threw exception:\n"
+				  << ex.what() << '\n';
+		return "";
+	}
+}
+
+std::filesystem::path normalizePath(const std::filesystem::path& path) {
+	try {
+		auto value = std::filesystem::weakly_canonical(path);
+		return value;
+	} catch (const std::exception& ex) {
+		std::cout << "Canonical path for [" << path << "] threw exception:\n"
+				  << ex.what() << '\n';
+		return std::filesystem::path("");
+	}
+}

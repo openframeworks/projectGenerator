@@ -65,6 +65,8 @@ public:
 	virtual void addAddon(std::string addon);
 	virtual void addAddon(ofAddon & addon);
 	virtual void addSrcRecursively(const fs::path & srcPath);
+	
+	virtual void restoreBackup(const fs::path & srcPath){};
 
 	bool isPlatformName(const string & platform);
 
