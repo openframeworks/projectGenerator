@@ -87,10 +87,19 @@ echo "====== clean"
 npm run
 echo "====== run"
 
+
+cd projectGenerator-${PLATFORM}${POSTFIX}
+${SCRIPT_DIR}/secure.sh projectGenerator.app/Contents/MacOS/projectGenerator projectGenerator-gui
+${SCRIPT_DIR}/secure.sh projectGenerator.app/Contents/Resources/app/app/projectGenerator projectGenerator
+cd ../
+
+
 if [ "${BUILD_TEST}" == 1 ]; then
    npm run start:prod
    echo "====== start:prod"
 fi
+
+
 
 npm run dist:${FRONTEND_TARGET}
 echo "====== dist:${FRONTEND_TARGET}"

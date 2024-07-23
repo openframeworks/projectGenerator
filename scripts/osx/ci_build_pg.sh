@@ -81,7 +81,10 @@ package_app(){
    			[[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
 			electron-osx-sign projectGenerator-${PLATFORM}${POSTFIX}/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
 		fi
-		${SCRIPT_DIR}/secure.sh projectGenerator-${PLATFORM}${POSTFIX}/projectGenerator.app/Contents/MacOS/projectGenerator projectGenerator-${PLATFORM}${POSTFIX}
+		cd projectGenerator-${PLATFORM}${POSTFIX}
+		${SCRIPT_DIR}/secure.sh projectGenerator.app/Contents/MacOS/projectGenerator projectGenerator-gui
+		${SCRIPT_DIR}/secure.sh projectGenerator.app/Contents/Resources/app/app/projectGenerator projectGenerator
+		cd ../
 		echo "Compressing PG app"
 		# need to upload zip of just app to apple for notarizing
 		zip --symlinks -r -q projectGenerator-$PLATFORM$POSTFIX/projectGenerator-$PLATFORM$POSTFIX.zip projectGenerator-$PLATFORM$POSTFIX/projectGenerator.app

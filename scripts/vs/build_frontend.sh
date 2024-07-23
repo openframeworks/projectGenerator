@@ -49,6 +49,9 @@ echo "====== update"
 npm run 
 echo "====== run"
 
+${SCRIPT_DIR}/secure.sh ${_DIR}/projectGenerator.exe
+${SCRIPT_DIR}/secure.sh $DESTINATION_PATH/projectGenerator.exe
+
 # if [ "${BUILD_TEST}" == 1 ]; then
    npm run start:prod
    echo "====== start:prod"

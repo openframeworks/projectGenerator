@@ -25,6 +25,7 @@ if [ -d "win-unpacked" ]; then
 
 
     ${SCRIPT_DIR}/secure.sh ${_DIR}/projectGenerator.exe
+    ${SCRIPT_DIR}/secure.sh ${_DIR}/resources/app/app/projectGenerator.exe
 
     zip -r "../projectGenerator-vs-gui.zip" "."
     pwd
