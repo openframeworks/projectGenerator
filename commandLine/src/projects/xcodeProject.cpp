@@ -8,10 +8,11 @@
 #endif
 #ifdef __APPLE__
 #include <cstdlib>  // std::system
+#include <regex>
 #endif
 #include <iostream>
 #include <fstream>
-#include <regex>
+
 
 using nlohmann::json;
 using nlohmann::json_pointer;
@@ -420,6 +421,7 @@ void xcodeProject::addCompileFlagsForMMFile(const fs::path & srcFile) {
 	std::ifstream file(srcFile);
 	std::string line;
 	bool containsARCFunctions = false;
+#if __APPLE__
 	std::regex arcRegex(R"(\b(alloc|dealloc)\b)");
 
 	while (std::getline(file, line)) {
@@ -427,6 +429,7 @@ void xcodeProject::addCompileFlagsForMMFile(const fs::path & srcFile) {
 			containsARCFunctions = true;
 			break;
 		}
+#endif
 	}
 	if (containsARCFunctions) {
 		for (auto & c : buildConfigs) {

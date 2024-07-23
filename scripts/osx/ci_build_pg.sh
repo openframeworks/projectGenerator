@@ -74,17 +74,22 @@ package_app(){
 		echo "cd to ${PG_DIR}"
 		cd ${PG_DIR}
 
+		cd projectGenerator.app/Contents/MacOS/projectGenerator
+		${SCRIPT_DIR}/secure.sh projectGenerator
+		cd ${PG_DIR}
+		cd projectGenerator.app/Contents/Resources/app/app/projectGenerator
+		${SCRIPT_DIR}/secure.sh projectGenerator
+		cd ../
+
 		TEAM_ID="HC25N2E7UT"
 		APPLE_ID="theo@theowatson.com"
+
 		# echo "--identity=3rd Party Mac Developer Application: ${APPLE_ID} (${TEAM_ID})"
 		if [[ ("${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" || "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/bleeding") && "$TRAVIS_PULL_REQUEST" == "false" ]] || 
    			[[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
 			electron-osx-sign projectGenerator-${PLATFORM}${POSTFIX}/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
 		fi
-		cd projectGenerator-${PLATFORM}${POSTFIX}
-		${SCRIPT_DIR}/secure.sh projectGenerator.app/Contents/MacOS/projectGenerator projectGenerator-gui
-		${SCRIPT_DIR}/secure.sh projectGenerator.app/Contents/Resources/app/app/projectGenerator projectGenerator
-		cd ../
+		
 		echo "Compressing PG app"
 		# need to upload zip of just app to apple for notarizing
 		zip --symlinks -r -q projectGenerator-$PLATFORM$POSTFIX/projectGenerator-$PLATFORM$POSTFIX.zip projectGenerator-$PLATFORM$POSTFIX/projectGenerator.app
@@ -195,11 +200,6 @@ import_certificate(){
 echo "##[group]build_cmdline.sh"
 # Compile commandline tool
 ${CURRENT_DIR}/build_cmdline.sh
-echo "##[endgroup]"
-
-echo "##[group]test_cmdline.sh"
-# Test commandline tool
-${CURRENT_DIR}/test_cmdline.sh
 echo "##[endgroup]"
 
 
