@@ -82,12 +82,9 @@ bool VSCodeProject::createProjectFile(){
 	}
 #endif
 	
-	// Copy all files from template, recursively
-	//dangerous as its copying src/ and bin/ into existing project files
-	//fs::copy(templatePath, projectDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
-
+	createBackup(projectDir / ".vscode");
 	try {
-		fs::copy(templatePath / ".vscode", projectDir / ".vscode", fs::copy_options::overwrite_existing | fs::copy_options::recursive);
+		fs::copy(templatePath / ".vscode", projectDir / ".vscode", fs::copy_options::update_existing | fs::copy_options::recursive);
 	} catch(fs::filesystem_error& e) {
 		ofLogError(LOG_NAME) << "error copying folder " << templatePath.string() << " : " << projectDir.string() << " : " << e.what();
 		return false;
@@ -111,7 +108,12 @@ bool VSCodeProject::createProjectFile(){
 	});
 
 	for (auto & c : copyTemplateFiles) {
-		c.run();
+		try {
+			c.run();
+		} catch (const std::exception& e) {
+			std::cerr << "Error running copy template files: " << e.what() << std::endl;
+			return false;
+		}
 	}
 	
 	return true;

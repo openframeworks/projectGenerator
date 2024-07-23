@@ -530,21 +530,23 @@ bool ofIsPathInPath(const std::filesystem::path & path, const std::filesystem::p
 
 
 void createBackup(const fs::path &path) {
-	fs::path backupDir = path.parent_path() / "backup";
-	fs::path backupFile = backupDir / (path.filename().string() + ".bak");
-	if (!fs::exists(backupDir)) {
-		fs::create_directories(backupDir);
-	}
-	if (fs::exists(path)) {
-		try {
-			fs::copy_file(path, backupFile, fs::copy_options::overwrite_existing);
-			ofLogNotice() << "Backup created at: " << backupFile;
-		} catch (const std::exception &ex) {
-			ofLogError() << "Failed to create backup: " << ex.what();
+	if(fs::exists(path)) {
+		fs::path backupDir = path.parent_path();
+		fs::path backupFile = backupDir / (path.filename().string() + ".bak");
+		if (!fs::exists(backupDir)) {
+			fs::create_directories(backupDir);
+		}
+		if (fs::exists(path)) {
+			try {
+				fs::copy_file(path, backupFile, fs::copy_options::overwrite_existing);
+				messageReturn("Backup created", backupFile);
+			} catch (const std::exception &ex) {
+				messageError("Failed to create backup: {" + backupFile.string() + "} Error:" + ex.what());
+			}
 		}
 	} else {
-		ofLogWarning() << "Project file does not exist, no backup created.";
-	}
+		ofLogVerbose() << "Project file does not exist, no backup created.";
+   }
 }
 
 std::string normalizePath(const std::string& path) {

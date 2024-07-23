@@ -9,24 +9,26 @@ bool visualStudioProject::createProjectFile(){
 
 	ensureDllDirectoriesExist();
 	solution = projectDir / (projectName + ".sln");
-
-//	std::pair <string, string> replacements;
-//	if (!fs::equivalent(getOFRoot(), fs::path{ "../../.." })) {
-//		string root { getOFRoot().string() };
-//		string relRootWindows { convertStringToWindowsSeparator(root) + "\\" };
-//		
-//		replacements = { "..\\..\\..\\", relRootWindows };
-//	} else {
-////		cout << "equivalent to default ../../.." << endl;
-//	}
+	createBackup(solution);
 	
+	std::pair <string, string> replacementsForward, replacementsBack;
+	if (!fs::equivalent(getOFRoot(), fs::path{ "../../.." })) {
+		fs::path root { getOFRoot() };
+		string relRootWindows { convertStringToWindowsSeparator(root.string()) + "\\" };
+		replacementsForward = { "../../../", relRootWindows };
+		replacementsBack = { "..\\..\\..\\", relRootWindows };
+	} else {
+//		cout << "equivalent to default ../../.." << endl;
+	}
+	\
 	// solution
 	copyTemplateFiles.push_back({
 		templatePath / "emptyExample.sln",
 		projectDir / (projectName + ".sln"),
 		{
 			{ "emptyExample", projectName },
-			//replacements
+			replacementsForward,
+			replacementsBack
 		}
 	});
 	
@@ -36,7 +38,8 @@ bool visualStudioProject::createProjectFile(){
 		projectDir / (projectName + ".vcxproj"),
 		{
 			{ "emptyExample", projectName },
-			//replacements
+			replacementsForward,
+			replacementsBack
 		}
 
 	});
@@ -45,24 +48,43 @@ bool visualStudioProject::createProjectFile(){
 	copyTemplateFiles.push_back({
 		templatePath / "emptyExample.vcxproj.user",
 		projectDir / (projectName + ".vcxproj.user"),
-		{{ "emptyExample", projectName }}
+		{
+			{ "emptyExample", projectName },
+			replacementsForward,
+			replacementsBack
+		}
 	});
 
 	// filters
 	copyTemplateFiles.push_back({
 		templatePath / "emptyExample.vcxproj.filters",
-		projectDir / (projectName + ".vcxproj.filters")
+		projectDir / (projectName + ".vcxproj.filters"),
+		{
+			{ "emptyExample", projectName },
+			replacementsForward,
+			replacementsBack
+		}
 	});
 
 	// icon
 	copyTemplateFiles.push_back({
 		templatePath / "icon.rc",
-		projectDir / "icon.rc"
+		projectDir / "icon.rc",
+		{
+			{ "emptyExample", projectName },
+			replacementsForward,
+			replacementsBack
+		}
 	});
 
 	for (auto & c : copyTemplateFiles) {
-		c.run();
-	}
+			try {
+				c.run();
+			} catch (const std::exception& e) {
+				std::cerr << "Error running copy template files: " << e.what() << std::endl;
+				return false;
+			}
+		}
 
 
 	 fs::path filters { projectDir / (projectName + ".vcxproj.filters") };
