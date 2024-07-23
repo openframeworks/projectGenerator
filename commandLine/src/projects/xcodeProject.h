@@ -3,7 +3,7 @@
 #include "baseProject.h"
 //#include <unordered_map>
 #include <map>
-
+#include <regex.h>
 using std::string;
 
 
@@ -32,6 +32,7 @@ public:
 	void addAfterRule(string script);
 	void addDefine(string define, LibType libType = RELEASE_LIB);
 
+	void addCompileFlagsForMMFile(const fs::path & srcFile);
 	void addFramework(const fs::path & path, const fs::path & folder);
 	void addXCFramework(const fs::path & path, const fs::path & folder);
 	void addDylib(const fs::path & path, const fs::path & folder);
