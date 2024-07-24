@@ -88,10 +88,10 @@ npm run
 echo "====== run"
 
 
-if [ "${BUILD_TEST}" == 1 ]; then
-   npm run start:prod
-   echo "====== start:prod"
-fi
+# if [ "${BUILD_TEST}" == 1 ]; then
+#    npm run start:prod
+#    echo "====== start:prod"
+# fi
 
 
 

@@ -6,9 +6,13 @@
 #else
 	#include <nlohmann/json.hpp> // MSYS2 : use of system-installed include
 #endif
+#include "ofMain.h"
+
+#if TARGET_OS_MAC
 #ifdef __APPLE__
-#include <cstdlib>  // std::system
-#include <regex>
+	#include <cstdlib>  // std::system
+	#include <regex>
+	#endif
 #endif
 #include <iostream>
 #include <fstream>
@@ -155,7 +159,7 @@ bool xcodeProject::createProjectFile(){
 			baseProject::recursiveCopyContents(templateDataDir, projectDataDir);
 		}
         if (fs::exists(templateBinDir) && fs::is_directory(templateBinDir)) {
-#ifdef __APPLE__
+#ifdef TARGET_OS_MAC
             try {
                 //  extended attributes on macOS
                 std::string command = "xattr -w com.apple.xcode.CreatedByBuildSystem true " + templateBinDir.string();
@@ -429,8 +433,8 @@ void xcodeProject::addCompileFlagsForMMFile(const fs::path & srcFile) {
 			containsARCFunctions = true;
 			break;
 		}
-#endif
 	}
+#endif
 	if (containsARCFunctions) {
 		for (auto & c : buildConfigs) {
 			addCommand("Add :objects:"+c+":buildSettings:OTHER_CPLUSPLUSFLAGS: string -fno-objc-arc");
