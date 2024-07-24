@@ -6,13 +6,9 @@
 #else
 	#include <nlohmann/json.hpp> // MSYS2 : use of system-installed include
 #endif
-#include "ofMain.h"
-
-#if TARGET_OS_MAC
 #ifdef __APPLE__
 	#include <cstdlib>  // std::system
 	#include <regex>
-	#endif
 #endif
 #include <iostream>
 #include <fstream>
