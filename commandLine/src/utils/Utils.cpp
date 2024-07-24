@@ -588,3 +588,7 @@ std::filesystem::path normalizePath(const std::filesystem::path& path) {
 		return std::filesystem::path("");
 	}
 }
+
+fs::path makeRelative(const fs::path& from, const fs::path& to) {
+	return fs::relative(to, from);
+}

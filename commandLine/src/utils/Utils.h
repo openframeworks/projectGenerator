@@ -105,6 +105,8 @@ vector <string> fileToStrings (const fs::path & file);
 fs::path getUserHomeDir();
 std::string getPGVersion();
 
+fs::path makeRelative(const fs::path& from, const fs::path& to);
+
 bool ofIsPathInPath(const fs::path & path, const fs::path & base);
 void createBackup(const fs::path &path);
 

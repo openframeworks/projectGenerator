@@ -537,56 +537,64 @@ void visualStudioProject::addAddon(ofAddon &addon) {
 
 	// Add props files from the addon
 	for (auto &props : addon.propsFiles) {
-		ofLogVerbose() << "Adding addon props: [" << props.string() << "]";
-		addProps(props);
+		fs::path normalizedDir = normalizePath(props);
+		ofLogVerbose() << "Adding addon props: [" << normalizedDir.string() << "]";
+		addProps(normalizedDir);
 	}
 
 	// Add libraries from the addon
 	for (auto &lib : addon.libs) {
+		fs::path normalizedDir = normalizePath( lib.path);
+		lib.path = normalizedDir;
 		ofLogVerbose() << "Adding addon library: [" << lib.path.string() << "]";
 		addLibrary(lib);
 	}
 
 	// Add source files to the project, avoiding excessive directory nesting
 	for (auto &s : addon.srcFiles) {
-		ofLogVerbose() << "Adding addon source file: [" << s.string() << "]";
+		fs::path normalizedDir = normalizePath(s);
+		ofLogVerbose() << "Adding addon source file: [" << normalizedDir.string() << "]";
 		if (addon.filesToFolders.find(s) == addon.filesToFolders.end()) {
 			addon.filesToFolders[s] = fs::path{""};
 		}
-		addSrc(s, addon.filesToFolders[s]);
+		addSrc(normalizedDir, addon.filesToFolders[s]);
 	}
 
 	// Add C source files to the project
 	for (auto &a : addon.csrcFiles) {
-		ofLogVerbose() << "Adding addon C source file: [" << a.string() << "]";
+		fs::path normalizedDir = normalizePath(a);
+		ofLogVerbose() << "Adding addon C source file: [" << normalizedDir.string() << "]";
 		if (addon.filesToFolders.find(a) == addon.filesToFolders.end()) {
 			addon.filesToFolders[a] = fs::path{""};
 		}
-		addSrc(a, addon.filesToFolders[a], C);
+		addSrc(normalizedDir, addon.filesToFolders[a], C);
 	}
 
 	// Add C++ source files to the project
 	for (auto &a : addon.cppsrcFiles) {
-		ofLogVerbose() << "Adding addon C++ source file: [" << a.string() << "]";
+		fs::path normalizedDir = normalizePath(a);
+		ofLogVerbose() << "Adding addon C++ source file: [" << normalizedDir.string() << "]";
 		if (addon.filesToFolders.find(a) == addon.filesToFolders.end()) {
 			addon.filesToFolders[a] = fs::path{""};
 		}
-		addSrc(a, addon.filesToFolders[a], CPP);
+		addSrc(normalizedDir, addon.filesToFolders[a], CPP);
 	}
 
 	// Add Objective-C source files to the project
 	for (auto &a : addon.objcsrcFiles) {
-		ofLogVerbose() << "Adding addon Objective-C source file ?: [" << a.string() << "]";
+		fs::path normalizedDir = normalizePath(a);
+		ofLogVerbose() << "Adding addon Objective-C source file ?: [" << normalizedDir.string() << "]";
 		if (addon.filesToFolders.find(a) == addon.filesToFolders.end()) {
 			addon.filesToFolders[a] = fs::path{""};
 		}
-		addSrc(a, addon.filesToFolders[a], OBJC);
+		addSrc(normalizedDir, addon.filesToFolders[a], OBJC);
 	}
 
 	// Add header files to the project
 	for (auto &a : addon.headersrcFiles) {
-		ofLogVerbose() << "Adding addon header file: [" << a.string() << "]";
-		addSrc(a, addon.filesToFolders[a], HEADER);
+		fs::path normalizedDir = normalizePath(a);
+		ofLogVerbose() << "Adding addon header file: [" << normalizedDir.string() << "]";
+		addSrc(normalizedDir, addon.filesToFolders[a], HEADER);
 	}
 
 	// Add CFLAGS, CPPFLAGS, and defines from the addon
@@ -612,18 +620,21 @@ void visualStudioProject::addAddon(ofAddon &addon) {
 	for (const auto &dir : addon.includePaths) {
 		fs::path normalizedDir = normalizePath(dir);
 		std::string dirStr = normalizedDir.string();
-		if (dirStr.find("\\lib\\vs\\") == std::string::npos &&
-				dirStr.find("\\lib\\AndroidJNI\\") == std::string::npos &&
+		if (dirStr.find("lib\\vs") == std::string::npos &&
+			dirStr.find("\\license") == std::string::npos &&
+			dirStr.find("lib\\\\vs") == std::string::npos &&
+				dirStr.find("lib\\AndroidJNI") == std::string::npos &&
 				dirStr.find("\\bin\\") == std::string::npos) {
 			uniqueIncludeDirs.insert(normalizedDir);
 		} else {
-			ofLogVerbose() << "include dir - not adding in lib vs: [" << dir.string() << "]";
+			ofLogVerbose() << "include dir - not adding vs: [" << dir.string() << "]";
 		}
 	}
 
 	for (const auto &dir : uniqueIncludeDirs) {
-		ofLogVerbose() << "Adding include dir: [" << dir.string() << "]";
-		addInclude(dir);
+		fs::path normalizedDir = makeRelative(dir, getOFRoot());
+		ofLogVerbose() << "Adding include dir: [" << normalizedDir.string() << "]";
+		addInclude(normalizedDir);
 	}
 }
 
