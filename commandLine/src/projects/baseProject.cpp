@@ -161,8 +161,14 @@ bool baseProject::create(const fs::path & _path, string templateName){
 	if (fs::exists(project) && fs::is_directory(project)) {
 		bDoesDirExist = true;
 	} else {
-		for (auto & p : { fs::path("src") , fs::path("bin") }) {
-			fs::copy (templatePath / p, projectDir / p, fs::copy_options::recursive);
+		for (auto & p : { fs::path("src"), fs::path("bin") }) {
+			try {
+				// think of exclusions to manually merge like plist
+				fs::copy (templatePath / p, projectDir / p, fs::copy_options::recursive | (bOverwrite ? fs::copy_options::overwrite_existing : fs::copy_options::update_existing));
+			} catch(fs::filesystem_error& e) {
+				ofLogNotice() << "Can not copy: " << templatePath / p << " :: " <<projectDir / p << " :: " << e.what() ;
+			}
+			
 		}
 	}
 	bool ret = createProjectFile();
@@ -184,6 +190,7 @@ bool baseProject::create(const fs::path & _path, string templateName){
 			for(auto & rename: templateConfig->renames){
 				auto from = projectDir / rename.first;
 				auto to = projectDir / rename.second;
+			
 				if (fs::exists(to)) {
 					fs::remove(to);
 				}
@@ -367,10 +374,9 @@ void baseProject::addAddon(string addonName){
 	addons.emplace_back(addon);
 
 	for (auto & e : addon.includePaths) {
-		ofLogVerbose() << "adding addon include path: " << e;
-//		alert ("adding addon include path: " + e, 34);
-//		ofLog() << "adding addon include path: " << e;
-		addInclude(e);
+		fs::path normalizedDir = makeRelative(getOFRoot(), e);
+		ofLogVerbose() << "base adding addon include path: [" << normalizedDir << "]";
+		addInclude(normalizedDir);
 	}
 
 	// It was part exclusive of visualStudioProject. now it is part of baseProject, so dlls are copied in VSCode project and .so files in linux
@@ -382,7 +388,7 @@ void baseProject::addAddon(string addonName){
 			fs::path folder { projectDir / "bin" / "libs" };
 			if (!fs::exists(folder)) {
 				try {
-					fs::create_directory(folder);
+					fs::create_directories(folder);
 				} catch(fs::filesystem_error& e) {
 					ofLogError("baseProject::addAddon") << "error creating folder " << folder << e.what();
 				}
@@ -408,7 +414,7 @@ void baseProject::addAddon(string addonName){
 		}
 
 		try {
-			fs::copy_file(from, to, fs::copy_options::overwrite_existing);
+			fs::copy_file(from, to, fs::copy_options::overwrite_existing); // always overwrite DLLS
 		} catch(fs::filesystem_error& e) {
 			ofLogError("baseProject::addAddon") << "error copying template file " << from << endl << "to: " << to << endl <<  e.what();
 		}
@@ -430,7 +436,7 @@ void baseProject::addAddon(string addonName){
 				fs::path to { dest / d };
 				if (fs::is_regular_file(from)){
 					try {
-						fs::copy_file(from, to, fs::copy_options::overwrite_existing);
+						fs::copy_file(from, to, fs::copy_options::overwrite_existing); // this is addon files
 						ofLogVerbose() << "adding addon data file: " << d << endl;
 					} catch(fs::filesystem_error& e) {
 						ofLogWarning() << "Can not add addon data file: " << to.string() << " :: " << e.what() << std::endl;;
@@ -438,7 +444,11 @@ void baseProject::addAddon(string addonName){
 
 				} else if (fs::is_directory(from)) {
 					if (!fs::exists(to)) {
-						fs::create_directory(to);
+						try {
+						   fs::create_directory(to);
+						} catch (const std::exception& e) {
+						   std::cerr << "Error creating directories: " << e.what() << std::endl;
+						}
 					}
 
 					try {
@@ -499,23 +509,19 @@ void baseProject::addAddon(ofAddon & addon){
 	addons.emplace_back(addon);
 
 	ofLogVerbose("baseProject") << "libs in addAddon " << addon.libs.size();
-	for(auto & lib: addon.libs){
-		ofLogVerbose("baseProject") << lib.path.string();
-	}
-    
+
     for(auto & lib: addon.libsPaths){
 		ofLogVerbose("adding lib paths") << lib.string();
     }
 
 	for (auto & a : addon.includePaths) {
-		ofLogVerbose() << "adding addon include path: " << a.string();
-		addInclude(a);
+		fs::path normalizedDir = makeRelative(getOFRoot(), a);
+		ofLogVerbose() << "adding addon include path: [" << normalizedDir.string() + "]";
+		addInclude(normalizedDir);
 	}
 
 	for (auto & a : addon.libs) {
 		ofLogVerbose() << "adding addon libs: " << a.path.string();
-		// FIXME: remove
-		alert ("addlibrary path:" + a.path.string(), 33);
 		addLibrary(a);
 	}
 
@@ -535,32 +541,38 @@ void baseProject::addAddon(ofAddon & addon){
 	}
 
 	for (auto & a : addon.srcFiles) {
-		ofLogVerbose() << "adding addon srcFiles: " << a.string();
-		addSrc(a, addon.filesToFolders[a]);
+		fs::path normalizedDir = makeRelative(getOFRoot(), a);
+		ofLogVerbose() << "adding addon srcFiles: " << normalizedDir.string();
+		addSrc(normalizedDir, addon.filesToFolders[a]);
 	}
 
 	for (auto & a : addon.csrcFiles) {
-		ofLogVerbose() << "adding addon c srcFiles: " << a.string();
-		addSrc(a, addon.filesToFolders[a], C);
+		fs::path normalizedDir = makeRelative(getOFRoot(), a);
+		ofLogVerbose() << "adding addon c srcFiles: " << normalizedDir.string();
+		addSrc(normalizedDir, addon.filesToFolders[a], C);
 	}
 
 	for (auto & a : addon.cppsrcFiles) {
-		ofLogVerbose() << "adding addon cpp srcFiles: " << a.string();
-		addSrc(a, addon.filesToFolders[a],CPP);
+		fs::path normalizedDir = makeRelative(getOFRoot(), a);
+		ofLogVerbose() << "adding addon cpp srcFiles: " << normalizedDir.string();
+		addSrc(normalizedDir, addon.filesToFolders[a],CPP);
 	}
 
 	for (auto & a : addon.objcsrcFiles) {
-		ofLogVerbose() << "adding addon objc srcFiles: " << a.string();
-		addSrc(a, addon.filesToFolders[a],OBJC);
+		fs::path normalizedDir = makeRelative(getOFRoot(), a);
+		ofLogVerbose() << "adding addon objc srcFiles: " << normalizedDir.string();
+		addSrc(normalizedDir, addon.filesToFolders[a],OBJC);
 	}
 
 	for (auto & a : addon.headersrcFiles) {
-		ofLogVerbose() << "adding addon header srcFiles: " << a.string();
-		addSrc(a, addon.filesToFolders[a],HEADER);
+		
+		fs::path normalizedDir = makeRelative(getOFRoot(), a);
+		ofLogVerbose() << "adding addon header srcFiles: [" << normalizedDir.string() << "]";
+		addSrc(normalizedDir, addon.filesToFolders[a],HEADER);
 	}
 
 	for (auto & a : addon.defines) {
-		ofLogVerbose() << "adding addon defines: " << a;
+		ofLogVerbose() << "adding addon defines: [" << a << "]";
 		addDefine(a);
 	}
 }
@@ -569,8 +581,6 @@ void baseProject::addAddon(ofAddon & addon){
 void baseProject::addSrcRecursively(const fs::path & srcPath){
 //	alert("addSrcRecursively " + srcPath.string(), 32);
 	ofLog() << "using additional source folder " << srcPath.string();
-//	alert("--");
-
 	extSrcPaths.emplace_back(srcPath);
 	vector < fs::path > srcFilesToAdd;
 	getFilesRecursively(srcPath, srcFilesToAdd);
@@ -583,16 +593,18 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 		fs::path parent = src.parent_path();
 		fs::path folder = fs::path("external_sources") / parent.lexically_relative(base);
 //		fs::path folder = parent.lexically_relative(base);
+		ofLogVerbose() << " addSrcRecursively srcFilesToAdd:[" << src.string() << "]";
 		addSrc(src, folder);
 		if (parent.string() != "") {
 			uniqueIncludeFolders.insert(parent);
 		}
 	}
-
+	
 	for(auto & i : uniqueIncludeFolders){
-		ofLogVerbose() << " adding search include paths for folder " << i.string();
+		fs::path normalizedDir = makeRelative(getOFRoot(), i);
+		ofLogVerbose() << " adding search include paths for folder: [" << normalizedDir.string() << "]";
 //		alert("addInclude " + i, 31);
-		addInclude(i);
+		addInclude(normalizedDir);
 	}
 }
 
@@ -646,7 +658,7 @@ void baseProject::recursiveCopyContents(const fs::path & srcDir, const fs::path 
 bool baseProject::recursiveCopy(const fs::path & srcDir, const fs::path & destDir){
 	//	alert("recursiveCopy " + srcDir.string() + " : " + destDir.string(), 32);
 	try {
-		fs::copy(srcDir, destDir, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
+		fs::copy(srcDir, destDir, (bOverwrite ? fs::copy_options::overwrite_existing : fs::copy_options::update_existing) | fs::copy_options::recursive);
 		return true;
 	} catch (std::exception& e) {
 		// TODO: ofLogWarning()

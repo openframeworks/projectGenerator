@@ -87,6 +87,8 @@ public:
 	std::string target;
 
 	bool bMakeRelative = false;
+	
+	bool bOverwrite = false;
 
 
 

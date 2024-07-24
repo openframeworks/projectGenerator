@@ -374,6 +374,7 @@ void fixSlashOrder(std::string &toFix) {
 	std::replace(toFix.begin(), toFix.end(), '/', '\\');
 	// Remove duplicate backslashes
 	toFix = std::regex_replace(toFix, std::regex(R"(\\\\)"), R"(\\)");
+	toFix = std::regex_replace(toFix, std::regex(R"(\\\\\\)"), R"(\\\\)");
 }
 
 void fixSlashOrderPath(fs::path &toFix) {
@@ -381,7 +382,17 @@ void fixSlashOrderPath(fs::path &toFix) {
 	std::replace(p.begin(), p.end(), '/', '\\');
 	// Remove duplicate backslashes
 	p = std::regex_replace(p, std::regex(R"(\\\\)"), R"(\\)");
+	p = std::regex_replace(p, std::regex(R"(\\\\\\)"), R"(\\\\)");
 	toFix = fs::path { p };
+}
+
+fs::path fixSlashOrderPathReturn(const fs::path &toFix) {
+	string p = toFix.string();
+	std::replace(p.begin(), p.end(), '/', '\\');
+	// Remove duplicate backslashes
+	p = std::regex_replace(p, std::regex(R"(\\\\)"), R"(\\)");
+	p = std::regex_replace(p, std::regex(R"(\\\\\\)"), R"(\\\\)");
+	return fs::path { p };
 }
 
 string unsplitString (std::vector < string > strings, string deliminator ){
@@ -550,7 +561,7 @@ void createBackup(const fs::path &path) {
 		}
 		if (fs::exists(path)) {
 			try {
-				fs::copy_file(path, backupFile, fs::copy_options::overwrite_existing);
+				fs::copy_file(path, backupFile, fs::copy_options::overwrite_existing); //backup file
 				messageReturn("Backup created", backupFile.string());
 			} catch (const std::exception &ex) {
 				messageError("Failed to create backup: {" + backupFile.string() + "} Error:" + ex.what());
@@ -590,5 +601,9 @@ std::filesystem::path normalizePath(const std::filesystem::path& path) {
 }
 
 fs::path makeRelative(const fs::path& from, const fs::path& to) {
-	return fs::relative(to, from);
+	fs::path relative = fs::relative(to, from);
+#ifdef TARGET_WIN32
+		fixSlashOrderPath(relative);
+#endif
+	return relative;
 }

@@ -23,7 +23,7 @@ bool QtCreatorProject::createProjectFile(){
 		fs::path src { templatePath / p.first };
 		fs::path dst { projectDir / p.second };
 		try {
-			fs::copy_file(src, dst, fs::copy_options::overwrite_existing);
+			fs::copy_file(src, dst, (bOverwrite ? fs::copy_options::overwrite_existing : fs::copy_options::update_existing));
 		} catch(fs::filesystem_error& e) {
 			ofLogError(LOG_NAME) << "error copying template file " << src << " : " << dst << " : " << e.what();
 			return false;
