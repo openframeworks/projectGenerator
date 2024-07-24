@@ -539,7 +539,7 @@ void createBackup(const fs::path &path) {
 		if (fs::exists(path)) {
 			try {
 				fs::copy_file(path, backupFile, fs::copy_options::overwrite_existing);
-				messageReturn("Backup created", backupFile);
+				messageReturn("Backup created", backupFile.string());
 			} catch (const std::exception &ex) {
 				messageError("Failed to create backup: {" + backupFile.string() + "} Error:" + ex.what());
 			}
