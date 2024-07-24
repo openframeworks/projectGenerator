@@ -74,6 +74,7 @@ void getDllsRecursively(const fs::path & path, std::vector < fs::path > & dlls, 
 void splitFromFirst(string toSplit, string deliminator, string & first, string & second);
 
 void fixSlashOrder(string & toFix);
+void fixSlashOrderPath(fs::path &toFix);
 string unsplitString (std::vector < string > strings, string deliminator );
 
 std::unique_ptr<baseProject> getTargetProject(const string & targ);

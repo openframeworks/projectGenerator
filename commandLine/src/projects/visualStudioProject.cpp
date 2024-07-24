@@ -610,12 +610,14 @@ void visualStudioProject::addAddon(ofAddon &addon) {
 
 	std::set<fs::path> uniqueIncludeDirs;
 	for (const auto &dir : addon.includePaths) {
-		fs::path normalizedDir = fs::weakly_canonical(dir);
+		fs::path normalizedDir = normalizePath(dir);
 		std::string dirStr = normalizedDir.string();
-		if (dirStr.find("lib\\vs\\") == std::string::npos) {
+		if (dirStr.find("\\lib\\vs\\") == std::string::npos &&
+				dirStr.find("\\lib\\AndroidJNI\\") == std::string::npos &&
+				dirStr.find("\\bin\\") == std::string::npos) {
 			uniqueIncludeDirs.insert(normalizedDir);
 		} else {
-			ofLogVerbose() << "include dir - not adding in lib\vs: [" << dir.string() << "]";
+			ofLogVerbose() << "include dir - not adding in lib vs: [" << dir.string() << "]";
 		}
 	}
 

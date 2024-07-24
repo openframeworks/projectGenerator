@@ -112,17 +112,6 @@ protected:
 	std::vector<ofAddon> addons;
 	std::vector<fs::path> extSrcPaths;
 	
-	std::filesystem::path normalizePath(const std::filesystem::path& path) {
-		try {
-			auto value = std::filesystem::weakly_canonical(path);
-			return value;
-		} catch (const std::exception& ex) {
-			std::cout << "Canonical path for [" << path << "] threw exception:\n"
-					  << ex.what() << '\n';
-			return std::filesystem::path("");
-		}
-	}
-
 	//cached addons - if an addon is requested more than once, avoid loading from disk as it's quite slow
 	std::map<std::string,std::map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]
 	bool isAddonInCache(const std::string & addonPath, const std::string platform); //is this addon in the mem cache?
