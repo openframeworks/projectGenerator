@@ -1,7 +1,6 @@
 #pragma once
 
-#define PG_VERSION "63"
-
+#include "defines.h"
 #include "ofAddon.h"
 #include "pugixml.hpp"
 #include <map>
@@ -12,8 +11,6 @@
 #include <vector>
 
 namespace fs = of::filesystem;
-
-
 
 class baseProject {
 public:
@@ -27,7 +24,11 @@ public:
 		HEADER,
 		CPP,
 		C,
-		OBJC
+		OBJC,
+		METAL,
+		SWIFT,
+		JAVA,
+		KOTLIN
 	};
 
 	struct Template {

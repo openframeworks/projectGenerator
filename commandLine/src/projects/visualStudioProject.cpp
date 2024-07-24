@@ -1,6 +1,7 @@
 #include "visualStudioProject.h"
 #include "Utils.h"
 #include "ofUtils.h"
+#include <set>
 
 string visualStudioProject::LOG_NAME = "visualStudioProjectFile";
 
@@ -512,7 +513,7 @@ void visualStudioProject::ensureDllDirectoriesExist() {
 		fs::path dirPath = projectDir / dir;
 		dirPath = normalizePath(dirPath);
 		if (!fs::exists(dirPath)) {
-			ofLogVerbose() << "adding dll folder: [" << dirPath << "]";
+			ofLogVerbose() << "adding dll folder: [" << dirPath.string() << "]";
 			fs::create_directories(dirPath);
 		}
 	}
@@ -520,12 +521,13 @@ void visualStudioProject::ensureDllDirectoriesExist() {
 
 
 
-void visualStudioProject::addAddon(ofAddon & addon) {
-//	alert ("visualStudioProject::addAddon " + addon.name);
-
+void visualStudioProject::addAddon(ofAddon &addon) {
+	// Log the addition of the addon
+	ofLogVerbose() << "Adding addon: [" << addon.name << "]";
+	// Handle additional vcxproj files in the addon
 	fs::path additionalFolder = addon.addonPath / (addon.name + "Lib");
 	if (fs::exists(additionalFolder)) {
-		for (const auto & entry : fs::directory_iterator(additionalFolder)) {
+		for (const auto &entry : fs::directory_iterator(additionalFolder)) {
 			auto f = entry.path();
 			if (f.extension() == ".vcxproj") {
 				additionalvcxproj.emplace_back(f);
@@ -533,89 +535,93 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 		}
 	}
 
-	for (auto & props : addon.propsFiles) {
-		ofLogVerbose() << "adding addon props: [" << props << "]";
+	// Add props files from the addon
+	for (auto &props : addon.propsFiles) {
+		ofLogVerbose() << "Adding addon props: [" << props.string() << "]";
 		addProps(props);
 	}
 
-//	cout << "addon libs size = " << addon.libs.size() << endl;
-	for(auto & lib: addon.libs){
-//		alert ("visualStudioProject::addon.libs " + lib.path);
-		ofLogVerbose() << "adding addon libs: [" << lib.path << "]";;
+	// Add libraries from the addon
+	for (auto &lib : addon.libs) {
+		ofLogVerbose() << "Adding addon library: [" << lib.path.string() << "]";
 		addLibrary(lib);
 	}
 
-	// MARK: -NEW TEST, lets see how it works now.
-	for (auto & f : addon.filesToFolders) {
-		if (f.second == "") {
-//			alert("OTHER");
-			f.second = "other";
-		}
-	}
-    
-
-	for (auto & s : addon.srcFiles) {
-		//s = normalizePath( s);
-		ofLogVerbose() << "adding addon srcFiles: [" << s << "]";;
-		if(addon.filesToFolders.find(s) == addon.filesToFolders.end()) {
-			addon.filesToFolders[s] = fs::path { "" };
+	// Add source files to the project, avoiding excessive directory nesting
+	for (auto &s : addon.srcFiles) {
+		ofLogVerbose() << "Adding addon source file: [" << s.string() << "]";
+		if (addon.filesToFolders.find(s) == addon.filesToFolders.end()) {
+			addon.filesToFolders[s] = fs::path{""};
 		}
 		addSrc(s, addon.filesToFolders[s]);
 	}
 
-	for (auto & a : addon.csrcFiles) {
-		ofLogVerbose() << "adding addon c srcFiles: [" << a << "]";
-		if(addon.filesToFolders.find(a) == addon.filesToFolders.end()) {
-			addon.filesToFolders[a] = fs::path { "" };
+	// Add C source files to the project
+	for (auto &a : addon.csrcFiles) {
+		ofLogVerbose() << "Adding addon C source file: [" << a.string() << "]";
+		if (addon.filesToFolders.find(a) == addon.filesToFolders.end()) {
+			addon.filesToFolders[a] = fs::path{""};
 		}
 		addSrc(a, addon.filesToFolders[a], C);
 	}
-//		if(addon.filesToFolders[addon.csrcFiles[i]]=="") addon.filesToFolders[addon.csrcFiles[i]]="other";
 
-	for (auto & a : addon.cppsrcFiles) {
-		ofLogVerbose() << "adding addon cpp srcFiles: [" << a << "]";
-		if(addon.filesToFolders.find(a) == addon.filesToFolders.end()) {
-			addon.filesToFolders[a] = fs::path { "" };
+	// Add C++ source files to the project
+	for (auto &a : addon.cppsrcFiles) {
+		ofLogVerbose() << "Adding addon C++ source file: [" << a.string() << "]";
+		if (addon.filesToFolders.find(a) == addon.filesToFolders.end()) {
+			addon.filesToFolders[a] = fs::path{""};
 		}
-		addSrc(a, addon.filesToFolders[a],CPP);
+		addSrc(a, addon.filesToFolders[a], CPP);
 	}
-//		if(addon.filesToFolders[addon.cppsrcFiles[i]]=="") addon.filesToFolders[addon.cppsrcFiles[i]]="other";
-//		addSrc(addon.cppsrcFiles[i],addon.filesToFolders[addon.cppsrcFiles[i]],C);
 
-	for (auto & a : addon.objcsrcFiles) {
-		ofLogVerbose() << "adding addon objc srcFiles: [" << a << "]";
-		if(addon.filesToFolders.find(a) == addon.filesToFolders.end()) {
-			addon.filesToFolders[a] = fs::path { "" };
+	// Add Objective-C source files to the project
+	for (auto &a : addon.objcsrcFiles) {
+		ofLogVerbose() << "Adding addon Objective-C source file ?: [" << a.string() << "]";
+		if (addon.filesToFolders.find(a) == addon.filesToFolders.end()) {
+			addon.filesToFolders[a] = fs::path{""};
 		}
-		addSrc(a, addon.filesToFolders[a],OBJC);
+		addSrc(a, addon.filesToFolders[a], OBJC);
 	}
-//		if(addon.filesToFolders[addon.objcsrcFiles[i]]=="") addon.filesToFolders[addon.objcsrcFiles[i]]="other";
-//		addSrc(addon.objcsrcFiles[i],addon.filesToFolders[addon.objcsrcFiles[i]],C);
 
-
-	for (auto & a : addon.headersrcFiles) {
-		ofLogVerbose() << "adding addon header srcFiles: [" << a << "]";
-		addSrc(a, addon.filesToFolders[a],HEADER);
+	// Add header files to the project
+	for (auto &a : addon.headersrcFiles) {
+		ofLogVerbose() << "Adding addon header file: [" << a.string() << "]";
+		addSrc(a, addon.filesToFolders[a], HEADER);
 	}
-//		if(addon.filesToFolders[addon.headersrcFiles[i]]=="") addon.filesToFolders[addon.headersrcFiles[i]]="other";
-//		addSrc(addon.headersrcFiles[i],addon.filesToFolders[addon.headersrcFiles[i]],C);
 
-
-	for (auto & a : addon.cflags) {
-		ofLogVerbose() << "adding addon cflags: [" << a << "]";;
+	// Add CFLAGS, CPPFLAGS, and defines from the addon
+	for (auto &a : addon.cflags) {
+		ofLogVerbose() << "Adding addon CFLAG: [" << a << "]";
 		addCFLAG(a, RELEASE_LIB);
 		addCFLAG(a, DEBUG_LIB);
 	}
 
-	for (auto & a : addon.cppflags) {
-		ofLogVerbose() << "adding addon cppflags: [" << a << "]";;
+	for (auto &a : addon.cppflags) {
+		ofLogVerbose() << "Adding addon CPPFLAG: [" << a << "]";
 		addCPPFLAG(a, RELEASE_LIB);
 		addCPPFLAG(a, DEBUG_LIB);
 	}
 
-	for (auto & a : addon.defines) {
-		ofLogVerbose() << "adding addon defines: [" << a << "]";;
+	for (auto &a : addon.defines) {
+		ofLogVerbose() << "Adding addon define: [" << a << "]";
 		addDefine(a, RELEASE_LIB);
 		addDefine(a, DEBUG_LIB);
 	}
+
+	std::set<fs::path> uniqueIncludeDirs;
+	for (const auto &dir : addon.includePaths) {
+		fs::path normalizedDir = fs::weakly_canonical(dir);
+		std::string dirStr = normalizedDir.string();
+		if (dirStr.find("lib\\vs\\") == std::string::npos) {
+			uniqueIncludeDirs.insert(normalizedDir);
+		} else {
+			ofLogVerbose() << "include dir - not adding in lib\vs: [" << dir.string() << "]";
+		}
+	}
+
+	for (const auto &dir : uniqueIncludeDirs) {
+		ofLogVerbose() << "Adding include dir: [" << dir.string() << "]";
+		addInclude(dir);
+	}
 }
+
