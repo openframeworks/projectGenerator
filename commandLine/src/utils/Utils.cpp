@@ -546,8 +546,8 @@ std::string getPGVersion() {
 }
 
 
-bool ofIsPathInPath(const std::filesystem::path & path, const std::filesystem::path & base) {
-	auto rel = std::filesystem::relative(path, base);
+bool ofIsPathInPath(const fs::path & path, const fs::path & base) {
+	auto rel = fs::relative(path, base);
 	return !rel.empty() && rel.native()[0] != '.';
 }
 
@@ -574,7 +574,7 @@ void createBackup(const fs::path &path) {
 
 std::string normalizePath(const std::string& path) {
 	try {
-		auto value = std::filesystem::weakly_canonical(path);
+		auto value = fs::weakly_canonical(path);
 #ifdef TARGET_WIN32
 		fixSlashOrderPath(value);
 #endif
@@ -586,9 +586,9 @@ std::string normalizePath(const std::string& path) {
 	}
 }
 
-std::filesystem::path normalizePath(const std::filesystem::path& path) {
+fs::path normalizePath(const fs::path& path) {
 	try {
-		auto value = std::filesystem::weakly_canonical(path);
+		auto value = fs::weakly_canonical(path);
 #ifdef TARGET_WIN32
 		fixSlashOrderPath(value);
 #endif
@@ -596,7 +596,7 @@ std::filesystem::path normalizePath(const std::filesystem::path& path) {
 	} catch (const std::exception& ex) {
 		std::cout << "Canonical path for [" << path << "] threw exception:\n"
 				  << ex.what() << '\n';
-		return std::filesystem::path("");
+		return fs::path("");
 	}
 }
 
@@ -630,9 +630,9 @@ bool containsSourceFiles(const fs::path& dir) {
 }
 
 
-std::filesystem::path ofRelativeToOFPATH(const std::filesystem::path& path) {
+fs::path ofRelativeToOFPATH(const fs::path& path) {
 	try {
-		std::filesystem::path normalized_path = path;
+		fs::path normalized_path = path;
 		std::string path_str = normalized_path.string();
 #ifdef TARGET_WIN32
 		std::regex relative_pattern(R"((\.\.\\\.\.\\\.\.\\)|(\.\.\\\.\.\\\.\.))");
@@ -647,7 +647,7 @@ std::filesystem::path ofRelativeToOFPATH(const std::filesystem::path& path) {
 	} catch (const std::exception& ex) {
 		std::cout << "Canonical path for [" << path << "] threw exception:\n"
 				  << ex.what() << '\n';
-		return std::filesystem::path("");
+		return fs::path("");
 	}
 }
 

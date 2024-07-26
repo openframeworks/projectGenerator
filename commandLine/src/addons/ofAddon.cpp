@@ -111,7 +111,7 @@ void ofAddon::addReplaceString(std::string &variable, const std::string &value, 
 	else variable = value;
 }
 
-void ofAddon::addReplaceStringPath(std::filesystem::path & variable, const std::string & value, bool addToVariable) {
+void ofAddon::addReplaceStringPath(fs::path & variable, const std::string & value, bool addToVariable) {
 	if (addToVariable)
 		variable = fs::path {
 			variable / value
@@ -120,7 +120,7 @@ void ofAddon::addReplaceStringPath(std::filesystem::path & variable, const std::
 		variable = fs::path { value };
 }
 
-void ofAddon::addReplaceStringVectorPre(std::vector<std::string> &variable, const std::string &value, std::filesystem::path &prefix, bool addToVariable) {
+void ofAddon::addReplaceStringVectorPre(std::vector<std::string> &variable, const std::string &value, fs::path &prefix, bool addToVariable) {
 	addReplaceStringVector(variable, value, prefix.string(), addToVariable);
 }
 
@@ -330,7 +330,7 @@ void ofAddon::addReplaceStringVectorLibrary(std::vector<LibraryBinary> &variable
 	}
 }
 
-void ofAddon::parseVariableValuePath(std::filesystem::path &variable, const string & value, bool addToValue, const string & line, int lineNum) {
+void ofAddon::parseVariableValuePath(fs::path &variable, const string & value, bool addToValue, const string & line, int lineNum) {
 	parseVariableValue(variable.string(), value, addToValue, line, lineNum);
 }
 	
@@ -501,7 +501,7 @@ void ofAddon::exclude(vector<string> & variables, vector<string> exclusions){
 	}
 }
 
-void ofAddon::excludePathStr(vector<std::filesystem::path> & variables, vector<string> exclusions){
+void ofAddon::excludePathStr(vector<fs::path> & variables, vector<string> exclusions){
 	for (auto & exclusion : exclusions) {
 		ofStringReplace(exclusion, "\\", "/");
 		ofStringReplace(exclusion, ".", "\\.");
@@ -511,7 +511,7 @@ void ofAddon::excludePathStr(vector<std::filesystem::path> & variables, vector<s
 		std::regex findVar(exclusion);
 		std::smatch varMatch;
 
-		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const std::filesystem::path & variable) {
+		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const fs::path & variable) {
 			auto forwardSlashedVariable = variable.string();
 			ofStringReplace(forwardSlashedVariable, "\\", "/");
 			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
@@ -519,7 +519,7 @@ void ofAddon::excludePathStr(vector<std::filesystem::path> & variables, vector<s
 			variables.end());
 	}
 }
-void ofAddon::excludePath(vector<std::filesystem::path> & variables, vector<std::filesystem::path> exclusions){
+void ofAddon::excludePath(vector<fs::path> & variables, vector<fs::path> exclusions){
 	for(auto & exclusion: exclusions){
 		string excluse = exclusion.string();
 		ofStringReplace(excluse,"\\","/");
@@ -531,7 +531,7 @@ void ofAddon::excludePath(vector<std::filesystem::path> & variables, vector<std:
 		std::regex findVar(excluse);
 		std::smatch varMatch;
 
-		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const std::filesystem::path & variable) {
+		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const fs::path & variable) {
 			auto forwardSlashedVariable = variable.string();
 			ofStringReplace(forwardSlashedVariable, "\\", "/");
 			return std::regex_search(forwardSlashedVariable, varMatch, findVar);

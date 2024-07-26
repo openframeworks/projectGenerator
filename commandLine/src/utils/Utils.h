@@ -112,10 +112,10 @@ void createBackup(const fs::path &path);
 
 std::string normalizePath(const std::string& path);
 
-std::filesystem::path normalizePath(const std::filesystem::path& path);
+fs::path normalizePath(const fs::path& path);
 
 bool containsSourceFiles(const fs::path& dir);
-std::filesystem::path ofRelativeToOFPATH(const std::filesystem::path& path);
+fs::path ofRelativeToOFPATH(const fs::path& path);
 
 /*
  Idea: create an object to hold the origin and destination files, with renames where needed

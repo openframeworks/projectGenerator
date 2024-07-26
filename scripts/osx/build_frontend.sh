@@ -51,7 +51,7 @@ if [ -f "$SOURCE_FILE" ]; then
       cp -aX "$SOURCE_FILE" "$DESTINATION_PATH/projectGenerator"
    fi
    . "${SCRIPT_DIR}/secure.sh"
-   secure "commandLine/bin/projectGenerator" projectGenerator.pkl
+   secure "$DESTINATION_PATH/projectGenerator" projectGenerator.pkl
    echo "File copied successfully."
 else
     # File does not exist

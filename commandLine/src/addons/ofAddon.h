@@ -183,25 +183,25 @@ private:
 	void preParseConfig();
 	void parseConfig();
 	void parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum);
-	void parseVariableValuePath(std::filesystem::path & variable, const string & value, bool addToValue, const string & line, int lineNum);
+	void parseVariableValuePath(fs::path & variable, const string & value, bool addToValue, const string & line, int lineNum);
 	
 	void addReplaceString(std::string &variable, const std::string &value, bool addToVariable);
-	void addReplaceStringPath(std::filesystem::path &variable, const std::string & value, bool addToVariable);
+	void addReplaceStringPath(fs::path &variable, const std::string & value, bool addToVariable);
 	void addReplaceStringVector(std::vector<std::string> &variable, const std::string &value, const std::string &prefix, bool addToVariable);
-	void addReplaceStringVectorPre(std::vector<std::string> &variable, const std::string &value, std::filesystem::path &prefix, bool addToVariable);
-	void addReplaceStringVectorPathStr(std::vector<std::filesystem::path> & variable, std::filesystem::path & value, const std::string & prefix, bool addToVariable);
+	void addReplaceStringVectorPre(std::vector<std::string> &variable, const std::string &value, fs::path &prefix, bool addToVariable);
+	void addReplaceStringVectorPathStr(std::vector<fs::path> & variable, fs::path & value, const std::string & prefix, bool addToVariable);
 	
-	void addReplaceStringVectorPath(std::vector<std::filesystem::path> &variable, const std::string &value, const std::string &prefix, bool addToVariable);
-	void addReplaceStringVectorPathAll(std::vector<std::filesystem::path> & variable, std::filesystem::path & value, std::filesystem::path & prefix, bool addToVariable);
-	void addReplaceStringVectorPathPrefix(std::vector<std::filesystem::path> &variable, const std::string &value, std::filesystem::path &prefix, bool addToVariable);
+	void addReplaceStringVectorPath(std::vector<fs::path> &variable, const std::string &value, const std::string &prefix, bool addToVariable);
+	void addReplaceStringVectorPathAll(std::vector<fs::path> & variable, fs::path & value, fs::path & prefix, bool addToVariable);
+	void addReplaceStringVectorPathPrefix(std::vector<fs::path> &variable, const std::string &value, fs::path &prefix, bool addToVariable);
 	
 	void addReplaceStringVectorLibrary(std::vector<LibraryBinary> & variable, const std::string & value, const std::string & prefix, bool addToVariable);
 	
 	void addReplaceStringVectorPath(std::vector<LibraryBinary> &variable, const std::string &value,  const fs::path &prefix, bool addToVariable);
 
 	void exclude(vector<string> & variable, vector<string> exclusions);
-	void excludePathStr(vector<std::filesystem::path> & variable, vector<string> exclusions);
-	void excludePath(vector<std::filesystem::path> & variable, vector<std::filesystem::path> exclusions);
+	void excludePathStr(vector<fs::path> & variable, vector<string> exclusions);
+	void excludePath(vector<fs::path> & variable, vector<fs::path> exclusions);
 	void excludeLibrary(vector<LibraryBinary> & variable, vector<string> exclusions);
 	bool checkCorrectVariable(const string & variable, const string & state);
 	bool checkCorrectPlatform(const string & state);
@@ -216,14 +216,14 @@ private:
 
 	fs::path fixPath(const fs::path & path);
 	
-	std::filesystem::path normalizePath(const std::filesystem::path& path) {
+	fs::path normalizePath(const fs::path& path) {
 		try {
-			auto value = std::filesystem::weakly_canonical(path);
+			auto value = fs::weakly_canonical(path);
 			return value;
 		} catch (const std::exception& ex) {
 			std::cout << "Canonical path for [" << path << "] threw exception:\n"
 					  << ex.what() << '\n';
-			return std::filesystem::path("");
+			return fs::path("");
 		}
 	}
 };

@@ -5,8 +5,7 @@ OF_PATH = ../../..
 //THIS HAS ALL THE HEADER AND LIBS FOR OF CORE
 #include "../../../libs/openFrameworksCompiled/project/osx/CoreOF.xcconfig"
 
-//UNCOMMENT BELOW TO ENABLE C++ 17 and std::filesystem
-CLANG_CXX_LANGUAGE_STANDARD = c++17
+CLANG_CXX_LANGUAGE_STANDARD = c++23
 MACOSX_DEPLOYMENT_TARGET = 10.15
 
 // App Settings

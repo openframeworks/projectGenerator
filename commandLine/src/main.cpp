@@ -98,7 +98,7 @@ void printOFPath() {
     std::cout << ofPath.string() << endl;
 }
 
-void setofPath(const std::filesystem::path& path) {
+void setofPath(const fs::path& path) {
 	ofLogNotice() << " setofPath: [" << path << "] ";
 	ofPath = path;
 }
@@ -305,7 +305,7 @@ void recursiveUpdate(const fs::path & path, const string & target) {
 	}
 }
 
-int updateOFPath(std::filesystem::path path) {
+int updateOFPath(fs::path path) {
     
 	std::string ofPathEnv;
 	auto envValue = ofGetEnv("PG_OF_PATH");
