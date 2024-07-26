@@ -88,7 +88,7 @@ public:
 
 	bool bMakeRelative = false;
 	
-	bool bOverwrite = false;
+	bool bOverwrite = true;
 
 
 
