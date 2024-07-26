@@ -14,7 +14,7 @@ public:
 	CBLinuxProject(const std::string & target) : CBWinProject(target) {};
 
 	bool createProjectFile();
-	void addInclude(std::string includeName){};
+	void addInclude(const fs::path & includeName){};
 	void addLibrary(const LibraryBinary & lib){};
 
 	static std::string LOG_NAME;

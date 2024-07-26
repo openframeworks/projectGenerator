@@ -3,7 +3,6 @@
 #include "baseProject.h"
 //#include <unordered_map>
 #include <map>
-
 using std::string;
 
 
@@ -24,7 +23,7 @@ private:
 public:
 
 	void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT);
-	void addInclude(string includeName);
+	void addInclude(const fs::path & includeName);
 	void addLibrary(const LibraryBinary & lib);
 	void addLDFLAG(string ldflag, LibType libType = RELEASE_LIB);
 	void addCFLAG(string cflag, LibType libType = RELEASE_LIB); // Other C Flags
@@ -32,6 +31,7 @@ public:
 	void addAfterRule(string script);
 	void addDefine(string define, LibType libType = RELEASE_LIB);
 
+	void addCompileFlagsForMMFile(const fs::path & srcFile);
 	void addFramework(const fs::path & path, const fs::path & folder);
 	void addXCFramework(const fs::path & path, const fs::path & folder);
 	void addDylib(const fs::path & path, const fs::path & folder);

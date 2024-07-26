@@ -174,9 +174,9 @@ if (!path.isAbsolute(defaultOfPath)) {
     // take a look at this...
 
     if (hostplatform == "windows" || hostplatform == "linux" || hostplatform == "linux64" ){
-    	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../"), defaultOfPath));
+    	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../../"), defaultOfPath));
     } else if(hostplatform == "osx"){
-    	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../../../"), defaultOfPath));
+    	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../../"), defaultOfPath));
     }
 
     settings["defaultOfPath"] = defaultOfPath || "";
@@ -1060,7 +1060,7 @@ ipcMain.on('pickProjectImport', async (event, arg) => {
     dialogIsOpen = true;
     try {
         const filenames = await dialog.showOpenDialog({
-            title: 'Select the folder of your project, typically apps/myApps/myGeniusApp',
+            title: 'Select the folder of your project, typically apps/myApps/targetAppName',
             properties: ['openDirectory'],
             filters: [],
             defaultPath: arg

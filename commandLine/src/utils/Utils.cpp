@@ -34,6 +34,8 @@
 #include <limits.h>		/* PATH_MAX */
 #endif
 
+#include <regex>
+
 using std::unique_ptr;
 
 string generateUUID(const string & input){
@@ -285,7 +287,7 @@ void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props
 	}
 }
 
-void getDllsRecursively(const fs::path & path, std::vector<string> & dlls, string platform) {
+void getDllsRecursively(const fs::path & path, std::vector<fs::path> & dlls, string platform) {
 //	alert ("getDllsRecursively " + path.string(), 34);
 //	if (!fs::exists(path) || !fs::is_directory(path)) return;
 	if (!fs::exists(path) || !fs::is_directory(path)) {
@@ -341,7 +343,7 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 
 			if(platform!=""){
 				std::vector<string> splittedPath = ofSplitString(f.string(), fs::path("/").make_preferred().string());
-				for(int j=0;j<(int)splittedPath.size();j++){
+				for(size_t j=0;j<splittedPath.size();j++){
 					if(splittedPath[j]==platform){
 						platformFound = true;
 					}
@@ -352,12 +354,11 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
                platformFound = true;
             }
 
-			if (ext == ".a" || ext == ".lib" || ext == ".dylib" || ext == ".so" ||  ext == ".xcframework" || ext == ".framework" ||
-				(ext == ".dll" && platform != "vs")){
+			if (ext.string() == ".a" || ext.string() == ".lib" || ext.string() == ".dylib" || ext.string() == ".so" || ext.string() == ".xcframework" || ext.string() == ".framework" || (ext.string() == ".dll" && platform != "vs")) {
 				if (platformFound){
 					libLibs.push_back({ f.string(), arch, target });
 				}
-			} else if (ext == ".h" || ext == ".hpp" || ext == ".c" || ext == ".cpp" || ext == ".cc" || ext == ".cxx" || ext == ".m" || ext == ".mm"){
+			} else if (ext.string() == ".h" || ext.string() == ".hpp" || ext.string() == ".c" || ext.string() == ".cpp" || ext.string() == ".cc" || ext.string() == ".cxx" || ext.string() == ".m" || ext.string() == ".mm") {
 				libFiles.emplace_back(f);
 			}
 		}
@@ -369,13 +370,34 @@ string convertStringToWindowsSeparator(string in) {
 	return in;
 }
 
-void fixSlashOrder(string & toFix){
-	std::replace(toFix.begin(), toFix.end(),'/', '\\');
+void fixSlashOrder(std::string &toFix) {
+	std::replace(toFix.begin(), toFix.end(), '/', '\\');
+	// Remove duplicate backslashes
+	toFix = std::regex_replace(toFix, std::regex(R"(\\\\)"), R"(\\)");
+	toFix = std::regex_replace(toFix, std::regex(R"(\\\\\\)"), R"(\\\\)");
+}
+
+void fixSlashOrderPath(fs::path &toFix) {
+	string p = toFix.string();
+	std::replace(p.begin(), p.end(), '/', '\\');
+	// Remove duplicate backslashes
+	p = std::regex_replace(p, std::regex(R"(\\\\)"), R"(\\)");
+	p = std::regex_replace(p, std::regex(R"(\\\\\\)"), R"(\\\\)");
+	toFix = fs::path { p };
+}
+
+fs::path fixSlashOrderPathReturn(const fs::path &toFix) {
+	string p = toFix.string();
+	std::replace(p.begin(), p.end(), '/', '\\');
+	// Remove duplicate backslashes
+	p = std::regex_replace(p, std::regex(R"(\\\\)"), R"(\\)");
+	p = std::regex_replace(p, std::regex(R"(\\\\\\)"), R"(\\\\)");
+	return fs::path { p };
 }
 
 string unsplitString (std::vector < string > strings, string deliminator ){
 	string result;
-	for (int i = 0; i < (int)strings.size(); i++){
+	for (size_t i = 0; i < strings.size(); i++){
 		if (i != 0) result += deliminator;
 		result += strings[i];
 	}
@@ -389,8 +411,21 @@ fs::path getOFRoot(){
 }
 
 void setOFRoot(const fs::path & path){
-    ofLogNotice() << "OFRoot set: [" << path << "].";
+	ofLogNotice() << "ofRoot set: [" << path.string() << "].";
 	OFRoot = path;
+}
+
+void messageError(const string & targ) {
+	ofLogError() << "{ \"errorMessage\": \"" << targ << "\", \"status:\" \"EXIT_FAILURE\" }";
+}
+void messageReturn(const string & targ) {
+	ofLogNotice() << "{ \"message\": \"" << targ << "\" }";
+}
+void messageReturn(const string & key, const string & value) {
+	ofLogNotice() << "{ \""<< key << "\": \"" << value << "\" }";
+}
+void messageExtra(const string & targ) {
+	ofLogVerbose() << "{ \"detail\": \"" << targ << "\" }";
 }
 
 unique_ptr<baseProject> getTargetProject(const string & targ) {
@@ -473,7 +508,7 @@ vector <fs::path> folderList(const fs::path & path) {
 
 		for(; it != last; ++it) {
 			// this wont' allow hidden directories files like .git to be added, and stop recursivity at this folder level.
-			if ( it->path().filename().c_str()[0] == '.' || it->path().extension() == ".framework" ) {
+			if (it->path().filename().c_str()[0] == '.' || it->path().extension().string() == ".framework") {
 				it.disable_recursion_pending();
 				continue;
 			}
@@ -511,7 +546,108 @@ std::string getPGVersion() {
 }
 
 
-bool ofIsPathInPath(const std::filesystem::path & path, const std::filesystem::path & base) {
-	auto rel = std::filesystem::relative(path, base);
+bool ofIsPathInPath(const fs::path & path, const fs::path & base) {
+	auto rel = fs::relative(path, base);
 	return !rel.empty() && rel.native()[0] != '.';
 }
+
+
+void createBackup(const fs::path &path) {
+	if(fs::exists(path)) {
+		fs::path backupDir = path.parent_path();
+		fs::path backupFile = backupDir / (path.filename().string() + ".bak");
+		if (!fs::exists(backupDir)) {
+			fs::create_directories(backupDir);
+		}
+		if (fs::exists(path)) {
+			try {
+				fs::copy_file(path, backupFile, fs::copy_options::overwrite_existing); //backup file
+				messageReturn("Backup created", backupFile.string());
+			} catch (const std::exception &ex) {
+				messageError("Failed to create backup: {" + backupFile.string() + "} Error:" + ex.what());
+			}
+		}
+	} else {
+		ofLogVerbose() << "Project file does not exist, no backup created.";
+   }
+}
+
+std::string normalizePath(const std::string& path) {
+	try {
+		auto value = fs::weakly_canonical(path);
+#ifdef TARGET_WIN32
+		fixSlashOrderPath(value);
+#endif
+		return value.string();
+	} catch (const std::exception& ex) {
+		std::cout << "Canonical path for [" << path << "] threw exception:\n"
+				  << ex.what() << '\n';
+		return "";
+	}
+}
+
+fs::path normalizePath(const fs::path& path) {
+	try {
+		auto value = fs::weakly_canonical(path);
+#ifdef TARGET_WIN32
+		fixSlashOrderPath(value);
+#endif
+		return value;
+	} catch (const std::exception& ex) {
+		std::cout << "Canonical path for [" << path << "] threw exception:\n"
+				  << ex.what() << '\n';
+		return fs::path("");
+	}
+}
+
+fs::path makeRelative(const fs::path& from, const fs::path& to) {
+	fs::path relative = fs::relative(to, from);
+#ifdef TARGET_WIN32
+		fixSlashOrderPath(relative);
+#endif
+	return relative;
+}
+
+bool containsSourceFiles(const fs::path& dir) {
+	fs::path normal = normalizePath(dir);
+	static const std::vector<std::string> extensions = { ".cpp", ".c", ".mm", ".m", ".h", ".hpp" };
+	if (!fs::exists(normal) || !fs::is_directory(normal)) {
+		ofLogVerbose() << "Path does not exist or is not a directory: [" << normal.string() << "]";
+		return false;
+	}
+
+	for (const auto& entry : fs::recursive_directory_iterator(normal)) {
+		if (fs::is_regular_file(entry)) {
+			if (std::find(extensions.begin(), extensions.end(), entry.path().extension().string()) != extensions.end()) {
+				ofLogVerbose() << "Found source file: [" << entry.path().string() << "]";
+				return true;
+			}
+		}
+	}
+
+	ofLogVerbose() << "No source files found in directory: [" << dir.string() << "]";
+	return false;
+}
+
+
+fs::path ofRelativeToOFPATH(const fs::path& path) {
+	try {
+		fs::path normalized_path = path;
+		std::string path_str = normalized_path.string();
+#ifdef TARGET_WIN32
+		std::regex relative_pattern(R"((\.\.\\\.\.\\\.\.\\)|(\.\.\\\.\.\\\.\.))");
+#else
+		std::regex relative_pattern(R"((\.\.\/\.\.\/\.\.\/))");
+#endif
+		path_str = std::regex_replace(path_str, relative_pattern, "$(OF_PATH)/");
+#ifdef TARGET_WIN32
+		fixSlashOrderPath(normalized_path);
+#endif
+		return normalized_path;
+	} catch (const std::exception& ex) {
+		std::cout << "Canonical path for [" << path << "] threw exception:\n"
+				  << ex.what() << '\n';
+		return fs::path("");
+	}
+}
+

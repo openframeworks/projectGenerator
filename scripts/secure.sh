@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-set -e
+set +e
+VERSION=2.0.0
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -29,51 +30,87 @@ calculate_hash() {
 BUILD_TIME=$(date -u +"%Y-%m-%d T%H:%M:%SZ")
 
 # Check if git is available and repository exists
-if command -v git &>/dev/null && git rev-parse --git-dir > /dev/null 2>&1; then
-    # Get the current Git commit hash
-    GIT_HASH=$(git rev-parse HEAD)
+# if command -v git &>/dev/null && git rev-parse --git-dir > /dev/null 2>&1; then
+#     # Get the current Git commit hash
+#     GIT_HASH=$(git rev-parse HEAD)
 
-    # Get the current Git branch
-    GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-else
-    GIT_HASH="N/A"
-    GIT_BRANCH="N/A"
-fi
+#     # Get the current Git branch
+#     GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+# else
+#     GIT_HASH="N/A"
+#     GIT_BRANCH="N/A"
+# fi
 
 if [ -z "${BINARY_SEC+x}" ]; then
     BINARY_SEC=${1:-}
 fi
-
-
-# If OUTPUT_LOCATION is not set, and if the second argument is not provided,
-# set OUTPUT_LOCATION to the directory of BINARY_SEC
-if [ -z "${OUTPUT_LOCATION+x}" ]; then
-    if [ -z "$2" ]; then
-        if [ -n "$BINARY_SEC" ]; then
-            OUTPUT_LOCATION=$(dirname "$BINARY_SEC")
-        else
-            OUTPUT_LOCATION=.
-        fi
-    else
-        OUTPUT_LOCATION=$2
-    fi
-    echo "OUTPUT_LOCATION: $OUTPUT_LOCATION"
+if [ -z "${VERSION+x}" ]; then
+    VERSION=${3:-}
 fi
 
-# Calculate SHA hash for the provided binary, if available
-BINARY_SHA=$(calculate_hash "$BINARY_SEC")
+secure() { 
+    echo " [openFrameworks secure pkl v${VERSION}] ... "
+    if [ -z "${1+x}" ]; then
+        BINARY_SEC=""
+    else
+        BINARY_SEC=$1
+    fi
 
-OUTPUT_FILE="${OUTPUT_LOCATION:-.}/version.json"
+    OUTPUT_LOCATION=$(dirname "$BINARY_SEC")
+    ACTUAL_FILENAME=$(basename "$BINARY_SEC")
+    ACTUAL_FILENAME_WITHOUT_EXT="${ACTUAL_FILENAME%.*}"
 
-# Create or overwrite the version.json file
-cat <<EOF > "$OUTPUT_FILE"
-{
-  "buildTime": "$BUILD_TIME",
-  "gitHash": "$GIT_HASH",
-  "gitBranch": "$GIT_BRANCH",
-  "binarySha": "$BINARY_SHA"
-}
+    if [ -z "${2+x}" ]; then NAME=$ACTUAL_FILENAME_WITHOUT_EXT; else
+        NAME=$2
+        NAME="${NAME%.*}"
+    fi
+
+    if [ -z "${DEFS+x}" ]; then DEFINES=""; else
+        DEFINES=$DEFS
+    fi
+
+    if [ -z "${TYPE+x}" ]; then TARGET=""; else
+        TARGET=$TYPE
+    fi
+
+    
+    if [ -n "$NAME" ]; then
+        FILENAME="$NAME"
+    else
+        FILENAME="$ACTUAL_FILENAME"
+    fi
+
+    FILENAME_WITHOUT_EXT="${FILENAME%.*}"
+
+    # Calculate SHA hash for the provided binary, if available
+    BINARY_SHA=$(calculate_hash "$BINARY_SEC")
+    # OUTPUT_FILE="${OUTPUT_LOCATION:-.}/$FILENAME_WITHOUT_EXT.json"
+    #
+    # Create or overwrite the .json file
+    # cat <<EOF > "$OUTPUT_FILE"
+    # {
+    #   "buildTime": "$BUILD_TIME",
+    #   "gitHash": "$GIT_HASH",
+    #   "gitBranch": "$GIT_BRANCH",
+    #   "gitUrl": "$GIT_URL",
+    #   "binarySha": "$BINARY_SHA",
+    #   "binary": "$FILENAME",
+    #   "version": "$VER",
+    # }
+    # EOF
+    # cat "$OUTPUT_FILE"
+    OUTPUT_PKL_FILE="${OUTPUT_LOCATION:-.}/$FILENAME_WITHOUT_EXT.pkl"
+# Create or overwrite the .pkl file - Pkl simple Key = Value
+cat <<EOF > "$OUTPUT_PKL_FILE"
+name = "$NAME"
+version = "$VER"
+buildTime = "$BUILD_TIME"
+type = "$TARGET"
+gitUrl = "$GIT_URL"
+binary = "$ACTUAL_FILENAME"
+binarySha = "$BINARY_SHA"
 EOF
+#defines = "$DEFINES"
+cat "$OUTPUT_PKL_FILE"
 
-# Display the contents of the version.json file
-cat "$OUTPUT_FILE"
+}

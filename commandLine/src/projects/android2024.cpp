@@ -41,14 +41,16 @@ bool android2024Project::createProjectFile(){
 		c.run();
 	}
 
-	// TODO: try
-	fs::create_directory(projectDir /  "ofApp");
-	// copy recursively and try not overwrite code.
+	try {
+	   fs::create_directories(projectDir /  "ofApp");
+	} catch (const std::exception& e) {
+	   std::cerr << "Error creating directories: " << e.what() << std::endl;
+	}
 	try {
 		fs::copy(
 				 templatePath / "ofApp" / "src",
 				 projectDir / "ofApp" / "src",
-				 fs::copy_options::recursive | fs::copy_options::skip_existing
+				 fs::copy_options::recursive | (bOverwrite ? fs::copy_options::overwrite_existing : fs::copy_options::update_existing)
 		);
 	} catch(fs::filesystem_error & e) {
 		ofLogError() << "copy failed " << e.what() << endl;

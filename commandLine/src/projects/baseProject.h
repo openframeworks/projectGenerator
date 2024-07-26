@@ -1,7 +1,6 @@
 #pragma once
 
-#define PG_VERSION "63"
-
+#include "defines.h"
 #include "ofAddon.h"
 #include "pugixml.hpp"
 #include <map>
@@ -25,7 +24,11 @@ public:
 		HEADER,
 		CPP,
 		C,
-		OBJC
+		OBJC,
+		METAL,
+		SWIFT,
+		JAVA,
+		KOTLIN
 	};
 
 	struct Template {
@@ -50,7 +53,7 @@ public:
 	bool save();
 
 	virtual void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) = 0;
-	virtual void addInclude(std::string includeName) = 0;
+	virtual void addInclude(const fs::path & includeName) = 0;
 	virtual void addLibrary(const LibraryBinary & lib) = 0;
 
 	// FIXME: change some strings to const &
@@ -63,6 +66,8 @@ public:
 	virtual void addAddon(std::string addon);
 	virtual void addAddon(ofAddon & addon);
 	virtual void addSrcRecursively(const fs::path & srcPath);
+	
+	virtual void restoreBackup(const fs::path & srcPath){};
 
 	bool isPlatformName(const string & platform);
 
@@ -82,6 +87,8 @@ public:
 	std::string target;
 
 	bool bMakeRelative = false;
+	
+	bool bOverwrite = true;
 
 
 
@@ -93,6 +100,8 @@ private:
 	virtual bool createProjectFile()=0;
 	virtual bool loadProjectFile()=0;
 	virtual bool saveProjectFile()=0;
+	
+	
 
 	// virtual void renameProject();
 	// this should get called at the end.
@@ -104,9 +113,9 @@ protected:
 
 	std::vector<ofAddon> addons;
 	std::vector<fs::path> extSrcPaths;
-
+	
 	//cached addons - if an addon is requested more than once, avoid loading from disk as it's quite slow
-	std::unordered_map<std::string,std::unordered_map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]
+	std::map<std::string,std::map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]
 	bool isAddonInCache(const std::string & addonPath, const std::string platform); //is this addon in the mem cache?
 	
 	static void replaceAll(std::string& str, const std::string& from, const std::string& to) {
@@ -153,7 +162,7 @@ protected:
                 } else {
                     // straight copy
                     try {
-                        fs::copy(from, to, fs::copy_options::overwrite_existing);
+                        fs::copy(from, to, fs::copy_options::update_existing);
                     }
                     catch(fs::filesystem_error & e) {
                         std::cout << "error copying template file " << from << " : " << to << std::endl;

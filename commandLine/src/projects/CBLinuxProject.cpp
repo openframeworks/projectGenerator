@@ -21,7 +21,7 @@ bool CBLinuxProject::createProjectFile(){
 
 	for (auto & p : fromTo) {
 		try {
-			fs::copy_file(p.first, p.second, fs::copy_options::overwrite_existing);
+			fs::copy_file(p.first, p.second, (bOverwrite ? fs::copy_options::overwrite_existing : fs::copy_options::update_existing));
 		} catch(fs::filesystem_error& e) {
 			ofLogError(LOG_NAME) << "error copying template file " << p.first << " : " << p.second << e.what();
 			return false;

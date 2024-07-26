@@ -18,7 +18,7 @@ public:
 	bool saveProjectFile();
 
 	void addSrc(const fs::path & srcName, const fs::path & folder, SrcType type=DEFAULT);
-	void addInclude(std::string includeName);
+	void addInclude(const fs::path & includeName);
 	void addLibrary(const LibraryBinary & lib);
 
 	static std::string LOG_NAME;

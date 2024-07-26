@@ -9,7 +9,9 @@
 
 #include "ofConstants.h"
 #include "LibraryBinary.h"
-#include <unordered_map>
+#include <map>
+#include <iostream>
+#include <filesystem>
 
 namespace fs = of::filesystem;
 using std::string;
@@ -116,32 +118,34 @@ class ofAddon {
 
 public:
 
-	ofAddon();
+	ofAddon() = default;
+	ofAddon(const ofAddon& other);
+
 
 	bool fromFS(const fs::path & path, const string & platform);
 	void parseLibsPath(const fs::path & path, const fs::path & parentFolder);
-	vector <fs::path> additionalLibsFolder;
-	vector <fs::path> libFiles;
+	
 
 //	void fromXML(string installXmlName);
 	void clear();
 
+	vector <fs::path> additionalLibsFolder;
+	vector <fs::path> libFiles;
 	// this is source files:
-	// FIXME: map using fs::path, fs::path
-	std::unordered_map < string, string > filesToFolders;      //the addons has had, for each file,
+	std::map < fs::path, fs::path > filesToFolders;      //the addons has had, for each file,
 												//sometimes a listing of what folder to put it in, such as "addons/ofxOsc/src"
 
-	vector < string > srcFiles;
-	vector < string > csrcFiles;
-	vector < string > cppsrcFiles;
-	vector < string > headersrcFiles;
-	vector < string > objcsrcFiles;
+	vector < fs::path > srcFiles;
+	vector < fs::path > csrcFiles;
+	vector < fs::path > cppsrcFiles;
+	vector < fs::path > headersrcFiles;
+	vector < fs::path > objcsrcFiles;
 //	vector < string > propsFiles;
 	vector < fs::path > propsFiles;
 	vector < LibraryBinary > libs;
-	vector < string > dllsToCopy;
-	vector < string > includePaths;
-    vector < string > libsPaths;
+	vector < fs::path > dllsToCopy;
+	vector < fs::path > includePaths;
+    vector < fs::path > libsPaths;
 
 	// From addon_config.mk
 	vector < string > dependencies;
@@ -163,11 +167,10 @@ public:
 	string author;
 	vector<string> tags;
 	string url;
-
-
-	fs::path pathToOF;
-	fs::path pathToProject;
-	bool isLocalAddon; // set to true if the addon path is realtive to the project instead of in OF/addons/
+	
+	fs::path pathToOF = fs::path { "../../../ "};
+	fs::path pathToProject = fs::path { "." };
+	bool isLocalAddon = false; // set to true if the addon path is realtive to the project instead of in OF/addons/
 
 	bool operator <(const ofAddon & addon) const{
 		return addon.name < name;
@@ -176,15 +179,30 @@ public:
 private:
 	
 	string currentParseState { "" };
-
+	string emptyString = { "" };
 	void preParseConfig();
 	void parseConfig();
 	void parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum);
-	void addReplaceString(string & variable, string value, bool addToVariable);
-	void addReplaceStringVector(vector<string> & variable, string value, string prefix, bool addToVariable);
-	void addReplaceStringVector(vector<LibraryBinary> & variable, string value, string prefix, bool addToVariable);
+	void parseVariableValuePath(fs::path & variable, const string & value, bool addToValue, const string & line, int lineNum);
+	
+	void addReplaceString(std::string &variable, const std::string &value, bool addToVariable);
+	void addReplaceStringPath(fs::path &variable, const std::string & value, bool addToVariable);
+	void addReplaceStringVector(std::vector<std::string> &variable, const std::string &value, const std::string &prefix, bool addToVariable);
+	void addReplaceStringVectorPre(std::vector<std::string> &variable, const std::string &value, fs::path &prefix, bool addToVariable);
+	void addReplaceStringVectorPathStr(std::vector<fs::path> & variable, fs::path & value, const std::string & prefix, bool addToVariable);
+	
+	void addReplaceStringVectorPath(std::vector<fs::path> &variable, const std::string &value, const std::string &prefix, bool addToVariable);
+	void addReplaceStringVectorPathAll(std::vector<fs::path> & variable, fs::path & value, fs::path & prefix, bool addToVariable);
+	void addReplaceStringVectorPathPrefix(std::vector<fs::path> &variable, const std::string &value, fs::path &prefix, bool addToVariable);
+	
+	void addReplaceStringVectorLibrary(std::vector<LibraryBinary> & variable, const std::string & value, const std::string & prefix, bool addToVariable);
+	
+	void addReplaceStringVectorPath(std::vector<LibraryBinary> &variable, const std::string &value,  const fs::path &prefix, bool addToVariable);
+
 	void exclude(vector<string> & variable, vector<string> exclusions);
-	void exclude(vector<LibraryBinary> & variable, vector<string> exclusions);
+	void excludePathStr(vector<fs::path> & variable, vector<string> exclusions);
+	void excludePath(vector<fs::path> & variable, vector<fs::path> exclusions);
+	void excludeLibrary(vector<LibraryBinary> & variable, vector<string> exclusions);
 	bool checkCorrectVariable(const string & variable, const string & state);
 	bool checkCorrectPlatform(const string & state);
 
@@ -197,4 +215,15 @@ private:
 	vector<string> excludeXCFrameworks;
 
 	fs::path fixPath(const fs::path & path);
+	
+	fs::path normalizePath(const fs::path& path) {
+		try {
+			auto value = fs::weakly_canonical(path);
+			return value;
+		} catch (const std::exception& ex) {
+			std::cout << "Canonical path for [" << path << "] threw exception:\n"
+					  << ex.what() << '\n';
+			return fs::path("");
+		}
+	}
 };

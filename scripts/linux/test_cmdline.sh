@@ -26,4 +26,23 @@ errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
         exit $errorcode
 fi
+echo "Test generate new just name"
+./projectGenerator -o"../openFrameworks" -plinux64 -tvscode "testingGenerate"
+errorcode=$?
+if [[ $errorcode -ne 0 ]]; then
+                exit $errorcode
+fi
+echo "Test generate new / update full path"
+./projectGenerator -o"../openFrameworks" -plinux64 -tvscode "../openFrameworks/apps/myApps/testingGenerate"
+errorcode=$?
+if [[ $errorcode -ne 0 ]]; then
+        exit $errorcode
+fi
+
+echo "Test generate full path"
+./projectGenerator -o"../openFrameworks" -plinux64 -tvscode "../openFrameworks/apps/myApps/testingGenerate2"
+errorcode=$?
+if [[ $errorcode -ne 0 ]]; then
+        exit $errorcode
+fi
 echo "Successful projectGenerator tests for [linux64]";

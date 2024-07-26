@@ -1,6 +1,7 @@
 #include "visualStudioProject.h"
 #include "Utils.h"
 #include "ofUtils.h"
+#include <set>
 
 string visualStudioProject::LOG_NAME = "visualStudioProjectFile";
 
@@ -9,24 +10,26 @@ bool visualStudioProject::createProjectFile(){
 
 	ensureDllDirectoriesExist();
 	solution = projectDir / (projectName + ".sln");
-
-//	std::pair <string, string> replacements;
-//	if (!fs::equivalent(getOFRoot(), fs::path{ "../../.." })) {
-//		string root { getOFRoot().string() };
-//		string relRootWindows { convertStringToWindowsSeparator(root) + "\\" };
-//		
-//		replacements = { "..\\..\\..\\", relRootWindows };
-//	} else {
-////		cout << "equivalent to default ../../.." << endl;
-//	}
+	createBackup(solution);
 	
+	std::pair <string, string> replacementsForward, replacementsBack;
+	if (!fs::equivalent(getOFRoot(), fs::path{ "../../.." })) {
+		fs::path root { getOFRoot() };
+		string relRootWindows { convertStringToWindowsSeparator(root.string()) + "\\" };
+		replacementsForward = { "../../../", relRootWindows };
+		replacementsBack = { "..\\..\\..\\", relRootWindows };
+	} else {
+//		cout << "equivalent to default ../../.." << endl;
+	}
+	\
 	// solution
 	copyTemplateFiles.push_back({
 		templatePath / "emptyExample.sln",
 		projectDir / (projectName + ".sln"),
 		{
 			{ "emptyExample", projectName },
-			//replacements
+			replacementsForward,
+			replacementsBack
 		}
 	});
 	
@@ -36,7 +39,8 @@ bool visualStudioProject::createProjectFile(){
 		projectDir / (projectName + ".vcxproj"),
 		{
 			{ "emptyExample", projectName },
-			//replacements
+			replacementsForward,
+			replacementsBack
 		}
 
 	});
@@ -45,24 +49,43 @@ bool visualStudioProject::createProjectFile(){
 	copyTemplateFiles.push_back({
 		templatePath / "emptyExample.vcxproj.user",
 		projectDir / (projectName + ".vcxproj.user"),
-		{{ "emptyExample", projectName }}
+		{
+			{ "emptyExample", projectName },
+			replacementsForward,
+			replacementsBack
+		}
 	});
 
 	// filters
 	copyTemplateFiles.push_back({
 		templatePath / "emptyExample.vcxproj.filters",
-		projectDir / (projectName + ".vcxproj.filters")
+		projectDir / (projectName + ".vcxproj.filters"),
+		{
+			{ "emptyExample", projectName },
+			replacementsForward,
+			replacementsBack
+		}
 	});
 
 	// icon
 	copyTemplateFiles.push_back({
 		templatePath / "icon.rc",
-		projectDir / "icon.rc"
+		projectDir / "icon.rc",
+		{
+			{ "emptyExample", projectName },
+			replacementsForward,
+			replacementsBack
+		}
 	});
 
 	for (auto & c : copyTemplateFiles) {
-		c.run();
-	}
+			try {
+				c.run();
+			} catch (const std::exception& e) {
+				std::cerr << "Error running copy template files: " << e.what() << std::endl;
+				return false;
+			}
+		}
 
 
 	 fs::path filters { projectDir / (projectName + ".vcxproj.filters") };
@@ -229,7 +252,7 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
 			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());*/
 
-		} else if (ext == ".storyboard" || ext == ".mm") {
+		} else if (ext == ".storyboard" || ext == ".mm" || ext == ".m" || ext == ".swift" || ext == ".java" || ext == ".kotlin") {
 			// Do not add files for other platforms
 		} else{
 			appendValue(doc, "ClCompile", "Include", srcFileString);
@@ -290,25 +313,25 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 	}
 }
 
-void visualStudioProject::addInclude(string includeName){
+void visualStudioProject::addInclude(const fs::path & includeName){
 //	alert ("visualStudioProject::addInclude " + includeName, 35);
-
-	fixSlashOrder(includeName);
+	string inc = includeName.string();
+	fixSlashOrder(inc);
 
 	pugi::xpath_node_set source = doc.select_nodes("//ClCompile/AdditionalIncludeDirectories");
 	for (pugi::xpath_node_set::const_iterator it = source.begin(); it != source.end(); ++it){
 		pugi::xpath_node node = *it;
-		string includes = node.node().first_child().value();
-		std::vector < string > strings = ofSplitString(includes, ";");
+		std::string includes = node.node().first_child().value();
+		std::vector < std::string > strings = ofSplitString(includes, ";");
 		bool bAdd = true;
-		for (int i = 0; i < (int)strings.size(); i++){
-			if (strings[i].compare(includeName) == 0){
+		for (size_t i = 0; i < strings.size(); i++){
+			if (strings[i].compare(includeName.string()) == 0){
 				bAdd = false;
 			}
 		}
 		if (bAdd == true){
-			strings.emplace_back(includeName);
-			string includesNew = unsplitString(strings, ";");
+			strings.emplace_back(includeName.string());
+			std::string includesNew = unsplitString(strings, ";");
 //			alert ("includesNew " + includesNew);
 			node.node().first_child().set_value(includesNew.c_str());
 		}
@@ -323,7 +346,7 @@ void addLibraryPath(const pugi::xpath_node_set & nodes, string libFolder) {
 		string includes = node.node().first_child().value();
 		std::vector < string > strings = ofSplitString(includes, ";");
 		bool bAdd = true;
-		for (int i = 0; i < (int)strings.size(); i++) {
+		for (size_t i = 0; i < strings.size(); i++) {
 			if (strings[i].compare(libFolder) == 0) {
 				bAdd = false;
 			}
@@ -341,7 +364,7 @@ void addLibraryName(const pugi::xpath_node_set & nodes, string libName) {
 		string includes = node.node().first_child().value();
 		std::vector < string > strings = ofSplitString(includes, ";");
 		bool bAdd = true;
-		for (int i = 0; i < (int)strings.size(); i++) {
+		for (size_t i = 0; i < strings.size(); i++) {
 			if (strings[i].compare(libName) == 0) {
 				bAdd = false;
 			}
@@ -485,24 +508,30 @@ void visualStudioProject::addDefine(string define, LibType libType) {
 }
 
 void visualStudioProject::ensureDllDirectoriesExist() {
-	std::vector<fs::path> dirs { "dll/x64", "dll/ARM64", "dll/ARM64EC" };
+	std::vector<fs::path> dirs { "dll\\x64", "dll\\ARM64", "dll\\ARM64EC" };
 	for (const auto & dir : dirs) {
 		fs::path dirPath = projectDir / dir;
+		dirPath = normalizePath(dirPath);
 		if (!fs::exists(dirPath)) {
-			ofLogVerbose() << "adding dll folder " << dirPath;
-			fs::create_directories(dirPath);
+			ofLogVerbose() << "adding dll folder: [" << dirPath.string() << "]";
+			try {
+			   fs::create_directories(dirPath);
+			} catch (const std::exception& e) {
+			   std::cerr << "Error creating directories: " << e.what() << std::endl;
+			}
 		}
 	}
 }
 
 
 
-void visualStudioProject::addAddon(ofAddon & addon) {
-//	alert ("visualStudioProject::addAddon " + addon.name);
-
+void visualStudioProject::addAddon(ofAddon &addon) {
+	// Log the addition of the addon
+	ofLogVerbose() << "Adding addon: [" << addon.name << "]";
+	// Handle additional vcxproj files in the addon
 	fs::path additionalFolder = addon.addonPath / (addon.name + "Lib");
 	if (fs::exists(additionalFolder)) {
-		for (const auto & entry : fs::directory_iterator(additionalFolder)) {
+		for (const auto &entry : fs::directory_iterator(additionalFolder)) {
 			auto f = entry.path();
 			if (f.extension() == ".vcxproj") {
 				additionalvcxproj.emplace_back(f);
@@ -510,78 +539,116 @@ void visualStudioProject::addAddon(ofAddon & addon) {
 		}
 	}
 
-	for (auto & props : addon.propsFiles) {
-		ofLogVerbose() << "adding addon props: " << props;
-		addProps(props);
+	// Add props files from the addon
+	for (auto &props : addon.propsFiles) {
+		fs::path normalizedDir = makeRelative(projectDir, props);
+		ofLogVerbose() << "Adding addon props: [" << normalizedDir.string() << "] folder:[" << addon.filesToFolders[props].string() << "]";
+		addProps(normalizedDir);
 	}
 
-//	cout << "addon libs size = " << addon.libs.size() << endl;
-	for(auto & lib: addon.libs){
-//		alert ("visualStudioProject::addon.libs " + lib.path);
-		ofLogVerbose() << "adding addon libs: " << lib.path;
+	// Add libraries from the addon
+	for (auto &lib : addon.libs) {
+		fs::path normalizedDir = makeRelative(projectDir, lib.path);
+		lib.path = normalizedDir;
+		ofLogVerbose() << "Adding addon library: [" << lib.path.string() << "]";
 		addLibrary(lib);
 	}
 
-	// MARK: -NEW TEST, lets see how it works now.
-	for (auto & f : addon.filesToFolders) {
-		if (f.second == "") {
-//			alert("OTHER");
-			f.second = "other";
+	// Add source files to the project, avoiding excessive directory nesting
+	for (auto &s : addon.srcFiles) {
+		fs::path normalizedDir = makeRelative(projectDir, s);
+		
+		if (addon.filesToFolders.find(s) == addon.filesToFolders.end()) {
+			addon.filesToFolders[s] = fs::path{""};
 		}
-	}
-    
-
-	for (auto & s : addon.srcFiles) {
-		ofLogVerbose() << "adding addon srcFiles: " << s;
-
-//		cout << "addSrc s=" << s << " : " << addon.filesToFolders[s] << endl;
-		addSrc(s,addon.filesToFolders[s]);
+		ofLogVerbose() << "Adding addon source file: [" << normalizedDir.string() << "] folder:[" << addon.filesToFolders[s].string() << "]";
+		addSrc(normalizedDir, addon.filesToFolders[s]);
 	}
 
-	for (auto & a : addon.csrcFiles) {
-		ofLogVerbose() << "adding addon c srcFiles: " << a;
-		addSrc(a, addon.filesToFolders[a], C);
+	// Add C source files to the project
+	for (auto &a : addon.csrcFiles) {
+		fs::path normalizedDir = makeRelative(projectDir, a);
+		
+		if (addon.filesToFolders.find(a) == addon.filesToFolders.end()) {
+			addon.filesToFolders[a] = fs::path{""};
+		}
+		ofLogVerbose() << "Adding addon C source file: [" << normalizedDir.string() << "] folder:[" << addon.filesToFolders[a].string() << "]";
+		addSrc(normalizedDir, addon.filesToFolders[a], C);
 	}
-//		if(addon.filesToFolders[addon.csrcFiles[i]]=="") addon.filesToFolders[addon.csrcFiles[i]]="other";
 
-	for (auto & a : addon.cppsrcFiles) {
-		ofLogVerbose() << "adding addon cpp srcFiles: " << a;
-		addSrc(a, addon.filesToFolders[a],CPP);
+	// Add C++ source files to the project
+	for (auto &a : addon.cppsrcFiles) {
+		fs::path normalizedDir = makeRelative(projectDir, a);
+		
+		if (addon.filesToFolders.find(a) == addon.filesToFolders.end()) {
+			addon.filesToFolders[a] = fs::path{""};
+		}
+		ofLogVerbose() << "Adding addon C++ source file: [" << normalizedDir.string() << "] folder:[" << addon.filesToFolders[a].string() << "]";
+		addSrc(normalizedDir, addon.filesToFolders[a], CPP);
 	}
-//		if(addon.filesToFolders[addon.cppsrcFiles[i]]=="") addon.filesToFolders[addon.cppsrcFiles[i]]="other";
-//		addSrc(addon.cppsrcFiles[i],addon.filesToFolders[addon.cppsrcFiles[i]],C);
 
-	for (auto & a : addon.objcsrcFiles) {
-		ofLogVerbose() << "adding addon objc srcFiles: " << a;
-		addSrc(a, addon.filesToFolders[a],OBJC);
+	// Add Objective-C source files to the project
+	for (auto &a : addon.objcsrcFiles) {
+		fs::path normalizedDir = makeRelative(projectDir, a);
+		
+		if (addon.filesToFolders.find(a) == addon.filesToFolders.end()) {
+			addon.filesToFolders[a] = fs::path{""};
+		}
+		ofLogVerbose() << "Adding addon Objective-C source file ?: [" << normalizedDir.string() << "] folder:[" << addon.filesToFolders[a].string() << "]";
+		addSrc(normalizedDir, addon.filesToFolders[a], OBJC);
 	}
-//		if(addon.filesToFolders[addon.objcsrcFiles[i]]=="") addon.filesToFolders[addon.objcsrcFiles[i]]="other";
-//		addSrc(addon.objcsrcFiles[i],addon.filesToFolders[addon.objcsrcFiles[i]],C);
 
-
-	for (auto & a : addon.headersrcFiles) {
-		ofLogVerbose() << "adding addon header srcFiles: " << a;
-		addSrc(a, addon.filesToFolders[a],HEADER);
+	// Add header files to the project
+	for (auto &a : addon.headersrcFiles) {
+		fs::path normalizedDir = makeRelative(projectDir, a);
+		ofLogVerbose() << "Adding addon header file: [" << normalizedDir.string() << "] folder:[" << addon.filesToFolders[a].string() << "]";
+		addSrc(normalizedDir, addon.filesToFolders[a], HEADER);
 	}
-//		if(addon.filesToFolders[addon.headersrcFiles[i]]=="") addon.filesToFolders[addon.headersrcFiles[i]]="other";
-//		addSrc(addon.headersrcFiles[i],addon.filesToFolders[addon.headersrcFiles[i]],C);
 
-
-	for (auto & a : addon.cflags) {
-		ofLogVerbose() << "adding addon cflags: " << a;
+	// Add CFLAGS, CPPFLAGS, and defines from the addon
+	for (auto &a : addon.cflags) {
+		ofLogVerbose() << "Adding addon CFLAG: [" << a << "]";
 		addCFLAG(a, RELEASE_LIB);
 		addCFLAG(a, DEBUG_LIB);
 	}
 
-	for (auto & a : addon.cppflags) {
-		ofLogVerbose() << "adding addon cppflags: " << a;
+	for (auto &a : addon.cppflags) {
+		ofLogVerbose() << "Adding addon CPPFLAG: [" << a << "]";
 		addCPPFLAG(a, RELEASE_LIB);
 		addCPPFLAG(a, DEBUG_LIB);
 	}
 
-	for (auto & a : addon.defines) {
-		ofLogVerbose() << "adding addon defines: " << a;
+	for (auto &a : addon.defines) {
+		ofLogVerbose() << "Adding addon define: [" << a << "]";
 		addDefine(a, RELEASE_LIB);
 		addDefine(a, DEBUG_LIB);
 	}
+
+	std::set<fs::path> uniqueIncludeDirs;
+	for (const auto &dir : addon.includePaths) {
+		fs::path normalizedDir = normalizePath(dir);
+		std::string dirStr = normalizedDir.string();
+		// this dont work
+		if (dirStr.find("lib\\vs") == std::string::npos &&
+			dirStr.find("\\license") == std::string::npos &&
+			dirStr.find("lib\\\\vs") == std::string::npos &&
+				dirStr.find("lib\\AndroidJNI") == std::string::npos &&
+				dirStr.find("\\bin\\") == std::string::npos) {
+			uniqueIncludeDirs.insert(normalizedDir);
+		} else {
+			ofLogVerbose() << "include dir - not adding vs: [" << dir.string() << "]";
+		}
+	}
+
+	for (const auto &dir : uniqueIncludeDirs) {
+		fs::path normalizedDir = normalizePath(dir);
+		if (containsSourceFiles(normalizedDir)) {
+			normalizedDir = makeRelative(projectDir, dir);
+			ofLogVerbose() << "[vsproject]-uniqueIncludeDirs] contains src - Adding dir:: [" << normalizedDir.string() << "]";
+			addInclude(normalizedDir);
+		} else {
+			ofLogVerbose() << "[vsproject]-uniqueIncludeDirs] no src - not adding [" << normalizedDir.string() << "]";
+		}
+	}
 }
+

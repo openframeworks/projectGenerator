@@ -69,14 +69,20 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 void getFrameworksRecursively(const fs::path & path, std::vector < string > & frameworks,  string platform = "" );
 void getXCFrameworksRecursively(const fs::path & path, std::vector<string> & xcframeworks, string platform = "");
 void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props, const string & platform);
-void getDllsRecursively(const fs::path & path, std::vector < string > & dlls, string platform);
+void getDllsRecursively(const fs::path & path, std::vector < fs::path > & dlls, string platform);
 
 void splitFromFirst(string toSplit, string deliminator, string & first, string & second);
 
 void fixSlashOrder(string & toFix);
+void fixSlashOrderPath(fs::path &toFix);
 string unsplitString (std::vector < string > strings, string deliminator );
 
 std::unique_ptr<baseProject> getTargetProject(const string & targ);
+
+void messageError(const string & targ);
+void messageReturn(const string & targ);
+void messageReturn(const string & key, const string & value);
+void messageExtra(const string & targ);
 
 template <class T>
 inline bool isInVector(T item, std::vector<T> & vec){
@@ -99,8 +105,17 @@ vector <string> fileToStrings (const fs::path & file);
 fs::path getUserHomeDir();
 std::string getPGVersion();
 
-bool ofIsPathInPath(const fs::path & path, const fs::path & base);
+fs::path makeRelative(const fs::path& from, const fs::path& to);
 
+bool ofIsPathInPath(const fs::path & path, const fs::path & base);
+void createBackup(const fs::path &path);
+
+std::string normalizePath(const std::string& path);
+
+fs::path normalizePath(const fs::path& path);
+
+bool containsSourceFiles(const fs::path& dir);
+fs::path ofRelativeToOFPATH(const fs::path& path);
 
 /*
  Idea: create an object to hold the origin and destination files, with renames where needed

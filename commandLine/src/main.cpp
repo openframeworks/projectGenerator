@@ -4,6 +4,8 @@
 #include "Utils.h"
 #include "defines.h"
 #include "ofUtils.h"
+#include "ofFileUtils.h"
+#include "ofSystemUtils.h"
 #include "optionparser.h"
 #include <set>
 #include <string>
@@ -24,7 +26,8 @@ enum optionIndex { UNKNOWN,
 	VERSION,
 	GET_OFPATH,
 	GET_HOST_PLATFORM,
-	COMMAND
+	COMMAND,
+	BACKUP_PROJECT_FILES,
 };
 
 constexpr option::Descriptor usage[] = {
@@ -43,6 +46,7 @@ constexpr option::Descriptor usage[] = {
     { GET_OFPATH, 0, "g", "getofpath", option::Arg::None, "  --getofpath, -g  \treturn the current ofPath" },
     { GET_HOST_PLATFORM, 0, "h", "gethost", option::Arg::None, "  --gethost, -h  \treturn the current host platform" },
     { COMMAND, 0, "c", "command", option::Arg::None, "  --command, -c \truns command" },
+	{ BACKUP_PROJECT_FILES, 0, "b", "backup", option::Arg::None, "  --backup, -b  \tbackup project files when replacing with template" },
 	{ 0, 0, 0, 0, 0, 0 }
 };
 
@@ -62,6 +66,8 @@ int nProjectsUpdated;
 int nProjectsCreated;
 
 fs::path projectPath;
+fs::path defaultAppPath = { "apps/myApps" };
+fs::path generatorPath;
 fs::path ofPath;
 vector<string> addons;
 vector<fs::path> srcPaths;
@@ -78,6 +84,7 @@ bool bRecursive; // do we recurse in update mode?
 bool bHelpRequested; // did we request help?
 bool bListTemplates; // did we request help?
 bool bDryRun; // do dry run (useful for debugging recursive update)
+bool bBackup;
 
 void consoleSpace() {
 	std::cout << std::endl;
@@ -90,6 +97,12 @@ void printVersion() {
 void printOFPath() {
     std::cout << ofPath.string() << endl;
 }
+
+void setofPath(const fs::path& path) {
+	ofLogNotice() << " setofPath: [" << path << "] ";
+	ofPath = path;
+}
+
 
 bool printTemplates() {
 	if (targets.size() > 1) {
@@ -140,28 +153,6 @@ bool printTemplates() {
 		}
 		return templatesFound;
 	}
-}
-
-std::string normalizePath(const std::string& path) {
-    try {
-        auto value = std::filesystem::weakly_canonical(path).string();
-        return value;
-    } catch (const std::exception& ex) {
-        std::cout << "Canonical path for [" << path << "] threw exception:\n"
-                  << ex.what() << '\n';
-        return "";
-    }
-}
-
-std::filesystem::path normalizePath(const std::filesystem::path& path) {
-    try {
-        auto value = std::filesystem::weakly_canonical(path);
-        return value;
-    } catch (const std::exception& ex) {
-        std::cout << "Canonical path for [" << path << "] threw exception:\n"
-                  << ex.what() << '\n';
-        return std::filesystem::path("");
-    }
 }
 
 void handleCommand(const std::string& args) {
@@ -222,7 +213,7 @@ fs::path findOFPathUpwards(const fs::path & startPath) {
 	fs::path currentPath = startPath;
 	//    ofLogNotice() << "startPath: " << currentPath.string();
 	if (currentPath.empty() || currentPath == currentPath.root_path()) {
-		ofLogError() << "Starting path is empty or root path, cannot find OF path.";
+		ofLogError() << "Starting path is empty or root path, cannot find OF path." << "\" }";
 		return fs::path();
 	}
 	while (!currentPath.empty() && currentPath != currentPath.root_path()) {
@@ -269,7 +260,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 
 void recursiveUpdate(const fs::path & path, const string & target) {
 	// FIXME: remove
-	alert("recursiveUpdate:" + path.string() + "]");
+	alert("recursiveUpdate:[" + path.string() + "]");
 	if (!fs::is_directory(path)) return;
 	vector<fs::path> folders;
 
@@ -300,9 +291,9 @@ void recursiveUpdate(const fs::path & path, const string & target) {
 		nProjectsUpdated++;
 
 		if (!ofPath.is_absolute()) {
-			ofPath = ofCalcPath;
+			setofPath(ofCalcPath);
 			if (ofIsPathInPath(path, ofPath)) {
-				ofPath = fs::relative(ofCalcPath, path);
+				setofPath(fs::relative(ofCalcPath, path));
 			}
 		}
 //		setOFRoot(ofPath);
@@ -314,42 +305,39 @@ void recursiveUpdate(const fs::path & path, const string & target) {
 	}
 }
 
-int updateOFPath() {
-    std::string ofPath;
+int updateOFPath(fs::path path) {
+    
 	std::string ofPathEnv;
-	#ifdef _WIN32
-		char* envValue = nullptr;
-		size_t len = 0;
-		if (_dupenv_s(&envValue, &len, "PG_OF_PATH") == 0 && envValue != nullptr) {
-			ofPathEnv = std::string(envValue);
-			free(envValue);
-		}
-	#else
-		const char* envValue = std::getenv("PG_OF_PATH");
-		if (envValue) {
-			ofPathEnv = std::string(envValue);
-		}
-	#endif
+	auto envValue = ofGetEnv("PG_OF_PATH");
+	if(!envValue.empty()) {
+		ofPathEnv = std::string(envValue);
+		ofPathEnv = normalizePath(ofPathEnv);
+	}
 
 	if ((ofPath.empty() && !ofPathEnv.empty()) ||
-		(!ofPath.empty() && !isGoodOFPath(ofPath) && !ofPathEnv.empty())) {
-		ofPath = normalizePath(ofPathEnv);
+		((!ofPath.empty() && !isGoodOFPath(ofPath)) && 
+		 (!ofPathEnv.empty() && isGoodOFPath(ofPathEnv)))) {
+		setofPath(ofPathEnv);
 		ofLogNotice() << "PG_OF_PATH set: ofPath [" << ofPath << "]";
 	}
-    
-    fs::path startPath = normalizePath(ofFilePath::getCurrentExeDir());
+	of::filesystem::path exePath = ofFilePath::getCurrentExeDir();
+	
+    fs::path startPath = normalizePath(exePath);
+	generatorPath = startPath;
+	ofLogNotice() << "projectGenerator cmd path: {" << startPath << "] }";
     //ofFilePath::getAbsolutePathFS(fs::current_path(), false);
 //    ofLogNotice() << "startPath: " << startPath.string();
     fs::path foundOFPath = findOFPathUpwards(startPath);
     if (foundOFPath.empty() && ofPath.empty()) {
-        ofLogError() << "oF path not found: please use -o or --ofPath or set 'PG_OF_PATH' environment var. Auto up folders from :[" << startPath.string() << "]";
+        ofLogError() << "{ \"errorMessage: \"" << "oF path not found: please use -o or --ofPath or set 'PG_OF_PATH' environment var. Auto up folders from :[" << startPath.string() << "]" << "\" }";
         return EXIT_FAILURE;
     } else {
         if (!ofPath.empty() && isGoodOFPath(ofPath)) {
             ofLogNotice() << "ofPath set and valid using [" << ofPath << "]";
         } else {
             if(isGoodOFPath(foundOFPath))
-            ofPath = foundOFPath.string();
+            setofPath(foundOFPath);
+			setOFRoot(foundOFPath);
             ofLogNotice() << "ofPath auto-found and valid using [" << ofPath << "]";
         }
     }
@@ -358,7 +346,7 @@ int updateOFPath() {
         if (!isGoodOFPath(ofPath)) {
             foundOFPath = findOFPathUpwards(ofPath);
             if (foundOFPath.empty()) {
-                ofLogNotice() << "ofPath not valid. [" << ofPath << "] auto-find ofPath failed also...";
+                ofLogNotice() << "{ \"errorMessage: \"" << "ofPath not valid. [" << ofPath << "] auto-find ofPath failed also..." << "\" }";
                 return EXIT_USAGE;
             }
         }
@@ -417,8 +405,9 @@ int main(int argc, char ** argv) {
 	ofLog() << "PG v." + getPGVersion();
 	bAddonsPassedIn = false;
 	bDryRun = false;
+	bBackup = false;
 	busingEnvVar = false;
-	bVerbose = true;
+	bVerbose = false;
 	mode = PG_MODE_NONE;
 	bForce = false;
 	bRecursive = false;
@@ -444,12 +433,17 @@ int main(int argc, char ** argv) {
 	option::Parser parse(usage, argc, argv, &options[0], &buffer[0]);
 
 	if (parse.error()) {
+		messageError("Parse error for arguments");
 		return 1;
 	}
     
     if (options[VERBOSE].count() > 0) {
         bVerbose = true;
     }
+	
+	if (options[BACKUP_PROJECT_FILES].count() > 0) {
+		bBackup = true;
+	}
 
 	// templates:
 	if (options[LISTTEMPLATES].count() > 0) {
@@ -468,33 +462,44 @@ int main(int argc, char ** argv) {
         printVersion();
         return EXIT_OK;
     }
+	
+	if (options[OFPATH].count() > 0) {
+		if (options[OFPATH].arg != NULL) {
+			setofPath(options[OFPATH].arg);
+			ofLogNotice() << "ofPath arg: [" << ofPath << "]";
+			setofPath(normalizePath(ofPath));
+			ofLogNotice() << "ofPath normalised arg: [" << ofPath << "]";
+		}
+	}
     
-	int updated = updateOFPath();
+	int updated = updateOFPath(ofPath);
 
+#ifndef DEBUG_NO_OPTIONS
 	if (options[HELP] || argc == 0) {
-		ofLogError() << "No arguments";
+		messageError("No arguments");
 		printHelp();
 		return EXIT_OK;
 	}
+#endif
 
 	if (options[COMMAND].count() > 0) {
 		if (options[COMMAND].arg != NULL) {
 			string argument(options[COMMAND].arg);
 			handleCommand(argument);
 		} else {
-			ofLogError() << "Custom command requires an argument";
+			messageError("Custom command requires an argument");
 			return EXIT_USAGE;
 		}
 		return EXIT_OK;
 	}
 
 	if (options[GET_OFPATH].count() > 0) {
-		getOFRoot();
+		ofLogNotice() << "{ \"ofPath\": \"" << getOFRoot() << "\" }";
 		return EXIT_OK;
 	}
 
 	if (options[GET_HOST_PLATFORM].count() > 0) {
-		ofLogNotice() << ofGetTargetPlatform();
+		ofLogNotice() <<  "{ \"ofHostPlatform\": \"" << ofGetTargetPlatform() << "\" }";
 		return EXIT_OK;
 	}
     
@@ -539,14 +544,7 @@ int main(int argc, char ** argv) {
 		}
 	}
 
-	if (options[OFPATH].count() > 0) {
-		if (options[OFPATH].arg != NULL) {
-			ofPath = options[OFPATH].arg;
-            ofLogNotice() << "ofPath arg [" << ofPath << "]";
-            ofPath = normalizePath(ofPath);
-            ofLogNotice() << "ofPath normalised arg [" << ofPath << "]";
-		}
-	}
+	
 
 	if (parse.nonOptionsCount() > 0) {
 		projectName = parse.nonOption(0);
@@ -561,45 +559,95 @@ int main(int argc, char ** argv) {
 	consoleSpace();
 
 	// try to get the OF_PATH as an environt variable
+	
+	if (bVerbose) {
+		ofSetLogLevel(OF_LOG_VERBOSE);
+	}
+
     
+	if (projectName == "") {
+		messageError("Missing project path");
+		printHelp();
+		consoleSpace();
+		return EXIT_USAGE;
+	}
 
-    fs::path projectPath = fs::weakly_canonical(fs::current_path() / projectName);
-
-    // Verify that projectPath is not root and exists
-    if (!projectPath.empty() && projectPath != projectPath.root_path() && fs::exists(projectPath)) {
-        fs::create_directory(projectPath);
+	fs::path projectPath = normalizePath(fs::weakly_canonical(fs::current_path() / projectName));
+	fs::path projectNamePath = projectPath.filename();
+	projectName = projectNamePath.string();
+	
+    
+	ofLogVerbose() << " projectPath path: [" << projectPath << "] root_path: [" << projectPath.root_path() << "]";
+	ofLogNotice() << " ofPath path: [" << ofPath << "]";
+	ofLogNotice() << " ofRoot path: [" << getOFRoot()  << "]";
+	
+	if(projectPath == projectPath.root_path()) {
+		ofLogVerbose() << " !! projectPath == projectPath.root_path() ";
+	} else if(normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName )) == projectPath) {
+		ofLogVerbose() << " !! normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName )) == projectPath ";
+		ofLogVerbose() << " !! fs::weakly_canonical( projectPath.root_path() / projectName )):=" << fs::weakly_canonical( projectPath.root_path() / projectName );
+		ofLogVerbose() << " !! normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName )):=" << normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName ));
+		ofLogVerbose() << " !! projectPath:=" << projectPath;
+	} else if(normalizePath(fs::weakly_canonical( generatorPath / projectName )) == projectPath) {
+		ofLogVerbose() << " !! normalizePath(fs::weakly_canonical( generatorPath / projectName )) == projectPath ";
+	}
+	if(projectPath.empty() ) {
+		projectPath = normalizePath(fs::weakly_canonical( getOFRoot() / defaultAppPath / projectName));
+		ofLogNotice() << " projectPath.empty() path now: [" << projectPath << "]";
+	} else if(projectPath == projectPath.root_path() || // if projectPath == "/"
+			  normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName )) == projectPath || // or /projectName
+			  normalizePath(fs::weakly_canonical( generatorPath / projectName )) == projectPath // or generatorPath/projectName
+			  ){
+		ofLogVerbose() << " fs::weakly_canonical( [" << fs::weakly_canonical( projectPath.root_path() / projectName ) << "]";
+		ofLogVerbose() << " projectPath.root_path(): [" << projectPath.root_path() << "]";
+		projectPath =  normalizePath(fs::weakly_canonical( getOFRoot() / defaultAppPath / projectName));
+		ofLogNotice() << " projectPath issue managed, path now: [" << projectPath << "]";
+	} else {
+		ofLogNotice() << " projectPath path: [" << projectPath << "]";
+	}
+	if(projectPath.empty()) {
+		messageError( "Invalid project path: {" + projectPath.string() + "}");
+		return EXIT_FAILURE;
+	}
+	// make folder
+    if (!fs::exists(projectPath)) {
+		try {
+			ofLogNotice() << " creating projectPath directory.";
+			fs::create_directories(projectPath);
+		} catch (const std::exception& ex) {
+			messageError( "fs::create_directory failed, \"projectPath\": { \""+ projectPath.string() + "\" }, \"exception\": \""
+			+ ex.what() + "\"");
+			return EXIT_FAILURE;
+		}
     } else {
-        ofLogError() << "Invalid or non-existent project path: [" << projectPath << "]";
-        return EXIT_FAILURE;
+		if (fs::exists(projectPath)) {
+			ofLogNotice() << " The path exists.";
+			if (fs::is_directory(projectPath)) {
+				ofLogNotice() << " projectPath exists and it is a directory.";
+			} else {
+				ofLogWarning() << " projectPath exists and It is a file.";
+			}
+		}
     }
 
-    
 	if (bListTemplates) {
 		auto ret = printTemplates();
 		consoleSpace();
 		if (ret) {
+			
 			return EXIT_OK;
 		} else {
 			return EXIT_DATAERR;
 		}
 	}
 
-	if (projectName == "") {
-		ofLogError() << "Missing project path";
-		printHelp();
-		consoleSpace();
-		return EXIT_USAGE;
-	}
-
-	if (bVerbose) {
-		ofSetLogLevel(OF_LOG_VERBOSE);
-	}
-
 	if (bRecursive) {
+		ofLogNotice() << "project path is: [" << projectPath << "]";
 		for (auto & t : targets) {
 			ofLogNotice() << "-----------------------------------------------";
 			ofLogNotice() << "updating an existing project";
 			ofLogNotice() << "target platform is: " << t;
+			
 
 			// MARK: - RECURSIVE UPDATE
 			recursiveUpdate(projectPath, t);
@@ -634,6 +682,7 @@ int main(int argc, char ** argv) {
 					ofLogNotice() << "project updated! ";
 				} else {
 					if (!bDryRun) {
+						ofLogNotice() << "project path is: [" << projectPath << "]";
 						auto project = getTargetProject(t);
 						project->create(projectPath, templateName);
 						for (auto & addon : addons) {
@@ -660,5 +709,6 @@ int main(int argc, char ** argv) {
 	ofLogNotice() << "in " << elapsedTime << " seconds" << std::endl;
 	consoleSpace();
 
+	messageReturn("status", "EXIT_OK");
 	return EXIT_OK;
 }

@@ -31,6 +31,7 @@ if [ $SIGN_STATUS -ne 0 ]; then
 else
     echo "Application is already code-signed and valid"
 fi
-
+. "${SCRIPT_DIR}/secure.sh"
+secure "commandLine/bin/projectGenerator" projectGenerator.pkl
 echo "Successfully built commandLine openFrameworks"
 
