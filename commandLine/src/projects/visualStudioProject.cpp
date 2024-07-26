@@ -624,6 +624,7 @@ void visualStudioProject::addAddon(ofAddon &addon) {
 	for (const auto &dir : addon.includePaths) {
 		fs::path normalizedDir = normalizePath(dir);
 		std::string dirStr = normalizedDir.string();
+		// this dont work
 		if (dirStr.find("lib\\vs") == std::string::npos &&
 			dirStr.find("\\license") == std::string::npos &&
 			dirStr.find("lib\\\\vs") == std::string::npos &&
@@ -636,9 +637,14 @@ void visualStudioProject::addAddon(ofAddon &addon) {
 	}
 
 	for (const auto &dir : uniqueIncludeDirs) {
-		fs::path normalizedDir = makeRelative(getOFRoot(), dir);
-		ofLogVerbose() << "Adding include dir: [" << normalizedDir.string() << "]";
-		addInclude(normalizedDir);
+		fs::path normalizedDir = normalizePath(projectDir);
+		if (containsSourceFiles(normalizedDir)) {
+			normalizedDir = makeRelative(projectDir, dir);
+			ofLogVerbose() << "[vsproject]-uniqueIncludeDirs] contains src - Adding dir:: [" << normalizedDir.string() << "]";
+			addInclude(normalizedDir);
+		} else {
+			ofLogVerbose() << "[vsproject]-uniqueIncludeDirs] no src - not adding [" << normalizedDir.string() << "]";
+		}
 	}
 }
 

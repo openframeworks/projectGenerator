@@ -607,3 +607,47 @@ fs::path makeRelative(const fs::path& from, const fs::path& to) {
 #endif
 	return relative;
 }
+
+bool containsSourceFiles(const fs::path& dir) {
+	fs::path normal = normalizePath(dir);
+	static const std::vector<std::string> extensions = { ".cpp", ".c", ".mm", ".m", ".h", ".hpp" };
+	if (!fs::exists(normal) || !fs::is_directory(normal)) {
+		ofLogVerbose() << "Path does not exist or is not a directory: [" << normal.string() << "]";
+		return false;
+	}
+
+	for (const auto& entry : fs::recursive_directory_iterator(normal)) {
+		if (fs::is_regular_file(entry)) {
+			if (std::find(extensions.begin(), extensions.end(), entry.path().extension().string()) != extensions.end()) {
+				ofLogVerbose() << "Found source file: [" << entry.path().string() << "]";
+				return true;
+			}
+		}
+	}
+
+	ofLogVerbose() << "No source files found in directory: [" << dir.string() << "]";
+	return false;
+}
+
+
+std::filesystem::path ofRelativeToOFPATH(const std::filesystem::path& path) {
+	try {
+		std::filesystem::path normalized_path = path;
+		std::string path_str = normalized_path.string();
+#ifdef TARGET_WIN32
+		std::regex relative_pattern(R"((\.\.\\\.\.\\\.\.\\)|(\.\.\\\.\.\\\.\.))");
+#else
+		std::regex relative_pattern(R"((\.\.\/\.\.\/\.\.\/))");
+#endif
+		path_str = std::regex_replace(path_str, relative_pattern, "$(OF_PATH)/");
+#ifdef TARGET_WIN32
+		fixSlashOrderPath(normalized_path);
+#endif
+		return normalized_path;
+	} catch (const std::exception& ex) {
+		std::cout << "Canonical path for [" << path << "] threw exception:\n"
+				  << ex.what() << '\n';
+		return std::filesystem::path("");
+	}
+}
+

@@ -114,6 +114,9 @@ std::string normalizePath(const std::string& path);
 
 std::filesystem::path normalizePath(const std::filesystem::path& path);
 
+bool containsSourceFiles(const fs::path& dir);
+std::filesystem::path ofRelativeToOFPATH(const std::filesystem::path& path);
+
 /*
  Idea: create an object to hold the origin and destination files, with renames where needed
  and string substitution, so we can avoid opening and writing multiple times the same file, less ssd wear.

@@ -234,14 +234,17 @@ bool baseProject::create(const fs::path & _path, string templateName){
 			}
 		}
 		// FIXME: Port to std::list, so no comparison is needed.
-		// only add unique paths
 		vector < fs::path > paths;
 		for (auto & f : fileNames) {
 			fs::path rel { fs::relative(fs::path(f).parent_path(), projectDir) };
 			if (std::find(paths.begin(), paths.end(), rel) == paths.end()) {
 				paths.emplace_back(rel);
-//				alert ("rel = " + rel.string());
-				addInclude(rel);
+				if (containsSourceFiles(rel)) {
+					ofLogVerbose() << "[prjFiles-addIncludeDir] contains src - Adding dir: [" << rel.string() << "]";
+					addInclude(rel);
+				} else {
+					ofLogVerbose() << "[prjFiles-addIncludeDir] no src - not adding: [" << rel.string() << "]";
+				}
 			}
 		}
 	}
@@ -311,8 +314,7 @@ void baseProject::addAddon(string addonName){
 	} else {
 		addon.pathToOF = getOFRoot();
 	}
-	ofLogVerbose() << "addon.addonPath to: [" << addon.addonPath.string() << "]";
-	ofLogVerbose() << "addon.pathToOF: [" << addon.pathToOF.string() << "]";
+	
 	
 	addon.pathToOF = normalizePath(addon.pathToOF);
 	addon.addonPath = normalizePath(addon.addonPath);
@@ -329,8 +331,11 @@ void baseProject::addAddon(string addonName){
 	} else {
 		addonPath = fs::path { getOFRoot() / "addons" / addonName };
 		addon.isLocalAddon = false;
+		addon.addonPath = addonPath;
 	}
 
+	ofLogVerbose() << "addon.addonPath to: [" << addon.addonPath.string() << "]";
+	ofLogVerbose() << "addon.pathToOF: [" << addon.pathToOF.string() << "]";
 
 	if (!inCache) {
 		addonOK = addon.fromFS(addonPath, target);
@@ -374,9 +379,18 @@ void baseProject::addAddon(string addonName){
 	addons.emplace_back(addon);
 
 	for (auto & e : addon.includePaths) {
-		fs::path normalizedDir = makeRelative(getOFRoot(), e);
-		ofLogVerbose() << "base adding addon include path: [" << normalizedDir << "]";
-		addInclude(normalizedDir);
+		fs::path normalizedDir = normalizePath(projectDir);
+		ofLogVerbose() << "[addon.includePaths] adding addon include path: [" << normalizedDir << "]";
+		if (containsSourceFiles(normalizedDir)) {
+			normalizedDir = makeRelative(projectDir, e);
+			ofLogVerbose() << "[addon.includePaths] contains src - Adding dir: [" << normalizedDir.string() << "]";
+			fs::path ofpathChanged = ofRelativeToOFPATH(projectDir);
+			ofLogVerbose() << "[addon.includePaths] OFPATH: rel include dir: [" << ofpathChanged.string() << "]";
+			
+			addInclude(normalizedDir);
+		} else {
+			ofLogVerbose() << "[addon.includePaths] no src - not adding: [" << normalizedDir.string() << "]";
+		}
 	}
 
 	// It was part exclusive of visualStudioProject. now it is part of baseProject, so dlls are copied in VSCode project and .so files in linux
@@ -515,7 +529,7 @@ void baseProject::addAddon(ofAddon & addon){
     }
 
 	for (auto & a : addon.includePaths) {
-		fs::path normalizedDir = makeRelative(getOFRoot(), a);
+		fs::path normalizedDir = makeRelative(projectDir, a);
 		ofLogVerbose() << "adding addon include path: [" << normalizedDir.string() + "]";
 		addInclude(normalizedDir);
 	}
@@ -580,7 +594,7 @@ void baseProject::addAddon(ofAddon & addon){
 
 void baseProject::addSrcRecursively(const fs::path & srcPath){
 //	alert("addSrcRecursively " + srcPath.string(), 32);
-	ofLog() << "using additional source folder " << srcPath.string();
+	ofLog() << "[addSrcRecursively] using additional source folder " << srcPath.string();
 	extSrcPaths.emplace_back(srcPath);
 	vector < fs::path > srcFilesToAdd;
 	getFilesRecursively(srcPath, srcFilesToAdd);
@@ -593,7 +607,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 		fs::path parent = src.parent_path();
 		fs::path folder = fs::path("external_sources") / parent.lexically_relative(base);
 //		fs::path folder = parent.lexically_relative(base);
-		ofLogVerbose() << " addSrcRecursively srcFilesToAdd:[" << src.string() << "]";
+		ofLogVerbose() << "[addSrcRecursively] srcFilesToAdd:[" << src.string() << "]";
 		addSrc(src, folder);
 		if (parent.string() != "") {
 			uniqueIncludeFolders.insert(parent);
@@ -601,10 +615,15 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 	}
 	
 	for(auto & i : uniqueIncludeFolders){
-		fs::path normalizedDir = makeRelative(getOFRoot(), i);
-		ofLogVerbose() << " adding search include paths for folder: [" << normalizedDir.string() << "]";
-//		alert("addInclude " + i, 31);
-		addInclude(normalizedDir);
+		fs::path normalizedDir = normalizePath(projectDir);
+		ofLogVerbose() << "[addSrcRecursively] search include paths for folder: [" << normalizedDir.string() << "]";
+		if (containsSourceFiles(normalizedDir)) {
+			normalizedDir = makeRelative(projectDir, i);
+			ofLogVerbose() << "[addSrcRecursively] uniqueIncludeFolders: contains src - Adding dir: [" << normalizedDir.string() << "]";
+		   addInclude(normalizedDir);
+	   } else {
+		   ofLogVerbose() << "[addSrcRecursively] uniqueIncludeFolders: no src - not adding: [" << normalizedDir.string() << "]";
+	   }
 	}
 }
 

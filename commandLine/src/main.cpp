@@ -26,7 +26,8 @@ enum optionIndex { UNKNOWN,
 	VERSION,
 	GET_OFPATH,
 	GET_HOST_PLATFORM,
-	COMMAND
+	COMMAND,
+	BACKUP_PROJECT_FILES,
 };
 
 constexpr option::Descriptor usage[] = {
@@ -45,6 +46,7 @@ constexpr option::Descriptor usage[] = {
     { GET_OFPATH, 0, "g", "getofpath", option::Arg::None, "  --getofpath, -g  \treturn the current ofPath" },
     { GET_HOST_PLATFORM, 0, "h", "gethost", option::Arg::None, "  --gethost, -h  \treturn the current host platform" },
     { COMMAND, 0, "c", "command", option::Arg::None, "  --command, -c \truns command" },
+	{ BACKUP_PROJECT_FILES, 0, "b", "backup", option::Arg::None, "  --backup, -b  \tbackup project files when replacing with template" },
 	{ 0, 0, 0, 0, 0, 0 }
 };
 
@@ -82,6 +84,7 @@ bool bRecursive; // do we recurse in update mode?
 bool bHelpRequested; // did we request help?
 bool bListTemplates; // did we request help?
 bool bDryRun; // do dry run (useful for debugging recursive update)
+bool bBackup;
 
 void consoleSpace() {
 	std::cout << std::endl;
@@ -402,6 +405,7 @@ int main(int argc, char ** argv) {
 	ofLog() << "PG v." + getPGVersion();
 	bAddonsPassedIn = false;
 	bDryRun = false;
+	bBackup = false;
 	busingEnvVar = false;
 	bVerbose = false;
 	mode = PG_MODE_NONE;
@@ -436,6 +440,10 @@ int main(int argc, char ** argv) {
     if (options[VERBOSE].count() > 0) {
         bVerbose = true;
     }
+	
+	if (options[BACKUP_PROJECT_FILES].count() > 0) {
+		bBackup = true;
+	}
 
 	// templates:
 	if (options[LISTTEMPLATES].count() > 0) {
@@ -564,10 +572,25 @@ int main(int argc, char ** argv) {
 		return EXIT_USAGE;
 	}
 
-    fs::path projectPath = normalizePath(fs::weakly_canonical(fs::current_path() / projectName));
+	fs::path projectPath = normalizePath(fs::weakly_canonical(fs::current_path() / projectName));
+	fs::path projectNamePath = projectPath.filename();
+	projectName = projectNamePath.string();
+	
+    
 	ofLogVerbose() << " projectPath path: [" << projectPath << "] root_path: [" << projectPath.root_path() << "]";
 	ofLogNotice() << " ofPath path: [" << ofPath << "]";
 	ofLogNotice() << " ofRoot path: [" << getOFRoot()  << "]";
+	
+	if(projectPath == projectPath.root_path()) {
+		ofLogVerbose() << " !! projectPath == projectPath.root_path() ";
+	} else if(normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName )) == projectPath) {
+		ofLogVerbose() << " !! normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName )) == projectPath ";
+		ofLogVerbose() << " !! fs::weakly_canonical( projectPath.root_path() / projectName )):=" << fs::weakly_canonical( projectPath.root_path() / projectName );
+		ofLogVerbose() << " !! normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName )):=" << normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName ));
+		ofLogVerbose() << " !! projectPath:=" << projectPath;
+	} else if(normalizePath(fs::weakly_canonical( generatorPath / projectName )) == projectPath) {
+		ofLogVerbose() << " !! normalizePath(fs::weakly_canonical( generatorPath / projectName )) == projectPath ";
+	}
 	if(projectPath.empty() ) {
 		projectPath = normalizePath(fs::weakly_canonical( getOFRoot() / defaultAppPath / projectName));
 		ofLogNotice() << " projectPath.empty() path now: [" << projectPath << "]";
