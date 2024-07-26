@@ -34,6 +34,8 @@ if [ -f "$SOURCE_FILE" ]; then
     # File exists, proceed with copying
     mkdir -p "$DESTINATION_PATH" # Create destination directory if it doesn't exist
     cp "$SOURCE_FILE" "$DESTINATION_PATH/projectGenerator.exe"
+    . "${SCRIPT_DIR}/secure.sh"
+    secure "$DESTINATION_PATH/projectGenerator.exe" projectGenerator.pkl
     echo "projectGenerator.exe File copied successfully."
 else
     # File does not exist
@@ -49,8 +51,8 @@ echo "====== update"
 npm run 
 echo "====== run"
 
-${SCRIPT_DIR}/secure.sh ${_DIR}/projectGenerator.exe
-${SCRIPT_DIR}/secure.sh $DESTINATION_PATH/projectGenerator.exe
+. "${SCRIPT_DIR}/secure.sh"
+secure "${_DIR}/projectGenerator.exe" projectGenerator.pkl
 
 # if [ "${BUILD_TEST}" == 1 ]; then
    npm run start:prod

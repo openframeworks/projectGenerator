@@ -13,6 +13,7 @@ echo "CMD_DIR:  ${CMD_DIR}"
 echo "====== ${CMD_DIR}"
 # Compile commandline tool
 cd "${CMD_DIR}/bin"
+pwd
 echo "Testing projectGenerator [osx]";
 chmod +x projectGenerator
 
@@ -28,11 +29,11 @@ else
 fi
 
 echo "Test auto path:"
-./projectGenerator --recursive -posx ../../../../examples/templates
+./projectGenerator --recursive -posx ../../examples/templates
 
 
 echo "Test all"
-./projectGenerator --recursive -posx -o../../../../ ../../../../examples/ ./projectGenerator 
+./projectGenerator --recursive -posx -o../../ ../../examples/ ./projectGenerator 
 
 
 echo "test out of folder -o [vs]";
@@ -47,6 +48,12 @@ fi
 cd ../../../../../pg2
 ls -a
 pwd
+./projectGenerator --recursive -posx -o"./../openFrameworks" ./../openFrameworks/examples/
+errorcode=$?
+if [[ $errorcode -ne 0 ]]; then
+        exit $errorcode
+fi
+
 ./projectGenerator --recursive -posx -o"./../openFrameworks" ./../openFrameworks/examples/
 errorcode=$?
 if [[ $errorcode -ne 0 ]]; then

@@ -235,7 +235,8 @@
 				E4C2427710CC5ABF004149E2 /* CopyFiles */,
 				E4A5B60F29BAAAE400C2D356 /* Copy Files */,
 				19B789C429E5AB4A0082E9B8 /* ShellScript */,
-				928F60851B6710B200E2D791 /* ShellScript */,
+				928F60851B6710B200E2D791 /* Run Script */,
+				BFEFBB3F2C5153D000464FC6 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -292,14 +293,33 @@
 			shellScript = "\"$OF_PATH/scripts/osx/xcode_project.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		928F60851B6710B200E2D791 /* ShellScript */ = {
+		928F60851B6710B200E2D791 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
+			name = "Run Script";
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if test -f \"$TARGET_BUILD_DIR/projectGenerator\"; then rm \"$TARGET_BUILD_DIR/projectGenerator\"; fi;  \nrsync -avzp \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\" \"$TARGET_BUILD_DIR/projectGenerator\"\nchmod 755 \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\" \nchmod 755 \"$TARGET_BUILD_DIR/projectGenerator\"\n";
 			showEnvVarsInLog = 0;
+		};
+		BFEFBB3F2C5153D000464FC6 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n#\"$OF_PATH/apps/projectGenerator/scripts/osx/test_cmdline.sh\"\n";
 		};
 		E42962A92163ECCD00A6A9E2 /* Run Script — Compile OF */ = {
 			isa = PBXShellScriptBuildPhase;

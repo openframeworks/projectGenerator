@@ -31,9 +31,9 @@ SOURCE_FILE="${PG_DIR}/commandLine/bin/projectGenerator"
 DESTINATION_PATH="app"
 echo "SOURCE_FILE:$SOURCE_FILE";
 
-if [ ! -f "$SOURCE_FILE" ]; then
+# if [ ! -f "$SOURCE_FILE" ]; then
    SOURCE_FILE="${PG_DIR}/commandLine/bin/commandLine.app/contents/MacOS/commandLine"
-fi
+# fi
 
 
 # Check if the source file exists
@@ -50,6 +50,8 @@ if [ -f "$SOURCE_FILE" ]; then
    else
       cp -aX "$SOURCE_FILE" "$DESTINATION_PATH/projectGenerator"
    fi
+   . "${SCRIPT_DIR}/secure.sh"
+   secure "commandLine/bin/projectGenerator" projectGenerator.pkl
    echo "File copied successfully."
 else
     # File does not exist

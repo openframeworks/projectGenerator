@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set +e
+VERSION=2.0.0
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -48,7 +49,8 @@ if [ -z "${VERSION+x}" ]; then
 fi
 
 secure() { 
-   if [ -z "${1+x}" ]; then
+    echo " [openFrameworks secure pkl v${VERSION}] ... "
+    if [ -z "${1+x}" ]; then
         BINARY_SEC=""
     else
         BINARY_SEC=$1
