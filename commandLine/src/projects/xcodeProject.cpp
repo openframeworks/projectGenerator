@@ -631,6 +631,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 	}
 
 	for (auto & f : addon.frameworks) {
+		// alert (f, 31);
 		ofLogVerbose() << "adding addon frameworks: " << f;
 
 		size_t found=f.find('/');

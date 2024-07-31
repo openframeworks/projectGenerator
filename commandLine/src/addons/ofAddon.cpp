@@ -414,7 +414,13 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
 	else if(variable == ADDON_FRAMEWORKS){
-		addReplaceStringVectorPre(frameworks,value,addonRelPath,addToValue);
+		size_t found=value.find('/');
+		if (found==string::npos) { // This path doesn't have slashes
+			addReplaceStringVector(frameworks, value, emptyString, addToValue);
+
+		} else {
+			addReplaceStringVectorPre(frameworks, value, addonRelPath, addToValue);
+		}
 	}
 
 	else if (variable == ADDON_XCFRAMEWORKS) {
