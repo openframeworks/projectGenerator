@@ -1091,7 +1091,7 @@ function switchGenerateMode(mode) {
         $("#nameRandomiser").hide();
         $("#revealProjectFiles").show();
         $("#adons-refresh-icon").hide();
-        if(!isAdvanced){
+        if(!defaultSettings.advancedMode){
             $("#consoleContainer").hide();
         }
         $("#extraContainer").hide();
@@ -1119,7 +1119,7 @@ function switchGenerateMode(mode) {
         $("#nameRandomiser").show();
         $("#revealProjectFiles").hide();
         $("#adons-refresh-icon").hide();
-        if(!isAdvanced){
+        if(!defaultSettings.advancedMode){
             $("#consoleContainer").hide();
         }
         $("#extraContainer").hide();
