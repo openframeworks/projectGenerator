@@ -46,6 +46,35 @@ ipcRenderer.on('setUpdatePath', (event, arg) => {
     $("#updateMultiplePath").change();
 });
 
+function typeText(element, text, speed = 50) {
+    let index = 0;
+    element.textContent = '';
+
+    function type() {
+        if (index < text.length) {
+            element.textContent += text.charAt(index);
+            index++;
+            setTimeout(type, speed);
+        }
+    }
+
+    type();
+}
+
+function typeTextJ($element, text, speed = 50) {
+    let index = 0;
+    $element.text(''); // Clear previous text
+
+    function type() {
+        if (index < text.length) {
+            $element.text($element.text() + text.charAt(index));
+            index++;
+            setTimeout(type, speed);
+        }
+    }
+    type();
+}
+
 ipcRenderer.on('isUpdateMultiplePathOk', (event, arg) => {
     if (arg == true){
         $("#updateMultipleWrongMessage").hide();
@@ -152,8 +181,9 @@ ipcRenderer.on('setPlatforms', (event, arg) => {
 
     platforms = arg;
 
-
+    
     let select = $("#platformList");
+    select.empty();
     for (const i in platforms) {
         $('<div/>', {
             "class": 'item',
@@ -387,6 +417,9 @@ function setOFPath(ofPathValue) {
     /** @type {HTMLInputElement} */
     const ofPathElem = document.getElementById("ofPath");
 
+    const $element = $('#ofPath');
+    const text = ofPathValue;
+
     if (ofPathValue != null && !path.isAbsolute(ofPathValue)) {
         // if we are relative, don't do anything...
 
@@ -401,27 +434,66 @@ function setOFPath(ofPathValue) {
         }
     }
 
+    
+
     $("#ofPath").trigger('change');
+
+    typeTextJ($element, text, 150);
+}
+
+function disableButtonTemporarily(button) {
+    button.prop('disabled', true); // Disable the button
+    setTimeout(() => {
+        button.prop('disabled', false); // Enable the button after 400ms
+    }, 400);
+}
+
+
+function setPGVersion(ofPathValue) {
+    // get the element:
+    /** @type {HTMLInputElement} */
+    const ofPathElem = document.getElementById("versionDisplay");
+
+    if (ofPathValue != null) {
+        ofPathElem.value = ofPathValue;
+    }
+
+    typeText(ofPathElem, ofPathElem.value, 100);
+
+}
+
+function setPGPlatform(ofPathValue) {
+    // get the element:
+    /** @type {HTMLInputElement} */
+    const ofPathElem = document.getElementById("platformDisplay");
+
+    if (ofPathValue != null) {
+        ofPathElem.value = ofPathValue;
+    }
+
+    typeText(ofPathElem, ofPathElem.value, 50);
+
+    
 }
 
 //----------------------------------------
 function setup() {
-    // jQuery.fn.extend({
-    //     oneTimeTooltip: function (msg) {
-    //         return this.each(function () {
-    //             $(this).popup({
-    //                 content: msg,
-    //                 position: 'bottom center',
-    //                 on: 'manual',
-    //                 onVisible: function (e) {
-    //                     // hide on focus / change / onShow (for dropdowns)
-    //                     $(e).one('focus change click', function () { $(this).popup('hide'); });
-    //                     console.log($(e).children('input'));
-    //                 }
-    //             }).popup('show')
-    //         });
-    //     }
-    // });
+    jQuery.fn.extend({
+        oneTimeTooltip: function (msg) {
+            return this.each(function () {
+                $(this).popup({
+                    content: msg,
+                    position: 'bottom center',
+                    on: 'manual',
+                    onVisible: function (e) {
+                        // hide on focus / change / onShow (for dropdowns)
+                        $(e).one('focus change click', function () { $(this).popup('hide'); });
+                        console.log($(e).children('input'));
+                    }
+                }).popup('show')
+            });
+        }
+    });
 
 
     $(document).ready(() => {
@@ -448,7 +520,42 @@ function setup() {
         } catch(e) {
             isFirstTimeSierra = false;
         }
+        getOFPath();
+                getOFPlatform();
+                getOFVersion();
+
+        if (document.querySelector('.ui.tab[data-tab="settings"]').classList.contains('active')) {
+                getOFPath();
+                getOFPlatform();
+                getOFVersion();
+            }
+
+            // Event listener for tab change
+            document.querySelectorAll('.menu .item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                const tab = e.target.getAttribute('data-tab');
+                if (tab === 'settings') {
+                getOFPath();
+                getOFPlatform();
+                getOFVersion();
+                }
+            });
+        });
+
+
+       
+        $('#ofPathButton').click(() => {
+            disableButtonTemporarily($("#commandButton"));
+            getOFPath();
+        });
         
+        $('#commandButton').click(() => {
+            disableButtonTemporarily($("#commandButton"));
+            const customArg = $('#commandInput').val();
+            customArg = customArg.replace(/[`$&|<>]/g, '\\$&');
+            ipcRenderer.send('command', customArg);
+        });
+       
         console.log("App is translocated: " + isFirstTimeSierra);
  
         $('.main.menu .item').tab({
@@ -556,10 +663,25 @@ function setup() {
             }
         });
 
-         $("#IDEButton").on("click", () => launchInIDE());
+         $("#IDEButton").on("click", () => {
+            disableButtonTemporarily($("#IDEButton"));
+            launchInIDE();
+        });
 
-         $("#FolderButton").on("click", () => launchFolder());
+        $("#mainIDEButton").on("click", () => {
+            disableButtonTemporarily($("#mainIDEButton"));
+            launchInIDE();
+        });
 
+        $("#mainFolderButton").on("click", () => {
+            disableButtonTemporarily($("#mainFolderButton"));
+            launchFolder();
+        });
+
+        $("#FolderButton").on("click", () => {
+            disableButtonTemporarily($("#FolderButton"));
+            launchFolder();
+        });
 
          $("#verboseOption").checkbox();
          $("#verboseOption").on("change", () => {
@@ -961,13 +1083,17 @@ function switchGenerateMode(mode) {
     if (mode == 'updateMode') {
         $("#generateButton").hide();
         $("#updateButton").show();
+        $("#mainIDEButton").show();
+        $("#mainFolderButton").show();
         $("#folderButton").show();
         $("#missingAddonMessage").hide();
         $("#localAddonMessage").hide();
         $("#nameRandomiser").hide();
         $("#revealProjectFiles").show();
         $("#adons-refresh-icon").hide();
-        $("#consoleContainer").hide();
+        if(!defaultSettings.advancedMode){
+            $("#consoleContainer").hide();
+        }
         $("#extraContainer").hide();
 
         console.log('Switching GenerateMode to Update...');
@@ -985,13 +1111,17 @@ function switchGenerateMode(mode) {
 
         $("#generateButton").show();
         $("#updateButton").hide();
+        $("#mainIDEButton").hide();
+        $("#mainFolderButton").hide();
         $("#folderButton").show();
         $("#missingAddonMessage").hide();
         $("#localAddonMessage").hide();
         $("#nameRandomiser").show();
         $("#revealProjectFiles").hide();
         $("#adons-refresh-icon").hide();
-        $("#consoleContainer").hide();
+        if(!defaultSettings.advancedMode){
+            $("#consoleContainer").hide();
+        }
         $("#extraContainer").hide();
 
         console.log('Switching GenerateMode to Create...');
@@ -1016,6 +1146,7 @@ function enableAdvancedMode(isAdvanced) {
         $('#commandButton').show();
         $('#ofPathButton').show();
 
+
     } else {
         $('#platformsDropdown').removeClass("disabled");
         $('#platformsDropdown').dropdown('set exactly', defaultSettings.defaultPlatform);
@@ -1027,9 +1158,9 @@ function enableAdvancedMode(isAdvanced) {
         $('#templateSection').show();
         $('#templateSectionMulti').show();
 
-        $('#commandInput').disable();
-        $('#commandButton').disable();
-        $('#ofPathButton').disable();
+        $('#commandInput').hide();
+        $('#commandButton').hide();
+        $('#ofPathButton').hide();
         $("body").removeClass('advanced');
         $('a.updateMultiMenuOption').hide();
     }
@@ -1051,6 +1182,7 @@ function enableConsole( showConsole ){
 	}
 	defaultSettings['showConsole'] = showConsole;
 	saveDefaultSettings();
+    $("#consoleContainer").show();
 	$("#consoleToggle").prop('checked', defaultSettings['showConsole'] );
 }
 
@@ -1218,14 +1350,30 @@ function launchFolder(){
     ipcRenderer.send('launchFolder', project );
 }
 
-try {
-    document.getElementById('commandButton').addEventListener('click', () => {
-        const customArg = document.getElementById('commandInput').value;
-        ipcRenderer.send('command', customArg);
-    });
-} catch (error) {
-    console.error('An error occurred while setting up the event listener:', error);
+function getOFVersion() {
+    console.log('getOFVersion:sending');
+    ipcRenderer.send('getVersion');
 }
+
+function getOFPlatform() {
+    let platform = '';
+    if (navigator.platform.indexOf('Win') > -1) {
+        platform = 'Windows';
+    } else if (navigator.platform.indexOf('Mac') > -1) {
+        platform = 'macOS';
+    } else if (navigator.platform.indexOf('Linux') > -1) {
+        platform = 'Linux';
+    }
+    document.getElementById('platformDisplay').textContent = platform;
+    console.log('getOFPlatform:sending');
+    ipcRenderer.send('getHostType');
+}
+
+function getOFPath() {
+    console.log('getOFPath:sending');
+    ipcRenderer.send('getOFPath');
+}
+
 
 ipcRenderer.on('commandResult', (event, result) => {
     if (result.success) {
@@ -1235,18 +1383,35 @@ ipcRenderer.on('commandResult', (event, result) => {
     }
 });
 
-try {
-    document.getElementById('ofPathButton').addEventListener('click', () => {
-        const customArg = document.getElementById('ofPathButton').value;
-        ipcRenderer.send('getOFPath', customArg);
-    });
-} catch (error) {
-    console.error('An error occurred while setting up the event listener:', error);
-}
 
 ipcRenderer.on('ofPathResult', (event, result) => {
     if (result.success) {
         console.log('ofPath:', result.message);
+        document.getElementById('ofPath').textContent = result.message;
+        setOFPath(result.message);
+        $("updateMenuButton").triggerHandler('click');
+    } else {
+        console.error('ofPath: failed:', result.message);
+    }
+});
+
+ipcRenderer.on('ofPlatformResult', (event, result) => {
+    if (result.success) {
+        console.log('ofPlatform:', result.message);
+        document.getElementById('platformDisplay').textContent = result.message;
+        setPGPlatform(result.message);
+        $("updateMenuButton").triggerHandler('click');
+    } else {
+        console.error('ofPath: failed:', result.message);
+    }
+});
+
+ipcRenderer.on('ofVersionResult', (event, result) => {
+    if (result.success) {
+        console.log('ofVersionResult:', result.message);
+        document.getElementById('versionDisplay').textContent = result.message;
+        setPGVersion(result.message);
+        $("updateMenuButton").triggerHandler('click');
     } else {
         console.error('ofPath: failed:', result.message);
     }

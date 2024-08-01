@@ -1,7 +1,7 @@
 {
   "name": "projectGenerator",
   "productName": "projectGenerator",
-  "version": "0.64.0",
+  "version": "0.67.0",
   "description": "Build electron GUI openFrameworks projectGenerator",
   "license": "MIT",
   "main": "index.js",
