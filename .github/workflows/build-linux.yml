@@ -91,7 +91,7 @@ jobs:
       - name: Copy GUI tarball to root directory
         run: |
           cd ./../openFrameworks/apps/projectGenerator/frontend/dist
-          mv projectGenerator-0.64.0.tar.gz $GITHUB_WORKSPACE/projectGenerator-linux-gui.gz
+          mv projectGenerator-0.67.0.tar.gz $GITHUB_WORKSPACE/projectGenerator-linux-gui.gz
       
       - name: Test Artefact zip
         run: |
