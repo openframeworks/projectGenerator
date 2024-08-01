@@ -1,12 +1,12 @@
 {
   "name": "projectGenerator",
-  "version": "0.64.0",
+  "version": "0.67.0",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
       "name": "projectGenerator",
-      "version": "0.64.0",
+      "version": "0.67.0",
       "license": "MIT",
       "dependencies": {
         "@types/jquery": "^3.5.30",
