@@ -37,6 +37,7 @@ constexpr option::Descriptor usage[] = {
 	{ LISTTEMPLATES, 0, "l", "listtemplates", option::Arg::None, "  --listtemplates, -l  \tlist templates available for the specified or current platform(s)" },
 	{ PLATFORMS, 0, "p", "platforms", option::Arg::Optional, "  --platforms, -p  \tplatform list (such as osx, ios, winvs)" },
 	{ ADDONS, 0, "a", "addons", option::Arg::Optional, "  --addons, -a  \taddon list (such as ofxOpenCv, ofxGui, ofxXmlSettings)" },
+	{ ADDONS, 0, "a", "addons", option::Arg::Optional, "  --addons, -a  \taddon list (such as ofxOpenCv, ofxGui, ofxXmlSettings)" },
 	{ OFPATH, 0, "o", "ofPath", option::Arg::Optional, "  --ofPath, -o  \tpath to openframeworks (relative or absolute). This *must* be set, or you can also alternatively use an environment variable PG_OF_PATH and if this isn't set, it will use that value instead" },
 	{ VERBOSE, 0, "v", "verbose", option::Arg::None, "  --verbose, -v  \trun verbose" },
 	{ TEMPLATE, 0, "t", "template", option::Arg::Optional, "  --template, -t  \tproject template" },
@@ -44,7 +45,7 @@ constexpr option::Descriptor usage[] = {
 	{ SRCEXTERNAL, 0, "s", "source", option::Arg::Optional, "  --source, -s  \trelative or absolute path to source or include folders external to the project (such as ../../../../common_utils/" },
 	{ VERSION, 0, "w", "version", option::Arg::None, "  --version, -w  \treturn the current version" },
     { GET_OFPATH, 0, "g", "getofpath", option::Arg::None, "  --getofpath, -g  \treturn the current ofPath" },
-    { GET_HOST_PLATFORM, 0, "h", "gethost", option::Arg::None, "  --gethost, -h  \treturn the current host platform" },
+    { GET_HOST_PLATFORM, 0, "i", "platform", option::Arg::None, "  --getplatform, -i  \treturn the current host platform" },
     { COMMAND, 0, "c", "command", option::Arg::None, "  --command, -c \truns command" },
 	{ BACKUP_PROJECT_FILES, 0, "b", "backup", option::Arg::None, "  --backup, -b  \tbackup project files when replacing with template" },
 	{ 0, 0, 0, 0, 0, 0 }
@@ -91,7 +92,7 @@ void consoleSpace() {
 }
 
 void printVersion() {
-	std::cout << OFPROJECTGENERATOR_MAJOR_VERSION << "." << OFPROJECTGENERATOR_MINOR_VERSION << "." << OFPROJECTGENERATOR_PATCH_VERSION << std::endl;
+	messageReturn("version", PG_VERSION);
 }
 
 void printOFPath() {
@@ -99,7 +100,7 @@ void printOFPath() {
 }
 
 void setofPath(const fs::path& path) {
-	ofLogNotice() << " setofPath: [" << path << "] ";
+	ofLogVerbose() << " setofPath: [" << path << "] ";
 	ofPath = path;
 }
 
@@ -324,7 +325,7 @@ int updateOFPath(fs::path path) {
 	
     fs::path startPath = normalizePath(exePath);
 	generatorPath = startPath;
-	ofLogNotice() << "projectGenerator cmd path: {" << startPath << "] }";
+	ofLogVerbose() << "projectGenerator cmd path: {" << startPath << "] }";
     //ofFilePath::getAbsolutePathFS(fs::current_path(), false);
 //    ofLogNotice() << "startPath: " << startPath.string();
     fs::path foundOFPath = findOFPathUpwards(startPath);
@@ -338,7 +339,7 @@ int updateOFPath(fs::path path) {
             if(isGoodOFPath(foundOFPath))
             setofPath(foundOFPath);
 			setOFRoot(foundOFPath);
-            ofLogNotice() << "ofPath auto-found and valid using [" << ofPath << "]";
+            ofLogVerbose() << "ofPath auto-found and valid using [" << ofPath << "]";
         }
     }
     
@@ -402,7 +403,7 @@ void printHelp() {
 }
 
 int main(int argc, char ** argv) {
-	ofLog() << "PG v." + getPGVersion();
+	messageReturn("openFrameworks projectGenerator", getPGVersion());
 	bAddonsPassedIn = false;
 	bDryRun = false;
 	bBackup = false;
@@ -466,21 +467,12 @@ int main(int argc, char ** argv) {
 	if (options[OFPATH].count() > 0) {
 		if (options[OFPATH].arg != NULL) {
 			setofPath(options[OFPATH].arg);
-			ofLogNotice() << "ofPath arg: [" << ofPath << "]";
+			ofLogVerbose() << "ofPath arg: [" << ofPath << "]";
 			setofPath(normalizePath(ofPath));
-			ofLogNotice() << "ofPath normalised arg: [" << ofPath << "]";
+			ofLogVerbose() << "ofPath normalised arg: [" << ofPath << "]";
 		}
 	}
-    
 	int updated = updateOFPath(ofPath);
-
-#ifndef DEBUG_NO_OPTIONS
-	if (options[HELP] || argc == 0) {
-		messageError("No arguments");
-		printHelp();
-		return EXIT_OK;
-	}
-#endif
 
 	if (options[COMMAND].count() > 0) {
 		if (options[COMMAND].arg != NULL) {
@@ -494,12 +486,12 @@ int main(int argc, char ** argv) {
 	}
 
 	if (options[GET_OFPATH].count() > 0) {
-		ofLogNotice() << "{ \"ofPath\": \"" << getOFRoot() << "\" }";
+		ofLogNotice() << "{ \"ofPath\": " << getOFRoot() << " }";
 		return EXIT_OK;
 	}
 
 	if (options[GET_HOST_PLATFORM].count() > 0) {
-		ofLogNotice() <<  "{ \"ofHostPlatform\": \"" << ofGetTargetPlatform() << "\" }";
+		ofLogNotice() <<  "{ \"ofHostPlatform\": \"" << platformsToString[ofGetTargetPlatform()] << "\" }";
 		return EXIT_OK;
 	}
     
@@ -543,6 +535,14 @@ int main(int argc, char ** argv) {
 			}
 		}
 	}
+	
+#ifndef DEBUG_NO_OPTIONS
+	if (options[HELP] || argc == 0) {
+		messageError("No arguments");
+		printHelp();
+		return EXIT_OK;
+	}
+#endif
 
 	
 
@@ -578,8 +578,8 @@ int main(int argc, char ** argv) {
 	
     
 	ofLogVerbose() << " projectPath path: [" << projectPath << "] root_path: [" << projectPath.root_path() << "]";
-	ofLogNotice() << " ofPath path: [" << ofPath << "]";
-	ofLogNotice() << " ofRoot path: [" << getOFRoot()  << "]";
+	ofLogVerbose() << " ofPath path: [" << ofPath << "]";
+	ofLogVerbose() << " ofRoot path: [" << getOFRoot()  << "]";
 	
 	if(projectPath == projectPath.root_path()) {
 		ofLogVerbose() << " !! projectPath == projectPath.root_path() ";
@@ -603,7 +603,7 @@ int main(int argc, char ** argv) {
 		projectPath =  normalizePath(fs::weakly_canonical( getOFRoot() / defaultAppPath / projectName));
 		ofLogNotice() << " projectPath issue managed, path now: [" << projectPath << "]";
 	} else {
-		ofLogNotice() << " projectPath path: [" << projectPath << "]";
+		ofLogVerbose() << " projectPath path: [" << projectPath << "]";
 	}
 	if(projectPath.empty()) {
 		messageError( "Invalid project path: {" + projectPath.string() + "}");
@@ -612,7 +612,7 @@ int main(int argc, char ** argv) {
 	// make folder
     if (!fs::exists(projectPath)) {
 		try {
-			ofLogNotice() << " creating projectPath directory.";
+			ofLogVerbose() << " creating projectPath directory.";
 			fs::create_directories(projectPath);
 		} catch (const std::exception& ex) {
 			messageError( "fs::create_directory failed, \"projectPath\": { \""+ projectPath.string() + "\" }, \"exception\": \""
@@ -621,11 +621,11 @@ int main(int argc, char ** argv) {
 		}
     } else {
 		if (fs::exists(projectPath)) {
-			ofLogNotice() << " The path exists.";
+			ofLogVerbose() << " The project path exists.";
 			if (fs::is_directory(projectPath)) {
-				ofLogNotice() << " projectPath exists and it is a directory.";
+				ofLogVerbose() << "  and it is a directory.";
 			} else {
-				ofLogWarning() << " projectPath exists and It is a file.";
+				ofLogVerbose() << "  and It is a file...";
 			}
 		}
     }
@@ -642,7 +642,7 @@ int main(int argc, char ** argv) {
 	}
 
 	if (bRecursive) {
-		ofLogNotice() << "project path is: [" << projectPath << "]";
+		ofLogVerbose() << "project path is: [" << projectPath << "]";
 		for (auto & t : targets) {
 			ofLogNotice() << "-----------------------------------------------";
 			ofLogNotice() << "updating an existing project";
@@ -663,8 +663,8 @@ int main(int argc, char ** argv) {
 
 			for (auto & t : targets) {
 				ofLogNotice() << "-----------------------------------------------";
-				ofLogNotice() << "target platform is: [" << t << "]";
-                ofLogNotice() << "setting OF path to: [" << ofPath << "]";
+				ofLogVerbose() << "target platform is: [" << t << "]";
+				ofLogVerbose() << "setting OF path to: [" << ofPath << "]";
 				if (busingEnvVar) {
 					ofLogNotice() << "from PG_OF_PATH environment variable";
 				} else {

@@ -45,21 +45,90 @@ crashReporter.start({
 /** @type Settings */
 let settings = {};
 
+
+
 /** @type Settings */
 const templateSettings = {
     defaultOfPath: "",
     advancedMode: false,
-    defaultPlatform: 'osx',
+    defaultPlatform: '',
     showConsole: false,
     showDeveloperTools: false,
     defaultRelativeProjectPath: "apps/myApps",
-    useDictionaryNameGenerator: false
+    useDictionaryNameGenerator: true
 };
+
+
+
+/**
+ * Determines the current platform based on process information.
+ * @returns {string} The platform identifier.
+ */
+function getCurrentPlatform() {
+    let platform = "unknown";
+
+    if (/^win/.test(process.platform)) {
+        platform = 'vs';
+    } else if (process.platform === "darwin") {
+        platform = 'osx';
+    } else if (process.platform === "linux") {
+        if (process.arch === 'ia32') {
+            platform = 'linux';
+        } else if (process.arch === 'arm') {
+            if (os.cpus()[0].model.indexOf('ARMv6') === 0) {
+                platform = 'linuxarmv6l';
+            } else {
+                platform = 'linuxaarch64';
+            }
+        } else if (process.arch === 'x64') {
+            platform = 'linux64';
+        } else {
+            platform = 'linux';
+        }
+    }
+
+    return platform;
+}
+const hostplatform = getCurrentPlatform();
+
+/**
+ * Determines the default template for a given platform.
+ * @param {string} platformId - The platform identifier.
+ * @returns {string} The default template for the platform.
+ */
+function getDefaultTemplateForPlatform(platformId) {
+    const defaultTemplates = {
+        "osx": "OS X (Xcode)",
+        "vs": "Windows (Visual Studio)",
+        "msys2": "Windows (msys2/mingw)",
+        "ios": "iOS (Xcode)",
+        "macos": "Mega iOS/tvOS/macOS (Xcode)",
+        "android": "Android (Android Studio)",
+        "linux64": "Linux 64 (VS Code/Make)",
+        "linuxarmv6l": "Arm 32 (VS Code/Make)",
+        "linuxaarch64": "Arm 64 (VS Code/Make)",
+        "vscode": "VS Code"
+    };
+
+    return defaultTemplates[platformId] || "Unknown Template";
+}
+
+// Example usage:
+const platformId = getCurrentPlatform();
+const defaultTemplate = getDefaultTemplateForPlatform(platformId);
+console.log(`Detected platform: ${platformId}`);
+console.log(`Default template: ${defaultTemplate}`);
+
 
 try {
     const settingsJsonString = fs.readFileSync(path.resolve(__dirname, 'settings.json'), 'utf-8');
     settings = JSON.parse(settingsJsonString);
     console.log(settings);
+
+    if (!settings.defaultPlatform) {
+        settings.defaultPlatform = getDefaultTemplateForPlatform(getCurrentPlatform());
+    }
+
 } catch (e) {
     // automatic platform detection
     let myPlatform = "Unknown";
@@ -91,7 +160,7 @@ try {
         showConsole: false,
         showDeveloperTools: false,
         defaultRelativeProjectPath: "apps/myApps",
-        useDictionaryNameGenerator: false,
+        useDictionaryNameGenerator: true,
     };
 }
 
@@ -101,23 +170,43 @@ for(const key in templateSettings) {
     }
 }
 
-const hostplatform = (() => {
-    if (/^win/.test(process.platform)) {
-        return 'windows';
-    } else if (process.platform === "win32") {
-        return 'windows';
-    } else if (process.platform === "darwin") {
-        return 'osx';
-    } else if (process.platform === "linux64") {
-        return 'linux64';
-    } else if (process.platform === "linux") {
-        return 'linux';
-    }
-    return 'unknown';
-})();
+
 
 console.log("detected platform: " + hostplatform + " in " + __dirname);
 
+const randomName = moniker.choose();
+console.log(`Randomly generated name: ${randomName}`);
+
+// Get the current working directory
+const currentDir = process.cwd();
+console.log(`Current working directory: ${currentDir}`);
+
+// Get the platform information
+const platform = os.platform();
+console.log(`Operating system platform: ${platform}`);
+
+// // Read a file using fs
+// const filePath = path.join(__dirname, 'example.txt');
+// fs.readFile(filePath, 'utf8', (err, data) => {
+//     if (err) {
+//         console.error(`Error reading file: ${err.message}`);
+//     } else {
+//         console.log(`File contents: ${data}`);
+//     }
+// });
+
+// Execute a shell command using exec
+exec('ls', (error, stdout, stderr) => {
+    if (error) {
+        console.error(`Error executing command: ${error.message}`);
+        return;
+    }
+    if (stderr) {
+        console.error(`Error in command output: ${stderr}`);
+        return;
+    }
+    console.log(`Command output: ${stdout}`);
+});
 // hide some addons, per https://github.com/openframeworks/projectGenerator/issues/62
 
 const addonsToSkip = [
@@ -228,8 +317,8 @@ function toLetters(num) {
 app.on('ready', () => {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: 500,
-        height: 700,
+        width: 600,
+        height: 800,
         resizable: true, // TODO: fix to false, true for debug
         frame: false,
         webPreferences: {
@@ -375,21 +464,44 @@ function getStartingProjectName() {
  * @param {string} ofPathValue
  */
 function refreshAddonList(event, ofPathValue) {
-    console.log("in refreshAddonList " + ofPathValue);
-    //path = require('path').resolve(__dirname, defaultOfPath + "/addons");
-    let addons = getDirectories(path.join(ofPathValue, "addons"), "ofx");
+    try {
+        console.log("in refreshAddonList " + ofPathValue);
+        // Define the path to the addons directory
+        const addonsPath = path.join(ofPathValue, "addons");
 
-    if (addons){
-        if (addons.length > 0){
-            addons = addons.filter((addon) => addonsToSkip.indexOf(addon) == -1);
+        // Get the list of directories in the addons folder
+        let addons = getDirectories(addonsPath, "ofx");
+
+        // Filter out any addons that are in the addonsToSkip list
+        if (addons) {
+            if (addons.length > 0) {
+                addons = addons.filter((addon) => addonsToSkip.indexOf(addon) === -1);
+            }
         }
-    }
 
-    console.log("Reloading the addons folder, these were found:");
-    console.log(addons);
-    mainWindow.webContents.send('setAddons', addons);
-    event.returnValue = true;
+        console.log("Reloading the addons folder, these were found:");
+        console.log(addons);
+
+        // Send the list of addons to the renderer process
+        event.sender.send('setAddons', addons);
+        event.returnValue = true;
+
+    } catch (error) {
+        // Log the error
+        console.error("Error in refreshAddonList:", error);
+
+        // Send an error message to the renderer process
+        event.sender.send('sendUIMessage', {
+            type: 'error',
+            message: 'An error occurred while refreshing the addon list. Please check the console for more details.',
+            error: error.message,
+        });
+
+        // Return false as the operation was unsuccessful
+        event.returnValue = false;
+    }
 }
+
 
 /**
  * @param {Electron.IpcMainEvent} event
@@ -439,38 +551,43 @@ function refreshPlatformList(event, ofPathValue) {
  * @param {string} currentProjectPath 
  * @returns {string}
  */
-function getGoodSketchName(currentProjectPath){
+function getGoodSketchName(currentProjectPath) {
     let goodName = "mySketch";
 
-    if (bUseMoniker){
-        const projectNames = new moniker.Dictionary();
-        projectNames.read(path.join(__dirname, 'static', 'data', 'sketchAdjectives.txt'));
+    try {
+        if (bUseMoniker) {
+            const projectNames = new moniker.Dictionary();
+            projectNames.read(path.join(__dirname, 'static', 'data', 'sketchAdjectives.txt'));
 
-        while (true) {
-            if (fs.existsSync(path.join(currentProjectPath, goodName))) {
-                console.log("«" + goodName + "» already exists, generating a new name...");
-                const adjective = projectNames.choose();
-                console.log(adjective);
-                goodName = "my" + adjective.charAt(0).toUpperCase() + adjective.slice(1) + "Sketch";
-            } else {
-                break;
+            while (true) {
+                if (fs.existsSync(path.join(currentProjectPath, goodName))) {
+                    console.log("«" + goodName + "» already exists, generating a new name...");
+                    const adjective = projectNames.choose();
+                    console.log(adjective);
+                    goodName = "my" + adjective.charAt(0).toUpperCase() + adjective.slice(1) + "Sketch";
+                } else {
+                    break;
+                }
+            }
+        } else {
+            const date = new Date();
+            const formattedDate = formatDate(date);
+            goodName = "sketch_" + formattedDate;
+            let count = 1;
+
+            while (true) {
+                if (fs.existsSync(path.join(currentProjectPath, goodName))) {
+                    console.log("«" + goodName + "» already exists, generating a new name...");
+                    goodName = "sketch_" + formattedDate + toLetters(count);
+                    count++;
+                } else {
+                    break;
+                }
             }
         }
-    } else {
-        const date = new Date();
-        const formattedDate = formatDate(date);
-        goodName = "sketch_" + formattedDate;
-        let count = 1;
-
-        while (true) {
-            if (fs.existsSync(path.join(currentProjectPath, goodName))) {
-                console.log("«" + goodName + "» already exists, generating a new name...");
-                goodName = "sketch_" + formattedDate + toLetters(count);
-                count++;
-            } else {
-                break;
-            }
-        }
+    } catch (error) {
+        console.error("Error in getGoodSketchName:", error);
+        goodName = "mySketch_Fallback"; // Fallback name in case of an error
     }
 
     return goodName;
@@ -646,95 +763,89 @@ ipcMain.on('refreshPlatformList', refreshPlatformList);
 
 ipcMain.on('refreshTemplateList', (event, arg) => {
     console.log("refreshTemplateList");
-    const {
-        selectedPlatforms,
-        ofPath,
-        bMulti,
-    } = arg;
-
-    // Everytime user select/deselect new platforms,
-    // we check each templates and disable if it is not supported by selected platforms
-    // iterate all avairable templates and check template.config file
+    const { selectedPlatforms, ofPath, bMulti } = arg;
 
     const supportedPlatforms = [];
 
-    for (const template in templates) {
-        const configFilePath = path.join(ofPath, "scripts", "templates", template, "template.config");
-        if (fs.existsSync(configFilePath)) {
-            const lineByLine = require('n-readlines');
-            const liner = new lineByLine(configFilePath);
-            let line;
-            let bFindPLATOFORMS = false;
+    try {
+        for (const template in templates) {
+            const configFilePath = path.join(ofPath, "scripts", "templates", template, "template.config");
+            if (fs.existsSync(configFilePath)) {
+                const lineByLine = require('n-readlines');
+                const liner = new lineByLine(configFilePath);
+                let line;
+                let bFindPLATOFORMS = false;
 
-            // read line by line and try to find PLATFORMS setting
-            while (line = liner.next()) {
-                let line_st = line.toString();
-                if (line_st.includes('PLATFORMS')) {
-                    line_st = line_st.replace('PLATFORMS', '');
-                    line_st = line_st.replace('=', '');
-                    let platforms = line_st.trim().split(' ');
-                    supportedPlatforms[template] = platforms;
-                    bFindPLATOFORMS = true;
-                    break;
+                while (line = liner.next()) {
+                    let line_st = line.toString();
+                    if (line_st.includes('PLATFORMS')) {
+                        line_st = line_st.replace('PLATFORMS', '');
+                        line_st = line_st.replace('=', '');
+                        let platforms = line_st.trim().split(' ');
+                        supportedPlatforms[template] = platforms;
+                        bFindPLATOFORMS = true;
+                        break;
+                    }
                 }
-            }
 
-            // PLATFORMS parameter does not exist
-            if (!bFindPLATOFORMS) {
+                if (!bFindPLATOFORMS) {
+                    supportedPlatforms[template] = 'enable';
+                }
+            } else {
                 supportedPlatforms[template] = 'enable';
             }
-        } else {
-            // config file does not exist
-            supportedPlatforms[template] = 'enable';
         }
-    }
 
-    const invalidTemplateList = [];
-    for (const template in supportedPlatforms) {
-        const platforms = supportedPlatforms[template];
-        if (platforms !== 'enable') {
-            const bValidTemplate = selectedPlatforms.every(p => platforms.indexOf(p) > -1 );
-            // Another option to enable template when "some" of the platforms are supported. (not every)
-            // let bValidTemplate = platforms.some((p) => { supportedPlatforms.indexOf(p) > -1 });
-            if (!bValidTemplate) {
-                console.log("Selected platform [" + selectedPlatforms + "] does not support template " + template);
-                invalidTemplateList.push(template);
+        const invalidTemplateList = [];
+        for (const template in supportedPlatforms) {
+            const platforms = supportedPlatforms[template];
+            if (platforms !== 'enable') {
+                const bValidTemplate = selectedPlatforms.every(p => platforms.indexOf(p) > -1);
+                if (!bValidTemplate) {
+                    console.log("Selected platform [" + selectedPlatforms + "] does not support template " + template);
+                    invalidTemplateList.push(template);
+                }
             }
         }
-    }
 
-    const returnArg = {
-        invalidTemplateList,
-        bMulti
-    };
-    mainWindow.webContents.send('enableTemplate', returnArg);
-});
+        const returnArg = { invalidTemplateList, bMulti };
+        mainWindow.webContents.send('enableTemplate', returnArg);
+    } catch (error) {
+        console.error("Error in processing templates:", error);
+    }
+}); // This closing was missing
+
+
 
 ipcMain.on('getRandomSketchName', (event, projectPath) => {
     const goodName = getGoodSketchName(projectPath);
     event.returnValue = { randomisedSketchName: goodName, generateMode: 'createMode' };
-    // event.sender.send('setRandomisedSketchName', goodName);
+    //event.sender.send('setRandomisedSketchName', goodName);
     // event.sender.send('setGenerateMode', 'createMode'); // it's a new sketch name, we are in create mode
 });
 
 function getPgPath() {
     let pgApp = "";
-    // @ts-ignore
-    if(hostplatform == "linux" || hostplatform == "linux64") { // ???: when appear there linux64?
-        pgApp = path.join(defaultOfPath, "apps/projectGenerator/commandLine/bin/projectGenerator");
-        //pgApp = "projectGenerator";
-    } else {
-        pgApp = path.normalize(path.join(__dirname, "app", "projectGenerator"));
-    }
+    try {
+        if (hostplatform == "linux" || hostplatform == "linux64") { // ???: when appear there linux64?
+            pgApp = path.join(defaultOfPath, "apps/projectGenerator/commandLine/bin/projectGenerator");
+            //pgApp = "projectGenerator";
+        } else {
+            pgApp = path.normalize(path.join(__dirname, "app", "projectGenerator"));
+        }
 
-    // @ts-ignore
-    if( hostplatform == 'osx' || hostplatform == 'linux' || hostplatform == 'linux64') {  // ???: when appear there linux64?
-        pgApp = pgApp.replace(/ /g, '\\ ');
-    } else {
-        pgApp = pgApp = "\"" + pgApp + "\"";
+        if (hostplatform == 'osx' || hostplatform == 'linux' || hostplatform == 'linux64') {
+            pgApp = pgApp.replace(/ /g, '\\ ');
+        } else {
+            pgApp = "\"" + pgApp + "\"";
+        }
+    } catch (error) {
+        console.error("Error determining project generator path:", error);
+        pgApp = ""; // Return an empty string or some default path in case of error
     }
     return pgApp;
 }
+
 
 /** @typedef {{
  *     updatePath: string,
@@ -1245,21 +1356,111 @@ ipcMain.on('command', (event, customArg) => {
     });
 });
 
-ipcMain.on('getOFPath', (event, customArg) => {
+ipcMain.on('getOFPath', (event) => {
     const pgApp = getPgPath();
-    const command = `${pgApp} - "${customArg}"`;
+    const command = `${pgApp} --getofpath`;
 
     exec(command, { maxBuffer: Infinity }, (error, stdout, stderr) => {
         if (error) {
+             console.log( 'getOFPath error' );
             event.sender.send('ofPathResult', {
                 success: false,
                 message: error.message
             });
         } else {
-            event.sender.send('ofPathResult', {
-                success: true,
-                message: stdout
+            try {
+                 // Assuming the JSON object is on the last line
+                const lastLine = stdout.trim().split('\n').pop();
+                const jsonOutput = lastLine.match(/\{.*\}/); // Extract JSON string
+                if (jsonOutput) {
+                    const data = JSON.parse(jsonOutput[0]); // Parse JSON
+                    console.log(data);
+                    event.sender.send('ofPathResult', {
+                        success: true,
+                        message: data.ofPath
+                    });
+                } else {
+                    throw new Error('No JSON output found');
+                }
+            } catch (e) {
+                console.log( 'getOFPath error' );
+                event.sender.send('ofPathResult', {
+                    success: false,
+                    message: 'Failed to parse output.'
+                });
+            }
+        }
+    });
+});
+
+ipcMain.on('getHostType', (event) => {
+    const pgApp = getPgPath();
+    const command = `${pgApp} -i`;
+
+    exec(command, { maxBuffer: Infinity }, (error, stdout, stderr) => {
+        if (error) {
+            console.log( 'getHostType error' );
+            event.sender.send('ofPlatformResult', {
+                success: false,
+                message: error.message
             });
+        } else {
+            try {
+                const lastLine = stdout.trim().split('\n').pop();
+                const jsonOutput = lastLine.match(/\{.*\}/); // Extract JSON string
+                if (jsonOutput) {
+                    const data = JSON.parse(jsonOutput[0]); // Parse JSON
+                    console.log(data);
+                    event.sender.send('ofPlatformResult', {
+                        success: true,
+                        message: data.ofHostPlatform
+                    });
+                } else {
+                    throw new Error('No JSON output found');
+                }
+            } catch (e) {
+                console.log( 'getHostType error' );
+                event.sender.send('ofPlatformResult', {
+                    success: false,
+                    message: 'Failed to parse output.'
+                });
+            }
+        }
+    });
+});
+
+ipcMain.on('getVersion', (event) => {
+    const pgApp = getPgPath();
+    const command = `${pgApp} -w`;
+
+    exec(command, { maxBuffer: Infinity }, (error, stdout, stderr) => {
+        if (error) {
+            console.log( 'getVersion error' );
+            event.sender.send('ofVersionResult', {
+                success: false,
+                message: error.message
+            });
+        } else {
+            try {
+                const lastLine = stdout.trim().split('\n').pop();
+                const jsonOutput = lastLine.match(/\{.*\}/); // Extract JSON string
+                if (jsonOutput) {
+                    const data = JSON.parse(jsonOutput[0]); // Parse JSON
+                    console.log(data);
+                    event.sender.send('ofVersionResult', {
+                        success: true,
+                        message: data.version
+                    });
+                } else {
+                    throw new Error('No JSON output found');
+                }
+            } catch (e) {
+                console.log( 'getVersion error' );
+                event.sender.send('ofVersionResult', {
+                    success: false,
+                    message: 'Failed to parse output.'
+                });
+            }
         }
     });
 });

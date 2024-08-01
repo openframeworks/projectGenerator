@@ -229,6 +229,8 @@
 					<div class="field">
 						<div class="ui olive button" id="generateButton" onclick="generate()">Generate</div>
 						<div class="ui orange button" id="updateButton" style="display: none" onclick="generate()">Update</div>
+						<div class="ui cancel button" id="mainIDEButton" style="display: none;">Open in IDE</div>
+						<div class="ui cancel button" id="mainFolderButton" style="display: none;">Open Folder</div>
 					</div>
      
 				</div>
@@ -292,12 +294,25 @@
 			<div class="ui tab" data-tab="settings">
 				<div class="ui form">
 					<div class="field">
-						<label>openFrameworks path:</label>
+					<label>openFrameworks path:</label>
+					<div class="ui icon input fluid">
+						<input type="text" placeholder="openFrameworks path..." id="ofPath">
+						<i class="search link icon" onclick="browseOfPath()"></i>
+					</div>
+					</div>
+					<div class="field">
+						<label>Platform:</label>
 						<div class="ui icon input fluid">
-							<input type="text" placeholder="openFrameworks path..." id="ofPath">
-							<i class="search link icon" onclick="browseOfPath()"></i>
+						<input type="text" placeholder="Platform..." id="platformDisplay" readonly>
 						</div>
 					</div>
+					<div class="field">
+						<label>Version:</label>
+						<div class="ui icon input fluid">
+						<input type="text" placeholder="Version..." id="versionDisplay" readonly>
+						</div>
+					</div>
+
 					<div class="ui negative message" id="ofPathWrongMessage" style="display: none">
 						<div class="header">
 							openFrameworks path is wrong
@@ -324,11 +339,11 @@
 						</div>
     				</div>
     				<div class="field">
-						<div class="ui orange button advanced disabled" id="commandButton" style="display: none" >Run cmd</div>
+						<div class="ui orange button advanced" id="commandButton" style="display: none" >Run cmd</div>
 					</div>
 
 					<div class="field">
-						<div class="ui olive button advanced disabled" id="ofPathButton" style="display: none" >ofPath</div>
+						<div class="ui olive button advanced" id="ofPathButton" style="display: none" >ofPath</div>
 					</div>
 
     		
@@ -395,6 +410,8 @@
                 delete window.require;
                 delete window.exports;
                 delete window.module;
+
+
                 </script>
 
 
