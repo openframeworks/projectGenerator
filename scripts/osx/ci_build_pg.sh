@@ -217,7 +217,7 @@ echo "Directory contents:"
 ls
 echo "-------------"
 
-PLATFORM=osx
+export PLATFORM=osx
 
 export POSTFIX=""
 if [ -z "${PG_DIR}/projectGenerator-osx${POSTFIX}" ]; then
