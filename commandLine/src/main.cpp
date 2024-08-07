@@ -685,6 +685,8 @@ int main(int argc, char ** argv) {
 						ofLogNotice() << "project path is: [" << projectPath << "]";
 						auto project = getTargetProject(t);
 						project->create(projectPath, templateName);
+						project->parseAddons();
+
 						for (auto & addon : addons) {
 							project->addAddon(addon);
 						}
