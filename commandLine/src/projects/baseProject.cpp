@@ -681,6 +681,8 @@ bool baseProject::recursiveCopy(const fs::path & srcDir, const fs::path & destDi
 		return true;
 	} catch (std::exception& e) {
 		// TODO: ofLogWarning()
+		std::cout << "baseProject::recursiveCopy " << e.what();
+
 		std::cout << e.what();
 		return false;
 	}
