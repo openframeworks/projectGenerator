@@ -8,11 +8,7 @@
 #include "VSCodeProject.h"
 #include "ofLog.h"
 #include "Utils.h"
-#if !defined(TARGET_MINGW)
-	#include <json.hpp>
-#else
-	#include <nlohmann/json.hpp> // MSYS2 : use of system-installed include
-#endif
+#include <nlohmann/json.hpp>
 
 
 using json = nlohmann::json;
