@@ -5,57 +5,84 @@ SCRIPT_DIR="$( cd "$( dirname "${CURRENT_DIR}"/../../ )" && pwd )"
 PG_DIR="$( cd "$( dirname "${SCRIPT_DIR}"/../../ )" && pwd )"
 
 CMD_DIR="${PG_DIR}/commandLine"
+EXE_FILE="projectGenerator.exe"
 
 echo "CURRENT_DIR:  ${CURRENT_DIR}"
 echo "SCRIPT_DIR:  ${SCRIPT_DIR}"
 echo "PG_DIR:  ${PG_DIR}"
 echo "CMD_DIR:  ${CMD_DIR}"
+
 echo "====== ${CMD_DIR}"
-# Compile commandline tool
+
 cd "${CMD_DIR}/bin"
-echo "Testing projectGenerator: [vs]";
-chmod +x projectGenerator
-./projectGenerator --recursive -pvs -o../../../../ ../../../../examples/
+pwd
+ls
+if [[ -f "${EXE_FILE}" ]]; then
+    echo "File ${EXE_FILE} exists."
+else
+    echo "File ${EXE_FILE} does not exist. trying commandLine.exe"
+    EXE_FILE="commandLine.exe"
+    if [[ -f "${EXE_FILE}" ]]; then
+        echo "File ${EXE_FILE} exists."
+    else
+        echo "No commandLine.exe either! Fail! exiting"
+        exit 1
+    fi
+fi
+echo "Executable File: ${EXE_FILE}"
+echo "Testing projectGenerator: [vs]"
+
+
+chmod +x "${EXE_FILE}"
+
+# Run the project generator executable
+./"${EXE_FILE}" --recursive -pvs -b -o../../../../ ../../../../examples/
 errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
-		exit $errorcode
+    exit $errorcode
 fi
 
-echo "test out of folder -o [vs]";
+echo "Test out of folder -o [vs]"
 rm -rf ../../../../../pg2
-mkdir -p  ../../../../../pg2
+mkdir -p ../../../../../pg2
+
 if ! command -v rsync &> /dev/null
 then      
-    cp -a ./projectGenerator ../../../../../pg2 
+    cp -a ./"${EXE_FILE}" ../../../../../pg2 
 else
-    rsync -azp ./projectGenerator ../../../../../pg2
+    rsync -azp ./"${EXE_FILE}" ../../../../../pg2
 fi
+
 cd ../../../../../pg2
 ls -a
 pwd
-./projectGenerator --recursive -pvs -o"./../openFrameworks" ./../openFrameworks/examples/
+
+# Run the project generator executable again in the new directory
+./"${EXE_FILE}" --recursive -pvs -b -o"./../openFrameworks" ./../openFrameworks/examples/
 errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
-		exit $errorcode
+    exit $errorcode
 fi
 
 echo "Test generate new just name"
-./projectGenerator -o"../openFrameworks" -p"vs" "testingGenerate"
+./"${EXE_FILE}" -o"../openFrameworks" -p"vs" "testingGenerate"
 errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
-		exit $errorcode
+    exit $errorcode
 fi
+
 echo "Test generate new / update full path"
-./projectGenerator -o"../openFrameworks" -p"vs" "../openFrameworks/apps/myApps/testingGenerate"
+./"${EXE_FILE}" -o"../openFrameworks" -p"vs" "../openFrameworks/apps/myApps/testingGenerate"
 errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
-        exit $errorcode
+    exit $errorcode
 fi
 
 echo "Test generate full path"
-./projectGenerator -o"../openFrameworks" -p"vs" "../openFrameworks/apps/myApps/testingGenerate2"
+./"${EXE_FILE}" -o"../openFrameworks" -p"vs" "../openFrameworks/apps/myApps/testingGenerate2"
 errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
-        exit $errorcode
+    exit $errorcode
 fi
-echo "Successful projectGenerator tests for [vs]";
+
+echo "Successful projectGenerator tests for [vs]"

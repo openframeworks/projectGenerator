@@ -69,6 +69,17 @@ std::string VSCodeProject::LOG_NAME = "VSCodeProject";
 
 bool VSCodeProject::createProjectFile(){
 
+	if (backupProjectFiles) {
+		createBackup({ projectDir / ".vscode" / "c_cpp_properties.json" }, projectDir);
+		createBackup({ projectDir / ".vscode" / "extensions.json" }, projectDir);
+		createBackup({ projectDir / ".vscode" / "launch.json" }, projectDir);
+		createBackup({ projectDir / ".vscode" / "tasks.json" }, projectDir);
+		createBackup({ projectDir / (projectName + ".code-workspace") }, projectDir);
+		createBackup({ projectDir / "addons.make" }, projectDir);
+		createBackup({ projectDir / "config.make" }, projectDir);
+		createBackup({ projectDir / "Makefile" }, projectDir);
+	}
+
 #if defined(__MINGW32__) || defined(__MINGW64__)
 	try {
 		fs::remove_all(projectDir / ".vscode");
@@ -78,7 +89,6 @@ bool VSCodeProject::createProjectFile(){
 	}
 #endif
 	
-	createBackup(projectDir / ".vscode");
 	try {
 		fs::copy(templatePath / ".vscode", projectDir / ".vscode", fs::copy_options::update_existing | fs::copy_options::recursive);
 	} catch(fs::filesystem_error& e) {

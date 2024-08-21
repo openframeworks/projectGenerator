@@ -552,10 +552,16 @@ bool ofIsPathInPath(const fs::path & path, const fs::path & base) {
 }
 
 
-void createBackup(const fs::path &path) {
+void createBackup(const fs::path & path, const fs::path & backupPath) {
 	if(fs::exists(path)) {
-		fs::path backupDir = path.parent_path();
-		fs::path backupFile = backupDir / (path.filename().string() + ".bak");
+		std::string datetimeStr = ofGetTimestampString("%Y-%m-%d");
+
+		fs::path backupDir = { backupPath / "backups" / datetimeStr };
+		if (fs::exists(backupDir)) {			
+			std::string hour = ofGetTimestampString("%H-%M");
+			backupDir = { backupPath / "backups" / (datetimeStr + "_" + hour) };
+		}
+		fs::path backupFile = backupDir / (path.filename().string());
 		if (!fs::exists(backupDir)) {
 			fs::create_directories(backupDir);
 		}
@@ -650,4 +656,6 @@ fs::path ofRelativeToOFPATH(const fs::path& path) {
 		return fs::path("");
 	}
 }
+
+
 

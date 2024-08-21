@@ -116,12 +116,23 @@ bool xcodeProject::createProjectFile(){
 		   }
 	   }
 	   
+	if (backupProjectFiles) {
+		createBackup({ xcodeProject / "project.pbxproj" }, projectDir);
+		createBackup({ projectDir / "openFrameworks-Info.plist" }, projectDir);
+		createBackup({ projectDir / "Project.xcconfig" }, projectDir);
+		createBackup({ projectDir / "of.entitlements" }, projectDir);
+		createBackup({ projectDir / "addons.make" }, projectDir);
+		createBackup({ projectDir / "config.make" }, projectDir);
+		createBackup({ projectDir / "Makefile" }, projectDir);
+	}
 	   
 	saveScheme();
 
 	if(target == "osx" || target == "macos"){
 		saveMakefile();
 	}
+
+	
 	
 	// Execute all file copy and replacements, including ones in saveScheme, saveMakefile
 	for (auto & c : copyTemplateFiles) {
