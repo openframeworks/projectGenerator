@@ -37,7 +37,6 @@ constexpr option::Descriptor usage[] = {
 	{ LISTTEMPLATES, 0, "l", "listtemplates", option::Arg::None, "  --listtemplates, -l  \tlist templates available for the specified or current platform(s)" },
 	{ PLATFORMS, 0, "p", "platforms", option::Arg::Optional, "  --platforms, -p  \tplatform list (such as osx, ios, winvs)" },
 	{ ADDONS, 0, "a", "addons", option::Arg::Optional, "  --addons, -a  \taddon list (such as ofxOpenCv, ofxGui, ofxXmlSettings)" },
-	{ ADDONS, 0, "a", "addons", option::Arg::Optional, "  --addons, -a  \taddon list (such as ofxOpenCv, ofxGui, ofxXmlSettings)" },
 	{ OFPATH, 0, "o", "ofPath", option::Arg::Optional, "  --ofPath, -o  \tpath to openframeworks (relative or absolute). This *must* be set, or you can also alternatively use an environment variable PG_OF_PATH and if this isn't set, it will use that value instead" },
 	{ VERBOSE, 0, "v", "verbose", option::Arg::None, "  --verbose, -v  \trun verbose" },
 	{ TEMPLATE, 0, "t", "template", option::Arg::Optional, "  --template, -t  \tproject template" },
@@ -540,8 +539,8 @@ int main(int argc, char ** argv) {
 	
 #ifndef DEBUG_NO_OPTIONS
 	if (options[HELP] || argc == 0) {
-		messageError("No arguments");
 		printHelp();
+		messageError("No arguments");
 		return EXIT_OK;
 	}
 #endif
@@ -568,9 +567,9 @@ int main(int argc, char ** argv) {
 
     
 	if (projectName == "") {
-		messageError("Missing project path");
 		printHelp();
 		consoleSpace();
+		messageError("Missing project path");
 		return EXIT_USAGE;
 	}
 
@@ -635,10 +634,11 @@ int main(int argc, char ** argv) {
 	if (bListTemplates) {
 		auto ret = printTemplates();
 		consoleSpace();
-		if (ret) {
-			
+		if (ret) {			
+			messageReturn("status", "EXIT_OK");
 			return EXIT_OK;
 		} else {
+			messageError("printTemplates data error");
 			return EXIT_DATAERR;
 		}
 	}
