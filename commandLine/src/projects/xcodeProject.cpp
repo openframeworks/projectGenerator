@@ -902,8 +902,11 @@ bool xcodeProject::saveProjectFile(){
 
 		contents.close();
 
-		// json jversion = getPGVersion();
-		// j["_OFProjectGeneratorVersion"] = jversion;
+		
+//		json jversion = { "_OFProjectGeneratorVersion", getPGVersion() };
+//		j.update(jversion);
+//		 json jversion = getPGVersion();
+		j["_OFProjectGeneratorVersion"] = getPGVersion();
 
 		
 		for (auto & c : commands) {
@@ -958,8 +961,13 @@ bool xcodeProject::saveProjectFile(){
 
 		
 		std::ofstream jsonFile(fileName);
+		auto dump = j.dump(1, '	');
+		if (dump[0] == '[') {
+			dump = j[0].dump(1, '	');
+		}
+
 		try {
-			jsonFile << j.dump(1, '	');
+			jsonFile << dump;
 		} catch(std::exception & e) {
 			ofLogError("xcodeProject::saveProjectFile") << "Error saving json to " << fileName << ": " << e.what();
 			return false;
