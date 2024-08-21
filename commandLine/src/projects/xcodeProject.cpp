@@ -891,8 +891,8 @@ bool xcodeProject::saveProjectFile(){
 
 		contents.close();
 
-		json jversion = getPGVersion();
-		j["_OFProjectGeneratorVersion"] = jversion;
+		// json jversion = getPGVersion();
+		// j["_OFProjectGeneratorVersion"] = jversion;
 
 		
 		for (auto & c : commands) {
