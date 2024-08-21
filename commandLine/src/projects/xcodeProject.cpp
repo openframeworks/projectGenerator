@@ -958,8 +958,13 @@ bool xcodeProject::saveProjectFile(){
 
 		
 		std::ofstream jsonFile(fileName);
+		auto dump = j.dump(1, '	');
+		if (dump[0] == '[') {
+			dump = j[0].dump(1, '	');
+		}
+
 		try {
-			jsonFile << j.dump(1, '	');
+			jsonFile << dump;
 		} catch(std::exception & e) {
 			ofLogError("xcodeProject::saveProjectFile") << "Error saving json to " << fileName << ": " << e.what();
 			return false;
