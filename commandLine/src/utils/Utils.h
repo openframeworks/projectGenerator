@@ -20,6 +20,8 @@ using std::vector;
 using std::cout;
 using std::endl;
 
+bool backupProjectFiles = false;
+
 static std::map <ofTargetPlatform, std::string> platformsToString {
 	{ OF_TARGET_ANDROID, "android" },
 //	{ OF_TARGET_EMSCRIPTEN, "" },
@@ -108,7 +110,7 @@ std::string getPGVersion();
 fs::path makeRelative(const fs::path& from, const fs::path& to);
 
 bool ofIsPathInPath(const fs::path & path, const fs::path & base);
-void createBackup(const fs::path &path);
+void createBackup(const fs::path & path, const fs::path & backupPath);
 
 std::string normalizePath(const std::string& path);
 

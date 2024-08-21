@@ -444,6 +444,8 @@ int main(int argc, char ** argv) {
 	
 	if (options[BACKUP_PROJECT_FILES].count() > 0) {
 		bBackup = true;
+		backupProjectFiles = bBackup;
+		ofLogVerbose() << "Backup project files: true";
 	}
 
 	// templates:

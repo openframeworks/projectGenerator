@@ -10,7 +10,13 @@ bool visualStudioProject::createProjectFile(){
 
 	ensureDllDirectoriesExist();
 	solution = projectDir / (projectName + ".sln");
-	createBackup(solution);
+	if (backupProjectFiles) {
+		createBackup(solution, projectDir);
+		createBackup({ projectDir / "addons.make" }, projectDir);
+		createBackup({ projectDir / "config.make" }, projectDir);
+		createBackup({ projectDir / "Makefile" }, projectDir);
+		createBackup({ projectDir / (projectName + ".vcxproj") }, projectDir);
+	}
 	
 	std::pair <string, string> replacementsForward, replacementsBack;
 	if (!fs::equivalent(getOFRoot(), fs::path{ "../../.." })) {
