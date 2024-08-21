@@ -20,7 +20,7 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-bool backupProjectFiles = false;
+static bool backupProjectFiles = false;
 
 static std::map <ofTargetPlatform, std::string> platformsToString {
 	{ OF_TARGET_ANDROID, "android" },
