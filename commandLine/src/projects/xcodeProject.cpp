@@ -161,7 +161,7 @@ bool xcodeProject::createProjectFile(){
                     ofLogVerbose("xcodeProject") << "xattr set correctly for /bin" << endl;
                 }
             } catch (const std::exception& e) {
-                std::cout << e.what() << std::endl;
+                std::cout << "xcodeProject::createProjectFile() error " << e.what() << std::endl;
             }
 #endif
         }
