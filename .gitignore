@@ -98,3 +98,6 @@ frontend/app/projectGenerator*
 
 commandLine/.vs/commandLine/xs
 commandLine/.vs/
+commandLine/bin
+commandLine/dll
+commandLine/icon.aps

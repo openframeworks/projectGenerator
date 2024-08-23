@@ -7,7 +7,7 @@ public:
 	AndroidStudioProject(const std::string & target);
 
 	bool createProjectFile();
-	void addInclude(std::string includeName){}
+	void addInclude(const fs::path & includeName){}
 	void addLibrary(const LibraryBinary & lib){}
 	void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT){};
 	bool loadProjectFile() { return false; };

@@ -1,15 +1,14 @@
 #include "xcodeProject.h"
 #include "Utils.h"
 #include "ofUtils.h"
-#if !defined(TARGET_MINGW)
-	#include <json.hpp>
-#else
-	#include <nlohmann/json.hpp> // MSYS2 : use of system-installed include
-#endif
+#include <nlohmann/json.hpp>
 #ifdef __APPLE__
-#include <cstdlib>  // std::system
+	#include <cstdlib>  // std::system
+	#include <regex>
 #endif
 #include <iostream>
+#include <fstream>
+
 
 using nlohmann::json;
 using nlohmann::json_pointer;
@@ -70,61 +69,80 @@ xcodeProject::xcodeProject(const string & target) : baseProject(target){
 
 bool xcodeProject::createProjectFile(){
 	fs::path xcodeProject = projectDir / ( projectName + ".xcodeproj" );
-//	alert ("createProjectFile " + ofPathToString(xcodeProject), 35);
+	try {
+		   fs::create_directories(xcodeProject);
+	   } catch (const std::exception& e) {
+		   std::cerr << "Error creating directories: " << e.what() << std::endl;
+		   return false;
+	   }
 
-	if (fs::exists(xcodeProject)) {
-		fs::remove_all(xcodeProject);
+	   // if project is outside OF, rootReplacements is set to be used in XCode and make
+	   if (!fs::equivalent(getOFRoot(), normalizePath(fs::path{"../../.."}))) {
+		   string root { ofPathToString(getOFRoot()) };
+		   rootReplacements = { "../../..", root };
+	   }
+	   
+	  
+	   copyTemplateFiles.push_back({
+		   normalizePath(templatePath / "emptyExample.xcodeproj" / "project.pbxproj"),
+		   normalizePath(xcodeProject / "project.pbxproj"),
+		   {{"emptyExample", projectName},
+		   rootReplacements}
+	   });
+
+	   copyTemplateFiles.push_back({
+		   normalizePath(templatePath / "Project.xcconfig"),
+		   normalizePath(projectDir / "Project.xcconfig"),
+		   {rootReplacements}
+	   });
+   
+	   if (target == "osx" || target == "macos") {
+		   for (auto & f : {"openFrameworks-Info.plist", "of.entitlements"}) {
+			   copyTemplateFiles.push_back({normalizePath(templatePath / f), normalizePath(projectDir / f)});
+		   }
+	   } else if (target == "ios" || target == "macos") {
+		   for (auto & f : {"ofxiOS-Info.plist", "ofxiOS_Prefix.pch"}) {
+			   copyTemplateFiles.push_back({normalizePath(templatePath / f), normalizePath(projectDir / f)});
+			   try {
+				   fs::path from = normalizePath(templatePath / "mediaAssets");
+				   fs::path to = normalizePath(projectDir / "mediaAssets");
+				   if (!fs::exists(to)) {
+					   fs::copy(from, to, fs::copy_options::recursive | fs::copy_options::update_existing);
+				   }
+			   } catch (const std::exception& e) {
+				   std::cerr << "Error copying template files: " << e.what() << std::endl;
+				   return false;
+			   }
+		   }
+	   }
+	   
+	if (backupProjectFiles) {
+		createBackup({ xcodeProject / "project.pbxproj" }, projectDir);
+		createBackup({ projectDir / "openFrameworks-Info.plist" }, projectDir);
+		createBackup({ projectDir / "Project.xcconfig" }, projectDir);
+		createBackup({ projectDir / "of.entitlements" }, projectDir);
+		createBackup({ projectDir / "addons.make" }, projectDir);
+		createBackup({ projectDir / "config.make" }, projectDir);
+		createBackup({ projectDir / "Makefile" }, projectDir);
 	}
-	fs::create_directories(xcodeProject);
-
-	// if project is outside OF, rootReplacements is set to be used in XCode and make
-	if (!fs::equivalent(getOFRoot(), fs::path{"../../.."})) {
-		string root { ofPathToString(getOFRoot()) };
-		rootReplacements = { "../../..", root };
-	}
-	
-	copyTemplateFiles.push_back({
-		templatePath / "emptyExample.xcodeproj" / "project.pbxproj",
-		xcodeProject / "project.pbxproj",
-		{{ "emptyExample", projectName },
-		rootReplacements }
-	});
-
-	copyTemplateFiles.push_back({
-		templatePath / "Project.xcconfig",
-		projectDir / "Project.xcconfig",
-		{ rootReplacements }
-	});
-	
-	if (target == "osx" || target == "macos") {
-		// TODO: TEST
-		for (auto & f : { "openFrameworks-Info.plist", "of.entitlements" }) {
-			copyTemplateFiles.push_back({ templatePath / f, projectDir / f });
-		}
-	} else {
-		for (auto & f : { "ofxiOS-Info.plist", "ofxiOS_Prefix.pch" }) {
-			copyTemplateFiles.push_back({ templatePath / f, projectDir / f });
-		}
-
-		fs::path from = templatePath / "mediaAssets";
-		fs::path to = projectDir / "mediaAssets";
-		if (!fs::exists(to)) {
-			fs::copy(from, to, fs::copy_options::recursive);
-		}
-	}
-
+	   
 	saveScheme();
 
 	if(target == "osx" || target == "macos"){
 		saveMakefile();
 	}
+
+	
 	
 	// Execute all file copy and replacements, including ones in saveScheme, saveMakefile
 	for (auto & c : copyTemplateFiles) {
-		c.run();
+		try {
+			c.run();
+		} catch (const std::exception& e) {
+			std::cerr << "Error running copy template files: " << e.what() << std::endl;
+			return false;
+		}
 	}
-	
-	
 	
 	// NOW only files being copied
 	
@@ -138,14 +156,13 @@ bool xcodeProject::createProjectFile(){
 	if (fs::exists(projectDataDir)) {
 		// originally only on IOS
 		//this is needed for 0.9.3 / 0.9.4 projects which have iOS media assets in bin/data/
-		// TODO: Test on IOS
         fs::path templateBinDir { templatePath / "bin" };
 		fs::path templateDataDir { templatePath / "bin" / "data" };
 		if (fs::exists(templateDataDir) && fs::is_directory(templateDataDir)) {
 			baseProject::recursiveCopyContents(templateDataDir, projectDataDir);
 		}
         if (fs::exists(templateBinDir) && fs::is_directory(templateBinDir)) {
-#ifdef __APPLE__
+#ifdef TARGET_OS_MAC
             try {
                 //  extended attributes on macOS
                 std::string command = "xattr -w com.apple.xcode.CreatedByBuildSystem true " + templateBinDir.string();
@@ -155,12 +172,11 @@ bool xcodeProject::createProjectFile(){
                     ofLogVerbose("xcodeProject") << "xattr set correctly for /bin" << endl;
                 }
             } catch (const std::exception& e) {
-                std::cout << e.what() << std::endl;
+                std::cout << "xcodeProject::createProjectFile() error " << e.what() << std::endl;
             }
 #endif
         }
 	}
-
 	return true;
 }
 
@@ -249,13 +265,20 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 
 		if (folders.size()){
 			// Iterating every folder from full path
-			for (std::size_t a=0; a<folders.size(); a++) {
-				fs::path fullPath { "" };
+			for (std::size_t a = 0; a < folders.size(); a++) {
+				fs::path fullPath{""};
+				
+				std::vector<fs::path> joinFolders;
+				joinFolders.reserve(a + 1); // Reserve / avoid reallocations
 
-				vector <fs::path> joinFolders = std::vector(folders.begin(), folders.begin() + (a+1));
-				for (auto & j : joinFolders) {
+				for (std::size_t i = 0; i <= a; ++i) {
+					joinFolders.push_back(folders[i]);
+				}
+
+				for (const auto& j : joinFolders) {
 					fullPath /= j;
 				}
+			
 
 				// Query if partial path is already stored. if not execute this following block
 				if ( folderUUID.find(fullPath) != folderUUID.end() ) {
@@ -308,8 +331,8 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 							// Base folders can be in a different depth,
 							// so we cut folders to point to the right path
 							fs::path base2 { base };
-							int diff = folders.size() - (a+1);
-							for (int x=0; x<diff; x++) {
+							size_t diff = folders.size() - (a+1);
+							for (size_t x=0; x<diff; x++) {
 								base2 = base2.parent_path();
 							}
 							
@@ -395,9 +418,34 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 	string UUID {
 		addFile(srcFile, folder, fp)
 	};
+	
+	if (ext == ".mm" || ext == ".m") {
+		addCompileFlagsForMMFile(srcFile);
+	}
 }
 
-// FIXME: name not needed anymore.
+void xcodeProject::addCompileFlagsForMMFile(const fs::path & srcFile) {
+	std::ifstream file(srcFile);
+	std::string line;
+	bool containsARCFunctions = false;
+#if __APPLE__
+	std::regex arcRegex(R"(\b(alloc|dealloc)\b)");
+
+	while (std::getline(file, line)) {
+		if (std::regex_search(line, arcRegex)) {
+			containsARCFunctions = true;
+			break;
+		}
+	}
+#endif
+	if (containsARCFunctions) {
+		for (auto & c : buildConfigs) {
+			addCommand("Add :objects:"+c+":buildSettings:OTHER_CPLUSPLUSFLAGS: string -fno-objc-arc");
+		}
+	}
+}
+
+
 void xcodeProject::addFramework(const fs::path & path, const fs::path & folder){
 	// alert( "xcodeProject::addFramework " + ofPathToString(path) + " : " + ofPathToString(folder) , 33);
 	// path = the full path (w name) of this framework
@@ -474,17 +522,17 @@ void xcodeProject::addDylib(const fs::path & path, const fs::path & folder){
 }
 
 
-void xcodeProject::addInclude(string includeName){
+void xcodeProject::addInclude(const fs::path & includeName){
 	//alert("addInclude " + includeName);
 	for (auto & c : buildConfigs) {
-		addCommand("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + includeName);
+		addCommand("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + ofPathToString(includeName));
 	}
 }
 
 void xcodeProject::addLibrary(const LibraryBinary & lib){
 //	alert( "xcodeProject::addLibrary " + lib.path , 33);
 	for (auto & c : buildConfigs) {
-		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + lib.path);
+		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ofPathToString(lib.path));
 	}
 }
 
@@ -543,7 +591,10 @@ void xcodeProject::addAddon(ofAddon & addon){
 	//	alert("xcodeProject addAddon string :: " + addon.name, 31);
 
 	// Files listed alphabetically on XCode navigator.
-	std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), std::less<string>());
+	
+	std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), [](const fs::path & a, const fs::path & b) {
+		return a.string() < b.string();
+	});
 
 	for (auto & e : addon.libs) {
 		ofLogVerbose() << "adding addon libs: " << e.path;
@@ -575,6 +626,9 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 	for (auto & e : addon.srcFiles) {
 		ofLogVerbose() << "adding addon srcFiles: " << e;
+		if(addon.filesToFolders.find(e) == addon.filesToFolders.end()) {
+			addon.filesToFolders[e] = fs::path { "" };
+		}
 		addSrc(e,addon.filesToFolders[e]);
 	}
 
@@ -584,6 +638,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 	}
 
 	for (auto & f : addon.frameworks) {
+		// alert (f, 31);
 		ofLogVerbose() << "adding addon frameworks: " << f;
 
 		size_t found=f.find('/');
@@ -847,8 +902,11 @@ bool xcodeProject::saveProjectFile(){
 
 		contents.close();
 
-		json jversion = getPGVersion();
-		j["_OFProjectGeneratorVersion"] = jversion;
+		
+//		json jversion = { "_OFProjectGeneratorVersion", getPGVersion() };
+//		j.update(jversion);
+//		 json jversion = getPGVersion();
+		j["_OFProjectGeneratorVersion"] = getPGVersion();
 
 		
 		for (auto & c : commands) {
@@ -903,8 +961,13 @@ bool xcodeProject::saveProjectFile(){
 
 		
 		std::ofstream jsonFile(fileName);
+		auto dump = j.dump(1, '	');
+		if (dump[0] == '[') {
+			dump = j[0].dump(1, '	');
+		}
+
 		try {
-			jsonFile << j.dump(1, '	');
+			jsonFile << dump;
 		} catch(std::exception & e) {
 			ofLogError("xcodeProject::saveProjectFile") << "Error saving json to " << fileName << ": " << e.what();
 			return false;

@@ -24,7 +24,7 @@ bool CBWinProject::createProjectFile(){
 
 	for (auto & p : fromTo) {
 		try {
-			fs::copy_file(p.first, p.second, fs::copy_options::overwrite_existing);
+			fs::copy_file(p.first, p.second, (bOverwrite ? fs::copy_options::overwrite_existing : fs::copy_options::update_existing));
 		} catch(fs::filesystem_error& e) {
 			ofLogError(LOG_NAME) << "error copying template file " << p.first << " : " << p.second << e.what();
 			return false;
@@ -80,13 +80,13 @@ void CBWinProject::addSrc(const fs::path & srcName, const fs::path & folder, Src
 	}
 }
 
-void CBWinProject::addInclude(std::string includeName){
-	ofLogNotice() << "adding include " << includeName;
-	appendValue(doc, "Add", "directory", includeName);
+void CBWinProject::addInclude(const fs::path & includeName){
+	ofLogNotice() << "adding include " << includeName.string();
+	appendValue(doc, "Add", "directory", includeName.string());
 }
 
 void CBWinProject::addLibrary(const LibraryBinary & lib){
-	appendValue(doc, "Add", "library", lib.path, true);
+	appendValue(doc, "Add", "library", lib.path.string(), true);
 	// overwriteMultiple for a lib if it's there (so libsorder.make will work)
 	// this is because we might need to say libosc, then ws2_32
 }

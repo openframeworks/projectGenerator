@@ -23,8 +23,8 @@ if [ -d "win-unpacked" ]; then
 
     _DIR=$(pwd)
 
-
-    ${SCRIPT_DIR}/secure.sh ${_DIR}/projectGenerator.exe
+    . "${SCRIPT_DIR}/secure.sh"
+    secure "{_DIR}/projectGenerator.exe" projectGenerator.pkl
 
     zip -r "../projectGenerator-vs-gui.zip" "."
     pwd

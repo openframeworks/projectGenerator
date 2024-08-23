@@ -35,6 +35,8 @@ if [ -f "$SOURCE_FILE" ]; then
     # File exists, proceed with copying
     mkdir -p "$DESTINATION_PATH" # Create destination directory if it doesn't exist
     cp "$SOURCE_FILE" "$DESTINATION_PATH/projectGenerator.exe"
+    . "${SCRIPT_DIR}/secure.sh"
+    secure "$DESTINATION_PATH/projectGenerator.exe" projectGenerator.pkl
     echo "projectGenerator.exe File copied successfully."
 else
     # File does not exist
