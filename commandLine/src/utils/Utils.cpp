@@ -34,11 +34,7 @@
 #include <limits.h>		/* PATH_MAX */
 #endif
 
-<<<<<<< HEAD
-#include <array>
-=======
 #include <regex>
->>>>>>> master
 
 using std::unique_ptr;
 
