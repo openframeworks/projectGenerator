@@ -413,8 +413,8 @@ int main(int argc, char ** argv) {
 	bRecursive = false;
 	bHelpRequested = false;
 	bListTemplates = false;
-	// FIXME! problem.
-	targets.emplace_back(platformsToString[ofGetTargetPlatform()]);
+	targets.emplace_back(getPlatformString());
+
 	startTime = 0;
 	nProjectsUpdated = 0;
 	nProjectsCreated = 0;
