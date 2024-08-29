@@ -224,6 +224,8 @@ void xcodeProject::saveMakefile(){
 
 
 bool xcodeProject::loadProjectFile(){ //base
+	addCommand("Add :_OFProjectGeneratorVersion string " + getPGVersion());
+	
 	renameProject();
 	// MARK: just to return something.
 	return true;
@@ -902,11 +904,8 @@ bool xcodeProject::saveProjectFile(){
 
 		contents.close();
 
-		
-		// j["_OFProjectGeneratorVersion"] = getPGVersion();
-
-		
 		for (auto & c : commands) {
+			//alert (c, 31);
 			// readable comments enabled now.
 			if (c != "" && c[0] != '#') {
 				vector<string> cols { ofSplitString(c, " ") };
@@ -958,6 +957,7 @@ bool xcodeProject::saveProjectFile(){
 
 		
 		std::ofstream jsonFile(fileName);
+		// This is not pretty but address some differences in nlohmann json 3.11.2 to 3.11.3
 		auto dump = j.dump(1, '	');
 		if (dump[0] == '[') {
 			dump = j[0].dump(1, '	');
