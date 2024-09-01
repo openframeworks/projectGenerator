@@ -21,20 +21,21 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <regex>
+#include <array>
+#include <stdio.h>
 
 #ifdef TARGET_WIN32
-#include <direct.h>
-
-#define GetCurrentDir _getcwd
+	#include <direct.h>
+	#define GetCurrentDir _getcwd
 #elif defined(TARGET_LINUX)
-#include <unistd.h>
-#define GetCurrentDir getcwd
+	#include <unistd.h>
+	#define GetCurrentDir getcwd
 #else
-#include <mach-o/dyld.h>	/* _NSGetExecutablePath */
-#include <limits.h>		/* PATH_MAX */
+	#include <mach-o/dyld.h>	/* _NSGetExecutablePath */
+	#include <limits.h>		/* PATH_MAX */
 #endif
 
-#include <regex>
 
 using std::unique_ptr;
 
@@ -61,12 +62,6 @@ std::string execute_popen(const char* cmd) {
 	auto rc = pclose(pipe);
 #endif
 
-
-	if (rc == EXIT_SUCCESS) { // == 0
-
-	} else if (rc == EXIT_FAILURE) {  // EXIT_FAILURE is not used by all programs, maybe needs some adaptation.
-
-	}
 	// trim last line break
 	result.pop_back();
 	return result;
