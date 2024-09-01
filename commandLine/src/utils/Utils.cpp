@@ -62,12 +62,6 @@ std::string execute_popen(const char* cmd) {
 	auto rc = pclose(pipe);
 #endif
 
-
-	if (rc == EXIT_SUCCESS) { // == 0
-
-	} else if (rc == EXIT_FAILURE) {  // EXIT_FAILURE is not used by all programs, maybe needs some adaptation.
-
-	}
 	// trim last line break
 	result.pop_back();
 	return result;
