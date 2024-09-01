@@ -21,20 +21,21 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <regex>
+#include <array>
+#include <stdio.h>
 
 #ifdef TARGET_WIN32
-#include <direct.h>
-
-#define GetCurrentDir _getcwd
+	#include <direct.h>
+	#define GetCurrentDir _getcwd
 #elif defined(TARGET_LINUX)
-#include <unistd.h>
-#define GetCurrentDir getcwd
+	#include <unistd.h>
+	#define GetCurrentDir getcwd
 #else
-#include <mach-o/dyld.h>	/* _NSGetExecutablePath */
-#include <limits.h>		/* PATH_MAX */
+	#include <mach-o/dyld.h>	/* _NSGetExecutablePath */
+	#include <limits.h>		/* PATH_MAX */
 #endif
 
-#include <regex>
 
 using std::unique_ptr;
 
