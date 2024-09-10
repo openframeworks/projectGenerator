@@ -43,9 +43,9 @@ constexpr option::Descriptor usage[] = {
 	{ DRYRUN, 0, "d", "dryrun", option::Arg::None, "  --dryrun, -d  \tdry run, don't change files" },
 	{ SRCEXTERNAL, 0, "s", "source", option::Arg::Optional, "  --source, -s  \trelative or absolute path to source or include folders external to the project (such as ../../../../common_utils/" },
 	{ VERSION, 0, "w", "version", option::Arg::None, "  --version, -w  \treturn the current version" },
-    { GET_OFPATH, 0, "g", "getofpath", option::Arg::None, "  --getofpath, -g  \treturn the current ofPath" },
-    { GET_HOST_PLATFORM, 0, "i", "platform", option::Arg::None, "  --getplatform, -i  \treturn the current host platform" },
-    { COMMAND, 0, "c", "command", option::Arg::None, "  --command, -c \truns command" },
+	{ GET_OFPATH, 0, "g", "getofpath", option::Arg::None, "  --getofpath, -g  \treturn the current ofPath" },
+	{ GET_HOST_PLATFORM, 0, "i", "platform", option::Arg::None, "  --getplatform, -i  \treturn the current host platform" },
+	{ COMMAND, 0, "c", "command", option::Arg::None, "  --command, -c \truns command" },
 	{ BACKUP_PROJECT_FILES, 0, "b", "backup", option::Arg::None, "  --backup, -b  \tbackup project files when replacing with template" },
 	{ 0, 0, 0, 0, 0, 0 }
 };
@@ -95,7 +95,7 @@ void printVersion() {
 }
 
 void printOFPath() {
-    std::cout << ofPath.string() << endl;
+	std::cout << ofPath.string() << endl;
 }
 
 void setofPath(const fs::path& path) {
@@ -156,11 +156,11 @@ bool printTemplates() {
 }
 
 void handleCommand(const std::string& args) {
-    if (args == "ping") {
-        std::cout << "pong" << args << std::endl;
-    } else {
-        std::cout << "Unknown custom command: " << args << std::endl;
-    }
+	if (args == "ping") {
+		std::cout << "pong" << args << std::endl;
+	} else {
+		std::cout << "Unknown custom command: " << args << std::endl;
+	}
 }
 
 
@@ -306,7 +306,7 @@ void recursiveUpdate(const fs::path & path, const string & target) {
 }
 
 int updateOFPath(fs::path path) {
-    
+
 	std::string ofPathEnv;
 	auto envValue = ofGetEnv("PG_OF_PATH");
 	if(!envValue.empty()) {
@@ -315,50 +315,50 @@ int updateOFPath(fs::path path) {
 	}
 
 	if ((ofPath.empty() && !ofPathEnv.empty()) ||
-		((!ofPath.empty() && !isGoodOFPath(ofPath)) && 
+		((!ofPath.empty() && !isGoodOFPath(ofPath)) &&
 		 (!ofPathEnv.empty() && isGoodOFPath(ofPathEnv)))) {
 		setofPath(ofPathEnv);
 		ofLogNotice() << "PG_OF_PATH set: ofPath [" << ofPath << "]";
 	}
 	of::filesystem::path exePath = ofFilePath::getCurrentExeDir();
-	
-    fs::path startPath = normalizePath(exePath);
+
+	fs::path startPath = normalizePath(exePath);
 	generatorPath = startPath;
 	ofLogVerbose() << "projectGenerator cmd path: {" << startPath << "] }";
-    //ofFilePath::getAbsolutePathFS(fs::current_path(), false);
+	//ofFilePath::getAbsolutePathFS(fs::current_path(), false);
 //    ofLogNotice() << "startPath: " << startPath.string();
-    fs::path foundOFPath = findOFPathUpwards(startPath);
-    if (foundOFPath.empty() && ofPath.empty()) {
-        ofLogError() << "{ \"errorMessage: \"" << "oF path not found: please use -o or --ofPath or set 'PG_OF_PATH' environment var. Auto up folders from :[" << startPath.string() << "]" << "\" }";
-        return EXIT_FAILURE;
-    } else {
-        if (!ofPath.empty() && isGoodOFPath(ofPath)) {
-            ofLogNotice() << "ofPath set and valid using [" << ofPath << "]";
-        } else {
-            if(isGoodOFPath(foundOFPath))
-            setofPath(foundOFPath);
+	fs::path foundOFPath = findOFPathUpwards(startPath);
+	if (foundOFPath.empty() && ofPath.empty()) {
+		ofLogError() << "{ \"errorMessage: \"" << "oF path not found: please use -o or --ofPath or set 'PG_OF_PATH' environment var. Auto up folders from :[" << startPath.string() << "]" << "\" }";
+		return EXIT_FAILURE;
+	} else {
+		if (!ofPath.empty() && isGoodOFPath(ofPath)) {
+			ofLogNotice() << "ofPath set and valid using [" << ofPath << "]";
+		} else {
+			if(isGoodOFPath(foundOFPath))
+			setofPath(foundOFPath);
 			setOFRoot(foundOFPath);
-            ofLogVerbose() << "ofPath auto-found and valid using [" << ofPath << "]";
-        }
-    }
-    
-    if (!ofPath.empty()) {
-        if (!isGoodOFPath(ofPath)) {
-            foundOFPath = findOFPathUpwards(ofPath);
-            if (foundOFPath.empty()) {
-                ofLogNotice() << "{ \"errorMessage: \"" << "ofPath not valid. [" << ofPath << "] auto-find ofPath failed also..." << "\" }";
-                return EXIT_USAGE;
-            }
-        }
+			ofLogVerbose() << "ofPath auto-found and valid using [" << ofPath << "]";
+		}
+	}
+
+	if (!ofPath.empty()) {
+		if (!isGoodOFPath(ofPath)) {
+			foundOFPath = findOFPathUpwards(ofPath);
+			if (foundOFPath.empty()) {
+				ofLogNotice() << "{ \"errorMessage: \"" << "ofPath not valid. [" << ofPath << "] auto-find ofPath failed also..." << "\" }";
+				return EXIT_USAGE;
+			}
+		}
 //        if (ofIsPathInPath(projectPath, ofPath)) {
 //            fs::path path = fs::relative(ofPath, projectPath);
 //            ofPath = path.string();
 //        }
-        ofPath = normalizePath(ofPath);
-        setOFRoot(ofPath);
-    }
-    
-    return EXIT_OK;
+		ofPath = normalizePath(ofPath);
+		setOFRoot(ofPath);
+	}
+
+	return EXIT_OK;
 }
 
 void printHelp() {
@@ -436,11 +436,11 @@ int main(int argc, char ** argv) {
 		messageError("Parse error for arguments");
 		return 1;
 	}
-    
-    if (options[VERBOSE].count() > 0) {
-        bVerbose = true;
-    }
-	
+
+	if (options[VERBOSE].count() > 0) {
+		bVerbose = true;
+	}
+
 	if (options[BACKUP_PROJECT_FILES].count() > 0) {
 		bBackup = true;
 		backupProjectFiles = bBackup;
@@ -459,12 +459,12 @@ int main(int argc, char ** argv) {
 	if (options[DRYRUN].count() > 0) {
 		bDryRun = true;
 	}
-    
-    if (options[VERSION].count() > 0) {
-        printVersion();
-        return EXIT_OK;
-    }
-	
+
+	if (options[VERSION].count() > 0) {
+		printVersion();
+		return EXIT_OK;
+	}
+
 	if (options[OFPATH].count() > 0) {
 		if (options[OFPATH].arg != NULL) {
 			setofPath(options[OFPATH].arg);
@@ -495,7 +495,7 @@ int main(int argc, char ** argv) {
 		ofLogNotice() <<  "{ \"ofHostPlatform\": \"" << platformsToString[ofGetTargetPlatform()] << "\" }";
 		return EXIT_OK;
 	}
-    
+
 	if (options[TEMPLATE].count() > 0) {
 		if (options[TEMPLATE].arg != NULL) {
 			string templateString(options[TEMPLATE].arg);
@@ -536,7 +536,7 @@ int main(int argc, char ** argv) {
 			}
 		}
 	}
-	
+
 #ifndef DEBUG_NO_OPTIONS
 	if (options[HELP] || argc == 0) {
 		printHelp();
@@ -545,7 +545,7 @@ int main(int argc, char ** argv) {
 	}
 #endif
 
-	
+
 
 	if (parse.nonOptionsCount() > 0) {
 		projectName = parse.nonOption(0);
@@ -560,12 +560,12 @@ int main(int argc, char ** argv) {
 	consoleSpace();
 
 	// try to get the OF_PATH as an environt variable
-	
+
 	if (bVerbose) {
 		ofSetLogLevel(OF_LOG_VERBOSE);
 	}
 
-    
+
 	if (projectName == "") {
 		printHelp();
 		consoleSpace();
@@ -576,12 +576,12 @@ int main(int argc, char ** argv) {
 	fs::path projectPath = normalizePath(fs::weakly_canonical(fs::current_path() / projectName));
 	fs::path projectNamePath = projectPath.filename();
 	projectName = projectNamePath.string();
-	
-    
+
+
 	ofLogVerbose() << " projectPath path: [" << projectPath << "] root_path: [" << projectPath.root_path() << "]";
 	ofLogVerbose() << " ofPath path: [" << ofPath << "]";
 	ofLogVerbose() << " ofRoot path: [" << getOFRoot()  << "]";
-	
+
 	if(projectPath == projectPath.root_path()) {
 		ofLogVerbose() << " !! projectPath == projectPath.root_path() ";
 	} else if(normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName )) == projectPath) {
@@ -611,7 +611,7 @@ int main(int argc, char ** argv) {
 		return EXIT_FAILURE;
 	}
 	// make folder
-    if (!fs::exists(projectPath)) {
+	if (!fs::exists(projectPath)) {
 		try {
 			ofLogVerbose() << " creating projectPath directory.";
 			fs::create_directories(projectPath);
@@ -620,7 +620,7 @@ int main(int argc, char ** argv) {
 			+ ex.what() + "\"");
 			return EXIT_FAILURE;
 		}
-    } else {
+	} else {
 		if (fs::exists(projectPath)) {
 			ofLogVerbose() << " The project path exists.";
 			if (fs::is_directory(projectPath)) {
@@ -629,12 +629,12 @@ int main(int argc, char ** argv) {
 				ofLogVerbose() << "  and It is a file...";
 			}
 		}
-    }
+	}
 
 	if (bListTemplates) {
 		auto ret = printTemplates();
 		consoleSpace();
-		if (ret) {			
+		if (ret) {
 			messageReturn("status", "EXIT_OK");
 			return EXIT_OK;
 		} else {
@@ -649,7 +649,7 @@ int main(int argc, char ** argv) {
 			ofLogNotice() << "-----------------------------------------------";
 			ofLogNotice() << "updating an existing project";
 			ofLogNotice() << "target platform is: " << t;
-			
+
 
 			// MARK: - RECURSIVE UPDATE
 			recursiveUpdate(projectPath, t);

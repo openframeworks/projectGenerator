@@ -137,6 +137,8 @@ protected:
         bool run() {
             // needed for mingw only. maybe a ifdef here.
             if (fs::exists(from)) {
+				std::cout << "--- copyTemplateFile from: " << from << " to: " << to << std::endl;
+
                 if (findReplaces.size()) {
                     // Load file, replace contents, write to destination.
                     
@@ -144,8 +146,13 @@ protected:
                     std::string contents((std::istreambuf_iterator<char>(fileFrom)), std::istreambuf_iterator<char>());
                     fileFrom.close();
 
-                    for (auto & f : findReplaces) {
+					for (auto & f : findReplaces) {
+						// Avoid processing empty pairs
+						if (empty(f.first) && empty(f.second)) {
+							continue;
+						}
                         replaceAll(contents, f.first, f.second);
+						std::cout << "Replacing " << f.first << " : " << f.second << std::endl;
                     }
                     
                     std::ofstream fileTo(to);
@@ -158,6 +165,7 @@ protected:
                         std::cout << "Error saving to " << to << std::endl;
                         return false;
                     }
+					
                     
                 } else {
                     // straight copy
