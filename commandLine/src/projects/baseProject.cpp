@@ -680,10 +680,61 @@ bool baseProject::recursiveCopy(const fs::path & srcDir, const fs::path & destDi
 		fs::copy(srcDir, destDir, (bOverwrite ? fs::copy_options::overwrite_existing : fs::copy_options::update_existing) | fs::copy_options::recursive);
 		return true;
 	} catch (std::exception& e) {
-		// TODO: ofLogWarning()
-		std::cout << "baseProject::recursiveCopy " << e.what();
-
-		std::cout << e.what();
+		ofLogError() << "baseProject::recursiveCopy " << e.what();
 		return false;
 	}
+}
+
+// FIXME: Avoid copying duplicate files like Makefile / config.make when using multiple templates (ex. vscode / osx)
+bool baseProject::copyTemplateFile::run() {
+	from = fs::relative(from);
+	to = fs::relative(to);
+	
+	// needed for mingw only. maybe a ifdef here.
+	if (fs::exists(from)) {
+		ofLogNotice() << "copyTemplateFile from: " << from << " to: " << to;
+
+		if (findReplaces.size()) {
+			// Load file, replace contents, write to destination.
+			
+			std::ifstream fileFrom(from);
+			std::string contents((std::istreambuf_iterator<char>(fileFrom)), std::istreambuf_iterator<char>());
+			fileFrom.close();
+
+			for (auto & f : findReplaces) {
+				// Avoid processing empty pairs
+				if (empty(f.first) && empty(f.second)) {
+					continue;
+				}
+				replaceAll(contents, f.first, f.second);
+				ofLogNotice() << "└─ Replacing " << f.first << " : " << f.second;
+			}
+			
+			std::ofstream fileTo(to);
+			try{
+				fileTo << contents;
+			}catch(std::exception & e){
+				std::cout << "Error saving to " << to << " : " << e.what() << std::endl;
+				return false;
+			}catch(...){
+				std::cout << "Error saving to " << to << std::endl;
+				return false;
+			}
+			
+			
+		} else {
+			// straight copy
+			try {
+				fs::copy(from, to, fs::copy_options::update_existing);
+			}
+			catch(fs::filesystem_error & e) {
+				std::cout << "error copying template file " << from << " : " << to << std::endl;
+				std::cout << e.what() << std::endl;
+				return false;
+			}
+		}
+	} else {
+		return false;
+	}
+	return true;
 }

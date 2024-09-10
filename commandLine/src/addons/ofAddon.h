@@ -218,7 +218,8 @@ private:
 	
 	fs::path normalizePath(const fs::path& path) {
 		try {
-			auto value = fs::weakly_canonical(path);
+//			auto value = fs::weakly_canonical(path);
+			auto value = fs::relative(path);
 			return value;
 		} catch (const std::exception& ex) {
 			std::cout << "Canonical path for [" << path << "] threw exception:\n"
