@@ -133,8 +133,6 @@ bool xcodeProject::createProjectFile(){
 		saveMakefile();
 	}
 
-
-
 	// Execute all file copy and replacements, including ones in saveScheme, saveMakefile
 	for (auto & c : copyTemplateFiles) {
 		try {
@@ -146,7 +144,6 @@ bool xcodeProject::createProjectFile(){
 	}
 
 	// NOW only files being copied
-
 	fs::path projectDataDir { projectDir / "bin" / "data" };
 
 	if (!fs::exists(projectDataDir)) {
@@ -299,28 +296,26 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 					addCommand("Add :objects:"+thisUUID+":name string " + folderName);
 
 					// FIXME: Inspect if this is really being used
-					if (isFolder) {
-//						alert("INSIDE " , 31);
-						fs::path filePath;
-						fs::path filePath_full { relRoot / fullPath };
-						// FIXME: known issue: doesn't handle files with spaces in name.
-
-						if (fs::exists(filePath_full)) {
-							filePath = filePath_full;
-						}
-						if (fs::exists(fullPath)) {
-							filePath = fullPath;
-						}
-
-						if (!filePath.empty()) {
-							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(filePath));
-//							alert(commands.back(), 33);
-						} else {
-//							cout << ">>>>> filePath empty " << endl;
-						}
-					} else {
-//						cout << "isFolder false" << endl;
-					}
+//					if (isFolder) {
+//						alert("getFolderUUID, isFolder INSIDE " , 31);
+//						fs::path filePath;
+//						fs::path filePath_full { relRoot / fullPath };
+//						// FIXME: known issue: doesn't handle files with spaces in name.
+//
+//						if (fs::exists(filePath_full)) {
+//							filePath = filePath_full;
+//						}
+//						if (fs::exists(fullPath)) {
+//							filePath = fullPath;
+//						}
+//
+//						if (!filePath.empty()) {
+//							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(filePath));
+//						} else {
+//						}
+//					} else {
+//						alert("getFolderUUID isFolder false", 31);
+//					}
 
 					addCommand("Add :objects:"+thisUUID+":isa string PBXGroup");
 
@@ -339,6 +334,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 								base2 = base2.parent_path();
 							}
 
+							alert ("external_sources base2" + ofPathToString(base2), 33);
 
 							addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
 							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(base2));
@@ -754,17 +750,19 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 			addCommand("Add :objects:"+UUID+":sourceTree string <group>");
 		}
 
-		string folderUUID;
-		auto rootDir = folder.root_directory();
-		if (rootDir != "addons" && rootDir != "src") {
-//			alert("addFile path:" + ofPathToString(path) + " folder:" + ofPathToString(folder) , 31);
-			auto base = path.parent_path();
-			folderUUID = getFolderUUID(folder, isFolder, base);
-
-		} else {
-			folderUUID = getFolderUUID(folder, isFolder);
-		}
-		folderUUID = getFolderUUID(folder, isFolder);
+//		string folderUUID;
+//		auto rootDir = folder.root_directory();
+//		if (rootDir != "addons" && rootDir != "src") {
+////			alert("addFile path:" + ofPathToString(path) + " folder:" + ofPathToString(folder) , 31);
+//			auto base = path.parent_path();
+//			folderUUID = getFolderUUID(folder, isFolder, base);
+//
+//		} else {
+//			folderUUID = getFolderUUID(folder, isFolder);
+//		}
+		
+		// Eventually remove isFolder and base parameter
+		std::string folderUUID { getFolderUUID(folder, isFolder) };
 
 
 		addCommand("# ---- addFileToFolder UUID : " + ofPathToString(folder));

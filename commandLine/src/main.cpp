@@ -155,7 +155,7 @@ bool printTemplates() {
 	}
 }
 
-void handleCommand(const std::string& args) {
+void handleCommand(const std::string & args) {
 	if (args == "ping") {
 		std::cout << "pong" << args << std::endl;
 	} else {
@@ -199,7 +199,7 @@ bool isGoodProjectPath(fs::path path) {
 
 bool isGoodOFPath(const fs::path & path) {
 	if (!fs::is_directory(path)) {
-	//		ofLogVerbose() << "ofPath: not a directory: " << path.string();
+		ofLogVerbose() << "ofPath: not a directory: " << path;
 		return false;
 	}
 	bool bHasTemplates = containsFolder(path, "scripts");
@@ -214,7 +214,7 @@ fs::path findOFPathUpwards(const fs::path & startPath) {
 	//    ofLogNotice() << "startPath: " << currentPath.string();
 	if (currentPath.empty() || currentPath == currentPath.root_path()) {
 		ofLogError() << "Starting path is empty or root path, cannot find OF path." << "\" }";
-		return fs::path();
+		return {};
 	}
 	while (!currentPath.empty() && currentPath != currentPath.root_path()) {
 	//        ofLogWarning() << "currentPath: " << currentPath.string();
@@ -227,11 +227,11 @@ fs::path findOFPathUpwards(const fs::path & startPath) {
 		currentPath = currentPath.parent_path();
 	}
 	//    ofLogError() << "No valid OF path found... please use -o or --ofPath or set a PG_OF_PATH environment variable: " << startPath.string();
-	return fs::path();
+	return {};
 }
 
 void updateProject(const fs::path & path, const string & target, bool bConsiderParameterAddons = true) {
-	//    alert("updateProject path=" + path.string() , 34);
+	// alert("updateProject path=" + path.string() , 34);
 	// bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
 	// either we read the addons.make file, or we look at the parameter list.
 	// if we are updating recursively, we *never* consider addons passed as parameters.
@@ -269,7 +269,7 @@ void recursiveUpdate(const fs::path & path, const string & target) {
 		folders.emplace_back(path);
 	}
 
-	// MARK: - Known issue. it can add undesired folders which can mirror directory of a valid project like
+	// MARK: Known issue. it can add undesired folders which can mirror directory of a valid project like
 	// "./templates/allAddonsExample/obj/osx/Release"
 	// "./templates/allAddonsExample/bin/build/build/arm64-apple-darwin_Release/obj.room/Volumes/tool/ofw/addons/ofxKinect"
 
@@ -285,9 +285,6 @@ void recursiveUpdate(const fs::path & path, const string & target) {
 	fs::path ofCalcPath = fs::weakly_canonical(fs::current_path() / ofPath);
 
 	for (auto & path : folders) {
-		//		cout << "------" << endl;
-		//		cout << path << endl;
-		//		cout << "------" << endl;
 		nProjectsUpdated++;
 
 		if (!ofPath.is_absolute()) {
@@ -296,11 +293,8 @@ void recursiveUpdate(const fs::path & path, const string & target) {
 				setofPath(fs::relative(ofCalcPath, path));
 			}
 		}
-//		setOFRoot(ofPath);
-		fs::current_path(path);
-		//alert ("ofRoot " + ofPath.string());
-		//alert ("cwd " + path.string());
 
+		fs::current_path(path);
 		updateProject(path, target, false);
 	}
 }
@@ -564,7 +558,6 @@ int main(int argc, char ** argv) {
 	if (bVerbose) {
 		ofSetLogLevel(OF_LOG_VERBOSE);
 	}
-
 
 	if (projectName == "") {
 		printHelp();

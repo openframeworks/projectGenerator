@@ -132,12 +132,12 @@ protected:
 	public:
 		fs::path from;
 		fs::path to;
-		std::vector <std::pair <string, string> > findReplaces;
+		std::vector <std::pair <string, string>> findReplaces;
 		
         bool run() {
             // needed for mingw only. maybe a ifdef here.
             if (fs::exists(from)) {
-				std::cout << "--- copyTemplateFile from: " << from << " to: " << to << std::endl;
+//				std::cout << "--- copyTemplateFile from: " << from << " to: " << to << std::endl;
 
                 if (findReplaces.size()) {
                     // Load file, replace contents, write to destination.
@@ -152,7 +152,7 @@ protected:
 							continue;
 						}
                         replaceAll(contents, f.first, f.second);
-						std::cout << "Replacing " << f.first << " : " << f.second << std::endl;
+//						std::cout << "Replacing " << f.first << " : " << f.second << std::endl;
                     }
                     
                     std::ofstream fileTo(to);
