@@ -260,7 +260,9 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 
 void recursiveUpdate(const fs::path & path, const string & target) {
 	// FIXME: remove
-	alert("recursiveUpdate:[" + path.string() + "]");
+//	alert("recursiveUpdate :[" + path.string() + "]");
+	ofLogNotice() << "recursiveUpdate " << path;
+	
 	if (!fs::is_directory(path)) return;
 	vector<fs::path> folders;
 

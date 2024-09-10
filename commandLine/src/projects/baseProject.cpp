@@ -634,7 +634,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 
 void baseProject::parseAddons(){
 	fs::path parseFile { fs::relative(projectDir / "addons.make") };
-	alert (parseFile.string(), 31);
+//	alert (parseFile.string(), 31);
 	
 	for (auto & line : fileToStrings(parseFile)) {
 		auto addon = ofTrim(line);
@@ -647,7 +647,7 @@ void baseProject::parseAddons(){
 }
 
 void baseProject::parseConfigMake(){
-	fs::path parseFile { projectDir / "config.make" };
+	fs::path parseFile { fs::relative(projectDir / "config.make") };
 
 	for (auto & line : fileToStrings(parseFile)) {
 		auto config = ofTrim(line);
@@ -680,9 +680,13 @@ void baseProject::recursiveCopyContents(const fs::path & srcDir, const fs::path 
 }
 
 bool baseProject::recursiveCopy(const fs::path & srcDir, const fs::path & destDir){
-	//	alert("recursiveCopy " + srcDir.string() + " : " + destDir.string(), 32);
+//	if (fs::is_empty(fs::relative(srcDir))) {
+//		alert("recursiveCopy false " + srcDir.string(), 34 );
+//		return false;
+//	}
+//	alert("recursiveCopy " + fs::relative(srcDir).string() + " : " + fs::relative(destDir).string(), 32);
 	try {
-		fs::copy(srcDir, destDir, (bOverwrite ? fs::copy_options::overwrite_existing : fs::copy_options::update_existing) | fs::copy_options::recursive);
+		fs::copy(fs::relative(srcDir), fs::relative(destDir), (bOverwrite ? fs::copy_options::overwrite_existing : fs::copy_options::update_existing) | fs::copy_options::recursive);
 		return true;
 	} catch (std::exception& e) {
 		ofLogError() << "baseProject::recursiveCopy " << e.what();
