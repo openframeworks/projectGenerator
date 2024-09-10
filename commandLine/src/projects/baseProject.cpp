@@ -126,8 +126,8 @@ bool baseProject::create(const fs::path & _path, string templateName){
 //	alert("path " + path.string());
 //	alert("path " + fs::weakly_canonical(fs::absolute(path)).string());
 	
-	cout << endl;
-	ofLogNotice() << "create project " << path;
+//	cout << endl;
+//	ofLogNotice() << "create project " << path;
 
 	// FIXME: Rewrite here
 //	if (ofIsPathInPath(fs::absolute(path), getOFRoot())) {

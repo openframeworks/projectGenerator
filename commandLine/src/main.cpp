@@ -235,7 +235,6 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 	// bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
 	// either we read the addons.make file, or we look at the parameter list.
 	// if we are updating recursively, we *never* consider addons passed as parameters.
-	cout << endl;
 	ofLogNotice() << "updating project " << path;
 
 	if (!bDryRun) {
@@ -656,20 +655,23 @@ int main(int argc, char ** argv) {
 		} else {
 			nProjectsCreated += 1;
 
+			ofLogNotice() << "setting OF path to: [" << ofPath << "]";
+			if (busingEnvVar) {
+				ofLogNotice() << "from PG_OF_PATH environment variable";
+			} else {
+				ofLogNotice() << "from -o option";
+			}
+
+			
 			for (auto & t : targets) {
+				consoleSpace();
 				ofLogNotice() << "-----------------------------------------------";
-				ofLogVerbose() << "target platform is: [" << t << "]";
-				ofLogVerbose() << "setting OF path to: [" << ofPath << "]";
-				if (busingEnvVar) {
-					ofLogNotice() << "from PG_OF_PATH environment variable";
-				} else {
-					ofLogNotice() << "from -o option";
-				}
+				ofLogNotice() << "target platform is: [" << t << "]";
 //				ofLogNotice() << "project path is: [" << projectPath << "]";
 				if (templateName != "") {
 					ofLogNotice() << "using additional template " << templateName;
 				}
-				ofLogNotice() << "setting up new project " << projectPath;
+				ofLogVerbose() << "setting up new project " << projectPath;
 
 				if (mode == PG_MODE_UPDATE) {
 					// MARK: - UPDATE
@@ -693,7 +695,6 @@ int main(int argc, char ** argv) {
 					ofLogNotice() << "project created! ";
 				}
 				ofLogNotice() << "-----------------------------------------------";
-				consoleSpace();
 			}
 		}
 	}
