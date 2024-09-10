@@ -132,50 +132,9 @@ protected:
 	public:
 		fs::path from;
 		fs::path to;
-		std::vector <std::pair <string, string> > findReplaces;
+		std::vector <std::pair <string, string>> findReplaces;
 		
-        bool run() {
-            // needed for mingw only. maybe a ifdef here.
-            if (fs::exists(from)) {
-                if (findReplaces.size()) {
-                    // Load file, replace contents, write to destination.
-                    
-                    std::ifstream fileFrom(from);
-                    std::string contents((std::istreambuf_iterator<char>(fileFrom)), std::istreambuf_iterator<char>());
-                    fileFrom.close();
-
-                    for (auto & f : findReplaces) {
-                        replaceAll(contents, f.first, f.second);
-                    }
-                    
-                    std::ofstream fileTo(to);
-                    try{
-                        fileTo << contents;
-                    }catch(std::exception & e){
-                        std::cout << "Error saving to " << to << " : " << e.what() << std::endl;
-                        return false;
-                    }catch(...){
-                        std::cout << "Error saving to " << to << std::endl;
-                        return false;
-                    }
-                    
-                } else {
-                    // straight copy
-                    try {
-                        fs::copy(from, to, fs::copy_options::update_existing);
-                    }
-                    catch(fs::filesystem_error & e) {
-                        std::cout << "error copying template file " << from << " : " << to << std::endl;
-                        std::cout << e.what() << std::endl;
-                        return false;
-                    }
-                }
-            } else {
-                return false;
-            }
-
-            return true;
-        }
+		bool run();
 	};
 
 	vector <copyTemplateFile> copyTemplateFiles;

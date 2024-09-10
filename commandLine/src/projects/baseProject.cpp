@@ -126,8 +126,8 @@ bool baseProject::create(const fs::path & _path, string templateName){
 //	alert("path " + path.string());
 //	alert("path " + fs::weakly_canonical(fs::absolute(path)).string());
 	
-	cout << endl;
-	ofLogNotice() << "create project " << path;
+//	cout << endl;
+//	ofLogNotice() << "create project " << path;
 
 	// FIXME: Rewrite here
 //	if (ofIsPathInPath(fs::absolute(path), getOFRoot())) {
@@ -165,8 +165,10 @@ bool baseProject::create(const fs::path & _path, string templateName){
 			try {
 				// think of exclusions to manually merge like plist
 				fs::copy (templatePath / p, projectDir / p, fs::copy_options::recursive | (bOverwrite ? fs::copy_options::overwrite_existing : fs::copy_options::update_existing));
-			} catch(fs::filesystem_error& e) {
-				ofLogNotice() << "Can not copy: " << templatePath / p << " :: " <<projectDir / p << " :: " << e.what() ;
+			} catch(fs::filesystem_error & e) {
+				ofLogNotice() << "Can not copy: " << templatePath / p << " :: " << projectDir / p;
+				ofLogNotice() << e.what();
+
 			}
 			
 		}
@@ -197,7 +199,8 @@ bool baseProject::create(const fs::path & _path, string templateName){
 				try {
 					fs::rename(from, to);
 				} catch(fs::filesystem_error& e) {
-					ofLog() << "Can not rename: " << from << " :: " << to << " :: " << e.what() ;
+					ofLogWarning() << "Can not rename: " << from << " :: " << to;
+					ofLogWarning() << e.what();
 				}
 			}
 		} else {
@@ -404,7 +407,8 @@ void baseProject::addAddon(string addonName){
 				try {
 					fs::create_directories(folder);
 				} catch(fs::filesystem_error& e) {
-					ofLogError("baseProject::addAddon") << "error creating folder " << folder << e.what();
+					ofLogError("baseProject::addAddon") << "error creating folder " << folder;
+					ofLogError() << e.what();
 				}
 			}
 //			to = projectDir / "bin" / "libs" / from.filename();
@@ -629,8 +633,9 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 
 
 void baseProject::parseAddons(){
-	fs::path parseFile { projectDir / "addons.make" };
-
+	fs::path parseFile { fs::relative(projectDir / "addons.make") };
+//	alert (parseFile.string(), 31);
+	
 	for (auto & line : fileToStrings(parseFile)) {
 		auto addon = ofTrim(line);
 //		alert("line " + addon);
@@ -642,7 +647,7 @@ void baseProject::parseAddons(){
 }
 
 void baseProject::parseConfigMake(){
-	fs::path parseFile { projectDir / "config.make" };
+	fs::path parseFile { fs::relative(projectDir / "config.make") };
 
 	for (auto & line : fileToStrings(parseFile)) {
 		auto config = ofTrim(line);
@@ -675,15 +680,72 @@ void baseProject::recursiveCopyContents(const fs::path & srcDir, const fs::path 
 }
 
 bool baseProject::recursiveCopy(const fs::path & srcDir, const fs::path & destDir){
-	//	alert("recursiveCopy " + srcDir.string() + " : " + destDir.string(), 32);
+//	if (fs::is_empty(fs::relative(srcDir))) {
+//		alert("recursiveCopy false " + srcDir.string(), 34 );
+//		return false;
+//	}
+//	alert("recursiveCopy " + fs::relative(srcDir).string() + " : " + fs::relative(destDir).string(), 32);
 	try {
-		fs::copy(srcDir, destDir, (bOverwrite ? fs::copy_options::overwrite_existing : fs::copy_options::update_existing) | fs::copy_options::recursive);
+		fs::copy(fs::relative(srcDir), fs::relative(destDir), (bOverwrite ? fs::copy_options::overwrite_existing : fs::copy_options::update_existing) | fs::copy_options::recursive);
 		return true;
 	} catch (std::exception& e) {
-		// TODO: ofLogWarning()
-		std::cout << "baseProject::recursiveCopy " << e.what();
-
-		std::cout << e.what();
+		ofLogError() << "baseProject::recursiveCopy " << e.what();
 		return false;
 	}
+}
+
+// FIXME: Avoid copying duplicate files like Makefile / config.make when using multiple templates (ex. vscode / osx)
+bool baseProject::copyTemplateFile::run() {
+	from = fs::relative(from);
+	to = fs::relative(to);
+	
+	// needed for mingw only. maybe a ifdef here.
+	if (fs::exists(from)) {
+		ofLogVerbose() << "copyTemplateFile from: " << from << " to: " << to;
+
+		if (findReplaces.size()) {
+			// Load file, replace contents, write to destination.
+			
+			std::ifstream fileFrom(from);
+			std::string contents((std::istreambuf_iterator<char>(fileFrom)), std::istreambuf_iterator<char>());
+			fileFrom.close();
+
+			for (auto & f : findReplaces) {
+				// Avoid processing empty pairs
+				if (empty(f.first) && empty(f.second)) {
+					continue;
+				}
+				replaceAll(contents, f.first, f.second);
+				ofLogVerbose() << "└─ Replacing " << f.first << " : " << f.second;
+			}
+			
+			std::ofstream fileTo(to);
+			try{
+				fileTo << contents;
+			}catch(std::exception & e){
+				ofLogError() << "Error saving to " << to;
+				ofLogError() << e.what();
+				return false;
+			}catch(...){
+				ofLogError() << "Error saving to " << to;
+
+				return false;
+			}
+			
+			
+		} else {
+			// straight copy
+			try {
+				fs::copy(from, to, fs::copy_options::update_existing);
+			}
+			catch(fs::filesystem_error & e) {
+				ofLogError() << "error copying template file " << from << " : " << to ;
+				ofLogError() << e.what();
+				return false;
+			}
+		}
+	} else {
+		return false;
+	}
+	return true;
 }

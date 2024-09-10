@@ -18,6 +18,7 @@ bool visualStudioProject::createProjectFile(){
 		createBackup({ projectDir / (projectName + ".vcxproj") }, projectDir);
 	}
 	
+	// FIXME: this will insert an empty pair
 	std::pair <string, string> replacementsForward, replacementsBack;
 	if (!fs::equivalent(getOFRoot(), fs::path{ "../../.." })) {
 		fs::path root { getOFRoot() };
