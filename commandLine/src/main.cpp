@@ -665,7 +665,7 @@ int main(int argc, char ** argv) {
 				} else {
 					ofLogNotice() << "from -o option";
 				}
-				ofLogNotice() << "project path is: [" << projectPath << "]";
+//				ofLogNotice() << "project path is: [" << projectPath << "]";
 				if (templateName != "") {
 					ofLogNotice() << "using additional template " << templateName;
 				}
@@ -677,7 +677,7 @@ int main(int argc, char ** argv) {
 					ofLogNotice() << "project updated! ";
 				} else {
 					if (!bDryRun) {
-						ofLogNotice() << "project path is: [" << projectPath << "]";
+//						ofLogNotice() << "project path is: [" << projectPath << "]";
 						auto project = getTargetProject(t);
 						project->create(projectPath, templateName);
 						project->parseAddons();

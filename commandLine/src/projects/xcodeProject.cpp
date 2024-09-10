@@ -326,6 +326,8 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 						if (lastFolderUUID == projRootUUID ||
 							lastFolder == "external_sources" || lastFolder == "local_addons") { //
 
+//							alert ("external_sources base = " + ofPathToString(base), 33);
+
 							// Base folders can be in a different depth,
 							// so we cut folders to point to the right path
 							fs::path base2 { base };
@@ -334,7 +336,6 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 								base2 = base2.parent_path();
 							}
 
-							alert ("external_sources base2" + ofPathToString(base2), 33);
 
 							addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
 							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(base2));
