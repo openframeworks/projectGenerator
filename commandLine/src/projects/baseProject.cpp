@@ -165,8 +165,10 @@ bool baseProject::create(const fs::path & _path, string templateName){
 			try {
 				// think of exclusions to manually merge like plist
 				fs::copy (templatePath / p, projectDir / p, fs::copy_options::recursive | (bOverwrite ? fs::copy_options::overwrite_existing : fs::copy_options::update_existing));
-			} catch(fs::filesystem_error& e) {
-				ofLogNotice() << "Can not copy: " << templatePath / p << " :: " <<projectDir / p << " :: " << e.what() ;
+			} catch(fs::filesystem_error & e) {
+				ofLogNotice() << "Can not copy: " << templatePath / p << " :: " << projectDir / p;
+				ofLogNotice() << e.what();
+
 			}
 			
 		}
@@ -197,7 +199,8 @@ bool baseProject::create(const fs::path & _path, string templateName){
 				try {
 					fs::rename(from, to);
 				} catch(fs::filesystem_error& e) {
-					ofLog() << "Can not rename: " << from << " :: " << to << " :: " << e.what() ;
+					ofLogWarning() << "Can not rename: " << from << " :: " << to;
+					ofLogWarning() << e.what();
 				}
 			}
 		} else {
@@ -404,7 +407,8 @@ void baseProject::addAddon(string addonName){
 				try {
 					fs::create_directories(folder);
 				} catch(fs::filesystem_error& e) {
-					ofLogError("baseProject::addAddon") << "error creating folder " << folder << e.what();
+					ofLogError("baseProject::addAddon") << "error creating folder " << folder;
+					ofLogError() << e.what();
 				}
 			}
 //			to = projectDir / "bin" / "libs" / from.filename();
@@ -629,8 +633,9 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 
 
 void baseProject::parseAddons(){
-	fs::path parseFile { projectDir / "addons.make" };
-
+	fs::path parseFile { fs::relative(projectDir / "addons.make") };
+	alert (parseFile.string(), 31);
+	
 	for (auto & line : fileToStrings(parseFile)) {
 		auto addon = ofTrim(line);
 //		alert("line " + addon);
@@ -692,7 +697,7 @@ bool baseProject::copyTemplateFile::run() {
 	
 	// needed for mingw only. maybe a ifdef here.
 	if (fs::exists(from)) {
-		ofLogNotice() << "copyTemplateFile from: " << from << " to: " << to;
+		ofLogVerbose() << "copyTemplateFile from: " << from << " to: " << to;
 
 		if (findReplaces.size()) {
 			// Load file, replace contents, write to destination.
@@ -707,17 +712,19 @@ bool baseProject::copyTemplateFile::run() {
 					continue;
 				}
 				replaceAll(contents, f.first, f.second);
-				ofLogNotice() << "└─ Replacing " << f.first << " : " << f.second;
+				ofLogVerbose() << "└─ Replacing " << f.first << " : " << f.second;
 			}
 			
 			std::ofstream fileTo(to);
 			try{
 				fileTo << contents;
 			}catch(std::exception & e){
-				std::cout << "Error saving to " << to << " : " << e.what() << std::endl;
+				ofLogError() << "Error saving to " << to;
+				ofLogError() << e.what();
 				return false;
 			}catch(...){
-				std::cout << "Error saving to " << to << std::endl;
+				ofLogError() << "Error saving to " << to;
+
 				return false;
 			}
 			
@@ -728,8 +735,8 @@ bool baseProject::copyTemplateFile::run() {
 				fs::copy(from, to, fs::copy_options::update_existing);
 			}
 			catch(fs::filesystem_error & e) {
-				std::cout << "error copying template file " << from << " : " << to << std::endl;
-				std::cout << e.what() << std::endl;
+				ofLogError() << "error copying template file " << from << " : " << to ;
+				ofLogError() << e.what();
 				return false;
 			}
 		}

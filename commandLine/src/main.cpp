@@ -235,6 +235,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 	// bConsiderParameterAddons = do we consider that the user could call update with a new set of addons
 	// either we read the addons.make file, or we look at the parameter list.
 	// if we are updating recursively, we *never* consider addons passed as parameters.
+	consoleSpace();
 	ofLogNotice() << "updating project " << path;
 
 	if (!bDryRun) {
