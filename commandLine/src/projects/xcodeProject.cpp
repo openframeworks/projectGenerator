@@ -222,7 +222,7 @@ void xcodeProject::saveMakefile(){
 
 
 bool xcodeProject::loadProjectFile(){ //base
-	addCommand("Add :_OFProjectGeneratorVersion string " + getPGVersion());
+//	addCommand("Add :_OFProjectGeneratorVersion string " + getPGVersion());
 
 	renameProject();
 	// MARK: just to return something.
@@ -925,7 +925,7 @@ bool xcodeProject::saveProjectFile(){
 							} catch (std::exception & e) {
 								
 								ofLogError() << "substr " << c.substr(stringStart) << "\n" <<
-								"pointer " << p << "\n" << 
+								"pointer " << p << "\n" <<
 								e.what();
 							}
 							// j[p] = cols[3];
