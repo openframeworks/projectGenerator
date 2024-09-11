@@ -923,7 +923,7 @@ bool xcodeProject::saveProjectFile(){
 							try {
 								j[p] = c.substr(stringStart);
 							} catch (std::exception & e) {
-								cout << e.what() << endl;
+								ofLogError() << e.what() << endl;
 							}
 							// j[p] = cols[3];
 						}
@@ -931,14 +931,14 @@ bool xcodeProject::saveProjectFile(){
 							try {
 								j[p] = {};
 							} catch (std::exception & e) {
-								cout << e.what() << endl;
+								ofLogError() << e.what() << endl;
 							}
 						}
 					} catch (std::exception & e) {
-						cout << "xcodeProject saveProjectFile() first json error " << endl;
-						cout << e.what() << endl;
-						cout << "" << thispath << endl;
-						cout << "-----" << endl;
+						ofLogError() << "xcodeProject saveProjectFile() first json error " << endl;
+						ofLogError() << e.what() << endl;
+						ofLogError() << "" << thispath << endl;
+						ofLogError() << "-----" << endl;
 					}
 					
 
