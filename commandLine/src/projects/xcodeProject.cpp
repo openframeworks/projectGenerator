@@ -940,7 +940,7 @@ bool xcodeProject::saveProjectFile(){
 						cout << "pointer " << endl;
 						ofLogError() << "xcodeProject saveProjectFile() first json error " << endl;
 						ofLogError() << e.what() << endl;
-						ofLogError() << "" << thispath << endl;
+						ofLogError() << thispath << endl;
 						ofLogError() << "-----" << endl;
 					}
 					
