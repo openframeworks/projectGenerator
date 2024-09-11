@@ -296,26 +296,26 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 					addCommand("Add :objects:"+thisUUID+":name string " + folderName);
 
 					// FIXME: Inspect if this is really being used
-//					if (isFolder) {
-//						alert("getFolderUUID, isFolder INSIDE " , 31);
-//						fs::path filePath;
-//						fs::path filePath_full { relRoot / fullPath };
-//						// FIXME: known issue: doesn't handle files with spaces in name.
-//
-//						if (fs::exists(filePath_full)) {
-//							filePath = filePath_full;
-//						}
-//						if (fs::exists(fullPath)) {
-//							filePath = fullPath;
-//						}
-//
-//						if (!filePath.empty()) {
-//							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(filePath));
-//						} else {
-//						}
-//					} else {
-//						alert("getFolderUUID isFolder false", 31);
-//					}
+					if (isFolder) {
+						alert("getFolderUUID, isFolder INSIDE " , 31);
+						fs::path filePath;
+						fs::path filePath_full { relRoot / fullPath };
+						// FIXME: known issue: doesn't handle files with spaces in name.
+
+						if (fs::exists(filePath_full)) {
+							filePath = filePath_full;
+						}
+						if (fs::exists(fullPath)) {
+							filePath = fullPath;
+						}
+
+						if (!filePath.empty()) {
+							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(filePath));
+						} else {
+						}
+					} else {
+						alert("getFolderUUID isFolder false", 31);
+					}
 
 					addCommand("Add :objects:"+thisUUID+":isa string PBXGroup");
 
@@ -916,20 +916,32 @@ bool xcodeProject::saveProjectFile(){
 					//if (cols[0] == "Set") {
 					try {
 						json::json_pointer p { json::json_pointer(thispath) };
+
 						if (cols[2] == "string") {
 							// find position after find word
 							auto stringStart { c.find("string ") + 7 };
-							j[p] = c.substr(stringStart);
+							try {
+								j[p] = c.substr(stringStart);
+							} catch (std::exception & e) {
+								cout << e.what() << endl;
+							}
 							// j[p] = cols[3];
 						}
 						else if (cols[2] == "array") {
-							j[p] = {};
+							try {
+								j[p] = {};
+							} catch (std::exception & e) {
+								cout << e.what() << endl;
+							}
 						}
 					} catch (std::exception & e) {
 						cout << "xcodeProject saveProjectFile() first json error " << endl;
 						cout << e.what() << endl;
-						cout << " error at this path: " << thispath << endl;
+						cout << "" << thispath << endl;
+						cout << "-----" << endl;
 					}
+					
+
 				}
 				else {
 					thispath = thispath.substr(0, thispath.length() -1);
