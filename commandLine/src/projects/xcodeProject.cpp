@@ -970,6 +970,7 @@ bool xcodeProject::saveProjectFile(){
 						ofLogError() << "-------------------------";
 					}
 				}
+				alert("-----", 32);
 			}
 		}
 
