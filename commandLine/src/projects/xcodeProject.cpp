@@ -68,6 +68,8 @@ xcodeProject::xcodeProject(const string & target) : baseProject(target){
 
 bool xcodeProject::createProjectFile(){
 	fs::path xcodeProject = projectDir / ( projectName + ".xcodeproj" );
+	addCommand("Add :_OFProjectGeneratorVersion string " + getPGVersion());
+
 //	alert ("createProjectFile " + ofPathToString(xcodeProject), 35);
 
 	if (fs::exists(xcodeProject)) {
