@@ -923,7 +923,10 @@ bool xcodeProject::saveProjectFile(){
 							try {
 								j[p] = c.substr(stringStart);
 							} catch (std::exception & e) {
-								ofLogError() << "substr " << stringStart << "\n" << e.what();
+								
+								ofLogError() << "substr " << c.substr(stringStart) << "\n" <<
+								p << "\n" << 
+								e.what();
 							}
 							// j[p] = cols[3];
 						}
@@ -934,7 +937,8 @@ bool xcodeProject::saveProjectFile(){
 								ofLogError() << "array " << e.what();
 							}
 						}
-					} catch (std::exception & e) {
+					} 
+					catch (std::exception & e) {
 						cout << "pointer " << thispath;
 						ofLogError() << "xcodeProject saveProjectFile() first json error ";
 						ofLogError() << e.what();
