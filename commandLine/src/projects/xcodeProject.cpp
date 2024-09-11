@@ -925,7 +925,7 @@ bool xcodeProject::saveProjectFile(){
 							} catch (std::exception & e) {
 								
 								ofLogError() << "substr " << c.substr(stringStart) << "\n" <<
-								p << "\n" << 
+								"pointer " << p << "\n" << 
 								e.what();
 							}
 							// j[p] = cols[3];
