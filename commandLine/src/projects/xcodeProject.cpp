@@ -938,10 +938,10 @@ bool xcodeProject::saveProjectFile(){
 						}
 					} catch (std::exception & e) {
 						cout << "pointer " << thispath << endl;
-						ofLogError() << "xcodeProject saveProjectFile() first json error " << endl;
-						ofLogError() << e.what() << endl;
-						ofLogError() << thispath << endl;
-						ofLogError() << "-----" << endl;
+						ofLogError() << "xcodeProject saveProjectFile() first json error ";
+						ofLogError() << e.what();
+						ofLogError() << thispath;
+						ofLogError() << "-------------------------";
 					}
 					
 
@@ -962,11 +962,10 @@ bool xcodeProject::saveProjectFile(){
 						j[p].emplace_back(cols[3]);
 
 					} catch (std::exception & e) {
-						ofLogError() << "xcodeProject saveProjectFile() json error " << endl;
-						ofLogError() << e.what() << endl;
-						ofLogError() << thispath << endl;
-						ofLogError() << "-----" << endl;
-
+						ofLogError() << "xcodeProject saveProjectFile() json error ";
+						ofLogError() << e.what();
+						ofLogError() << thispath;
+						ofLogError() << "-------------------------";
 					}
 				}
 			}
