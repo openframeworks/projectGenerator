@@ -314,7 +314,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 						} else {
 						}
 					} else {
-						alert("getFolderUUID isFolder false", 31);
+//						alert("getFolderUUID isFolder false", 31);
 					}
 
 					addCommand("Add :objects:"+thisUUID+":isa string PBXGroup");
