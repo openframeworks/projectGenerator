@@ -974,6 +974,7 @@ bool xcodeProject::saveProjectFile(){
 								j[p].emplace_back(v);
 							}
 						}
+						alert ('emplace back' + cols[3] , 31);
 						j[p].emplace_back(cols[3]);
 
 					} catch (std::exception & e) {
