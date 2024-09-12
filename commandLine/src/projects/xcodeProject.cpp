@@ -900,7 +900,7 @@ bool xcodeProject::saveProjectFile(){
 		try {
 			
 			
-			j = { json::parse(contents) };
+			j = { json::parse(contents.rdbuf()) };
 		} catch (json::parse_error& ex) {
 			ofLogError(xcodeProject::LOG_NAME) << "JSON parse error at byte" << ex.byte;
 			ofLogError(xcodeProject::LOG_NAME) << "fileName" << fileName;
