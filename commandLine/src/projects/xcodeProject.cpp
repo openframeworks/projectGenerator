@@ -222,6 +222,7 @@ void xcodeProject::saveMakefile(){
 
 
 bool xcodeProject::loadProjectFile(){ //base
+	addCommand("# ---- PG VERSION " + getPGVersion());
 	addCommand("Add :_OFProjectGeneratorVersion string " + getPGVersion());
 
 	renameProject();
@@ -296,26 +297,26 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 					addCommand("Add :objects:"+thisUUID+":name string " + folderName);
 
 					// FIXME: Inspect if this is really being used
-//					if (isFolder) {
-//						alert("getFolderUUID, isFolder INSIDE " , 31);
-//						fs::path filePath;
-//						fs::path filePath_full { relRoot / fullPath };
-//						// FIXME: known issue: doesn't handle files with spaces in name.
-//
-//						if (fs::exists(filePath_full)) {
-//							filePath = filePath_full;
-//						}
-//						if (fs::exists(fullPath)) {
-//							filePath = fullPath;
-//						}
-//
-//						if (!filePath.empty()) {
-//							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(filePath));
-//						} else {
-//						}
-//					} else {
+					if (isFolder) {
+						alert("getFolderUUID, isFolder INSIDE " , 31);
+						fs::path filePath;
+						fs::path filePath_full { relRoot / fullPath };
+						// FIXME: known issue: doesn't handle files with spaces in name.
+
+						if (fs::exists(filePath_full)) {
+							filePath = filePath_full;
+						}
+						if (fs::exists(fullPath)) {
+							filePath = fullPath;
+						}
+
+						if (!filePath.empty()) {
+							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(filePath));
+						} else {
+						}
+					} else {
 //						alert("getFolderUUID isFolder false", 31);
-//					}
+					}
 
 					addCommand("Add :objects:"+thisUUID+":isa string PBXGroup");
 
@@ -532,7 +533,8 @@ void xcodeProject::addInclude(const fs::path & includeName){
 void xcodeProject::addLibrary(const LibraryBinary & lib){
 //	alert( "xcodeProject::addLibrary " + lib.path , 33);
 	for (auto & c : buildConfigs) {
-		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ofPathToString(lib.path));
+//		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ofPathToString(lib.path));
+		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ofPathToString(fs::relative(lib.path)));
 	}
 }
 
@@ -858,8 +860,6 @@ bool xcodeProject::saveProjectFile(){
 
 //	debugCommands = true;
 
-//	addCommand("# ---- PG VERSION " + getPGVersion());
-//	addCommand("Add :a_OFProjectGeneratorVersion string " + getPGVersion());
 
 	fileProperties fp;
 //	fp.isGroupWithoutFolder = true;
@@ -894,10 +894,19 @@ bool xcodeProject::saveProjectFile(){
 		// JSON Block - Multiplatform
 
 		std::ifstream contents(fileName);
+//		std::cout << contents.rdbuf() << std::endl;
 		json j;
 		try {
 			j = { json::parse(contents) };
-		} catch (json::parse_error& ex) {
+			
+			// Ugly hack to make nlohmann json work with v 3.11.3
+			auto dump = j.dump(1, '	');
+			if (dump[0] == '[') {
+//				alert("OWWW BUCETA", 31);
+				j = j[0];
+			}
+			
+		} catch (json::parse_error & ex) {
 			ofLogError(xcodeProject::LOG_NAME) << "JSON parse error at byte" << ex.byte;
 			ofLogError(xcodeProject::LOG_NAME) << "fileName" << fileName;
 		}
@@ -905,7 +914,7 @@ bool xcodeProject::saveProjectFile(){
 		contents.close();
 
 		for (auto & c : commands) {
-			//alert (c, 31);
+//			alert (c, 31);
 			// readable comments enabled now.
 			if (c != "" && c[0] != '#') {
 				vector<string> cols { ofSplitString(c, " ") };
@@ -916,20 +925,37 @@ bool xcodeProject::saveProjectFile(){
 					//if (cols[0] == "Set") {
 					try {
 						json::json_pointer p { json::json_pointer(thispath) };
+
 						if (cols[2] == "string") {
 							// find position after find word
 							auto stringStart { c.find("string ") + 7 };
-							j[p] = c.substr(stringStart);
+							try {
+								j[p] = c.substr(stringStart);
+							} catch (std::exception & e) {
+								
+								ofLogError() << "substr " << c.substr(stringStart) << "\n" <<
+								"pointer " << p << "\n" <<
+								e.what();
+							}
 							// j[p] = cols[3];
 						}
 						else if (cols[2] == "array") {
-							j[p] = {};
+							try {
+								j[p] = {};
+							} catch (std::exception & e) {
+								ofLogError() << "array " << e.what();
+							}
 						}
-					} catch (std::exception & e) {
-						cout << "xcodeProject saveProjectFile() first json error " << endl;
-						cout << e.what() << endl;
-						cout << " error at this path: " << thispath << endl;
+					} 
+					catch (std::exception & e) {
+						cout << "pointer " << thispath;
+						ofLogError(xcodeProject::LOG_NAME) << "first json error ";
+						ofLogError() << e.what();
+						ofLogError() << thispath;
+						ofLogError() << "-------------------------";
 					}
+					
+
 				}
 				else {
 					thispath = thispath.substr(0, thispath.length() -1);
@@ -937,26 +963,36 @@ bool xcodeProject::saveProjectFile(){
 					json::json_pointer p { json::json_pointer(thispath) };
 					try {
 						// Fixing XCode one item array issue
-						if (!j[p].is_array()) {
-							auto v { j[p] };
-							j[p] = json::array();
-							if (!v.is_null()) {
-								j[p].emplace_back(v);
-							}
-						}
+//						if (!j[p].is_array()) {
+//							cout << endl;
+//							alert (c, 31);
+//							cout << "this is not array, creating" << endl;
+//							cout << thispath << endl;
+//							auto v { j[p] };
+//							j[p] = json::array();
+//							if (!v.is_null()) {
+//								cout << "thispath" << endl;
+//								j[p].emplace_back(v);
+//							}
+//						}
+//						alert (c, 31);
+//						alert ("emplace back " + cols[3] , 32);
 						j[p].emplace_back(cols[3]);
 
 					} catch (std::exception & e) {
-						cout << "xcodeProject saveProjectFile() json error " << endl;
-						cout << e.what() << endl;
-						cout << " error at this path: " << thispath << endl;
+						ofLogError(xcodeProject::LOG_NAME) << "json error ";
+						ofLogError() << e.what();
+						ofLogError() << thispath;
+						ofLogError() << "-------------------------";
 					}
 				}
+//				alert("-----", 32);
 			}
 		}
 
 
 		std::ofstream jsonFile(fileName);
+		
 		// This is not pretty but address some differences in nlohmann json 3.11.2 to 3.11.3
 		auto dump = j.dump(1, '	');
 		if (dump[0] == '[') {
