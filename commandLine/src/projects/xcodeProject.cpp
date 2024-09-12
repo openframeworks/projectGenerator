@@ -962,8 +962,9 @@ bool xcodeProject::saveProjectFile(){
 					json::json_pointer p { json::json_pointer(thispath) };
 					try {
 						// Fixing XCode one item array issue
-						alert (c, 31);
 						if (!j[p].is_array()) {
+							cout << endl;
+							alert (c, 31);
 							cout << "this is not array, creating" << endl;
 							cout << thispath << endl;
 							auto v { j[p] };
