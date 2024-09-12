@@ -898,7 +898,13 @@ bool xcodeProject::saveProjectFile(){
 		json j;
 		try {
 			j = { json::parse(contents) };
-			j = j[0];
+			
+			// Ugly hack to make nlohmann json work with v 3.11.3
+			auto dump = j.dump(1, '	');
+			if (dump[0] == '[') {
+				j = j[0];
+			}
+			
 		} catch (json::parse_error & ex) {
 			ofLogError(xcodeProject::LOG_NAME) << "JSON parse error at byte" << ex.byte;
 			ofLogError(xcodeProject::LOG_NAME) << "fileName" << fileName;
@@ -978,6 +984,7 @@ bool xcodeProject::saveProjectFile(){
 
 
 		std::ofstream jsonFile(fileName);
+		
 		// This is not pretty but address some differences in nlohmann json 3.11.2 to 3.11.3
 		auto dump = j.dump(1, '	');
 		if (dump[0] == '[') {
