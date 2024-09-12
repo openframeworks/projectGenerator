@@ -901,7 +901,7 @@ bool xcodeProject::saveProjectFile(){
 			// Ugly hack to make nlohmann json work with v 3.11.3
 			auto dump = j.dump(1, '	');
 			if (dump[0] == '[') {
-				alert("OWWW BUCETA", 31);
+//				alert("OWWW BUCETA", 31);
 				j = j[0];
 			}
 			
@@ -968,7 +968,7 @@ bool xcodeProject::saveProjectFile(){
 							cout << "this is not array, creating" << endl;
 							cout << thispath << endl;
 							auto v { j[p] };
-							j[p] = json::array();
+//							j[p] = json::array();
 							if (!v.is_null()) {
 								cout << "thispath" << endl;
 								j[p].emplace_back(v);
