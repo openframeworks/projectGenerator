@@ -871,7 +871,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
     
     // lib paths are directories to parse for libs
     for (auto & a : libsPaths) {
-		alert(a, 33);
+//		alert(a, 33);
         parseLibsPath((path / a), parentFolder);
     }
 
