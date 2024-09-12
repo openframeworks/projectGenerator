@@ -222,7 +222,8 @@ void xcodeProject::saveMakefile(){
 
 
 bool xcodeProject::loadProjectFile(){ //base
-//	addCommand("Add :_OFProjectGeneratorVersion string " + getPGVersion());
+	addCommand("# ---- PG VERSION " + getPGVersion());
+	addCommand("Add :_OFProjectGeneratorVersion string " + getPGVersion());
 
 	renameProject();
 	// MARK: just to return something.
@@ -858,8 +859,6 @@ bool xcodeProject::saveProjectFile(){
 
 //	debugCommands = true;
 
-//	addCommand("# ---- PG VERSION " + getPGVersion());
-//	addCommand("Add :a_OFProjectGeneratorVersion string " + getPGVersion());
 
 	fileProperties fp;
 //	fp.isGroupWithoutFolder = true;
