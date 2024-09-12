@@ -739,9 +739,9 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 	// Maybe it is the same situation for all others fixPath occurences?
 	if (!isLocalAddon) {
 		for (auto & l : libs) {
-//			alert("fixpath before " + l.path);
+//			alert("fixpath before " + ofPathToString(l.path));
 			l.path = fixPath(l.path);
-//			alert("fixpath after  " + l.path);
+//			alert("fixpath after  " + ofPathToString(l.path));
 		}
 	}
 
@@ -871,6 +871,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
     
     // lib paths are directories to parse for libs
     for (auto & a : libsPaths) {
+		alert(a, 33);
         parseLibsPath((path / a), parentFolder);
     }
 

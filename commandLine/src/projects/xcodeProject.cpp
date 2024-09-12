@@ -533,7 +533,8 @@ void xcodeProject::addInclude(const fs::path & includeName){
 void xcodeProject::addLibrary(const LibraryBinary & lib){
 //	alert( "xcodeProject::addLibrary " + lib.path , 33);
 	for (auto & c : buildConfigs) {
-		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ofPathToString(lib.path));
+//		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ofPathToString(lib.path));
+		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ofPathToString(fs::relative(lib.path)));
 	}
 }
 
@@ -974,7 +975,8 @@ bool xcodeProject::saveProjectFile(){
 //								j[p].emplace_back(v);
 //							}
 //						}
-						alert ("emplace back " + cols[3] , 32);
+//						alert (c, 31);
+//						alert ("emplace back " + cols[3] , 32);
 						j[p].emplace_back(cols[3]);
 
 					} catch (std::exception & e) {
