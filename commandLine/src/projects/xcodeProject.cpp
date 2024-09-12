@@ -970,8 +970,8 @@ bool xcodeProject::saveProjectFile(){
 							auto v { j[p] };
 //							j[p] = json::array();
 							if (!v.is_null()) {
-								cout << "thispath" << endl;
-								j[p].emplace_back(v);
+//								cout << "thispath" << endl;
+//								j[p].emplace_back(v);
 							}
 						}
 						alert ("emplace back " + cols[3] , 32);
