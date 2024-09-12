@@ -913,7 +913,7 @@ bool xcodeProject::saveProjectFile(){
 		contents.close();
 
 		for (auto & c : commands) {
-			alert (c, 31);
+//			alert (c, 31);
 			// readable comments enabled now.
 			if (c != "" && c[0] != '#') {
 				vector<string> cols { ofSplitString(c, " ") };
@@ -978,7 +978,7 @@ bool xcodeProject::saveProjectFile(){
 						ofLogError() << "-------------------------";
 					}
 				}
-				alert("-----", 32);
+//				alert("-----", 32);
 			}
 		}
 
