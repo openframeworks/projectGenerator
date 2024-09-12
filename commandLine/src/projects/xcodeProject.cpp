@@ -894,8 +894,12 @@ bool xcodeProject::saveProjectFile(){
 		// JSON Block - Multiplatform
 
 		std::ifstream contents(fileName);
+		
+		std::cout << contents.rdbuf() << std::endl;
 		json j;
 		try {
+			
+			
 			j = { json::parse(contents) };
 		} catch (json::parse_error& ex) {
 			ofLogError(xcodeProject::LOG_NAME) << "JSON parse error at byte" << ex.byte;
