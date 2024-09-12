@@ -898,6 +898,7 @@ bool xcodeProject::saveProjectFile(){
 		json j;
 		try {
 			j = { json::parse(contents) };
+			j = j[0];
 		} catch (json::parse_error & ex) {
 			ofLogError(xcodeProject::LOG_NAME) << "JSON parse error at byte" << ex.byte;
 			ofLogError(xcodeProject::LOG_NAME) << "fileName" << fileName;
@@ -941,7 +942,7 @@ bool xcodeProject::saveProjectFile(){
 					} 
 					catch (std::exception & e) {
 						cout << "pointer " << thispath;
-						ofLogError() << "xcodeProject saveProjectFile() first json error ";
+						ofLogError(xcodeProject::LOG_NAME) << "first json error ";
 						ofLogError() << e.what();
 						ofLogError() << thispath;
 						ofLogError() << "-------------------------";
@@ -965,7 +966,7 @@ bool xcodeProject::saveProjectFile(){
 						j[p].emplace_back(cols[3]);
 
 					} catch (std::exception & e) {
-						ofLogError() << "xcodeProject saveProjectFile() json error ";
+						ofLogError(xcodeProject::LOG_NAME) << "json error ";
 						ofLogError() << e.what();
 						ofLogError() << thispath;
 						ofLogError() << "-------------------------";
