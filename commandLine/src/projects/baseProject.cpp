@@ -310,13 +310,39 @@ void baseProject::addAddon(string addonName){
 	#endif
 
 	ofAddon addon;
-	// MARK: Review this path here. EDIT: I think it is finally good
-
-	if (bMakeRelative) {
-		addon.pathToOF = fs::relative(getOFRoot(), projectDir);
-	} else {
-		addon.pathToOF = getOFRoot();
-	}
+//    addon.addonMakeString = addonName;
+    
+    {
+        auto s = ofSplitString(addonName, "#");
+        if(s.size()){
+            addonName = s[0];
+        }
+    }
+    
+       
+       if(addonName.empty()){
+           ofLogError("baseProject::addAddon") << "cant add addon with empty name";
+           return;
+       }
+       
+       //This should be the only instance where we check if the addon is either local or not.
+       //being local just means that the addon name is a filepath and it starts with a dot.
+       //otherwise it will look in the addons folder.
+       //A local addon is not restricted to one that lives in folder with the name local_addons, should be any valid addon on the filesystem.
+       //Parsing will generate the correct path to both OF and the project.
+       //Everything else should be treated exactly in the same way, regardless of it being local or not.
+       if(addonName[0] == '.' && fs::exists( ofFilePath::join(projectDir, addonName))){
+           
+           addon.addonPath = ofFilePath::join(projectDir, addonName);
+           addon.isLocalAddon = true;
+           ofLogVerbose() << "Adding local addon: " << addonName;
+   //        addon.pathToProject = makeRelative(getOFRoot(), projectDir);
+   //        projectDir;
+       }else{
+           addon.addonPath = fs::path { getOFRoot() / "addons" / addonName };
+       }
+       addon.pathToOF = getOFRoot();
+       
 	
 	
 	addon.pathToOF = normalizePath(addon.pathToOF);
@@ -329,13 +355,13 @@ void baseProject::addAddon(string addonName){
 
 	fs::path addonPath { addonName };
 
-	if (fs::exists(addonPath)) {
-		addon.isLocalAddon = true;
-	} else {
-		addonPath = fs::path { getOFRoot() / "addons" / addonName };
-		addon.isLocalAddon = false;
-		addon.addonPath = addonPath;
-	}
+//	if (fs::exists(addonPath)) {
+//		addon.isLocalAddon = true;
+//	} else {
+//		addonPath = fs::path { getOFRoot() / "addons" / addonName };
+//		addon.isLocalAddon = false;
+//		addon.addonPath = addonPath;
+//	}
 
 	ofLogVerbose() << "addon.addonPath to: [" << addon.addonPath.string() << "]";
 	ofLogVerbose() << "addon.pathToOF: [" << addon.pathToOF.string() << "]";
