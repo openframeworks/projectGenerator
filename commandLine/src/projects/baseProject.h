@@ -56,15 +56,15 @@ public:
 	virtual void addInclude(const fs::path & includeName) = 0;
 	virtual void addLibrary(const LibraryBinary & lib) = 0;
 
-	// FIXME: change some strings to const &
-	virtual void addLDFLAG(std::string ldflag, LibType libType = RELEASE_LIB){}
-	virtual void addCFLAG(std::string cflag, LibType libType = RELEASE_LIB){} // C_FLAGS
-	virtual void addCPPFLAG(std::string cppflag, LibType libType = RELEASE_LIB){} // CXX_FLAGS
-	virtual void addAfterRule(std::string script){}
-	virtual void addDefine(std::string define, LibType libType = RELEASE_LIB) {}
 
-	virtual void addAddon(std::string addon);
-	virtual void addAddon(ofAddon & addon);
+	virtual void addLDFLAG(const std::string& ldflag, LibType libType = RELEASE_LIB) = 0;
+	virtual void addCFLAG(const std::string& cflag, LibType libType = RELEASE_LIB) = 0; // C_FLAGS
+	virtual void addCPPFLAG(const std::string& cppflag, LibType libType = RELEASE_LIB) = 0; // CXX_FLAGS
+	virtual void addAfterRule(const std::string& script) = 0;
+	virtual void addDefine(const std::string& define, LibType libType = RELEASE_LIB) = 0;
+
+    void addAddon(std::string addon);
+	void addAddon(ofAddon & addon);
 	virtual void addSrcRecursively(const fs::path & srcPath);
 	
 	virtual void restoreBackup(const fs::path & srcPath){};
@@ -86,7 +86,7 @@ public:
 	std::string projectName;
 	std::string target;
 
-	bool bMakeRelative = false;
+//	bool bMakeRelative = false;
 	
 	bool bOverwrite = true;
 
