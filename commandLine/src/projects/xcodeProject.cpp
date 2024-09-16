@@ -538,14 +538,14 @@ void xcodeProject::addLibrary(const LibraryBinary & lib){
 	}
 }
 
-void xcodeProject::addLDFLAG(string ldflag, LibType libType){
+void xcodeProject::addLDFLAG(const string& ldflag, LibType libType){
 //	alert( "xcodeProject::addLDFLAG " + ldflag , 34);
 	for (auto & c : buildConfigs) {
 		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ldflag);
 	}
 }
 
-void xcodeProject::addCFLAG(string cflag, LibType libType){
+void xcodeProject::addCFLAG(const string& cflag, LibType libType){
 	//alert("xcodeProject::addCFLAG " + cflag);
 	for (auto & c : buildConfigs) {
 		// FIXME: add array here if it doesnt exist
@@ -553,7 +553,7 @@ void xcodeProject::addCFLAG(string cflag, LibType libType){
 	}
 }
 
-void xcodeProject::addDefine(string define, LibType libType){
+void xcodeProject::addDefine(const string& define, LibType libType){
 	for (auto & c : buildConfigs) {
 		// FIXME: add array here if it doesnt exist
 		addCommand("Add :objects:"+c+":buildSettings:GCC_PREPROCESSOR_DEFINITIONS: string " + define);
@@ -561,14 +561,14 @@ void xcodeProject::addDefine(string define, LibType libType){
 }
 
 // FIXME: libtype is unused here
-void xcodeProject::addCPPFLAG(string cppflag, LibType libType){
+void xcodeProject::addCPPFLAG(const string& cppflag, LibType libType){
 	for (auto & c : buildConfigs) {
 		// FIXME: add array here if it doesnt exist
 		addCommand("Add :objects:"+c+":buildSettings:OTHER_CPLUSPLUSFLAGS: string " + cppflag);
 	}
 }
 
-void xcodeProject::addAfterRule(string rule){
+void xcodeProject::addAfterRule(const string& rule){
 	// return;
 //	cout << ">>>>>> addAfterRule " << rule << endl;
 	addCommand("Add :objects:"+afterPhaseUUID+":buildActionMask string 2147483647");

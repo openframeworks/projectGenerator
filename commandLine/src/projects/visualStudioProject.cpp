@@ -443,7 +443,7 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 }
 
 
-void visualStudioProject::addCFLAG(string cflag, LibType libType){
+void visualStudioProject::addCFLAG(const string& cflag, LibType libType){
 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
 	// FIXME: iterator
 	for (auto & item : items) {
@@ -467,7 +467,7 @@ void visualStudioProject::addCFLAG(string cflag, LibType libType){
 }
 
 
-void visualStudioProject::addCPPFLAG(string cppflag, LibType libType){
+void visualStudioProject::addCPPFLAG(const string& cppflag, LibType libType){
 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
 	for (auto & item : items) {
 		pugi::xml_node additionalOptions;
@@ -490,7 +490,7 @@ void visualStudioProject::addCPPFLAG(string cppflag, LibType libType){
 }
 
 
-void visualStudioProject::addDefine(string define, LibType libType) {
+void visualStudioProject::addDefine(const string& define, LibType libType) {
 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
 	for (auto & item : items) {
 		pugi::xml_node additionalOptions;

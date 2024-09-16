@@ -12,9 +12,9 @@ public:
 	xcodeProject(const string & target);
 
 private:
-	bool createProjectFile();
-	bool loadProjectFile();
-	bool saveProjectFile();
+	virtual bool createProjectFile() override;
+	virtual bool loadProjectFile() override;
+	virtual bool saveProjectFile() override;
 	void saveMakefile();
 	bool debugCommands = false;
     
@@ -22,14 +22,14 @@ private:
 
 public:
 
-	void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT);
-	void addInclude(const fs::path & includeName);
-	void addLibrary(const LibraryBinary & lib);
-	void addLDFLAG(string ldflag, LibType libType = RELEASE_LIB);
-	void addCFLAG(string cflag, LibType libType = RELEASE_LIB); // Other C Flags
-	void addCPPFLAG(string cppflag, LibType libType = RELEASE_LIB); // Other C++ Flags
-	void addAfterRule(string script);
-	void addDefine(string define, LibType libType = RELEASE_LIB);
+	virtual void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) override;
+	virtual void addInclude(const fs::path & includeName) override;
+	virtual void addLibrary(const LibraryBinary & lib) override;
+	virtual void addLDFLAG(const string& ldflag, LibType libType = RELEASE_LIB) override;
+	virtual void addCFLAG(const string& cflag, LibType libType = RELEASE_LIB) override; // Other C Flag overrides
+	virtual void addCPPFLAG(const string& cppflag, LibType libType = RELEASE_LIB) override; // Other C++ Flag overrides
+	virtual void addAfterRule(const string& script) override;
+	virtual void addDefine(const string& define, LibType libType = RELEASE_LIB) override;
 
 	void addCompileFlagsForMMFile(const fs::path & srcFile);
 	void addFramework(const fs::path & path, const fs::path & folder);
