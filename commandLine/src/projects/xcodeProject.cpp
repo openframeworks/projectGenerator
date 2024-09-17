@@ -897,14 +897,14 @@ bool xcodeProject::saveProjectFile(){
 //		std::cout << contents.rdbuf() << std::endl;
 		json j;
 		try {
-			j = { json::parse(contents) };
+			j = json::parse(contents);
 			
 			// Ugly hack to make nlohmann json work with v 3.11.3
-			auto dump = j.dump(1, '	');
-			if (dump[0] == '[') {
+//			auto dump = j.dump(1, '	');
+//			if (dump[0] == '[') {
 //				alert("OWWW BUCETA", 31);
-				j = j[0];
-			}
+//				j = j[0];
+//			}
 			
 		} catch (json::parse_error & ex) {
 			ofLogError(xcodeProject::LOG_NAME) << "JSON parse error at byte" << ex.byte;
@@ -960,21 +960,21 @@ bool xcodeProject::saveProjectFile(){
 				else {
 					thispath = thispath.substr(0, thispath.length() -1);
 //					cout << thispath << endl;
-					json::json_pointer p { json::json_pointer(thispath) };
+					json::json_pointer p = json::json_pointer(thispath);
 					try {
 						// Fixing XCode one item array issue
-//						if (!j[p].is_array()) {
+						if (!j[p].is_array()) {
 //							cout << endl;
 //							alert (c, 31);
 //							cout << "this is not array, creating" << endl;
 //							cout << thispath << endl;
-//							auto v { j[p] };
-//							j[p] = json::array();
-//							if (!v.is_null()) {
-//								cout << "thispath" << endl;
-//								j[p].emplace_back(v);
-//							}
-//						}
+							auto v { j[p] };
+							j[p] = json::array();
+							if (!v.is_null()) {
+//								cout << "thispath " << thispath << endl;
+								j[p].emplace_back(v);
+							}
+						}
 //						alert (c, 31);
 //						alert ("emplace back " + cols[3] , 32);
 						j[p].emplace_back(cols[3]);
