@@ -373,7 +373,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 }
 
 void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type){
-//	alert ("addSrc " + ofPathToString(srcFile) + " : " + ofPathToString(folder), 31);
+	alert ("xcodeProject::addSrc " + ofPathToString(srcFile) + " : " + ofPathToString(folder), 31);
 	
     string ext = ofPathToString(srcFile.extension());
 
@@ -640,6 +640,7 @@ void xcodeProject::addAddonSrcFiles(ofAddon& addon){
     for (auto & e : addon.srcFiles) {
         ofLogVerbose() << "adding addon srcFiles: " << e;
         if(addon.filesToFolders.find(e) == addon.filesToFolders.end()) {
+            
             addSrc(e,"");
         }else{
             addSrc(e,addon.filesToFolders.at(e));

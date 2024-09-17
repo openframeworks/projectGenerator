@@ -349,8 +349,8 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 		return;
 	}
 
-	fs::path addonRelPath = isLocalAddon ? addonPath : (pathToOF / "addons" / name);
-
+//	fs::path addonRelPath = isLocalAddon ? addonPath : (pathToOF / "addons" / name);
+    fs::path addonRelPath = makeRelative(addonPath, pathToProject);
 	if (variable == "ADDON_ADDITIONAL_LIBS") {
 		additionalLibsFolder.emplace_back(fs::path { value });
 		return;
@@ -803,7 +803,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 }
 	
 bool ofAddon::fromFS(const fs::path & path, const string & platform){
-	//alert("ofAddon::fromFS path : " + path.string(), 33);
+	alert("ofAddon::fromFS path : " + path.string(), 33);
 	
 	if (!fs::exists(path)) {
 		return false;
@@ -813,7 +813,7 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	this->platform = platform;
 
 	addonPath = path;
-
+    
 	
 	name = isLocalAddon ? ofPathToString(path.stem()) : ofPathToString(path.filename());
 
@@ -826,12 +826,14 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 
 	for (auto & s : srcFiles) {
 		fs::path folder;
+        fs::path sFS { fixPath(s) };
+        s = sFS;
 		if (isLocalAddon) {
-			fs::path sFS { s };
+//			fs::path sFS { s };
+            
 			folder = fs::path { "local_addons" } / fs::relative(sFS.parent_path(), parentFolder);
 		} else {
-			fs::path sFS { fixPath(s) };
-			s = sFS;
+			
 			folder = fs::relative(sFS.parent_path(), getOFRoot());
 		}
 		filesToFolders[s] = folder;
@@ -855,7 +857,8 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	if (fs::exists(libsPath)) {
 		getFoldersRecursively(libsPath, libFolders, platform);
 		for (auto & path : libFolders) {
-			paths.emplace_back( isLocalAddon ? path : fixPath(path) );
+//			paths.emplace_back( isLocalAddon ? path : fixPath(path) );
+            paths.emplace_back( fixPath(path) );
 		}
 	}
 
@@ -863,7 +866,8 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	if (fs::exists(srcPath)) {
 		getFoldersRecursively(srcPath, srcFolders, platform);
 		for (auto & path : srcFolders) {
-			paths.emplace_back( isLocalAddon ? path : fixPath(path) );
+//			paths.emplace_back( isLocalAddon ? path : fixPath(path) );
+            paths.emplace_back( fixPath(path) );
 		}
 	}
 
@@ -938,5 +942,9 @@ fs::path ofAddon::fixPath(const fs::path & path) {
 	 but the problem is fs::relative actually calculate symlink paths, modifying filename.
 	 which is not good for macos dylibs, like ofxHapPlayer, so I had to replace with the original filename back
 	 */
-	return normalizePath(( pathToOF / fs::relative(path, getOFRoot()) ).parent_path() / path.filename());
+    if(isLocalAddon){
+        return normalizePath(( pathToProject / fs::relative(path, pathToProject) ).parent_path() / path.filename());
+    }else{
+        return normalizePath(( pathToOF / fs::relative(path, getOFRoot()) ).parent_path() / path.filename());
+    }
 }
