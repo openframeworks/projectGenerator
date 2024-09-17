@@ -259,11 +259,12 @@ bool baseProject::save(){
 
 	std::ofstream addonsMake(projectDir / "addons.make");
 	for (auto & a : addons) {
-		if (a.isLocalAddon) {
-			addonsMake << fs::path(a.addonPath).generic_string() << std::endl;
-		} else {
-			addonsMake << a.name << std::endl;
-		}
+        addonsMake << a.addonMakeName << std::endl;
+//		if (a.isLocalAddon) {
+//			addonsMake << fs::path(a.addonPath).generic_string() << std::endl;
+//		} else {
+//			addonsMake << a.name << std::endl;
+//		}
 	}
 
 	//save out params which the PG knows about to config.make
@@ -311,7 +312,7 @@ void baseProject::addAddon(string addonName){
 #endif
     
     ofAddon addon;
-    //    addon.addonMakeString = addonName;
+    addon.addonMakeName = addonName;
     
     {
         auto s = ofSplitString(addonName, "#");
@@ -572,10 +573,6 @@ void baseProject::addAddon(ofAddon & addon){
     addAddonFrameworks(addon);
 	
     addAddonXCFrameworks(addon);
-    
-//	for (auto & f : addon.xcframeworks) {
-//		addXCFramework(f);
-//	}
 
     copyAddonData(addon);
     
@@ -593,7 +590,7 @@ void  baseProject::addAddonLibsPaths(const ofAddon& addon){
 void  baseProject::addAddonIncludePaths(const ofAddon& addon){
     for (auto & e : addon.includePaths) {
         fs::path normalizedDir = normalizePath(projectDir);
-        ofLogVerbose() << "[addon.includePaths] adding addon include path: [" << normalizedDir << "]";
+        ofLogVerbose("baseProject") << "[addon.includePaths] adding addon include path: [" << normalizedDir << "]";
         if (containsSourceFiles(normalizedDir)) {
             normalizedDir = makeRelative(projectDir, e);
             ofLogVerbose() << "[addon.includePaths] contains src - Adding dir: [" << normalizedDir.string() << "]";
@@ -616,28 +613,28 @@ void  baseProject::addAddonIncludePaths(const ofAddon& addon){
 
 void  baseProject::addAddonLibs(const ofAddon& addon){
     for (auto & a : addon.libs) {
-        ofLogVerbose() << "adding addon libs: " << a.path.string();
+        ofLogVerbose("baseProject") << "adding addon libs: " << a.path.string();
         addLibrary(a);
     }
 }
 
 void  baseProject::addAddonCflags(const ofAddon& addon){
     for (auto & a : addon.cflags) {
-        ofLogVerbose() << "adding addon cflags: " << a;
+        ofLogVerbose("baseProject") << "adding addon cflags: " << a;
         addCFLAG(a);
     }
 }
 
 void  baseProject::addAddonCppflags(const ofAddon& addon){
     for (auto & a : addon.cppflags) {
-        ofLogVerbose() << "adding addon cppflags: " << a;
+        ofLogVerbose("baseProject") << "adding addon cppflags: " << a;
         addCPPFLAG(a);
     }
 }
 
 void  baseProject::addAddonLdflags(const ofAddon& addon){
     for (auto & a : addon.ldflags) {
-        ofLogVerbose() << "adding addon ldflags: " << a;
+        ofLogVerbose("baseProject") << "adding addon ldflags: " << a;
         addLDFLAG(a);
     }
 }
@@ -645,7 +642,7 @@ void  baseProject::addAddonLdflags(const ofAddon& addon){
 void  baseProject::addAddonSrcFiles( ofAddon& addon){
     for (auto & a : addon.srcFiles) {
         fs::path normalizedDir = makeRelative(getOFRoot(), a);
-        ofLogVerbose() << "adding addon srcFiles: " << normalizedDir.string();
+        ofLogVerbose("baseProject") << "adding addon srcFiles: " << normalizedDir.string();
         addSrc(normalizedDir, addon.filesToFolders.at(a));
     }
 }
@@ -653,7 +650,7 @@ void  baseProject::addAddonSrcFiles( ofAddon& addon){
 void  baseProject::addAddonCsrcFiles(const ofAddon& addon){
     for (auto & a : addon.csrcFiles) {
         fs::path normalizedDir = makeRelative(getOFRoot(), a);
-        ofLogVerbose() << "adding addon c srcFiles: " << normalizedDir.string();
+        ofLogVerbose("baseProject") << "adding addon c srcFiles: " << normalizedDir.string();
         addSrc(normalizedDir, addon.filesToFolders.at(a), C);
     }
 }
@@ -661,7 +658,7 @@ void  baseProject::addAddonCsrcFiles(const ofAddon& addon){
 void  baseProject::addAddonCppsrcFiles(const ofAddon& addon){
     for (auto & a : addon.cppsrcFiles) {
         fs::path normalizedDir = makeRelative(getOFRoot(), a);
-        ofLogVerbose() << "adding addon cpp srcFiles: " << normalizedDir.string();
+        ofLogVerbose("baseProject") << "adding addon cpp srcFiles: " << normalizedDir.string();
         addSrc(normalizedDir, addon.filesToFolders.at(a),CPP);
     }
 }
@@ -669,7 +666,7 @@ void  baseProject::addAddonCppsrcFiles(const ofAddon& addon){
 void  baseProject::addAddonObjcsrcFiles(const ofAddon& addon){
     for (auto & a : addon.objcsrcFiles) {
         fs::path normalizedDir = makeRelative(getOFRoot(), a);
-        ofLogVerbose() << "adding addon objc srcFiles: " << normalizedDir.string();
+        ofLogVerbose("baseProject") << "adding addon objc srcFiles: " << normalizedDir.string();
         addSrc(normalizedDir, addon.filesToFolders.at(a),OBJC);
     }
 }
@@ -678,7 +675,7 @@ void  baseProject::addAddonHeadersrcFiles(const ofAddon& addon){
     for (auto & a : addon.headersrcFiles) {
         
         fs::path normalizedDir = makeRelative(getOFRoot(), a);
-        ofLogVerbose() << "adding addon header srcFiles: [" << normalizedDir.string() << "]";
+        ofLogVerbose("baseProject") << "adding addon header srcFiles: [" << normalizedDir.string() << "]";
         addSrc(normalizedDir, addon.filesToFolders.at(a),HEADER);
     }
 }

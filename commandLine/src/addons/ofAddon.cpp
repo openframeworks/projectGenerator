@@ -71,7 +71,9 @@ ofAddon::ofAddon(const ofAddon& other)
 	  excludeSources(other.excludeSources),
 	  excludeIncludes(other.excludeIncludes),
 	  excludeFrameworks(other.excludeFrameworks),
-	  excludeXCFrameworks(other.excludeXCFrameworks)
+	  excludeXCFrameworks(other.excludeXCFrameworks),
+        addonMakeName(other.addonMakeName)
+
 {
 }
 
@@ -568,10 +570,11 @@ void ofAddon::excludeLibrary(vector<LibraryBinary> & variables, vector<string> e
 
 void ofAddon::preParseConfig(){
 	//	alert ("ofAddon::parseConfig " + addonPath.string(), 33);
-	fs::path fileName = isLocalAddon ?
-		(pathToProject / addonPath / "addon_config.mk") :
-		(addonPath / "addon_config.mk")
-	;
+    fs::path fileName =     (addonPath / "addon_config.mk");
+//    isLocalAddon ?
+//		(pathToProject / addonPath / "addon_config.mk") :
+//		(addonPath / "addon_config.mk")
+//	;
 
 	if (!fs::exists(fileName)) {
 //		ofLogError() << "ofAddon::parseConfig() " << fileName << " not found " << ofPathToString(fileName);
@@ -636,8 +639,9 @@ void ofAddon::preParseConfig(){
 
 void ofAddon::parseConfig(){
 //	alert ("ofAddon::parseConfig " + addonPath.string(), 33);
-	fs::path fileName = isLocalAddon ?
-		(pathToProject / addonPath / "addon_config.mk") :
+	fs::path fileName = 
+//    isLocalAddon ?
+//		(pathToProject / addonPath / "addon_config.mk") :
 		(addonPath / "addon_config.mk")
 	;
 

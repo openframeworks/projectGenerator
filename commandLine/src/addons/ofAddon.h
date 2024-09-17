@@ -175,7 +175,7 @@ public:
 	bool operator <(const ofAddon & addon) const{
 		return addon.name < name;
 	}
-
+    string addonMakeName;
 private:
 	
 	string currentParseState { "" };
