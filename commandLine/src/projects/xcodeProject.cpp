@@ -374,7 +374,8 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 
 void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type){
 //	alert ("addSrc " + ofPathToString(srcFile) + " : " + ofPathToString(folder), 31);
-	string ext = ofPathToString(srcFile.extension());
+	
+    string ext = ofPathToString(srcFile.extension());
 
 //		.reference = true,
 //		.addToBuildPhase = true,
@@ -448,6 +449,7 @@ void xcodeProject::addCompileFlagsForMMFile(const fs::path & srcFile) {
 
 
 void xcodeProject::addFramework(const fs::path & path, const fs::path & folder){
+    ofLogVerbose() << "Adding framework " << ofPathToString(path) << "  folder: " << folder;
 	// alert( "xcodeProject::addFramework " + ofPathToString(path) + " : " + ofPathToString(folder) , 33);
 	// path = the full path (w name) of this framework
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
@@ -481,6 +483,7 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder){
 
 
 void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder) {
+    ofLogVerbose() << "Adding XCFramework " << ofPathToString(path) << "  folder: " << folder;
 	//	alert( "xcodeProject::addFramework " + path.string() + " : " + folder.string() , 33);
 
 	// path = the full path (w name) of this framework
@@ -539,6 +542,7 @@ void xcodeProject::addLibrary(const LibraryBinary & lib){
 }
 
 void xcodeProject::addLDFLAG(const string& ldflag, LibType libType){
+    ofLogVerbose("xcodeProject::addLDFLAG") << ldflag;
 //	alert( "xcodeProject::addLDFLAG " + ldflag , 34);
 	for (auto & c : buildConfigs) {
 		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ldflag);
@@ -546,6 +550,7 @@ void xcodeProject::addLDFLAG(const string& ldflag, LibType libType){
 }
 
 void xcodeProject::addCFLAG(const string& cflag, LibType libType){
+    ofLogVerbose("xcodeProject::addCFLAG") << cflag;
 	//alert("xcodeProject::addCFLAG " + cflag);
 	for (auto & c : buildConfigs) {
 		// FIXME: add array here if it doesnt exist
@@ -589,88 +594,102 @@ void xcodeProject::addAfterRule(const string& rule){
 	addCommand("Add :objects:"+buildConfigurationListUUID+":buildPhases: string " + afterPhaseUUID);
 }
 
-void xcodeProject::addAddon(ofAddon & addon){
+// void xcodeProject::addAddon(ofAddon & addon){
+    // 
 	//	alert("xcodeProject addAddon string :: " + addon.name, 31);
 
 	// Files listed alphabetically on XCode navigator.
 
-	std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), [](const fs::path & a, const fs::path & b) {
-		return a.string() < b.string();
-	});
+	// std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), [](const fs::path & a, const fs::path & b) {
+	// 	return a.string() < b.string();
+	// });
+void  xcodeProject::addAddonLibs(const ofAddon& addon){
+    for (auto & e : addon.libs) {
+        ofLogVerbose() << "adding addon libs: " << e.path;
+        addLibrary(e);
+        
+        fs::path dylibPath { e.path };
+        fs::path folder = dylibPath.parent_path().lexically_relative(addon.pathToOF);
+        //		cout << "dylibPath " << dylibPath << endl;
+        if (dylibPath.extension() == ".dylib") {
+            addDylib(dylibPath, folder);
+        }
+    }
+}
 
-	for (auto & e : addon.libs) {
-		ofLogVerbose() << "adding addon libs: " << e.path;
-		addLibrary(e);
+//	for (auto & e : addon.cflags) {
+//		ofLogVerbose() << "adding addon cflags: " << e;
+//		addCFLAG(e);
+//	}
 
-		fs::path dylibPath { e.path };
-		fs::path folder = dylibPath.parent_path().lexically_relative(addon.pathToOF);
-//		cout << "dylibPath " << dylibPath << endl;
-		if (dylibPath.extension() == ".dylib") {
-			addDylib(dylibPath, folder);
-		}
-	}
+//	for (auto & e : addon.cppflags) {
+//		ofLogVerbose() << "adding addon cppflags: " << e;
+//		addCPPFLAG(e);
+//	}
 
-	for (auto & e : addon.cflags) {
-		ofLogVerbose() << "adding addon cflags: " << e;
-		addCFLAG(e);
-	}
+//	for (auto & e : addon.ldflags) {
+//		ofLogVerbose() << "adding addon ldflags: " << e;
+////		alert("addon ldflags " + e, 31 );
+//		addLDFLAG(e);
+//	}
 
-	for (auto & e : addon.cppflags) {
-		ofLogVerbose() << "adding addon cppflags: " << e;
-		addCPPFLAG(e);
-	}
+void xcodeProject::addAddonSrcFiles(ofAddon& addon){
+    std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), [](const fs::path & a, const fs::path & b) {
+        return a.string() < b.string();
+    });
+    for (auto & e : addon.srcFiles) {
+        ofLogVerbose() << "adding addon srcFiles: " << e;
+        if(addon.filesToFolders.find(e) == addon.filesToFolders.end()) {
+            addSrc(e,"");
+        }else{
+            addSrc(e,addon.filesToFolders.at(e));
+        }
+    }
+}
 
-	for (auto & e : addon.ldflags) {
-		ofLogVerbose() << "adding addon ldflags: " << e;
-//		alert("addon ldflags " + e, 31 );
-		addLDFLAG(e);
-	}
+//	for (auto & e : addon.defines) {
+//		ofLogVerbose() << "adding addon defines: " << e;
+//		addDefine(e);
+//	}
 
-	for (auto & e : addon.srcFiles) {
-		ofLogVerbose() << "adding addon srcFiles: " << e;
-		if(addon.filesToFolders.find(e) == addon.filesToFolders.end()) {
-			addon.filesToFolders[e] = fs::path { "" };
-		}
-		addSrc(e,addon.filesToFolders[e]);
-	}
+//-----------------------------------------------------------------------------------------------
+void xcodeProject::addAddonFrameworks(const ofAddon& addon){
+    ofLogVerbose("xcodeProject::addAddonFrameworks") << addon.name;
+    
+    for (auto & f : addon.frameworks) {
+        ofLogVerbose() << "adding addon frameworks: " << f;
 
-	for (auto & e : addon.defines) {
-		ofLogVerbose() << "adding addon defines: " << e;
-		addDefine(e);
-	}
+        size_t found=f.find('/');
+        if (found==string::npos) { // This path doesn't have slashes
+            fs::path folder = fs::path{ "addons" } / addon.name / "frameworks";
+//            fs::path folder = addon.filesToFolders[f];
 
-	for (auto & f : addon.frameworks) {
-		// alert (f, 31);
-		ofLogVerbose() << "adding addon frameworks: " << f;
+            if (target == "ios"){
+                addFramework(  "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/" + f + ".framework",
+//                    folder
+                    "Frameworks"
+                    );
+            } else {
+                if (addon.isLocalAddon) {
+                    folder = addon.addonPath / "frameworks";
+                }
+                addFramework( "/System/Library/Frameworks/" + f + ".framework", folder);
+            }
+        }
+        else {
+            if (ofIsStringInString(f, "/System/Library")){
+                addFramework(f, "addons/" + addon.name + "/frameworks");
 
-		size_t found=f.find('/');
-		if (found==string::npos) { // This path doesn't have slashes
-			fs::path folder = fs::path{ "addons" } / addon.name / "frameworks";
-//			fs::path folder = addon.filesToFolders[f];
+            } else {
+                addFramework(f, addon.filesToFolders.at(f));
+            }
+        }
+    }
+}
 
-			if (target == "ios"){
-				addFramework(  "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/" + f + ".framework",
-//					folder
-					"Frameworks"
-					);
-			} else {
-				if (addon.isLocalAddon) {
-					folder = addon.addonPath / "frameworks";
-				}
-				addFramework( "/System/Library/Frameworks/" + f + ".framework", folder);
-			}
-		}
-		else {
-			if (ofIsStringInString(f, "/System/Library")){
-				addFramework(f, "addons/" + addon.name + "/frameworks");
-
-			} else {
-				addFramework(f, addon.filesToFolders[f]);
-			}
-		}
-	}
-
-
+//-----------------------------------------------------------------------------------------------
+void xcodeProject::addAddonXCFrameworks(const ofAddon& addon){
+    ofLogVerbose("xcodeProject::addAddonXCFrameworks") << addon.name;
 	for (auto & f : addon.xcframeworks) {
 		//		alert ("xcodeproj addon.xcframeworks : " + f);
 		ofLogVerbose() << "adding addon xcframeworks: " << f;
@@ -690,7 +709,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 			if (ofIsStringInString(f, "/System/Library")) {
 				addXCFramework(f, "addons/" + addon.name + "/xcframeworks");
 			} else {
-				addXCFramework(f, addon.filesToFolders[f]);
+				addXCFramework(f, addon.filesToFolders.at(f));
 			}
 		}
 	}
@@ -698,7 +717,7 @@ void xcodeProject::addAddon(ofAddon & addon){
 
 
 string xcodeProject::addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp) {
-	//alert("addFile " + ofPathToString(path) + " : " + ofPathToString(folder) , 31);
+	alert("addFile " + ofPathToString(path) + " : " + ofPathToString(folder) , 31);
 
 	string UUID { "" };
 

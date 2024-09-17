@@ -18,6 +18,11 @@ public:
 	virtual void addCFLAG(const std::string& cflag, LibType libType = RELEASE_LIB) override ; // C
 	virtual void addCPPFLAG(const std::string& cppflag, LibType libType = RELEASE_LIB) override ; // C++
 	virtual void addDefine(const std::string& define, LibType libType = RELEASE_LIB) override ;
+    
+    virtual void addLDFLAG(const std::string& ldflag, LibType libType = RELEASE_LIB) override {}
+    virtual void addAfterRule(const std::string& script) override {}
+    
+    
     void ensureDllDirectoriesExist() ;
     void addAddon(ofAddon & addon) ;
 

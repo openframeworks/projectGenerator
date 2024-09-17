@@ -52,16 +52,6 @@ public:
 	void parseConfigMake();
 	bool save();
 
-	virtual void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) = 0;
-	virtual void addInclude(const fs::path & includeName) = 0;
-	virtual void addLibrary(const LibraryBinary & lib) = 0;
-
-
-	virtual void addLDFLAG(const std::string& ldflag, LibType libType = RELEASE_LIB) = 0;
-	virtual void addCFLAG(const std::string& cflag, LibType libType = RELEASE_LIB) = 0; // C_FLAGS
-	virtual void addCPPFLAG(const std::string& cppflag, LibType libType = RELEASE_LIB) = 0; // CXX_FLAGS
-	virtual void addAfterRule(const std::string& script) = 0;
-	virtual void addDefine(const std::string& define, LibType libType = RELEASE_LIB) = 0;
 
     void addAddon(std::string addon);
 	void addAddon(ofAddon & addon);
@@ -107,6 +97,40 @@ private:
 	// this should get called at the end.
 
 protected:
+    
+    virtual void addAddonFrameworks(const ofAddon& addon){}
+    virtual void addAddonXCFrameworks(const ofAddon& addon){}
+    virtual  void addAddonLibsPaths(const ofAddon& addon);
+	virtual  void addAddonIncludePaths(const ofAddon& addon);
+	virtual  void addAddonLibs(const ofAddon& addon);
+	virtual  void addAddonCflags(const ofAddon& addon);
+	virtual  void addAddonCppflags(const ofAddon& addon);
+	virtual  void addAddonLdflags(const ofAddon& addon);
+	virtual  void addAddonSrcFiles(ofAddon& addon);
+	virtual  void addAddonCsrcFiles(const ofAddon& addon);
+	virtual  void addAddonCppsrcFiles(const ofAddon& addon);
+	virtual  void addAddonObjcsrcFiles(const ofAddon& addon);
+	virtual  void addAddonHeadersrcFiles(const ofAddon& addon);
+    virtual  void addAddonDllsToCopy(ofAddon& addon);
+
+
+    virtual void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) = 0;
+    virtual void addInclude(const fs::path & includeName) = 0;
+    virtual void addLibrary(const LibraryBinary & lib) = 0;
+
+    virtual void addLDFLAG(const std::string& ldflag, LibType libType = RELEASE_LIB) = 0;
+    virtual void addCFLAG(const std::string& cflag, LibType libType = RELEASE_LIB) = 0; // C_FLAGS
+    virtual void addCPPFLAG(const std::string& cppflag, LibType libType = RELEASE_LIB) = 0; // CXX_FLAGS
+    virtual void addAfterRule(const std::string& script) = 0;
+    virtual void addDefine(const std::string& define, LibType libType = RELEASE_LIB) = 0;
+
+    
+    void copyAddonData(ofAddon& addon);
+    
+    
+    
+    
+    
 	void recursiveCopyContents(const fs::path & srcDir, const fs::path & destDir);
 	void recursiveTemplateCopy(const fs::path & srcDir, const fs::path & destDir);
 	bool recursiveCopy(const fs::path & srcDir, const fs::path & destDir);

@@ -20,8 +20,15 @@ private:
     
     static std::string LOG_NAME;
 
-public:
+protected:
 
+    virtual void addAddonFrameworks(const ofAddon& addon) override ;
+    virtual void addAddonXCFrameworks(const ofAddon& addon) override ;
+    virtual void addAddonLibs(const ofAddon& addon) override;
+    virtual void addAddonSrcFiles( ofAddon& addon) override;
+    
+    
+    
 	virtual void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) override;
 	virtual void addInclude(const fs::path & includeName) override;
 	virtual void addLibrary(const LibraryBinary & lib) override;
@@ -36,7 +43,7 @@ public:
 	void addXCFramework(const fs::path & path, const fs::path & folder);
 	void addDylib(const fs::path & path, const fs::path & folder);
 
-	void addAddon(ofAddon & addon);
+//	void addAddon(ofAddon & addon);
 	void saveScheme();
 	void renameProject();
 
