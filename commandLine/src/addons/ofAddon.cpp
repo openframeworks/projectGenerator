@@ -751,13 +751,13 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 	// TODO: this is not needed even if it is local addon but project is outside OF root path
 	// Absolute paths will be used in this case too.
 	// Maybe it is the same situation for all others fixPath occurences?
-	if (!isLocalAddon) {
+//	if (!isLocalAddon) {
 		for (auto & l : libs) {
 //			alert("fixpath before " + ofPathToString(l.path));
 			l.path = fixPath(l.path);
 //			alert("fixpath after  " + ofPathToString(l.path));
 		}
-	}
+//	}
 
 	for (auto & s : libFiles) {
         addToFolder(s, parentFolder);
