@@ -117,7 +117,7 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(string target)
 bool baseProject::create(const fs::path & _path, string templateName){
 //	alert("baseProject::create " + path.string() + " : " + templateName, 35);
 	auto path = _path; // just because it is const
-
+    fs::current_path(path);
 
 	//if the files being added are inside the OF root folder, make them relative to the folder.
 
