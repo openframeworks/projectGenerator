@@ -349,8 +349,7 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 		return;
 	}
 
-//	fs::path addonRelPath = isLocalAddon ? addonPath : (pathToOF / "addons" / name);
-    fs::path addonRelPath = makeRelative(addonPath, pathToProject);
+    fs::path addonRelPath = makeRelative(pathToProject, addonPath);
 	if (variable == "ADDON_ADDITIONAL_LIBS") {
 		additionalLibsFolder.emplace_back(fs::path { value });
 		return;
