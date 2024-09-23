@@ -709,6 +709,17 @@ void ofAddon::parseConfig(){
 	}
 }
 
+void ofAddon::addToFolder(const fs::path& path, const fs::path & parentFolder){
+ 
+    fs::path folder;
+    if (isLocalAddon) {
+        folder = fs::path { "local_addons" } / fs::relative(path.parent_path(), parentFolder);
+    } else {
+        folder = fs::relative(path.parent_path(), getOFRoot());
+    }
+    filesToFolders[path] = folder;
+}
+
 void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFolder) {
 //	alert ("parseLibsPath " + libsPath.string(), 35);
 	if (!fs::exists(libsPath)) {
@@ -749,15 +760,16 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 	}
 
 	for (auto & s : libFiles) {
-		fs::path folder;
-		if (isLocalAddon) {
-			folder = fs::path { "local_addons" } / fs::relative(s.parent_path(), parentFolder);
-		} else {
-			folder = fs::relative(s.parent_path(), getOFRoot());
-			s = fixPath(s);
-		}
+        addToFolder(s, parentFolder);
+//		fs::path folder;
+//		if (isLocalAddon) {
+//			folder = fs::path { "local_addons" } / fs::relative(s.parent_path(), parentFolder);
+//		} else {
+//			folder = fs::relative(s.parent_path(), getOFRoot());
+//			s = fixPath(s);
+//		}
 		srcFiles.emplace_back(s);
-		filesToFolders[s] = folder;
+//		filesToFolders[s] = folder;
 	}
 
 	// so addons will never be system.
@@ -775,29 +787,31 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 			; // do we need to do anything here?
 		} else {
 			// if addon is local, it is relative to the project folder, and if it is not, it is related to the project folder, ex: addons/ofxSvg
-			fs::path rel = fs::relative (f, isLocalAddon ? pathToProject : pathToOF);
-			fs::path folder = rel.parent_path();
-
-			if (isLocalAddon) {
-				fs::path fFS { f };
-				folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
-			}
-
-			filesToFolders[f] = folder;
+//			fs::path rel = fs::relative (f, isLocalAddon ? pathToProject : pathToOF);
+//			fs::path folder = rel.parent_path();
+//
+//			if (isLocalAddon) {
+//				fs::path fFS { f };
+//				folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
+//			}
+//
+//			filesToFolders[f] = folder;
+            addToFolder(f, parentFolder);
 		}
 	}
 
 	for (const auto & f : xcframeworks) {
 		
-		fs::path rel = fs::relative(f, isLocalAddon ? pathToProject : pathToOF);
-		fs::path folder = rel.parent_path();
-
-		if (isLocalAddon) {
-			fs::path fFS { f };
-			folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
-		}
-
-		filesToFolders[f] = folder;
+//		fs::path rel = fs::relative(f, isLocalAddon ? pathToProject : pathToOF);
+//		fs::path folder = rel.parent_path();
+//
+//		if (isLocalAddon) {
+//			fs::path fFS { f };
+//			folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
+//		}
+//
+//		filesToFolders[f] = folder;
+        addToFolder(f, parentFolder);
 	}
 }
 	
@@ -824,18 +838,19 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 	fs::path parentFolder { path.parent_path() };
 
 	for (auto & s : srcFiles) {
-		fs::path folder;
+//		fs::path folder;
         fs::path sFS { fixPath(s) };
         s = sFS;
-		if (isLocalAddon) {
-//			fs::path sFS { s };
-            
-			folder = fs::path { "local_addons" } / fs::relative(sFS.parent_path(), parentFolder);
-		} else {
-			
-			folder = fs::relative(sFS.parent_path(), getOFRoot());
-		}
-		filesToFolders[s] = folder;
+        addToFolder(s, parentFolder);
+//		if (isLocalAddon) {
+////			fs::path sFS { s };
+//            
+//			folder = fs::path { "local_addons" } / fs::relative(sFS.parent_path(), parentFolder);
+//		} else {
+//			
+//			folder = fs::relative(sFS.parent_path(), getOFRoot());
+//		}
+//		filesToFolders[s] = folder;
 	}
 
 	
