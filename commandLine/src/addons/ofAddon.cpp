@@ -72,7 +72,7 @@ ofAddon::ofAddon(const ofAddon& other)
 	  excludeIncludes(other.excludeIncludes),
 	  excludeFrameworks(other.excludeFrameworks),
 	  excludeXCFrameworks(other.excludeXCFrameworks),
-        addonMakeName(other.addonMakeName)
+      addonMakeName(other.addonMakeName)
 
 {
 }
@@ -99,7 +99,7 @@ bool ofAddon::checkCorrectVariable(const string & variable, const string & state
 						 AddonMetaVariables.end(),
 						 variable) != AddonMetaVariables.end();
 	}
-	else if (state == "osx") {
+	else if (state == "osx") {// Why only checking for osx? 
 		return std::find(AddonProjectVariables.begin(),
 						 AddonProjectVariables.end(),
 						 variable) != AddonProjectVariables.end();
@@ -380,14 +380,7 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
 	else if(variable == "ADDON_INCLUDES"){
-//		if (!addToValue) {
-//			alert ("CLEAR " + variable, 36);
-//			alert ("value " + value, 36);
-//		}
-//		cout << includePaths.size() << endl;
 		addReplaceStringVectorPathPrefix(includePaths, value, addonRelPath, addToValue);
-		//		cout << includePaths.size() << endl;
-//		cout << "----" << endl;
 	}
 
 	else if(variable == ADDON_CFLAGS){
