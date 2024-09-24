@@ -941,7 +941,8 @@ bool xcodeProject::saveProjectFile(){
 						}
 						else if (cols[2] == "array") {
 							try {
-								j[p] = {};
+//								j[p] = {};
+								j[p] = json::array({});
 							} catch (std::exception & e) {
 								ofLogError() << "array " << e.what();
 							}
