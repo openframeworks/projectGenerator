@@ -720,11 +720,29 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		return;
 	}
 
-	getLibsRecursively(libsPath, libFiles, libs, platform);
-	if (platform == "osx"  ||
+    
+    if (platform == "osx"  || platform == "macos"){
+        // Horrible hack to make it work with the bad idea of renaming osx to macos
+        getLibsRecursively(libsPath, libFiles, libs, "macos");
+        getLibsRecursively(libsPath, libFiles, libs, "osx");
+        
+        getFrameworksRecursively(libsPath, frameworks, "macos");
+        getFrameworksRecursively(libsPath, frameworks, "osx");
+        getXCFrameworksRecursively(libsPath, xcframeworks, "macos");
+        getXCFrameworksRecursively(libsPath, xcframeworks, "osx");
+        
+        
+        
+    }else{
+        
+        getLibsRecursively(libsPath, libFiles, libs, platform);
+    }
+    
+    if (//platform == "osx"  ||
         platform == "ios"  ||
-        platform == "tvos" ||
-        platform == "macos"){
+        platform == "tvos"){//} ||
+        //platform == "macos"){
+        
             getFrameworksRecursively(libsPath, frameworks, platform);
             getXCFrameworksRecursively(libsPath, xcframeworks, platform);
 	}
