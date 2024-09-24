@@ -902,7 +902,6 @@ bool xcodeProject::saveProjectFile(){
 			// Ugly hack to make nlohmann json work with v 3.11.3
 //			auto dump = j.dump(1, '	');
 //			if (dump[0] == '[') {
-//				alert("OWWW BUCETA", 31);
 //				j = j[0];
 //			}
 			
