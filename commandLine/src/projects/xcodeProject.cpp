@@ -243,9 +243,23 @@ void xcodeProject::renameProject(){ //base
 	}
 }
 
+fs::path getPathTo(fs::path path, string limit){
+    fs::path p;
+    vector <fs::path> folders = std::vector(path.begin(), path.end());
+    for(auto & f: folders){
+        p /= f;
+        if(f.string() == limit){
+            alert("getPathTo "+  p.string(), 33);
+            return p;
+        }
+    }
+    return p;
+}
+
+
 // FIXME: Double check if isFolder is even being used. Remove it if not
-string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::path base) {
-//	alert ("xcodeProject::getFolderUUID "+folder.string()+" : isfolder="+ofToString(isFolder)+" : base="+ base.string());
+string xcodeProject::getFolderUUID(const fs::path & folder, fs::path base){//, bool isFolder, fs::path base) {
+//    alert ("xcodeProject::getFolderUUID "+folder.string());//+" : isfolder="+ofToString(isFolder)+" : base="+ base.string());
 
 //	TODO: Change key of folderUUID to base + folder, so "src" in additional source folders
 //	doesn't get confused with "src" from project.
@@ -266,6 +280,8 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 
 		if (folders.size()){
 			// Iterating every folder from full path
+            
+            
 			for (std::size_t a = 0; a < folders.size(); a++) {
 				fs::path fullPath{""};
 
@@ -279,7 +295,8 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 				for (const auto& j : joinFolders) {
 					fullPath /= j;
 				}
-
+                
+//                alert("xcodeProject::getFolderUUID fullpath: " + fullPath.string(),33);
 
 				// Query if partial path is already stored. if not execute this following block
 				if ( folderUUID.find(fullPath) != folderUUID.end() ) {
@@ -288,6 +305,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 				}
 
 				else {
+                    
 					string thisUUID = generateUUID(fullPath);
 					folderUUID[fullPath] = thisUUID;
 					folderFromUUID[thisUUID] = fullPath;
@@ -297,67 +315,81 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 					addCommand("Add :objects:"+thisUUID+":name string " + folderName);
 
 					// FIXME: Inspect if this is really being used
-					if (isFolder) {
-						alert("getFolderUUID, isFolder INSIDE " , 31);
-						fs::path filePath;
-						fs::path filePath_full { relRoot / fullPath };
-						// FIXME: known issue: doesn't handle files with spaces in name.
-
-						if (fs::exists(filePath_full)) {
-							filePath = filePath_full;
-						}
-						if (fs::exists(fullPath)) {
-							filePath = fullPath;
-						}
-
-						if (!filePath.empty()) {
-							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(filePath));
-						} else {
-						}
-					} else {
-//						alert("getFolderUUID isFolder false", 31);
-					}
+//					if (isFolder) {
+//						alert("getFolderUUID, isFolder INSIDE " , 31);
+//						fs::path filePath;
+//						fs::path filePath_full { relRoot / fullPath };
+//						// FIXME: known issue: doesn't handle files with spaces in name.
+//
+//						if (fs::exists(filePath_full)) {
+//							filePath = filePath_full;
+//						}
+//						if (fs::exists(fullPath)) {
+//							filePath = fullPath;
+//						}
+//
+//						if (!filePath.empty()) {
+//							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(filePath));
+//						} else {
+//						}
+//					} else {
+////						alert("getFolderUUID isFolder false", 31);
+//					}
 
 					addCommand("Add :objects:"+thisUUID+":isa string PBXGroup");
-
+                    
+                    
+                    bool bFolderPathSet = false;
+                    
 					if (folderName == "external_sources" || folderName == "local_addons") {
-						addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
+                        
+						addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
+                        addCommand("Add :objects:"+thisUUID+":path string ");
+                        bFolderPathSet = true;
 					}
-					else {
-						if (lastFolderUUID == projRootUUID ||
-							lastFolder == "external_sources" || lastFolder == "local_addons") { //
-
-//							alert ("external_sources base = " + ofPathToString(base), 33);
-
-							// Base folders can be in a different depth,
-							// so we cut folders to point to the right path
-							fs::path base2 { base };
-							size_t diff = folders.size() - (a+1);
-							for (size_t x=0; x<diff; x++) {
-								base2 = base2.parent_path();
-							}
-
-
-							addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
-							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(base2));
+                    else {
+                        if (lastFolderUUID == projRootUUID ){//} ||
+                            //                            lastFolder == "external_sources" || lastFolder == "local_addons") { //
+                            
+                            
+                            
+                            // Base folders can be in a different depth,
+                            // so we cut folders to point to the right path
+                            // ROY: THIS hardly makes sense to me. I can see the purpose of it. base2 is never set to anything.
+                            fs::path base2 { "" };
+                            size_t diff = folders.size() - (a+1);
+                            for (size_t x=0; x<diff; x++) {
+                                base2 = base2.parent_path();
+                            }
+                            alert ("external_sources base = " + ofPathToString(base2) + " UUID: " + thisUUID, 33);
+                            addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
+                            addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(base2));
+                            bFolderPathSet = true;
+                        }else if(lastFolder == "external_sources" || lastFolder == "local_addons") { //
+                            addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
+//                            alert ("xxxx " + lastFolder + "  " + ofPathToString(base) + " UUID: " + thisUUID, 33);
+                            addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(getPathTo(base, folderName)));
+                            bFolderPathSet = true;
 						} else {
 							addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
-							fs::path addonFolder { fs::path(fullPath).filename() };
-							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(addonFolder));
+//							fs::path addonFolder { fs::path(fullPath).filename() };
+							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(fullPath.filename()));
+                            bFolderPathSet = true;
 						}
 					}
 
 					addCommand("Add :objects:"+thisUUID+":children array");
-
-					if (folder.begin()->string() == "addons" || folder.begin()->string() == "src") {
-						addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
-						fs::path addonFolder { fs::path(fullPath).filename() };
-						addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(addonFolder));
-						// alert ("group " + folder.string() + " : " + base.string() + " : " + addonFolder.string(), 32);
-					} else {
-						addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
-					}
-
+                    
+                    if(!bFolderPathSet){
+                        if (folder.begin()->string() == "addons" || folder.begin()->string() == "src"){//} || folder.begin()->string() == "local_addons") {
+                            addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
+                            //						fs::path addonFolder { fs::path(fullPath).filename() };
+                            addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(fullPath.filename()));
+                            // alert ("group " + folder.string() + " : " + base.string() + " : " + addonFolder.string(), 32);
+                        } else {
+                            addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
+                        }
+                    }
 
 					// Add this new folder to its parent, projRootUUID if root
 					addCommand("Add :objects:"+lastFolderUUID+":children: string " + thisUUID);
@@ -373,7 +405,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, bool isFolder, fs::p
 }
 
 void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type){
-	alert ("xcodeProject::addSrc " + ofPathToString(srcFile) + " : " + ofPathToString(folder), 31);
+//	alert ("xcodeProject::addSrc " + ofPathToString(srcFile) + " : " + ofPathToString(folder), 31);
 	
     string ext = ofPathToString(srcFile.extension());
 
@@ -718,7 +750,7 @@ void xcodeProject::addAddonXCFrameworks(const ofAddon& addon){
 
 
 string xcodeProject::addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp) {
-	alert("addFile " + ofPathToString(path) + " : " + ofPathToString(folder) , 31);
+//	alert("addFile " + ofPathToString(path) + " : " + ofPathToString(folder) , 31);
 
 	string UUID { "" };
 
@@ -770,7 +802,19 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 				addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
 			}
 		} else {
-			addCommand("Add :objects:"+UUID+":sourceTree string <group>");
+			
+            if(folder.begin()->string() == "local_addons" || folder.begin()->string() == "external_sources"){
+//                if(path.is_absolute()){
+                    addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
+                    addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
+//                }else{
+//                    if (fs::exists( projectDir / path )) {
+//                        addCommand("Add :objects:"+UUID+":path string " + ofPathToString(projectDir /path));
+//                    }
+//                }
+            }else{
+                addCommand("Add :objects:"+UUID+":sourceTree string <group>");
+            }
 		}
 
 //		string folderUUID;
@@ -785,7 +829,7 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 //		}
 		
 		// Eventually remove isFolder and base parameter
-		std::string folderUUID { getFolderUUID(folder, isFolder) };
+        std::string folderUUID { getFolderUUID(folder, path)};//, isFolder) };
 
 
 		addCommand("# ---- addFileToFolder UUID : " + ofPathToString(folder));

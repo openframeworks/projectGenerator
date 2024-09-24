@@ -99,7 +99,7 @@ protected:
 	// Temporary
 	std::map <string, fs::path> folderFromUUID ;
 	
-	string getFolderUUID(const fs::path & folder, bool isFolder = true, fs::path base = "");
+    string getFolderUUID(const fs::path & folder, fs::path base = "");//, bool isFolder = true, fs::path base = "");
 
 	// TODO: Phase out relRoot. totally
 	fs::path relRoot = "../../..";
