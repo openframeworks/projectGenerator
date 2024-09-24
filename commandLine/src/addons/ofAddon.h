@@ -121,9 +121,10 @@ public:
 	ofAddon() = default;
 	ofAddon(const ofAddon& other);
 
-
-	bool fromFS(const fs::path & path, const string & platform);
-	void parseLibsPath(const fs::path & path, const fs::path & parentFolder);
+    static string cleanName(const string& name);
+    
+    bool load(string addonName, const fs::path& projectDir, const string& targetPlatform);
+	
 	
 
 //	void fromXML(string installXmlName);
@@ -176,7 +177,16 @@ public:
 		return addon.name < name;
 	}
     string addonMakeName;
+    
+   
+    
 private:
+    
+    
+    bool fromFS();
+    void parseLibsPath(const fs::path & path, const fs::path & parentFolder);
+    
+    void addToFolder(const fs::path& path, const fs::path & parentFolder);
 	
 	string currentParseState { "" };
 	string emptyString = { "" };

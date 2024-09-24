@@ -714,7 +714,7 @@ void ofAddon::addToFolder(const fs::path& path, const fs::path & parentFolder){
 }
 
 void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFolder) {
-//	alert ("parseLibsPath " + libsPath.string(), 35);
+	alert ("parseLibsPath " + libsPath.string(), 35);
 	if (!fs::exists(libsPath)) {
 //		alert("file not found " + libsPath.string(), 35);
 		return;
@@ -753,13 +753,14 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 //	}
 
 	for (auto & s : libFiles) {
+        s = fixPath(s);
         addToFolder(s, parentFolder);
 //		fs::path folder;
 //		if (isLocalAddon) {
 //			folder = fs::path { "local_addons" } / fs::relative(s.parent_path(), parentFolder);
 //		} else {
 //			folder = fs::relative(s.parent_path(), getOFRoot());
-//			s = fixPath(s);
+
 //		}
 		srcFiles.emplace_back(s);
 //		filesToFolders[s] = folder;
@@ -807,28 +808,108 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
         addToFolder(f, parentFolder);
 	}
 }
+string ofAddon::cleanName(const string& name){
+    auto addonName = name;
+#ifdef TARGET_WIN32
+    //    std::replace( addonName.begin(), addonName.end(), '/', '\\' );
+    fixSlashOrder(addonName);
+#endif
+        
+    {
+        // in case that addonName contains a comment, get rid of it
+        auto s = ofSplitString(addonName, "#");
+        if(s.size()){
+            addonName = s[0];
+        }
+    }
+    return addonName;
+}
+
+bool ofAddon::load(string addonName, const fs::path& projectDir, const string& targetPlatform){
+    // we want to set addonMakeName before cleaning the addon name, so it is preserved in the exact same way as it was passed, and the addons.make file can be (re)constructed properly
+    addonMakeName = addonName;
+    
+    addonName = cleanName(addonName);
+    
+//    // FIXME : not target, yes platform.
+//#ifdef TARGET_WIN32
+//    //    std::replace( addonName.begin(), addonName.end(), '/', '\\' );
+//    fixSlashOrder(addonName);
+//#endif
+//    
+//    
+//    addonMakeName = addonName;
+//    
+//    {
+//        // in case that addonName contains a comment, get rid of it
+//        auto s = ofSplitString(addonName, "#");
+//        if(s.size()){
+//            addonName = s[0];
+//        }
+//    }
+//    
+    
+    if(addonName.empty()){
+        ofLogError("baseProject::addAddon") << "cant add addon with empty name";
+        return false;
+    }
+    
+    //This should be the only instance where we check if the addon is either local or not.
+    //being local just means that the addon name is a filepath and it starts with a dot.
+    //otherwise it will look in the addons folder.
+    //A local addon is not restricted to one that lives in folder with the name local_addons, should be any valid addon on the filesystem.
+    //Parsing will generate the correct path to both OF and the project.
+    //Everything else should be treated exactly in the same way, regardless of it being local or not.
+    if(addonName[0] == '.' && fs::exists( ofFilePath::join(projectDir, addonName))){
+        
+        addonPath = normalizePath(ofFilePath::join(projectDir, addonName));
+        isLocalAddon = true;
+        ofLogVerbose() << "Adding local addon: " << addonName;
+        //        addon.pathToProject = makeRelative(getOFRoot(), projectDir);
+        //        projectDir;
+    }else{
+        addonPath = fs::path { getOFRoot() / "addons" / addonName };
+    }
+    pathToOF = getOFRoot();
+    
+    
+    pathToOF = normalizePath(pathToOF);
+    addonPath = normalizePath(addonPath);
+    
+    
+    pathToProject = projectDir;
+    
+    this->platform = targetPlatform;
+    
+    ofLogVerbose() << "addonPath to: [" << addonPath.string() << "]";
+    ofLogVerbose() << "pathToOF: [" << pathToOF.string() << "]";
+    
+    
+    return fromFS();
+}
+
+
+bool ofAddon::fromFS(){//const fs::path & path, const string & platform){
+	alert("ofAddon::fromFS path : " + addonPath.string(), 33);
 	
-bool ofAddon::fromFS(const fs::path & path, const string & platform){
-	alert("ofAddon::fromFS path : " + path.string(), 33);
-	
-	if (!fs::exists(path)) {
+	if (!fs::exists(addonPath)) {
 		return false;
 	}
 	
 	clear();
-	this->platform = platform;
+//	this->platform = platform;
 
-	addonPath = path;
+//	addonPath = addonPath;
     
 	
-	name = isLocalAddon ? ofPathToString(path.stem()) : ofPathToString(path.filename());
+	name = isLocalAddon ? ofPathToString(addonPath.stem()) : ofPathToString(addonPath.filename());
 
-	fs::path srcPath { path / "src" };
+	fs::path srcPath { addonPath / "src" };
 	if (fs::exists(srcPath)) {
 		getFilesRecursively(srcPath, srcFiles);
 	}
 
-	fs::path parentFolder { path.parent_path() };
+	fs::path parentFolder { addonPath.parent_path() };
 
 	for (auto & s : srcFiles) {
 //		fs::path folder;
@@ -854,12 +935,15 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
 
 
 
-	fs::path libsPath { path / "libs" };
+	fs::path libsPath { addonPath / "libs" };
 
 	// paths that are needed for the includes.
 	std::list < fs::path > paths;
 
 	// get every folder in addon/src and addon/libs
+    
+    
+    
 	vector < fs::path > libFolders;
 	if (fs::exists(libsPath)) {
 		getFoldersRecursively(libsPath, libFolders, platform);
@@ -868,6 +952,8 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
             paths.emplace_back( fixPath(path) );
 		}
 	}
+    
+    
 
 	vector < fs::path > srcFolders;
 	if (fs::exists(srcPath)) {
@@ -887,12 +973,12 @@ bool ofAddon::fromFS(const fs::path & path, const string & platform){
     // lib paths are directories to parse for libs
     for (auto & a : libsPaths) {
 //		alert(a, 33);
-        parseLibsPath((path / a), parentFolder);
+        parseLibsPath((addonPath / a), parentFolder);
     }
 
 	for (auto & a : additionalLibsFolder) {
 //		parseLibsPath(fs::weakly_canonical(path / a), parentFolder);
-		parseLibsPath((path / a), parentFolder);
+		parseLibsPath((addonPath / a), parentFolder);
 	}
 
 	paths.sort([](const fs::path & a, const fs::path & b) {
