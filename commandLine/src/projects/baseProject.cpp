@@ -301,26 +301,28 @@ bool baseProject::isAddonInCache(const string & addonPath, const string platform
 	return addonsCache[platform].find(addonPath) != addonsCache[platform].end();
 }
 
-void baseProject::addAddon(string addonName){
-    ofLogVerbose("baseProject::addAddon") << addonName;
+void baseProject::addAddon(const std::string& _addonName){
+    ofLogVerbose("baseProject::addAddon") << _addonName;
     //	alert( "baseProject::addAddon " + addonName );
     
+    auto addonName = ofAddon::cleanName(_addonName);
+    
     // FIXME : not target, yes platform.
-#ifdef TARGET_WIN32
-    //	std::replace( addonName.begin(), addonName.end(), '/', '\\' );
-    fixSlashOrder(addonName);
-#endif
+//#ifdef TARGET_WIN32
+//    //	std::replace( addonName.begin(), addonName.end(), '/', '\\' );
+//    fixSlashOrder(addonName);
+//#endif
+//    
     
-    ofAddon addon;
-    addon.addonMakeName = addonName;
-    
-    {
-        auto s = ofSplitString(addonName, "#");
-        if(s.size()){
-            addonName = s[0];
-        }
-    }
-    
+//    addon.addonMakeName = addonName;
+//    
+//    {
+//        auto s = ofSplitString(addonName, "#");
+//        if(s.size()){
+//            addonName = s[0];
+//        }
+//    }
+//    
     
     if(addonName.empty()){
         ofLogError("baseProject::addAddon") << "cant add addon with empty name";
@@ -333,27 +335,29 @@ void baseProject::addAddon(string addonName){
     //A local addon is not restricted to one that lives in folder with the name local_addons, should be any valid addon on the filesystem.
     //Parsing will generate the correct path to both OF and the project.
     //Everything else should be treated exactly in the same way, regardless of it being local or not.
-    if(addonName[0] == '.' && fs::exists( ofFilePath::join(projectDir, addonName))){
-        
-        addon.addonPath = normalizePath(ofFilePath::join(projectDir, addonName));
-        addon.isLocalAddon = true;
-        ofLogVerbose() << "Adding local addon: " << addonName;
-        //        addon.pathToProject = makeRelative(getOFRoot(), projectDir);
-        //        projectDir;
-    }else{
-        addon.addonPath = fs::path { getOFRoot() / "addons" / addonName };
-    }
-    addon.pathToOF = getOFRoot();
+//    if(addonName[0] == '.' && fs::exists( ofFilePath::join(projectDir, addonName))){
+//        
+//        addon.addonPath = normalizePath(ofFilePath::join(projectDir, addonName));
+//        addon.isLocalAddon = true;
+//        ofLogVerbose() << "Adding local addon: " << addonName;
+//        //        addon.pathToProject = makeRelative(getOFRoot(), projectDir);
+//        //        projectDir;
+//    }else{
+//        addon.addonPath = fs::path { getOFRoot() / "addons" / addonName };
+//    }
+//    addon.pathToOF = getOFRoot();
+//    
+//    
+//    
+//    addon.pathToOF = normalizePath(addon.pathToOF);
+//    addon.addonPath = normalizePath(addon.addonPath);
+//    
+//    addon.pathToProject = projectDir;
     
+    ofAddon addon;
     
-    
-    addon.pathToOF = normalizePath(addon.pathToOF);
-    addon.addonPath = normalizePath(addon.addonPath);
-    
-    addon.pathToProject = projectDir;
-    
-    bool addonOK = false;
-    bool inCache = isAddonInCache(addonName, target);
+//    bool addonOK = false;
+//    bool inCache = isAddonInCache(addonName, target);
     
     //	fs::path addonPath { addonName };
     
@@ -365,25 +369,35 @@ void baseProject::addAddon(string addonName){
     //		addon.addonPath = addonPath;
     //	}
     
-    ofLogVerbose() << "addon.addonPath to: [" << addon.addonPath.string() << "]";
-    ofLogVerbose() << "addon.pathToOF: [" << addon.pathToOF.string() << "]";
+//    ofLogVerbose() << "addon.addonPath to: [" << addon.addonPath.string() << "]";
+//    ofLogVerbose() << "addon.pathToOF: [" << addon.pathToOF.string() << "]";
     
-    if (!inCache) {
-        addonOK = addon.fromFS(addon.addonPath, target);
-    } else {
+    if(isAddonInCache(addonName, target)){
         addon = addonsCache[target][addonName];
-        addonOK = true;
+    }else{
+        if(addon.load(_addonName, projectDir, target)){
+            addonsCache[target][addonName] = addon;
+        }else{
+            ofLogVerbose("baseProject::addAddon") << "Ignoring addon that doesn't seem to exist: " << _addonName;
+            return; //if addon does not exist, stop early
+        }
     }
+//    if (!inCache) {
+//        addonOK = addon.fromFS(addon.addonPath, target);
+//    } else {
+//        addon = addonsCache[target][addonName];
+//        addonOK = true;
+//    }
     
-    if(!addonOK){
-        ofLogVerbose() << "Ignoring addon that doesn't seem to exist: " << addonName;
-        return; //if addon does not exist, stop early
-    }
+//    if(!addonOK){
+//        ofLogVerbose() << "Ignoring addon that doesn't seem to exist: " << addonName;
+//        return; //if addon does not exist, stop early
+//    }
     
-    if(!inCache){
-        //cache the addon so we dont have to be reading form disk all the time
-        addonsCache[target][addonName] = addon;
-    }
+//    if(!inCache){
+//        //cache the addon so we dont have to be reading form disk all the time
+//        addonsCache[target][addonName] = addon;
+//    }
 //    
 //    for (auto & a : addons) {
 //        if (a.name == addon.name) return;
