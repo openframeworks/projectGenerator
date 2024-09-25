@@ -293,6 +293,7 @@ bool baseProject::save(){
 		   saveConfig << str << std::endl;
 		}
 	}
+    saveAddonsToJson();
 	return saveProjectFile();
 }
 
@@ -541,7 +542,7 @@ void baseProject::addAddon(ofAddon & addon){
 	 unless there is one addon added which needs another, and it needs another.
 
 	 */
-	alert("---> dependencies");
+//	alert("---> dependencies");
 	for (auto & d : addon.dependencies) {
 		bool found = false;
 		for (auto & a : addons) {
@@ -557,7 +558,7 @@ void baseProject::addAddon(ofAddon & addon){
 			ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << d;
 		}
 	}
-	alert("---> dependencies");
+//	alert("---> dependencies");
 	addons.emplace_back(addon);
 
 	ofLogVerbose("baseProject") << "libs in addAddon " << addon.libs.size();
@@ -687,7 +688,6 @@ void  baseProject::addAddonObjcsrcFiles(const ofAddon& addon){
 
 void  baseProject::addAddonHeadersrcFiles(const ofAddon& addon){
     for (auto & a : addon.headersrcFiles) {
-        
         fs::path normalizedDir = makeRelative(getOFRoot(), a);
         ofLogVerbose("baseProject") << "adding addon header srcFiles: [" << normalizedDir.string() << "]";
         addSrc(normalizedDir, addon.filesToFolders.at(a),HEADER);
@@ -746,8 +746,10 @@ void baseProject::parseAddons(){
 //		alert("line " + addon);
 		if(addon[0] == '#') continue;
 		if(addon == "") continue;
-		auto s = ofSplitString(addon, "#")[0];
-		addAddon(ofSplitString(addon, "#")[0]);
+//		auto s = ofSplitString(addon, "#")[0];
+//		addAddon(ofSplitString(addon, "#")[0]);
+        //we want to keep the comments in the addons.make file since those are use in the package manage
+        addAddon(addon);
 	}
 }
 
