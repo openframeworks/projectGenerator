@@ -81,9 +81,18 @@ public:
 	bool bOverwrite = true;
 
 
-
-
-
+#ifdef OFADDON_OUTPUT_JSON_DEBUG
+    void saveAddonsToJson(){
+        auto dir = ofFilePath::join(projectDir, "addonsJson");
+        ofDirectory::createDirectory(dir, false, true);
+        
+        for(auto& a: addons){
+            ofJson j = a;
+            ofSavePrettyJson(ofFilePath::join(dir, a.name+".json"), j);
+        }
+    }
+#endif
+    
 	// this shouldn't be called by anyone.  call "create(...), save" etc
 private:
 

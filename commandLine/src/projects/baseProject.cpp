@@ -293,7 +293,9 @@ bool baseProject::save(){
 		   saveConfig << str << std::endl;
 		}
 	}
+#ifdef OFADDON_OUTPUT_JSON_DEBUG
     saveAddonsToJson();
+#endif
 	return saveProjectFile();
 }
 
