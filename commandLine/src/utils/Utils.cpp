@@ -365,7 +365,7 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 //	alert ("target " + target, 34);
 //	if (!fs::exists(path) || !fs::is_directory(path)) return;
 	if (!fs::exists(path) || !fs::is_directory(path)) {
-//		alert ("not found!");
+		alert ("getLibsRecursively: path not found!" + path.string(), 31);
 		return;
 	}
 
@@ -418,6 +418,11 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 			}
 		}
 	}
+    
+    for(const auto& l: libLibs){
+        alert(l.path , 35);
+    }
+    
 }
 
 string convertStringToWindowsSeparator(string in) {
