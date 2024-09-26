@@ -13,7 +13,7 @@
 #include "ofSystemUtils.h"
 #include "baseProject.h"
 #include <unordered_set>
-struct LibraryBinary;
+class LibraryBinary;
 
 std::string execute_popen(const char* cmd);
 
