@@ -731,7 +731,9 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
         getXCFrameworksRecursively(libsPath, xcframeworks, "macos");
         getXCFrameworksRecursively(libsPath, xcframeworks, "osx");
         
-        
+        removeDuplicates(libFiles);
+        removeDuplicates(frameworks);
+        removeDuplicates(xcframeworks);
         
     }else{
         
