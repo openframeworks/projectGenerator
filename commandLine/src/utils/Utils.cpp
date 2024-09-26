@@ -418,11 +418,6 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 			}
 		}
 	}
-    
-    for(const auto& l: libLibs){
-        alert(l.path , 35);
-    }
-    
 }
 
 string convertStringToWindowsSeparator(string in) {
