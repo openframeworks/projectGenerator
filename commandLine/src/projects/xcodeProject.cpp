@@ -459,24 +459,29 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 }
 
 void xcodeProject::addCompileFlagsForMMFile(const fs::path & srcFile) {
-	std::ifstream file(srcFile);
-	std::string line;
-	bool containsARCFunctions = false;
-#if __APPLE__
-	std::regex arcRegex(R"(\b(alloc|dealloc)\b)");
-
-	while (std::getline(file, line)) {
-		if (std::regex_search(line, arcRegex)) {
-			containsARCFunctions = true;
-			break;
-		}
-	}
-#endif
-	if (containsARCFunctions) {
-		for (auto & c : buildConfigs) {
-			addCommand("Add :objects:"+c+":buildSettings:OTHER_CPLUSPLUSFLAGS: string -fno-objc-arc");
-		}
-	}
+    
+    // This requires a moro thorough inspection on how to deal with these files, and determine if these need the -fno-objc-arc flag.
+    // This flag should be added on a file by file basis, rather than the way it is done below where these are added globally, as such messes up other things.
+    
+//	std::ifstream file(srcFile);
+//	std::string line;
+//	bool containsARCFunctions = false;
+//#if __APPLE__
+//	std::regex arcRegex(R"(\b(alloc|dealloc)\b)");
+//
+//	while (std::getline(file, line)) {
+//		if (std::regex_search(line, arcRegex)) {
+//			containsARCFunctions = true;
+//			break;
+//		}
+//	}
+//#endif
+//	if (containsARCFunctions) {
+//		for (auto & c : buildConfigs) {
+//			addCommand("Add :objects:"+c+":buildSettings:OTHER_CPLUSPLUSFLAGS: string -fno-objc-arc");
+//		}
+//	}
+    
 }
 
 
