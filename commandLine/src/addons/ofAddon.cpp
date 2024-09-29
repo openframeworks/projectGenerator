@@ -905,24 +905,22 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
     ofLogVerbose() << "pathToOF: [" << pathToOF.string() << "]";
     
     
-    return fromFS();
-}
+//    return fromFS();
+//}
 
 
-bool ofAddon::fromFS(){//const fs::path & path, const string & platform){
+//bool ofAddon::fromFS(){//const fs::path & path, const string & platform){
 	alert("ofAddon::fromFS path : " + addonPath.string(), 33);
 	
 	if (!fs::exists(addonPath)) {
+        ofLogVerbose("ofAddon::load") << "addon does not exist!" << addonPath;
 		return false;
 	}
 	
 	clear();
-//	this->platform = platform;
-
-//	addonPath = addonPath;
+    fs::path addonNamePath { addonName};
     
-	
-	name = isLocalAddon ? ofPathToString(addonPath.stem()) : ofPathToString(addonPath.filename());
+	name = isLocalAddon ? ofPathToString(addonNamePath.stem()) : ofPathToString(addonNamePath.filename());
 
 	fs::path srcPath { addonPath / "src" };
 	if (fs::exists(srcPath)) {
