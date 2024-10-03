@@ -12,9 +12,9 @@ public:
 	xcodeProject(const string & target);
 
 private:
-	virtual bool createProjectFile() override;
-	virtual bool loadProjectFile() override;
-	virtual bool saveProjectFile() override;
+	bool createProjectFile() override;
+	bool loadProjectFile() override;
+	bool saveProjectFile() override;
 	void saveMakefile();
 	bool debugCommands = false;
     
@@ -22,21 +22,21 @@ private:
 
 protected:
 
-    virtual void addAddonFrameworks(const ofAddon& addon) override ;
-    virtual void addAddonXCFrameworks(const ofAddon& addon) override ;
-    virtual void addAddonLibs(const ofAddon& addon) override;
-    virtual void addAddonSrcFiles( ofAddon& addon) override;
+    void addAddonFrameworks(const ofAddon& addon) override ;
+    void addAddonXCFrameworks(const ofAddon& addon) override ;
+    void addAddonLibs(const ofAddon& addon) override;
+    void addAddonSrcFiles( ofAddon& addon) override;
     
     
     
-	virtual void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) override;
-	virtual void addInclude(const fs::path & includeName) override;
-	virtual void addLibrary(const LibraryBinary & lib) override;
-	virtual void addLDFLAG(const string& ldflag, LibType libType = RELEASE_LIB) override;
-	virtual void addCFLAG(const string& cflag, LibType libType = RELEASE_LIB) override; // Other C Flag overrides
-	virtual void addCPPFLAG(const string& cppflag, LibType libType = RELEASE_LIB) override; // Other C++ Flag overrides
-	virtual void addAfterRule(const string& script) override;
-	virtual void addDefine(const string& define, LibType libType = RELEASE_LIB) override;
+	void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) override;
+	void addInclude(const fs::path & includeName) override;
+	void addLibrary(const LibraryBinary & lib) override;
+	void addLDFLAG(const string& ldflag, LibType libType = RELEASE_LIB) override;
+	void addCFLAG(const string& cflag, LibType libType = RELEASE_LIB) override; // Other C Flag overrides
+	void addCPPFLAG(const string& cppflag, LibType libType = RELEASE_LIB) override; // Other C++ Flag overrides
+	void addAfterRule(const string& script) override;
+	void addDefine(const string& define, LibType libType = RELEASE_LIB) override;
 
 	void addCompileFlagsForMMFile(const fs::path & srcFile);
 	void addFramework(const fs::path & path, const fs::path & folder);
