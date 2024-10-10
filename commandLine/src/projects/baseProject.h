@@ -140,7 +140,7 @@ protected:
     virtual void addAddonDllsToCopy(ofAddon& addon);
     virtual void addAddonDefines(const ofAddon& addon);
 
-    virtual addAddonProps(const ofAddon& addon) {};
+    virtual void addAddonProps(const ofAddon& addon) {};
 
     virtual void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) = 0;
     virtual void addInclude(const fs::path & includeName) = 0;
