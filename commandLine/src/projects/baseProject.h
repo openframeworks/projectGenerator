@@ -133,10 +133,10 @@ protected:
 	virtual void addAddonCppflags(const ofAddon& addon);
 	virtual void addAddonLdflags(const ofAddon& addon);
 	virtual void addAddonSrcFiles(ofAddon& addon);
-	virtual void addAddonCsrcFiles(const ofAddon& addon);
-	virtual void addAddonCppsrcFiles(const ofAddon& addon);
-	virtual void addAddonObjcsrcFiles(const ofAddon& addon);
-	virtual void addAddonHeadersrcFiles(const ofAddon& addon);
+	virtual void addAddonCsrcFiles( ofAddon& addon);
+	virtual void addAddonCppsrcFiles( ofAddon& addon);
+	virtual void addAddonObjcsrcFiles( ofAddon& addon);
+	virtual void addAddonHeadersrcFiles( ofAddon& addon);
     virtual void addAddonDllsToCopy(ofAddon& addon);
     virtual void addAddonDefines(const ofAddon& addon);
 

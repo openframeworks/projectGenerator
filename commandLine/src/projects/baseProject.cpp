@@ -687,7 +687,7 @@ void  baseProject::addAddonSrcFiles( ofAddon& addon){
     // }
 }
 
-void  baseProject::addAddonCsrcFiles(const ofAddon& addon){
+void  baseProject::addAddonCsrcFiles(ofAddon& addon){
     // for (auto & a : addon.csrcFiles) {
     //     fs::path normalizedDir = makeRelative(getOFRoot(), a);
     //     ofLogVerbose("baseProject") << "adding addon c srcFiles: " << normalizedDir.string();
@@ -698,13 +698,13 @@ void  baseProject::addAddonCsrcFiles(const ofAddon& addon){
 
 
 
-void baseProject::addAddonCppsrcFiles(const ofAddon& addon) {
+void baseProject::addAddonCppsrcFiles(ofAddon& addon) {
 	addSrcFiles(addon, addon.cppsrcFiles, CPP);
 }
-void baseProject::addAddonObjcsrcFiles(const ofAddon& addon) {
+void baseProject::addAddonObjcsrcFiles(ofAddon& addon) {
 	addSrcFiles(addon, addon.objcsrcFiles, OBJC);
 }
-void baseProject::addAddonHeadersrcFiles(const ofAddon& addon) {
+void baseProject::addAddonHeadersrcFiles(ofAddon& addon) {
 	addSrcFiles(addon, addon.headersrcFiles, HEADER);
 }
 
