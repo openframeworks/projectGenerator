@@ -671,7 +671,7 @@ void baseProject::addSrcFiles(ofAddon& addon, const vector<fs::path> &filepaths,
 		if (bFindInFilesToFolder && (addon.filesToFolders.find(s) == addon.filesToFolders.end())) {
 			addon.filesToFolders[s] = fs::path{""};
 		}
-		fs::path normalizedDir = makeRelative(getOFRoot(), a);
+		fs::path normalizedDir = makeRelative(getOFRoot(), s);
 		ofLogVerbose("baseProject::addSrcFiles") << "Adding addon " << toString(type) << " source file: [" << s.string() << "] folder:[" << addon.filesToFolders[s].string() << "]";
 		addSrc(normalizedDir, addon.filesToFolders[s]);
 	}
