@@ -347,43 +347,41 @@ void visualStudioProject::addInclude(const fs::path & includeName){
 	//appendValue(doc, "Add", "directory", includeName);
 }
 
-void addLibraryPath(const pugi::xpath_node_set & nodes, string libFolder) {
-//	alert ("addLibraryPath " + libFolder);
+void addToNode(const pugi::xpath_node_set & nodes, string item) {
 	for (auto & node : nodes) {
 		string includes = node.node().first_child().value();
 		std::vector < string > strings = ofSplitString(includes, ";");
 		bool bAdd = true;
 		for (size_t i = 0; i < strings.size(); i++) {
-			if (strings[i].compare(libFolder) == 0) {
+			if (strings[i].compare(item) == 0) {
 				bAdd = false;
+				break;
 			}
 		}
 		if (bAdd == true) {
-			strings.emplace_back(libFolder);
-			string libPathsNew = unsplitString(strings, ";");
-			node.node().first_child().set_value(libPathsNew.c_str());
+			strings.emplace_back(item);
+			node.node().first_child().set_value(unsplitString(strings, ";").c_str());
 		}
 	}
 }
 
-void addLibraryName(const pugi::xpath_node_set & nodes, string libName) {
-	for (auto & node : nodes) {
-		string includes = node.node().first_child().value();
-		std::vector < string > strings = ofSplitString(includes, ";");
-		bool bAdd = true;
-		for (size_t i = 0; i < strings.size(); i++) {
-			if (strings[i].compare(libName) == 0) {
-				bAdd = false;
-			}
-		}
-
-		if (bAdd == true) {
-			strings.emplace_back(libName);
-			string libsNew = unsplitString(strings, ";");
-			node.node().first_child().set_value(libsNew.c_str());
-		}
-	}
-}
+// void addLibraryName(const pugi::xpath_node_set & nodes, string lib) {
+// 	for (auto & node : nodes) {
+// 		string includes = node.node().first_child().value();
+// 		std::vector < string > strings = ofSplitString(includes, ";");
+// 		bool bAdd = true;
+// 		for (size_t i = 0; i < strings.size(); i++) {
+// 			if (strings[i].compare(lib) == 0) {
+// 				bAdd = false;
+// 			}
+// 		}
+// 		if (bAdd == true) {
+// 			strings.emplace_back(lib);
+// 			string libNew = unsplitString(strings, ";");
+// 			node.node().first_child().set_value(libNew.c_str());
+// 		}
+// 	}
+// }
 
 void visualStudioProject::addProps(fs::path propsFile){
 //	alert ("visualStudioProject::addProps " + propsFile.string());
@@ -432,14 +430,14 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	if (!libFolderString.empty()) {
 		pugi::xpath_node_set addlLibsDir = doc.select_nodes((linkPath + "AdditionalLibraryDirectories").c_str());
 		ofLogVerbose() << "adding " << lib.arch << " lib path " << linkPath;
-		addLibraryPath(addlLibsDir, libFolderString);
+		addToNode(addlLibsDir, libFolderString);
 	}
 
 	pugi::xpath_node_set addlDeps = doc.select_nodes((linkPath + "AdditionalDependencies").c_str());
-	addLibraryName(addlDeps, libName.string());
+	addToNode(addlDeps, libName.string());
 
-	ofLogVerbose() << "adding lib path " << libFolder;
-	ofLogVerbose() << "adding lib " << libName;
+	ofLogVerbose("visualStudioProject::addLibrary") << "adding lib path " << libFolder;
+	ofLogVerbose("visualStudioProject::addLibrary") << "adding lib " << libName;
 }
 
 
