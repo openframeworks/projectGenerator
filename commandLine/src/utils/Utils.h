@@ -147,7 +147,7 @@ std::string normalizePath(const std::string& path);
 fs::path normalizePath(const fs::path& path);
 
 bool containsSourceFiles(const fs::path& dir);
-fs::path ofRelativeToOFPATH(const fs::path& path);
+// fs::path ofRelativeToOFPATH(const fs::path& path);
 
 /*
  Idea: create an object to hold the origin and destination files, with renames where needed

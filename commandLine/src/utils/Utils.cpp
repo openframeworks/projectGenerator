@@ -691,26 +691,26 @@ bool containsSourceFiles(const fs::path& dir) {
 }
 
 
-fs::path ofRelativeToOFPATH(const fs::path& path) {
-	try {
-		fs::path normalized_path = path;
-		std::string path_str = normalized_path.string();
-#ifdef TARGET_WIN32
-		std::regex relative_pattern(R"((\.\.\\\.\.\\\.\.\\)|(\.\.\\\.\.\\\.\.))");
-#else
-		std::regex relative_pattern(R"((\.\.\/\.\.\/\.\.\/))");
-#endif
-		path_str = std::regex_replace(path_str, relative_pattern, "$(OF_PATH)/");
-#ifdef TARGET_WIN32
-		fixSlashOrderPath(normalized_path);
-#endif
-		return normalized_path;
-	} catch (const std::exception& ex) {
-		std::cout << "Canonical path for [" << path << "] threw exception:\n"
-				  << ex.what() << '\n';
-		return fs::path("");
-	}
-}
+// fs::path ofRelativeToOFPATH(const fs::path& path) {
+// 	try {
+// 		fs::path normalized_path = path;
+// 		std::string path_str = normalized_path.string();
+// #ifdef TARGET_WIN32
+// 		std::regex relative_pattern(R"((\.\.\\\.\.\\\.\.\\)|(\.\.\\\.\.\\\.\.))");
+// #else
+// 		std::regex relative_pattern(R"((\.\.\/\.\.\/\.\.\/))");
+// #endif
+// 		path_str = std::regex_replace(path_str, relative_pattern, "$(OF_PATH)/");
+// #ifdef TARGET_WIN32
+// 		fixSlashOrderPath(normalized_path);
+// #endif
+// 		return normalized_path;
+// 	} catch (const std::exception& ex) {
+// 		std::cout << "Canonical path for [" << path << "] threw exception:\n"
+// 				  << ex.what() << '\n';
+// 		return fs::path("");
+// 	}
+// }
 
 
 

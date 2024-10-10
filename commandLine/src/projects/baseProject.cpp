@@ -567,7 +567,6 @@ void baseProject::addAddon(ofAddon & addon){
 
     addAddonBegin(addon);
 
-    
     addAddonDllsToCopy(addon);
     
     addAddonLibsPaths(addon);
@@ -599,6 +598,9 @@ void baseProject::addAddon(ofAddon & addon){
 
 
 void  baseProject::addAddonLibsPaths(const ofAddon& addon){
+	if(addon.libsPaths.size()){
+		ofLogWarning("baseProject::addAddonLibsPaths") << "this is not implemented!";
+	}
     for (auto & lib: addon.libsPaths){
         ofLogVerbose("adding lib paths") << lib.string();
     }
@@ -606,13 +608,14 @@ void  baseProject::addAddonLibsPaths(const ofAddon& addon){
 
 void  baseProject::addAddonIncludePaths(const ofAddon& addon){
     for (auto & e : addon.includePaths) {
+        ofLogVerbose("baseProject") << "----------------------------------------------------------------";
         fs::path normalizedDir = normalizePath(projectDir);
-        ofLogVerbose("baseProject") << "[addon.includePaths] adding addon include path: [" << normalizedDir << "]";
+        ofLogVerbose("baseProject") << "[addon.includePaths] adding addon include path: [" << e.string() << "]";
         if (containsSourceFiles(normalizedDir)) {
             normalizedDir = makeRelative(projectDir, e);
             ofLogVerbose() << "[addon.includePaths] contains src - Adding dir: [" << normalizedDir.string() << "]";
-            fs::path ofpathChanged = ofRelativeToOFPATH(projectDir);
-            ofLogVerbose() << "[addon.includePaths] OFPATH: rel include dir: [" << ofpathChanged.string() << "]";
+            // fs::path ofpathChanged = ofRelativeToOFPATH(projectDir);
+            // ofLogVerbose() << "[addon.includePaths] OFPATH: rel include dir: [" << ofpathChanged.string() << "]";
             
             addInclude(normalizedDir);
         } else {
