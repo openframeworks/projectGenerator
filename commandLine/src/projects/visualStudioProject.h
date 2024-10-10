@@ -30,7 +30,7 @@ public:
 	void addAddonCppflags(const ofAddon& addon) override;
 
 	void addAddonDefines(const ofAddon& addon) override;
-    void addAddonDllsToCopy(ofAddon& addon) override;
+
 	void addAddonProps(const ofAddon& addon) override;
 
 	void addAddonBegin(const ofAddon& addon) override;
