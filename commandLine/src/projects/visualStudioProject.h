@@ -23,8 +23,20 @@ public:
     void addAfterRule(const std::string& script) override {}
     
     
-    void ensureDllDirectoriesExist() ;
-    void addAddon(ofAddon & addon) ;
+
+	void addAddonIncludePaths(const ofAddon& addon) override;
+
+	void addAddonCflags(const ofAddon& addon) override;
+	void addAddonCppflags(const ofAddon& addon) override;
+
+	void addAddonDefines(const ofAddon& addon) override;
+    void addAddonDllsToCopy(ofAddon& addon) override;
+	void addAddonProps(const ofAddon& addon) override;
+
+	void addAddonBegin(const ofAddon& addon) override;
+
+
+   void ensureDllDirectoriesExist() ;
 
 	static std::string LOG_NAME;
 
@@ -34,6 +46,8 @@ public:
 
 	vector <fs::path> additionalvcxproj;
 	fs::path solution;
-private:
+protected:
+	void addSrcFiles(ofAddon& addon, const vector<fs::path> &filepaths, SrcType type, bool bFindInFilesToFolder = true) override;
+
 
 };
