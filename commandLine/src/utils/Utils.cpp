@@ -426,28 +426,29 @@ string convertStringToWindowsSeparator(string in) {
 }
 
 void fixSlashOrder(std::string &toFix) {
-	std::replace(toFix.begin(), toFix.end(), '/', '\\');
-	// Remove duplicate backslashes
-	toFix = std::regex_replace(toFix, std::regex(R"(\\\\)"), R"(\\)");
-	toFix = std::regex_replace(toFix, std::regex(R"(\\\\\\)"), R"(\\\\)");
+	// std::replace(toFix.begin(), toFix.end(), '/', '\\');
+	// // Remove duplicate backslashes
+	// toFix = std::regex_replace(toFix, std::regex(R"(\\\\)"), R"(\\)");
+	// toFix = std::regex_replace(toFix, std::regex(R"(\\\\\\)"), R"(\\\\)");
 }
 
 void fixSlashOrderPath(fs::path &toFix) {
-	string p = toFix.string();
-	std::replace(p.begin(), p.end(), '/', '\\');
-	// Remove duplicate backslashes
-	p = std::regex_replace(p, std::regex(R"(\\\\)"), R"(\\)");
-	p = std::regex_replace(p, std::regex(R"(\\\\\\)"), R"(\\\\)");
-	toFix = fs::path { p };
+	// string p = toFix.string();
+	// std::replace(p.begin(), p.end(), '/', '\\');
+	// // Remove duplicate backslashes
+	// p = std::regex_replace(p, std::regex(R"(\\\\)"), R"(\\)");
+	// p = std::regex_replace(p, std::regex(R"(\\\\\\)"), R"(\\\\)");
+	// toFix = fs::path { p };
 }
 
 fs::path fixSlashOrderPathReturn(const fs::path &toFix) {
-	string p = toFix.string();
-	std::replace(p.begin(), p.end(), '/', '\\');
-	// Remove duplicate backslashes
-	p = std::regex_replace(p, std::regex(R"(\\\\)"), R"(\\)");
-	p = std::regex_replace(p, std::regex(R"(\\\\\\)"), R"(\\\\)");
-	return fs::path { p };
+	// string p = toFix.string();
+	// std::replace(p.begin(), p.end(), '/', '\\');
+	// // Remove duplicate backslashes
+	// p = std::regex_replace(p, std::regex(R"(\\\\)"), R"(\\)");
+	// p = std::regex_replace(p, std::regex(R"(\\\\\\)"), R"(\\\\)");
+	// return fs::path { p };
+	return toFix;
 }
 
 string unsplitString (std::vector < string > strings, string deliminator ){
