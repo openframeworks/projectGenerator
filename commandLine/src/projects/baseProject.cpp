@@ -663,45 +663,71 @@ void  baseProject::addAddonLdflags(const ofAddon& addon){
     }
 }
 
+void baseProject::addSrcFiles(ofAddon& addon, const vector<fs::path> &filepaths, SrcType type, bool bFindInFilesToFolder){
+	for (auto &s : filepaths) {			
+		if (bFindInFilesToFolder && (addon.filesToFolders.find(s) == addon.filesToFolders.end())) {
+			addon.filesToFolders[s] = fs::path{""};
+		}
+		fs::path normalizedDir = makeRelative(getOFRoot(), a);
+		ofLogVerbose("baseProject::addSrcFiles") << "Adding addon " << toString(type) << " source file: [" << s.string() << "] folder:[" << addon.filesToFolders[s].string() << "]";
+		addSrc(normalizedDir, addon.filesToFolders[s]);
+	}
+}
+
 void  baseProject::addAddonSrcFiles( ofAddon& addon){
-    for (auto & a : addon.srcFiles) {
-        fs::path normalizedDir = makeRelative(getOFRoot(), a);
-        ofLogVerbose("baseProject") << "adding addon srcFiles: " << normalizedDir.string();
-        addSrc(normalizedDir, addon.filesToFolders.at(a));
-    }
+	addSrcFiles(addon, addon.srcFiles, DEFAULT);
+
+    // for (auto & a : addon.srcFiles) {
+    //     fs::path normalizedDir = makeRelative(getOFRoot(), a);
+    //     ofLogVerbose("baseProject") << "adding addon srcFiles: " << normalizedDir.string();
+    //     addSrc(normalizedDir, addon.filesToFolders.at(a));
+    // }
 }
 
 void  baseProject::addAddonCsrcFiles(const ofAddon& addon){
-    for (auto & a : addon.csrcFiles) {
-        fs::path normalizedDir = makeRelative(getOFRoot(), a);
-        ofLogVerbose("baseProject") << "adding addon c srcFiles: " << normalizedDir.string();
-        addSrc(normalizedDir, addon.filesToFolders.at(a), C);
-    }
+    // for (auto & a : addon.csrcFiles) {
+    //     fs::path normalizedDir = makeRelative(getOFRoot(), a);
+    //     ofLogVerbose("baseProject") << "adding addon c srcFiles: " << normalizedDir.string();
+    //     addSrc(normalizedDir, addon.filesToFolders.at(a), C);
+    // }
+	addSrcFiles(addon, addon.csrcFiles, C);
 }
 
-void  baseProject::addAddonCppsrcFiles(const ofAddon& addon){
-    for (auto & a : addon.cppsrcFiles) {
-        fs::path normalizedDir = makeRelative(getOFRoot(), a);
-        ofLogVerbose("baseProject") << "adding addon cpp srcFiles: " << normalizedDir.string();
-        addSrc(normalizedDir, addon.filesToFolders.at(a),CPP);
-    }
+
+
+void baseProject::addAddonCppsrcFiles(const ofAddon& addon) {
+	addSrcFiles(addon, addon.cppsrcFiles, CPP);
+}
+void baseProject::addAddonObjcsrcFiles(const ofAddon& addon) {
+	addSrcFiles(addon, addon.objcsrcFiles, OBJC);
+}
+void baseProject::addAddonHeadersrcFiles(const ofAddon& addon) {
+	addSrcFiles(addon, addon.headersrcFiles, HEADER);
 }
 
-void  baseProject::addAddonObjcsrcFiles(const ofAddon& addon){
-    for (auto & a : addon.objcsrcFiles) {
-        fs::path normalizedDir = makeRelative(getOFRoot(), a);
-        ofLogVerbose("baseProject") << "adding addon objc srcFiles: " << normalizedDir.string();
-        addSrc(normalizedDir, addon.filesToFolders.at(a),OBJC);
-    }
-}
+// void  baseProject::addAddonCppsrcFiles(const ofAddon& addon){
+//     for (auto & a : addon.cppsrcFiles) {
+//         fs::path normalizedDir = makeRelative(getOFRoot(), a);
+//         ofLogVerbose("baseProject") << "adding addon cpp srcFiles: " << normalizedDir.string();
+//         addSrc(normalizedDir, addon.filesToFolders.at(a),CPP);
+//     }
+// }
 
-void  baseProject::addAddonHeadersrcFiles(const ofAddon& addon){
-    for (auto & a : addon.headersrcFiles) {
-        fs::path normalizedDir = makeRelative(getOFRoot(), a);
-        ofLogVerbose("baseProject") << "adding addon header srcFiles: [" << normalizedDir.string() << "]";
-        addSrc(normalizedDir, addon.filesToFolders.at(a),HEADER);
-    }
-}
+// void  baseProject::addAddonObjcsrcFiles(const ofAddon& addon){
+//     for (auto & a : addon.objcsrcFiles) {
+//         fs::path normalizedDir = makeRelative(getOFRoot(), a);
+//         ofLogVerbose("baseProject") << "adding addon objc srcFiles: " << normalizedDir.string();
+//         addSrc(normalizedDir, addon.filesToFolders.at(a),OBJC);
+//     }
+// }
+
+// void  baseProject::addAddonHeadersrcFiles(const ofAddon& addon){
+//     for (auto & a : addon.headersrcFiles) {
+//         fs::path normalizedDir = makeRelative(getOFRoot(), a);
+//         ofLogVerbose("baseProject") << "adding addon header srcFiles: [" << normalizedDir.string() << "]";
+//         addSrc(normalizedDir, addon.filesToFolders.at(a),HEADER);
+//     }
+// }
 
 
 
