@@ -214,7 +214,8 @@ void visualStudioProject::appendFilter(string folderName){
 
 
 void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type){
-//	alert("addSrc " + srcFile.string(), 35);
+	alert("addSrc file: " + srcFile.string(), 35);
+	alert("addSrc folder: " + folder.string(), 35);
 
 	// I had an empty ClCompile field causing errors
 	if (srcFile.empty()) {
@@ -321,9 +322,10 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 }
 
 void visualStudioProject::addInclude(const fs::path & includeName){
-//	alert ("visualStudioProject::addInclude " + includeName, 35);
+	alert ("visualStudioProject::addInclude " + includeName.string(), 35);
 	string inc = includeName.string();
 	fixSlashOrder(inc);
+		alert ("visualStudioProject::addInclude " + inc, 35);
 
 	pugi::xpath_node_set source = doc.select_nodes("//ClCompile/AdditionalIncludeDirectories");
 	for (pugi::xpath_node_set::const_iterator it = source.begin(); it != source.end(); ++it){
@@ -334,6 +336,7 @@ void visualStudioProject::addInclude(const fs::path & includeName){
 		for (size_t i = 0; i < strings.size(); i++){
 			if (strings[i].compare(includeName.string()) == 0){
 				bAdd = false;
+				break;
 			}
 		}
 		if (bAdd == true){
@@ -401,7 +404,7 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	auto libraryName = fs::path { lib.path };
 	auto libFolder = libraryName.parent_path();
 	string libFolderString = libFolder.string();
-	fixSlashOrder(libFolderString);
+	// fixSlashOrder(libFolderString);
 	auto libName = libraryName.filename();
 
 	// Determine the correct link path based on the target and architecture
@@ -474,7 +477,8 @@ void visualStudioProject::addCPPFLAG(const string& cppflag, LibType libType){
 		if(libType==RELEASE_LIB && condition.find("Debug") != string::npos){
 			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
 			found = true;
-		}else if(libType==DEBUG_LIB && condition.find("Release") != string::npos){
+		}
+		else if(libType==DEBUG_LIB && condition.find("Release") != string::npos) {
 			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
 			found = true;
 		}
