@@ -630,12 +630,7 @@ void ofAddon::preParseConfig(){
 }
 
 void ofAddon::parseConfig(){
-//	alert ("ofAddon::parseConfig " + addonPath.string(), 33);
-	fs::path fileName = 
-//    isLocalAddon ?
-//		(pathToProject / addonPath / "addon_config.mk") :
-		(addonPath / "addon_config.mk")
-	;
+	fs::path fileName = (addonPath / "addon_config.mk");
 
 	if (!fs::exists(fileName)) {
 //		ofLogError() << "ofAddon::parseConfig() " << fileName << " not found " << ofPathToString(fileName);
@@ -850,24 +845,6 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
     addonMakeName = addonName;
     
     addonName = cleanName(addonName);
-    
-//    // FIXME : not target, yes platform.
-//#ifdef TARGET_WIN32
-//    //    std::replace( addonName.begin(), addonName.end(), '/', '\\' );
-//    fixSlashOrder(addonName);
-//#endif
-//    
-//    
-//    addonMakeName = addonName;
-//    
-//    {
-//        // in case that addonName contains a comment, get rid of it
-//        auto s = ofSplitString(addonName, "#");
-//        if(s.size()){
-//            addonName = s[0];
-//        }
-//    }
-//    
     
     if(addonName.empty()){
         ofLogError("baseProject::addAddon") << "cant add addon with empty name";
