@@ -159,7 +159,7 @@ void ofAddon::addReplaceStringVector(std::vector<std::string> &variable, const s
 				}
 			}
 
-			if (prefix == "" || val.find(ofPathToString(pathToOF)) == 0 || fs::path{val}.is_absolute()) {
+			if (prefix == "" || val.find(ofPathToString(pathToOF)) == 0 || fs::path{val}.is_absolute() || (val.size() && val[0] == '$')) {
 				variable.emplace_back(val);
 			} else {
 				fs::path p = fs::path{prefix} / val;
@@ -200,8 +200,7 @@ void ofAddon::addReplaceStringVectorPathStr(std::vector<fs::path> &variable, fs:
 					}
 				}
 			}
-
-			if (prefix == "" || val.find(ofPathToString(pathToOF)) == 0 || fs::path { val }.is_absolute()) {
+			if (prefix == "" || val.find(ofPathToString(pathToOF)) == 0 || fs::path { val }.is_absolute() || (val.size() && val[0] == '$')) {
 				variable.emplace_back(fs::path { val });
 			} else {
 				fs::path p = fs::path { prefix } / val;
@@ -253,7 +252,7 @@ void ofAddon::addReplaceStringVectorPathAll(std::vector<fs::path> & variable, fs
 				}
 			}
 
-			if (prefix.string() == "" || val.find(ofPathToString(pathToOF)) == 0 || fs::path{val}.is_absolute()) {
+			if (prefix.string() == "" || val.find(ofPathToString(pathToOF)) == 0 || fs::path{val}.is_absolute() || (val.size() && val[0] == '$')) {
 				variable.emplace_back(fs::path{val});
 			} else {
 				fs::path p = fs::path{prefix} / val;
@@ -292,7 +291,7 @@ void ofAddon::addReplaceStringVectorPath(std::vector<LibraryBinary> &variable, c
 				}
 			}
 
-			if (prefix.empty() || v.find(ofPathToString(pathToOF)) == 0 || fs::path{v}.is_absolute()) {
+			if (prefix.empty() || v.find(ofPathToString(pathToOF)) == 0 || fs::path{v}.is_absolute() || (v.size() && v[0] == '$')) {
 				variable.push_back({ fs::path { v }, "", "" });
 			} else {
 				fs::path p = fs::path{prefix / v };
@@ -332,7 +331,7 @@ void ofAddon::addReplaceStringVectorLibrary(std::vector<LibraryBinary> &variable
 				}
 			}
 
-			if (prefix == "" || v.find(ofPathToString(pathToOF)) == 0 || fs::path{v}.is_absolute()) {
+			if (prefix == "" || v.find(ofPathToString(pathToOF)) == 0 || fs::path{v}.is_absolute() || (v.size() && v[0] == '$')) {
 				variable.push_back({ fs::path { v }, "", "" });
 			} else {
 				fs::path p = fs::path{prefix} / v;
