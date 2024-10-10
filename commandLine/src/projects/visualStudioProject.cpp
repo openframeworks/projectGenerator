@@ -649,7 +649,7 @@ void visualStudioProject::addAddonProps(const ofAddon& addon){
 	// Add props files from the addon
 	for (auto &props : addon.propsFiles) {
 		fs::path normalizedDir = makeRelative(projectDir, props);
-		ofLogVerbose() << "Adding addon props: [" << normalizedDir.string() << "] folder:[" << addon.filesToFolders[props].string() << "]";
+		ofLogVerbose() << "Adding addon props: [" << normalizedDir.string() << "] folder:[" << addon.filesToFolders.at(props).string() << "]";
 		addProps(normalizedDir);
 	}
 }
