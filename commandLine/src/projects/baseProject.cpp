@@ -563,7 +563,9 @@ void baseProject::addAddon(ofAddon & addon){
 //	alert("---> dependencies");
 	addons.emplace_back(addon);
 
-	ofLogVerbose("baseProject") << "libs in addAddon " << addon.libs.size();
+	//ofLogVerbose("baseProject") << "libs in addAddon " << addon.libs.size();
+
+    addAddonBegin(addon);
 
     
     addAddonDllsToCopy(addon);
@@ -582,17 +584,15 @@ void baseProject::addAddon(ofAddon & addon){
 
 
 
-	for (auto & a : addon.defines) {
-		ofLogVerbose() << "adding addon defines: [" << a << "]";
-		addDefine(a);
-	}
-	
+	addAddonDefines(addon);
     addAddonFrameworks(addon);
 	
     addAddonXCFrameworks(addon);
 
     copyAddonData(addon);
     
+    addAddonProps(addon);
+
 }
 
 
@@ -626,6 +626,13 @@ void  baseProject::addAddonIncludePaths(const ofAddon& addon){
 //        ofLogVerbose() << "adding addon include path: [" << normalizedDir.string() + "]";
 //        addInclude(normalizedDir);
 //    }
+}
+
+void baseProject::addAddonDefines(const ofAddon& addon) {
+	for (auto & a : addon.defines) {
+		ofLogVerbose() << "adding addon defines: [" << a << "]";
+		addDefine(a);
+	}
 }
 
 void  baseProject::addAddonLibs(const ofAddon& addon){

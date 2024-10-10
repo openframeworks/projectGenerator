@@ -109,19 +109,22 @@ protected:
     
     virtual void addAddonFrameworks(const ofAddon& addon){}
     virtual void addAddonXCFrameworks(const ofAddon& addon){}
-    virtual  void addAddonLibsPaths(const ofAddon& addon);
-	virtual  void addAddonIncludePaths(const ofAddon& addon);
-	virtual  void addAddonLibs(const ofAddon& addon);
-	virtual  void addAddonCflags(const ofAddon& addon);
-	virtual  void addAddonCppflags(const ofAddon& addon);
-	virtual  void addAddonLdflags(const ofAddon& addon);
-	virtual  void addAddonSrcFiles(ofAddon& addon);
-	virtual  void addAddonCsrcFiles(const ofAddon& addon);
-	virtual  void addAddonCppsrcFiles(const ofAddon& addon);
-	virtual  void addAddonObjcsrcFiles(const ofAddon& addon);
-	virtual  void addAddonHeadersrcFiles(const ofAddon& addon);
-    virtual  void addAddonDllsToCopy(ofAddon& addon);
+    virtual void addAddonBegin(const ofAddon& addon){}
+    virtual void addAddonLibsPaths(const ofAddon& addon);
+	virtual void addAddonIncludePaths(const ofAddon& addon);
+	virtual void addAddonLibs(const ofAddon& addon);
+	virtual void addAddonCflags(const ofAddon& addon);
+	virtual void addAddonCppflags(const ofAddon& addon);
+	virtual void addAddonLdflags(const ofAddon& addon);
+	virtual void addAddonSrcFiles(ofAddon& addon);
+	virtual void addAddonCsrcFiles(const ofAddon& addon);
+	virtual void addAddonCppsrcFiles(const ofAddon& addon);
+	virtual void addAddonObjcsrcFiles(const ofAddon& addon);
+	virtual void addAddonHeadersrcFiles(const ofAddon& addon);
+    virtual void addAddonDllsToCopy(ofAddon& addon);
+    virtual void addAddonDefines(const ofAddon& addon);
 
+    virtual addAddonProps(const ofAddon& addon) {};
 
     virtual void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) = 0;
     virtual void addInclude(const fs::path & includeName) = 0;
