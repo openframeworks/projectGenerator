@@ -31,6 +31,22 @@ public:
 		KOTLIN
 	};
 
+	std::string toString(SrcType type){
+		switch(type){
+			case DEFAULT: return "DEFAULT";
+			case HEADER: return "HEADER";
+			case CPP: return "CPP";
+			case C: return "C";
+			case OBJC: return "OBJC";
+			case METAL: return "METAL";
+			case SWIFT: return "SWIFT";
+			case JAVA: return "JAVA";
+			case KOTLIN: return "KOTLIN";
+		}
+		return "";
+    }
+
+
 	struct Template {
 //		ofDirectory dir;
 		fs::path dir;
@@ -140,7 +156,8 @@ protected:
     void copyAddonData(ofAddon& addon);
     
     
-    
+	virtual void addSrcFiles(ofAddon& addon, const vector<fs::path> &filepaths, SrcType type, bool bFindInFilesToFolder = true);
+
     
     
 	void recursiveCopyContents(const fs::path & srcDir, const fs::path & destDir);
