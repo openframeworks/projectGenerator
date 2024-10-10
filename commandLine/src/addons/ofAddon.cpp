@@ -152,8 +152,10 @@ void ofAddon::addReplaceStringVector(std::vector<std::string> &variable, const s
 					} else if (!ofGetEnv(varName.c_str()).empty()) {
 						varValue = ofGetEnv(varName.c_str());
 					}
-					ofStringReplace(val, "$(" + varName + ")", varValue);
-					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << val;
+					if(!varValue.empty()){
+						ofStringReplace(val, "$(" + varName + ")", varValue);
+						ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << val;
+					}
 				}
 			}
 
@@ -192,8 +194,10 @@ void ofAddon::addReplaceStringVectorPathStr(std::vector<fs::path> &variable, fs:
 					} else if (!ofGetEnv(varName.c_str()).empty()) {
 						varValue = ofGetEnv(varName.c_str());
 					}
-					ofStringReplace(val, "$(" + varName + ")", varValue);
-					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << val;
+					if(!varValue.empty()){
+						ofStringReplace(val, "$(" + varName + ")", varValue);
+						ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << val;
+					}
 				}
 			}
 
@@ -242,8 +246,10 @@ void ofAddon::addReplaceStringVectorPathAll(std::vector<fs::path> & variable, fs
 					} else if (!ofGetEnv(varName.c_str()).empty()) {
 						varValue = ofGetEnv(varName.c_str());
 					}
-					ofStringReplace(val, "$(" + varName + ")", varValue);
-					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << val;
+					if(!varValue.empty()){
+						ofStringReplace(val, "$(" + varName + ")", varValue);
+						ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << val;
+					}
 				}
 			}
 
@@ -279,8 +285,10 @@ void ofAddon::addReplaceStringVectorPath(std::vector<LibraryBinary> &variable, c
 					} else if (!ofGetEnv(varName.c_str()).empty()) {
 						varValue = ofGetEnv(varName.c_str());
 					}
-					ofStringReplace(v, "$(" + varName + ")", varValue);
-					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << v;
+					if(!varValue.empty()){
+						ofStringReplace(v, "$(" + varName + ")", varValue);
+						ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << v;
+					}
 				}
 			}
 
@@ -317,8 +325,10 @@ void ofAddon::addReplaceStringVectorLibrary(std::vector<LibraryBinary> &variable
 					} else if (!ofGetEnv(varName.c_str()).empty()) {
 						varValue = ofGetEnv(varName.c_str());
 					}
-					ofStringReplace(v, "$(" + varName + ")", varValue);
-					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << v;
+					if(!varValue.empty()){
+						ofStringReplace(v, "$(" + varName + ")", varValue);
+						ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << v;
+					}
 				}
 			}
 
