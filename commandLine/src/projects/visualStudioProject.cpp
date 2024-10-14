@@ -479,10 +479,10 @@ void visualStudioProject::addCompileOption(const string& nodeName, const string&
 	string nodePath = "//ItemDefinitionGroup[contains(@Condition,'" + configuration + "')]/ClCompile/"+nodeName;
 	
 	pugi::xpath_node_set source = doc.select_nodes(nodePath.c_str());
-	if(bPrint){
-		alert("visualStudioProject::addCompileOption " + nodeName + " val: " + value + " del: " + delimiter, 33 );  
-		alert("     nodePath: " + nodePath, 33);
-	}
+	// if(bPrint){
+	// 	alert("visualStudioProject::addCompileOption " + nodeName + " val: " + value + " del: " + delimiter, 33 );  
+	// 	alert("     nodePath: " + nodePath, 33);
+	// }
 
 	addToAllNodes(source, value, delimiter);
 
