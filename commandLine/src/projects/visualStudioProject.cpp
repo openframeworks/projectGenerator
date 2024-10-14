@@ -214,8 +214,8 @@ void visualStudioProject::appendFilter(string folderName){
 
 
 void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type){
-	alert("addSrc file: " + srcFile.string(), 35);
-	alert("addSrc folder: " + folder.string(), 35);
+//	alert("addSrc file: " + srcFile.string(), 35);
+//	alert("addSrc folder: " + folder.string(), 35);
 
 	// I had an empty ClCompile field causing errors
 	if (srcFile.empty()) {
@@ -321,52 +321,81 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 	}
 }
 
-void visualStudioProject::addInclude(const fs::path & includeName){
-	alert ("visualStudioProject::addInclude " + includeName.string(), 35);
-	string inc = includeName.string();
-	fixSlashOrder(inc);
-		alert ("visualStudioProject::addInclude " + inc, 35);
+bool exclusiveAppend( string& values, string item, string delimiter = ";") {
+	auto strings = ofSplitString(values, delimiter);
+	bool bAdd = true;
+	for (size_t i = 0; i < strings.size(); i++) {
+		if (strings[i].compare(item) == 0) {
+			bAdd = false;
+			break;
+		}
+	}
+	if (bAdd == true) {
+		// strings.emplace_back(item);
+		values += delimiter+item;
+		//unsplitString(strings, delimiter);
+		return true;
+	}
+	return false;
+}
 
-	pugi::xpath_node_set source = doc.select_nodes("//ClCompile/AdditionalIncludeDirectories");
-	for (pugi::xpath_node_set::const_iterator it = source.begin(); it != source.end(); ++it){
-		pugi::xpath_node node = *it;
-		std::string includes = node.node().first_child().value();
-		std::vector < std::string > strings = ofSplitString(includes, ";");
-		bool bAdd = true;
-		for (size_t i = 0; i < strings.size(); i++){
-			if (strings[i].compare(includeName.string()) == 0){
-				bAdd = false;
-				break;
+void addToAllNode(const pugi::xpath_node_set & nodes, string item, string delimiter = ";", bool bPrint = false) {
+	for (auto & node : nodes) {
+		std::string values = node.node().first_child().value();
+		if(exclusiveAppend(values, item, delimiter)){
+
+			node.node().first_child().set_value(values.c_str());
+			if(bPrint) {
+				string msg = "Adding To Node: " + string(node.node().first_child().value());
+				alert(msg, 35);
 			}
 		}
-		if (bAdd == true){
-			strings.emplace_back(includeName.string());
-			std::string includesNew = unsplitString(strings, ";");
-//			alert ("includesNew " + includesNew);
-			node.node().first_child().set_value(includesNew.c_str());
-		}
-
+		// std::vector < std::string > strings = ofSplitString(includes, delimiter);
+		// bool bAdd = true;
+		// for (size_t i = 0; i < strings.size(); i++) {
+		// 	if (strings[i].compare(item) == 0) {
+		// 		bAdd = false;
+		// 		break;
+		// 	}
+		// }
+		// if (bAdd == true) {
+		// 	strings.emplace_back(item);
+		// 	node.node().first_child().set_value(unsplitString(strings, delimiter).c_str());
+		// }
 	}
+}
+
+void visualStudioProject::addInclude(const fs::path & includeName){
+	// alert ("visualStudioProject::addInclude " + includeName.string(), 35);
+	// string inc = includeName.string();
+	// fixSlashOrder(inc);
+	//alert ("visualStudioProject::addInclude " + inc, 35);
+
+	pugi::xpath_node_set source = doc.select_nodes("//ClCompile/AdditionalIncludeDirectories");
+	addToAllNode(source, includeName.string());
+
+// 	for (pugi::xpath_node_set::const_iterator it = source.begin(); it != source.end(); ++it){
+// 		pugi::xpath_node node = *it;
+// 		std::string includes = node.node().first_child().value();
+// 		std::vector < std::string > strings = ofSplitString(includes, ";");
+// 		bool bAdd = true;
+// 		for (size_t i = 0; i < strings.size(); i++) {
+// 			if (strings[i].compare(includeName.string()) == 0){
+// 				bAdd = false;
+// 				break;
+// 			}
+// 		}
+// 		if (bAdd == true){
+// 			strings.emplace_back(includeName.string());
+// 			std::string includesNew = unsplitString(strings, ";");
+// //			alert ("includesNew " + includesNew);
+// 			node.node().first_child().set_value(includesNew.c_str());
+// 		}
+
+// 	}
 	//appendValue(doc, "Add", "directory", includeName);
 }
 
-void addToNode(const pugi::xpath_node_set & nodes, string item) {
-	for (auto & node : nodes) {
-		string includes = node.node().first_child().value();
-		std::vector < string > strings = ofSplitString(includes, ";");
-		bool bAdd = true;
-		for (size_t i = 0; i < strings.size(); i++) {
-			if (strings[i].compare(item) == 0) {
-				bAdd = false;
-				break;
-			}
-		}
-		if (bAdd == true) {
-			strings.emplace_back(item);
-			node.node().first_child().set_value(unsplitString(strings, ";").c_str());
-		}
-	}
-}
 
 // void addLibraryName(const pugi::xpath_node_set & nodes, string lib) {
 // 	for (auto & node : nodes) {
@@ -433,87 +462,133 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	if (!libFolderString.empty()) {
 		pugi::xpath_node_set addlLibsDir = doc.select_nodes((linkPath + "AdditionalLibraryDirectories").c_str());
 		ofLogVerbose() << "adding " << lib.arch << " lib path " << linkPath;
-		addToNode(addlLibsDir, libFolderString);
+		addToAllNode(addlLibsDir, libFolderString);
 	}
 
 	pugi::xpath_node_set addlDeps = doc.select_nodes((linkPath + "AdditionalDependencies").c_str());
-	addToNode(addlDeps, libName.string());
+	addToAllNode(addlDeps, libName.string());
 
 	ofLogVerbose("visualStudioProject::addLibrary") << "adding lib path " << libFolder;
 	ofLogVerbose("visualStudioProject::addLibrary") << "adding lib " << libName;
 }
 
 
-void visualStudioProject::addCFLAG(const string& cflag, LibType libType){
-	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
-	// FIXME: iterator
-	for (auto & item : items) {
-		pugi::xml_node additionalOptions;
-		bool found=false;
-		string condition(item.node().attribute("Condition").value());
-		if (libType == RELEASE_LIB && condition.find("Release") != string::npos) {
-			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
-			found = true;
-		}else if(libType==DEBUG_LIB && condition.find("Debug") != string::npos){
-			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
-			found = true;
-		}
-		if(!found) continue;
-		if(!additionalOptions){
-			item.node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(cflag.c_str());
-		}else{
-			additionalOptions.set_value((string(additionalOptions.value()) + " " + cflag).c_str());
-		}
+void visualStudioProject::addCompileOption(const string& nodeName, const string& value, const string& delimiter, LibType libType, bool bPrint){
+
+	string configuration = ((libType == DEBUG_LIB)?"Debug":"Release");
+	string nodePath = "//ItemDefinitionGroup[contains(@Condition,'" + configuration + "')]/ClCompile/"+nodeName;
+	
+	pugi::xpath_node_set source = doc.select_nodes(nodePath.c_str());
+	if(bPrint){
+		alert("visualStudioProject::addCompileOption " + nodeName + " val: " + value + " del: " + delimiter, 33 );  
+		alert("     nodePath: " + nodePath, 33);
 	}
+
+	addToAllNode(source, value, delimiter, bPrint);
+
+
+// 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
+// 	for (auto & item : items) {
+// 		pugi::xml_node options;
+// 		bool found=false;
+// 		string condition(item.node().attribute("Condition").value());
+// 		ofLogNotice() << "Condition: " << condition ;
+// 		if (libType == RELEASE_LIB && condition.find("Release") != string::npos) {
+// 			options = item.node().child("ClCompile").child(nodeName.c_str());
+// 			found = true;
+// 		}else if(libType==DEBUG_LIB && condition.find("Debug") != string::npos){
+// 			options = item.node().child("ClCompile").child(nodeName.c_str());
+// 			found = true;
+// 		}
+// 		if(!found) continue;
+// 		if(!options){
+// 			item.node().child("ClCompile").append_child(nodeName.c_str()).append_child(pugi::node_pcdata).set_value(value.c_str());
+// 		}else{
+// 			string option_values = options.value();
+// 			if(exclusiveAppend(option_values, value, delimiter)){
+// 				alert("adding option: " + option_values, 34);
+// 				options.set_value(option_values.c_str());
+// 			}
+// //			options.set_value((string(options.value()) + delimiter + value).c_str());
+// 		}
+// 		// addToNode(options, value, delimiter);
+// 		doc.print(std::cout);
+// 	}
+}
+
+void visualStudioProject::addCFLAG(const string& cflag, LibType libType){
+	addCompileOption("AdditionalOptions", cflag, " ", libType);
+	// pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
+	// // FIXME: iterator
+	// for (auto & item : items) {
+	// 	pugi::xml_node additionalOptions;
+	// 	bool found=false;
+	// 	string condition(item.node().attribute("Condition").value());
+	// 	if (libType == RELEASE_LIB && condition.find("Release") != string::npos) {
+	// 		additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
+	// 		found = true;
+	// 	}else if(libType==DEBUG_LIB && condition.find("Debug") != string::npos){
+	// 		additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
+	// 		found = true;
+	// 	}
+	// 	if(!found) continue;
+	// 	if(!additionalOptions){
+	// 		item.node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(cflag.c_str());
+	// 	}else{
+	// 		additionalOptions.set_value((string(additionalOptions.value()) + " " + cflag).c_str());
+	// 	}
+	// }
 }
 
 
 void visualStudioProject::addCPPFLAG(const string& cppflag, LibType libType){
-	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
-	for (auto & item : items) {
-		pugi::xml_node additionalOptions;
-		bool found=false;
-		string condition(item.node().attribute("Condition").value());
-		if(libType==RELEASE_LIB && condition.find("Debug") != string::npos){
-			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
-			found = true;
-		}
-		else if(libType==DEBUG_LIB && condition.find("Release") != string::npos) {
-			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
-			found = true;
-		}
-		if(!found) continue;
-		if(!additionalOptions){
-			item.node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(cppflag.c_str());
-		}else{
-			additionalOptions.set_value((string(additionalOptions.value()) + " " + cppflag).c_str());
-		}
-	}
+		addCompileOption("AdditionalOptions", cppflag, " ", libType);
+	// pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
+	// for (auto & item : items) {
+	// 	pugi::xml_node additionalOptions;
+	// 	bool found=false;
+	// 	string condition(item.node().attribute("Condition").value());
+	// 	if(libType==RELEASE_LIB && condition.find("Release") != string::npos){
+	// 		additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
+	// 		found = true;
+	// 	}
+	// 	else if(libType==DEBUG_LIB && condition.find("Debug") != string::npos) {
+	// 		additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
+	// 		found = true;
+	// 	}
+	// 	if(!found) continue;
+	// 	if(!additionalOptions){
+	// 		item.node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(cppflag.c_str());
+	// 	}else{
+	// 		additionalOptions.set_value((string(additionalOptions.value()) + " " + cppflag).c_str());
+	// 	}
+	// }
 }
 
 
 void visualStudioProject::addDefine(const string& define, LibType libType) {
-	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
-	for (auto & item : items) {
-		pugi::xml_node additionalOptions;
-		bool found = false;
-		string condition(item.node().attribute("Condition").value());
-		if (libType == RELEASE_LIB && condition.find("Debug") != string::npos) {
-			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
-			found = true;
-		}
-		else if (libType == DEBUG_LIB && condition.find("Release") != string::npos) {
-			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
-			found = true;
-		}
-		if (!found) continue;
-		if (!additionalOptions) {
-			item.node().child("ClCompile").append_child("PreprocessorDefinitions").append_child(pugi::node_pcdata).set_value(define.c_str());
-		}
-		else {
-			additionalOptions.set_value((string(additionalOptions.value()) + " " + define).c_str());
-		}
-	}
+	addCompileOption("PreprocessorDefinitions", define, ";", libType, true);
+	// pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
+	// for (auto & item : items) {
+	// 	pugi::xml_node preprocessorDefinitions;
+	// 	bool found = false;
+	// 	string condition(item.node().attribute("Condition").value());
+	// 	if (libType == RELEASE_LIB && condition.find("Release") != string::npos) {
+	// 		preprocessorDefinitions = item.node().child("ClCompile").child("PreprocessorDefinitions");
+	// 		found = true;
+	// 	}
+	// 	else if (libType == DEBUG_LIB && condition.find("Debug") != string::npos) {
+	// 		preprocessorDefinitions = item.node().child("ClCompile").child("PreprocessorDefinitions");
+	// 		found = true;
+	// 	}
+	// 	if (!found) continue;
+	// 	if (!preprocessorDefinitions) {
+	// 		item.node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(define.c_str());
+	// 	}
+	// 	else {
+	// 		additionalOptions.set_value((string(additionalOptions.value()) + " " + define).c_str());
+	// 	}
+	// }
 }
 
 void visualStudioProject::ensureDllDirectoriesExist() {
