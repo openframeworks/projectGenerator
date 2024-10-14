@@ -339,7 +339,7 @@ bool exclusiveAppend( string& values, string item, string delimiter = ";") {
 	return false;
 }
 
-void addToAllNode(const pugi::xpath_node_set & nodes, string item, string delimiter = ";", bool bPrint = false) {
+void addToAllNodes(const pugi::xpath_node_set & nodes, string item, string delimiter = ";") {
 	for (auto & node : nodes) {
 		std::string values = node.node().first_child().value();
 		if(exclusiveAppend(values, item, delimiter)){
@@ -372,7 +372,7 @@ void visualStudioProject::addInclude(const fs::path & includeName){
 	//alert ("visualStudioProject::addInclude " + inc, 35);
 
 	pugi::xpath_node_set source = doc.select_nodes("//ClCompile/AdditionalIncludeDirectories");
-	addToAllNode(source, includeName.string());
+	addToAllNodes(source, includeName.string());
 
 // 	for (pugi::xpath_node_set::const_iterator it = source.begin(); it != source.end(); ++it){
 // 		pugi::xpath_node node = *it;
@@ -462,11 +462,11 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	if (!libFolderString.empty()) {
 		pugi::xpath_node_set addlLibsDir = doc.select_nodes((linkPath + "AdditionalLibraryDirectories").c_str());
 		ofLogVerbose() << "adding " << lib.arch << " lib path " << linkPath;
-		addToAllNode(addlLibsDir, libFolderString);
+		addToAllNodes(addlLibsDir, libFolderString);
 	}
 
 	pugi::xpath_node_set addlDeps = doc.select_nodes((linkPath + "AdditionalDependencies").c_str());
-	addToAllNode(addlDeps, libName.string());
+	addToAllNodes(addlDeps, libName.string());
 
 	ofLogVerbose("visualStudioProject::addLibrary") << "adding lib path " << libFolder;
 	ofLogVerbose("visualStudioProject::addLibrary") << "adding lib " << libName;
