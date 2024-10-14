@@ -345,10 +345,10 @@ void addToAllNode(const pugi::xpath_node_set & nodes, string item, string delimi
 		if(exclusiveAppend(values, item, delimiter)){
 
 			node.node().first_child().set_value(values.c_str());
-			if(bPrint) {
-				string msg = "Adding To Node: " + string(node.node().first_child().value());
-				alert(msg, 35);
-			}
+			// if(bPrint) {
+			// 	string msg = "Adding To Node: " + string(node.node().first_child().value());
+			// 	alert(msg, 35);
+			// }
 		}
 		// std::vector < std::string > strings = ofSplitString(includes, delimiter);
 		// bool bAdd = true;
@@ -473,7 +473,7 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 }
 
 
-void visualStudioProject::addCompileOption(const string& nodeName, const string& value, const string& delimiter, LibType libType, bool bPrint){
+void visualStudioProject::addCompileOption(const string& nodeName, const string& value, const string& delimiter, LibType libType){
 
 	string configuration = ((libType == DEBUG_LIB)?"Debug":"Release");
 	string nodePath = "//ItemDefinitionGroup[contains(@Condition,'" + configuration + "')]/ClCompile/"+nodeName;
@@ -484,7 +484,7 @@ void visualStudioProject::addCompileOption(const string& nodeName, const string&
 		alert("     nodePath: " + nodePath, 33);
 	}
 
-	addToAllNode(source, value, delimiter, bPrint);
+	addToAllNodes(source, value, delimiter);
 
 
 // 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
@@ -567,7 +567,7 @@ void visualStudioProject::addCPPFLAG(const string& cppflag, LibType libType){
 
 
 void visualStudioProject::addDefine(const string& define, LibType libType) {
-	addCompileOption("PreprocessorDefinitions", define, ";", libType, true);
+	addCompileOption("PreprocessorDefinitions", define, ";", libType);
 	// pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
 	// for (auto & item : items) {
 	// 	pugi::xml_node preprocessorDefinitions;
