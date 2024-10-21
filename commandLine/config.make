@@ -152,8 +152,6 @@ PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/communication
 PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/events
 PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/gl
 PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/graphics
-#PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/math
-PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/types
 PLATFORM_CORE_EXCLUSIONS += ../../../libs/openFrameworks/video
 
 PLATFORM_CORE_EXCLUSIONS += ../../../libs/boost%
