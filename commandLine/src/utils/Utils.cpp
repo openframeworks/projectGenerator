@@ -374,6 +374,7 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 
 	for(; it != last; ++it) {
 		auto f = it->path();
+//		alert ("file: "+f.string(), 33);
 
 		if (fs::is_directory(f)) {
 			// on osx, framework is a directory, let's not parse it....

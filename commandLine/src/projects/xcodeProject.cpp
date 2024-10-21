@@ -524,17 +524,18 @@ void xcodeProject::addDylib(const fs::path & path, const fs::path & folder){
 
 
 void xcodeProject::addInclude(const fs::path & includeName){
-	//alert("addInclude " + includeName);
+//	alert("addInclude " + includeName.string(), 33);
 	for (auto & c : buildConfigs) {
 		addCommand("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + ofPathToString(includeName));
 	}
 }
 
 void xcodeProject::addLibrary(const LibraryBinary & lib){
-//	alert( "xcodeProject::addLibrary " + lib.path , 33);
+//	alert( "xcodeProject::addLibrary " + lib.path.string() , 33);
 	for (auto & c : buildConfigs) {
-//		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ofPathToString(lib.path));
-		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ofPathToString(fs::relative(lib.path)));
+		// FIXME: maybe this relative can be calculated
+		fs::path rel = fs::relative(lib.path, projectDir);
+		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ofPathToString(rel));
 	}
 }
 
@@ -546,7 +547,7 @@ void xcodeProject::addLDFLAG(string ldflag, LibType libType){
 }
 
 void xcodeProject::addCFLAG(string cflag, LibType libType){
-	//alert("xcodeProject::addCFLAG " + cflag);
+//	alert("xcodeProject::addCFLAG " + cflag);
 	for (auto & c : buildConfigs) {
 		// FIXME: add array here if it doesnt exist
 		addCommand("Add :objects:"+c+":buildSettings:OTHER_CFLAGS: string " + cflag);
