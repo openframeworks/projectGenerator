@@ -31,6 +31,22 @@ public:
 		KOTLIN
 	};
 
+	std::string toString(SrcType type){
+		switch(type){
+			case DEFAULT: return "DEFAULT";
+			case HEADER: return "HEADER";
+			case CPP: return "CPP";
+			case C: return "C";
+			case OBJC: return "OBJC";
+			case METAL: return "METAL";
+			case SWIFT: return "SWIFT";
+			case JAVA: return "JAVA";
+			case KOTLIN: return "KOTLIN";
+		}
+		return "";
+    }
+
+
 	struct Template {
 //		ofDirectory dir;
 		fs::path dir;
@@ -52,19 +68,9 @@ public:
 	void parseConfigMake();
 	bool save();
 
-	virtual void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) = 0;
-	virtual void addInclude(const fs::path & includeName) = 0;
-	virtual void addLibrary(const LibraryBinary & lib) = 0;
 
-	// FIXME: change some strings to const &
-	virtual void addLDFLAG(std::string ldflag, LibType libType = RELEASE_LIB){}
-	virtual void addCFLAG(std::string cflag, LibType libType = RELEASE_LIB){} // C_FLAGS
-	virtual void addCPPFLAG(std::string cppflag, LibType libType = RELEASE_LIB){} // CXX_FLAGS
-	virtual void addAfterRule(std::string script){}
-	virtual void addDefine(std::string define, LibType libType = RELEASE_LIB) {}
-
-	virtual void addAddon(std::string addon);
-	virtual void addAddon(ofAddon & addon);
+    void addAddon(const std::string& addon);
+	void addAddon(ofAddon & addon);
 	virtual void addSrcRecursively(const fs::path & srcPath);
 	
 	virtual void restoreBackup(const fs::path & srcPath){};
@@ -86,14 +92,23 @@ public:
 	std::string projectName;
 	std::string target;
 
-	bool bMakeRelative = false;
+//	bool bMakeRelative = false;
 	
 	bool bOverwrite = true;
 
 
-
-
-
+#ifdef OFADDON_OUTPUT_JSON_DEBUG
+    void saveAddonsToJson(){
+        auto dir = ofFilePath::join(projectDir, "addonsJson");
+        ofDirectory::createDirectory(dir, false, true);
+        
+        for(auto& a: addons){
+            ofJson j = a;
+            ofSavePrettyJson(ofFilePath::join(dir, a.name+".json"), j);
+        }
+    }
+#endif
+    
 	// this shouldn't be called by anyone.  call "create(...), save" etc
 private:
 
@@ -107,6 +122,44 @@ private:
 	// this should get called at the end.
 
 protected:
+    
+    virtual void addAddonFrameworks(const ofAddon& addon){}
+    virtual void addAddonXCFrameworks(const ofAddon& addon){}
+    virtual void addAddonBegin(const ofAddon& addon){}
+    virtual void addAddonLibsPaths(const ofAddon& addon);
+	virtual void addAddonIncludePaths(const ofAddon& addon);
+	virtual void addAddonLibs(const ofAddon& addon);
+	virtual void addAddonCflags(const ofAddon& addon);
+	virtual void addAddonCppflags(const ofAddon& addon);
+	virtual void addAddonLdflags(const ofAddon& addon);
+	virtual void addAddonSrcFiles(ofAddon& addon);
+	virtual void addAddonCsrcFiles( ofAddon& addon);
+	virtual void addAddonCppsrcFiles( ofAddon& addon);
+	virtual void addAddonObjcsrcFiles( ofAddon& addon);
+	virtual void addAddonHeadersrcFiles( ofAddon& addon);
+    virtual void addAddonDllsToCopy(ofAddon& addon);
+    virtual void addAddonDefines(const ofAddon& addon);
+
+    virtual void addAddonProps(const ofAddon& addon) {};
+
+    virtual void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) = 0;
+    virtual void addInclude(const fs::path & includeName) = 0;
+    virtual void addLibrary(const LibraryBinary & lib) = 0;
+
+    virtual void addLDFLAG(const std::string& ldflag, LibType libType = RELEASE_LIB) = 0;
+    virtual void addCFLAG(const std::string& cflag, LibType libType = RELEASE_LIB) = 0; // C_FLAGS
+    virtual void addCPPFLAG(const std::string& cppflag, LibType libType = RELEASE_LIB) = 0; // CXX_FLAGS
+    virtual void addAfterRule(const std::string& script) = 0;
+    virtual void addDefine(const std::string& define, LibType libType = RELEASE_LIB) = 0;
+
+    
+    void copyAddonData(ofAddon& addon);
+    
+    
+	virtual void addSrcFiles(ofAddon& addon, const vector<fs::path> &filepaths, SrcType type, bool bFindInFilesToFolder = true);
+
+    
+    
 	void recursiveCopyContents(const fs::path & srcDir, const fs::path & destDir);
 	void recursiveTemplateCopy(const fs::path & srcDir, const fs::path & destDir);
 	bool recursiveCopy(const fs::path & srcDir, const fs::path & destDir);

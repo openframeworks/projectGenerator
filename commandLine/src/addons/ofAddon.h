@@ -13,6 +13,7 @@
 #include <iostream>
 #include <filesystem>
 
+
 namespace fs = of::filesystem;
 using std::string;
 using std::vector;
@@ -121,9 +122,10 @@ public:
 	ofAddon() = default;
 	ofAddon(const ofAddon& other);
 
-
-	bool fromFS(const fs::path & path, const string & platform);
-	void parseLibsPath(const fs::path & path, const fs::path & parentFolder);
+    static string cleanName(const string& name);
+    
+    bool load(string addonName, const fs::path& projectDir, const string& targetPlatform);
+	
 	
 
 //	void fromXML(string installXmlName);
@@ -175,8 +177,17 @@ public:
 	bool operator <(const ofAddon & addon) const{
 		return addon.name < name;
 	}
-
+    string addonMakeName;
+    
+   
+    
 private:
+    
+    
+//    bool fromFS();
+    void parseLibsPath(const fs::path & path, const fs::path & parentFolder);
+    
+    void addToFolder(const fs::path& path, const fs::path & parentFolder);
 	
 	string currentParseState { "" };
 	string emptyString = { "" };
@@ -227,4 +238,10 @@ private:
 			return fs::path("");
 		}
 	}
+    
+#ifdef OFADDON_OUTPUT_JSON_DEBUG
+public:
+    
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(ofAddon, additionalLibsFolder, libFiles, filesToFolders, srcFiles, csrcFiles, cppsrcFiles, headersrcFiles, objcsrcFiles, propsFiles, libs, dllsToCopy, includePaths, libsPaths, dependencies, cflags,    cppflags,  ldflags, pkgConfigLibs,      frameworks, xcframeworks, data, defines, definesCMAKE, name, addonPath, description, author, tags, url, pathToOF, pathToProject, isLocalAddon, addonMakeName, currentParseState, platform, excludeLibs, excludeSources, excludeIncludes, excludeFrameworks, excludeXCFrameworks)
+#endif
 };

@@ -68,7 +68,7 @@ function getCurrentPlatform() {
     let platform = "unknown";
 
     if (/^win/.test(process.platform)) {
-        platform = 'vs';
+        platform = 'windows';
     } else if (process.platform === "darwin") {
         platform = 'osx';
     } else if (process.platform === "linux") {

@@ -365,7 +365,7 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 //	alert ("target " + target, 34);
 //	if (!fs::exists(path) || !fs::is_directory(path)) return;
 	if (!fs::exists(path) || !fs::is_directory(path)) {
-//		alert ("not found!");
+		alert ("getLibsRecursively: path not found!" + path.string(), 31);
 		return;
 	}
 
@@ -426,28 +426,29 @@ string convertStringToWindowsSeparator(string in) {
 }
 
 void fixSlashOrder(std::string &toFix) {
-	std::replace(toFix.begin(), toFix.end(), '/', '\\');
-	// Remove duplicate backslashes
-	toFix = std::regex_replace(toFix, std::regex(R"(\\\\)"), R"(\\)");
-	toFix = std::regex_replace(toFix, std::regex(R"(\\\\\\)"), R"(\\\\)");
+	// std::replace(toFix.begin(), toFix.end(), '/', '\\');
+	// // Remove duplicate backslashes
+	// toFix = std::regex_replace(toFix, std::regex(R"(\\\\)"), R"(\\)");
+	// toFix = std::regex_replace(toFix, std::regex(R"(\\\\\\)"), R"(\\\\)");
 }
 
 void fixSlashOrderPath(fs::path &toFix) {
-	string p = toFix.string();
-	std::replace(p.begin(), p.end(), '/', '\\');
-	// Remove duplicate backslashes
-	p = std::regex_replace(p, std::regex(R"(\\\\)"), R"(\\)");
-	p = std::regex_replace(p, std::regex(R"(\\\\\\)"), R"(\\\\)");
-	toFix = fs::path { p };
+	// string p = toFix.string();
+	// std::replace(p.begin(), p.end(), '/', '\\');
+	// // Remove duplicate backslashes
+	// p = std::regex_replace(p, std::regex(R"(\\\\)"), R"(\\)");
+	// p = std::regex_replace(p, std::regex(R"(\\\\\\)"), R"(\\\\)");
+	// toFix = fs::path { p };
 }
 
 fs::path fixSlashOrderPathReturn(const fs::path &toFix) {
-	string p = toFix.string();
-	std::replace(p.begin(), p.end(), '/', '\\');
-	// Remove duplicate backslashes
-	p = std::regex_replace(p, std::regex(R"(\\\\)"), R"(\\)");
-	p = std::regex_replace(p, std::regex(R"(\\\\\\)"), R"(\\\\)");
-	return fs::path { p };
+	// string p = toFix.string();
+	// std::replace(p.begin(), p.end(), '/', '\\');
+	// // Remove duplicate backslashes
+	// p = std::regex_replace(p, std::regex(R"(\\\\)"), R"(\\)");
+	// p = std::regex_replace(p, std::regex(R"(\\\\\\)"), R"(\\\\)");
+	// return fs::path { p };
+	return toFix;
 }
 
 string unsplitString (std::vector < string > strings, string deliminator ){
@@ -691,26 +692,26 @@ bool containsSourceFiles(const fs::path& dir) {
 }
 
 
-fs::path ofRelativeToOFPATH(const fs::path& path) {
-	try {
-		fs::path normalized_path = path;
-		std::string path_str = normalized_path.string();
-#ifdef TARGET_WIN32
-		std::regex relative_pattern(R"((\.\.\\\.\.\\\.\.\\)|(\.\.\\\.\.\\\.\.))");
-#else
-		std::regex relative_pattern(R"((\.\.\/\.\.\/\.\.\/))");
-#endif
-		path_str = std::regex_replace(path_str, relative_pattern, "$(OF_PATH)/");
-#ifdef TARGET_WIN32
-		fixSlashOrderPath(normalized_path);
-#endif
-		return normalized_path;
-	} catch (const std::exception& ex) {
-		std::cout << "Canonical path for [" << path << "] threw exception:\n"
-				  << ex.what() << '\n';
-		return fs::path("");
-	}
-}
+// fs::path ofRelativeToOFPATH(const fs::path& path) {
+// 	try {
+// 		fs::path normalized_path = path;
+// 		std::string path_str = normalized_path.string();
+// #ifdef TARGET_WIN32
+// 		std::regex relative_pattern(R"((\.\.\\\.\.\\\.\.\\)|(\.\.\\\.\.\\\.\.))");
+// #else
+// 		std::regex relative_pattern(R"((\.\.\/\.\.\/\.\.\/))");
+// #endif
+// 		path_str = std::regex_replace(path_str, relative_pattern, "$(OF_PATH)/");
+// #ifdef TARGET_WIN32
+// 		fixSlashOrderPath(normalized_path);
+// #endif
+// 		return normalized_path;
+// 	} catch (const std::exception& ex) {
+// 		std::cout << "Canonical path for [" << path << "] threw exception:\n"
+// 				  << ex.what() << '\n';
+// 		return fs::path("");
+// 	}
+// }
 
 
 

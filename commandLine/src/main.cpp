@@ -79,7 +79,7 @@ bool busingEnvVar;
 bool bVerbose;
 bool bAddonsPassedIn;
 bool bForce; // force even if things like ofRoot seem wrong of if update folder looks wonky
-pgMode mode; // what mode are we in?
+pgMode mode; // what mode are we in? //mode is never set to anything else. this is unnecesary.
 bool bRecursive; // do we recurse in update mode?
 bool bHelpRequested; // did we request help?
 bool bListTemplates; // did we request help?
@@ -685,11 +685,14 @@ int main(int argc, char ** argv) {
 //						ofLogNotice() << "project path is: [" << projectPath << "]";
 						auto project = getTargetProject(t);
 						project->create(projectPath, templateName);
-						project->parseAddons();
-
-						for (auto & addon : addons) {
-							project->addAddon(addon);
+						if(bAddonsPassedIn){
+							for (auto & addon : addons) {
+								project->addAddon(addon);
+							}							
+						}else{
+							project->parseAddons();
 						}
+
 						for (auto & s : srcPaths) {
 							project->addSrcRecursively(s);
 						}
