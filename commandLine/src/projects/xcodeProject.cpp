@@ -646,10 +646,15 @@ void  xcodeProject::addAddonLibs(const ofAddon& addon){
         addLibrary(e);
         
         fs::path dylibPath { e.path };
-        fs::path folder = dylibPath.parent_path().lexically_relative(addon.pathToOF);
+
         //		cout << "dylibPath " << dylibPath << endl;
         if (dylibPath.extension() == ".dylib") {
-            addDylib(dylibPath, folder);
+            
+            if(addon.filesToFolders.find(dylibPath) == addon.filesToFolders.end()) {
+                addDylib(dylibPath, dylibPath.parent_path().lexically_relative(addon.pathToOF));
+            }else{
+                addDylib(dylibPath,addon.filesToFolders.at(dylibPath));
+            }
         }
     }
 }
