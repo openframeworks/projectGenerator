@@ -358,6 +358,7 @@ void getDllsRecursively(const fs::path & path, std::vector<fs::path> & dlls, str
 	}
 }
 
+
 void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFiles, std::vector < LibraryBinary > & libLibs, string platform, string arch, string target) {
 //	alert ("getLibsRecursively " + path.string(), 34);
 //	alert ("platform " + platform, 34);
@@ -380,40 +381,48 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 			if ((f.extension() == ".framework") || (f.extension() == ".xcframework")) {
 				it.disable_recursion_pending();
 				continue;
-			} else {
-				auto stem = f.stem();
-				auto archFound = std::find(LibraryBinary::archs.begin(), LibraryBinary::archs.end(), stem);
-				if (archFound != LibraryBinary::archs.end()) {
-					arch = *archFound;
-				} else {
-					auto targetFound = std::find(LibraryBinary::targets.begin(), LibraryBinary::targets.end(), stem);
-					if (targetFound != LibraryBinary::targets.end()) {
-						target = *targetFound;
-					}
-				}
-			}
+			} 
+                //else {
+//				auto stem = f.stem();
+//				auto archFound = std::find(LibraryBinary::archs.begin(), LibraryBinary::archs.end(), stem);
+//				if (archFound != LibraryBinary::archs.end()) {
+//					arch = *archFound;
+//					alert ("arch found: " + arch, 34);
+//				} else {
+//					auto targetFound = std::find(LibraryBinary::targets.begin(), LibraryBinary::targets.end(), stem);
+//					if (targetFound != LibraryBinary::targets.end()) {
+//						target = *targetFound;
+//                        alert ("target found: " + target, 34);
+//					}
+//				}
+//			}
 		} else {
-			auto ext = f.extension();
+			auto ext = ofPathToString(f.extension());
 			bool platformFound = false;
 
-			if(platform!=""){
-				std::vector<string> splittedPath = ofSplitString(f.string(), fs::path("/").make_preferred().string());
-				for(size_t j=0;j<splittedPath.size();j++){
-					if(splittedPath[j]==platform){
-						platformFound = true;
-					}
-				}
-			}
+//			if(platform!=""){
+//				std::vector<string> splittedPath = ofSplitString(f.string(), fs::path("/").make_preferred().string());
+//				for(size_t j=0;j<splittedPath.size();j++){
+//					if(splittedPath[j]==platform){
+//						platformFound = true;
+//					}
+//				}
+//			}
             
             if (!platform.empty() && f.string().find(platform) != std::string::npos) {
                platformFound = true;
             }
 
-			if (ext.string() == ".a" || ext.string() == ".lib" || ext.string() == ".dylib" || ext.string() == ".so" || ext.string() == ".xcframework" || ext.string() == ".framework" || (ext.string() == ".dll" && platform != "vs")) {
+			if (ext == ".a" || ext == ".lib" || ext == ".dylib" || ext == ".so" || ext == ".xcframework" || ext == ".framework" || (ext == ".dll" && platform != "vs")) {
 				if (platformFound){
-					libLibs.push_back({ f.string(), arch, target });
+                    
+                    LibraryBinary lib(normalizePath(f));
+                    if(lib.isValidFor(arch, target)){
+//                        alert ("adding lib " + f.string() + " arch: " +  arch + " target: " + target, 34);
+                        libLibs.push_back(lib);
+                    }
 				}
-			} else if (ext.string() == ".h" || ext.string() == ".hpp" || ext.string() == ".c" || ext.string() == ".cpp" || ext.string() == ".cc" || ext.string() == ".cxx" || ext.string() == ".m" || ext.string() == ".mm") {
+			} else if (ext == ".h" || ext == ".hpp" || ext == ".c" || ext == ".cpp" || ext == ".cc" || ext == ".cxx" || ext == ".m" || ext == ".mm") {
 				libFiles.emplace_back(f);
 			}
 		}
