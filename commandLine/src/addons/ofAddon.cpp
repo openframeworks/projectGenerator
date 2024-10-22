@@ -730,6 +730,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
         getXCFrameworksRecursively(libsPath, xcframeworks, "macos");
         getXCFrameworksRecursively(libsPath, xcframeworks, "osx");
         
+        removeDuplicates(libs);
         removeDuplicates(libFiles);
         removeDuplicates(frameworks);
         removeDuplicates(xcframeworks);
@@ -767,6 +768,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		for (auto & l : libs) {
 //			alert("fixpath before " + ofPathToString(l.path));
 			l.path = fixPath(l.path);
+            addToFolder(l.path , parentFolder);
 //			alert("fixpath after  " + ofPathToString(l.path));
 		}
 //	}
@@ -1006,12 +1008,17 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 	exclude(frameworks, excludeFrameworks);
 	exclude(xcframeworks, excludeXCFrameworks);
 	excludeLibrary(libs, excludeLibs);
+    
+    excludePathStr(libFiles, excludeIncludes);
+    excludePathStr(libFiles, excludeSources);
 
-	ofLogVerbose("ofAddon") << "libs after exclusions " << libs.size();
+    
+    
+//	ofLogVerbose("ofAddon") << "libs after exclusions " << libs.size();
 
-	for (auto & lib: libs) {
-		ofLogVerbose("ofAddon") << lib.path.string();
-	}
+//	for (auto & lib: libs) {
+//		ofLogVerbose("ofAddon") << lib.path.string();
+//	}
 
 	return true;
 }
