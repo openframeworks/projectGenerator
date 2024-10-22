@@ -103,30 +103,57 @@ inline bool isInVector(T item, std::vector<T> & vec){
 	return bIsInVector;
 }
 
+std::string toString(const std::string& str){
+    return str;
+}
 
-inline void removeDuplicates(std::vector<std::string> & vec){
+std::string toString(const fs::path& path){
+    return ofPathToString(path);
+}
+
+std::string toString(const LibraryBinary& lib){
+    return ofPathToString(lib.path);
+}
+
+template<typename T>
+inline void removeDuplicates(std::vector<T> & vec){
     std::unordered_set<std::string> seen;
-    std::vector<std::string> output;
+    std::vector<T> output;
     
     for (const auto& value : vec) {
-        if (seen.insert(value).second) { // If insertion is successful (element not seen before)
+        if (seen.insert(toString(value)).second) { // If insertion is successful (element not seen before)
             output.push_back(value);
         }
     }
     vec = std::move(output);
 }
 
-inline void removeDuplicates(std::vector<fs::path> & vec){
-    std::unordered_set<std::string> seen;
-    std::vector<fs::path> output;
-    
-    for (const auto& value : vec) {
-        if (seen.insert(value.string()).second) { // If insertion is successful (element not seen before)
-            output.emplace_back(value);
-        }
-    }
-    vec = std::move(output);
-}
+//inline void removeDuplicates(std::vector<fs::path> & vec){
+//    std::unordered_set<std::string> seen;
+//    std::vector<fs::path> output;
+//    
+//    for (const auto& value : vec) {
+//        if (seen.insert(value.string()).second) { // If insertion is successful (element not seen before)
+//            output.emplace_back(value);
+//        }
+//    }
+//    vec = std::move(output);
+//}
+//
+//inline void removeDuplicates(std::vector<LibraryBinary> & vec){
+//    std::unordered_set<std::string> seen;
+//    std::vector<fs::path> output;
+//    
+//    for (const auto& value : vec) {
+//        if (seen.insert(value.string()).second) { // If insertion is successful (element not seen before)
+//            output.emplace_back(value);
+//        }
+//    }
+//    vec = std::move(output);
+//}
+
+
+
 
 string colorText(const string & s, int color = 32);
 void alert(string msg, int color=32);
