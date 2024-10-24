@@ -17,16 +17,8 @@
 namespace fs = of::filesystem;
 using std::string;
 using std::vector;
-// #include <map>
-// About Metadata
 
-const vector<string> AddonMetaVariables {
-	"ADDON_NAME",
-	"ADDON_DESCRIPTION",
-	"ADDON_AUTHOR",
-	"ADDON_TAGS",
-	"ADDON_URL",
-};
+
 
 const vector<string> parseStates {
 	"meta",
@@ -53,7 +45,6 @@ const vector<string> parseStates {
 	"visionos",
 };
 
-// About Project settings
 
 // About Build Settings
 const string ADDON_DEPENDENCIES = "ADDON_DEPENDENCIES";
@@ -63,6 +54,7 @@ const string ADDON_CPPFLAGS = "ADDON_CPPFLAGS";
 const string ADDON_LDFLAGS = "ADDON_LDFLAGS";
 const string ADDON_LIBS = "ADDON_LIBS";
 const string ADDON_DEFINES = "ADDON_DEFINES";
+const string ADDON_ADDITIONAL_LIBS = "ADDON_ADDITIONAL_LIBS";
 
 // About Source Codes
 const string ADDON_SOURCES = "ADDON_SOURCES";
@@ -85,6 +77,21 @@ const string ADDON_PKG_CONFIG_LIBRARIES = "ADDON_PKG_CONFIG_LIBRARIES";
 const string ADDON_FRAMEWORKS = "ADDON_FRAMEWORKS";
 const string ADDON_XCFRAMEWORKS = "ADDON_XCFRAMEWORKS";
 const string ADDON_DLLS_TO_COPY = "ADDON_DLLS_TO_COPY";
+
+// About Metadata
+const string ADDON_NAME = "ADDON_NAME";
+const string ADDON_DESCRIPTION = "ADDON_DESCRIPTION";
+const string ADDON_AUTHOR = "ADDON_AUTHOR";
+const string ADDON_TAGS = "ADDON_TAGS";
+const string ADDON_URL = "ADDON_URL";
+
+const vector<string> AddonMetaVariables {
+    ADDON_NAME,
+    ADDON_DESCRIPTION,
+    ADDON_AUTHOR,
+    ADDON_TAGS,
+    ADDON_URL,
+};
 
 const vector<string> AddonProjectVariables = {
 	ADDON_DEPENDENCIES,
@@ -113,6 +120,7 @@ const vector<string> AddonProjectVariables = {
 	ADDON_PKG_CONFIG_LIBRARIES,
 	ADDON_FRAMEWORKS,
 	ADDON_DLLS_TO_COPY,
+    ADDON_ADDITIONAL_LIBS,
 };
 
 class ofAddon {

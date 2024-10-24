@@ -360,35 +360,36 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 
     fs::path addonRelPath = makeRelative(pathToProject, addonPath);
 	if (variable == "ADDON_ADDITIONAL_LIBS") {
+	if (variable == ADDON_ADDITIONAL_LIBS) {
 		additionalLibsFolder.emplace_back(fs::path { value });
 		return;
 	}
 	
-	else if (variable == "ADDON_DESCRIPTION") {
+	else if (variable == ADDON_DESCRIPTION) {
 		addReplaceString(description, value, addToValue);
 		return;
 	}
 
-	else if(variable == "ADDON_AUTHOR"){
+	else if(variable == ADDON_AUTHOR){
 		addReplaceString(author,value,addToValue);
 		return;
 	}
 
-	else if(variable == "ADDON_TAGS"){
+	else if(variable == ADDON_TAGS){
 		addReplaceStringVector(tags,value,emptyString,addToValue);
 		return;
 	}
 
-	else if(variable == "ADDON_URL"){
+	else if(variable == ADDON_URL){
 		addReplaceString(url,value,addToValue);
 		return;
 	}
 
-	else if(variable == "ADDON_DEPENDENCIES"){
+	else if(variable == ADDON_DEPENDENCIES){
 		addReplaceStringVector(dependencies,value,emptyString,addToValue);
 	}
 
-	else if(variable == "ADDON_INCLUDES"){
+	else if(variable == ADDON_INCLUDES){
 		addReplaceStringVectorPathPrefix(includePaths, value, addonRelPath, addToValue);
 	}
 
