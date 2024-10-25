@@ -855,7 +855,7 @@ string ofAddon::cleanName(const string& name){
 
 bool ofAddon::load(string addonName, const fs::path& projectDir, const string& targetPlatform){
     // we want to set addonMakeName before cleaning the addon name, so it is preserved in the exact same way as it was passed, and the addons.make file can be (re)constructed properly
-    addonMakeName = addonName;
+    this->addonMakeName = addonName;
     
     addonName = cleanName(addonName);
     
@@ -872,34 +872,27 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
     //Everything else should be treated exactly in the same way, regardless of it being local or not.
     if(addonName[0] == '.' && fs::exists( ofFilePath::join(projectDir, addonName))){
         
-        addonPath = normalizePath(ofFilePath::join(projectDir, addonName));
-        isLocalAddon = true;
+        this->addonPath = normalizePath(ofFilePath::join(projectDir, addonName));
+        this->isLocalAddon = true;
         ofLogVerbose() << "Adding local addon: " << addonName;
         //        addon.pathToProject = makeRelative(getOFRoot(), projectDir);
         //        projectDir;
     }else{
-        addonPath = fs::path { getOFRoot() / "addons" / addonName };
+        this->addonPath = fs::path { getOFRoot() / "addons" / addonName };
     }
-    pathToOF = getOFRoot();
+    this->pathToOF = normalizePath(getOFRoot());
+    
+    this->addonPath = normalizePath(addonPath);
     
     
-    pathToOF = normalizePath(pathToOF);
-    addonPath = normalizePath(addonPath);
-    
-    
-    pathToProject = projectDir;
+    this->pathToProject = projectDir;
     
     this->platform = targetPlatform;
     
     ofLogVerbose() << "addonPath to: [" << addonPath.string() << "]";
     ofLogVerbose() << "pathToOF: [" << pathToOF.string() << "]";
     
-    
-//    return fromFS();
-//}
 
-
-//bool ofAddon::fromFS(){//const fs::path & path, const string & platform){
 	alert("ofAddon::fromFS path : " + addonPath.string(), 33);
 	
 	if (!fs::exists(addonPath)) {
@@ -916,32 +909,22 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 	if (fs::exists(srcPath)) {
 		getFilesRecursively(srcPath, srcFiles);
 	}
+    
+//    printPaths(srcFiles, "srcFiles", 34);
+    
 
 	fs::path parentFolder { addonPath.parent_path() };
-
-	for (auto & s : srcFiles) {
-//		fs::path folder;
+    
+    for (auto & s : srcFiles) {
         fs::path sFS { fixPath(s) };
         s = sFS;
         addToFolder(s, parentFolder);
-//		if (isLocalAddon) {
-////			fs::path sFS { s };
-//            
-//			folder = fs::path { "local_addons" } / fs::relative(sFS.parent_path(), parentFolder);
-//		} else {
-//			
-//			folder = fs::relative(sFS.parent_path(), getOFRoot());
-//		}
-//		filesToFolders[s] = folder;
-	}
-
+    }
 	
 	if (platform == "vs" || platform == "msys2") {
 		// here addonPath is the same as path.
 		getPropsRecursively(addonPath, propsFiles, platform);
 	}
-
-
 
 	fs::path libsPath { addonPath / "libs" };
 
@@ -950,31 +933,35 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 
 	// get every folder in addon/src and addon/libs
     
-    
-    
-	vector < fs::path > libFolders;
-	if (fs::exists(libsPath)) {
+    if (fs::exists(libsPath)) {
+        vector < fs::path > libFolders;
 		getFoldersRecursively(libsPath, libFolders, platform);
 		for (auto & path : libFolders) {
-//			paths.emplace_back( isLocalAddon ? path : fixPath(path) );
             paths.emplace_back( fixPath(path) );
 		}
 	}
     
-    
-
-	vector < fs::path > srcFolders;
-	if (fs::exists(srcPath)) {
+    if (fs::exists(srcPath)) {
+        vector < fs::path > srcFolders;
 		getFoldersRecursively(srcPath, srcFolders, platform);
 		for (auto & path : srcFolders) {
-//			paths.emplace_back( isLocalAddon ? path : fixPath(path) );
             paths.emplace_back( fixPath(path) );
 		}
 	}
-
+    
+    paths.sort([](const fs::path & a, const fs::path & b) {
+        return a.string() < b.string();
+    });
 	
-	// FIXME: MARK: - HACK:
-	preParseConfig();
+    for (auto & p : paths) {
+        includePaths.emplace_back(p);
+    }
+
+    
+    // FIXME: MARK: - HACK:
+//	preParseConfig();
+
+    parseConfig();
 
 	parseLibsPath(libsPath, parentFolder);
     
@@ -989,43 +976,32 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 		parseLibsPath((addonPath / a), parentFolder);
 	}
 
-	paths.sort([](const fs::path & a, const fs::path & b) {
-		return a.string() < b.string();
-	});
 
-	for (auto & p : paths) {
-		includePaths.emplace_back(p);
-	}
-	
-	parseConfig();
-
-	excludePathStr(includePaths, excludeIncludes);
+	exclude(includePaths, excludeIncludes);
 	
 	// Dimitre. I've added this here to exclude some srcFiles from addons,
 	// ofxAssimpModelLoader was adding some files from libs/assimp/include/assimp/port/AndroidJNI
 	// even when the folder was excluded from includePaths
-	excludePathStr(srcFiles, excludeIncludes);
+    // Roy: The purpose of not excluding the includes from srcFiles is to be able to keep a folder path out of the include paths but still have those in the IDE.
+    // Which was the behaviour we had before. If an addon needs to exclude something from the src folder on a platform specific way it should use the
+    // ADDON_SOURCES_EXCLUDE exclude field of the addon_config.mk file
+    
+//	excludePathStr(srcFiles, excludeIncludes);
 	
-	excludePathStr(srcFiles, excludeSources);
-	excludePathStr(csrcFiles, excludeSources);
-	excludePathStr(cppsrcFiles, excludeSources);
-	excludePathStr(objcsrcFiles, excludeSources);
-	excludePathStr(headersrcFiles, excludeSources);
+	exclude(srcFiles, excludeSources);
+	exclude(csrcFiles, excludeSources);
+	exclude(cppsrcFiles, excludeSources);
+	exclude(objcsrcFiles, excludeSources);
+	exclude(headersrcFiles, excludeSources);
 	//	exclude(propsFiles, excludeSources);
 	exclude(frameworks, excludeFrameworks);
 	exclude(xcframeworks, excludeXCFrameworks);
-	excludeLibrary(libs, excludeLibs);
+	exclude(libs, excludeLibs);
     
-    excludePathStr(libFiles, excludeIncludes);
-    excludePathStr(libFiles, excludeSources);
+    exclude(libFiles, excludeIncludes);
+    exclude(libFiles, excludeSources);
 
-    
-    
-//	ofLogVerbose("ofAddon") << "libs after exclusions " << libs.size();
-
-//	for (auto & lib: libs) {
-//		ofLogVerbose("ofAddon") << lib.path.string();
-//	}
+  
 
 	return true;
 }
