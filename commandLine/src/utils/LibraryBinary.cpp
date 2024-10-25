@@ -11,7 +11,7 @@ LibraryBinary::LibraryBinary(fs::path p):path(p){
 
 std::string findStringsInPath(const std::vector<std::string> & strings, const std::filesystem::path & path){
     for (const auto& part : path) {
-        auto p = ofPathToString(part);
+        std::string p = ofPathToString(part);
         if (std::find(strings.begin(), strings.end(), p) != strings.end()) {
             return p;
         }

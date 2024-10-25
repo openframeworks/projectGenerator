@@ -40,6 +40,13 @@ public:
     ///\return true if valid false otherwise
     bool isValidFor(const std::string& arch, const std::string& target);
     
+    
+    operator fs::path() const {
+        return path;
+//        return ofPathToString(path);
+    }
+
+    
 protected:
     void findArch(const std::filesystem::path & path);
     void findTarget(const std::filesystem::path & path);
