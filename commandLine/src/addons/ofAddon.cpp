@@ -87,9 +87,6 @@ bool ofAddon::checkCorrectPlatform(const string & state) {
 		}
 	}
 	return false;
-//	return std::find(parseStates.begin(),
-//					 parseStates.end(),
-//					 state) != parseStates.end();
 }
 
 
@@ -112,19 +109,19 @@ void ofAddon::addReplaceString(std::string &variable, const std::string &value, 
 	if (addToVariable) variable += value;
 	else variable = value;
 }
+//
+//void ofAddon::addReplaceStringPath(fs::path & variable, const std::string & value, bool addToVariable) {
+//	if (addToVariable)
+//		variable = fs::path {
+//			variable / value
+//		};
+//	else
+//		variable = fs::path { value };
+//}
 
-void ofAddon::addReplaceStringPath(fs::path & variable, const std::string & value, bool addToVariable) {
-	if (addToVariable)
-		variable = fs::path {
-			variable / value
-		};
-	else
-		variable = fs::path { value };
-}
-
-void ofAddon::addReplaceStringVectorPre(std::vector<std::string> &variable, const std::string &value, fs::path &prefix, bool addToVariable) {
-	addReplaceStringVector(variable, value, prefix.string(), addToVariable);
-}
+//void ofAddon::addReplaceStringVectorPre(std::vector<std::string> &variable, const std::string &value, fs::path &prefix, bool addToVariable) {
+//	addReplaceStringVector(variable, value, prefix.string(), addToVariable);
+//}
 
 
 void ofAddon::addReplaceStringVector(std::vector<std::string> &variable, const std::string &value, const std::string &prefix, bool addToVariable) {
@@ -215,52 +212,52 @@ void ofAddon::addReplaceStringVectorPath(std::vector<fs::path> &variable, const 
 	addReplaceStringVectorPathStr(variable, pathValue, prefix, addToVariable);
 }
 
-void ofAddon::addReplaceStringVectorPathPrefix(std::vector<fs::path> &variable, const std::string &value, fs::path &prefix, bool addToVariable) {
-	fs::path pathValue = fs::path { value };
-	addReplaceStringVectorPathStr(variable, pathValue, prefix.string(), addToVariable);
-}
+//void ofAddon::addReplaceStringVectorPathPrefix(std::vector<fs::path> &variable, const std::string &value, fs::path &prefix, bool addToVariable) {
+//	fs::path pathValue = fs::path { value };
+//	addReplaceStringVectorPathStr(variable, pathValue, prefix.string(), addToVariable);
+//}
 
-void ofAddon::addReplaceStringVectorPathAll(std::vector<fs::path> & variable, fs::path & value, fs::path & prefix, bool addToVariable) {
-	if (value == prefix) return;
-
-	std::vector<std::string> values;
-	if (value.string().find("\"") != std::string::npos) {
-		values = ofSplitString(value.string(), "\"", true, true);
-	} else {
-		values = ofSplitString(value.string(), " ", true, true);
-	}
-
-	if (!addToVariable) variable.clear();
-
-	std::regex findVar("(\\$\\()(.+)(\\))");
-	for (auto &val : values) {
-		if (val != "") {
-			std::smatch varMatch;
-			if (std::regex_search(val, varMatch, findVar)) {
-				if (varMatch.size() > 2) {
-					std::string varName = varMatch[2].str();
-					std::string varValue;
-					if (varName == "OF_ROOT") {
-						varValue = ofPathToString(pathToOF);
-					} else if (!ofGetEnv(varName.c_str()).empty()) {
-						varValue = ofGetEnv(varName.c_str());
-					}
-					if(!varValue.empty()){
-						ofStringReplace(val, "$(" + varName + ")", varValue);
-						ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << val;
-					}
-				}
-			}
-
-			if (prefix.string() == "" || val.find(ofPathToString(pathToOF)) == 0 || fs::path{val}.is_absolute() || (val.size() && val[0] == '$')) {
-				variable.emplace_back(fs::path{val});
-			} else {
-				fs::path p = fs::path{prefix} / val;
-				variable.emplace_back(p);
-			}
-		}
-	}
-}
+//void ofAddon::addReplaceStringVectorPathAll(std::vector<fs::path> & variable, fs::path & value, fs::path & prefix, bool addToVariable) {
+//	if (value == prefix) return;
+//
+//	std::vector<std::string> values;
+//	if (value.string().find("\"") != std::string::npos) {
+//		values = ofSplitString(value.string(), "\"", true, true);
+//	} else {
+//		values = ofSplitString(value.string(), " ", true, true);
+//	}
+//
+//	if (!addToVariable) variable.clear();
+//
+//	std::regex findVar("(\\$\\()(.+)(\\))");
+//	for (auto &val : values) {
+//		if (val != "") {
+//			std::smatch varMatch;
+//			if (std::regex_search(val, varMatch, findVar)) {
+//				if (varMatch.size() > 2) {
+//					std::string varName = varMatch[2].str();
+//					std::string varValue;
+//					if (varName == "OF_ROOT") {
+//						varValue = ofPathToString(pathToOF);
+//					} else if (!ofGetEnv(varName.c_str()).empty()) {
+//						varValue = ofGetEnv(varName.c_str());
+//					}
+//					if(!varValue.empty()){
+//						ofStringReplace(val, "$(" + varName + ")", varValue);
+//						ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << val;
+//					}
+//				}
+//			}
+//
+//			if (prefix.string() == "" || val.find(ofPathToString(pathToOF)) == 0 || fs::path{val}.is_absolute() || (val.size() && val[0] == '$')) {
+//				variable.emplace_back(fs::path{val});
+//			} else {
+//				fs::path p = fs::path{prefix} / val;
+//				variable.emplace_back(p);
+//			}
+//		}
+//	}
+//}
 void ofAddon::addReplaceStringVectorPath(std::vector<LibraryBinary> &variable, const std::string &value,  const fs::path &prefix, bool addToVariable) {
 	std::vector<std::string> values;
 	if (value.find("\"") != std::string::npos) {
@@ -301,50 +298,45 @@ void ofAddon::addReplaceStringVectorPath(std::vector<LibraryBinary> &variable, c
 	}
 }
 
-void ofAddon::addReplaceStringVectorLibrary(std::vector<LibraryBinary> &variable, const std::string &value, const std::string &prefix, bool addToVariable) {
-	std::vector<std::string> values;
-	if (value.find("\"") != std::string::npos) {
-		values = ofSplitString(value, "\"", true, true);
-	} else {
-		values = ofSplitString(value, " ", true, true);
-	}
-
-	if (!addToVariable) variable.clear();
-	std::regex findVar("(\\$\\()(.+)(\\))");
-
-	for (auto &v : values) {
-		if (v != "") {
-			std::smatch varMatch;
-			if (std::regex_search(v, varMatch, findVar)) {
-				if (varMatch.size() > 2) {
-					std::string varName = varMatch[2].str();
-					std::string varValue;
-					if (varName == "OF_ROOT") {
-						varValue = ofPathToString(pathToOF);
-					} else if (!ofGetEnv(varName.c_str()).empty()) {
-						varValue = ofGetEnv(varName.c_str());
-					}
-					if(!varValue.empty()){
-						ofStringReplace(v, "$(" + varName + ")", varValue);
-						ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << v;
-					}
-				}
-			}
-
-			if (prefix == "" || v.find(ofPathToString(pathToOF)) == 0 || fs::path{v}.is_absolute() || (v.size() && v[0] == '$')) {
-				variable.push_back({ fs::path { v }, "", "" });
-			} else {
-				fs::path p = fs::path{prefix} / v;
-				variable.push_back({p, "", ""});
-			}
-		}
-	}
-}
-
-void ofAddon::parseVariableValuePath(fs::path &variable, const string & value, bool addToValue, const string & line, int lineNum) {
-	parseVariableValue(variable.string(), value, addToValue, line, lineNum);
-}
-	
+//void ofAddon::addReplaceStringVectorLibrary(std::vector<LibraryBinary> &variable, const std::string &value, const std::string &prefix, bool addToVariable) {
+//	std::vector<std::string> values;
+//	if (value.find("\"") != std::string::npos) {
+//		values = ofSplitString(value, "\"", true, true);
+//	} else {
+//		values = ofSplitString(value, " ", true, true);
+//	}
+//
+//	if (!addToVariable) variable.clear();
+//	std::regex findVar("(\\$\\()(.+)(\\))");
+//
+//	for (auto &v : values) {
+//		if (v != "") {
+//			std::smatch varMatch;
+//			if (std::regex_search(v, varMatch, findVar)) {
+//				if (varMatch.size() > 2) {
+//					std::string varName = varMatch[2].str();
+//					std::string varValue;
+//					if (varName == "OF_ROOT") {
+//						varValue = ofPathToString(pathToOF);
+//					} else if (!ofGetEnv(varName.c_str()).empty()) {
+//						varValue = ofGetEnv(varName.c_str());
+//					}
+//					if(!varValue.empty()){
+//						ofStringReplace(v, "$(" + varName + ")", varValue);
+//						ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << v;
+//					}
+//				}
+//			}
+//
+//			if (prefix == "" || v.find(ofPathToString(pathToOF)) == 0 || fs::path{v}.is_absolute() || (v.size() && v[0] == '$')) {
+//				variable.push_back({ fs::path { v }, "", "" });
+//			} else {
+//				fs::path p = fs::path{prefix} / v;
+//				variable.push_back({p, "", ""});
+//			}
+//		}
+//	}
+//}
 
 void ofAddon::parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum){
 	
@@ -359,7 +351,8 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
     fs::path addonRelPath = makeRelative(pathToProject, addonPath);
-	if (variable == "ADDON_ADDITIONAL_LIBS") {
+    std::string addonRelPathStr = ofPathToString(addonRelPath);
+    
 	if (variable == ADDON_ADDITIONAL_LIBS) {
 		additionalLibsFolder.emplace_back(fs::path { value });
 		return;
@@ -390,7 +383,7 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
 	else if(variable == ADDON_INCLUDES){
-		addReplaceStringVectorPathPrefix(includePaths, value, addonRelPath, addToValue);
+		addReplaceStringVectorPath(includePaths, value, addonRelPathStr, addToValue);
 	}
 
 	else if(variable == ADDON_CFLAGS){
@@ -410,7 +403,7 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
 	else if(variable == ADDON_DLLS_TO_COPY){
-		addReplaceStringVectorPathPrefix(dllsToCopy, value, addonRelPath, addToValue);
+		addReplaceStringVectorPath(dllsToCopy, value, addonRelPathStr, addToValue);
 	}
 
 	else if(variable == ADDON_PKG_CONFIG_LIBRARIES){
@@ -421,34 +414,33 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 		size_t found=value.find('/');
 		if (found==string::npos) { // This path doesn't have slashes
 			addReplaceStringVector(frameworks, value, emptyString, addToValue);
-
 		} else {
-			addReplaceStringVectorPre(frameworks, value, addonRelPath, addToValue);
+			addReplaceStringVector(frameworks, value, addonRelPathStr, addToValue);
 		}
 	}
 
 	else if (variable == ADDON_XCFRAMEWORKS) {
-		addReplaceStringVectorPre(xcframeworks, value, addonRelPath, addToValue);
+		addReplaceStringVector(xcframeworks, value, addonRelPathStr, addToValue);
 	}
 
 	else if(variable == ADDON_SOURCES){
-		addReplaceStringVectorPathPrefix(srcFiles, value, addonRelPath, addToValue);
+		addReplaceStringVectorPath(srcFiles, value, addonRelPathStr, addToValue);
 	}
 
 	else if(variable == ADDON_C_SOURCES){
-		addReplaceStringVectorPathPrefix(csrcFiles, value, addonRelPath, addToValue);
+		addReplaceStringVectorPath(csrcFiles, value, addonRelPathStr, addToValue);
 	}
 
 	else if(variable == ADDON_CPP_SOURCES){
-		addReplaceStringVectorPathPrefix(cppsrcFiles, value, addonRelPath, addToValue);
+		addReplaceStringVectorPath(cppsrcFiles, value, addonRelPathStr, addToValue);
 	}
 
 	else if(variable == ADDON_HEADER_SOURCES){
-		addReplaceStringVectorPathPrefix(headersrcFiles, value, addonRelPath, addToValue);
+		addReplaceStringVectorPath(headersrcFiles, value, addonRelPathStr, addToValue);
 	}
 
 	else if(variable == ADDON_OBJC_SOURCES){
-		addReplaceStringVectorPathPrefix(objcsrcFiles, value, addonRelPath, addToValue);
+		addReplaceStringVectorPath(objcsrcFiles, value, addonRelPathStr, addToValue);
 	}
 
 	else if(variable == ADDON_DATA){
@@ -460,7 +452,7 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
     
     else if(variable == ADDON_LIBS_DIR){
-		addReplaceStringVectorPathPrefix(libsPaths, value, addonRelPath, addToValue);
+		addReplaceStringVectorPath(libsPaths, value, addonRelPathStr, addToValue);
     }
 
 	else if(variable == ADDON_SOURCES_EXCLUDE){
@@ -480,160 +472,172 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 }
 
-void ofAddon::exclude(vector<string> & variables, vector<string> exclusions){
-	for(auto & exclusion: exclusions){
-		ofStringReplace(exclusion,"\\","/");
-		ofStringReplace(exclusion,".","\\.");
-		ofStringReplace(exclusion,"%",".*");
-		exclusion =".*"+ exclusion;
-//		alert ("ofAddon::exclude " +exclusion, 31);
+template<typename T>
+void exclude(std::vector<T>& variables, vector<string> exclusions){
+    for(auto & exclusion: exclusions){
+        ofStringReplace(exclusion,"\\","/");
+        ofStringReplace(exclusion,".","\\.");
+        ofStringReplace(exclusion,"%",".*");
+        exclusion =".*"+ exclusion;
+        
+        std::regex findVar(exclusion);
+        std::smatch varMatch;
+        variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const T & variable){
+            std::string forwardSlashedVariable = ofPathToString(variable);
+            ofStringReplace(forwardSlashedVariable, "\\", "/");
+            return std::regex_search(forwardSlashedVariable, varMatch, findVar);
+        }), variables.end());
+    }
+}
+//template<typename T>
+//void exclude(vector<T> & variables, vector<string> exclusions){
+//    for(auto & exclusion: exclusions){
+//        eraseVariable<T>(variables, exclusion);
+//    }
+//}
+//
+//void ofAddon::exclude(vector<string> & variables, vector<string> exclusions){
+//	for(auto & exclusion: exclusions){
+//        eraseVariable<std::string>(variables, exclusion);
+////		ofStringReplace(exclusion,"\\","/");
+////		ofStringReplace(exclusion,".","\\.");
+////		ofStringReplace(exclusion,"%",".*");
+////		exclusion =".*"+ exclusion;
+////
+////		std::regex findVar(exclusion);
+////		std::smatch varMatch;
+////
+////		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const std::string & variable){
+////			auto forwardSlashedVariable = variable;
+////			ofStringReplace(forwardSlashedVariable, "\\", "/");
+////			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
+////		}), variables.end());
+//	}
+//}
+//
+//void ofAddon::excludePathStr(vector<fs::path> & variables, vector<string> exclusions){
+//	for (auto & exclusion : exclusions) {
+//        eraseVariable<fs::path>(variables, exclusion);
+////		ofStringReplace(exclusion, "\\", "/");
+////		ofStringReplace(exclusion, ".", "\\.");
+////		ofStringReplace(exclusion, "%", ".*");
+////		exclusion = ".*" + exclusion;
+////
+////		std::regex findVar(exclusion);
+////		std::smatch varMatch;
+////
+////		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const fs::path & variable) {
+////			auto forwardSlashedVariable = variable.string();
+////			ofStringReplace(forwardSlashedVariable, "\\", "/");
+////			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
+////		}), variables.end());
+//	}
+//}
+////void ofAddon::excludePath(vector<fs::path> & variables, vector<fs::path> exclusions){
+//	for(auto & exclusion: exclusions){
+//		string excluse = exclusion.string();
+//		ofStringReplace(excluse,"\\","/");
+//		ofStringReplace(excluse,".","\\.");
+//		ofStringReplace(excluse,"%",".*");
+//		excluse =".*"+ excluse;
+//
+//		std::regex findVar(excluse);
+//		std::smatch varMatch;
+//
+//		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const fs::path & variable) {
+//			auto forwardSlashedVariable = variable.string();
+//			ofStringReplace(forwardSlashedVariable, "\\", "/");
+//			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
+//		}),
+//			variables.end());
+//	}
+//}
 
-		std::regex findVar(exclusion);
-		std::smatch varMatch;
-//		alert ("vars size " + ofToString(variables.size()));
-//		for (auto & v : variables) {
-//			alert ("\t" + v, 32);
-//		}
-		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const std::string & variable){
-			auto forwardSlashedVariable = variable;
-			ofStringReplace(forwardSlashedVariable, "\\", "/");
-//			bool exclude = std::regex_search(forwardSlashedVariable, varMatch, findVar);
-//			if (exclude) {
-//				alert ("variable removed : " + variable, 31);
+//
+//
+//void ofAddon::excludeLibrary(vector<LibraryBinary> & variables, vector<string> exclusions) {
+//	for(auto & exclusion: exclusions){
+//        eraseVariable(variables, exclusion);
+////		ofStringReplace(exclusion,"\\","/");
+////		ofStringReplace(exclusion,".","\\.");
+////		ofStringReplace(exclusion,"%",".*");
+////		exclusion =".*"+ exclusion;
+////
+////		std::regex findVar(exclusion);
+////		std::smatch varMatch;
+////		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const LibraryBinary & variable){
+////			auto forwardSlashedVariable = variable.path.string();
+////			ofStringReplace(forwardSlashedVariable, "\\", "/");
+////			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
+////		}), variables.end());
+//	}
+//}
+
+//
+//void ofAddon::preParseConfig(){
+//	//	alert ("ofAddon::parseConfig " + addonPath.string(), 33);
+//    fs::path fileName =     (addonPath / "addon_config.mk");
+//
+//	if (!fs::exists(fileName)) {
+////		ofLogError() << "ofAddon::parseConfig() " << fileName << " not found " << ofPathToString(fileName);
+//		return;
+//	}
+//	
+//	for (auto & line : fileToStrings(fileName)) {
+//		line = ofTrim(line);
+//		
+//		if (line[0]=='#' || line == "") {
+//			continue;
+//		} // discard comments
+//
+//
+//		// found section?
+//		if (line.back() == ':'){
+//			ofStringReplace(line, ":", "");
+//			currentParseState = line;
+//			
+//			if (std::find(parseStates.begin(), parseStates.end(), currentParseState) == parseStates.end()) {
+//				ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
+////								<< "line " << lineNum << ": " << originalLine << "\n\t\t"
+//								<< "sectionName " << currentParseState << " not recognized";
 //			}
-			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
-		}), variables.end());
-		
-//		alert ("vars size " + ofToString(variables.size()));
-//		for (auto & v : variables) {
-//			alert ("\t" + v, 32);
+//			continue;
 //		}
-	}
-}
-
-void ofAddon::excludePathStr(vector<fs::path> & variables, vector<string> exclusions){
-	for (auto & exclusion : exclusions) {
-		ofStringReplace(exclusion, "\\", "/");
-		ofStringReplace(exclusion, ".", "\\.");
-		ofStringReplace(exclusion, "%", ".*");
-		exclusion = ".*" + exclusion;
-
-		std::regex findVar(exclusion);
-		std::smatch varMatch;
-
-		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const fs::path & variable) {
-			auto forwardSlashedVariable = variable.string();
-			ofStringReplace(forwardSlashedVariable, "\\", "/");
-			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
-		}),
-			variables.end());
-	}
-}
-void ofAddon::excludePath(vector<fs::path> & variables, vector<fs::path> exclusions){
-	for(auto & exclusion: exclusions){
-		string excluse = exclusion.string();
-		ofStringReplace(excluse,"\\","/");
-		ofStringReplace(excluse,".","\\.");
-		ofStringReplace(excluse,"%",".*");
-		excluse =".*"+ excluse;
-//		alert ("ofAddon::exclude " +exclusion, 31);
-
-		std::regex findVar(excluse);
-		std::smatch varMatch;
-
-		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const fs::path & variable) {
-			auto forwardSlashedVariable = variable.string();
-			ofStringReplace(forwardSlashedVariable, "\\", "/");
-			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
-		}),
-			variables.end());
-	}
-}
-
-
-
-void ofAddon::excludeLibrary(vector<LibraryBinary> & variables, vector<string> exclusions) {
-	for(auto & exclusion: exclusions){
-		ofStringReplace(exclusion,"\\","/");
-		ofStringReplace(exclusion,".","\\.");
-		ofStringReplace(exclusion,"%",".*");
-		exclusion =".*"+ exclusion;
-
-		std::regex findVar(exclusion);
-		std::smatch varMatch;
-		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const LibraryBinary & variable){
-			auto forwardSlashedVariable = variable.path.string();
-			ofStringReplace(forwardSlashedVariable, "\\", "/");
-			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
-		}), variables.end());
-	}
-}
-
-
-void ofAddon::preParseConfig(){
-	//	alert ("ofAddon::parseConfig " + addonPath.string(), 33);
-    fs::path fileName =     (addonPath / "addon_config.mk");
-
-	if (!fs::exists(fileName)) {
-//		ofLogError() << "ofAddon::parseConfig() " << fileName << " not found " << ofPathToString(fileName);
-		return;
-	}
-	
-	for (auto & line : fileToStrings(fileName)) {
-		line = ofTrim(line);
-		
-		if (line[0]=='#' || line == "") {
-			continue;
-		} // discard comments
-
-
-		// found section?
-		if (line.back() == ':'){
-			ofStringReplace(line, ":", "");
-			currentParseState = line;
-			
-			if (std::find(parseStates.begin(), parseStates.end(), currentParseState) == parseStates.end()) {
-				ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
-//								<< "line " << lineNum << ": " << originalLine << "\n\t\t"
-								<< "sectionName " << currentParseState << " not recognized";
-			}
-			continue;
-		}
-		
-		// found Variable
-		if (line.find("=") != string::npos){
-//			bool addToValue = false;
-			string variable, value;
-			vector<string> varValue;
-			if (line.find("+=") != string::npos) {
-//				addToValue = true;
-				varValue = ofSplitString(line, "+=");
-			} else {
-				varValue = ofSplitString(line, "=");
-			}
-			variable = ofTrim(varValue[0]);
-			value = ofTrim(varValue[1]);
-
-			// FIXME: This seems to be meaningless
-			if(!checkCorrectPlatform(currentParseState)){
-				continue;
-			}
-
-			if(!checkCorrectVariable(variable, currentParseState)){
-				ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
-//								<< "line " << lineNum << ": " << originalLine << "\n\t\t"
-								<< "variable " << variable << " not recognized for section " << currentParseState;
-				continue;
-			}
-			
-			if (variable == "ADDON_ADDITIONAL_LIBS") {
-				additionalLibsFolder.emplace_back(fs::path { value });
-				//				return;
-			}
-//			parseVariableValue(variable, value, addToValue, originalLine, lineNum);
-		}
-	}
-}
+//		
+//		// found Variable
+//		if (line.find("=") != string::npos){
+////			bool addToValue = false;
+//			string variable, value;
+//			vector<string> varValue;
+//			if (line.find("+=") != string::npos) {
+////				addToValue = true;
+//				varValue = ofSplitString(line, "+=");
+//			} else {
+//				varValue = ofSplitString(line, "=");
+//			}
+//			variable = ofTrim(varValue[0]);
+//			value = ofTrim(varValue[1]);
+//
+//			// FIXME: This seems to be meaningless
+//			if(!checkCorrectPlatform(currentParseState)){
+//				continue;
+//			}
+//
+//			if(!checkCorrectVariable(variable, currentParseState)){
+//				ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
+////								<< "line " << lineNum << ": " << originalLine << "\n\t\t"
+//								<< "variable " << variable << " not recognized for section " << currentParseState;
+//				continue;
+//			}
+//			
+//			if (variable == ADDON_ADDITIONAL_LIBS) {
+//				additionalLibsFolder.emplace_back(fs::path { value });
+//				//				return;
+//			}
+////			parseVariableValue(variable, value, addToValue, originalLine, lineNum);
+//		}
+//	}
+//}
 
 void ofAddon::parseConfig(){
 	fs::path fileName = (addonPath / "addon_config.mk");
@@ -768,14 +772,16 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 //	if (!isLocalAddon) {
 		for (auto & l : libs) {
 //			alert("fixpath before " + ofPathToString(l.path));
-			l.path = fixPath(l.path);
+//			l.path = fixPath(l.path);
             addToFolder(l.path , parentFolder);
 //			alert("fixpath after  " + ofPathToString(l.path));
 		}
 //	}
 
 	for (auto & s : libFiles) {
+//        alert("fixpath before " + ofPathToString(s));
         s = fixPath(s);
+//        alert("fixpath after  " + ofPathToString(s));
         addToFolder(s, parentFolder);
 //		fs::path folder;
 //		if (isLocalAddon) {
@@ -834,7 +840,7 @@ string ofAddon::cleanName(const string& name){
     auto addonName = name;
 #ifdef TARGET_WIN32
     //    std::replace( addonName.begin(), addonName.end(), '/', '\\' );
-    fixSlashOrder(addonName);
+//    fixSlashOrder(addonName);
 #endif
         
     {

@@ -135,8 +135,6 @@ public:
     bool load(string addonName, const fs::path& projectDir, const string& targetPlatform);
 	
 	
-
-//	void fromXML(string installXmlName);
 	void clear();
 
 	vector <fs::path> additionalLibsFolder;
@@ -191,37 +189,34 @@ public:
     
 private:
     
-    
-//    bool fromFS();
     void parseLibsPath(const fs::path & path, const fs::path & parentFolder);
     
     void addToFolder(const fs::path& path, const fs::path & parentFolder);
 	
 	string currentParseState { "" };
 	string emptyString = { "" };
-	void preParseConfig();
+//	void preParseConfig();
 	void parseConfig();
 	void parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum);
-	void parseVariableValuePath(fs::path & variable, const string & value, bool addToValue, const string & line, int lineNum);
 	
 	void addReplaceString(std::string &variable, const std::string &value, bool addToVariable);
-	void addReplaceStringPath(fs::path &variable, const std::string & value, bool addToVariable);
+//	void addReplaceStringPath(fs::path &variable, const std::string & value, bool addToVariable);
 	void addReplaceStringVector(std::vector<std::string> &variable, const std::string &value, const std::string &prefix, bool addToVariable);
-	void addReplaceStringVectorPre(std::vector<std::string> &variable, const std::string &value, fs::path &prefix, bool addToVariable);
+//	void addReplaceStringVectorPre(std::vector<std::string> &variable, const std::string &value, fs::path &prefix, bool addToVariable);
 	void addReplaceStringVectorPathStr(std::vector<fs::path> & variable, fs::path & value, const std::string & prefix, bool addToVariable);
 	
 	void addReplaceStringVectorPath(std::vector<fs::path> &variable, const std::string &value, const std::string &prefix, bool addToVariable);
-	void addReplaceStringVectorPathAll(std::vector<fs::path> & variable, fs::path & value, fs::path & prefix, bool addToVariable);
-	void addReplaceStringVectorPathPrefix(std::vector<fs::path> &variable, const std::string &value, fs::path &prefix, bool addToVariable);
+//	void addReplaceStringVectorPathAll(std::vector<fs::path> & variable, fs::path & value, fs::path & prefix, bool addToVariable);
+//	void addReplaceStringVectorPathPrefix(std::vector<fs::path> &variable, const std::string &value, fs::path &prefix, bool addToVariable);
 	
-	void addReplaceStringVectorLibrary(std::vector<LibraryBinary> & variable, const std::string & value, const std::string & prefix, bool addToVariable);
+//	void addReplaceStringVectorLibrary(std::vector<LibraryBinary> & variable, const std::string & value, const std::string & prefix, bool addToVariable);
 	
 	void addReplaceStringVectorPath(std::vector<LibraryBinary> &variable, const std::string &value,  const fs::path &prefix, bool addToVariable);
 
-	void exclude(vector<string> & variable, vector<string> exclusions);
-	void excludePathStr(vector<fs::path> & variable, vector<string> exclusions);
-	void excludePath(vector<fs::path> & variable, vector<fs::path> exclusions);
-	void excludeLibrary(vector<LibraryBinary> & variable, vector<string> exclusions);
+//	void exclude(vector<string> & variable, vector<string> exclusions);
+//	void excludePathStr(vector<fs::path> & variable, vector<string> exclusions);
+//	void excludePath(vector<fs::path> & variable, vector<fs::path> exclusions);
+//	void excludeLibrary(vector<LibraryBinary> & variable, vector<string> exclusions);
 	bool checkCorrectVariable(const string & variable, const string & state);
 	bool checkCorrectPlatform(const string & state);
 
