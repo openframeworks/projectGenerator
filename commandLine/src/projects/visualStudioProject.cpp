@@ -137,7 +137,7 @@ bool visualStudioProject::saveProjectFile(){
 		for (auto & a : additionalvcxproj) {
 			string name = a.filename().stem().string();
 			string aString = a.string();
-			fixSlashOrder(aString);
+//			fixSlashOrder(aString);
 			string uuid = generateUUID(name);
 			additionalProjects +=
 			"Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \""+name+"\", \""+aString+"\", \"{"+uuid+"}\"" +
@@ -187,7 +187,7 @@ bool visualStudioProject::saveProjectFile(){
 
 
 void visualStudioProject::appendFilter(string folderName){
-	fixSlashOrder(folderName);
+//	fixSlashOrder(folderName);
 	string uuid { generateUUID(folderName) };
 	string tag { "//ItemGroup[Filter]/Filter[@Include=\"" + folderName + "\"]" };
 	pugi::xpath_node_set set = filterXmlDoc.select_nodes(tag.c_str());
@@ -223,10 +223,10 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 		return;
 	}
 
-	string srcFileString = srcFile.string();
-	fixSlashOrder(srcFileString);
-	string folderString = folder.string();
-	fixSlashOrder(folderString);
+    string srcFileString = ofPathToString(srcFile);//.string();
+//	fixSlashOrder(srcFileString);
+    string folderString = ofPathToString(folder);//.string();
+//	fixSlashOrder(folderString);
 
 	// Made to address ofxGstreamer - adds some core files
 	if (folderString == "") {
@@ -417,8 +417,8 @@ void visualStudioProject::addInclude(const fs::path & includeName){
 
 void visualStudioProject::addProps(fs::path propsFile){
 //	alert ("visualStudioProject::addProps " + propsFile.string());
-	string path = propsFile.string();
-	fixSlashOrder(path);
+    string path = ofPathToString(propsFile);//.string();
+//	fixSlashOrder(path);
 	pugi::xpath_node_set items = doc.select_nodes("//ImportGroup");
 	for (auto & item : items) {
 		// FIXME: needed?
