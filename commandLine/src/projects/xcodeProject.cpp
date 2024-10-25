@@ -257,7 +257,7 @@ fs::path getPathTo(fs::path path, string limit){
 }
 
 
-// FIXME: Double check if isFolder is even being used. Remove it if not
+
 string xcodeProject::getFolderUUID(const fs::path & folder, fs::path base){//, bool isFolder, fs::path base) {
 //    alert ("xcodeProject::getFolderUUID "+folder.string());//+" : isfolder="+ofToString(isFolder)+" : base="+ base.string());
 
@@ -564,23 +564,19 @@ void xcodeProject::addDylib(const fs::path & path, const fs::path & folder){
 
 
 void xcodeProject::addInclude(const fs::path & includeName){
-	//alert("addInclude " + includeName);
 	for (auto & c : buildConfigs) {
 		addCommand("Add :objects:"+c+":buildSettings:HEADER_SEARCH_PATHS: string " + ofPathToString(includeName));
 	}
 }
 
 void xcodeProject::addLibrary(const LibraryBinary & lib){
-//	alert( "xcodeProject::addLibrary " + lib.path , 33);
 	for (auto & c : buildConfigs) {
-//		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ofPathToString(lib.path));
 		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ofPathToString(fs::relative(lib.path)));
 	}
 }
 
 void xcodeProject::addLDFLAG(const string& ldflag, LibType libType){
     ofLogVerbose("xcodeProject::addLDFLAG") << ldflag;
-//	alert( "xcodeProject::addLDFLAG " + ldflag , 34);
 	for (auto & c : buildConfigs) {
 		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ldflag);
 	}
@@ -588,7 +584,6 @@ void xcodeProject::addLDFLAG(const string& ldflag, LibType libType){
 
 void xcodeProject::addCFLAG(const string& cflag, LibType libType){
     ofLogVerbose("xcodeProject::addCFLAG") << cflag;
-	//alert("xcodeProject::addCFLAG " + cflag);
 	for (auto & c : buildConfigs) {
 		// FIXME: add array here if it doesnt exist
 		addCommand("Add :objects:"+c+":buildSettings:OTHER_CFLAGS: string " + cflag);
@@ -659,22 +654,6 @@ void  xcodeProject::addAddonLibs(const ofAddon& addon){
     }
 }
 
-//	for (auto & e : addon.cflags) {
-//		ofLogVerbose() << "adding addon cflags: " << e;
-//		addCFLAG(e);
-//	}
-
-//	for (auto & e : addon.cppflags) {
-//		ofLogVerbose() << "adding addon cppflags: " << e;
-//		addCPPFLAG(e);
-//	}
-
-//	for (auto & e : addon.ldflags) {
-//		ofLogVerbose() << "adding addon ldflags: " << e;
-////		alert("addon ldflags " + e, 31 );
-//		addLDFLAG(e);
-//	}
-
 void xcodeProject::addAddonSrcFiles(ofAddon& addon){
     std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), [](const fs::path & a, const fs::path & b) {
         return a.string() < b.string();
@@ -690,10 +669,6 @@ void xcodeProject::addAddonSrcFiles(ofAddon& addon){
     }
 }
 
-//	for (auto & e : addon.defines) {
-//		ofLogVerbose() << "adding addon defines: " << e;
-//		addDefine(e);
-//	}
 
 //-----------------------------------------------------------------------------------------------
 void xcodeProject::addAddonFrameworks(const ofAddon& addon){
@@ -760,7 +735,6 @@ void xcodeProject::addAddonXCFrameworks(const ofAddon& addon){
 
 
 string xcodeProject::addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp) {
-//	alert("addFile " + ofPathToString(path) + " : " + ofPathToString(folder) , 31);
 
 	string UUID { "" };
 
