@@ -434,31 +434,6 @@ string convertStringToWindowsSeparator(string in) {
 	return in;
 }
 
-void fixSlashOrder(std::string &toFix) {
-	// std::replace(toFix.begin(), toFix.end(), '/', '\\');
-	// // Remove duplicate backslashes
-	// toFix = std::regex_replace(toFix, std::regex(R"(\\\\)"), R"(\\)");
-	// toFix = std::regex_replace(toFix, std::regex(R"(\\\\\\)"), R"(\\\\)");
-}
-
-void fixSlashOrderPath(fs::path &toFix) {
-	// string p = toFix.string();
-	// std::replace(p.begin(), p.end(), '/', '\\');
-	// // Remove duplicate backslashes
-	// p = std::regex_replace(p, std::regex(R"(\\\\)"), R"(\\)");
-	// p = std::regex_replace(p, std::regex(R"(\\\\\\)"), R"(\\\\)");
-	// toFix = fs::path { p };
-}
-
-fs::path fixSlashOrderPathReturn(const fs::path &toFix) {
-	// string p = toFix.string();
-	// std::replace(p.begin(), p.end(), '/', '\\');
-	// // Remove duplicate backslashes
-	// p = std::regex_replace(p, std::regex(R"(\\\\)"), R"(\\)");
-	// p = std::regex_replace(p, std::regex(R"(\\\\\\)"), R"(\\\\)");
-	// return fs::path { p };
-	return toFix;
-}
 
 string unsplitString (std::vector < string > strings, string deliminator ){
 	string result;
@@ -646,9 +621,9 @@ void createBackup(const fs::path & path, const fs::path & backupPath) {
 std::string normalizePath(const std::string& path) {
 	try {
 		auto value = fs::weakly_canonical(path);
-#ifdef TARGET_WIN32
-		fixSlashOrderPath(value);
-#endif
+//#ifdef TARGET_WIN32
+//		fixSlashOrderPath(value);
+//#endif
 		return value.string();
 	} catch (const std::exception& ex) {
 		std::cout << "Canonical path for [" << path << "] threw exception:\n"
@@ -660,9 +635,9 @@ std::string normalizePath(const std::string& path) {
 fs::path normalizePath(const fs::path& path) {
 	try {
 		auto value = fs::weakly_canonical(path);
-#ifdef TARGET_WIN32
-		fixSlashOrderPath(value);
-#endif
+//#ifdef TARGET_WIN32
+//		fixSlashOrderPath(value);
+//#endif
 		return value;
 	} catch (const std::exception& ex) {
 		std::cout << "Canonical path for [" << path << "] threw exception:\n"
@@ -673,9 +648,9 @@ fs::path normalizePath(const fs::path& path) {
 
 fs::path makeRelative(const fs::path& from, const fs::path& to) {
 	fs::path relative = fs::relative(to, from);
-#ifdef TARGET_WIN32
-		fixSlashOrderPath(relative);
-#endif
+//#ifdef TARGET_WIN32
+//		fixSlashOrderPath(relative);
+//#endif
 	return relative;
 }
 
