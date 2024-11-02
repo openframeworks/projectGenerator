@@ -742,7 +742,7 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 //	if (fs::exists( projectDir / path ))
 	{
 //		cout << "OK exists" << endl;
-		bool isFolder = false;
+//		bool isFolder = false;
 		string fileType { "file" };
 		fileType = extensionToFileType[path.extension()];
 
@@ -750,7 +750,7 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		if (fileType == "") {
 			if (fs::is_directory(path) || fp.isGroupWithoutFolder) {
 				fileType = "folder";
-				isFolder = true;
+//				isFolder = true;
 			} else {
 				// Break here if fileType is not set. and it is not a folder
 				return {};
@@ -813,7 +813,8 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 //		}
 		
 		// Eventually remove isFolder and base parameter
-        std::string folderUUID { getFolderUUID(folder, path)};//, isFolder) };
+        std::string folderUUID { getFolderUUID(folder, path)};
+		//, isFolder) };
 
 
 		addCommand("# ---- addFileToFolder UUID : " + ofPathToString(folder));
