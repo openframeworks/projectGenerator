@@ -416,7 +416,7 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 			if (ext == ".a" || ext == ".lib" || ext == ".dylib" || ext == ".so" || ext == ".xcframework" || ext == ".framework" || (ext == ".dll" && platform != "vs")) {
 				if (platformFound){
                     
-                    LibraryBinary lib(normalizePath(f));
+                    LibraryBinary lib(f);
                     if(lib.isValidFor(arch, target)){
 //                        alert ("adding lib " + f.string() + " arch: " +  arch + " target: " + target, 34);
                         libLibs.push_back(lib);
