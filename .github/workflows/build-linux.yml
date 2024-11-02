@@ -26,8 +26,8 @@ jobs:
     env:
       TARGET: ${{ matrix.cfg.target }}
     steps:
-      - name: Install libunwind
-        run: sudo apt-get install libunwind-dev wget2
+      # - name: Install libunwind
+        # run: sudo apt-get install libunwind-dev wget2
       
       - uses: actions/checkout@v4
       

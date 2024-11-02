@@ -524,7 +524,7 @@ void baseProject::addAddonDllsToCopy(ofAddon& addon){
 // MARK: - This function is only called by addon dependencies, when one addon is asking for another one to be included.
 // this is only invoked by XCode and visualStudioProject, and I don't understand why as they are similar
 void baseProject::addAddon(ofAddon & addon){
-	alert("baseProject::addAddon ofAddon & addon :: " + addon.name);
+//	alert("baseProject::addAddon ofAddon & addon :: " + addon.name);
 
 	// FIXME: Duplicate Code
 	for (auto & a : addons) {

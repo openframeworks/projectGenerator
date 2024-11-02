@@ -11,6 +11,33 @@
 #include <list>
 #include <regex>
 
+
+static std::string toString(const std::string& str){
+	return str;
+}
+
+static std::string toString(const fs::path& path){
+	return ofPathToString(path);
+}
+
+static std::string toString(const LibraryBinary& lib){
+	return ofPathToString(lib.path);
+}
+
+template<typename T>
+static inline void removeDuplicates(std::vector<T> & vec){
+	std::unordered_set<std::string> seen;
+	std::vector<T> output;
+
+	for (const auto& value : vec) {
+		if (seen.insert(toString(value)).second) { // If insertion is successful (element not seen before)
+			output.push_back(value);
+		}
+	}
+	vec = std::move(output);
+}
+
+
 vector<string> splitStringOnceByLeft(const string &source, const string &delimiter) {
 	size_t pos = source.find(delimiter);
 	vector<string> res;
@@ -31,48 +58,48 @@ vector<string> splitStringOnceByLeft(const string &source, const string &delimit
 //	= std::unordered_map<fs::path, fs::path>();
 //}
 
-ofAddon::ofAddon(const ofAddon& other)
-	: additionalLibsFolder(other.additionalLibsFolder),
-	  libFiles(other.libFiles),
-	  filesToFolders(other.filesToFolders),
-	  srcFiles(other.srcFiles),
-	  csrcFiles(other.csrcFiles),
-	  cppsrcFiles(other.cppsrcFiles),
-	  headersrcFiles(other.headersrcFiles),
-	  objcsrcFiles(other.objcsrcFiles),
-	  propsFiles(other.propsFiles),
-	  libs(other.libs),
-	  dllsToCopy(other.dllsToCopy),
-	  includePaths(other.includePaths),
-	  libsPaths(other.libsPaths),
-	  dependencies(other.dependencies),
-	  cflags(other.cflags),
-	  cppflags(other.cppflags),
-	  ldflags(other.ldflags),
-	  pkgConfigLibs(other.pkgConfigLibs),
-	  frameworks(other.frameworks),
-	  xcframeworks(other.xcframeworks),
-	  data(other.data),
-	  defines(other.defines),
-	  definesCMAKE(other.definesCMAKE),
-	  name(other.name),
-	  addonPath(other.addonPath),
-	  description(other.description),
-	  author(other.author),
-	  tags(other.tags),
-	  url(other.url),
-	  pathToOF(other.pathToOF),
-	  pathToProject(other.pathToProject),
-	  isLocalAddon(other.isLocalAddon),
-	  currentParseState(other.currentParseState),
-	  emptyString(other.emptyString),
-	  platform(other.platform),
-	  excludeLibs(other.excludeLibs),
-	  excludeSources(other.excludeSources),
-	  excludeIncludes(other.excludeIncludes),
-	  excludeFrameworks(other.excludeFrameworks),
-	  excludeXCFrameworks(other.excludeXCFrameworks),
-      addonMakeName(other.addonMakeName)
+ofAddon::ofAddon(const ofAddon& other): 
+	additionalLibsFolder(other.additionalLibsFolder),
+	libFiles(other.libFiles),
+	filesToFolders(other.filesToFolders),
+	srcFiles(other.srcFiles),
+	csrcFiles(other.csrcFiles),
+	cppsrcFiles(other.cppsrcFiles),
+	headersrcFiles(other.headersrcFiles),
+	objcsrcFiles(other.objcsrcFiles),
+	propsFiles(other.propsFiles),
+	libs(other.libs),
+	dllsToCopy(other.dllsToCopy),
+	includePaths(other.includePaths),
+	libsPaths(other.libsPaths),
+	dependencies(other.dependencies),
+	cflags(other.cflags),
+	cppflags(other.cppflags),
+	ldflags(other.ldflags),
+	pkgConfigLibs(other.pkgConfigLibs),
+	frameworks(other.frameworks),
+	xcframeworks(other.xcframeworks),
+	data(other.data),
+	defines(other.defines),
+	definesCMAKE(other.definesCMAKE),
+	name(other.name),
+	addonPath(other.addonPath),
+	description(other.description),
+	author(other.author),
+	tags(other.tags),
+	url(other.url),
+	pathToOF(other.pathToOF),
+	pathToProject(other.pathToProject),
+	isLocalAddon(other.isLocalAddon),
+	addonMakeName(other.addonMakeName),
+	currentParseState(other.currentParseState),
+	emptyString(other.emptyString),
+	platform(other.platform),
+	excludeLibs(other.excludeLibs),
+	excludeSources(other.excludeSources),
+	excludeIncludes(other.excludeIncludes),
+	excludeFrameworks(other.excludeFrameworks),
+	excludeXCFrameworks(other.excludeXCFrameworks)
 
 {
 }
@@ -96,7 +123,7 @@ bool ofAddon::checkCorrectVariable(const string & variable, const string & state
 						 AddonMetaVariables.end(),
 						 variable) != AddonMetaVariables.end();
 	}
-	else if (state == "osx") {// Why only checking for osx? 
+	else if (state == "osx") {// Why only checking for osx?
 		return std::find(AddonProjectVariables.begin(),
 						 AddonProjectVariables.end(),
 						 variable) != AddonProjectVariables.end();
@@ -339,7 +366,7 @@ void ofAddon::addReplaceStringVectorPath(std::vector<LibraryBinary> &variable, c
 //}
 
 void ofAddon::parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum){
-	
+
 
 	if (variable == "ADDON_NAME"){
 		if (value != name){
@@ -350,14 +377,14 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 		return;
 	}
 
-    fs::path addonRelPath = makeRelative(pathToProject, addonPath);
-    std::string addonRelPathStr = ofPathToString(addonRelPath);
-    
+	fs::path addonRelPath = makeRelative(pathToProject, addonPath);
+	std::string addonRelPathStr = ofPathToString(addonRelPath);
+
 	if (variable == ADDON_ADDITIONAL_LIBS) {
 		additionalLibsFolder.emplace_back(fs::path { value });
 		return;
 	}
-	
+
 	else if (variable == ADDON_DESCRIPTION) {
 		addReplaceString(description, value, addToValue);
 		return;
@@ -450,10 +477,10 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	else if(variable == ADDON_LIBS_EXCLUDE){
 		addReplaceStringVector(excludeLibs,value,emptyString,addToValue);
 	}
-    
-    else if(variable == ADDON_LIBS_DIR){
+
+	else if(variable == ADDON_LIBS_DIR){
 		addReplaceStringVectorPath(libsPaths, value, addonRelPathStr, addToValue);
-    }
+	}
 
 	else if(variable == ADDON_SOURCES_EXCLUDE){
 		addReplaceStringVector(excludeSources,value,emptyString,addToValue);
@@ -474,20 +501,20 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 
 template<typename T>
 void exclude(std::vector<T>& variables, vector<string> exclusions){
-    for(auto & exclusion: exclusions){
-        ofStringReplace(exclusion,"\\","/");
-        ofStringReplace(exclusion,".","\\.");
-        ofStringReplace(exclusion,"%",".*");
-        exclusion =".*"+ exclusion;
-        
-        std::regex findVar(exclusion);
-        std::smatch varMatch;
-        variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const T & variable){
-            std::string forwardSlashedVariable = ofPathToString(variable);
-            ofStringReplace(forwardSlashedVariable, "\\", "/");
-            return std::regex_search(forwardSlashedVariable, varMatch, findVar);
-        }), variables.end());
-    }
+	for(auto & exclusion: exclusions){
+		ofStringReplace(exclusion,"\\","/");
+		ofStringReplace(exclusion,".","\\.");
+		ofStringReplace(exclusion,"%",".*");
+		exclusion =".*"+ exclusion;
+
+		std::regex findVar(exclusion);
+		std::smatch varMatch;
+		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const T & variable){
+			std::string forwardSlashedVariable = ofPathToString(variable);
+			ofStringReplace(forwardSlashedVariable, "\\", "/");
+			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
+		}), variables.end());
+	}
 }
 //template<typename T>
 //void exclude(vector<T> & variables, vector<string> exclusions){
@@ -582,10 +609,10 @@ void exclude(std::vector<T>& variables, vector<string> exclusions){
 ////		ofLogError() << "ofAddon::parseConfig() " << fileName << " not found " << ofPathToString(fileName);
 //		return;
 //	}
-//	
+//
 //	for (auto & line : fileToStrings(fileName)) {
 //		line = ofTrim(line);
-//		
+//
 //		if (line[0]=='#' || line == "") {
 //			continue;
 //		} // discard comments
@@ -595,7 +622,7 @@ void exclude(std::vector<T>& variables, vector<string> exclusions){
 //		if (line.back() == ':'){
 //			ofStringReplace(line, ":", "");
 //			currentParseState = line;
-//			
+//
 //			if (std::find(parseStates.begin(), parseStates.end(), currentParseState) == parseStates.end()) {
 //				ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
 ////								<< "line " << lineNum << ": " << originalLine << "\n\t\t"
@@ -603,7 +630,7 @@ void exclude(std::vector<T>& variables, vector<string> exclusions){
 //			}
 //			continue;
 //		}
-//		
+//
 //		// found Variable
 //		if (line.find("=") != string::npos){
 ////			bool addToValue = false;
@@ -629,7 +656,7 @@ void exclude(std::vector<T>& variables, vector<string> exclusions){
 //								<< "variable " << variable << " not recognized for section " << currentParseState;
 //				continue;
 //			}
-//			
+//
 //			if (variable == ADDON_ADDITIONAL_LIBS) {
 //				additionalLibsFolder.emplace_back(fs::path { value });
 //				//				return;
@@ -665,7 +692,7 @@ void ofAddon::parseConfig(){
 			ofStringReplace(line,":","");
 			// FIXME: Remove
 			currentParseState = line;
-			
+
 			if (std::find(parseStates.begin(), parseStates.end(), currentParseState) == parseStates.end()) {
 				ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
 								<< "line " << lineNum << ": " << originalLine << "\n\t\t"
@@ -700,21 +727,21 @@ void ofAddon::parseConfig(){
 								<< "variable " << variable << " not recognized for section " << currentParseState;
 				continue;
 			}
-			
+
 			parseVariableValue(variable, value, addToValue, originalLine, lineNum);
 		}
 	}
 }
 
 void ofAddon::addToFolder(const fs::path& path, const fs::path & parentFolder){
- 
-    fs::path folder;
-    if (isLocalAddon) {
-        folder = fs::path { "local_addons" } / fs::relative(path.parent_path(), parentFolder);
-    } else {
-        folder = fs::relative(path.parent_path(), getOFRoot());
-    }
-    filesToFolders[path] = folder;
+
+	fs::path folder;
+	if (isLocalAddon) {
+		folder = fs::path { "local_addons" } / fs::relative(path.parent_path(), parentFolder);
+	} else {
+		folder = fs::relative(path.parent_path(), getOFRoot());
+	}
+	filesToFolders[path] = folder;
 }
 
 void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFolder) {
@@ -724,36 +751,36 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		return;
 	}
 
-    
-    if (platform == "osx"  || platform == "macos"){
-        // Horrible hack to make it work with the bad idea of renaming osx to macos
-        getLibsRecursively(libsPath, libFiles, libs, "macos");
-        getLibsRecursively(libsPath, libFiles, libs, "osx");
-        
-        getFrameworksRecursively(libsPath, frameworks, "macos");
-        getFrameworksRecursively(libsPath, frameworks, "osx");
-        getXCFrameworksRecursively(libsPath, xcframeworks, "macos");
-        getXCFrameworksRecursively(libsPath, xcframeworks, "osx");
-        
-        removeDuplicates(libs);
-        removeDuplicates(libFiles);
-        removeDuplicates(frameworks);
-        removeDuplicates(xcframeworks);
-        
-    }else{
-        
-        getLibsRecursively(libsPath, libFiles, libs, platform);
-    }
-    
-    if (//platform == "osx"  ||
-        platform == "ios"  ||
-        platform == "tvos"){//} ||
-        //platform == "macos"){
-        
-            getFrameworksRecursively(libsPath, frameworks, platform);
-            getXCFrameworksRecursively(libsPath, xcframeworks, platform);
+
+	if (platform == "osx"  || platform == "macos"){
+		// Horrible hack to make it work with the bad idea of renaming osx to macos
+		getLibsRecursively(libsPath, libFiles, libs, "macos");
+		getLibsRecursively(libsPath, libFiles, libs, "osx");
+
+		getFrameworksRecursively(libsPath, frameworks, "macos");
+		getFrameworksRecursively(libsPath, frameworks, "osx");
+		getXCFrameworksRecursively(libsPath, xcframeworks, "macos");
+		getXCFrameworksRecursively(libsPath, xcframeworks, "osx");
+
+		removeDuplicates(libs);
+		removeDuplicates(libFiles);
+		removeDuplicates(frameworks);
+		removeDuplicates(xcframeworks);
+
+	}else{
+
+		getLibsRecursively(libsPath, libFiles, libs, platform);
 	}
-	
+
+	if (//platform == "osx"  ||
+		platform == "ios"  ||
+		platform == "tvos"){//} ||
+		//platform == "macos"){
+
+			getFrameworksRecursively(libsPath, frameworks, platform);
+			getXCFrameworksRecursively(libsPath, xcframeworks, platform);
+	}
+
 	if (platform == "vs" || platform == "msys2"
 		   || platform == "vscode"
 		   || platform == "linux"
@@ -762,7 +789,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		   || platform == "linuxarmv7l"
 		   || platform == "linuxaarch64"
 	   ) {
-            getDllsRecursively(libsPath, dllsToCopy, platform);
+			getDllsRecursively(libsPath, dllsToCopy, platform);
 	}
 
 	// TODO: this is not needed even if it is local addon but project is outside OF root path
@@ -772,16 +799,16 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		for (auto & l : libs) {
 //			alert("fixpath before " + ofPathToString(l.path));
 //			l.path = fixPath(l.path);
-            addToFolder(l.path , parentFolder);
+			addToFolder(l.path , parentFolder);
 //			alert("fixpath after  " + ofPathToString(l.path));
 		}
 //	}
 
 	for (auto & s : libFiles) {
 //        alert("fixpath before " + ofPathToString(s));
-        s = fixPath(s);
+		s = fixPath(s);
 //        alert("fixpath after  " + ofPathToString(s));
-        addToFolder(s, parentFolder);
+		addToFolder(s, parentFolder);
 //		fs::path folder;
 //		if (isLocalAddon) {
 //			folder = fs::path { "local_addons" } / fs::relative(s.parent_path(), parentFolder);
@@ -817,12 +844,12 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 //			}
 //
 //			filesToFolders[f] = folder;
-            addToFolder(f, parentFolder);
+			addToFolder(f, parentFolder);
 		}
 	}
 
 	for (const auto & f : xcframeworks) {
-		
+
 //		fs::path rel = fs::relative(f, isLocalAddon ? pathToProject : pathToOF);
 //		fs::path folder = rel.parent_path();
 //
@@ -832,94 +859,94 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 //		}
 //
 //		filesToFolders[f] = folder;
-        addToFolder(f, parentFolder);
+		addToFolder(f, parentFolder);
 	}
 }
 string ofAddon::cleanName(const string& name){
-    auto addonName = name;
+	auto addonName = name;
 #ifdef TARGET_WIN32
-    //    std::replace( addonName.begin(), addonName.end(), '/', '\\' );
+	//    std::replace( addonName.begin(), addonName.end(), '/', '\\' );
 //    fixSlashOrder(addonName);
 #endif
-        
-    {
-        // in case that addonName contains a comment, get rid of it
-        auto s = ofSplitString(addonName, "#");
-        if(s.size()){
-            addonName = s[0];
-        }
-    }
-    return addonName;
+
+	{
+		// in case that addonName contains a comment, get rid of it
+		auto s = ofSplitString(addonName, "#");
+		if(s.size()){
+			addonName = s[0];
+		}
+	}
+	return addonName;
 }
 
 bool ofAddon::load(string addonName, const fs::path& projectDir, const string& targetPlatform){
-    // we want to set addonMakeName before cleaning the addon name, so it is preserved in the exact same way as it was passed, and the addons.make file can be (re)constructed properly
-    this->addonMakeName = addonName;
-    
-    addonName = cleanName(addonName);
-    
-    if(addonName.empty()){
-        ofLogError("baseProject::addAddon") << "cant add addon with empty name";
-        return false;
-    }
-    
-    //This should be the only instance where we check if the addon is either local or not.
-    //being local just means that the addon name is a filepath and it starts with a dot.
-    //otherwise it will look in the addons folder.
-    //A local addon is not restricted to one that lives in folder with the name local_addons, should be any valid addon on the filesystem.
-    //Parsing will generate the correct path to both OF and the project.
-    //Everything else should be treated exactly in the same way, regardless of it being local or not.
-    if(addonName[0] == '.' && fs::exists( ofFilePath::join(projectDir, addonName))){
-        
-        this->addonPath = normalizePath(ofFilePath::join(projectDir, addonName));
-        this->isLocalAddon = true;
-        ofLogVerbose() << "Adding local addon: " << addonName;
-        //        addon.pathToProject = makeRelative(getOFRoot(), projectDir);
-        //        projectDir;
-    }else{
-        this->addonPath = fs::path { getOFRoot() / "addons" / addonName };
-    }
-    this->pathToOF = normalizePath(getOFRoot());
-    
-    this->addonPath = normalizePath(addonPath);
-    
-    
-    this->pathToProject = projectDir;
-    
-    this->platform = targetPlatform;
-    
-    ofLogVerbose() << "addonPath to: [" << addonPath.string() << "]";
-    ofLogVerbose() << "pathToOF: [" << pathToOF.string() << "]";
-    
+	// we want to set addonMakeName before cleaning the addon name, so it is preserved in the exact same way as it was passed, and the addons.make file can be (re)constructed properly
+	this->addonMakeName = addonName;
 
-	alert("ofAddon::fromFS path : " + addonPath.string(), 33);
-	
-	if (!fs::exists(addonPath)) {
-        ofLogVerbose("ofAddon::load") << "addon does not exist!" << addonPath;
+	addonName = cleanName(addonName);
+
+	if(addonName.empty()){
+		ofLogError("baseProject::addAddon") << "cant add addon with empty name";
 		return false;
 	}
-	
+
+	//This should be the only instance where we check if the addon is either local or not.
+	//being local just means that the addon name is a filepath and it starts with a dot.
+	//otherwise it will look in the addons folder.
+	//A local addon is not restricted to one that lives in folder with the name local_addons, should be any valid addon on the filesystem.
+	//Parsing will generate the correct path to both OF and the project.
+	//Everything else should be treated exactly in the same way, regardless of it being local or not.
+	if(addonName[0] == '.' && fs::exists( ofFilePath::join(projectDir, addonName))){
+
+		this->addonPath = normalizePath(ofFilePath::join(projectDir, addonName));
+		this->isLocalAddon = true;
+		ofLogVerbose() << "Adding local addon: " << addonName;
+		//        addon.pathToProject = makeRelative(getOFRoot(), projectDir);
+		//        projectDir;
+	}else{
+		this->addonPath = fs::path { getOFRoot() / "addons" / addonName };
+	}
+	this->pathToOF = normalizePath(getOFRoot());
+
+	this->addonPath = normalizePath(addonPath);
+
+
+	this->pathToProject = projectDir;
+
+	this->platform = targetPlatform;
+
+	ofLogVerbose() << "addonPath to: [" << addonPath.string() << "]";
+	ofLogVerbose() << "pathToOF: [" << pathToOF.string() << "]";
+
+
+//	alert("ofAddon::fromFS path : " + addonPath.string(), 33);
+
+	if (!fs::exists(addonPath)) {
+		ofLogVerbose("ofAddon::load") << "addon does not exist!" << addonPath;
+		return false;
+	}
+
 	clear();
-    fs::path addonNamePath { addonName};
-    
+	fs::path addonNamePath { addonName};
+
 	name = isLocalAddon ? ofPathToString(addonNamePath.stem()) : ofPathToString(addonNamePath.filename());
 
 	fs::path srcPath { addonPath / "src" };
 	if (fs::exists(srcPath)) {
 		getFilesRecursively(srcPath, srcFiles);
 	}
-    
+
 //    printPaths(srcFiles, "srcFiles", 34);
-    
+
 
 	fs::path parentFolder { addonPath.parent_path() };
-    
-    for (auto & s : srcFiles) {
-        fs::path sFS { fixPath(s) };
-        s = sFS;
-        addToFolder(s, parentFolder);
-    }
-	
+
+	for (auto & s : srcFiles) {
+		fs::path sFS { fixPath(s) };
+		s = sFS;
+		addToFolder(s, parentFolder);
+	}
+
 	if (platform == "vs" || platform == "msys2") {
 		// here addonPath is the same as path.
 		getPropsRecursively(addonPath, propsFiles, platform);
@@ -931,44 +958,44 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 	std::list < fs::path > paths;
 
 	// get every folder in addon/src and addon/libs
-    
-    if (fs::exists(libsPath)) {
-        vector < fs::path > libFolders;
+
+	if (fs::exists(libsPath)) {
+		vector < fs::path > libFolders;
 		getFoldersRecursively(libsPath, libFolders, platform);
 		for (auto & path : libFolders) {
-            paths.emplace_back( fixPath(path) );
+			paths.emplace_back( fixPath(path) );
 		}
 	}
-    
-    if (fs::exists(srcPath)) {
-        vector < fs::path > srcFolders;
+
+	if (fs::exists(srcPath)) {
+		vector < fs::path > srcFolders;
 		getFoldersRecursively(srcPath, srcFolders, platform);
 		for (auto & path : srcFolders) {
-            paths.emplace_back( fixPath(path) );
+			paths.emplace_back( fixPath(path) );
 		}
 	}
-    
-    paths.sort([](const fs::path & a, const fs::path & b) {
-        return a.string() < b.string();
-    });
-	
-    for (auto & p : paths) {
-        includePaths.emplace_back(p);
-    }
 
-    
-    // FIXME: MARK: - HACK:
+	paths.sort([](const fs::path & a, const fs::path & b) {
+		return a.string() < b.string();
+	});
+
+	for (auto & p : paths) {
+		includePaths.emplace_back(p);
+	}
+
+
+	// FIXME: MARK: - HACK:
 //	preParseConfig();
 
-    parseConfig();
+	parseConfig();
 
 	parseLibsPath(libsPath, parentFolder);
-    
-    // lib paths are directories to parse for libs
-    for (auto & a : libsPaths) {
+
+	// lib paths are directories to parse for libs
+	for (auto & a : libsPaths) {
 //		alert(a, 33);
-        parseLibsPath((addonPath / a), parentFolder);
-    }
+		parseLibsPath((addonPath / a), parentFolder);
+	}
 
 	for (auto & a : additionalLibsFolder) {
 //		parseLibsPath(fs::weakly_canonical(path / a), parentFolder);
@@ -977,16 +1004,16 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 
 
 	exclude(includePaths, excludeIncludes);
-	
+
 	// Dimitre. I've added this here to exclude some srcFiles from addons,
 	// ofxAssimpModelLoader was adding some files from libs/assimp/include/assimp/port/AndroidJNI
 	// even when the folder was excluded from includePaths
-    // Roy: The purpose of not excluding the includes from srcFiles is to be able to keep a folder path out of the include paths but still have those in the IDE.
-    // Which was the behaviour we had before. If an addon needs to exclude something from the src folder on a platform specific way it should use the
-    // ADDON_SOURCES_EXCLUDE exclude field of the addon_config.mk file
-    
+	// Roy: The purpose of not excluding the includes from srcFiles is to be able to keep a folder path out of the include paths but still have those in the IDE.
+	// Which was the behaviour we had before. If an addon needs to exclude something from the src folder on a platform specific way it should use the
+	// ADDON_SOURCES_EXCLUDE exclude field of the addon_config.mk file
+
 //	excludePathStr(srcFiles, excludeIncludes);
-	
+
 	exclude(srcFiles, excludeSources);
 	exclude(csrcFiles, excludeSources);
 	exclude(cppsrcFiles, excludeSources);
@@ -996,11 +1023,11 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 	exclude(frameworks, excludeFrameworks);
 	exclude(xcframeworks, excludeXCFrameworks);
 	exclude(libs, excludeLibs);
-    
-    exclude(libFiles, excludeIncludes);
-    exclude(libFiles, excludeSources);
 
-  
+	exclude(libFiles, excludeIncludes);
+	exclude(libFiles, excludeSources);
+
+
 
 	return true;
 }
@@ -1012,7 +1039,7 @@ void ofAddon::clear(){
 	propsFiles.clear();
 	libs.clear();
 	includePaths.clear();
-    libsPaths.clear();
+	libsPaths.clear();
 	name.clear();
 }
 
@@ -1023,9 +1050,9 @@ fs::path ofAddon::fixPath(const fs::path & path) {
 	 but the problem is fs::relative actually calculate symlink paths, modifying filename.
 	 which is not good for macos dylibs, like ofxHapPlayer, so I had to replace with the original filename back
 	 */
-    if(isLocalAddon){
-        return normalizePath(( pathToProject / fs::relative(path, pathToProject) ).parent_path() / path.filename());
-    }else{
-        return normalizePath(( pathToOF / fs::relative(path, getOFRoot()) ).parent_path() / path.filename());
-    }
+	if(isLocalAddon){
+		return normalizePath(( pathToProject / fs::relative(path, pathToProject) ).parent_path() / path.filename());
+	}else{
+		return normalizePath(( pathToOF / fs::relative(path, getOFRoot()) ).parent_path() / path.filename());
+	}
 }

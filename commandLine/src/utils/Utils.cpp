@@ -57,9 +57,9 @@ std::string execute_popen(const char* cmd) {
 	}
 
 #ifdef _WIN32
-	auto rc = _pclose(pipe);
+	_pclose(pipe);
 #else
-	auto rc = pclose(pipe);
+	pclose(pipe);
 #endif
 
 	// trim last line break

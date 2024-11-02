@@ -36,11 +36,11 @@ const vector<string> parseStates {
 	"android/x86",
 	"android/x86_64",
 	"emscripten",
-    "android",
+	"android",
 	"ios",
 	"osx",
 	"tvos",
-    "macos",
+	"macos",
 	"watchos",
 	"visionos",
 };
@@ -86,11 +86,11 @@ const string ADDON_TAGS = "ADDON_TAGS";
 const string ADDON_URL = "ADDON_URL";
 
 const vector<string> AddonMetaVariables {
-    ADDON_NAME,
-    ADDON_DESCRIPTION,
-    ADDON_AUTHOR,
-    ADDON_TAGS,
-    ADDON_URL,
+	ADDON_NAME,
+	ADDON_DESCRIPTION,
+	ADDON_AUTHOR,
+	ADDON_TAGS,
+	ADDON_URL,
 };
 
 const vector<string> AddonProjectVariables = {
@@ -110,7 +110,7 @@ const vector<string> AddonProjectVariables = {
 	ADDON_OBJC_SOURCES,
 
 	ADDON_LIBS_EXCLUDE,
-    ADDON_LIBS_DIR,
+	ADDON_LIBS_DIR,
 	ADDON_SOURCES_EXCLUDE,
 	ADDON_INCLUDES_EXCLUDE,
 	ADDON_FRAMEWORKS_EXCLUDE,
@@ -120,7 +120,7 @@ const vector<string> AddonProjectVariables = {
 	ADDON_PKG_CONFIG_LIBRARIES,
 	ADDON_FRAMEWORKS,
 	ADDON_DLLS_TO_COPY,
-    ADDON_ADDITIONAL_LIBS,
+	ADDON_ADDITIONAL_LIBS,
 };
 
 class ofAddon {
@@ -130,11 +130,11 @@ public:
 	ofAddon() = default;
 	ofAddon(const ofAddon& other);
 
-    static string cleanName(const string& name);
-    
-    bool load(string addonName, const fs::path& projectDir, const string& targetPlatform);
-	
-	
+	static string cleanName(const string& name);
+
+	bool load(string addonName, const fs::path& projectDir, const string& targetPlatform);
+
+
 	void clear();
 
 	vector <fs::path> additionalLibsFolder;
@@ -153,7 +153,7 @@ public:
 	vector < LibraryBinary > libs;
 	vector < fs::path > dllsToCopy;
 	vector < fs::path > includePaths;
-    vector < fs::path > libsPaths;
+	vector < fs::path > libsPaths;
 
 	// From addon_config.mk
 	vector < string > dependencies;
@@ -165,8 +165,8 @@ public:
 	vector < string > xcframeworks; // osx only
 	vector < string > data;
 	vector < string > defines;
-    
-    vector < string > definesCMAKE;
+
+	vector < string > definesCMAKE;
 
 	// metadata
 	string name;
@@ -175,7 +175,7 @@ public:
 	string author;
 	vector<string> tags;
 	string url;
-	
+
 	fs::path pathToOF = fs::path { "../../../ "};
 	fs::path pathToProject = fs::path { "." };
 	bool isLocalAddon = false; // set to true if the addon path is realtive to the project instead of in OF/addons/
@@ -183,34 +183,34 @@ public:
 	bool operator <(const ofAddon & addon) const{
 		return addon.name < name;
 	}
-    string addonMakeName;
-    
-   
-    
+	string addonMakeName;
+
+
+
 private:
-    
-    void parseLibsPath(const fs::path & path, const fs::path & parentFolder);
-    
-    void addToFolder(const fs::path& path, const fs::path & parentFolder);
-	
+
+	void parseLibsPath(const fs::path & path, const fs::path & parentFolder);
+
+	void addToFolder(const fs::path& path, const fs::path & parentFolder);
+
 	string currentParseState { "" };
 	string emptyString = { "" };
 //	void preParseConfig();
 	void parseConfig();
 	void parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum);
-	
+
 	void addReplaceString(std::string &variable, const std::string &value, bool addToVariable);
 //	void addReplaceStringPath(fs::path &variable, const std::string & value, bool addToVariable);
 	void addReplaceStringVector(std::vector<std::string> &variable, const std::string &value, const std::string &prefix, bool addToVariable);
 //	void addReplaceStringVectorPre(std::vector<std::string> &variable, const std::string &value, fs::path &prefix, bool addToVariable);
 	void addReplaceStringVectorPathStr(std::vector<fs::path> & variable, fs::path & value, const std::string & prefix, bool addToVariable);
-	
+
 	void addReplaceStringVectorPath(std::vector<fs::path> &variable, const std::string &value, const std::string &prefix, bool addToVariable);
 //	void addReplaceStringVectorPathAll(std::vector<fs::path> & variable, fs::path & value, fs::path & prefix, bool addToVariable);
 //	void addReplaceStringVectorPathPrefix(std::vector<fs::path> &variable, const std::string &value, fs::path &prefix, bool addToVariable);
-	
+
 //	void addReplaceStringVectorLibrary(std::vector<LibraryBinary> & variable, const std::string & value, const std::string & prefix, bool addToVariable);
-	
+
 	void addReplaceStringVectorPath(std::vector<LibraryBinary> &variable, const std::string &value,  const fs::path &prefix, bool addToVariable);
 
 //	void exclude(vector<string> & variable, vector<string> exclusions);
@@ -229,7 +229,7 @@ private:
 	vector<string> excludeXCFrameworks;
 
 	fs::path fixPath(const fs::path & path);
-	
+
 	fs::path normalizePath(const fs::path& path) {
 		try {
 //			auto value = fs::weakly_canonical(path);
@@ -241,10 +241,12 @@ private:
 			return fs::path("");
 		}
 	}
-    
+
 #ifdef OFADDON_OUTPUT_JSON_DEBUG
 public:
-    
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(ofAddon, additionalLibsFolder, libFiles, filesToFolders, srcFiles, csrcFiles, cppsrcFiles, headersrcFiles, objcsrcFiles, propsFiles, libs, dllsToCopy, includePaths, libsPaths, dependencies, cflags,    cppflags,  ldflags, pkgConfigLibs,      frameworks, xcframeworks, data, defines, definesCMAKE, name, addonPath, description, author, tags, url, pathToOF, pathToProject, isLocalAddon, addonMakeName, currentParseState, platform, excludeLibs, excludeSources, excludeIncludes, excludeFrameworks, excludeXCFrameworks)
+
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(ofAddon, additionalLibsFolder, libFiles, filesToFolders, srcFiles, csrcFiles, cppsrcFiles, headersrcFiles, objcsrcFiles, propsFiles, libs, dllsToCopy, includePaths, libsPaths, dependencies, cflags,    cppflags,  ldflags, pkgConfigLibs,      frameworks, xcframeworks, data, defines, definesCMAKE, name, addonPath, description, author, tags, url, pathToOF, pathToProject, isLocalAddon, addonMakeName, currentParseState, platform, excludeLibs, excludeSources, excludeIncludes, excludeFrameworks, excludeXCFrameworks)
 #endif
+
+
 };

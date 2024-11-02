@@ -31,7 +31,7 @@ static std::map <ofTargetPlatform, std::string> platformsToString {
 	{ OF_TARGET_ANDROID, "android" },
 //	{ OF_TARGET_EMSCRIPTEN, "" },
 	{ OF_TARGET_IOS, "ios" },
-    { OF_TARGET_MACOS, "macos" },
+	{ OF_TARGET_MACOS, "macos" },
 	{ OF_TARGET_LINUX, "linux" },
 	{ OF_TARGET_LINUX64, "linux64" },
 	{ OF_TARGET_LINUXARMV6L, "linuxarmv6l" },
@@ -103,35 +103,10 @@ inline bool isInVector(T item, std::vector<T> & vec){
 	return bIsInVector;
 }
 
-std::string toString(const std::string& str){
-    return str;
-}
-
-std::string toString(const fs::path& path){
-    return ofPathToString(path);
-}
-
-std::string toString(const LibraryBinary& lib){
-    return ofPathToString(lib.path);
-}
-
-template<typename T>
-inline void removeDuplicates(std::vector<T> & vec){
-    std::unordered_set<std::string> seen;
-    std::vector<T> output;
-    
-    for (const auto& value : vec) {
-        if (seen.insert(toString(value)).second) { // If insertion is successful (element not seen before)
-            output.push_back(value);
-        }
-    }
-    vec = std::move(output);
-}
-
 //inline void removeDuplicates(std::vector<fs::path> & vec){
 //    std::unordered_set<std::string> seen;
 //    std::vector<fs::path> output;
-//    
+//
 //    for (const auto& value : vec) {
 //        if (seen.insert(value.string()).second) { // If insertion is successful (element not seen before)
 //            output.emplace_back(value);
@@ -143,7 +118,7 @@ inline void removeDuplicates(std::vector<T> & vec){
 //inline void removeDuplicates(std::vector<LibraryBinary> & vec){
 //    std::unordered_set<std::string> seen;
 //    std::vector<fs::path> output;
-//    
+//
 //    for (const auto& value : vec) {
 //        if (seen.insert(value.string()).second) { // If insertion is successful (element not seen before)
 //            output.emplace_back(value);
