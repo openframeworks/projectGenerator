@@ -13,9 +13,9 @@ class CBLinuxProject: public CBWinProject {
 public:
 	CBLinuxProject(const std::string & target) : CBWinProject(target) {};
 
-	virtual bool createProjectFile() override;
-	virtual void addInclude(const fs::path & includeName) override{};
-	virtual void addLibrary(const LibraryBinary & lib)override{};
+    bool createProjectFile() override;
+    void addInclude(const fs::path & includeName) override{};
+    void addLibrary(const LibraryBinary & lib)override{};
 
 	static std::string LOG_NAME;
 };
