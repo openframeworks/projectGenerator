@@ -249,7 +249,7 @@ fs::path getPathTo(fs::path path, string limit){
     for(auto & f: folders){
         p /= f;
         if(f.string() == limit){
-            alert("getPathTo "+  p.string(), 33);
+//            alert("getPathTo "+  p.string(), 33);
             return p;
         }
     }

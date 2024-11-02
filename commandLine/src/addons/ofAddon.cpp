@@ -919,7 +919,7 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 	ofLogVerbose() << "pathToOF: [" << pathToOF.string() << "]";
 
 
-	alert("ofAddon::fromFS path : " + addonPath.string(), 33);
+//	alert("ofAddon::fromFS path : " + addonPath.string(), 33);
 
 	if (!fs::exists(addonPath)) {
 		ofLogVerbose("ofAddon::load") << "addon does not exist!" << addonPath;
