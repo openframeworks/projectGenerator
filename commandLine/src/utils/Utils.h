@@ -12,7 +12,8 @@
 #include "ofLog.h"
 #include "ofSystemUtils.h"
 #include "baseProject.h"
-struct LibraryBinary;
+#include <unordered_set>
+class LibraryBinary;
 
 std::string execute_popen(const char* cmd);
 
@@ -79,8 +80,8 @@ void getDllsRecursively(const fs::path & path, std::vector < fs::path > & dlls, 
 
 void splitFromFirst(string toSplit, string deliminator, string & first, string & second);
 
-void fixSlashOrder(string & toFix);
-void fixSlashOrderPath(fs::path &toFix);
+//void fixSlashOrder(string & toFix);
+//void fixSlashOrderPath(fs::path &toFix);
 string unsplitString (std::vector < string > strings, string deliminator );
 
 std::unique_ptr<baseProject> getTargetProject(const string & targ);
@@ -102,6 +103,58 @@ inline bool isInVector(T item, std::vector<T> & vec){
 	return bIsInVector;
 }
 
+std::string toString(const std::string& str){
+    return str;
+}
+
+std::string toString(const fs::path& path){
+    return ofPathToString(path);
+}
+
+std::string toString(const LibraryBinary& lib){
+    return ofPathToString(lib.path);
+}
+
+template<typename T>
+inline void removeDuplicates(std::vector<T> & vec){
+    std::unordered_set<std::string> seen;
+    std::vector<T> output;
+    
+    for (const auto& value : vec) {
+        if (seen.insert(toString(value)).second) { // If insertion is successful (element not seen before)
+            output.push_back(value);
+        }
+    }
+    vec = std::move(output);
+}
+
+//inline void removeDuplicates(std::vector<fs::path> & vec){
+//    std::unordered_set<std::string> seen;
+//    std::vector<fs::path> output;
+//    
+//    for (const auto& value : vec) {
+//        if (seen.insert(value.string()).second) { // If insertion is successful (element not seen before)
+//            output.emplace_back(value);
+//        }
+//    }
+//    vec = std::move(output);
+//}
+//
+//inline void removeDuplicates(std::vector<LibraryBinary> & vec){
+//    std::unordered_set<std::string> seen;
+//    std::vector<fs::path> output;
+//    
+//    for (const auto& value : vec) {
+//        if (seen.insert(value.string()).second) { // If insertion is successful (element not seen before)
+//            output.emplace_back(value);
+//        }
+//    }
+//    vec = std::move(output);
+//}
+
+
+
+
 string colorText(const string & s, int color = 32);
 void alert(string msg, int color=32);
 
@@ -121,7 +174,7 @@ std::string normalizePath(const std::string& path);
 fs::path normalizePath(const fs::path& path);
 
 bool containsSourceFiles(const fs::path& dir);
-fs::path ofRelativeToOFPATH(const fs::path& path);
+// fs::path ofRelativeToOFPATH(const fs::path& path);
 
 /*
  Idea: create an object to hold the origin and destination files, with renames where needed

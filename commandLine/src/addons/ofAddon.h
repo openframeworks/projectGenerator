@@ -13,19 +13,12 @@
 #include <iostream>
 #include <filesystem>
 
+
 namespace fs = of::filesystem;
 using std::string;
 using std::vector;
-// #include <map>
-// About Metadata
 
-const vector<string> AddonMetaVariables {
-	"ADDON_NAME",
-	"ADDON_DESCRIPTION",
-	"ADDON_AUTHOR",
-	"ADDON_TAGS",
-	"ADDON_URL",
-};
+
 
 const vector<string> parseStates {
 	"meta",
@@ -52,7 +45,6 @@ const vector<string> parseStates {
 	"visionos",
 };
 
-// About Project settings
 
 // About Build Settings
 const string ADDON_DEPENDENCIES = "ADDON_DEPENDENCIES";
@@ -62,6 +54,7 @@ const string ADDON_CPPFLAGS = "ADDON_CPPFLAGS";
 const string ADDON_LDFLAGS = "ADDON_LDFLAGS";
 const string ADDON_LIBS = "ADDON_LIBS";
 const string ADDON_DEFINES = "ADDON_DEFINES";
+const string ADDON_ADDITIONAL_LIBS = "ADDON_ADDITIONAL_LIBS";
 
 // About Source Codes
 const string ADDON_SOURCES = "ADDON_SOURCES";
@@ -84,6 +77,21 @@ const string ADDON_PKG_CONFIG_LIBRARIES = "ADDON_PKG_CONFIG_LIBRARIES";
 const string ADDON_FRAMEWORKS = "ADDON_FRAMEWORKS";
 const string ADDON_XCFRAMEWORKS = "ADDON_XCFRAMEWORKS";
 const string ADDON_DLLS_TO_COPY = "ADDON_DLLS_TO_COPY";
+
+// About Metadata
+const string ADDON_NAME = "ADDON_NAME";
+const string ADDON_DESCRIPTION = "ADDON_DESCRIPTION";
+const string ADDON_AUTHOR = "ADDON_AUTHOR";
+const string ADDON_TAGS = "ADDON_TAGS";
+const string ADDON_URL = "ADDON_URL";
+
+const vector<string> AddonMetaVariables {
+    ADDON_NAME,
+    ADDON_DESCRIPTION,
+    ADDON_AUTHOR,
+    ADDON_TAGS,
+    ADDON_URL,
+};
 
 const vector<string> AddonProjectVariables = {
 	ADDON_DEPENDENCIES,
@@ -112,6 +120,7 @@ const vector<string> AddonProjectVariables = {
 	ADDON_PKG_CONFIG_LIBRARIES,
 	ADDON_FRAMEWORKS,
 	ADDON_DLLS_TO_COPY,
+    ADDON_ADDITIONAL_LIBS,
 };
 
 class ofAddon {
@@ -121,12 +130,11 @@ public:
 	ofAddon() = default;
 	ofAddon(const ofAddon& other);
 
-
-	bool fromFS(const fs::path & path, const string & platform);
-	void parseLibsPath(const fs::path & path, const fs::path & parentFolder);
+    static string cleanName(const string& name);
+    
+    bool load(string addonName, const fs::path& projectDir, const string& targetPlatform);
 	
-
-//	void fromXML(string installXmlName);
+	
 	void clear();
 
 	vector <fs::path> additionalLibsFolder;
@@ -175,34 +183,40 @@ public:
 	bool operator <(const ofAddon & addon) const{
 		return addon.name < name;
 	}
-
+    string addonMakeName;
+    
+   
+    
 private:
+    
+    void parseLibsPath(const fs::path & path, const fs::path & parentFolder);
+    
+    void addToFolder(const fs::path& path, const fs::path & parentFolder);
 	
 	string currentParseState { "" };
 	string emptyString = { "" };
-	void preParseConfig();
+//	void preParseConfig();
 	void parseConfig();
 	void parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum);
-	void parseVariableValuePath(fs::path & variable, const string & value, bool addToValue, const string & line, int lineNum);
 	
 	void addReplaceString(std::string &variable, const std::string &value, bool addToVariable);
-	void addReplaceStringPath(fs::path &variable, const std::string & value, bool addToVariable);
+//	void addReplaceStringPath(fs::path &variable, const std::string & value, bool addToVariable);
 	void addReplaceStringVector(std::vector<std::string> &variable, const std::string &value, const std::string &prefix, bool addToVariable);
-	void addReplaceStringVectorPre(std::vector<std::string> &variable, const std::string &value, fs::path &prefix, bool addToVariable);
+//	void addReplaceStringVectorPre(std::vector<std::string> &variable, const std::string &value, fs::path &prefix, bool addToVariable);
 	void addReplaceStringVectorPathStr(std::vector<fs::path> & variable, fs::path & value, const std::string & prefix, bool addToVariable);
 	
 	void addReplaceStringVectorPath(std::vector<fs::path> &variable, const std::string &value, const std::string &prefix, bool addToVariable);
-	void addReplaceStringVectorPathAll(std::vector<fs::path> & variable, fs::path & value, fs::path & prefix, bool addToVariable);
-	void addReplaceStringVectorPathPrefix(std::vector<fs::path> &variable, const std::string &value, fs::path &prefix, bool addToVariable);
+//	void addReplaceStringVectorPathAll(std::vector<fs::path> & variable, fs::path & value, fs::path & prefix, bool addToVariable);
+//	void addReplaceStringVectorPathPrefix(std::vector<fs::path> &variable, const std::string &value, fs::path &prefix, bool addToVariable);
 	
-	void addReplaceStringVectorLibrary(std::vector<LibraryBinary> & variable, const std::string & value, const std::string & prefix, bool addToVariable);
+//	void addReplaceStringVectorLibrary(std::vector<LibraryBinary> & variable, const std::string & value, const std::string & prefix, bool addToVariable);
 	
 	void addReplaceStringVectorPath(std::vector<LibraryBinary> &variable, const std::string &value,  const fs::path &prefix, bool addToVariable);
 
-	void exclude(vector<string> & variable, vector<string> exclusions);
-	void excludePathStr(vector<fs::path> & variable, vector<string> exclusions);
-	void excludePath(vector<fs::path> & variable, vector<fs::path> exclusions);
-	void excludeLibrary(vector<LibraryBinary> & variable, vector<string> exclusions);
+//	void exclude(vector<string> & variable, vector<string> exclusions);
+//	void excludePathStr(vector<fs::path> & variable, vector<string> exclusions);
+//	void excludePath(vector<fs::path> & variable, vector<fs::path> exclusions);
+//	void excludeLibrary(vector<LibraryBinary> & variable, vector<string> exclusions);
 	bool checkCorrectVariable(const string & variable, const string & state);
 	bool checkCorrectPlatform(const string & state);
 
@@ -227,4 +241,10 @@ private:
 			return fs::path("");
 		}
 	}
+    
+#ifdef OFADDON_OUTPUT_JSON_DEBUG
+public:
+    
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(ofAddon, additionalLibsFolder, libFiles, filesToFolders, srcFiles, csrcFiles, cppsrcFiles, headersrcFiles, objcsrcFiles, propsFiles, libs, dllsToCopy, includePaths, libsPaths, dependencies, cflags,    cppflags,  ldflags, pkgConfigLibs,      frameworks, xcframeworks, data, defines, definesCMAKE, name, addonPath, description, author, tags, url, pathToOF, pathToProject, isLocalAddon, addonMakeName, currentParseState, platform, excludeLibs, excludeSources, excludeIncludes, excludeFrameworks, excludeXCFrameworks)
+#endif
 };

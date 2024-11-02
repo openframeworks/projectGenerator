@@ -71,7 +71,9 @@ ofAddon::ofAddon(const ofAddon& other)
 	  excludeSources(other.excludeSources),
 	  excludeIncludes(other.excludeIncludes),
 	  excludeFrameworks(other.excludeFrameworks),
-	  excludeXCFrameworks(other.excludeXCFrameworks)
+	  excludeXCFrameworks(other.excludeXCFrameworks),
+      addonMakeName(other.addonMakeName)
+
 {
 }
 
@@ -85,9 +87,6 @@ bool ofAddon::checkCorrectPlatform(const string & state) {
 		}
 	}
 	return false;
-//	return std::find(parseStates.begin(),
-//					 parseStates.end(),
-//					 state) != parseStates.end();
 }
 
 
@@ -97,7 +96,7 @@ bool ofAddon::checkCorrectVariable(const string & variable, const string & state
 						 AddonMetaVariables.end(),
 						 variable) != AddonMetaVariables.end();
 	}
-	else if (state == "osx") {
+	else if (state == "osx") {// Why only checking for osx? 
 		return std::find(AddonProjectVariables.begin(),
 						 AddonProjectVariables.end(),
 						 variable) != AddonProjectVariables.end();
@@ -110,19 +109,19 @@ void ofAddon::addReplaceString(std::string &variable, const std::string &value, 
 	if (addToVariable) variable += value;
 	else variable = value;
 }
+//
+//void ofAddon::addReplaceStringPath(fs::path & variable, const std::string & value, bool addToVariable) {
+//	if (addToVariable)
+//		variable = fs::path {
+//			variable / value
+//		};
+//	else
+//		variable = fs::path { value };
+//}
 
-void ofAddon::addReplaceStringPath(fs::path & variable, const std::string & value, bool addToVariable) {
-	if (addToVariable)
-		variable = fs::path {
-			variable / value
-		};
-	else
-		variable = fs::path { value };
-}
-
-void ofAddon::addReplaceStringVectorPre(std::vector<std::string> &variable, const std::string &value, fs::path &prefix, bool addToVariable) {
-	addReplaceStringVector(variable, value, prefix.string(), addToVariable);
-}
+//void ofAddon::addReplaceStringVectorPre(std::vector<std::string> &variable, const std::string &value, fs::path &prefix, bool addToVariable) {
+//	addReplaceStringVector(variable, value, prefix.string(), addToVariable);
+//}
 
 
 void ofAddon::addReplaceStringVector(std::vector<std::string> &variable, const std::string &value, const std::string &prefix, bool addToVariable) {
@@ -150,12 +149,14 @@ void ofAddon::addReplaceStringVector(std::vector<std::string> &variable, const s
 					} else if (!ofGetEnv(varName.c_str()).empty()) {
 						varValue = ofGetEnv(varName.c_str());
 					}
-					ofStringReplace(val, "$(" + varName + ")", varValue);
-					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << val;
+					if(!varValue.empty()){
+						ofStringReplace(val, "$(" + varName + ")", varValue);
+						ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << val;
+					}
 				}
 			}
 
-			if (prefix == "" || val.find(ofPathToString(pathToOF)) == 0 || fs::path{val}.is_absolute()) {
+			if (prefix == "" || val.find(ofPathToString(pathToOF)) == 0 || fs::path{val}.is_absolute() || (val.size() && val[0] == '$')) {
 				variable.emplace_back(val);
 			} else {
 				fs::path p = fs::path{prefix} / val;
@@ -190,12 +191,13 @@ void ofAddon::addReplaceStringVectorPathStr(std::vector<fs::path> &variable, fs:
 					} else if (!ofGetEnv(varName.c_str()).empty()) {
 						varValue = ofGetEnv(varName.c_str());
 					}
-					ofStringReplace(val, "$(" + varName + ")", varValue);
-					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << val;
+					if(!varValue.empty()){
+						ofStringReplace(val, "$(" + varName + ")", varValue);
+						ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << val;
+					}
 				}
 			}
-
-			if (prefix == "" || val.find(ofPathToString(pathToOF)) == 0 || fs::path { val }.is_absolute()) {
+			if (prefix == "" || val.find(ofPathToString(pathToOF)) == 0 || fs::path { val }.is_absolute() || (val.size() && val[0] == '$')) {
 				variable.emplace_back(fs::path { val });
 			} else {
 				fs::path p = fs::path { prefix } / val;
@@ -210,50 +212,52 @@ void ofAddon::addReplaceStringVectorPath(std::vector<fs::path> &variable, const 
 	addReplaceStringVectorPathStr(variable, pathValue, prefix, addToVariable);
 }
 
-void ofAddon::addReplaceStringVectorPathPrefix(std::vector<fs::path> &variable, const std::string &value, fs::path &prefix, bool addToVariable) {
-	fs::path pathValue = fs::path { value };
-	addReplaceStringVectorPathStr(variable, pathValue, prefix.string(), addToVariable);
-}
+//void ofAddon::addReplaceStringVectorPathPrefix(std::vector<fs::path> &variable, const std::string &value, fs::path &prefix, bool addToVariable) {
+//	fs::path pathValue = fs::path { value };
+//	addReplaceStringVectorPathStr(variable, pathValue, prefix.string(), addToVariable);
+//}
 
-void ofAddon::addReplaceStringVectorPathAll(std::vector<fs::path> & variable, fs::path & value, fs::path & prefix, bool addToVariable) {
-	if (value == prefix) return;
-
-	std::vector<std::string> values;
-	if (value.string().find("\"") != std::string::npos) {
-		values = ofSplitString(value.string(), "\"", true, true);
-	} else {
-		values = ofSplitString(value.string(), " ", true, true);
-	}
-
-	if (!addToVariable) variable.clear();
-
-	std::regex findVar("(\\$\\()(.+)(\\))");
-	for (auto &val : values) {
-		if (val != "") {
-			std::smatch varMatch;
-			if (std::regex_search(val, varMatch, findVar)) {
-				if (varMatch.size() > 2) {
-					std::string varName = varMatch[2].str();
-					std::string varValue;
-					if (varName == "OF_ROOT") {
-						varValue = ofPathToString(pathToOF);
-					} else if (!ofGetEnv(varName.c_str()).empty()) {
-						varValue = ofGetEnv(varName.c_str());
-					}
-					ofStringReplace(val, "$(" + varName + ")", varValue);
-					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << val;
-				}
-			}
-
-			if (prefix.string() == "" || val.find(ofPathToString(pathToOF)) == 0 || fs::path{val}.is_absolute()) {
-				variable.emplace_back(fs::path{val});
-			} else {
-				fs::path p = fs::path{prefix} / val;
-				variable.emplace_back(p);
-			}
-		}
-	}
-}
+//void ofAddon::addReplaceStringVectorPathAll(std::vector<fs::path> & variable, fs::path & value, fs::path & prefix, bool addToVariable) {
+//	if (value == prefix) return;
+//
+//	std::vector<std::string> values;
+//	if (value.string().find("\"") != std::string::npos) {
+//		values = ofSplitString(value.string(), "\"", true, true);
+//	} else {
+//		values = ofSplitString(value.string(), " ", true, true);
+//	}
+//
+//	if (!addToVariable) variable.clear();
+//
+//	std::regex findVar("(\\$\\()(.+)(\\))");
+//	for (auto &val : values) {
+//		if (val != "") {
+//			std::smatch varMatch;
+//			if (std::regex_search(val, varMatch, findVar)) {
+//				if (varMatch.size() > 2) {
+//					std::string varName = varMatch[2].str();
+//					std::string varValue;
+//					if (varName == "OF_ROOT") {
+//						varValue = ofPathToString(pathToOF);
+//					} else if (!ofGetEnv(varName.c_str()).empty()) {
+//						varValue = ofGetEnv(varName.c_str());
+//					}
+//					if(!varValue.empty()){
+//						ofStringReplace(val, "$(" + varName + ")", varValue);
+//						ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << val;
+//					}
+//				}
+//			}
+//
+//			if (prefix.string() == "" || val.find(ofPathToString(pathToOF)) == 0 || fs::path{val}.is_absolute() || (val.size() && val[0] == '$')) {
+//				variable.emplace_back(fs::path{val});
+//			} else {
+//				fs::path p = fs::path{prefix} / val;
+//				variable.emplace_back(p);
+//			}
+//		}
+//	}
+//}
 void ofAddon::addReplaceStringVectorPath(std::vector<LibraryBinary> &variable, const std::string &value,  const fs::path &prefix, bool addToVariable) {
 	std::vector<std::string> values;
 	if (value.find("\"") != std::string::npos) {
@@ -277,12 +281,14 @@ void ofAddon::addReplaceStringVectorPath(std::vector<LibraryBinary> &variable, c
 					} else if (!ofGetEnv(varName.c_str()).empty()) {
 						varValue = ofGetEnv(varName.c_str());
 					}
-					ofStringReplace(v, "$(" + varName + ")", varValue);
-					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << v;
+					if(!varValue.empty()){
+						ofStringReplace(v, "$(" + varName + ")", varValue);
+						ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << v;
+					}
 				}
 			}
 
-			if (prefix.empty() || v.find(ofPathToString(pathToOF)) == 0 || fs::path{v}.is_absolute()) {
+			if (prefix.empty() || v.find(ofPathToString(pathToOF)) == 0 || fs::path{v}.is_absolute() || (v.size() && v[0] == '$')) {
 				variable.push_back({ fs::path { v }, "", "" });
 			} else {
 				fs::path p = fs::path{prefix / v };
@@ -292,48 +298,45 @@ void ofAddon::addReplaceStringVectorPath(std::vector<LibraryBinary> &variable, c
 	}
 }
 
-void ofAddon::addReplaceStringVectorLibrary(std::vector<LibraryBinary> &variable, const std::string &value, const std::string &prefix, bool addToVariable) {
-	std::vector<std::string> values;
-	if (value.find("\"") != std::string::npos) {
-		values = ofSplitString(value, "\"", true, true);
-	} else {
-		values = ofSplitString(value, " ", true, true);
-	}
-
-	if (!addToVariable) variable.clear();
-	std::regex findVar("(\\$\\()(.+)(\\))");
-
-	for (auto &v : values) {
-		if (v != "") {
-			std::smatch varMatch;
-			if (std::regex_search(v, varMatch, findVar)) {
-				if (varMatch.size() > 2) {
-					std::string varName = varMatch[2].str();
-					std::string varValue;
-					if (varName == "OF_ROOT") {
-						varValue = ofPathToString(pathToOF);
-					} else if (!ofGetEnv(varName.c_str()).empty()) {
-						varValue = ofGetEnv(varName.c_str());
-					}
-					ofStringReplace(v, "$(" + varName + ")", varValue);
-					ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << v;
-				}
-			}
-
-			if (prefix == "" || v.find(ofPathToString(pathToOF)) == 0 || fs::path{v}.is_absolute()) {
-				variable.push_back({ fs::path { v }, "", "" });
-			} else {
-				fs::path p = fs::path{prefix} / v;
-				variable.push_back({p, "", ""});
-			}
-		}
-	}
-}
-
-void ofAddon::parseVariableValuePath(fs::path &variable, const string & value, bool addToValue, const string & line, int lineNum) {
-	parseVariableValue(variable.string(), value, addToValue, line, lineNum);
-}
-	
+//void ofAddon::addReplaceStringVectorLibrary(std::vector<LibraryBinary> &variable, const std::string &value, const std::string &prefix, bool addToVariable) {
+//	std::vector<std::string> values;
+//	if (value.find("\"") != std::string::npos) {
+//		values = ofSplitString(value, "\"", true, true);
+//	} else {
+//		values = ofSplitString(value, " ", true, true);
+//	}
+//
+//	if (!addToVariable) variable.clear();
+//	std::regex findVar("(\\$\\()(.+)(\\))");
+//
+//	for (auto &v : values) {
+//		if (v != "") {
+//			std::smatch varMatch;
+//			if (std::regex_search(v, varMatch, findVar)) {
+//				if (varMatch.size() > 2) {
+//					std::string varName = varMatch[2].str();
+//					std::string varValue;
+//					if (varName == "OF_ROOT") {
+//						varValue = ofPathToString(pathToOF);
+//					} else if (!ofGetEnv(varName.c_str()).empty()) {
+//						varValue = ofGetEnv(varName.c_str());
+//					}
+//					if(!varValue.empty()){
+//						ofStringReplace(v, "$(" + varName + ")", varValue);
+//						ofLogVerbose("ofAddon") << "addon config: substituting " << varName << " with " << varValue << " = " << v;
+//					}
+//				}
+//			}
+//
+//			if (prefix == "" || v.find(ofPathToString(pathToOF)) == 0 || fs::path{v}.is_absolute() || (v.size() && v[0] == '$')) {
+//				variable.push_back({ fs::path { v }, "", "" });
+//			} else {
+//				fs::path p = fs::path{prefix} / v;
+//				variable.push_back({p, "", ""});
+//			}
+//		}
+//	}
+//}
 
 void ofAddon::parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum){
 	
@@ -347,46 +350,40 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 		return;
 	}
 
-	fs::path addonRelPath = isLocalAddon ? addonPath : (pathToOF / "addons" / name);
-
-	if (variable == "ADDON_ADDITIONAL_LIBS") {
+    fs::path addonRelPath = makeRelative(pathToProject, addonPath);
+    std::string addonRelPathStr = ofPathToString(addonRelPath);
+    
+	if (variable == ADDON_ADDITIONAL_LIBS) {
 		additionalLibsFolder.emplace_back(fs::path { value });
 		return;
 	}
 	
-	else if (variable == "ADDON_DESCRIPTION") {
+	else if (variable == ADDON_DESCRIPTION) {
 		addReplaceString(description, value, addToValue);
 		return;
 	}
 
-	else if(variable == "ADDON_AUTHOR"){
+	else if(variable == ADDON_AUTHOR){
 		addReplaceString(author,value,addToValue);
 		return;
 	}
 
-	else if(variable == "ADDON_TAGS"){
+	else if(variable == ADDON_TAGS){
 		addReplaceStringVector(tags,value,emptyString,addToValue);
 		return;
 	}
 
-	else if(variable == "ADDON_URL"){
+	else if(variable == ADDON_URL){
 		addReplaceString(url,value,addToValue);
 		return;
 	}
 
-	else if(variable == "ADDON_DEPENDENCIES"){
+	else if(variable == ADDON_DEPENDENCIES){
 		addReplaceStringVector(dependencies,value,emptyString,addToValue);
 	}
 
-	else if(variable == "ADDON_INCLUDES"){
-//		if (!addToValue) {
-//			alert ("CLEAR " + variable, 36);
-//			alert ("value " + value, 36);
-//		}
-//		cout << includePaths.size() << endl;
-		addReplaceStringVectorPathPrefix(includePaths, value, addonRelPath, addToValue);
-		//		cout << includePaths.size() << endl;
-//		cout << "----" << endl;
+	else if(variable == ADDON_INCLUDES){
+		addReplaceStringVectorPath(includePaths, value, addonRelPathStr, addToValue);
 	}
 
 	else if(variable == ADDON_CFLAGS){
@@ -406,7 +403,7 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
 	else if(variable == ADDON_DLLS_TO_COPY){
-		addReplaceStringVectorPathPrefix(dllsToCopy, value, addonRelPath, addToValue);
+		addReplaceStringVectorPath(dllsToCopy, value, addonRelPathStr, addToValue);
 	}
 
 	else if(variable == ADDON_PKG_CONFIG_LIBRARIES){
@@ -417,34 +414,33 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 		size_t found=value.find('/');
 		if (found==string::npos) { // This path doesn't have slashes
 			addReplaceStringVector(frameworks, value, emptyString, addToValue);
-
 		} else {
-			addReplaceStringVectorPre(frameworks, value, addonRelPath, addToValue);
+			addReplaceStringVector(frameworks, value, addonRelPathStr, addToValue);
 		}
 	}
 
 	else if (variable == ADDON_XCFRAMEWORKS) {
-		addReplaceStringVectorPre(xcframeworks, value, addonRelPath, addToValue);
+		addReplaceStringVector(xcframeworks, value, addonRelPathStr, addToValue);
 	}
 
 	else if(variable == ADDON_SOURCES){
-		addReplaceStringVectorPathPrefix(srcFiles, value, addonRelPath, addToValue);
+		addReplaceStringVectorPath(srcFiles, value, addonRelPathStr, addToValue);
 	}
 
 	else if(variable == ADDON_C_SOURCES){
-		addReplaceStringVectorPathPrefix(csrcFiles, value, addonRelPath, addToValue);
+		addReplaceStringVectorPath(csrcFiles, value, addonRelPathStr, addToValue);
 	}
 
 	else if(variable == ADDON_CPP_SOURCES){
-		addReplaceStringVectorPathPrefix(cppsrcFiles, value, addonRelPath, addToValue);
+		addReplaceStringVectorPath(cppsrcFiles, value, addonRelPathStr, addToValue);
 	}
 
 	else if(variable == ADDON_HEADER_SOURCES){
-		addReplaceStringVectorPathPrefix(headersrcFiles, value, addonRelPath, addToValue);
+		addReplaceStringVectorPath(headersrcFiles, value, addonRelPathStr, addToValue);
 	}
 
 	else if(variable == ADDON_OBJC_SOURCES){
-		addReplaceStringVectorPathPrefix(objcsrcFiles, value, addonRelPath, addToValue);
+		addReplaceStringVectorPath(objcsrcFiles, value, addonRelPathStr, addToValue);
 	}
 
 	else if(variable == ADDON_DATA){
@@ -456,7 +452,7 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
     
     else if(variable == ADDON_LIBS_DIR){
-		addReplaceStringVectorPathPrefix(libsPaths, value, addonRelPath, addToValue);
+		addReplaceStringVectorPath(libsPaths, value, addonRelPathStr, addToValue);
     }
 
 	else if(variable == ADDON_SOURCES_EXCLUDE){
@@ -476,173 +472,177 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 }
 
-void ofAddon::exclude(vector<string> & variables, vector<string> exclusions){
-	for(auto & exclusion: exclusions){
-		ofStringReplace(exclusion,"\\","/");
-		ofStringReplace(exclusion,".","\\.");
-		ofStringReplace(exclusion,"%",".*");
-		exclusion =".*"+ exclusion;
-//		alert ("ofAddon::exclude " +exclusion, 31);
+template<typename T>
+void exclude(std::vector<T>& variables, vector<string> exclusions){
+    for(auto & exclusion: exclusions){
+        ofStringReplace(exclusion,"\\","/");
+        ofStringReplace(exclusion,".","\\.");
+        ofStringReplace(exclusion,"%",".*");
+        exclusion =".*"+ exclusion;
+        
+        std::regex findVar(exclusion);
+        std::smatch varMatch;
+        variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const T & variable){
+            std::string forwardSlashedVariable = ofPathToString(variable);
+            ofStringReplace(forwardSlashedVariable, "\\", "/");
+            return std::regex_search(forwardSlashedVariable, varMatch, findVar);
+        }), variables.end());
+    }
+}
+//template<typename T>
+//void exclude(vector<T> & variables, vector<string> exclusions){
+//    for(auto & exclusion: exclusions){
+//        eraseVariable<T>(variables, exclusion);
+//    }
+//}
+//
+//void ofAddon::exclude(vector<string> & variables, vector<string> exclusions){
+//	for(auto & exclusion: exclusions){
+//        eraseVariable<std::string>(variables, exclusion);
+////		ofStringReplace(exclusion,"\\","/");
+////		ofStringReplace(exclusion,".","\\.");
+////		ofStringReplace(exclusion,"%",".*");
+////		exclusion =".*"+ exclusion;
+////
+////		std::regex findVar(exclusion);
+////		std::smatch varMatch;
+////
+////		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const std::string & variable){
+////			auto forwardSlashedVariable = variable;
+////			ofStringReplace(forwardSlashedVariable, "\\", "/");
+////			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
+////		}), variables.end());
+//	}
+//}
+//
+//void ofAddon::excludePathStr(vector<fs::path> & variables, vector<string> exclusions){
+//	for (auto & exclusion : exclusions) {
+//        eraseVariable<fs::path>(variables, exclusion);
+////		ofStringReplace(exclusion, "\\", "/");
+////		ofStringReplace(exclusion, ".", "\\.");
+////		ofStringReplace(exclusion, "%", ".*");
+////		exclusion = ".*" + exclusion;
+////
+////		std::regex findVar(exclusion);
+////		std::smatch varMatch;
+////
+////		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const fs::path & variable) {
+////			auto forwardSlashedVariable = variable.string();
+////			ofStringReplace(forwardSlashedVariable, "\\", "/");
+////			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
+////		}), variables.end());
+//	}
+//}
+////void ofAddon::excludePath(vector<fs::path> & variables, vector<fs::path> exclusions){
+//	for(auto & exclusion: exclusions){
+//		string excluse = exclusion.string();
+//		ofStringReplace(excluse,"\\","/");
+//		ofStringReplace(excluse,".","\\.");
+//		ofStringReplace(excluse,"%",".*");
+//		excluse =".*"+ excluse;
+//
+//		std::regex findVar(excluse);
+//		std::smatch varMatch;
+//
+//		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const fs::path & variable) {
+//			auto forwardSlashedVariable = variable.string();
+//			ofStringReplace(forwardSlashedVariable, "\\", "/");
+//			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
+//		}),
+//			variables.end());
+//	}
+//}
 
-		std::regex findVar(exclusion);
-		std::smatch varMatch;
-//		alert ("vars size " + ofToString(variables.size()));
-//		for (auto & v : variables) {
-//			alert ("\t" + v, 32);
-//		}
-		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const std::string & variable){
-			auto forwardSlashedVariable = variable;
-			ofStringReplace(forwardSlashedVariable, "\\", "/");
-//			bool exclude = std::regex_search(forwardSlashedVariable, varMatch, findVar);
-//			if (exclude) {
-//				alert ("variable removed : " + variable, 31);
+//
+//
+//void ofAddon::excludeLibrary(vector<LibraryBinary> & variables, vector<string> exclusions) {
+//	for(auto & exclusion: exclusions){
+//        eraseVariable(variables, exclusion);
+////		ofStringReplace(exclusion,"\\","/");
+////		ofStringReplace(exclusion,".","\\.");
+////		ofStringReplace(exclusion,"%",".*");
+////		exclusion =".*"+ exclusion;
+////
+////		std::regex findVar(exclusion);
+////		std::smatch varMatch;
+////		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const LibraryBinary & variable){
+////			auto forwardSlashedVariable = variable.path.string();
+////			ofStringReplace(forwardSlashedVariable, "\\", "/");
+////			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
+////		}), variables.end());
+//	}
+//}
+
+//
+//void ofAddon::preParseConfig(){
+//	//	alert ("ofAddon::parseConfig " + addonPath.string(), 33);
+//    fs::path fileName =     (addonPath / "addon_config.mk");
+//
+//	if (!fs::exists(fileName)) {
+////		ofLogError() << "ofAddon::parseConfig() " << fileName << " not found " << ofPathToString(fileName);
+//		return;
+//	}
+//	
+//	for (auto & line : fileToStrings(fileName)) {
+//		line = ofTrim(line);
+//		
+//		if (line[0]=='#' || line == "") {
+//			continue;
+//		} // discard comments
+//
+//
+//		// found section?
+//		if (line.back() == ':'){
+//			ofStringReplace(line, ":", "");
+//			currentParseState = line;
+//			
+//			if (std::find(parseStates.begin(), parseStates.end(), currentParseState) == parseStates.end()) {
+//				ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
+////								<< "line " << lineNum << ": " << originalLine << "\n\t\t"
+//								<< "sectionName " << currentParseState << " not recognized";
 //			}
-			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
-		}), variables.end());
-		
-//		alert ("vars size " + ofToString(variables.size()));
-//		for (auto & v : variables) {
-//			alert ("\t" + v, 32);
+//			continue;
 //		}
-	}
-}
-
-void ofAddon::excludePathStr(vector<fs::path> & variables, vector<string> exclusions){
-	for (auto & exclusion : exclusions) {
-		ofStringReplace(exclusion, "\\", "/");
-		ofStringReplace(exclusion, ".", "\\.");
-		ofStringReplace(exclusion, "%", ".*");
-		exclusion = ".*" + exclusion;
-
-		std::regex findVar(exclusion);
-		std::smatch varMatch;
-
-		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const fs::path & variable) {
-			auto forwardSlashedVariable = variable.string();
-			ofStringReplace(forwardSlashedVariable, "\\", "/");
-			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
-		}),
-			variables.end());
-	}
-}
-void ofAddon::excludePath(vector<fs::path> & variables, vector<fs::path> exclusions){
-	for(auto & exclusion: exclusions){
-		string excluse = exclusion.string();
-		ofStringReplace(excluse,"\\","/");
-		ofStringReplace(excluse,".","\\.");
-		ofStringReplace(excluse,"%",".*");
-		excluse =".*"+ excluse;
-//		alert ("ofAddon::exclude " +exclusion, 31);
-
-		std::regex findVar(excluse);
-		std::smatch varMatch;
-
-		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const fs::path & variable) {
-			auto forwardSlashedVariable = variable.string();
-			ofStringReplace(forwardSlashedVariable, "\\", "/");
-			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
-		}),
-			variables.end());
-	}
-}
-
-
-
-void ofAddon::excludeLibrary(vector<LibraryBinary> & variables, vector<string> exclusions) {
-	for(auto & exclusion: exclusions){
-		ofStringReplace(exclusion,"\\","/");
-		ofStringReplace(exclusion,".","\\.");
-		ofStringReplace(exclusion,"%",".*");
-		exclusion =".*"+ exclusion;
-
-		std::regex findVar(exclusion);
-		std::smatch varMatch;
-		variables.erase(std::remove_if(variables.begin(), variables.end(), [&](const LibraryBinary & variable){
-			auto forwardSlashedVariable = variable.path.string();
-			ofStringReplace(forwardSlashedVariable, "\\", "/");
-			return std::regex_search(forwardSlashedVariable, varMatch, findVar);
-		}), variables.end());
-	}
-}
-
-
-void ofAddon::preParseConfig(){
-	//	alert ("ofAddon::parseConfig " + addonPath.string(), 33);
-	fs::path fileName = isLocalAddon ?
-		(pathToProject / addonPath / "addon_config.mk") :
-		(addonPath / "addon_config.mk")
-	;
-
-	if (!fs::exists(fileName)) {
-//		ofLogError() << "ofAddon::parseConfig() " << fileName << " not found " << ofPathToString(fileName);
-		return;
-	}
-	
-	for (auto & line : fileToStrings(fileName)) {
-		line = ofTrim(line);
-		
-		if (line[0]=='#' || line == "") {
-			continue;
-		} // discard comments
-
-
-		// found section?
-		if (line.back() == ':'){
-			ofStringReplace(line, ":", "");
-			currentParseState = line;
-			
-			if (std::find(parseStates.begin(), parseStates.end(), currentParseState) == parseStates.end()) {
-				ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
-//								<< "line " << lineNum << ": " << originalLine << "\n\t\t"
-								<< "sectionName " << currentParseState << " not recognized";
-			}
-			continue;
-		}
-		
-		// found Variable
-		if (line.find("=") != string::npos){
-//			bool addToValue = false;
-			string variable, value;
-			vector<string> varValue;
-			if (line.find("+=") != string::npos) {
-//				addToValue = true;
-				varValue = ofSplitString(line, "+=");
-			} else {
-				varValue = ofSplitString(line, "=");
-			}
-			variable = ofTrim(varValue[0]);
-			value = ofTrim(varValue[1]);
-
-			// FIXME: This seems to be meaningless
-			if(!checkCorrectPlatform(currentParseState)){
-				continue;
-			}
-
-			if(!checkCorrectVariable(variable, currentParseState)){
-				ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
-//								<< "line " << lineNum << ": " << originalLine << "\n\t\t"
-								<< "variable " << variable << " not recognized for section " << currentParseState;
-				continue;
-			}
-			
-			if (variable == "ADDON_ADDITIONAL_LIBS") {
-				additionalLibsFolder.emplace_back(fs::path { value });
-				//				return;
-			}
-//			parseVariableValue(variable, value, addToValue, originalLine, lineNum);
-		}
-	}
-}
+//		
+//		// found Variable
+//		if (line.find("=") != string::npos){
+////			bool addToValue = false;
+//			string variable, value;
+//			vector<string> varValue;
+//			if (line.find("+=") != string::npos) {
+////				addToValue = true;
+//				varValue = ofSplitString(line, "+=");
+//			} else {
+//				varValue = ofSplitString(line, "=");
+//			}
+//			variable = ofTrim(varValue[0]);
+//			value = ofTrim(varValue[1]);
+//
+//			// FIXME: This seems to be meaningless
+//			if(!checkCorrectPlatform(currentParseState)){
+//				continue;
+//			}
+//
+//			if(!checkCorrectVariable(variable, currentParseState)){
+//				ofLogError() << "Error parsing " << name << " addon_config.mk" << "\n\t\t"
+////								<< "line " << lineNum << ": " << originalLine << "\n\t\t"
+//								<< "variable " << variable << " not recognized for section " << currentParseState;
+//				continue;
+//			}
+//			
+//			if (variable == ADDON_ADDITIONAL_LIBS) {
+//				additionalLibsFolder.emplace_back(fs::path { value });
+//				//				return;
+//			}
+////			parseVariableValue(variable, value, addToValue, originalLine, lineNum);
+//		}
+//	}
+//}
 
 void ofAddon::parseConfig(){
-//	alert ("ofAddon::parseConfig " + addonPath.string(), 33);
-	fs::path fileName = isLocalAddon ?
-		(pathToProject / addonPath / "addon_config.mk") :
-		(addonPath / "addon_config.mk")
-	;
+	fs::path fileName = (addonPath / "addon_config.mk");
 
 	if (!fs::exists(fileName)) {
-//		ofLogError() << "ofAddon::parseConfig() " << fileName << " not found " << ofPathToString(fileName);
 		return;
 	}
 
@@ -706,6 +706,17 @@ void ofAddon::parseConfig(){
 	}
 }
 
+void ofAddon::addToFolder(const fs::path& path, const fs::path & parentFolder){
+ 
+    fs::path folder;
+    if (isLocalAddon) {
+        folder = fs::path { "local_addons" } / fs::relative(path.parent_path(), parentFolder);
+    } else {
+        folder = fs::relative(path.parent_path(), getOFRoot());
+    }
+    filesToFolders[path] = folder;
+}
+
 void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFolder) {
 //	alert ("parseLibsPath " + libsPath.string(), 35);
 	if (!fs::exists(libsPath)) {
@@ -713,11 +724,32 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		return;
 	}
 
-	getLibsRecursively(libsPath, libFiles, libs, platform);
-	if (platform == "osx"  ||
+    
+    if (platform == "osx"  || platform == "macos"){
+        // Horrible hack to make it work with the bad idea of renaming osx to macos
+        getLibsRecursively(libsPath, libFiles, libs, "macos");
+        getLibsRecursively(libsPath, libFiles, libs, "osx");
+        
+        getFrameworksRecursively(libsPath, frameworks, "macos");
+        getFrameworksRecursively(libsPath, frameworks, "osx");
+        getXCFrameworksRecursively(libsPath, xcframeworks, "macos");
+        getXCFrameworksRecursively(libsPath, xcframeworks, "osx");
+        
+        removeDuplicates(libs);
+        removeDuplicates(libFiles);
+        removeDuplicates(frameworks);
+        removeDuplicates(xcframeworks);
+        
+    }else{
+        
+        getLibsRecursively(libsPath, libFiles, libs, platform);
+    }
+    
+    if (//platform == "osx"  ||
         platform == "ios"  ||
-        platform == "tvos" ||
-        platform == "macos"){
+        platform == "tvos"){//} ||
+        //platform == "macos"){
+        
             getFrameworksRecursively(libsPath, frameworks, platform);
             getXCFrameworksRecursively(libsPath, xcframeworks, platform);
 	}
@@ -736,24 +768,29 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 	// TODO: this is not needed even if it is local addon but project is outside OF root path
 	// Absolute paths will be used in this case too.
 	// Maybe it is the same situation for all others fixPath occurences?
-	if (!isLocalAddon) {
+//	if (!isLocalAddon) {
 		for (auto & l : libs) {
 //			alert("fixpath before " + ofPathToString(l.path));
-			l.path = fixPath(l.path);
+//			l.path = fixPath(l.path);
+            addToFolder(l.path , parentFolder);
 //			alert("fixpath after  " + ofPathToString(l.path));
 		}
-	}
+//	}
 
 	for (auto & s : libFiles) {
-		fs::path folder;
-		if (isLocalAddon) {
-			folder = fs::path { "local_addons" } / fs::relative(s.parent_path(), parentFolder);
-		} else {
-			folder = fs::relative(s.parent_path(), getOFRoot());
-			s = fixPath(s);
-		}
+//        alert("fixpath before " + ofPathToString(s));
+        s = fixPath(s);
+//        alert("fixpath after  " + ofPathToString(s));
+        addToFolder(s, parentFolder);
+//		fs::path folder;
+//		if (isLocalAddon) {
+//			folder = fs::path { "local_addons" } / fs::relative(s.parent_path(), parentFolder);
+//		} else {
+//			folder = fs::relative(s.parent_path(), getOFRoot());
+
+//		}
 		srcFiles.emplace_back(s);
-		filesToFolders[s] = folder;
+//		filesToFolders[s] = folder;
 	}
 
 	// so addons will never be system.
@@ -771,146 +808,199 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 			; // do we need to do anything here?
 		} else {
 			// if addon is local, it is relative to the project folder, and if it is not, it is related to the project folder, ex: addons/ofxSvg
-			fs::path rel = fs::relative (f, isLocalAddon ? pathToProject : pathToOF);
-			fs::path folder = rel.parent_path();
-
-			if (isLocalAddon) {
-				fs::path fFS { f };
-				folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
-			}
-
-			filesToFolders[f] = folder;
+//			fs::path rel = fs::relative (f, isLocalAddon ? pathToProject : pathToOF);
+//			fs::path folder = rel.parent_path();
+//
+//			if (isLocalAddon) {
+//				fs::path fFS { f };
+//				folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
+//			}
+//
+//			filesToFolders[f] = folder;
+            addToFolder(f, parentFolder);
 		}
 	}
 
 	for (const auto & f : xcframeworks) {
 		
-		fs::path rel = fs::relative(f, isLocalAddon ? pathToProject : pathToOF);
-		fs::path folder = rel.parent_path();
-
-		if (isLocalAddon) {
-			fs::path fFS { f };
-			folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
-		}
-
-		filesToFolders[f] = folder;
+//		fs::path rel = fs::relative(f, isLocalAddon ? pathToProject : pathToOF);
+//		fs::path folder = rel.parent_path();
+//
+//		if (isLocalAddon) {
+//			fs::path fFS { f };
+//			folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
+//		}
+//
+//		filesToFolders[f] = folder;
+        addToFolder(f, parentFolder);
 	}
 }
+string ofAddon::cleanName(const string& name){
+    auto addonName = name;
+#ifdef TARGET_WIN32
+    //    std::replace( addonName.begin(), addonName.end(), '/', '\\' );
+//    fixSlashOrder(addonName);
+#endif
+        
+    {
+        // in case that addonName contains a comment, get rid of it
+        auto s = ofSplitString(addonName, "#");
+        if(s.size()){
+            addonName = s[0];
+        }
+    }
+    return addonName;
+}
+
+bool ofAddon::load(string addonName, const fs::path& projectDir, const string& targetPlatform){
+    // we want to set addonMakeName before cleaning the addon name, so it is preserved in the exact same way as it was passed, and the addons.make file can be (re)constructed properly
+    this->addonMakeName = addonName;
+    
+    addonName = cleanName(addonName);
+    
+    if(addonName.empty()){
+        ofLogError("baseProject::addAddon") << "cant add addon with empty name";
+        return false;
+    }
+    
+    //This should be the only instance where we check if the addon is either local or not.
+    //being local just means that the addon name is a filepath and it starts with a dot.
+    //otherwise it will look in the addons folder.
+    //A local addon is not restricted to one that lives in folder with the name local_addons, should be any valid addon on the filesystem.
+    //Parsing will generate the correct path to both OF and the project.
+    //Everything else should be treated exactly in the same way, regardless of it being local or not.
+    if(addonName[0] == '.' && fs::exists( ofFilePath::join(projectDir, addonName))){
+        
+        this->addonPath = normalizePath(ofFilePath::join(projectDir, addonName));
+        this->isLocalAddon = true;
+        ofLogVerbose() << "Adding local addon: " << addonName;
+        //        addon.pathToProject = makeRelative(getOFRoot(), projectDir);
+        //        projectDir;
+    }else{
+        this->addonPath = fs::path { getOFRoot() / "addons" / addonName };
+    }
+    this->pathToOF = normalizePath(getOFRoot());
+    
+    this->addonPath = normalizePath(addonPath);
+    
+    
+    this->pathToProject = projectDir;
+    
+    this->platform = targetPlatform;
+    
+    ofLogVerbose() << "addonPath to: [" << addonPath.string() << "]";
+    ofLogVerbose() << "pathToOF: [" << pathToOF.string() << "]";
+    
+
+	alert("ofAddon::fromFS path : " + addonPath.string(), 33);
 	
-bool ofAddon::fromFS(const fs::path & path, const string & platform){
-	//alert("ofAddon::fromFS path : " + path.string(), 33);
-	
-	if (!fs::exists(path)) {
+	if (!fs::exists(addonPath)) {
+        ofLogVerbose("ofAddon::load") << "addon does not exist!" << addonPath;
 		return false;
 	}
 	
 	clear();
-	this->platform = platform;
+    fs::path addonNamePath { addonName};
+    
+	name = isLocalAddon ? ofPathToString(addonNamePath.stem()) : ofPathToString(addonNamePath.filename());
 
-	addonPath = path;
-
-	
-	name = isLocalAddon ? ofPathToString(path.stem()) : ofPathToString(path.filename());
-
-	fs::path srcPath { path / "src" };
+	fs::path srcPath { addonPath / "src" };
 	if (fs::exists(srcPath)) {
 		getFilesRecursively(srcPath, srcFiles);
 	}
+    
+//    printPaths(srcFiles, "srcFiles", 34);
+    
 
-	fs::path parentFolder { path.parent_path() };
-
-	for (auto & s : srcFiles) {
-		fs::path folder;
-		if (isLocalAddon) {
-			fs::path sFS { s };
-			folder = fs::path { "local_addons" } / fs::relative(sFS.parent_path(), parentFolder);
-		} else {
-			fs::path sFS { fixPath(s) };
-			s = sFS;
-			folder = fs::relative(sFS.parent_path(), getOFRoot());
-		}
-		filesToFolders[s] = folder;
-	}
-
+	fs::path parentFolder { addonPath.parent_path() };
+    
+    for (auto & s : srcFiles) {
+        fs::path sFS { fixPath(s) };
+        s = sFS;
+        addToFolder(s, parentFolder);
+    }
 	
 	if (platform == "vs" || platform == "msys2") {
 		// here addonPath is the same as path.
 		getPropsRecursively(addonPath, propsFiles, platform);
 	}
 
-
-
-	fs::path libsPath { path / "libs" };
+	fs::path libsPath { addonPath / "libs" };
 
 	// paths that are needed for the includes.
 	std::list < fs::path > paths;
 
 	// get every folder in addon/src and addon/libs
-	vector < fs::path > libFolders;
-	if (fs::exists(libsPath)) {
+    
+    if (fs::exists(libsPath)) {
+        vector < fs::path > libFolders;
 		getFoldersRecursively(libsPath, libFolders, platform);
 		for (auto & path : libFolders) {
-			paths.emplace_back( isLocalAddon ? path : fixPath(path) );
+            paths.emplace_back( fixPath(path) );
 		}
 	}
-
-	vector < fs::path > srcFolders;
-	if (fs::exists(srcPath)) {
+    
+    if (fs::exists(srcPath)) {
+        vector < fs::path > srcFolders;
 		getFoldersRecursively(srcPath, srcFolders, platform);
 		for (auto & path : srcFolders) {
-			paths.emplace_back( isLocalAddon ? path : fixPath(path) );
+            paths.emplace_back( fixPath(path) );
 		}
 	}
-
+    
+    paths.sort([](const fs::path & a, const fs::path & b) {
+        return a.string() < b.string();
+    });
 	
-	// FIXME: MARK: - HACK:
-	preParseConfig();
+    for (auto & p : paths) {
+        includePaths.emplace_back(p);
+    }
+
+    
+    // FIXME: MARK: - HACK:
+//	preParseConfig();
+
+    parseConfig();
 
 	parseLibsPath(libsPath, parentFolder);
     
     // lib paths are directories to parse for libs
     for (auto & a : libsPaths) {
 //		alert(a, 33);
-        parseLibsPath((path / a), parentFolder);
+        parseLibsPath((addonPath / a), parentFolder);
     }
 
 	for (auto & a : additionalLibsFolder) {
 //		parseLibsPath(fs::weakly_canonical(path / a), parentFolder);
-		parseLibsPath((path / a), parentFolder);
+		parseLibsPath((addonPath / a), parentFolder);
 	}
 
-	paths.sort([](const fs::path & a, const fs::path & b) {
-		return a.string() < b.string();
-	});
 
-	for (auto & p : paths) {
-		includePaths.emplace_back(p);
-	}
-	
-	parseConfig();
-
-	excludePathStr(includePaths, excludeIncludes);
+	exclude(includePaths, excludeIncludes);
 	
 	// Dimitre. I've added this here to exclude some srcFiles from addons,
 	// ofxAssimpModelLoader was adding some files from libs/assimp/include/assimp/port/AndroidJNI
 	// even when the folder was excluded from includePaths
-	excludePathStr(srcFiles, excludeIncludes);
+    // Roy: The purpose of not excluding the includes from srcFiles is to be able to keep a folder path out of the include paths but still have those in the IDE.
+    // Which was the behaviour we had before. If an addon needs to exclude something from the src folder on a platform specific way it should use the
+    // ADDON_SOURCES_EXCLUDE exclude field of the addon_config.mk file
+    
+//	excludePathStr(srcFiles, excludeIncludes);
 	
-	excludePathStr(srcFiles, excludeSources);
-	excludePathStr(csrcFiles, excludeSources);
-	excludePathStr(cppsrcFiles, excludeSources);
-	excludePathStr(objcsrcFiles, excludeSources);
-	excludePathStr(headersrcFiles, excludeSources);
+	exclude(srcFiles, excludeSources);
+	exclude(csrcFiles, excludeSources);
+	exclude(cppsrcFiles, excludeSources);
+	exclude(objcsrcFiles, excludeSources);
+	exclude(headersrcFiles, excludeSources);
 	//	exclude(propsFiles, excludeSources);
 	exclude(frameworks, excludeFrameworks);
 	exclude(xcframeworks, excludeXCFrameworks);
-	excludeLibrary(libs, excludeLibs);
+	exclude(libs, excludeLibs);
+    
+    exclude(libFiles, excludeIncludes);
+    exclude(libFiles, excludeSources);
 
-	ofLogVerbose("ofAddon") << "libs after exclusions " << libs.size();
-
-	for (auto & lib: libs) {
-		ofLogVerbose("ofAddon") << lib.path.string();
-	}
+  
 
 	return true;
 }
@@ -933,5 +1023,9 @@ fs::path ofAddon::fixPath(const fs::path & path) {
 	 but the problem is fs::relative actually calculate symlink paths, modifying filename.
 	 which is not good for macos dylibs, like ofxHapPlayer, so I had to replace with the original filename back
 	 */
-	return normalizePath(( pathToOF / fs::relative(path, getOFRoot()) ).parent_path() / path.filename());
+    if(isLocalAddon){
+        return normalizePath(( pathToProject / fs::relative(path, pathToProject) ).parent_path() / path.filename());
+    }else{
+        return normalizePath(( pathToOF / fs::relative(path, getOFRoot()) ).parent_path() / path.filename());
+    }
 }

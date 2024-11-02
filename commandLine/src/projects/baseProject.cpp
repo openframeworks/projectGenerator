@@ -117,7 +117,7 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(string target)
 bool baseProject::create(const fs::path & _path, string templateName){
 //	alert("baseProject::create " + path.string() + " : " + templateName, 35);
 	auto path = _path; // just because it is const
-
+    fs::current_path(path);
 
 	//if the files being added are inside the OF root folder, make them relative to the folder.
 
@@ -259,11 +259,12 @@ bool baseProject::save(){
 
 	std::ofstream addonsMake(projectDir / "addons.make");
 	for (auto & a : addons) {
-		if (a.isLocalAddon) {
-			addonsMake << fs::path(a.addonPath).generic_string() << std::endl;
-		} else {
-			addonsMake << a.name << std::endl;
-		}
+        addonsMake << a.addonMakeName << std::endl;
+//		if (a.isLocalAddon) {
+//			addonsMake << fs::path(a.addonPath).generic_string() << std::endl;
+//		} else {
+//			addonsMake << a.name << std::endl;
+//		}
 	}
 
 	//save out params which the PG knows about to config.make
@@ -292,6 +293,9 @@ bool baseProject::save(){
 		   saveConfig << str << std::endl;
 		}
 	}
+#ifdef OFADDON_OUTPUT_JSON_DEBUG
+    saveAddonsToJson();
+#endif
 	return saveProjectFile();
 }
 
@@ -300,149 +304,138 @@ bool baseProject::isAddonInCache(const string & addonPath, const string platform
 	return addonsCache[platform].find(addonPath) != addonsCache[platform].end();
 }
 
-void baseProject::addAddon(string addonName){
-//	alert( "baseProject::addAddon " + addonName );
+void baseProject::addAddon(const std::string& _addonName){
+    ofLogVerbose("baseProject::addAddon") << _addonName;
+    //	alert( "baseProject::addAddon " + addonName );
+    
+    auto addonName = ofAddon::cleanName(_addonName);
+    
+    // FIXME : not target, yes platform.
+//#ifdef TARGET_WIN32
+//    //	std::replace( addonName.begin(), addonName.end(), '/', '\\' );
+//    fixSlashOrder(addonName);
+//#endif
+//    
+    
+//    addon.addonMakeName = addonName;
+//    
+//    {
+//        auto s = ofSplitString(addonName, "#");
+//        if(s.size()){
+//            addonName = s[0];
+//        }
+//    }
+//    
+    
+    if(addonName.empty()){
+        ofLogError("baseProject::addAddon") << "cant add addon with empty name";
+        return;
+    }
+    
+    //This should be the only instance where we check if the addon is either local or not.
+    //being local just means that the addon name is a filepath and it starts with a dot.
+    //otherwise it will look in the addons folder.
+    //A local addon is not restricted to one that lives in folder with the name local_addons, should be any valid addon on the filesystem.
+    //Parsing will generate the correct path to both OF and the project.
+    //Everything else should be treated exactly in the same way, regardless of it being local or not.
+//    if(addonName[0] == '.' && fs::exists( ofFilePath::join(projectDir, addonName))){
+//        
+//        addon.addonPath = normalizePath(ofFilePath::join(projectDir, addonName));
+//        addon.isLocalAddon = true;
+//        ofLogVerbose() << "Adding local addon: " << addonName;
+//        //        addon.pathToProject = makeRelative(getOFRoot(), projectDir);
+//        //        projectDir;
+//    }else{
+//        addon.addonPath = fs::path { getOFRoot() / "addons" / addonName };
+//    }
+//    addon.pathToOF = getOFRoot();
+//    
+//    
+//    
+//    addon.pathToOF = normalizePath(addon.pathToOF);
+//    addon.addonPath = normalizePath(addon.addonPath);
+//    
+//    addon.pathToProject = projectDir;
+    
+    ofAddon addon;
+    
+//    bool addonOK = false;
+//    bool inCache = isAddonInCache(addonName, target);
+    
+    //	fs::path addonPath { addonName };
+    
+    //	if (fs::exists(addonPath)) {
+    //		addon.isLocalAddon = true;
+    //	} else {
+    //		addonPath = fs::path { getOFRoot() / "addons" / addonName };
+    //		addon.isLocalAddon = false;
+    //		addon.addonPath = addonPath;
+    //	}
+    
+//    ofLogVerbose() << "addon.addonPath to: [" << addon.addonPath.string() << "]";
+//    ofLogVerbose() << "addon.pathToOF: [" << addon.pathToOF.string() << "]";
+    
+    if(isAddonInCache(addonName, target)){
+        addon = addonsCache[target][addonName];
+    }else{
+        if(addon.load(_addonName, projectDir, target)){
+            addonsCache[target][addonName] = addon;
+        }else{
+            ofLogVerbose("baseProject::addAddon") << "Ignoring addon that doesn't seem to exist: " << _addonName;
+            return; //if addon does not exist, stop early
+        }
+    }
+//    if (!inCache) {
+//        addonOK = addon.fromFS(addon.addonPath, target);
+//    } else {
+//        addon = addonsCache[target][addonName];
+//        addonOK = true;
+//    }
+    
+//    if(!addonOK){
+//        ofLogVerbose() << "Ignoring addon that doesn't seem to exist: " << addonName;
+//        return; //if addon does not exist, stop early
+//    }
+    
+//    if(!inCache){
+//        //cache the addon so we dont have to be reading form disk all the time
+//        addonsCache[target][addonName] = addon;
+//    }
+//    
+//    for (auto & a : addons) {
+//        if (a.name == addon.name) return;
+//    }
+//    
+//    
+//    for (auto & d : addon.dependencies) {
+//        bool found = false;
+//        for (auto & a : addons) {
+//            if (a.name == d) {
+//                found = true;
+//                break;
+//            }
+//        }
+//        if (!found) {
+//            baseProject::addAddon(d);
+//        } else {
+//            ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << d;
+//        }
+//    }
+//    
+    
+    ofLogNotice() << "adding addon: " << addon.name;
+    
+    
+    
+    
+    
+    // MARK: - SPECIFIC for each project.
+    // XCode and VS override the base addAddon. other templates will use baseproject::addAddon(ofAddon...
+    addAddon(addon);
+}
 
-	// FIXME : not target, yes platform.
-	#ifdef TARGET_WIN32
-//	std::replace( addonName.begin(), addonName.end(), '/', '\\' );
-	fixSlashOrder(addonName);
-	#endif
-
-	ofAddon addon;
-	// MARK: Review this path here. EDIT: I think it is finally good
-
-	if (bMakeRelative) {
-		addon.pathToOF = fs::relative(getOFRoot(), projectDir);
-	} else {
-		addon.pathToOF = getOFRoot();
-	}
-	
-	
-	addon.pathToOF = normalizePath(addon.pathToOF);
-	addon.addonPath = normalizePath(addon.addonPath);
-	
-	addon.pathToProject = projectDir;
-
-	bool addonOK = false;
-	bool inCache = isAddonInCache(addonName, target);
-
-	fs::path addonPath { addonName };
-
-	if (fs::exists(addonPath)) {
-		addon.isLocalAddon = true;
-	} else {
-		addonPath = fs::path { getOFRoot() / "addons" / addonName };
-		addon.isLocalAddon = false;
-		addon.addonPath = addonPath;
-	}
-
-	ofLogVerbose() << "addon.addonPath to: [" << addon.addonPath.string() << "]";
-	ofLogVerbose() << "addon.pathToOF: [" << addon.pathToOF.string() << "]";
-
-	if (!inCache) {
-		addonOK = addon.fromFS(addonPath, target);
-	} else {
-		addon = addonsCache[target][addonName];
-		addonOK = true;
-	}
-
-	if(!addonOK){
-		ofLogVerbose() << "Ignoring addon that doesn't seem to exist: " << addonName;
-		return; //if addon does not exist, stop early
-	}
-
-	if(!inCache){
-		//cache the addon so we dont have to be reading form disk all the time
-		addonsCache[target][addonName] = addon;
-	}
-
-	for (auto & a : addons) {
-		if (a.name == addon.name) return;
-	}
-
-
-	for (auto & d : addon.dependencies) {
-		bool found = false;
-		for (auto & a : addons) {
-			if (a.name == d) {
-				found = true;
-				break;
-			}
-		}
-		if (!found) {
-			baseProject::addAddon(d);
-		} else {
-			ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << d;
-		}
-	}
-
-
-	ofLogNotice() << "adding addon: " << addon.name;
-	addons.emplace_back(addon);
-
-	for (auto & e : addon.includePaths) {
-		fs::path normalizedDir = normalizePath(projectDir);
-		ofLogVerbose() << "[addon.includePaths] adding addon include path: [" << normalizedDir << "]";
-		if (containsSourceFiles(normalizedDir)) {
-			normalizedDir = makeRelative(projectDir, e);
-			ofLogVerbose() << "[addon.includePaths] contains src - Adding dir: [" << normalizedDir.string() << "]";
-			fs::path ofpathChanged = ofRelativeToOFPATH(projectDir);
-			ofLogVerbose() << "[addon.includePaths] OFPATH: rel include dir: [" << ofpathChanged.string() << "]";
-			
-			addInclude(normalizedDir);
-		} else {
-			ofLogVerbose() << "[addon.includePaths] no src - not adding: [" << normalizedDir.string() << "]";
-		}
-	}
-
-	// It was part exclusive of visualStudioProject. now it is part of baseProject, so dlls are copied in VSCode project and .so files in linux
-	for (auto & d : addon.dllsToCopy) {
-		ofLogVerbose() << "adding addon dlls to bin: " << d;
-		fs::path from { d };
-		fs::path to { projectDir / "bin" / from.filename() };
-		if (from.extension() == ".so") {
-			fs::path folder { projectDir / "bin" / "libs" };
-			if (!fs::exists(folder)) {
-				try {
-					fs::create_directories(folder);
-				} catch(fs::filesystem_error& e) {
-					ofLogError("baseProject::addAddon") << "error creating folder " << folder;
-					ofLogError() << e.what();
-				}
-			}
-//			to = projectDir / "bin" / "libs" / from.filename();
-			to = folder / from.filename();
-		}
-		if (from.extension() == ".dll") {
-			if (d.string().find("x64") != std::string::npos) {
-				to = fs::path { projectDir / "dll/x64" / from.filename() };
-				ofLogVerbose() << "adding addon dlls to dll/x64: " << d;
-			} else if (d.string().find("ARM64EC") != std::string::npos) {
-				to = fs::path { projectDir / "dll/ARM64EC" / from.filename()};
-				ofLogVerbose() << "adding addon dlls to dll/ARM64EC: " << d;
-			} else if (d.string().find("ARM64") != std::string::npos) {
-				to = fs::path { projectDir / "dll/ARM64" / from.filename() };
-				ofLogVerbose() << "adding addon dlls to dll/ARM64: " << d;
-			} else {
-				// Default case if architecture is not found
-				to = fs::path { projectDir / "bin" / from.filename() };
-				ofLogVerbose() << "adding addon dlls to bin: " << d;
-			}
-		}
-
-		try {
-			fs::copy_file(from, to, fs::copy_options::overwrite_existing); // always overwrite DLLS
-		} catch(fs::filesystem_error& e) {
-			ofLogError("baseProject::addAddon") << "error copying template file " << from << endl << "to: " << to << endl <<  e.what();
-		}
-	}
-
-	// MARK: - SPECIFIC for each project.
-	// XCode and VS override the base addAddon. other templates will use baseproject::addAddon(ofAddon...
-	addAddon(addon);
-
-	// Process values from ADDON_DATA
+void baseProject::copyAddonData(ofAddon& addon){
+// Process values from ADDON_DATA
 	if(addon.data.size()){
 		for(auto & data : addon.data){
 			string d = data;
@@ -483,6 +476,50 @@ void baseProject::addAddon(string addonName){
 	}
 }
 
+void baseProject::addAddonDllsToCopy(ofAddon& addon){
+    // It was part exclusive of visualStudioProject. now it is part of baseProject, so dlls are copied in VSCode project and .so files in linux
+    for (auto & d : addon.dllsToCopy) {
+        ofLogVerbose() << "adding addon dlls to bin: " << d;
+        fs::path from { d };
+        fs::path to { projectDir / "bin" / from.filename() };
+        if (from.extension() == ".so") {
+            fs::path folder { projectDir / "bin" / "libs" };
+            if (!fs::exists(folder)) {
+                try {
+                    fs::create_directories(folder);
+                } catch(fs::filesystem_error& e) {
+                    ofLogError("baseProject::addAddon") << "error creating folder " << folder;
+                    ofLogError() << e.what();
+                }
+            }
+//            to = projectDir / "bin" / "libs" / from.filename();
+            to = folder / from.filename();
+        }
+        if (from.extension() == ".dll") {
+            if (d.string().find("x64") != std::string::npos) {
+                to = fs::path { projectDir / "dll/x64" / from.filename() };
+                ofLogVerbose() << "adding addon dlls to dll/x64: " << d;
+            } else if (d.string().find("ARM64EC") != std::string::npos) {
+                to = fs::path { projectDir / "dll/ARM64EC" / from.filename()};
+                ofLogVerbose() << "adding addon dlls to dll/ARM64EC: " << d;
+            } else if (d.string().find("ARM64") != std::string::npos) {
+                to = fs::path { projectDir / "dll/ARM64" / from.filename() };
+                ofLogVerbose() << "adding addon dlls to dll/ARM64: " << d;
+            } else {
+                // Default case if architecture is not found
+                to = fs::path { projectDir / "bin" / from.filename() };
+                ofLogVerbose() << "adding addon dlls to bin: " << d;
+            }
+        }
+
+        try {
+            fs::copy_file(from, to, fs::copy_options::overwrite_existing); // always overwrite DLLS
+        } catch(fs::filesystem_error& e) {
+            ofLogError("baseProject::addAddon") << "error copying template file " << from << endl << "to: " << to << endl <<  e.what();
+        }
+    }
+}
+
 
 // MARK: - This function is only called by addon dependencies, when one addon is asking for another one to be included.
 // this is only invoked by XCode and visualStudioProject, and I don't understand why as they are similar
@@ -507,7 +544,7 @@ void baseProject::addAddon(ofAddon & addon){
 	 unless there is one addon added which needs another, and it needs another.
 
 	 */
-	alert("---> dependencies");
+//	alert("---> dependencies");
 	for (auto & d : addon.dependencies) {
 		bool found = false;
 		for (auto & a : addons) {
@@ -523,77 +560,183 @@ void baseProject::addAddon(ofAddon & addon){
 			ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << d;
 		}
 	}
-	alert("---> dependencies");
+//	alert("---> dependencies");
 	addons.emplace_back(addon);
 
-	ofLogVerbose("baseProject") << "libs in addAddon " << addon.libs.size();
+	//ofLogVerbose("baseProject") << "libs in addAddon " << addon.libs.size();
 
-    for(auto & lib: addon.libsPaths){
-		ofLogVerbose("adding lib paths") << lib.string();
+    addAddonBegin(addon);
+
+    addAddonDllsToCopy(addon);
+    
+    addAddonLibsPaths(addon);
+	addAddonIncludePaths(addon);
+	addAddonLibs(addon);
+	addAddonCflags(addon);
+	addAddonCppflags(addon);
+	addAddonLdflags(addon);
+	addAddonSrcFiles(addon);
+	addAddonCsrcFiles(addon);
+	addAddonCppsrcFiles(addon);
+	addAddonObjcsrcFiles(addon);
+	addAddonHeadersrcFiles(addon);
+
+
+
+	addAddonDefines(addon);
+    addAddonFrameworks(addon);
+	
+    addAddonXCFrameworks(addon);
+
+    copyAddonData(addon);
+    
+    addAddonProps(addon);
+
+}
+
+
+
+
+void  baseProject::addAddonLibsPaths(const ofAddon& addon){
+	if(addon.libsPaths.size()){
+		ofLogWarning("baseProject::addAddonLibsPaths") << "this is not implemented!";
+	}
+    for (auto & lib: addon.libsPaths){
+        ofLogVerbose("adding lib paths") << lib.string();
     }
+}
 
-	for (auto & a : addon.includePaths) {
-		fs::path normalizedDir = makeRelative(projectDir, a);
-		ofLogVerbose() << "adding addon include path: [" << normalizedDir.string() + "]";
-		addInclude(normalizedDir);
-	}
+void  baseProject::addAddonIncludePaths(const ofAddon& addon){
+    for (auto & e : addon.includePaths) {
+        ofLogVerbose("baseProject") << "----------------------------------------------------------------";
+        fs::path normalizedDir = normalizePath(projectDir);
+        ofLogVerbose("baseProject") << "[addon.includePaths] adding addon include path: [" << e.string() << "]";
+        if (containsSourceFiles(normalizedDir)) {
+            normalizedDir = makeRelative(projectDir, e);
+            ofLogVerbose() << "[addon.includePaths] contains src - Adding dir: [" << normalizedDir.string() << "]";
+            // fs::path ofpathChanged = ofRelativeToOFPATH(projectDir);
+            // ofLogVerbose() << "[addon.includePaths] OFPATH: rel include dir: [" << ofpathChanged.string() << "]";
+            
+            addInclude(normalizedDir);
+        } else {
+            ofLogVerbose() << "[addon.includePaths] no src - not adding: [" << normalizedDir.string() << "]";
+        }
+    }
+    
+    
+//    for (auto & a : addon.includePaths) {
+//        fs::path normalizedDir = makeRelative(projectDir, a);
+//        ofLogVerbose() << "adding addon include path: [" << normalizedDir.string() + "]";
+//        addInclude(normalizedDir);
+//    }
+}
 
-	for (auto & a : addon.libs) {
-		ofLogVerbose() << "adding addon libs: " << a.path.string();
-		addLibrary(a);
-	}
-
-	for (auto & a : addon.cflags) {
-		ofLogVerbose() << "adding addon cflags: " << a;
-		addCFLAG(a);
-	}
-
-	for (auto & a : addon.cppflags) {
-		ofLogVerbose() << "adding addon cppflags: " << a;
-		addCPPFLAG(a);
-	}
-
-	for (auto & a : addon.ldflags) {
-		ofLogVerbose() << "adding addon ldflags: " << a;
-		addLDFLAG(a);
-	}
-
-	for (auto & a : addon.srcFiles) {
-		fs::path normalizedDir = makeRelative(getOFRoot(), a);
-		ofLogVerbose() << "adding addon srcFiles: " << normalizedDir.string();
-		addSrc(normalizedDir, addon.filesToFolders[a]);
-	}
-
-	for (auto & a : addon.csrcFiles) {
-		fs::path normalizedDir = makeRelative(getOFRoot(), a);
-		ofLogVerbose() << "adding addon c srcFiles: " << normalizedDir.string();
-		addSrc(normalizedDir, addon.filesToFolders[a], C);
-	}
-
-	for (auto & a : addon.cppsrcFiles) {
-		fs::path normalizedDir = makeRelative(getOFRoot(), a);
-		ofLogVerbose() << "adding addon cpp srcFiles: " << normalizedDir.string();
-		addSrc(normalizedDir, addon.filesToFolders[a],CPP);
-	}
-
-	for (auto & a : addon.objcsrcFiles) {
-		fs::path normalizedDir = makeRelative(getOFRoot(), a);
-		ofLogVerbose() << "adding addon objc srcFiles: " << normalizedDir.string();
-		addSrc(normalizedDir, addon.filesToFolders[a],OBJC);
-	}
-
-	for (auto & a : addon.headersrcFiles) {
-		
-		fs::path normalizedDir = makeRelative(getOFRoot(), a);
-		ofLogVerbose() << "adding addon header srcFiles: [" << normalizedDir.string() << "]";
-		addSrc(normalizedDir, addon.filesToFolders[a],HEADER);
-	}
-
+void baseProject::addAddonDefines(const ofAddon& addon) {
 	for (auto & a : addon.defines) {
 		ofLogVerbose() << "adding addon defines: [" << a << "]";
 		addDefine(a);
 	}
 }
+
+void  baseProject::addAddonLibs(const ofAddon& addon){
+    for (auto & a : addon.libs) {
+        ofLogVerbose("baseProject") << "adding addon libs: " << a.path.string();
+        addLibrary(a);
+    }
+}
+
+void  baseProject::addAddonCflags(const ofAddon& addon){
+    for (auto & a : addon.cflags) {
+        ofLogVerbose("baseProject") << "adding addon cflags: " << a;
+        addCFLAG(a);
+    }
+}
+
+void  baseProject::addAddonCppflags(const ofAddon& addon){
+    for (auto & a : addon.cppflags) {
+        ofLogVerbose("baseProject") << "adding addon cppflags: " << a;
+        addCPPFLAG(a);
+    }
+}
+
+void  baseProject::addAddonLdflags(const ofAddon& addon){
+    for (auto & a : addon.ldflags) {
+        ofLogVerbose("baseProject") << "adding addon ldflags: " << a;
+        addLDFLAG(a);
+    }
+}
+
+void baseProject::addSrcFiles(ofAddon& addon, const vector<fs::path> &filepaths, SrcType type, bool bFindInFilesToFolder){
+	for (auto &s : filepaths) {			
+		if (bFindInFilesToFolder && (addon.filesToFolders.find(s) == addon.filesToFolders.end())) {
+			addon.filesToFolders[s] = fs::path{""};
+		}
+		fs::path normalizedDir = makeRelative(getOFRoot(), s);
+		ofLogVerbose("baseProject::addSrcFiles") << "Adding addon " << toString(type) << " source file: [" << s.string() << "] folder:[" << addon.filesToFolders[s].string() << "]";
+		addSrc(normalizedDir, addon.filesToFolders[s]);
+	}
+}
+
+void  baseProject::addAddonSrcFiles( ofAddon& addon){
+	addSrcFiles(addon, addon.srcFiles, DEFAULT);
+
+    // for (auto & a : addon.srcFiles) {
+    //     fs::path normalizedDir = makeRelative(getOFRoot(), a);
+    //     ofLogVerbose("baseProject") << "adding addon srcFiles: " << normalizedDir.string();
+    //     addSrc(normalizedDir, addon.filesToFolders.at(a));
+    // }
+}
+
+void  baseProject::addAddonCsrcFiles(ofAddon& addon){
+    // for (auto & a : addon.csrcFiles) {
+    //     fs::path normalizedDir = makeRelative(getOFRoot(), a);
+    //     ofLogVerbose("baseProject") << "adding addon c srcFiles: " << normalizedDir.string();
+    //     addSrc(normalizedDir, addon.filesToFolders.at(a), C);
+    // }
+	addSrcFiles(addon, addon.csrcFiles, C);
+}
+
+
+
+void baseProject::addAddonCppsrcFiles(ofAddon& addon) {
+	addSrcFiles(addon, addon.cppsrcFiles, CPP);
+}
+void baseProject::addAddonObjcsrcFiles(ofAddon& addon) {
+	addSrcFiles(addon, addon.objcsrcFiles, OBJC);
+}
+void baseProject::addAddonHeadersrcFiles(ofAddon& addon) {
+	addSrcFiles(addon, addon.headersrcFiles, HEADER);
+}
+
+// void  baseProject::addAddonCppsrcFiles(const ofAddon& addon){
+//     for (auto & a : addon.cppsrcFiles) {
+//         fs::path normalizedDir = makeRelative(getOFRoot(), a);
+//         ofLogVerbose("baseProject") << "adding addon cpp srcFiles: " << normalizedDir.string();
+//         addSrc(normalizedDir, addon.filesToFolders.at(a),CPP);
+//     }
+// }
+
+// void  baseProject::addAddonObjcsrcFiles(const ofAddon& addon){
+//     for (auto & a : addon.objcsrcFiles) {
+//         fs::path normalizedDir = makeRelative(getOFRoot(), a);
+//         ofLogVerbose("baseProject") << "adding addon objc srcFiles: " << normalizedDir.string();
+//         addSrc(normalizedDir, addon.filesToFolders.at(a),OBJC);
+//     }
+// }
+
+// void  baseProject::addAddonHeadersrcFiles(const ofAddon& addon){
+//     for (auto & a : addon.headersrcFiles) {
+//         fs::path normalizedDir = makeRelative(getOFRoot(), a);
+//         ofLogVerbose("baseProject") << "adding addon header srcFiles: [" << normalizedDir.string() << "]";
+//         addSrc(normalizedDir, addon.filesToFolders.at(a),HEADER);
+//     }
+// }
+
+
+
+
+
+
 
 
 void baseProject::addSrcRecursively(const fs::path & srcPath){
@@ -641,8 +784,10 @@ void baseProject::parseAddons(){
 //		alert("line " + addon);
 		if(addon[0] == '#') continue;
 		if(addon == "") continue;
-		auto s = ofSplitString(addon, "#")[0];
-		addAddon(ofSplitString(addon, "#")[0]);
+//		auto s = ofSplitString(addon, "#")[0];
+//		addAddon(ofSplitString(addon, "#")[0]);
+        //we want to keep the comments in the addons.make file since those are use in the package manage
+        addAddon(addon);
 	}
 }
 

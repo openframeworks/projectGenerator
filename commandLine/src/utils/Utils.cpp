@@ -358,6 +358,7 @@ void getDllsRecursively(const fs::path & path, std::vector<fs::path> & dlls, str
 	}
 }
 
+
 void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFiles, std::vector < LibraryBinary > & libLibs, string platform, string arch, string target) {
 //	alert ("getLibsRecursively " + path.string(), 34);
 //	alert ("platform " + platform, 34);
@@ -365,7 +366,7 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 //	alert ("target " + target, 34);
 //	if (!fs::exists(path) || !fs::is_directory(path)) return;
 	if (!fs::exists(path) || !fs::is_directory(path)) {
-//		alert ("not found!");
+		alert ("getLibsRecursively: path not found!" + path.string(), 31);
 		return;
 	}
 
@@ -381,40 +382,48 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 			if ((f.extension() == ".framework") || (f.extension() == ".xcframework")) {
 				it.disable_recursion_pending();
 				continue;
-			} else {
-				auto stem = f.stem();
-				auto archFound = std::find(LibraryBinary::archs.begin(), LibraryBinary::archs.end(), stem);
-				if (archFound != LibraryBinary::archs.end()) {
-					arch = *archFound;
-				} else {
-					auto targetFound = std::find(LibraryBinary::targets.begin(), LibraryBinary::targets.end(), stem);
-					if (targetFound != LibraryBinary::targets.end()) {
-						target = *targetFound;
-					}
-				}
-			}
+			} 
+                //else {
+//				auto stem = f.stem();
+//				auto archFound = std::find(LibraryBinary::archs.begin(), LibraryBinary::archs.end(), stem);
+//				if (archFound != LibraryBinary::archs.end()) {
+//					arch = *archFound;
+//					alert ("arch found: " + arch, 34);
+//				} else {
+//					auto targetFound = std::find(LibraryBinary::targets.begin(), LibraryBinary::targets.end(), stem);
+//					if (targetFound != LibraryBinary::targets.end()) {
+//						target = *targetFound;
+//                        alert ("target found: " + target, 34);
+//					}
+//				}
+//			}
 		} else {
-			auto ext = f.extension();
+			auto ext = ofPathToString(f.extension());
 			bool platformFound = false;
 
-			if(platform!=""){
-				std::vector<string> splittedPath = ofSplitString(f.string(), fs::path("/").make_preferred().string());
-				for(size_t j=0;j<splittedPath.size();j++){
-					if(splittedPath[j]==platform){
-						platformFound = true;
-					}
-				}
-			}
+//			if(platform!=""){
+//				std::vector<string> splittedPath = ofSplitString(f.string(), fs::path("/").make_preferred().string());
+//				for(size_t j=0;j<splittedPath.size();j++){
+//					if(splittedPath[j]==platform){
+//						platformFound = true;
+//					}
+//				}
+//			}
             
             if (!platform.empty() && f.string().find(platform) != std::string::npos) {
                platformFound = true;
             }
 
-			if (ext.string() == ".a" || ext.string() == ".lib" || ext.string() == ".dylib" || ext.string() == ".so" || ext.string() == ".xcframework" || ext.string() == ".framework" || (ext.string() == ".dll" && platform != "vs")) {
+			if (ext == ".a" || ext == ".lib" || ext == ".dylib" || ext == ".so" || ext == ".xcframework" || ext == ".framework" || (ext == ".dll" && platform != "vs")) {
 				if (platformFound){
-					libLibs.push_back({ f.string(), arch, target });
+                    
+                    LibraryBinary lib(f);
+                    if(lib.isValidFor(arch, target)){
+//                        alert ("adding lib " + f.string() + " arch: " +  arch + " target: " + target, 34);
+                        libLibs.push_back(lib);
+                    }
 				}
-			} else if (ext.string() == ".h" || ext.string() == ".hpp" || ext.string() == ".c" || ext.string() == ".cpp" || ext.string() == ".cc" || ext.string() == ".cxx" || ext.string() == ".m" || ext.string() == ".mm") {
+			} else if (ext == ".h" || ext == ".hpp" || ext == ".c" || ext == ".cpp" || ext == ".cc" || ext == ".cxx" || ext == ".m" || ext == ".mm") {
 				libFiles.emplace_back(f);
 			}
 		}
@@ -426,30 +435,6 @@ string convertStringToWindowsSeparator(string in) {
 	return in;
 }
 
-void fixSlashOrder(std::string &toFix) {
-	std::replace(toFix.begin(), toFix.end(), '/', '\\');
-	// Remove duplicate backslashes
-	toFix = std::regex_replace(toFix, std::regex(R"(\\\\)"), R"(\\)");
-	toFix = std::regex_replace(toFix, std::regex(R"(\\\\\\)"), R"(\\\\)");
-}
-
-void fixSlashOrderPath(fs::path &toFix) {
-	string p = toFix.string();
-	std::replace(p.begin(), p.end(), '/', '\\');
-	// Remove duplicate backslashes
-	p = std::regex_replace(p, std::regex(R"(\\\\)"), R"(\\)");
-	p = std::regex_replace(p, std::regex(R"(\\\\\\)"), R"(\\\\)");
-	toFix = fs::path { p };
-}
-
-fs::path fixSlashOrderPathReturn(const fs::path &toFix) {
-	string p = toFix.string();
-	std::replace(p.begin(), p.end(), '/', '\\');
-	// Remove duplicate backslashes
-	p = std::regex_replace(p, std::regex(R"(\\\\)"), R"(\\)");
-	p = std::regex_replace(p, std::regex(R"(\\\\\\)"), R"(\\\\)");
-	return fs::path { p };
-}
 
 string unsplitString (std::vector < string > strings, string deliminator ){
 	string result;
@@ -637,9 +622,9 @@ void createBackup(const fs::path & path, const fs::path & backupPath) {
 std::string normalizePath(const std::string& path) {
 	try {
 		auto value = fs::weakly_canonical(path);
-#ifdef TARGET_WIN32
-		fixSlashOrderPath(value);
-#endif
+//#ifdef TARGET_WIN32
+//		fixSlashOrderPath(value);
+//#endif
 		return value.string();
 	} catch (const std::exception& ex) {
 		std::cout << "Canonical path for [" << path << "] threw exception:\n"
@@ -651,9 +636,9 @@ std::string normalizePath(const std::string& path) {
 fs::path normalizePath(const fs::path& path) {
 	try {
 		auto value = fs::weakly_canonical(path);
-#ifdef TARGET_WIN32
-		fixSlashOrderPath(value);
-#endif
+//#ifdef TARGET_WIN32
+//		fixSlashOrderPath(value);
+//#endif
 		return value;
 	} catch (const std::exception& ex) {
 		std::cout << "Canonical path for [" << path << "] threw exception:\n"
@@ -664,9 +649,9 @@ fs::path normalizePath(const fs::path& path) {
 
 fs::path makeRelative(const fs::path& from, const fs::path& to) {
 	fs::path relative = fs::relative(to, from);
-#ifdef TARGET_WIN32
-		fixSlashOrderPath(relative);
-#endif
+//#ifdef TARGET_WIN32
+//		fixSlashOrderPath(relative);
+//#endif
 	return relative;
 }
 
@@ -692,26 +677,26 @@ bool containsSourceFiles(const fs::path& dir) {
 }
 
 
-fs::path ofRelativeToOFPATH(const fs::path& path) {
-	try {
-		fs::path normalized_path = path;
-		std::string path_str = normalized_path.string();
-#ifdef TARGET_WIN32
-		std::regex relative_pattern(R"((\.\.\\\.\.\\\.\.\\)|(\.\.\\\.\.\\\.\.))");
-#else
-		std::regex relative_pattern(R"((\.\.\/\.\.\/\.\.\/))");
-#endif
-		path_str = std::regex_replace(path_str, relative_pattern, "$(OF_PATH)/");
-#ifdef TARGET_WIN32
-		fixSlashOrderPath(normalized_path);
-#endif
-		return normalized_path;
-	} catch (const std::exception& ex) {
-		std::cout << "Canonical path for [" << path << "] threw exception:\n"
-				  << ex.what() << '\n';
-		return fs::path("");
-	}
-}
+// fs::path ofRelativeToOFPATH(const fs::path& path) {
+// 	try {
+// 		fs::path normalized_path = path;
+// 		std::string path_str = normalized_path.string();
+// #ifdef TARGET_WIN32
+// 		std::regex relative_pattern(R"((\.\.\\\.\.\\\.\.\\)|(\.\.\\\.\.\\\.\.))");
+// #else
+// 		std::regex relative_pattern(R"((\.\.\/\.\.\/\.\.\/))");
+// #endif
+// 		path_str = std::regex_replace(path_str, relative_pattern, "$(OF_PATH)/");
+// #ifdef TARGET_WIN32
+// 		fixSlashOrderPath(normalized_path);
+// #endif
+// 		return normalized_path;
+// 	} catch (const std::exception& ex) {
+// 		std::cout << "Canonical path for [" << path << "] threw exception:\n"
+// 				  << ex.what() << '\n';
+// 		return fs::path("");
+// 	}
+// }
 
 
 

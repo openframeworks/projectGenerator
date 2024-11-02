@@ -137,7 +137,7 @@ bool visualStudioProject::saveProjectFile(){
 		for (auto & a : additionalvcxproj) {
 			string name = a.filename().stem().string();
 			string aString = a.string();
-			fixSlashOrder(aString);
+//			fixSlashOrder(aString);
 			string uuid = generateUUID(name);
 			additionalProjects +=
 			"Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \""+name+"\", \""+aString+"\", \"{"+uuid+"}\"" +
@@ -187,7 +187,7 @@ bool visualStudioProject::saveProjectFile(){
 
 
 void visualStudioProject::appendFilter(string folderName){
-	fixSlashOrder(folderName);
+//	fixSlashOrder(folderName);
 	string uuid { generateUUID(folderName) };
 	string tag { "//ItemGroup[Filter]/Filter[@Include=\"" + folderName + "\"]" };
 	pugi::xpath_node_set set = filterXmlDoc.select_nodes(tag.c_str());
@@ -214,7 +214,8 @@ void visualStudioProject::appendFilter(string folderName){
 
 
 void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type){
-//	alert("addSrc " + srcFile.string(), 35);
+//	alert("addSrc file: " + srcFile.string(), 35);
+//	alert("addSrc folder: " + folder.string(), 35);
 
 	// I had an empty ClCompile field causing errors
 	if (srcFile.empty()) {
@@ -222,10 +223,10 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 		return;
 	}
 
-	string srcFileString = srcFile.string();
-	fixSlashOrder(srcFileString);
-	string folderString = folder.string();
-	fixSlashOrder(folderString);
+    string srcFileString = ofPathToString(srcFile);//.string();
+//	fixSlashOrder(srcFileString);
+    string folderString = ofPathToString(folder);//.string();
+//	fixSlashOrder(folderString);
 
 	// Made to address ofxGstreamer - adds some core files
 	if (folderString == "") {
@@ -320,75 +321,104 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 	}
 }
 
+bool exclusiveAppend( string& values, string item, string delimiter = ";") {
+	auto strings = ofSplitString(values, delimiter);
+	bool bAdd = true;
+	for (size_t i = 0; i < strings.size(); i++) {
+		if (strings[i].compare(item) == 0) {
+			bAdd = false;
+			break;
+		}
+	}
+	if (bAdd == true) {
+		// strings.emplace_back(item);
+		values += delimiter+item;
+		//unsplitString(strings, delimiter);
+		return true;
+	}
+	return false;
+}
+
+void addToAllNodes(const pugi::xpath_node_set & nodes, string item, string delimiter = ";") {
+	for (auto & node : nodes) {
+		std::string values = node.node().first_child().value();
+		if(exclusiveAppend(values, item, delimiter)){
+
+			node.node().first_child().set_value(values.c_str());
+			// if(bPrint) {
+			// 	string msg = "Adding To Node: " + string(node.node().first_child().value());
+			// 	alert(msg, 35);
+			// }
+		}
+		// std::vector < std::string > strings = ofSplitString(includes, delimiter);
+		// bool bAdd = true;
+		// for (size_t i = 0; i < strings.size(); i++) {
+		// 	if (strings[i].compare(item) == 0) {
+		// 		bAdd = false;
+		// 		break;
+		// 	}
+		// }
+		// if (bAdd == true) {
+		// 	strings.emplace_back(item);
+		// 	node.node().first_child().set_value(unsplitString(strings, delimiter).c_str());
+		// }
+	}
+}
+
 void visualStudioProject::addInclude(const fs::path & includeName){
-//	alert ("visualStudioProject::addInclude " + includeName, 35);
-	string inc = includeName.string();
-	fixSlashOrder(inc);
+	// alert ("visualStudioProject::addInclude " + includeName.string(), 35);
+	// string inc = includeName.string();
+	// fixSlashOrder(inc);
+	//alert ("visualStudioProject::addInclude " + inc, 35);
 
 	pugi::xpath_node_set source = doc.select_nodes("//ClCompile/AdditionalIncludeDirectories");
-	for (pugi::xpath_node_set::const_iterator it = source.begin(); it != source.end(); ++it){
-		pugi::xpath_node node = *it;
-		std::string includes = node.node().first_child().value();
-		std::vector < std::string > strings = ofSplitString(includes, ";");
-		bool bAdd = true;
-		for (size_t i = 0; i < strings.size(); i++){
-			if (strings[i].compare(includeName.string()) == 0){
-				bAdd = false;
-			}
-		}
-		if (bAdd == true){
-			strings.emplace_back(includeName.string());
-			std::string includesNew = unsplitString(strings, ";");
-//			alert ("includesNew " + includesNew);
-			node.node().first_child().set_value(includesNew.c_str());
-		}
+	addToAllNodes(source, includeName.string());
 
-	}
+// 	for (pugi::xpath_node_set::const_iterator it = source.begin(); it != source.end(); ++it){
+// 		pugi::xpath_node node = *it;
+// 		std::string includes = node.node().first_child().value();
+// 		std::vector < std::string > strings = ofSplitString(includes, ";");
+// 		bool bAdd = true;
+// 		for (size_t i = 0; i < strings.size(); i++) {
+// 			if (strings[i].compare(includeName.string()) == 0){
+// 				bAdd = false;
+// 				break;
+// 			}
+// 		}
+// 		if (bAdd == true){
+// 			strings.emplace_back(includeName.string());
+// 			std::string includesNew = unsplitString(strings, ";");
+// //			alert ("includesNew " + includesNew);
+// 			node.node().first_child().set_value(includesNew.c_str());
+// 		}
+
+// 	}
 	//appendValue(doc, "Add", "directory", includeName);
 }
 
-void addLibraryPath(const pugi::xpath_node_set & nodes, string libFolder) {
-//	alert ("addLibraryPath " + libFolder);
-	for (auto & node : nodes) {
-		string includes = node.node().first_child().value();
-		std::vector < string > strings = ofSplitString(includes, ";");
-		bool bAdd = true;
-		for (size_t i = 0; i < strings.size(); i++) {
-			if (strings[i].compare(libFolder) == 0) {
-				bAdd = false;
-			}
-		}
-		if (bAdd == true) {
-			strings.emplace_back(libFolder);
-			string libPathsNew = unsplitString(strings, ";");
-			node.node().first_child().set_value(libPathsNew.c_str());
-		}
-	}
-}
 
-void addLibraryName(const pugi::xpath_node_set & nodes, string libName) {
-	for (auto & node : nodes) {
-		string includes = node.node().first_child().value();
-		std::vector < string > strings = ofSplitString(includes, ";");
-		bool bAdd = true;
-		for (size_t i = 0; i < strings.size(); i++) {
-			if (strings[i].compare(libName) == 0) {
-				bAdd = false;
-			}
-		}
-
-		if (bAdd == true) {
-			strings.emplace_back(libName);
-			string libsNew = unsplitString(strings, ";");
-			node.node().first_child().set_value(libsNew.c_str());
-		}
-	}
-}
+// void addLibraryName(const pugi::xpath_node_set & nodes, string lib) {
+// 	for (auto & node : nodes) {
+// 		string includes = node.node().first_child().value();
+// 		std::vector < string > strings = ofSplitString(includes, ";");
+// 		bool bAdd = true;
+// 		for (size_t i = 0; i < strings.size(); i++) {
+// 			if (strings[i].compare(lib) == 0) {
+// 				bAdd = false;
+// 			}
+// 		}
+// 		if (bAdd == true) {
+// 			strings.emplace_back(lib);
+// 			string libNew = unsplitString(strings, ";");
+// 			node.node().first_child().set_value(libNew.c_str());
+// 		}
+// 	}
+// }
 
 void visualStudioProject::addProps(fs::path propsFile){
 //	alert ("visualStudioProject::addProps " + propsFile.string());
-	string path = propsFile.string();
-	fixSlashOrder(path);
+    string path = ofPathToString(propsFile);//.string();
+//	fixSlashOrder(path);
 	pugi::xpath_node_set items = doc.select_nodes("//ImportGroup");
 	for (auto & item : items) {
 		// FIXME: needed?
@@ -403,7 +433,7 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	auto libraryName = fs::path { lib.path };
 	auto libFolder = libraryName.parent_path();
 	string libFolderString = libFolder.string();
-	fixSlashOrder(libFolderString);
+	// fixSlashOrder(libFolderString);
 	auto libName = libraryName.filename();
 
 	// Determine the correct link path based on the target and architecture
@@ -432,86 +462,133 @@ void visualStudioProject::addLibrary(const LibraryBinary & lib) {
 	if (!libFolderString.empty()) {
 		pugi::xpath_node_set addlLibsDir = doc.select_nodes((linkPath + "AdditionalLibraryDirectories").c_str());
 		ofLogVerbose() << "adding " << lib.arch << " lib path " << linkPath;
-		addLibraryPath(addlLibsDir, libFolderString);
+		addToAllNodes(addlLibsDir, libFolderString);
 	}
 
 	pugi::xpath_node_set addlDeps = doc.select_nodes((linkPath + "AdditionalDependencies").c_str());
-	addLibraryName(addlDeps, libName.string());
+	addToAllNodes(addlDeps, libName.string());
 
-	ofLogVerbose() << "adding lib path " << libFolder;
-	ofLogVerbose() << "adding lib " << libName;
+	ofLogVerbose("visualStudioProject::addLibrary") << "adding lib path " << libFolder;
+	ofLogVerbose("visualStudioProject::addLibrary") << "adding lib " << libName;
 }
 
 
-void visualStudioProject::addCFLAG(string cflag, LibType libType){
-	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
-	// FIXME: iterator
-	for (auto & item : items) {
-		pugi::xml_node additionalOptions;
-		bool found=false;
-		string condition(item.node().attribute("Condition").value());
-		if (libType == RELEASE_LIB && condition.find("Release") != string::npos) {
-			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
-			found = true;
-		}else if(libType==DEBUG_LIB && condition.find("Debug") != string::npos){
-			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
-			found = true;
-		}
-		if(!found) continue;
-		if(!additionalOptions){
-			item.node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(cflag.c_str());
-		}else{
-			additionalOptions.set_value((string(additionalOptions.value()) + " " + cflag).c_str());
-		}
-	}
+void visualStudioProject::addCompileOption(const string& nodeName, const string& value, const string& delimiter, LibType libType){
+
+	string configuration = ((libType == DEBUG_LIB)?"Debug":"Release");
+	string nodePath = "//ItemDefinitionGroup[contains(@Condition,'" + configuration + "')]/ClCompile/"+nodeName;
+	
+	pugi::xpath_node_set source = doc.select_nodes(nodePath.c_str());
+	// if(bPrint){
+	// 	alert("visualStudioProject::addCompileOption " + nodeName + " val: " + value + " del: " + delimiter, 33 );  
+	// 	alert("     nodePath: " + nodePath, 33);
+	// }
+
+	addToAllNodes(source, value, delimiter);
+
+
+// 	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
+// 	for (auto & item : items) {
+// 		pugi::xml_node options;
+// 		bool found=false;
+// 		string condition(item.node().attribute("Condition").value());
+// 		ofLogNotice() << "Condition: " << condition ;
+// 		if (libType == RELEASE_LIB && condition.find("Release") != string::npos) {
+// 			options = item.node().child("ClCompile").child(nodeName.c_str());
+// 			found = true;
+// 		}else if(libType==DEBUG_LIB && condition.find("Debug") != string::npos){
+// 			options = item.node().child("ClCompile").child(nodeName.c_str());
+// 			found = true;
+// 		}
+// 		if(!found) continue;
+// 		if(!options){
+// 			item.node().child("ClCompile").append_child(nodeName.c_str()).append_child(pugi::node_pcdata).set_value(value.c_str());
+// 		}else{
+// 			string option_values = options.value();
+// 			if(exclusiveAppend(option_values, value, delimiter)){
+// 				alert("adding option: " + option_values, 34);
+// 				options.set_value(option_values.c_str());
+// 			}
+// //			options.set_value((string(options.value()) + delimiter + value).c_str());
+// 		}
+// 		// addToNode(options, value, delimiter);
+// 		doc.print(std::cout);
+// 	}
+}
+
+void visualStudioProject::addCFLAG(const string& cflag, LibType libType){
+	addCompileOption("AdditionalOptions", cflag, " ", libType);
+	// pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
+	// // FIXME: iterator
+	// for (auto & item : items) {
+	// 	pugi::xml_node additionalOptions;
+	// 	bool found=false;
+	// 	string condition(item.node().attribute("Condition").value());
+	// 	if (libType == RELEASE_LIB && condition.find("Release") != string::npos) {
+	// 		additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
+	// 		found = true;
+	// 	}else if(libType==DEBUG_LIB && condition.find("Debug") != string::npos){
+	// 		additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
+	// 		found = true;
+	// 	}
+	// 	if(!found) continue;
+	// 	if(!additionalOptions){
+	// 		item.node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(cflag.c_str());
+	// 	}else{
+	// 		additionalOptions.set_value((string(additionalOptions.value()) + " " + cflag).c_str());
+	// 	}
+	// }
 }
 
 
-void visualStudioProject::addCPPFLAG(string cppflag, LibType libType){
-	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
-	for (auto & item : items) {
-		pugi::xml_node additionalOptions;
-		bool found=false;
-		string condition(item.node().attribute("Condition").value());
-		if(libType==RELEASE_LIB && condition.find("Debug") != string::npos){
-			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
-			found = true;
-		}else if(libType==DEBUG_LIB && condition.find("Release") != string::npos){
-			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
-			found = true;
-		}
-		if(!found) continue;
-		if(!additionalOptions){
-			item.node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(cppflag.c_str());
-		}else{
-			additionalOptions.set_value((string(additionalOptions.value()) + " " + cppflag).c_str());
-		}
-	}
+void visualStudioProject::addCPPFLAG(const string& cppflag, LibType libType){
+		addCompileOption("AdditionalOptions", cppflag, " ", libType);
+	// pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
+	// for (auto & item : items) {
+	// 	pugi::xml_node additionalOptions;
+	// 	bool found=false;
+	// 	string condition(item.node().attribute("Condition").value());
+	// 	if(libType==RELEASE_LIB && condition.find("Release") != string::npos){
+	// 		additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
+	// 		found = true;
+	// 	}
+	// 	else if(libType==DEBUG_LIB && condition.find("Debug") != string::npos) {
+	// 		additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
+	// 		found = true;
+	// 	}
+	// 	if(!found) continue;
+	// 	if(!additionalOptions){
+	// 		item.node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(cppflag.c_str());
+	// 	}else{
+	// 		additionalOptions.set_value((string(additionalOptions.value()) + " " + cppflag).c_str());
+	// 	}
+	// }
 }
 
 
-void visualStudioProject::addDefine(string define, LibType libType) {
-	pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
-	for (auto & item : items) {
-		pugi::xml_node additionalOptions;
-		bool found = false;
-		string condition(item.node().attribute("Condition").value());
-		if (libType == RELEASE_LIB && condition.find("Debug") != string::npos) {
-			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
-			found = true;
-		}
-		else if (libType == DEBUG_LIB && condition.find("Release") != string::npos) {
-			additionalOptions = item.node().child("ClCompile").child("AdditionalOptions");
-			found = true;
-		}
-		if (!found) continue;
-		if (!additionalOptions) {
-			item.node().child("ClCompile").append_child("PreprocessorDefinitions").append_child(pugi::node_pcdata).set_value(define.c_str());
-		}
-		else {
-			additionalOptions.set_value((string(additionalOptions.value()) + " " + define).c_str());
-		}
-	}
+void visualStudioProject::addDefine(const string& define, LibType libType) {
+	addCompileOption("PreprocessorDefinitions", define, ";", libType);
+	// pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");
+	// for (auto & item : items) {
+	// 	pugi::xml_node preprocessorDefinitions;
+	// 	bool found = false;
+	// 	string condition(item.node().attribute("Condition").value());
+	// 	if (libType == RELEASE_LIB && condition.find("Release") != string::npos) {
+	// 		preprocessorDefinitions = item.node().child("ClCompile").child("PreprocessorDefinitions");
+	// 		found = true;
+	// 	}
+	// 	else if (libType == DEBUG_LIB && condition.find("Debug") != string::npos) {
+	// 		preprocessorDefinitions = item.node().child("ClCompile").child("PreprocessorDefinitions");
+	// 		found = true;
+	// 	}
+	// 	if (!found) continue;
+	// 	if (!preprocessorDefinitions) {
+	// 		item.node().child("ClCompile").append_child("AdditionalOptions").append_child(pugi::node_pcdata).set_value(define.c_str());
+	// 	}
+	// 	else {
+	// 		additionalOptions.set_value((string(additionalOptions.value()) + " " + define).c_str());
+	// 	}
+	// }
 }
 
 void visualStudioProject::ensureDllDirectoriesExist() {
@@ -532,9 +609,11 @@ void visualStudioProject::ensureDllDirectoriesExist() {
 
 
 
-void visualStudioProject::addAddon(ofAddon &addon) {
+// void visualStudioProject::addAddon(ofAddon &addon) {
+
+void visualStudioProject::addAddonBegin(const ofAddon& addon){
 	// Log the addition of the addon
-	ofLogVerbose() << "Adding addon: [" << addon.name << "]";
+	ofLogVerbose("visualStudioProject::") << "Adding addon: [" << addon.name << "]";
 	// Handle additional vcxproj files in the addon
 	fs::path additionalFolder = addon.addonPath / (addon.name + "Lib");
 	if (fs::exists(additionalFolder)) {
@@ -545,91 +624,10 @@ void visualStudioProject::addAddon(ofAddon &addon) {
 			}
 		}
 	}
+}
+    
 
-	// Add props files from the addon
-	for (auto &props : addon.propsFiles) {
-		fs::path normalizedDir = makeRelative(projectDir, props);
-		ofLogVerbose() << "Adding addon props: [" << normalizedDir.string() << "] folder:[" << addon.filesToFolders[props].string() << "]";
-		addProps(normalizedDir);
-	}
-
-	// Add libraries from the addon
-	for (auto &lib : addon.libs) {
-		fs::path normalizedDir = makeRelative(projectDir, lib.path);
-		lib.path = normalizedDir;
-		ofLogVerbose() << "Adding addon library: [" << lib.path.string() << "]";
-		addLibrary(lib);
-	}
-
-	// Add source files to the project, avoiding excessive directory nesting
-	for (auto &s : addon.srcFiles) {
-		fs::path normalizedDir = makeRelative(projectDir, s);
-		
-		if (addon.filesToFolders.find(s) == addon.filesToFolders.end()) {
-			addon.filesToFolders[s] = fs::path{""};
-		}
-		ofLogVerbose() << "Adding addon source file: [" << normalizedDir.string() << "] folder:[" << addon.filesToFolders[s].string() << "]";
-		addSrc(normalizedDir, addon.filesToFolders[s]);
-	}
-
-	// Add C source files to the project
-	for (auto &a : addon.csrcFiles) {
-		fs::path normalizedDir = makeRelative(projectDir, a);
-		
-		if (addon.filesToFolders.find(a) == addon.filesToFolders.end()) {
-			addon.filesToFolders[a] = fs::path{""};
-		}
-		ofLogVerbose() << "Adding addon C source file: [" << normalizedDir.string() << "] folder:[" << addon.filesToFolders[a].string() << "]";
-		addSrc(normalizedDir, addon.filesToFolders[a], C);
-	}
-
-	// Add C++ source files to the project
-	for (auto &a : addon.cppsrcFiles) {
-		fs::path normalizedDir = makeRelative(projectDir, a);
-		
-		if (addon.filesToFolders.find(a) == addon.filesToFolders.end()) {
-			addon.filesToFolders[a] = fs::path{""};
-		}
-		ofLogVerbose() << "Adding addon C++ source file: [" << normalizedDir.string() << "] folder:[" << addon.filesToFolders[a].string() << "]";
-		addSrc(normalizedDir, addon.filesToFolders[a], CPP);
-	}
-
-	// Add Objective-C source files to the project
-	for (auto &a : addon.objcsrcFiles) {
-		fs::path normalizedDir = makeRelative(projectDir, a);
-		
-		if (addon.filesToFolders.find(a) == addon.filesToFolders.end()) {
-			addon.filesToFolders[a] = fs::path{""};
-		}
-		ofLogVerbose() << "Adding addon Objective-C source file ?: [" << normalizedDir.string() << "] folder:[" << addon.filesToFolders[a].string() << "]";
-		addSrc(normalizedDir, addon.filesToFolders[a], OBJC);
-	}
-
-	// Add header files to the project
-	for (auto &a : addon.headersrcFiles) {
-		fs::path normalizedDir = makeRelative(projectDir, a);
-		ofLogVerbose() << "Adding addon header file: [" << normalizedDir.string() << "] folder:[" << addon.filesToFolders[a].string() << "]";
-		addSrc(normalizedDir, addon.filesToFolders[a], HEADER);
-	}
-
-	// Add CFLAGS, CPPFLAGS, and defines from the addon
-	for (auto &a : addon.cflags) {
-		ofLogVerbose() << "Adding addon CFLAG: [" << a << "]";
-		addCFLAG(a, RELEASE_LIB);
-		addCFLAG(a, DEBUG_LIB);
-	}
-
-	for (auto &a : addon.cppflags) {
-		ofLogVerbose() << "Adding addon CPPFLAG: [" << a << "]";
-		addCPPFLAG(a, RELEASE_LIB);
-		addCPPFLAG(a, DEBUG_LIB);
-	}
-
-	for (auto &a : addon.defines) {
-		ofLogVerbose() << "Adding addon define: [" << a << "]";
-		addDefine(a, RELEASE_LIB);
-		addDefine(a, DEBUG_LIB);
-	}
+void visualStudioProject::addAddonIncludePaths(const ofAddon& addon) {
 
 	std::set<fs::path> uniqueIncludeDirs;
 	for (const auto &dir : addon.includePaths) {
@@ -648,14 +646,90 @@ void visualStudioProject::addAddon(ofAddon &addon) {
 	}
 
 	for (const auto &dir : uniqueIncludeDirs) {
-		fs::path normalizedDir = normalizePath(dir);
-		if (containsSourceFiles(normalizedDir)) {
-			normalizedDir = makeRelative(projectDir, dir);
-			ofLogVerbose() << "[vsproject]-uniqueIncludeDirs] contains src - Adding dir:: [" << normalizedDir.string() << "]";
-			addInclude(normalizedDir);
-		} else {
-			ofLogVerbose() << "[vsproject]-uniqueIncludeDirs] no src - not adding [" << normalizedDir.string() << "]";
+		if( (dir.string().size() && dir.string()[0] == '$')){
+			addInclude(dir.string());
+		} else{
+			fs::path normalizedDir = normalizePath(dir);
+			if (containsSourceFiles(normalizedDir)) {
+				normalizedDir = makeRelative(projectDir, dir);
+				ofLogVerbose() << "[vsproject]-uniqueIncludeDirs] contains src - Adding dir:: [" << normalizedDir.string() << "]";
+				addInclude(normalizedDir);
+			} else {
+				ofLogVerbose() << "[vsproject]-uniqueIncludeDirs] no src - not adding [" << normalizedDir.string() << "]";
+			}
 		}
+	}
+}
+// void visualStudioProject::addAddonLibs(const ofAddon& addon) {
+// 	// Add libraries from the addon
+// 	for (auto &lib : addon.libs) {
+// 		fs::path normalizedDir = makeRelative(projectDir, lib.path);
+// 		lib.path = normalizedDir;
+// 		ofLogVerbose() << "Adding addon library: [" << lib.path.string() << "]";
+// 		addLibrary(lib);
+// 	}
+// }
+void visualStudioProject::addAddonCflags(const ofAddon& addon) {
+	for (auto &a : addon.cflags) {
+		ofLogVerbose() << "Adding addon CFLAG: [" << a << "]";
+		addCFLAG(a, RELEASE_LIB);
+		addCFLAG(a, DEBUG_LIB);
+	}
+}
+void visualStudioProject::addAddonCppflags(const ofAddon& addon) {
+	for (auto &a : addon.cppflags) {
+		ofLogVerbose() << "Adding addon CPPFLAG: [" << a << "]";
+		addCPPFLAG(a, RELEASE_LIB);
+		addCPPFLAG(a, DEBUG_LIB);
+	}
+}
+// void visualStudioProject::addAddonLdflags(const ofAddon& addon) {
+
+// }
+
+void visualStudioProject::addSrcFiles(ofAddon& addon, const vector<fs::path> &filepaths, SrcType type, bool bFindInFilesToFolder){
+	for (auto &s : filepaths) {
+		
+		if (bFindInFilesToFolder && (addon.filesToFolders.find(s) == addon.filesToFolders.end())) {
+			addon.filesToFolders[s] = fs::path{""};
+		}
+		ofLogVerbose("visualStudioProject::addSrcFiles") << "Adding addon " << toString(type) << " source file: [" << s.string() << "] folder:[" << addon.filesToFolders[s].string() << "]";
+		addSrc(s, addon.filesToFolders[s]);
+	}
+}
+
+// void visualStudioProject::addAddonSrcFiles(ofAddon& addon) {
+// 	addSrcFiles(addon, addon.srcFiles, DEFAULT);
+// }
+// void visualStudioProject::addAddonCsrcFiles(const ofAddon& addon) {
+// 	addSrcFiles(addon, addon.csrcFiles, C);
+// }
+
+// void visualStudioProject::addAddonCppsrcFiles(const ofAddon& addon) {
+// 	addSrcFiles(addon, addon.cppsrcFiles, CPP);
+// }
+// void visualStudioProject::addAddonObjcsrcFiles(const ofAddon& addon) {
+// 	addSrcFiles(addon, addon.objcsrcFiles, OBJC);
+// }
+// void visualStudioProject::addAddonHeadersrcFiles(const ofAddon& addon) {
+// 	addSrcFiles(addon, addon.headersrcFiles, HEADER);
+// }
+
+void visualStudioProject::addAddonDefines(const ofAddon& addon){
+	for (auto &a : addon.defines) {
+		ofLogVerbose() << "Adding addon define: [" << a << "]";
+		addDefine(a, RELEASE_LIB);
+		addDefine(a, DEBUG_LIB);
+	}
+}
+
+
+void visualStudioProject::addAddonProps(const ofAddon& addon){
+	// Add props files from the addon
+	for (auto &props : addon.propsFiles) {
+		fs::path normalizedDir = makeRelative(projectDir, props);
+		ofLogVerbose() << "Adding addon props: [" << normalizedDir.string() << "] folder:[" << addon.filesToFolders.at(props).string() << "]";
+		addProps(normalizedDir);
 	}
 }
 
