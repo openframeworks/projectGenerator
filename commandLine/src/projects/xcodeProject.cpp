@@ -361,7 +361,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, fs::path base){//, b
                             for (size_t x=0; x<diff; x++) {
                                 base2 = base2.parent_path();
                             }
-                            alert ("external_sources base = " + ofPathToString(base2) + " UUID: " + thisUUID, 33);
+//                            alert ("external_sources base = " + ofPathToString(base2) + " UUID: " + thisUUID, 33);
                             addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
                             addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(base2));
                             bFolderPathSet = true;
@@ -494,7 +494,7 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder, 
 	addCommand("# ----- addFramework path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
 
 	fileProperties fp;
-	fp.absolute = !isRelativeToSDK;
+	fp.absolute = false;
 	fp.codeSignOnCopy = !isRelativeToSDK;
 	fp.copyFilesBuildPhase = !isRelativeToSDK;
 	fp.isRelativeToSDK = isRelativeToSDK;
@@ -503,7 +503,6 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder, 
 	string UUID;
 	if (isRelativeToSDK) {
 		fs::path frameworkPath { "System/Library/Frameworks/" + ofPathToString(path) + ".framework" } ;
-		cout << frameworkPath << endl;
 		UUID = addFile(frameworkPath, "Frameworks", fp);
 	} else {
 		UUID = addFile(path, folder, fp);
@@ -646,14 +645,12 @@ void xcodeProject::addAddonSrcFiles(ofAddon& addon){
     }
 }
 
-
 //-----------------------------------------------------------------------------------------------
 void xcodeProject::addAddonFrameworks(const ofAddon& addon){
     ofLogVerbose("xcodeProject::addAddonFrameworks") << addon.name;
     
     for (auto & f : addon.frameworks) {
         ofLogVerbose() << "adding addon frameworks: " << f;
-		alert ("ADDON f=" + f, 31);
 		
 		auto path = f;
 		// The only addon I've found using fixed path to system Frameworks is ofxCoreLocation
@@ -669,32 +666,14 @@ void xcodeProject::addAddonFrameworks(const ofAddon& addon){
         if (found==string::npos) {
 			isRelativeToSDK = true;
         }
-		alert ("ADDON path=" + path, 31);
 		fs::path folder = isRelativeToSDK ? "Frameworks" : addon.filesToFolders.at(f);
 		addFramework(path, folder, isRelativeToSDK);
 
     }
 }
 
-////-----------------------------------------------------------------------------------------------
-//void xcodeProject::addAddonXCFrameworks(const ofAddon& addon){
-//    ofLogVerbose("xcodeProject::addAddonXCFrameworks") << addon.name;
-//	for (auto & f : addon.xcframeworks) {
-//		//		alert ("xcodeproj addon.xcframeworks : " + f);
-//		ofLogVerbose() << "adding addon xcframeworks: " << f;
-//
-//		bool isRelativeToSDK = false;
-//		size_t found=f.find('/');
-//		if (found==string::npos) {
-//			isRelativeToSDK = true;
-//		}
-//		addXCFramework(f, addon.filesToFolders.at(f), isRelativeToSDK);
-//	}
-//}
-
-
+//-----------------------------------------------------------------------------------------------
 string xcodeProject::addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp) {
-
 	string UUID { "" };
 
 //	cout << "will check if exists " << (projectDir / path) << endl;
@@ -739,7 +718,6 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		addCommand("Add :objects:"+UUID+":name string " + ofPathToString(path.filename()));
 
 		if (fp.absolute) {
-			alert ("absolute " + path.string(), 32);
 			addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
 			if (fs::exists( projectDir / path )) {
 				addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
@@ -758,9 +736,7 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
             } else {
 				if (fp.isRelativeToSDK) {
 					addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
-					alert (commands.back(), 31);
 					addCommand("Add :objects:"+UUID+":sourceTree string SDKROOT");
-					alert (commands.back(), 31);
 				} else {
 					addCommand("Add :objects:"+UUID+":sourceTree string <group>");
 				}

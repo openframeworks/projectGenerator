@@ -51,7 +51,7 @@ protected:
 	void addDefine(const string& define, LibType libType = RELEASE_LIB) override;
 
 	void addCompileFlagsForMMFile(const fs::path & srcFile);
-	void addFramework(const fs::path & path, const fs::path & folder, bool isRelativeToSDK = false);
+	void addFramework(const fs::path & path, const fs::path & folder, bool isRelativeToSDK = false) override;
 	void addXCFramework(const fs::path & path, const fs::path & folder);
 	void addDylib(const fs::path & path, const fs::path & folder);
 
