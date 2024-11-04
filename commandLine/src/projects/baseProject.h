@@ -124,7 +124,7 @@ private:
 protected:
     
     virtual void addAddonFrameworks(const ofAddon& addon){}
-    virtual void addAddonXCFrameworks(const ofAddon& addon){}
+//    virtual void addAddonXCFrameworks(const ofAddon& addon){}
     virtual void addAddonBegin(const ofAddon& addon){}
     virtual void addAddonLibsPaths(const ofAddon& addon);
 	virtual void addAddonIncludePaths(const ofAddon& addon);

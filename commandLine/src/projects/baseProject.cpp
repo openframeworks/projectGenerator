@@ -586,7 +586,7 @@ void baseProject::addAddon(ofAddon & addon){
 	addAddonDefines(addon);
 
 	addAddonFrameworks(addon);
-    addAddonXCFrameworks(addon);
+//    addAddonXCFrameworks(addon);
 
     copyAddonData(addon);
     
