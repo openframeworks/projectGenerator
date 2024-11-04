@@ -46,18 +46,18 @@ jobs:
         id: vars
         shell: bash
         run: |
-          if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
-            echo "release=nightly" >> $GITHUB_ENV
-            echo "prerelease=false" >> $GITHUB_ENV
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "RELEASE=${{ github.ref_name }}" >> $GITHUB_ENV
+            echo "PRERELEASE=false" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+            echo "RELEASE=nightly" >> $GITHUB_ENV
+            echo "PRERELEASE=false" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
-            echo "release=bleeding" >> $GITHUB_ENV
-            echo "prerelease=true" >> $GITHUB_ENV
-          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "release=${GITHUB_REF_NAME}" >> $GITHUB_ENV
-            echo "prerelease=false" >> $GITHUB_ENV
+            echo "RELEASE=bleeding" >> $GITHUB_ENV
+            echo "PRERELEASE=true" >> $GITHUB_ENV
           else
-            echo "release=nightly" >> $GITHUB_ENV
-            echo "prerelease=false" >> $GITHUB_ENV
+            echo "RELEASE=bleeding" >> $GITHUB_ENV
+            echo "PRERELEASE=true" >> $GITHUB_ENV
           fi 
       - name: Install dependencies
         shell: bash
@@ -96,23 +96,19 @@ jobs:
         run:
           ../openFrameworks/apps/projectGenerator/scripts/vs/ci_frontend_package.sh
 
-      - name: Update CMD Gen Release
-        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
-        uses: IsaacShelton/update-existing-release@v1.3.4
+      - name: Update Release CMD
+        if: github.repository == 'openframeworks/apothecary' && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
+        uses: softprops/action-gh-release@v2.0.8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ env.release }}
-          release: ${{ env.release }}
-          prerelease: ${{ env.release }}
-          replace: false
+          tag_name: ${{ env.RELEASE }}
+          release: ${{ env.RELEASE }}
           files: ../openFrameworks/apps/projectGenerator/commandLine/bin/projectGenerator-vs.zip
-      - name: Update Project Gen GUI Release
-        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
-        uses: IsaacShelton/update-existing-release@v1.3.4
+      - name: Update Release GUI
+        if: github.repository == 'openframeworks/apothecary' && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
+        uses: softprops/action-gh-release@v2.0.8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ env.release }}
-          release: ${{ env.release }}
-          prerelease: ${{ env.release }}
-          replace: false
+          tag_name: ${{ env.RELEASE }}
+          release: ${{ env.RELEASE }}
           files: ../openFrameworks/apps/projectGenerator/frontend/dist/projectGenerator-vs-gui.zip
