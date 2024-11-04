@@ -19,15 +19,27 @@ private:
 	bool debugCommands = false;
     
     static std::string LOG_NAME;
-
+	
 protected:
+	struct fileProperties {
+		bool absolute = false;
+		bool reference = true;
+		bool addToBuildPhase = false;
+		bool codeSignOnCopy = false;
+		bool copyFilesBuildPhase = false;
+		bool linkBinaryWithLibraries = false;
+		bool addToBuildResource = false;
+		bool addToResources = false;
+		bool frameworksBuildPhase = false;
+		bool isSrc = false;
+		bool isGroupWithoutFolder = false;
+		bool isRelativeToSDK = false;
+	};
 
     void addAddonFrameworks(const ofAddon& addon) override ;
     void addAddonXCFrameworks(const ofAddon& addon) override ;
     void addAddonLibs(const ofAddon& addon) override;
     void addAddonSrcFiles( ofAddon& addon) override;
-    
-    
     
 	void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) override;
 	void addInclude(const fs::path & includeName) override;
@@ -40,6 +52,7 @@ protected:
 
 	void addCompileFlagsForMMFile(const fs::path & srcFile);
 	void addFramework(const fs::path & path, const fs::path & folder);
+	void addFrameworkSDK(const std::string & name);
 	void addXCFramework(const fs::path & path, const fs::path & folder);
 	void addDylib(const fs::path & path, const fs::path & folder);
 
@@ -47,21 +60,6 @@ protected:
 	void saveScheme();
 	void renameProject();
 
-	struct fileProperties {
-		bool absolute = false;
-		bool reference = true;
-		bool addToBuildPhase = false;
-		bool codeSignOnCopy = false;
-		bool copyFilesBuildPhase = false;
-		bool linkBinaryWithLibraries = false;
-		bool addToBuildResource = false;
-		bool addToResources = false;
-		bool frameworksBuildPhase = false;
-		bool isSrc = false;
-		
-		bool isGroupWithoutFolder = false;
-	};
-	
 	string addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp);
 	void addCommand(const string & command);
 	

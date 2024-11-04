@@ -4,7 +4,7 @@
 #include <nlohmann/json.hpp>
 #ifdef __APPLE__
 	#include <cstdlib>  // std::system
-	#include <regex>
+//	#include <regex>
 #endif
 #include <iostream>
 #include <fstream>
@@ -484,6 +484,26 @@ void xcodeProject::addCompileFlagsForMMFile(const fs::path & srcFile) {
     
 }
 
+void xcodeProject::addFrameworkSDK(const std::string & name) {
+	ofLogVerbose() << "Adding Framework SDK " << name;
+	addCommand("# ----- addFramework SDK " + name);
+
+	fileProperties fp;
+	fp.absolute = false;
+	fp.codeSignOnCopy = false;
+	fp.copyFilesBuildPhase = false;
+//	fp.linkBinaryWithLibraries = true;
+	fp.addToBuildPhase = true;
+	fp.isRelativeToSDK = true;
+
+	fs::path path { "System/Library/Frameworks/" + name + ".framework" };
+	fs::path folder { "Frameworks" };
+	
+	string UUID {
+		addFile(path, folder, fp)
+	};
+}
+
 
 void xcodeProject::addFramework(const fs::path & path, const fs::path & folder){
     ofLogVerbose() << "Adding framework " << ofPathToString(path) << "  folder: " << folder;
@@ -678,21 +698,22 @@ void xcodeProject::addAddonFrameworks(const ofAddon& addon){
         ofLogVerbose() << "adding addon frameworks: " << f;
 
         size_t found=f.find('/');
-        if (found==string::npos) { // This path doesn't have slashes
-            fs::path folder = fs::path{ "addons" } / addon.name / "frameworks";
-//            fs::path folder = addon.filesToFolders[f];
-
-            if (target == "ios"){
-                addFramework(  "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/" + f + ".framework",
-//                    folder
-                    "Frameworks"
-                    );
-            } else {
-                if (addon.isLocalAddon) {
-                    folder = addon.addonPath / "frameworks";
-                }
-                addFramework( "/System/Library/Frameworks/" + f + ".framework", folder);
-            }
+        if (found==string::npos) {
+			// This path doesn't have slashes, so it is a SDK Framework
+			addFrameworkSDK(f);
+//            fs::path folder = fs::path{ "addons" } / addon.name / "frameworks";
+//
+//            if (target == "ios"){
+//                addFramework(  "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/" + f + ".framework",
+////                    folder
+//                    "Frameworks"
+//                    );
+//            } else {
+//                if (addon.isLocalAddon) {
+//                    folder = addon.addonPath / "frameworks";
+//                }
+//                addFramework( "/System/Library/Frameworks/" + f + ".framework", folder);
+//            }
         }
         else {
             if (ofIsStringInString(f, "/System/Library")){
@@ -796,8 +817,13 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 //                        addCommand("Add :objects:"+UUID+":path string " + ofPathToString(projectDir /path));
 //                    }
 //                }
-            }else{
-                addCommand("Add :objects:"+UUID+":sourceTree string <group>");
+            } else {
+				if (fp.isRelativeToSDK) {
+					addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
+					addCommand("Add :objects:"+UUID+":sourceTree string SDKROOT");
+				} else {
+					addCommand("Add :objects:"+UUID+":sourceTree string <group>");
+				}
             }
 		}
 
