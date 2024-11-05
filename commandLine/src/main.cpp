@@ -28,6 +28,7 @@ enum optionIndex { UNKNOWN,
 	GET_HOST_PLATFORM,
 	COMMAND,
 	BACKUP_PROJECT_FILES,
+	FRAMEWORKS
 };
 
 constexpr option::Descriptor usage[] = {
@@ -47,6 +48,9 @@ constexpr option::Descriptor usage[] = {
 	{ GET_HOST_PLATFORM, 0, "i", "platform", option::Arg::None, "  --getplatform, -i  \treturn the current host platform" },
 	{ COMMAND, 0, "c", "command", option::Arg::None, "  --command, -c \truns command" },
 	{ BACKUP_PROJECT_FILES, 0, "b", "backup", option::Arg::None, "  --backup, -b  \tbackup project files when replacing with template" },
+	
+	{ FRAMEWORKS, 0, "f", "frameworks", option::Arg::Optional, "  --frameworks, -f  \tframeworks list (such as Vision,ARKit)" },
+
 	{ 0, 0, 0, 0, 0, 0 }
 };
 
@@ -72,6 +76,7 @@ fs::path ofPath;
 vector<string> addons;
 vector<fs::path> srcPaths;
 vector<string> targets;
+vector<string> frameworks;
 string ofPathEnv;
 string templateName;
 
@@ -460,6 +465,7 @@ int main(int argc, char ** argv) {
 		printVersion();
 		return EXIT_OK;
 	}
+	
 
 	if (options[OFPATH].count() > 0) {
 		if (options[OFPATH].arg != NULL) {
@@ -541,6 +547,13 @@ int main(int argc, char ** argv) {
 	}
 #endif
 
+	if (options[FRAMEWORKS].count() > 0) {
+		bAddonsPassedIn = true; // could be empty
+		if (options[FRAMEWORKS].arg != NULL) {
+			frameworks = ofSplitString(options[FRAMEWORKS].arg, ",", true, true);
+			cout << "frameworks " << options[FRAMEWORKS].arg << endl;
+		}
+	}
 
 
 	if (parse.nonOptionsCount() > 0) {
@@ -688,7 +701,10 @@ int main(int argc, char ** argv) {
 						if(bAddonsPassedIn){
 							for (auto & addon : addons) {
 								project->addAddon(addon);
-							}							
+							}
+							for (auto & f : frameworks) {
+								project->addFramework(f, "", true);
+							}
 						}else{
 							project->parseAddons();
 						}

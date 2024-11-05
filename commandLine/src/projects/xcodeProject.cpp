@@ -4,7 +4,7 @@
 #include <nlohmann/json.hpp>
 #ifdef __APPLE__
 	#include <cstdlib>  // std::system
-	#include <regex>
+//	#include <regex>
 #endif
 #include <iostream>
 #include <fstream>
@@ -361,7 +361,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, fs::path base){//, b
                             for (size_t x=0; x<diff; x++) {
                                 base2 = base2.parent_path();
                             }
-                            alert ("external_sources base = " + ofPathToString(base2) + " UUID: " + thisUUID, 33);
+//                            alert ("external_sources base = " + ofPathToString(base2) + " UUID: " + thisUUID, 33);
                             addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
                             addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(base2));
                             bFolderPathSet = true;
@@ -485,7 +485,7 @@ void xcodeProject::addCompileFlagsForMMFile(const fs::path & srcFile) {
 }
 
 
-void xcodeProject::addFramework(const fs::path & path, const fs::path & folder){
+void xcodeProject::addFramework(const fs::path & path, const fs::path & folder, bool isRelativeToSDK){
     ofLogVerbose() << "Adding framework " << ofPathToString(path) << "  folder: " << folder;
 	// alert( "xcodeProject::addFramework " + ofPathToString(path) + " : " + ofPathToString(folder) , 33);
 	// path = the full path (w name) of this framework
@@ -493,57 +493,33 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder){
 
 	addCommand("# ----- addFramework path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
 
-	bool isSystemFramework = true;
-	if (!folder.empty() && !ofIsStringInString(ofPathToString(path), "/System/Library/Frameworks")
-		&& target != "ios"){
-		isSystemFramework = false;
-	}
-
 	fileProperties fp;
-	fp.absolute = isSystemFramework;
-
-	fp.codeSignOnCopy = !isSystemFramework;
-	fp.copyFilesBuildPhase = !isSystemFramework;
+	fp.absolute = false;
+	fp.codeSignOnCopy = !isRelativeToSDK;
+	fp.copyFilesBuildPhase = !isRelativeToSDK;
+	fp.isRelativeToSDK = isRelativeToSDK;
 	fp.frameworksBuildPhase = (target != "ios" && !folder.empty());
-
-	string UUID {
-		addFile(path, folder, fp)
-	};
-
-	addCommand("# ----- FRAMEWORK_SEARCH_PATHS");
-	string parent { ofPathToString(path.parent_path()) };
-
-	for (auto & c : buildConfigs) {
-		addCommand("Add :objects:" + c + ":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + parent);
+	
+	string UUID;
+	if (isRelativeToSDK) {
+		fs::path frameworkPath { "System/Library/Frameworks/" + ofPathToString(path) + ".framework" } ;
+		UUID = addFile(frameworkPath, "Frameworks", fp);
+	} else {
+		UUID = addFile(path, folder, fp);
 	}
-}
-
-
-void xcodeProject::addXCFramework(const fs::path & path, const fs::path & folder) {
-    ofLogVerbose() << "Adding XCFramework " << ofPathToString(path) << "  folder: " << folder;
-	//	alert( "xcodeProject::addFramework " + path.string() + " : " + folder.string() , 33);
-
-	// path = the full path (w name) of this framework
-	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
-
-	addCommand("# ----- addXCFramework path=" + ofPathToString(path) + " folder=" + ofPathToString(folder));
-
-
-	fileProperties fp;
-//	fp.addToBuildPhase = true;
-	fp.codeSignOnCopy = true;
-	fp.copyFilesBuildPhase = true;
-	fp.frameworksBuildPhase = (target != "ios" && !folder.empty());
-
-	string UUID {
-		addFile(path, folder, fp)
-	};
-
-	addCommand("# ----- XCFRAMEWORK_SEARCH_PATHS");
-	string parent { ofPathToString(path.parent_path()) };
-
-	for (auto & c : buildConfigs) {
-		addCommand("Add :objects:" + c + ":buildSettings:XCFRAMEWORK_SEARCH_PATHS: string " + parent);
+	
+	if (!isRelativeToSDK) {
+		addCommand("# ----- FRAMEWORK_SEARCH_PATHS");
+		string parent { ofPathToString(path.parent_path()) };
+		
+		for (auto & c : buildConfigs) {
+			if (path.extension() == ".framework") {
+				addCommand("Add :objects:" + c + ":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + parent);
+			}
+			if (path.extension() == ".xcframework") {
+				addCommand("Add :objects:" + c + ":buildSettings:XCFRAMEWORK_SEARCH_PATHS: string " + parent);
+			}
+		}
 	}
 }
 
@@ -669,73 +645,35 @@ void xcodeProject::addAddonSrcFiles(ofAddon& addon){
     }
 }
 
-
 //-----------------------------------------------------------------------------------------------
 void xcodeProject::addAddonFrameworks(const ofAddon& addon){
     ofLogVerbose("xcodeProject::addAddonFrameworks") << addon.name;
     
     for (auto & f : addon.frameworks) {
         ofLogVerbose() << "adding addon frameworks: " << f;
-
-        size_t found=f.find('/');
-        if (found==string::npos) { // This path doesn't have slashes
-            fs::path folder = fs::path{ "addons" } / addon.name / "frameworks";
-//            fs::path folder = addon.filesToFolders[f];
-
-            if (target == "ios"){
-                addFramework(  "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/" + f + ".framework",
-//                    folder
-                    "Frameworks"
-                    );
-            } else {
-                if (addon.isLocalAddon) {
-                    folder = addon.addonPath / "frameworks";
-                }
-                addFramework( "/System/Library/Frameworks/" + f + ".framework", folder);
-            }
+		
+		auto path = f;
+		// The only addon I've found using fixed path to system Frameworks is ofxCoreLocation
+		// https://github.com/robotconscience/ofxCoreLocation/blob/533ee4b0d380a4a1aafbe1c5923ae66c26b92d53/addon_config.mk#L32
+		
+		if (ofIsStringInString(f, "/System/Library/Frameworks")){
+			fs::path fullPath = f;
+			path = ofPathToString(fullPath.filename());
+		}
+		
+		bool isRelativeToSDK = false;
+        size_t found=path.find('/');
+        if (found==string::npos) {
+			isRelativeToSDK = true;
         }
-        else {
-            if (ofIsStringInString(f, "/System/Library")){
-                addFramework(f, "addons/" + addon.name + "/frameworks");
+		fs::path folder = isRelativeToSDK ? "Frameworks" : addon.filesToFolders.at(f);
+		addFramework(path, folder, isRelativeToSDK);
 
-            } else {
-                addFramework(f, addon.filesToFolders.at(f));
-            }
-        }
     }
 }
 
 //-----------------------------------------------------------------------------------------------
-void xcodeProject::addAddonXCFrameworks(const ofAddon& addon){
-    ofLogVerbose("xcodeProject::addAddonXCFrameworks") << addon.name;
-	for (auto & f : addon.xcframeworks) {
-		//		alert ("xcodeproj addon.xcframeworks : " + f);
-		ofLogVerbose() << "adding addon xcframeworks: " << f;
-
-		size_t found = f.find('/');
-		if (found == string::npos) {
-			fs::path folder = fs::path { "addons" } / addon.name / "xcframeworks";
-			//			fs::path folder = addon.filesToFolders[f];
-
-			if (addon.isLocalAddon) {
-				folder = addon.addonPath / "xcframeworks";
-			}
-			// MARK: Is this ok to call .framework?
-			addXCFramework("/System/Library/Frameworks/" + f + ".xcframework", folder);
-
-		} else {
-			if (ofIsStringInString(f, "/System/Library")) {
-				addXCFramework(f, "addons/" + addon.name + "/xcframeworks");
-			} else {
-				addXCFramework(f, addon.filesToFolders.at(f));
-			}
-		}
-	}
-}
-
-
 string xcodeProject::addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp) {
-
 	string UUID { "" };
 
 //	cout << "will check if exists " << (projectDir / path) << endl;
@@ -780,7 +718,6 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		addCommand("Add :objects:"+UUID+":name string " + ofPathToString(path.filename()));
 
 		if (fp.absolute) {
-
 			addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
 			if (fs::exists( projectDir / path )) {
 				addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
@@ -796,8 +733,13 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 //                        addCommand("Add :objects:"+UUID+":path string " + ofPathToString(projectDir /path));
 //                    }
 //                }
-            }else{
-                addCommand("Add :objects:"+UUID+":sourceTree string <group>");
+            } else {
+				if (fp.isRelativeToSDK) {
+					addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
+					addCommand("Add :objects:"+UUID+":sourceTree string SDKROOT");
+				} else {
+					addCommand("Add :objects:"+UUID+":sourceTree string <group>");
+				}
             }
 		}
 

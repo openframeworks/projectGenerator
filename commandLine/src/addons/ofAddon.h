@@ -130,6 +130,8 @@ public:
 	ofAddon() = default;
 	ofAddon(const ofAddon& other);
 
+	void getFrameworksRecursively(const fs::path & path, string platform = "");
+
 	static string cleanName(const string& name);
 
 	bool load(string addonName, const fs::path& projectDir, const string& targetPlatform);
@@ -162,7 +164,7 @@ public:
 	vector < string > ldflags;
 	vector < string > pkgConfigLibs; 	// linux only
 	vector < string > frameworks;		// osx only
-	vector < string > xcframeworks; // osx only
+	vector < string > xcframeworks;		// osx only
 	vector < string > data;
 	vector < string > defines;
 

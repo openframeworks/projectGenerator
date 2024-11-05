@@ -96,6 +96,8 @@ public:
 	
 	bool bOverwrite = true;
 
+	virtual void addFramework(const fs::path & path, const fs::path & folder, bool isRelativeToSDK = false){};
+
 
 #ifdef OFADDON_OUTPUT_JSON_DEBUG
     void saveAddonsToJson(){
@@ -124,7 +126,7 @@ private:
 protected:
     
     virtual void addAddonFrameworks(const ofAddon& addon){}
-    virtual void addAddonXCFrameworks(const ofAddon& addon){}
+//    virtual void addAddonXCFrameworks(const ofAddon& addon){}
     virtual void addAddonBegin(const ofAddon& addon){}
     virtual void addAddonLibsPaths(const ofAddon& addon);
 	virtual void addAddonIncludePaths(const ofAddon& addon);
@@ -151,7 +153,6 @@ protected:
     virtual void addCPPFLAG(const std::string& cppflag, LibType libType = RELEASE_LIB) = 0; // CXX_FLAGS
     virtual void addAfterRule(const std::string& script) = 0;
     virtual void addDefine(const std::string& define, LibType libType = RELEASE_LIB) = 0;
-
     
     void copyAddonData(ofAddon& addon);
     

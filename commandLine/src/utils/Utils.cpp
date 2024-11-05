@@ -290,44 +290,6 @@ void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & fol
 	}
 }
 
-void getFrameworksRecursively(const fs::path & path, std::vector < string > & frameworks, string platform) {
-//	alert ("getFrameworksRecursively " + path.string(), 34);
-	if (!fs::exists(path) || !fs::is_directory(path)) return;
-
-	for (const auto & f : dirList(path)) {
-		if (fs::is_directory(f)) {
-			if (f.extension() == ".framework") {
-                bool platformFound = false;
-                if (!platform.empty() && f.string().find(platform) != std::string::npos) {
-                   platformFound = true;
-                }
-                if(platformFound) {
-                    frameworks.emplace_back(f.string());
-                }
-			}
-		}
-	}
-}
-
-void getXCFrameworksRecursively(const fs::path & path, std::vector<string> & xcframeworks, string platform) {
-//	alert("getXCFrameworksRecursively " + path.string(), 34);
-	if (!fs::exists(path) || !fs::is_directory(path)) return;
-
-	for (const auto & f : dirList(path)) {
-		if (fs::is_directory(f)) {
-			if (f.extension() == ".xcframework") {
-                bool platformFound = false;
-                if (!platform.empty() && f.string().find(platform) != std::string::npos) {
-                   platformFound = true;
-                }
-                if(platformFound) {
-                    xcframeworks.emplace_back(f.string());
-                }
-			}
-		}
-	}
-}
-
 void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props, const string & platform) {
 //	alert ("getPropsRecursively " + path.string(), 34);
 

@@ -19,34 +19,8 @@ private:
 	bool debugCommands = false;
     
     static std::string LOG_NAME;
-
+	
 protected:
-
-    void addAddonFrameworks(const ofAddon& addon) override ;
-    void addAddonXCFrameworks(const ofAddon& addon) override ;
-    void addAddonLibs(const ofAddon& addon) override;
-    void addAddonSrcFiles( ofAddon& addon) override;
-    
-    
-    
-	void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) override;
-	void addInclude(const fs::path & includeName) override;
-	void addLibrary(const LibraryBinary & lib) override;
-	void addLDFLAG(const string& ldflag, LibType libType = RELEASE_LIB) override;
-	void addCFLAG(const string& cflag, LibType libType = RELEASE_LIB) override; // Other C Flag overrides
-	void addCPPFLAG(const string& cppflag, LibType libType = RELEASE_LIB) override; // Other C++ Flag overrides
-	void addAfterRule(const string& script) override;
-	void addDefine(const string& define, LibType libType = RELEASE_LIB) override;
-
-	void addCompileFlagsForMMFile(const fs::path & srcFile);
-	void addFramework(const fs::path & path, const fs::path & folder);
-	void addXCFramework(const fs::path & path, const fs::path & folder);
-	void addDylib(const fs::path & path, const fs::path & folder);
-
-//	void addAddon(ofAddon & addon);
-	void saveScheme();
-	void renameProject();
-
 	struct fileProperties {
 		bool absolute = false;
 		bool reference = true;
@@ -58,10 +32,33 @@ protected:
 		bool addToResources = false;
 		bool frameworksBuildPhase = false;
 		bool isSrc = false;
-		
 		bool isGroupWithoutFolder = false;
+		bool isRelativeToSDK = false;
 	};
-	
+
+    void addAddonFrameworks(const ofAddon& addon) override ;
+//    void addAddonXCFrameworks(const ofAddon& addon) override ;
+    void addAddonLibs(const ofAddon& addon) override;
+    void addAddonSrcFiles( ofAddon& addon) override;
+    
+	void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) override;
+	void addInclude(const fs::path & includeName) override;
+	void addLibrary(const LibraryBinary & lib) override;
+	void addLDFLAG(const string& ldflag, LibType libType = RELEASE_LIB) override;
+	void addCFLAG(const string& cflag, LibType libType = RELEASE_LIB) override; // Other C Flag overrides
+	void addCPPFLAG(const string& cppflag, LibType libType = RELEASE_LIB) override; // Other C++ Flag overrides
+	void addAfterRule(const string& script) override;
+	void addDefine(const string& define, LibType libType = RELEASE_LIB) override;
+
+	void addCompileFlagsForMMFile(const fs::path & srcFile);
+	void addFramework(const fs::path & path, const fs::path & folder, bool isRelativeToSDK = false) override;
+	void addXCFramework(const fs::path & path, const fs::path & folder);
+	void addDylib(const fs::path & path, const fs::path & folder);
+
+//	void addAddon(ofAddon & addon);
+	void saveScheme();
+	void renameProject();
+
 	string addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp);
 	void addCommand(const string & command);
 	

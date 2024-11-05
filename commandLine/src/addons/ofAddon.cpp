@@ -12,6 +12,31 @@
 #include <regex>
 
 
+
+void ofAddon::getFrameworksRecursively(const fs::path & path, string platform) {
+//	alert ("getFrameworksRecursively " + path.string(), 34);
+	if (!fs::exists(path) || !fs::is_directory(path)) return;
+
+	for (const auto & f : dirList(path)) {
+		if (fs::is_directory(f)) {
+			if (f.extension() == ".framework" || f.extension() == ".xcframework") {
+				bool platformFound = false;
+				if (!platform.empty() && f.string().find(platform) != std::string::npos) {
+				   platformFound = true;
+				}
+				if(platformFound) {
+					if (f.extension() == ".framework") {
+						frameworks.emplace_back(f.string());
+					}
+					if (f.extension() == ".xcframework") {
+						xcframeworks.emplace_back(f.string());
+					}
+				}
+			}
+		}
+	}
+}
+
 static std::string toString(const std::string& str){
 	return str;
 }
@@ -757,10 +782,10 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		getLibsRecursively(libsPath, libFiles, libs, "macos");
 		getLibsRecursively(libsPath, libFiles, libs, "osx");
 
-		getFrameworksRecursively(libsPath, frameworks, "macos");
-		getFrameworksRecursively(libsPath, frameworks, "osx");
-		getXCFrameworksRecursively(libsPath, xcframeworks, "macos");
-		getXCFrameworksRecursively(libsPath, xcframeworks, "osx");
+		getFrameworksRecursively(libsPath, "macos");
+		getFrameworksRecursively(libsPath, "osx");
+//		getXCFrameworksRecursively(libsPath, "macos");
+//		getXCFrameworksRecursively(libsPath, "osx");
 
 		removeDuplicates(libs);
 		removeDuplicates(libFiles);
@@ -777,8 +802,8 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		platform == "tvos"){//} ||
 		//platform == "macos"){
 
-			getFrameworksRecursively(libsPath, frameworks, platform);
-			getXCFrameworksRecursively(libsPath, xcframeworks, platform);
+		getFrameworksRecursively(libsPath, platform);
+//		getXCFrameworksRecursively(libsPath, platform);
 	}
 
 	if (platform == "vs" || platform == "msys2"
