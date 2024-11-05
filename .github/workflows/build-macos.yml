@@ -132,5 +132,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
-          release: ${{ env.RELEASE }}
           files: projectGenerator-osx.zip
