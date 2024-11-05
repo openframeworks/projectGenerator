@@ -255,6 +255,9 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 			ofLogNotice() << "parsing addons.make";
 			project->parseAddons();
 		}
+		for (auto & f : frameworks) {
+			project->addFramework(f, "Frameworks", true);
+		}
 
 		for (auto & srcPath : srcPaths) {
 			project->addSrcRecursively(srcPath);
@@ -551,7 +554,7 @@ int main(int argc, char ** argv) {
 		bAddonsPassedIn = true; // could be empty
 		if (options[FRAMEWORKS].arg != NULL) {
 			frameworks = ofSplitString(options[FRAMEWORKS].arg, ",", true, true);
-			cout << "frameworks " << options[FRAMEWORKS].arg << endl;
+//			cout << "frameworks " << options[FRAMEWORKS].arg << endl;
 		}
 	}
 
@@ -702,11 +705,11 @@ int main(int argc, char ** argv) {
 							for (auto & addon : addons) {
 								project->addAddon(addon);
 							}
-							for (auto & f : frameworks) {
-								project->addFramework(f, "", true);
-							}
 						}else{
 							project->parseAddons();
+						}
+						for (auto & f : frameworks) {
+							project->addFramework(f, "Frameworks", true);
 						}
 
 						for (auto & s : srcPaths) {
