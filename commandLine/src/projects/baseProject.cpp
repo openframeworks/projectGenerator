@@ -156,6 +156,7 @@ bool baseProject::create(const fs::path & _path, string templateName){
 	//	}
 	bool bDoesSrcDirExist = false;
 
+	// it can be only "src"
 	fs::path projectSrc { projectDir / "src" };
 	
 	if (fs::exists(projectSrc) && fs::is_directory(projectSrc)) {
