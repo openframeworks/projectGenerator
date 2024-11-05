@@ -102,7 +102,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
-          release: ${{ env.RELEASE }}
           files: ../openFrameworks/apps/projectGenerator/commandLine/bin/projectGenerator-vs.zip
       - name: Update Release GUI
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
@@ -110,5 +109,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
-          release: ${{ env.RELEASE }}
           files: ../openFrameworks/apps/projectGenerator/frontend/dist/projectGenerator-vs-gui.zip
