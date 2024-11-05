@@ -216,17 +216,14 @@ bool baseProject::create(const fs::path & _path, string templateName){
 
 	if (bDoesSrcDirExist){
 		vector <fs::path> fileNames;
-//		getFilesRecursively(projectDir / "src", fileNames);
-		getFilesRecursively("src", fileNames); // CWD is already on src. so with this we get relative paths
+
+		// CWD is already on projectDir. so with this we get relative paths
+		getFilesRecursively("src", fileNames);
 
 		std::sort(fileNames.begin(), fileNames.end(), [](const fs::path & a, const fs::path & b) {
 			return a.string() < b.string();
 		});
 		for (const auto & f : fileNames) {
-//			fs::path rel { fs::relative(f, projectDir) };
-//			fs::path folder { rel.parent_path() };
-//			string fileName = f.string();
-
 			if (f != "src/ofApp.cpp" &&
 				f != "src/ofApp.h" &&
 				f != "src/main.cpp" &&
@@ -234,21 +231,6 @@ bool baseProject::create(const fs::path & _path, string templateName){
 				f != "src/main.mm") {
 				addSrc(f, f.parent_path());
 			} else {
-			}
-		}
-		// FIXME: Port to std::set, so no comparison is needed.
-		vector <fs::path> paths;
-		
-		for (auto & f : fileNames) {
-			fs::path rel { fs::relative(fs::path(f).parent_path(), projectDir) };
-			if (std::find(paths.begin(), paths.end(), rel) == paths.end()) {
-				paths.emplace_back(rel);
-				if (containsSourceFiles(rel)) {
-					ofLogVerbose() << "[prjFiles-addIncludeDir] contains src - Adding dir: [" << rel.string() << "]";
-					addInclude(rel);
-				} else {
-					ofLogVerbose() << "[prjFiles-addIncludeDir] no src - not adding: [" << rel.string() << "]";
-				}
 			}
 		}
 
