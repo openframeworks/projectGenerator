@@ -500,6 +500,10 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder, 
 	fp.isRelativeToSDK = isRelativeToSDK;
 	fp.frameworksBuildPhase = (target != "ios" && !folder.empty());
 	
+	if (isRelativeToSDK) {
+		fp.frameworksBuildPhase = true;
+	}
+	
 	string UUID;
 	if (isRelativeToSDK) {
 		fs::path frameworkPath { "System/Library/Frameworks/" + ofPathToString(path) + ".framework" } ;
