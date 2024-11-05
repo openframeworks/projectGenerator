@@ -154,12 +154,12 @@ bool baseProject::create(const fs::path & _path, string templateName){
 	//	if (!fs::exists(projectDir)) {
 	//		fs::create_directory(projectDir);
 	//	}
-	bool bDoesDirExist = false;
+	bool bDoesSrcDirExist = false;
 
-	fs::path project { projectDir / "src" };
+	fs::path projectSrc { projectDir / "src" };
 	
-	if (fs::exists(project) && fs::is_directory(project)) {
-		bDoesDirExist = true;
+	if (fs::exists(projectSrc) && fs::is_directory(projectSrc)) {
+		bDoesSrcDirExist = true;
 	} else {
 		for (auto & p : { fs::path("src"), fs::path("bin") }) {
 			try {
@@ -214,30 +214,31 @@ bool baseProject::create(const fs::path & _path, string templateName){
 
 	parseConfigMake();
 
-	if (bDoesDirExist){
-		vector <  fs::path > fileNames;
-		getFilesRecursively(projectDir / "src", fileNames);
+	if (bDoesSrcDirExist){
+		vector <fs::path> fileNames;
+//		getFilesRecursively(projectDir / "src", fileNames);
+		getFilesRecursively("src", fileNames); // CWD is already on src. so with this we get relative paths
 
 		std::sort(fileNames.begin(), fileNames.end(), [](const fs::path & a, const fs::path & b) {
 			return a.string() < b.string();
 		});
-		for (auto & f : fileNames) {
-			fs::path rel { fs::relative(f, projectDir) };
-			fs::path folder { rel.parent_path() };
+		for (const auto & f : fileNames) {
+//			fs::path rel { fs::relative(f, projectDir) };
+//			fs::path folder { rel.parent_path() };
+//			string fileName = f.string();
 
-			string fileName = rel.string();
-
-			if (fileName != "src/ofApp.cpp" &&
-				fileName != "src/ofApp.h" &&
-				fileName != "src/main.cpp" &&
-				fileName != "src/ofApp.mm" &&
-				fileName != "src/main.mm") {
-				addSrc(rel.string(), folder.string());
+			if (f != "src/ofApp.cpp" &&
+				f != "src/ofApp.h" &&
+				f != "src/main.cpp" &&
+				f != "src/ofApp.mm" &&
+				f != "src/main.mm") {
+				addSrc(f, f.parent_path());
 			} else {
 			}
 		}
-		// FIXME: Port to std::list, so no comparison is needed.
-		vector < fs::path > paths;
+		// FIXME: Port to std::set, so no comparison is needed.
+		vector <fs::path> paths;
+		
 		for (auto & f : fileNames) {
 			fs::path rel { fs::relative(fs::path(f).parent_path(), projectDir) };
 			if (std::find(paths.begin(), paths.end(), rel) == paths.end()) {
@@ -248,6 +249,20 @@ bool baseProject::create(const fs::path & _path, string templateName){
 				} else {
 					ofLogVerbose() << "[prjFiles-addIncludeDir] no src - not adding: [" << rel.string() << "]";
 				}
+			}
+		}
+
+		std::set<fs::path> uniquePaths;
+		for (auto & f : fileNames) {
+			uniquePaths.insert(f.parent_path());
+		}
+		
+		for (auto & p : uniquePaths) {
+			if (containsSourceFiles(p)) {
+				ofLogVerbose() << "[prjFiles-addIncludeDir] contains src - Adding dir: " << p;
+				addInclude(p);
+			} else {
+				ofLogVerbose() << "[prjFiles-addIncludeDir] no src - not adding: " << p;
 			}
 		}
 	}

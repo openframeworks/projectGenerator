@@ -256,7 +256,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 			project->parseAddons();
 		}
 		for (auto & f : frameworks) {
-			project->addFramework(f, "", true);
+			project->addFramework(f, "Frameworks", true);
 		}
 
 		for (auto & srcPath : srcPaths) {
@@ -709,7 +709,7 @@ int main(int argc, char ** argv) {
 							project->parseAddons();
 						}
 						for (auto & f : frameworks) {
-							project->addFramework(f, "", true);
+							project->addFramework(f, "Frameworks", true);
 						}
 
 						for (auto & s : srcPaths) {
