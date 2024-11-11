@@ -611,7 +611,7 @@ void xcodeProject::addAfterRule(const string& rule){
 	// std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), [](const fs::path & a, const fs::path & b) {
 	// 	return a.string() < b.string();
 	// });
-void  xcodeProject::addAddonLibs(const ofAddon& addon){
+void xcodeProject::addAddonLibs(const ofAddon& addon){
     for (auto & e : addon.libs) {
         ofLogVerbose() << "adding addon libs: " << e.path;
         addLibrary(e);

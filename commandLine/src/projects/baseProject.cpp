@@ -304,10 +304,11 @@ bool baseProject::isAddonInCache(const string & addonPath, const string platform
 
 void baseProject::addAddon(const std::string& _addonName){
     ofLogVerbose("baseProject::addAddon") << _addonName;
-    //	alert( "baseProject::addAddon " + addonName );
+//	alert( "baseProject::addAddon " + _addonName );
     
     auto addonName = ofAddon::cleanName(_addonName);
     
+
     // FIXME : not target, yes platform.
 //#ifdef TARGET_WIN32
 //    //	std::replace( addonName.begin(), addonName.end(), '/', '\\' );
@@ -423,10 +424,7 @@ void baseProject::addAddon(const std::string& _addonName){
     
     ofLogNotice() << "adding addon: " << addon.name;
     
-    
-    
-    
-    
+
     // MARK: - SPECIFIC for each project.
     // XCode and VS override the base addAddon. other templates will use baseproject::addAddon(ofAddon...
     addAddon(addon);
