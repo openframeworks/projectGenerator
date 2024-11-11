@@ -70,7 +70,7 @@ public:
 
 
     void addAddon(const std::string& addon);
-	void addAddon(ofAddon & addon);
+	virtual void addAddon(ofAddon & addon);
 	virtual void addSrcRecursively(const fs::path & srcPath);
 	
 	virtual void restoreBackup(const fs::path & srcPath){};
