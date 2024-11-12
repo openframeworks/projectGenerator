@@ -131,9 +131,8 @@ bool VSCodeProject::loadProjectFile(){
 	cppProperties.load();
 	return true;
 }
-
-
-void VSCodeProject::addAddon(ofAddon & addon) {
+ 
+void VSCodeProject::addAddonBegin(const ofAddon& addon) {
 //	alert("VSCodeProject::addAddon() " + addon.name, 35);
 
 	workspace.addPath(addon.addonPath);

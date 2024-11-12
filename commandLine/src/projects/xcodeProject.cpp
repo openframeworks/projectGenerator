@@ -602,15 +602,7 @@ void xcodeProject::addAfterRule(const string& rule){
 	addCommand("Add :objects:"+buildConfigurationListUUID+":buildPhases: string " + afterPhaseUUID);
 }
 
-// void xcodeProject::addAddon(ofAddon & addon){
-    // 
-	//	alert("xcodeProject addAddon string :: " + addon.name, 31);
 
-	// Files listed alphabetically on XCode navigator.
-
-	// std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), [](const fs::path & a, const fs::path & b) {
-	// 	return a.string() < b.string();
-	// });
 void xcodeProject::addAddonLibs(const ofAddon& addon){
     for (auto & e : addon.libs) {
         ofLogVerbose() << "adding addon libs: " << e.path;

@@ -144,10 +144,10 @@ bool QtCreatorProject::saveProjectFile(){
 }
 
 
-void QtCreatorProject::addAddon(ofAddon & addon){
-	// FIXME: I think this is unneded since this function here is triggered by baseclass::addAddon(string) which already checked if exists.
-//	for (auto & a : addons) {
-//		if (a.name == addon.name) return;
-//	}
-	addons.emplace_back(addon);
-}
+//void QtCreatorProject::addAddon(ofAddon & addon){
+//	// FIXME: I think this is unneded since this function here is triggered by baseclass::addAddon(string) which already checked if exists.
+////	for (auto & a : addons) {
+////		if (a.name == addon.name) return;
+////	}
+//	addons.emplace_back(addon);
+//}
