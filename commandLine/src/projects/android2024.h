@@ -17,7 +17,7 @@ public:
     void addDefine(const std::string& define, LibType libType = RELEASE_LIB) override {}
     
     
-    
+    //TODO: not sure if the following function should return false. as it will stop the further execution in  baseProject::create and make it to return as it had failed.
 	bool loadProjectFile() override { return false; };
     bool saveProjectFile() override { return false; };
 	static std::string LOG_NAME;

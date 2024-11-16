@@ -55,7 +55,6 @@ protected:
 	void addXCFramework(const fs::path & path, const fs::path & folder);
 	void addDylib(const fs::path & path, const fs::path & folder);
 
-//	void addAddon(ofAddon & addon);
 	void saveScheme();
 	void renameProject();
 

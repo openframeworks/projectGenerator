@@ -19,7 +19,6 @@ public:
     void addAfterRule(const std::string& script) override {}
     void addDefine(const std::string& define, LibType libType = RELEASE_LIB) override {}
     
-	void addAddon(ofAddon & addon) override;
 
 	bool loadProjectFile() override;
 	bool saveProjectFile() override;
