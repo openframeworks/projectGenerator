@@ -14,16 +14,20 @@
 
 
 void ofAddon::getFrameworksRecursively(const fs::path & path, string platform) {
-//	alert ("getFrameworksRecursively " + path.string(), 34);
+//	alert ("getFrameworksRecursively for " + platform + " : " + path.string(), 34);
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
 
 	for (const auto & f : dirList(path)) {
 		if (fs::is_directory(f)) {
 			if (f.extension() == ".framework" || f.extension() == ".xcframework") {
+//				alert ("found XCF " + f.string(), 31);
 				bool platformFound = false;
+				
+//				if (ofIsStringInString(platform), f.string()) {
 				if (!platform.empty() && f.string().find(platform) != std::string::npos) {
 				   platformFound = true;
 				}
+
 				if(platformFound) {
 					if (f.extension() == ".framework") {
 						frameworks.emplace_back(f.string());
@@ -770,11 +774,11 @@ void ofAddon::addToFolder(const fs::path& path, const fs::path & parentFolder){
 }
 
 void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFolder) {
-//	alert ("parseLibsPath " + libsPath.string(), 35);
 	if (!fs::exists(libsPath)) {
 //		alert("file not found " + libsPath.string(), 35);
 		return;
 	}
+//	alert ("parseLibsPath " + libsPath.string() + ", parent=" + parentFolder.string(), 35);
 
 
 	if (platform == "osx"  || platform == "macos"){
@@ -787,13 +791,14 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 //		getXCFrameworksRecursively(libsPath, "macos");
 //		getXCFrameworksRecursively(libsPath, "osx");
 
+		// FIXME: This is not needed when we get libraries right.
+		// if it was needed the best was change to std::set.
 		removeDuplicates(libs);
 		removeDuplicates(libFiles);
 		removeDuplicates(frameworks);
 		removeDuplicates(xcframeworks);
 
-	}else{
-
+	} else {
 		getLibsRecursively(libsPath, libFiles, libs, platform);
 	}
 
@@ -834,15 +839,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		s = fixPath(s);
 //        alert("fixpath after  " + ofPathToString(s));
 		addToFolder(s, parentFolder);
-//		fs::path folder;
-//		if (isLocalAddon) {
-//			folder = fs::path { "local_addons" } / fs::relative(s.parent_path(), parentFolder);
-//		} else {
-//			folder = fs::relative(s.parent_path(), getOFRoot());
-
-//		}
 		srcFiles.emplace_back(s);
-//		filesToFolders[s] = folder;
 	}
 
 	// so addons will never be system.
@@ -853,40 +850,21 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		size_t foundWindowsPath = f.find('\\');
 		if (foundUnixPath==string::npos &&
 			foundWindowsPath==string::npos){
-			bIsSystemFramework = true;                  // we have no "path" so we are system
+			bIsSystemFramework = true;  // we have no "path" so we are system
 		}
 
 		if (bIsSystemFramework){
 			; // do we need to do anything here?
 		} else {
-			// if addon is local, it is relative to the project folder, and if it is not, it is related to the project folder, ex: addons/ofxSvg
-//			fs::path rel = fs::relative (f, isLocalAddon ? pathToProject : pathToOF);
-//			fs::path folder = rel.parent_path();
-//
-//			if (isLocalAddon) {
-//				fs::path fFS { f };
-//				folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
-//			}
-//
-//			filesToFolders[f] = folder;
 			addToFolder(f, parentFolder);
 		}
 	}
 
 	for (const auto & f : xcframeworks) {
-
-//		fs::path rel = fs::relative(f, isLocalAddon ? pathToProject : pathToOF);
-//		fs::path folder = rel.parent_path();
-//
-//		if (isLocalAddon) {
-//			fs::path fFS { f };
-//			folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
-//		}
-//
-//		filesToFolders[f] = folder;
 		addToFolder(f, parentFolder);
 	}
 }
+
 string ofAddon::cleanName(const string& name){
 	auto addonName = name;
 #ifdef TARGET_WIN32
