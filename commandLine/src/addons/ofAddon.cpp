@@ -20,7 +20,7 @@ void ofAddon::getFrameworksRecursively(const fs::path & path, string platform) {
 	for (const auto & f : dirList(path)) {
 		if (fs::is_directory(f)) {
 			if (f.extension() == ".framework" || f.extension() == ".xcframework") {
-				alert ("found XCF " + f.string(), 31);
+//				alert ("found XCF " + f.string(), 31);
 				bool platformFound = false;
 				
 //				if (ofIsStringInString(platform), f.string()) {
@@ -839,15 +839,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		s = fixPath(s);
 //        alert("fixpath after  " + ofPathToString(s));
 		addToFolder(s, parentFolder);
-//		fs::path folder;
-//		if (isLocalAddon) {
-//			folder = fs::path { "local_addons" } / fs::relative(s.parent_path(), parentFolder);
-//		} else {
-//			folder = fs::relative(s.parent_path(), getOFRoot());
-
-//		}
 		srcFiles.emplace_back(s);
-//		filesToFolders[s] = folder;
 	}
 
 	// so addons will never be system.
@@ -858,53 +850,21 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		size_t foundWindowsPath = f.find('\\');
 		if (foundUnixPath==string::npos &&
 			foundWindowsPath==string::npos){
-			bIsSystemFramework = true;                  // we have no "path" so we are system
+			bIsSystemFramework = true;  // we have no "path" so we are system
 		}
 
 		if (bIsSystemFramework){
 			; // do we need to do anything here?
 		} else {
-			// if addon is local, it is relative to the project folder, and if it is not, it is related to the project folder, ex: addons/ofxSvg
-//			fs::path rel = fs::relative (f, isLocalAddon ? pathToProject : pathToOF);
-//			fs::path folder = rel.parent_path();
-//
-//			if (isLocalAddon) {
-//				fs::path fFS { f };
-//				folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
-//			}
-//
-//			filesToFolders[f] = folder;
 			addToFolder(f, parentFolder);
 		}
 	}
 
 	for (const auto & f : xcframeworks) {
-
-//		fs::path rel = fs::relative(f, isLocalAddon ? pathToProject : pathToOF);
-//		fs::path folder = rel.parent_path();
-//
-//		if (isLocalAddon) {
-//			fs::path fFS { f };
-//			folder = fs::path { "local_addons" } / fs::relative(fFS.parent_path(), parentFolder);
-//		}
-//
-//		filesToFolders[f] = folder;
-		
-		
-//		addToFolder(f, parentFolder);
-		
-		fs::path rel = fs::relative(f, parentFolder).parent_path();
-//		alert ("xcframeworks will add to folder " + f + " : " + parentFolder.string(), 31);
-		alert ("REL - " + rel.string(), 31);
-		addToFolder(f, rel);
-//		addFile(
+		addToFolder(f, parentFolder);
 	}
-	
-//	for (auto & f : filesToFolders) {
-//		cout << f.first << " : " << f.second << endl;
-//	}
-
 }
+
 string ofAddon::cleanName(const string& name){
 	auto addonName = name;
 #ifdef TARGET_WIN32

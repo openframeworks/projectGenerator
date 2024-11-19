@@ -487,7 +487,7 @@ void xcodeProject::addCompileFlagsForMMFile(const fs::path & srcFile) {
 
 void xcodeProject::addFramework(const fs::path & path, const fs::path & folder, bool isRelativeToSDK){
     ofLogVerbose() << "Adding framework " << ofPathToString(path) << "  folder: " << folder;
-	 alert( "xcodeProject::addFramework " + ofPathToString(path) + " : " + ofPathToString(folder) , 33);
+//	 alert( "xcodeProject::addFramework " + ofPathToString(path) + " : " + ofPathToString(folder) , 33);
 	// path = the full path (w name) of this framework
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
 
@@ -649,7 +649,7 @@ void xcodeProject::addAddonFrameworks(const ofAddon& addon){
 	for (auto & f : allFrameworks) {
 //    for (auto & f : addon.frameworks) {
         ofLogVerbose() << "adding addon frameworks: " << f;
-		alert ("ADD ADDON FRAMEWORKS " + f, 33);
+//		alert ("ADD ADDON FRAMEWORKS " + f, 33);
 
 		auto path = f;
 		// The only addon I've found using fixed path to system Frameworks is ofxCoreLocation

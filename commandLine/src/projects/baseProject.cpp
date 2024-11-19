@@ -576,19 +576,12 @@ void baseProject::addAddon(ofAddon & addon){
 	addAddonHeadersrcFiles(addon);
 
 
-
 	addAddonDefines(addon);
-
 	addAddonFrameworks(addon);
 //    addAddonXCFrameworks(addon);
-
     copyAddonData(addon);
-    
     addAddonProps(addon);
-
 }
-
-
 
 
 void  baseProject::addAddonLibsPaths(const ofAddon& addon){
@@ -599,6 +592,7 @@ void  baseProject::addAddonLibsPaths(const ofAddon& addon){
         ofLogVerbose("adding lib paths") << lib.string();
     }
 }
+
 
 void  baseProject::addAddonIncludePaths(const ofAddon& addon){
     for (auto & e : addon.includePaths) {
