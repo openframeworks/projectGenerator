@@ -220,10 +220,14 @@ bool baseProject::create(const fs::path & _path, string templateName){
 
 		// CWD is already on projectDir. so with this we get relative paths
 		getFilesRecursively("src", fileNames);
-
+		
 		std::sort(fileNames.begin(), fileNames.end(), [](const fs::path & a, const fs::path & b) {
 			return a.string() < b.string();
 		});
+		
+		// FIXME: I think we should remove this logic and remove the files from default project.
+		// only the files present are added to the project
+		
 		for (const auto & f : fileNames) {
 			if (f != "src/ofApp.cpp" &&
 				f != "src/ofApp.h" &&
@@ -302,12 +306,13 @@ bool baseProject::isAddonInCache(const string & addonPath, const string platform
 	return addonsCache[platform].find(addonPath) != addonsCache[platform].end();
 }
 
-void baseProject::addAddon(const std::string& _addonName){
+void baseProject::addAddon(const std::string & _addonName){
     ofLogVerbose("baseProject::addAddon") << _addonName;
 //	alert( "baseProject::addAddon " + _addonName );
     
-    auto addonName = ofAddon::cleanName(_addonName);
-    
+//    auto addonName = ofAddon::cleanName(_addonName);
+	auto addonName = _addonName;
+
 
     // FIXME : not target, yes platform.
 //#ifdef TARGET_WIN32

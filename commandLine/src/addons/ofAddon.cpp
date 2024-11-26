@@ -886,7 +886,7 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 	// we want to set addonMakeName before cleaning the addon name, so it is preserved in the exact same way as it was passed, and the addons.make file can be (re)constructed properly
 	this->addonMakeName = addonName;
 
-	addonName = cleanName(addonName);
+//	addonName = cleanName(addonName);
 
 	if(addonName.empty()){
 		ofLogError("baseProject::addAddon") << "cant add addon with empty name";
@@ -899,7 +899,12 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 	//A local addon is not restricted to one that lives in folder with the name local_addons, should be any valid addon on the filesystem.
 	//Parsing will generate the correct path to both OF and the project.
 	//Everything else should be treated exactly in the same way, regardless of it being local or not.
-	if(addonName[0] == '.' && fs::exists( ofFilePath::join(projectDir, addonName))){
+	
+	fs::path localAddon { addonName };
+
+	if (localAddon.has_parent_path() && fs::exists(projectDir / addonName)) {
+	
+//	if(addonName[0] == '.' && fs::exists( ofFilePath::join(projectDir, addonName))){
 
 		this->addonPath = normalizePath(ofFilePath::join(projectDir, addonName));
 		this->isLocalAddon = true;
