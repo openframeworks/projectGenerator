@@ -214,8 +214,7 @@ void visualStudioProject::appendFilter(string folderName){
 
 
 void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type){
-//	alert("addSrc file: " + srcFile.string(), 35);
-//	alert("addSrc folder: " + folder.string(), 35);
+//	alert("addSrc file: " + srcFile.string() + " folder: " + folder.string(), 35);
 
 	// I had an empty ClCompile field causing errors
 	if (srcFile.empty()) {
@@ -239,6 +238,7 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 	for (std::size_t i = 0; i < folderSubNames.size(); i++){
 		if (i != 0) folderName += "\\";
 		folderName += folderSubNames[i];
+//		alert("appendFilter: " + folderName, 34);
 		appendFilter(folderName);
 	}
 
