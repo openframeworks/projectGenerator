@@ -103,6 +103,7 @@ void printOFPath() {
 	std::cout << ofPath.string() << endl;
 }
 
+// no way this is a repeptition of setOFRoot
 void setofPath(const fs::path& path) {
 	ofLogVerbose() << " setofPath: [" << path << "] ";
 	ofPath = path;
@@ -298,9 +299,10 @@ void recursiveUpdate(const fs::path & path, const string & target) {
 		nProjectsUpdated++;
 
 		if (!ofPath.is_absolute()) {
-			setofPath(ofCalcPath);
 			if (ofIsPathInPath(path, ofPath)) {
 				setofPath(fs::relative(ofCalcPath, path));
+			} else {
+				setofPath(ofCalcPath);
 			}
 		}
 
@@ -354,11 +356,14 @@ int updateOFPath(fs::path path) {
 				return EXIT_USAGE;
 			}
 		}
-//        if (ofIsPathInPath(projectPath, ofPath)) {
-//            fs::path path = fs::relative(ofPath, projectPath);
-//            ofPath = path.string();
-//        }
-		ofPath = normalizePath(ofPath);
+		
+		// This make ofPath relative if it is inside project path, and avoid lots of fs::relative down the line
+		// it is important because we can detect if some path needs to be absolute in the project.
+		
+        if (ofIsPathInPath(projectPath, ofPath)) {
+			ofPath = fs::relative(ofPath, projectPath);
+        }
+//		ofPath = normalizePath(ofPath);
 		setOFRoot(ofPath);
 	}
 
@@ -474,7 +479,7 @@ int main(int argc, char ** argv) {
 		if (options[OFPATH].arg != NULL) {
 			setofPath(options[OFPATH].arg);
 			ofLogVerbose() << "ofPath arg: [" << ofPath << "]";
-			setofPath(normalizePath(ofPath));
+			setofPath(ofPath);
 			ofLogVerbose() << "ofPath normalised arg: [" << ofPath << "]";
 		}
 	}
@@ -584,14 +589,17 @@ int main(int argc, char ** argv) {
 		return EXIT_USAGE;
 	}
 
-	fs::path projectPath = normalizePath(fs::weakly_canonical(fs::current_path() / projectName));
-	fs::path projectNamePath = projectPath.filename();
+	
+	//	fs::path projectPath = normalizePath(fs::weakly_canonical(fs::current_path() / projectName));
+	fs::path projectPath = ".";
+	fs::path projectNamePath = fs::current_path().filename();
 	projectName = projectNamePath.string();
 
 
 	ofLogVerbose() << " projectPath path: [" << projectPath << "] root_path: [" << projectPath.root_path() << "]";
 	ofLogVerbose() << " ofPath path: [" << ofPath << "]";
 	ofLogVerbose() << " ofRoot path: [" << getOFRoot()  << "]";
+
 
 	if(projectPath == projectPath.root_path()) {
 		ofLogVerbose() << " !! projectPath == projectPath.root_path() ";
@@ -621,6 +629,8 @@ int main(int argc, char ** argv) {
 		messageError( "Invalid project path: {" + projectPath.string() + "}");
 		return EXIT_FAILURE;
 	}
+	
+
 	// make folder
 	if (!fs::exists(projectPath)) {
 		try {

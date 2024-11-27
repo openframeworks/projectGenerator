@@ -770,6 +770,7 @@ void ofAddon::addToFolder(const fs::path& path, const fs::path & parentFolder){
 	} else {
 		folder = fs::relative(path.parent_path(), getOFRoot());
 	}
+	
 	filesToFolders[path] = folder;
 }
 
@@ -893,12 +894,8 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 		return false;
 	}
 
-	//This should be the only instance where we check if the addon is either local or not.
-	//being local just means that the addon name is a filepath and it starts with a dot.
-	//otherwise it will look in the addons folder.
-	//A local addon is not restricted to one that lives in folder with the name local_addons, should be any valid addon on the filesystem.
-	//Parsing will generate the correct path to both OF and the project.
-	//Everything else should be treated exactly in the same way, regardless of it being local or not.
+	// a local addon can be added but it should have at least one parent folder, like
+	// addons/ofxMidi if there is no separator on path PG will search in $ofw/addons path
 	
 	fs::path localAddon { addonName };
 
@@ -906,7 +903,12 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 	
 //	if(addonName[0] == '.' && fs::exists( ofFilePath::join(projectDir, addonName))){
 
-		this->addonPath = normalizePath(ofFilePath::join(projectDir, addonName));
+		if (localAddon.is_absolute()) {
+			alert ("IS ABS ! " + localAddon.string(), 32);
+			this->addonPath = localAddon;
+		} else {
+			this->addonPath = normalizePath(projectDir / addonName);
+		}
 		this->isLocalAddon = true;
 		ofLogVerbose() << "Adding local addon: " << addonName;
 		//        addon.pathToProject = makeRelative(getOFRoot(), projectDir);
@@ -914,9 +916,9 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 	}else{
 		this->addonPath = fs::path { getOFRoot() / "addons" / addonName };
 	}
-	this->pathToOF = normalizePath(getOFRoot());
+//	this->pathToOF = normalizePath(getOFRoot());
 
-	this->addonPath = normalizePath(addonPath);
+//	this->addonPath = normalizePath(addonPath);
 
 
 	this->pathToProject = projectDir;
@@ -1058,9 +1060,16 @@ fs::path ofAddon::fixPath(const fs::path & path) {
 	 but the problem is fs::relative actually calculate symlink paths, modifying filename.
 	 which is not good for macos dylibs, like ofxHapPlayer, so I had to replace with the original filename back
 	 */
+//	alert("of:fixPath " + path.string(), 31);
+	if (path.is_absolute()) {
+		return path;
+	}
+
 	if(isLocalAddon){
+//		alert ((normalizePath(( pathToProject / fs::relative(path, pathToProject) ).parent_path() / path.filename())).string());
 		return normalizePath(( pathToProject / fs::relative(path, pathToProject) ).parent_path() / path.filename());
 	}else{
 		return normalizePath(( pathToOF / fs::relative(path, getOFRoot()) ).parent_path() / path.filename());
+		
 	}
 }

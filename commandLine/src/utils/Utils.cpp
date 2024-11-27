@@ -306,12 +306,10 @@ void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props
 
 void getDllsRecursively(const fs::path & path, std::vector<fs::path> & dlls, string platform) {
 //	alert ("getDllsRecursively " + path.string(), 34);
-//	if (!fs::exists(path) || !fs::is_directory(path)) return;
 	if (!fs::exists(path) || !fs::is_directory(path)) {
 //		alert ("not found!");
 		return;
 	}
-
 
 	for (const auto & f : dirList(path)) {
 		if (fs::is_regular_file(f) && (f.extension() == ".dll" || f.extension() == ".so")) {
@@ -344,39 +342,17 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 			if ((f.extension() == ".framework") || (f.extension() == ".xcframework")) {
 				it.disable_recursion_pending();
 				continue;
-			} 
-                //else {
-//				auto stem = f.stem();
-//				auto archFound = std::find(LibraryBinary::archs.begin(), LibraryBinary::archs.end(), stem);
-//				if (archFound != LibraryBinary::archs.end()) {
-//					arch = *archFound;
-//					alert ("arch found: " + arch, 34);
-//				} else {
-//					auto targetFound = std::find(LibraryBinary::targets.begin(), LibraryBinary::targets.end(), stem);
-//					if (targetFound != LibraryBinary::targets.end()) {
-//						target = *targetFound;
-//                        alert ("target found: " + target, 34);
-//					}
-//				}
-//			}
+			}
+			
 		} else {
 			auto ext = ofPathToString(f.extension());
 			bool platformFound = false;
 
-//			if(platform!=""){
-//				std::vector<string> splittedPath = ofSplitString(f.string(), fs::path("/").make_preferred().string());
-//				for(size_t j=0;j<splittedPath.size();j++){
-//					if(splittedPath[j]==platform){
-//						platformFound = true;
-//					}
-//				}
-//			}
-            
             if (!platform.empty() && f.string().find(platform) != std::string::npos) {
                platformFound = true;
             }
 
-			if (ext == ".a" || ext == ".lib" || ext == ".dylib" || ext == ".so" || ext == ".xcframework" || ext == ".framework" || (ext == ".dll" && platform != "vs")) {
+			if (ext == ".a" || ext == ".lib" || ext == ".dylib" || ext == ".so" || (ext == ".dll" && platform != "vs")) {
 				if (platformFound){
                     
                     LibraryBinary lib(f);

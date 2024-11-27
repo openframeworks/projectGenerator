@@ -85,28 +85,28 @@ bool xcodeProject::createProjectFile(){
 
 
 	   copyTemplateFiles.push_back({
-		   normalizePath(templatePath / "emptyExample.xcodeproj" / "project.pbxproj"),
-		   normalizePath(xcodeProject / "project.pbxproj"),
+		   templatePath / "emptyExample.xcodeproj" / "project.pbxproj",
+		   xcodeProject / "project.pbxproj",
 		   {{"emptyExample", projectName},
 		   rootReplacements}
 	   });
 
 	   copyTemplateFiles.push_back({
-		   normalizePath(templatePath / "Project.xcconfig"),
-		   normalizePath(projectDir / "Project.xcconfig"),
+		   templatePath / "Project.xcconfig",
+		   projectDir / "Project.xcconfig",
 		   {rootReplacements}
 	   });
 
 	   if (target == "osx" || target == "macos") {
 		   for (auto & f : {"openFrameworks-Info.plist", "of.entitlements"}) {
-			   copyTemplateFiles.push_back({normalizePath(templatePath / f), normalizePath(projectDir / f)});
+			   copyTemplateFiles.push_back({templatePath / f, projectDir / f});
 		   }
 	   } else if (target == "ios" || target == "macos") {
 		   for (auto & f : {"ofxiOS-Info.plist", "ofxiOS_Prefix.pch"}) {
-			   copyTemplateFiles.push_back({normalizePath(templatePath / f), normalizePath(projectDir / f)});
+			   copyTemplateFiles.push_back({ templatePath / f, projectDir / f });
 			   try {
-				   fs::path from = normalizePath(templatePath / "mediaAssets");
-				   fs::path to = normalizePath(projectDir / "mediaAssets");
+				   fs::path from = templatePath / "mediaAssets";
+				   fs::path to = projectDir / "mediaAssets";
 				   if (!fs::exists(to)) {
 					   fs::copy(from, to, fs::copy_options::recursive | fs::copy_options::update_existing);
 				   }
@@ -343,8 +343,10 @@ string xcodeProject::getFolderUUID(const fs::path & folder, fs::path base){//, b
                     
 					if (folderName == "external_sources" || folderName == "local_addons") {
                         
-						addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
-                        addCommand("Add :objects:"+thisUUID+":path string ");
+//						addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
+//						addCommand("Add :objects:"+thisUUID+":path string ");
+						addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
+
                         bFolderPathSet = true;
 					}
                     else {
@@ -675,6 +677,7 @@ void xcodeProject::addAddonFrameworks(const ofAddon& addon){
 string xcodeProject::addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp) {
 	string UUID { "" };
 
+//	alert("xc::addFile " + path.string() + " :folder:" + folder.string(), 31);
 //	cout << "will check if exists " << (projectDir / path) << endl;
 //	if (fs::exists( projectDir / path ))
 	{
@@ -715,8 +718,10 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		}
 		addCommand("Add :objects:"+UUID+":lastKnownFileType string " + fileType);
 		addCommand("Add :objects:"+UUID+":name string " + ofPathToString(path.filename()));
+//		addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path.filename()));
 
 		if (fp.absolute) {
+			alert ("aiaiaia absolute", 31);
 			addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
 			if (fs::exists( projectDir / path )) {
 				addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
@@ -724,9 +729,13 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		} else {
 			
             if(folder.begin()->string() == "local_addons" || folder.begin()->string() == "external_sources"){
-//                if(path.is_absolute()){
-                    addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
-                    addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
+				if (path.is_absolute()) {
+					addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
+					addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
+				} else {
+					addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path.filename()));
+					addCommand("Add :objects:"+UUID+":sourceTree string <group>");
+				}
 //                }else{
 //                    if (fs::exists( projectDir / path )) {
 //                        addCommand("Add :objects:"+UUID+":path string " + ofPathToString(projectDir /path));
