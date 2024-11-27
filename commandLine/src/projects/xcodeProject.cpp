@@ -259,7 +259,7 @@ fs::path getPathTo(fs::path path, string limit){
 
 
 string xcodeProject::getFolderUUID(const fs::path & folder, fs::path base){//, bool isFolder, fs::path base) {
-//    alert ("xcodeProject::getFolderUUID "+folder.string());//+" : isfolder="+ofToString(isFolder)+" : base="+ base.string());
+//    alert ("xcodeProject::getFolderUUID " + folder.string() + " base:" + base.string());//+" : isfolder="+ofToString(isFolder)+" : base="+ base.string());
 
 //	TODO: Change key of folderUUID to base + folder, so "src" in additional source folders
 //	doesn't get confused with "src" from project.

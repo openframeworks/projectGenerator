@@ -837,7 +837,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 
 	for (auto & s : libFiles) {
 //        alert("fixpath before " + ofPathToString(s));
-		s = fixPath(s);
+//		s = fixPath(s);
 //        alert("fixpath after  " + ofPathToString(s));
 		addToFolder(s, parentFolder);
 		srcFiles.emplace_back(s);
@@ -884,6 +884,9 @@ string ofAddon::cleanName(const string& name){
 }
 
 bool ofAddon::load(string addonName, const fs::path& projectDir, const string& targetPlatform){
+	
+	alert ("ofAddon::load " + addonName + " :projectDir:" + projectDir.string(), 37);
+	
 	// we want to set addonMakeName before cleaning the addon name, so it is preserved in the exact same way as it was passed, and the addons.make file can be (re)constructed properly
 	this->addonMakeName = addonName;
 
@@ -897,30 +900,41 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 	// a local addon can be added but it should have at least one parent folder, like
 	// addons/ofxMidi if there is no separator on path PG will search in $ofw/addons path
 	
-	fs::path localAddon { addonName };
-
-	if (localAddon.has_parent_path() && fs::exists(projectDir / addonName)) {
+	fs::path addonNamePath { addonName };
+	alert ("addonNamePath " + addonNamePath.string(), 32);
+	alert("CWD: " + fs::current_path().string(), 34);
+	alert("addonNamePath: has_parent_path " , 33);
+	cout << addonNamePath.has_parent_path() << endl;
+	alert("fs::exists " + addonNamePath.string(), 33);
+	cout << fs::exists(addonNamePath) << endl;
 	
-//	if(addonName[0] == '.' && fs::exists( ofFilePath::join(projectDir, addonName))){
-
-		if (localAddon.is_absolute()) {
-			alert ("IS ABS ! " + localAddon.string(), 32);
-			this->addonPath = localAddon;
-		} else {
-			this->addonPath = normalizePath(projectDir / addonName);
+	if (addonNamePath.has_parent_path() && fs::exists(fs::current_path() / addonNamePath)) {
+		if (addonNamePath.is_absolute()) {
+			alert ("IS ABS ! " + addonNamePath.string(), 32);
 		}
+		this->addonPath = addonNamePath;
 		this->isLocalAddon = true;
 		ofLogVerbose() << "Adding local addon: " << addonName;
+		alert ("IS LOCAL ! " + addonNamePath.string(), 34);
 		//        addon.pathToProject = makeRelative(getOFRoot(), projectDir);
 		//        projectDir;
-	}else{
+	}
+	
+	else {
 		this->addonPath = fs::path { getOFRoot() / "addons" / addonName };
+		alert ("NOT LOCAL ! " + this->addonPath.string(), 34);
 	}
 //	this->pathToOF = normalizePath(getOFRoot());
 
 //	this->addonPath = normalizePath(addonPath);
 
+	alert ("TIGRE::"+this->addonPath.string(), 33);
 
+	if (!fs::exists(this->addonPath)) {
+		ofLogVerbose("ofAddon::load") << "addon does not exist!" << addonPath;
+		return false;
+	}
+	
 	this->pathToProject = projectDir;
 
 	this->platform = targetPlatform;
@@ -931,15 +945,10 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 
 //	alert("ofAddon::fromFS path : " + addonPath.string(), 33);
 
-	if (!fs::exists(addonPath)) {
-		ofLogVerbose("ofAddon::load") << "addon does not exist!" << addonPath;
-		return false;
-	}
-
 	clear();
-	fs::path addonNamePath { addonName};
 
-	name = isLocalAddon ? ofPathToString(addonNamePath.stem()) : ofPathToString(addonNamePath.filename());
+//	name = isLocalAddon ? ofPathToString(addonNamePath.stem()) : ofPathToString(addonNamePath.filename());
+	name = ofPathToString(addonNamePath.filename());
 
 	fs::path srcPath { addonPath / "src" };
 	if (fs::exists(srcPath)) {
@@ -952,8 +961,10 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 	fs::path parentFolder { addonPath.parent_path() };
 
 	for (auto & s : srcFiles) {
-		fs::path sFS { fixPath(s) };
-		s = sFS;
+//		alert ("s BFR fixpath " + s.string(), 32);
+//		s = fixPath(s);
+//		alert ("s AFT fixpath " + s.string(), 33);
+
 		addToFolder(s, parentFolder);
 	}
 
@@ -973,7 +984,8 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 		vector < fs::path > libFolders;
 		getFoldersRecursively(libsPath, libFolders, platform);
 		for (auto & path : libFolders) {
-			paths.emplace_back( fixPath(path) );
+//			paths.emplace_back( fixPath(path) );
+			paths.emplace_back( path );
 		}
 	}
 
@@ -981,7 +993,8 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 		vector < fs::path > srcFolders;
 		getFoldersRecursively(srcPath, srcFolders, platform);
 		for (auto & path : srcFolders) {
-			paths.emplace_back( fixPath(path) );
+//			paths.emplace_back( fixPath(path) );
+			paths.emplace_back( path );
 		}
 	}
 
@@ -1064,12 +1077,17 @@ fs::path ofAddon::fixPath(const fs::path & path) {
 	if (path.is_absolute()) {
 		return path;
 	}
+	
+	return path;
 
-	if(isLocalAddon){
-//		alert ((normalizePath(( pathToProject / fs::relative(path, pathToProject) ).parent_path() / path.filename())).string());
-		return normalizePath(( pathToProject / fs::relative(path, pathToProject) ).parent_path() / path.filename());
-	}else{
-		return normalizePath(( pathToOF / fs::relative(path, getOFRoot()) ).parent_path() / path.filename());
-		
-	}
+//	alert ("ow::pathToProject " + pathToProject.string(), 31);
+//	alert ("ow::pathToOF " + pathToOF.string(), 31);
+
+//	if(isLocalAddon){
+////		alert ((normalizePath(( pathToProject / fs::relative(path, pathToProject) ).parent_path() / path.filename())).string());
+//		return (( pathToProject / fs::relative(path, pathToProject) ).parent_path() / path.filename());
+//	}else{
+//		return (( pathToOF / fs::relative(path, getOFRoot()) ).parent_path() / path.filename());
+//		
+//	}
 }

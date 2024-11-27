@@ -5,7 +5,7 @@
 
 
 #include "ofConstants.h"
-#include "defines.h"
+//#include "defines.h"
 
 #ifdef OFADDON_OUTPUT_JSON_DEBUG // defined in defines.h. only for dev debugging
 #include "ofJson.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "defines.h"
+//#include "defines.h"
 #include "ofAddon.h"
 #include "pugixml.hpp"
 #include <map>

@@ -5,6 +5,7 @@
  *      Author: arturo
  */
 
+#include "defines.h"
 #include "Utils.h"
 #include "ofUtils.h"
 

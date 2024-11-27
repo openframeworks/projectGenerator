@@ -1,8 +1,8 @@
 #define TARGET_NO_SOUND
 #define TARGET_NODISPLAY
 
-#include "Utils.h"
 #include "defines.h"
+#include "Utils.h"
 #include "ofUtils.h"
 #include "ofFileUtils.h"
 #include "ofSystemUtils.h"
@@ -70,7 +70,7 @@ int nProjectsUpdated;
 int nProjectsCreated;
 
 fs::path projectPath;
-fs::path defaultAppPath = { "apps/myApps" };
+//fs::path defaultAppPath = { "apps/myApps" };
 fs::path generatorPath;
 fs::path ofPath;
 vector<string> addons;
@@ -185,19 +185,11 @@ void addPlatforms(const string & value) {
 	}
 }
 
-bool containsFolder(fs::path path, string folderName) {
-	bool contains = false;
-	for (const auto & entry : fs::directory_iterator(path)) {
-		auto f = entry.path();
-		if (f.filename() == folderName) {
-			contains = true;
-			break;
-		}
-	}
-	return contains;
+bool containsFolder(const fs::path & path, const fs::path & folder) {
+	return fs::exists(path / folder);
 }
 
-bool isGoodProjectPath(fs::path path) {
+bool isGoodProjectPath(const fs::path & path) {
 	// TODO: think of a way of detecting make obj folders which creates a structure similar to project
 	// like this assimp3DModelLoaderExample/obj/osx/Release/src
 	return fs::exists(path / "src");
@@ -590,8 +582,8 @@ int main(int argc, char ** argv) {
 	}
 
 	
-	//	fs::path projectPath = normalizePath(fs::weakly_canonical(fs::current_path() / projectName));
-	fs::path projectPath = ".";
+	fs::path projectPath = normalizePath(fs::weakly_canonical(fs::current_path() / projectName));
+//	fs::path projectPath = "";
 	fs::path projectNamePath = fs::current_path().filename();
 	projectName = projectNamePath.string();
 
@@ -601,35 +593,35 @@ int main(int argc, char ** argv) {
 	ofLogVerbose() << " ofRoot path: [" << getOFRoot()  << "]";
 
 
-	if(projectPath == projectPath.root_path()) {
-		ofLogVerbose() << " !! projectPath == projectPath.root_path() ";
-	} else if(normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName )) == projectPath) {
-		ofLogVerbose() << " !! normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName )) == projectPath ";
-		ofLogVerbose() << " !! fs::weakly_canonical( projectPath.root_path() / projectName )):=" << fs::weakly_canonical( projectPath.root_path() / projectName );
-		ofLogVerbose() << " !! normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName )):=" << normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName ));
-		ofLogVerbose() << " !! projectPath:=" << projectPath;
-	} else if(normalizePath(fs::weakly_canonical( generatorPath / projectName )) == projectPath) {
-		ofLogVerbose() << " !! normalizePath(fs::weakly_canonical( generatorPath / projectName )) == projectPath ";
-	}
-	if(projectPath.empty() ) {
-		projectPath = normalizePath(fs::weakly_canonical( getOFRoot() / defaultAppPath / projectName));
-		ofLogNotice() << " projectPath.empty() path now: [" << projectPath << "]";
-	} else if(projectPath == projectPath.root_path() || // if projectPath == "/"
-			  normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName )) == projectPath || // or /projectName
-			  normalizePath(fs::weakly_canonical( generatorPath / projectName )) == projectPath // or generatorPath/projectName
-			  ){
-		ofLogVerbose() << " fs::weakly_canonical( [" << fs::weakly_canonical( projectPath.root_path() / projectName ) << "]";
-		ofLogVerbose() << " projectPath.root_path(): [" << projectPath.root_path() << "]";
-		projectPath =  normalizePath(fs::weakly_canonical( getOFRoot() / defaultAppPath / projectName));
-		ofLogNotice() << " projectPath issue managed, path now: [" << projectPath << "]";
-	} else {
-		ofLogVerbose() << " projectPath path: [" << projectPath << "]";
-	}
-	if(projectPath.empty()) {
-		messageError( "Invalid project path: {" + projectPath.string() + "}");
-		return EXIT_FAILURE;
-	}
-	
+//	if(projectPath == projectPath.root_path()) {
+//		ofLogVerbose() << " !! projectPath == projectPath.root_path() ";
+//	} else if(normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName )) == projectPath) {
+//		ofLogVerbose() << " !! normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName )) == projectPath ";
+//		ofLogVerbose() << " !! fs::weakly_canonical( projectPath.root_path() / projectName )):=" << fs::weakly_canonical( projectPath.root_path() / projectName );
+//		ofLogVerbose() << " !! normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName )):=" << normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName ));
+//		ofLogVerbose() << " !! projectPath:=" << projectPath;
+//	} else if(normalizePath(fs::weakly_canonical( generatorPath / projectName )) == projectPath) {
+//		ofLogVerbose() << " !! normalizePath(fs::weakly_canonical( generatorPath / projectName )) == projectPath ";
+//	}
+//	if(projectPath.empty() ) {
+//		projectPath = normalizePath(fs::weakly_canonical( getOFRoot() / defaultAppPath / projectName));
+//		ofLogNotice() << " projectPath.empty() path now: [" << projectPath << "]";
+//	} else if(projectPath == projectPath.root_path() || // if projectPath == "/"
+//			  normalizePath(fs::weakly_canonical( projectPath.root_path() / projectName )) == projectPath || // or /projectName
+//			  normalizePath(fs::weakly_canonical( generatorPath / projectName )) == projectPath // or generatorPath/projectName
+//			  ){
+//		ofLogVerbose() << " fs::weakly_canonical( [" << fs::weakly_canonical( projectPath.root_path() / projectName ) << "]";
+//		ofLogVerbose() << " projectPath.root_path(): [" << projectPath.root_path() << "]";
+//		projectPath =  normalizePath(fs::weakly_canonical( getOFRoot() / defaultAppPath / projectName));
+//		ofLogNotice() << " projectPath issue managed, path now: [" << projectPath << "]";
+//	} else {
+//		ofLogVerbose() << " projectPath path: [" << projectPath << "]";
+//	}
+//	if(projectPath.empty()) {
+//		messageError( "Invalid project path: {" + projectPath.string() + "}");
+//		return EXIT_FAILURE;
+//	}
+//	
 
 	// make folder
 	if (!fs::exists(projectPath)) {

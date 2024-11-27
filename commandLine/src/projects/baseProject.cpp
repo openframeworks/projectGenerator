@@ -145,7 +145,8 @@ bool baseProject::create(const fs::path & _path, string templateName){
     ofLogNotice() << "templatePath: [" << templatePath << "]";
 	auto projectPath = fs::canonical(fs::current_path() / path);
 	
-	projectDir = path;
+//	projectDir = path;
+	projectDir = "";
 	projectPath = normalizePath(projectPath);
 	ofLogNotice() << "projectPath: [" << projectPath << "]";
 	
