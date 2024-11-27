@@ -823,22 +823,11 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 			getDllsRecursively(libsPath, dllsToCopy, platform);
 	}
 
-	// TODO: this is not needed even if it is local addon but project is outside OF root path
-	// Absolute paths will be used in this case too.
-	// Maybe it is the same situation for all others fixPath occurences?
-//	if (!isLocalAddon) {
-		for (auto & l : libs) {
-//			alert("fixpath before " + ofPathToString(l.path));
-//			l.path = fixPath(l.path);
-			addToFolder(l.path , parentFolder);
-//			alert("fixpath after  " + ofPathToString(l.path));
-		}
-//	}
+	for (auto & l : libs) {
+		addToFolder(l.path , parentFolder);
+	}
 
 	for (auto & s : libFiles) {
-//        alert("fixpath before " + ofPathToString(s));
-//		s = fixPath(s);
-//        alert("fixpath after  " + ofPathToString(s));
 		addToFolder(s, parentFolder);
 		srcFiles.emplace_back(s);
 	}
@@ -883,9 +872,9 @@ string ofAddon::cleanName(const string& name){
 	return addonName;
 }
 
+// FIXME: change this. second parameter is not needed, projectDir is always CWD
 bool ofAddon::load(string addonName, const fs::path& projectDir, const string& targetPlatform){
-	
-	alert ("ofAddon::load " + addonName + " :projectDir:" + projectDir.string(), 37);
+//	alert ("ofAddon::load " + addonName + " :projectDir:" + projectDir.string(), 36);
 	
 	// we want to set addonMakeName before cleaning the addon name, so it is preserved in the exact same way as it was passed, and the addons.make file can be (re)constructed properly
 	this->addonMakeName = addonName;
@@ -901,34 +890,34 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 	// addons/ofxMidi if there is no separator on path PG will search in $ofw/addons path
 	
 	fs::path addonNamePath { addonName };
-	alert ("addonNamePath " + addonNamePath.string(), 32);
-	alert("CWD: " + fs::current_path().string(), 34);
-	alert("addonNamePath: has_parent_path " , 33);
-	cout << addonNamePath.has_parent_path() << endl;
-	alert("fs::exists " + addonNamePath.string(), 33);
-	cout << fs::exists(addonNamePath) << endl;
+//	alert ("addonNamePath " + addonNamePath.string(), 32);
+//	alert("CWD: " + fs::current_path().string(), 34);
+//	alert("addonNamePath: has_parent_path " , 33);
+//	cout << addonNamePath.has_parent_path() << endl;
+//	alert("fs::exists " + addonNamePath.string(), 33);
+//	cout << fs::exists(addonNamePath) << endl;
 	
 	if (addonNamePath.has_parent_path() && fs::exists(fs::current_path() / addonNamePath)) {
-		if (addonNamePath.is_absolute()) {
-			alert ("IS ABS ! " + addonNamePath.string(), 32);
-		}
+//		if (addonNamePath.is_absolute()) {
+//			alert ("IS ABS ! " + addonNamePath.string(), 32);
+//		}
 		this->addonPath = addonNamePath;
 		this->isLocalAddon = true;
 		ofLogVerbose() << "Adding local addon: " << addonName;
-		alert ("IS LOCAL ! " + addonNamePath.string(), 34);
+//		alert ("IS LOCAL ! " + addonNamePath.string(), 34);
 		//        addon.pathToProject = makeRelative(getOFRoot(), projectDir);
 		//        projectDir;
 	}
 	
 	else {
 		this->addonPath = fs::path { getOFRoot() / "addons" / addonName };
-		alert ("NOT LOCAL ! " + this->addonPath.string(), 34);
+//		alert ("NOT LOCAL ! " + this->addonPath.string(), 34);
 	}
 //	this->pathToOF = normalizePath(getOFRoot());
 
 //	this->addonPath = normalizePath(addonPath);
 
-	alert ("TIGRE::"+this->addonPath.string(), 33);
+	//alert ("ADDON PATH::"+this->addonPath.string(), 33);
 
 	if (!fs::exists(this->addonPath)) {
 		ofLogVerbose("ofAddon::load") << "addon does not exist!" << addonPath;

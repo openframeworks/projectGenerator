@@ -17,7 +17,7 @@ bool visualStudioProject::createProjectFile(){
 		createBackup({ projectDir / "Makefile" }, projectDir);
 		createBackup({ projectDir / (projectName + ".vcxproj") }, projectDir);
 	}
-	
+
 	// FIXME: this will insert an empty pair
 	std::pair <string, string> replacementsForward, replacementsBack;
 	if (!fs::equivalent(getOFRoot(), fs::path{ "../../.." })) {
@@ -39,7 +39,7 @@ bool visualStudioProject::createProjectFile(){
 			replacementsBack
 		}
 	});
-	
+
 	// project
 	copyTemplateFiles.push_back({
 		templatePath / "emptyExample.vcxproj",
@@ -51,7 +51,7 @@ bool visualStudioProject::createProjectFile(){
 		}
 
 	});
-	
+
 	// user
 	copyTemplateFiles.push_back({
 		templatePath / "emptyExample.vcxproj.user",
@@ -477,10 +477,10 @@ void visualStudioProject::addCompileOption(const string& nodeName, const string&
 
 	string configuration = ((libType == DEBUG_LIB)?"Debug":"Release");
 	string nodePath = "//ItemDefinitionGroup[contains(@Condition,'" + configuration + "')]/ClCompile/"+nodeName;
-	
+
 	pugi::xpath_node_set source = doc.select_nodes(nodePath.c_str());
 	// if(bPrint){
-	// 	alert("visualStudioProject::addCompileOption " + nodeName + " val: " + value + " del: " + delimiter, 33 );  
+	// 	alert("visualStudioProject::addCompileOption " + nodeName + " val: " + value + " del: " + delimiter, 33 );
 	// 	alert("     nodePath: " + nodePath, 33);
 	// }
 
@@ -625,37 +625,41 @@ void visualStudioProject::addAddonBegin(const ofAddon& addon){
 		}
 	}
 }
-    
+
 
 void visualStudioProject::addAddonIncludePaths(const ofAddon& addon) {
 
 	std::set<fs::path> uniqueIncludeDirs;
-	for (const auto &dir : addon.includePaths) {
-		fs::path normalizedDir = normalizePath(dir);
-		std::string dirStr = normalizedDir.string();
+	for (const auto & dir : addon.includePaths) {
+		std::string dirStr = ofPathToString(dir);
 		// this dont work
 		if (dirStr.find("lib\\vs") == std::string::npos &&
 			dirStr.find("\\license") == std::string::npos &&
 			dirStr.find("lib\\\\vs") == std::string::npos &&
-				dirStr.find("lib\\AndroidJNI") == std::string::npos &&
-				dirStr.find("\\bin\\") == std::string::npos) {
-			uniqueIncludeDirs.insert(normalizedDir);
+			dirStr.find("lib\\AndroidJNI") == std::string::npos &&
+			dirStr.find("\\bin\\") == std::string::npos
+		) {
+			if (!dir.empty()) {
+				uniqueIncludeDirs.insert(dir);
+			}
 		} else {
 			ofLogVerbose() << "include dir - not adding vs: [" << dir.string() << "]";
 		}
 	}
 
 	for (const auto &dir : uniqueIncludeDirs) {
-		if( (dir.string().size() && dir.string()[0] == '$')){
-			addInclude(dir.string());
+		alert ("visualSP::DIR " + dir.string(), 33);
+		if( dir.string()[0] == '$'){
+			addInclude(ofPathToString(dir));
 		} else{
-			fs::path normalizedDir = normalizePath(dir);
-			if (containsSourceFiles(normalizedDir)) {
-				normalizedDir = makeRelative(projectDir, dir);
-				ofLogVerbose() << "[vsproject]-uniqueIncludeDirs] contains src - Adding dir:: [" << normalizedDir.string() << "]";
-				addInclude(normalizedDir);
+
+//			fs::path normalizedDir = normalizePath(dir);
+			if (containsSourceFiles(dir)) {
+//				normalizedDir = makeRelative(projectDir, dir);
+//				ofLogVerbose() << "[vsproject]-uniqueIncludeDirs] contains src - Adding dir:: [" << normalizedDir.string() << "]";
+				addInclude(ofPathToString(dir));
 			} else {
-				ofLogVerbose() << "[vsproject]-uniqueIncludeDirs] no src - not adding [" << normalizedDir.string() << "]";
+//				ofLogVerbose() << "[vsproject]-uniqueIncludeDirs] no src - not adding [" << normalizedDir.string() << "]";
 			}
 		}
 	}
@@ -689,7 +693,7 @@ void visualStudioProject::addAddonCppflags(const ofAddon& addon) {
 
 void visualStudioProject::addSrcFiles(ofAddon& addon, const vector<fs::path> &filepaths, SrcType type, bool bFindInFilesToFolder){
 	for (auto &s : filepaths) {
-		
+
 		if (bFindInFilesToFolder && (addon.filesToFolders.find(s) == addon.filesToFolders.end())) {
 			addon.filesToFolders[s] = fs::path{""};
 		}
@@ -732,4 +736,3 @@ void visualStudioProject::addAddonProps(const ofAddon& addon){
 		addProps(normalizedDir);
 	}
 }
-

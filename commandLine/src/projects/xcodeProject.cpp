@@ -721,7 +721,6 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 //		addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path.filename()));
 
 		if (fp.absolute) {
-			alert ("aiaiaia absolute", 31);
 			addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
 			if (fs::exists( projectDir / path )) {
 				addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
