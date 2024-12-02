@@ -7,9 +7,8 @@
 #include "ofFileUtils.h"
 #include "ofSystemUtils.h"
 #include "optionparser.h"
-#include <set>
-#include <string>
 #include <cstdlib>
+#include <set>
 
 enum optionIndex { UNKNOWN,
 	HELP,
@@ -48,7 +47,7 @@ constexpr option::Descriptor usage[] = {
 	{ GET_HOST_PLATFORM, 0, "i", "platform", option::Arg::None, "  --getplatform, -i  \treturn the current host platform" },
 	{ COMMAND, 0, "c", "command", option::Arg::None, "  --command, -c \truns command" },
 	{ BACKUP_PROJECT_FILES, 0, "b", "backup", option::Arg::None, "  --backup, -b  \tbackup project files when replacing with template" },
-	
+
 	{ FRAMEWORKS, 0, "f", "frameworks", option::Arg::Optional, "  --frameworks, -f  \tframeworks list (such as Vision,ARKit)" },
 
 	{ 0, 0, 0, 0, 0, 0 }
@@ -117,6 +116,7 @@ bool printTemplates() {
 			auto templates = getTargetProject(target)->listAvailableTemplates(target);
 			allPlatformsTemplates.emplace_back(templates);
 		}
+
 		std::set<baseProject::Template> commonTemplates;
 		for (auto & templates : allPlatformsTemplates) {
 			for (auto & t : templates) {
@@ -263,7 +263,7 @@ void recursiveUpdate(const fs::path & path, const string & target) {
 	// FIXME: remove
 //	alert("recursiveUpdate :[" + path.string() + "]");
 	ofLogNotice() << "recursiveUpdate " << path;
-	
+
 	if (!fs::is_directory(path)) return;
 	vector<fs::path> folders;
 
@@ -348,10 +348,10 @@ int updateOFPath(fs::path path) {
 				return EXIT_USAGE;
 			}
 		}
-		
+
 		// This make ofPath relative if it is inside project path, and avoid lots of fs::relative down the line
 		// it is important because we can detect if some path needs to be absolute in the project.
-		
+
         if (ofIsPathInPath(projectPath, ofPath)) {
 			ofPath = fs::relative(ofPath, projectPath);
         }
@@ -465,7 +465,7 @@ int main(int argc, char ** argv) {
 		printVersion();
 		return EXIT_OK;
 	}
-	
+
 
 	if (options[OFPATH].count() > 0) {
 		if (options[OFPATH].arg != NULL) {
@@ -581,7 +581,7 @@ int main(int argc, char ** argv) {
 		return EXIT_USAGE;
 	}
 
-	
+
 	fs::path projectPath = normalizePath(fs::weakly_canonical(fs::current_path() / projectName));
 //	fs::path projectPath = "";
 	fs::path projectNamePath = fs::current_path().filename();
@@ -621,7 +621,7 @@ int main(int argc, char ** argv) {
 //		messageError( "Invalid project path: {" + projectPath.string() + "}");
 //		return EXIT_FAILURE;
 //	}
-//	
+//
 
 	// make folder
 	if (!fs::exists(projectPath)) {
@@ -683,7 +683,7 @@ int main(int argc, char ** argv) {
 				ofLogNotice() << "from -o option";
 			}
 
-			
+
 			for (auto & t : targets) {
 				consoleSpace();
 				ofLogNotice() << "-----------------------------------------------";
