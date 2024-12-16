@@ -782,26 +782,32 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 //	alert ("parseLibsPath " + libsPath.string() + ", parent=" + parentFolder.string(), 35);
 
 
+//	if (platform == "osx"  || platform == "macos"){
+//		// Horrible hack to make it work with the bad idea of renaming osx to macos
+//		getLibsRecursively(libsPath, libFiles, libs, "macos");
+//		getLibsRecursively(libsPath, libFiles, libs, "osx");
+//
+//		getFrameworksRecursively(libsPath, "macos");
+//		getFrameworksRecursively(libsPath, "osx");
+////		getXCFrameworksRecursively(libsPath, "macos");
+////		getXCFrameworksRecursively(libsPath, "osx");
+//
+//		// FIXME: This is not needed when we get libraries right.
+//		// if it was needed the best was change to std::set.
+//		removeDuplicates(libs);
+//		removeDuplicates(libFiles);
+//		removeDuplicates(frameworks);
+//		removeDuplicates(xcframeworks);
+//
+//	} else {
+//		getLibsRecursively(libsPath, libFiles, libs, platform);
+//	}
+	
+	getLibsRecursively(libsPath, libFiles, libs, platform);
 	if (platform == "osx"  || platform == "macos"){
-		// Horrible hack to make it work with the bad idea of renaming osx to macos
-		getLibsRecursively(libsPath, libFiles, libs, "macos");
-		getLibsRecursively(libsPath, libFiles, libs, "osx");
-
-		getFrameworksRecursively(libsPath, "macos");
-		getFrameworksRecursively(libsPath, "osx");
-//		getXCFrameworksRecursively(libsPath, "macos");
-//		getXCFrameworksRecursively(libsPath, "osx");
-
-		// FIXME: This is not needed when we get libraries right.
-		// if it was needed the best was change to std::set.
-		removeDuplicates(libs);
-		removeDuplicates(libFiles);
-		removeDuplicates(frameworks);
-		removeDuplicates(xcframeworks);
-
-	} else {
-		getLibsRecursively(libsPath, libFiles, libs, platform);
+		getFrameworksRecursively(libsPath, platform);
 	}
+	
 
 	if (//platform == "osx"  ||
 		platform == "ios"  ||

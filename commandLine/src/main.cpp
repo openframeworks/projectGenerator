@@ -414,6 +414,8 @@ int main(int argc, char ** argv) {
 	bRecursive = false;
 	bHelpRequested = false;
 	bListTemplates = false;
+	
+	std::cout << "getPlatformString() " << getPlatformString() << std::endl;
 	targets.emplace_back(getPlatformString());
 
 	startTime = 0;
