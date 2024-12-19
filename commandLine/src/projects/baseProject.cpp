@@ -33,7 +33,7 @@ fs::path baseProject::getPlatformTemplateDir() {
 	) {
 		folder = "vscode";
 	}
-    
+
 //	if ( target == "qtcreator" ) {
 //		return getOFRoot()
 //	}
@@ -140,13 +140,15 @@ bool baseProject::create(const fs::path & _path, string templateName){
 	addons.clear();
 	extSrcPaths.clear();
 
-	templatePath = normalizePath(getPlatformTemplateDir());
-    ofLogNotice() << "templatePath: [" << templatePath << "]";
+//	templatePath = normalizePath(getPlatformTemplateDir());
+	templatePath = getPlatformTemplateDir();
+    ofLogNotice() << "templatePath: " << templatePath;
 	auto projectPath = fs::canonical(fs::current_path() / path);
 	
-	projectDir = path;
+//	projectDir = path;
+	projectDir = "";
 	projectPath = normalizePath(projectPath);
-	ofLogNotice() << "projectPath: [" << projectPath << "]";
+	ofLogNotice() << "projectPath: " << projectPath;
 	
 	projectName = projectPath.filename().string();
 	
@@ -220,10 +222,14 @@ bool baseProject::create(const fs::path & _path, string templateName){
 
 		// CWD is already on projectDir. so with this we get relative paths
 		getFilesRecursively("src", fileNames);
-
+		
 		std::sort(fileNames.begin(), fileNames.end(), [](const fs::path & a, const fs::path & b) {
 			return a.string() < b.string();
 		});
+		
+		// FIXME: I think we should remove this logic and remove the files from default project.
+		// only the files present are added to the project
+		
 		for (const auto & f : fileNames) {
 			if (f != "src/ofApp.cpp" &&
 				f != "src/ofApp.h" &&
@@ -302,12 +308,13 @@ bool baseProject::isAddonInCache(const string & addonPath, const string platform
 	return addonsCache[platform].find(addonPath) != addonsCache[platform].end();
 }
 
-void baseProject::addAddon(const std::string& _addonName){
+void baseProject::addAddon(const std::string & _addonName){
     ofLogVerbose("baseProject::addAddon") << _addonName;
 //	alert( "baseProject::addAddon " + _addonName );
     
-    auto addonName = ofAddon::cleanName(_addonName);
-    
+//    auto addonName = ofAddon::cleanName(_addonName);
+	auto addonName = _addonName;
+
 
     // FIXME : not target, yes platform.
 //#ifdef TARGET_WIN32
@@ -665,67 +672,25 @@ void baseProject::addSrcFiles(ofAddon& addon, const vector<fs::path> &filepaths,
 	}
 }
 
-void  baseProject::addAddonSrcFiles( ofAddon& addon){
+void baseProject::addAddonSrcFiles( ofAddon& addon){
 	addSrcFiles(addon, addon.srcFiles, DEFAULT);
-
-    // for (auto & a : addon.srcFiles) {
-    //     fs::path normalizedDir = makeRelative(getOFRoot(), a);
-    //     ofLogVerbose("baseProject") << "adding addon srcFiles: " << normalizedDir.string();
-    //     addSrc(normalizedDir, addon.filesToFolders.at(a));
-    // }
 }
 
-void  baseProject::addAddonCsrcFiles(ofAddon& addon){
-    // for (auto & a : addon.csrcFiles) {
-    //     fs::path normalizedDir = makeRelative(getOFRoot(), a);
-    //     ofLogVerbose("baseProject") << "adding addon c srcFiles: " << normalizedDir.string();
-    //     addSrc(normalizedDir, addon.filesToFolders.at(a), C);
-    // }
+void baseProject::addAddonCsrcFiles(ofAddon& addon){
 	addSrcFiles(addon, addon.csrcFiles, C);
 }
-
-
 
 void baseProject::addAddonCppsrcFiles(ofAddon& addon) {
 	addSrcFiles(addon, addon.cppsrcFiles, CPP);
 }
+
 void baseProject::addAddonObjcsrcFiles(ofAddon& addon) {
 	addSrcFiles(addon, addon.objcsrcFiles, OBJC);
 }
+
 void baseProject::addAddonHeadersrcFiles(ofAddon& addon) {
 	addSrcFiles(addon, addon.headersrcFiles, HEADER);
 }
-
-// void  baseProject::addAddonCppsrcFiles(const ofAddon& addon){
-//     for (auto & a : addon.cppsrcFiles) {
-//         fs::path normalizedDir = makeRelative(getOFRoot(), a);
-//         ofLogVerbose("baseProject") << "adding addon cpp srcFiles: " << normalizedDir.string();
-//         addSrc(normalizedDir, addon.filesToFolders.at(a),CPP);
-//     }
-// }
-
-// void  baseProject::addAddonObjcsrcFiles(const ofAddon& addon){
-//     for (auto & a : addon.objcsrcFiles) {
-//         fs::path normalizedDir = makeRelative(getOFRoot(), a);
-//         ofLogVerbose("baseProject") << "adding addon objc srcFiles: " << normalizedDir.string();
-//         addSrc(normalizedDir, addon.filesToFolders.at(a),OBJC);
-//     }
-// }
-
-// void  baseProject::addAddonHeadersrcFiles(const ofAddon& addon){
-//     for (auto & a : addon.headersrcFiles) {
-//         fs::path normalizedDir = makeRelative(getOFRoot(), a);
-//         ofLogVerbose("baseProject") << "adding addon header srcFiles: [" << normalizedDir.string() << "]";
-//         addSrc(normalizedDir, addon.filesToFolders.at(a),HEADER);
-//     }
-// }
-
-
-
-
-
-
-
 
 void baseProject::addSrcRecursively(const fs::path & srcPath){
 //	alert("addSrcRecursively " + srcPath.string(), 32);
@@ -764,8 +729,8 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 
 
 void baseProject::parseAddons(){
-	fs::path parseFile { fs::relative(projectDir / "addons.make") };
-//	alert (parseFile.string(), 31);
+	fs::path parseFile { "addons.make" };
+//	alert ("baseProject::parseAddons() " + parseFile.string(), 33);
 	
 	for (auto & line : fileToStrings(parseFile)) {
 		auto addon = ofTrim(line);
@@ -780,7 +745,7 @@ void baseProject::parseAddons(){
 }
 
 void baseProject::parseConfigMake(){
-	fs::path parseFile { fs::relative(projectDir / "config.make") };
+	fs::path parseFile { "config.make" };
 
 	for (auto & line : fileToStrings(parseFile)) {
 		auto config = ofTrim(line);
@@ -829,12 +794,13 @@ bool baseProject::recursiveCopy(const fs::path & srcDir, const fs::path & destDi
 
 // FIXME: Avoid copying duplicate files like Makefile / config.make when using multiple templates (ex. vscode / osx)
 bool baseProject::copyTemplateFile::run() {
-	from = fs::relative(from);
-	to = fs::relative(to);
+//	from = fs::relative(from);
+//	to = fs::relative(to);
 	
 	// needed for mingw only. maybe a ifdef here.
 	if (fs::exists(from)) {
 		ofLogVerbose() << "copyTemplateFile from: " << from << " to: " << to;
+//		alert("base::copyTemplateFile from: " + from.string() + " to: " + to.string(), 33);
 
 		if (findReplaces.size()) {
 			// Load file, replace contents, write to destination.
