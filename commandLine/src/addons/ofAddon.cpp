@@ -792,8 +792,8 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 
 		getFrameworksRecursively(libsPath, "macos");
 		getFrameworksRecursively(libsPath, "osx");
-/		getXCFrameworksRecursively(libsPath, "macos");
-/		getXCFrameworksRecursively(libsPath, "osx");
+// 		getXCFrameworksRecursively(libsPath, "macos");
+//		getXCFrameworksRecursively(libsPath, "osx");
 
 		// FIXME: This is not needed when we get libraries right.
 		// if it was needed the best was change to std::set.
