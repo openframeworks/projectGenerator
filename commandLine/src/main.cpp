@@ -1,3 +1,4 @@
+#include <iostream>
 #define TARGET_NO_SOUND
 #define TARGET_NODISPLAY
 
@@ -116,7 +117,6 @@ bool printTemplates() {
 			auto templates = getTargetProject(target)->listAvailableTemplates(target);
 			allPlatformsTemplates.emplace_back(templates);
 		}
-
 		std::set<baseProject::Template> commonTemplates;
 		for (auto & templates : allPlatformsTemplates) {
 			for (auto & t : templates) {
@@ -333,10 +333,11 @@ int updateOFPath(fs::path path) {
 		if (!ofPath.empty() && isGoodOFPath(ofPath)) {
 			ofLogNotice() << "ofPath set and valid using [" << ofPath << "]";
 		} else {
-			if(isGoodOFPath(foundOFPath))
+			if(isGoodOFPath(foundOFPath)) {
 			setofPath(foundOFPath);
 			setOFRoot(foundOFPath);
 			ofLogVerbose() << "ofPath auto-found and valid using [" << ofPath << "]";
+			}
 		}
 	}
 
@@ -414,8 +415,6 @@ int main(int argc, char ** argv) {
 	bRecursive = false;
 	bHelpRequested = false;
 	bListTemplates = false;
-	
-	std::cout << "getPlatformString() " << getPlatformString() << std::endl;
 	targets.emplace_back(getPlatformString());
 
 	startTime = 0;
@@ -425,6 +424,8 @@ int main(int argc, char ** argv) {
 	//    projectPath = "";
 	//	ofPath = "";
 	templateName = "";
+
+
 
 	// ------------------------------------------------------ parse args
 	argc -= (argc > 0);
@@ -477,7 +478,7 @@ int main(int argc, char ** argv) {
 			ofLogVerbose() << "ofPath normalised arg: [" << ofPath << "]";
 		}
 	}
-	int updated = updateOFPath(ofPath);
+	// int updated = updateOFPath(ofPath);
 
 	if (options[COMMAND].count() > 0) {
 		if (options[COMMAND].arg != NULL) {
