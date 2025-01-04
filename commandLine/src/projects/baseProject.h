@@ -72,7 +72,7 @@ public:
     void addAddon(const std::string& addon);
     void addAddon(ofAddon & addon);
 	virtual void addSrcRecursively(const fs::path & srcPath);
-	
+
 	virtual void restoreBackup(const fs::path & srcPath){};
 
 	bool isPlatformName(const string & platform);
@@ -93,7 +93,7 @@ public:
 	std::string target;
 
 //	bool bMakeRelative = false;
-	
+
 	bool bOverwrite = true;
 
 	virtual void addFramework(const fs::path & path, const fs::path & folder, bool isRelativeToSDK = false){};
@@ -103,28 +103,28 @@ public:
     void saveAddonsToJson(){
         auto dir = ofFilePath::join(projectDir, "addonsJson");
         ofDirectory::createDirectory(dir, false, true);
-        
+
         for(auto& a: addons){
             ofJson j = a;
             ofSavePrettyJson(ofFilePath::join(dir, a.name+".json"), j);
         }
     }
 #endif
-    
+
 	// this shouldn't be called by anyone.  call "create(...), save" etc
 private:
 
 	virtual bool createProjectFile()=0;
 	virtual bool loadProjectFile()=0;
 	virtual bool saveProjectFile()=0;
-	
-	
+
+
 
 	// virtual void renameProject();
 	// this should get called at the end.
 
 protected:
-    
+
     virtual void addAddonFrameworks(const ofAddon& addon){}
 //    virtual void addAddonXCFrameworks(const ofAddon& addon){}
     virtual void addAddonBegin(const ofAddon& addon){}
@@ -153,25 +153,25 @@ protected:
     virtual void addCPPFLAG(const std::string& cppflag, LibType libType = RELEASE_LIB) = 0; // CXX_FLAGS
     virtual void addAfterRule(const std::string& script) = 0;
     virtual void addDefine(const std::string& define, LibType libType = RELEASE_LIB) = 0;
-    
+
     void copyAddonData(ofAddon& addon);
-    
-    
+
+
 	virtual void addSrcFiles(ofAddon& addon, const vector<fs::path> &filepaths, SrcType type, bool bFindInFilesToFolder = true);
 
-    
-    
+
+
 	void recursiveCopyContents(const fs::path & srcDir, const fs::path & destDir);
 	void recursiveTemplateCopy(const fs::path & srcDir, const fs::path & destDir);
 	bool recursiveCopy(const fs::path & srcDir, const fs::path & destDir);
 
 	std::vector<ofAddon> addons;
 	std::vector<fs::path> extSrcPaths;
-	
+
 	//cached addons - if an addon is requested more than once, avoid loading from disk as it's quite slow
 	std::map<std::string,std::map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]
 	bool isAddonInCache(const std::string & addonPath, const std::string platform); //is this addon in the mem cache?
-	
+
 	static void replaceAll(std::string& str, const std::string& from, const std::string& to) {
 		if(from.empty())
 			return;
@@ -187,7 +187,8 @@ protected:
 		fs::path from;
 		fs::path to;
 		std::vector <std::pair <string, string>> findReplaces;
-		
+		std::vector <std::string> appends;
+
 		bool run();
 	};
 

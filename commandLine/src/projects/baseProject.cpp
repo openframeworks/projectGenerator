@@ -37,7 +37,7 @@ fs::path baseProject::getPlatformTemplateDir() {
 //	if ( target == "qtcreator" ) {
 //		return getOFRoot()
 //	}
-	
+
 	return getOFRoot() / templatesFolder / folder;
 }
 
@@ -125,7 +125,7 @@ bool baseProject::create(const fs::path & _path, string templateName){
 //	alert("getOFRoot() " + fs::weakly_canonical(fs::absolute(getOFRoot())).string());
 //	alert("path " + path.string());
 //	alert("path " + fs::weakly_canonical(fs::absolute(path)).string());
-	
+
 //	cout << endl;
 //	ofLogNotice() << "create project " << path;
 
@@ -144,14 +144,14 @@ bool baseProject::create(const fs::path & _path, string templateName){
 	templatePath = getPlatformTemplateDir();
     ofLogNotice() << "templatePath: " << templatePath;
 	auto projectPath = fs::canonical(fs::current_path() / path);
-	
+
 //	projectDir = path;
 	projectDir = "";
 	projectPath = normalizePath(projectPath);
 	ofLogNotice() << "projectPath: " << projectPath;
-	
+
 	projectName = projectPath.filename().string();
-	
+
 	// we had this in some projects. if we decide to keep this is the place
 	//	if (!fs::exists(projectDir)) {
 	//		fs::create_directory(projectDir);
@@ -160,7 +160,7 @@ bool baseProject::create(const fs::path & _path, string templateName){
 
 	// it can be only "src"
 	fs::path projectSrc { projectDir / "src" };
-	
+
 	if (fs::exists(projectSrc) && fs::is_directory(projectSrc)) {
 		bDoesSrcDirExist = true;
 	} else {
@@ -173,7 +173,7 @@ bool baseProject::create(const fs::path & _path, string templateName){
 				ofLogNotice() << e.what();
 
 			}
-			
+
 		}
 	}
 	bool ret = createProjectFile();
@@ -195,7 +195,7 @@ bool baseProject::create(const fs::path & _path, string templateName){
 			for(auto & rename: templateConfig->renames){
 				auto from = projectDir / rename.first;
 				auto to = projectDir / rename.second;
-			
+
 				if (fs::exists(to)) {
 					fs::remove(to);
 				}
@@ -222,14 +222,14 @@ bool baseProject::create(const fs::path & _path, string templateName){
 
 		// CWD is already on projectDir. so with this we get relative paths
 		getFilesRecursively("src", fileNames);
-		
+
 		std::sort(fileNames.begin(), fileNames.end(), [](const fs::path & a, const fs::path & b) {
 			return a.string() < b.string();
 		});
-		
+
 		// FIXME: I think we should remove this logic and remove the files from default project.
 		// only the files present are added to the project
-		
+
 		for (const auto & f : fileNames) {
 			if (f != "src/ofApp.cpp" &&
 				f != "src/ofApp.h" &&
@@ -245,7 +245,7 @@ bool baseProject::create(const fs::path & _path, string templateName){
 		for (auto & f : fileNames) {
 			uniquePaths.insert(f.parent_path());
 		}
-		
+
 		for (auto & p : uniquePaths) {
 			if (containsSourceFiles(p)) {
 				ofLogVerbose() << "[prjFiles-addIncludeDir] contains src - Adding dir: " << p;
@@ -311,7 +311,7 @@ bool baseProject::isAddonInCache(const string & addonPath, const string platform
 void baseProject::addAddon(const std::string & _addonName){
     ofLogVerbose("baseProject::addAddon") << _addonName;
 //	alert( "baseProject::addAddon " + _addonName );
-    
+
 //    auto addonName = ofAddon::cleanName(_addonName);
 	auto addonName = _addonName;
 
@@ -321,23 +321,23 @@ void baseProject::addAddon(const std::string & _addonName){
 //    //	std::replace( addonName.begin(), addonName.end(), '/', '\\' );
 //    fixSlashOrder(addonName);
 //#endif
-//    
-    
+//
+
 //    addon.addonMakeName = addonName;
-//    
+//
 //    {
 //        auto s = ofSplitString(addonName, "#");
 //        if(s.size()){
 //            addonName = s[0];
 //        }
 //    }
-//    
-    
+//
+
     if(addonName.empty()){
         ofLogError("baseProject::addAddon") << "cant add addon with empty name";
         return;
     }
-    
+
     //This should be the only instance where we check if the addon is either local or not.
     //being local just means that the addon name is a filepath and it starts with a dot.
     //otherwise it will look in the addons folder.
@@ -345,7 +345,7 @@ void baseProject::addAddon(const std::string & _addonName){
     //Parsing will generate the correct path to both OF and the project.
     //Everything else should be treated exactly in the same way, regardless of it being local or not.
 //    if(addonName[0] == '.' && fs::exists( ofFilePath::join(projectDir, addonName))){
-//        
+//
 //        addon.addonPath = normalizePath(ofFilePath::join(projectDir, addonName));
 //        addon.isLocalAddon = true;
 //        ofLogVerbose() << "Adding local addon: " << addonName;
@@ -355,21 +355,21 @@ void baseProject::addAddon(const std::string & _addonName){
 //        addon.addonPath = fs::path { getOFRoot() / "addons" / addonName };
 //    }
 //    addon.pathToOF = getOFRoot();
-//    
-//    
-//    
+//
+//
+//
 //    addon.pathToOF = normalizePath(addon.pathToOF);
 //    addon.addonPath = normalizePath(addon.addonPath);
-//    
+//
 //    addon.pathToProject = projectDir;
-    
+
     ofAddon addon;
-    
+
 //    bool addonOK = false;
 //    bool inCache = isAddonInCache(addonName, target);
-    
+
     //	fs::path addonPath { addonName };
-    
+
     //	if (fs::exists(addonPath)) {
     //		addon.isLocalAddon = true;
     //	} else {
@@ -377,10 +377,10 @@ void baseProject::addAddon(const std::string & _addonName){
     //		addon.isLocalAddon = false;
     //		addon.addonPath = addonPath;
     //	}
-    
+
 //    ofLogVerbose() << "addon.addonPath to: [" << addon.addonPath.string() << "]";
 //    ofLogVerbose() << "addon.pathToOF: [" << addon.pathToOF.string() << "]";
-    
+
     if(isAddonInCache(addonName, target)){
         addon = addonsCache[target][addonName];
     }else{
@@ -397,22 +397,22 @@ void baseProject::addAddon(const std::string & _addonName){
 //        addon = addonsCache[target][addonName];
 //        addonOK = true;
 //    }
-    
+
 //    if(!addonOK){
 //        ofLogVerbose() << "Ignoring addon that doesn't seem to exist: " << addonName;
 //        return; //if addon does not exist, stop early
 //    }
-    
+
 //    if(!inCache){
 //        //cache the addon so we dont have to be reading form disk all the time
 //        addonsCache[target][addonName] = addon;
 //    }
-//    
+//
 //    for (auto & a : addons) {
 //        if (a.name == addon.name) return;
 //    }
-//    
-//    
+//
+//
 //    for (auto & d : addon.dependencies) {
 //        bool found = false;
 //        for (auto & a : addons) {
@@ -427,10 +427,10 @@ void baseProject::addAddon(const std::string & _addonName){
 //            ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << d;
 //        }
 //    }
-//    
-    
+//
+
     ofLogNotice() << "adding addon: " << addon.name;
-    
+
 
     // MARK: - SPECIFIC for each project.
     // XCode and VS override the base addAddon. other templates will use baseproject::addAddon(ofAddon...
@@ -569,7 +569,7 @@ void baseProject::addAddon(ofAddon & addon){
     addAddonBegin(addon);
 
     addAddonDllsToCopy(addon);
-    
+
     addAddonLibsPaths(addon);
 	addAddonIncludePaths(addon);
 	addAddonLibs(addon);
@@ -611,14 +611,14 @@ void  baseProject::addAddonIncludePaths(const ofAddon& addon){
             ofLogVerbose() << "[addon.includePaths] contains src - Adding dir: [" << normalizedDir.string() << "]";
             // fs::path ofpathChanged = ofRelativeToOFPATH(projectDir);
             // ofLogVerbose() << "[addon.includePaths] OFPATH: rel include dir: [" << ofpathChanged.string() << "]";
-            
+
             addInclude(normalizedDir);
         } else {
             ofLogVerbose() << "[addon.includePaths] no src - not adding: [" << normalizedDir.string() << "]";
         }
     }
-    
-    
+
+
 //    for (auto & a : addon.includePaths) {
 //        fs::path normalizedDir = makeRelative(projectDir, a);
 //        ofLogVerbose() << "adding addon include path: [" << normalizedDir.string() + "]";
@@ -662,7 +662,7 @@ void  baseProject::addAddonLdflags(const ofAddon& addon){
 }
 
 void baseProject::addSrcFiles(ofAddon& addon, const vector<fs::path> &filepaths, SrcType type, bool bFindInFilesToFolder){
-	for (auto &s : filepaths) {			
+	for (auto &s : filepaths) {
 		if (bFindInFilesToFolder && (addon.filesToFolders.find(s) == addon.filesToFolders.end())) {
 			addon.filesToFolders[s] = fs::path{""};
 		}
@@ -713,7 +713,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 			uniqueIncludeFolders.insert(parent);
 		}
 	}
-	
+
 	for(auto & i : uniqueIncludeFolders){
 		fs::path normalizedDir = normalizePath(projectDir);
 		ofLogVerbose() << "[addSrcRecursively] search include paths for folder: [" << normalizedDir.string() << "]";
@@ -731,7 +731,7 @@ void baseProject::addSrcRecursively(const fs::path & srcPath){
 void baseProject::parseAddons(){
 	fs::path parseFile { "addons.make" };
 //	alert ("baseProject::parseAddons() " + parseFile.string(), 33);
-	
+
 	for (auto & line : fileToStrings(parseFile)) {
 		auto addon = ofTrim(line);
 //		alert("line " + addon);
@@ -796,7 +796,7 @@ bool baseProject::recursiveCopy(const fs::path & srcDir, const fs::path & destDi
 bool baseProject::copyTemplateFile::run() {
 //	from = fs::relative(from);
 //	to = fs::relative(to);
-	
+
 	// needed for mingw only. maybe a ifdef here.
 	if (fs::exists(from)) {
 		ofLogVerbose() << "copyTemplateFile from: " << from << " to: " << to;
@@ -804,7 +804,7 @@ bool baseProject::copyTemplateFile::run() {
 
 		if (findReplaces.size()) {
 			// Load file, replace contents, write to destination.
-			
+
 			std::ifstream fileFrom(from);
 			std::string contents((std::istreambuf_iterator<char>(fileFrom)), std::istreambuf_iterator<char>());
 			fileFrom.close();
@@ -817,7 +817,11 @@ bool baseProject::copyTemplateFile::run() {
 				replaceAll(contents, f.first, f.second);
 				ofLogVerbose() << "└─ Replacing " << f.first << " : " << f.second;
 			}
-			
+
+			for (auto & a : appends) {
+			    contents += "\n" + a;
+			}
+
 			std::ofstream fileTo(to);
 			try{
 				fileTo << contents;
@@ -830,8 +834,8 @@ bool baseProject::copyTemplateFile::run() {
 
 				return false;
 			}
-			
-			
+
+
 		} else {
 			// straight copy
 			try {
