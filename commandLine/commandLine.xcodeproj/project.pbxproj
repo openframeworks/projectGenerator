@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		03433CF32BF3B842001412CF /* android2024.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 03433CF22BF3B842001412CF /* android2024.cpp */; };
 		03B57CDD2AC5B1C6005F56E0 /* VSCodeProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 03B57CDB2AC5B1C6005F56E0 /* VSCodeProject.cpp */; };
+		03CED5022D2C344F00075C8E /* zedProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 03CED5012D2C344F00075C8E /* zedProject.cpp */; };
 		"1A7D4C46-3FD3-4E35-9025-D0E93ECAD7DD" /* qtcreatorproject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "C5A3016A-B663-4FE7-B6E6-421C5F168447" /* qtcreatorproject.cpp */; };
 		"200CCA92-FAEE-4CEB-903B-ABB0D56B991F" /* ofAddon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "41F34CBC-2E3E-4C3D-B106-F9D6746B6FF0" /* ofAddon.cpp */; };
 		"2BC33EEF-CBDE-4E2E-9E0C-DB9AA6E0FE66" /* uuidxx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "4CB92F80-3CD1-41B1-BD98-26F35C9C7A6E" /* uuidxx.cpp */; };
@@ -54,6 +55,8 @@
 		03433CF22BF3B842001412CF /* android2024.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = android2024.cpp; sourceTree = "<group>"; };
 		03B57CDB2AC5B1C6005F56E0 /* VSCodeProject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VSCodeProject.cpp; sourceTree = "<group>"; };
 		03B57CDC2AC5B1C6005F56E0 /* VSCodeProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VSCodeProject.h; sourceTree = "<group>"; };
+		03CED5002D2C344F00075C8E /* zedProject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = zedProject.h; sourceTree = "<group>"; };
+		03CED5012D2C344F00075C8E /* zedProject.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = zedProject.cpp; sourceTree = "<group>"; };
 		"0C9DC8B7-7304-4A82-BAED-18F7A422ECA1" /* xcodeProject.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = xcodeProject.h; path = src/projects/xcodeProject.h; sourceTree = SOURCE_ROOT; };
 		191CD6FA2847E21E0085CBB6 /* of.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = of.entitlements; sourceTree = "<group>"; };
 		191EF70929D778A400F35F26 /* openFrameworks */ = {isa = PBXFileReference; lastKnownFileType = folder; name = openFrameworks; path = ../../../libs/openFrameworks; sourceTree = SOURCE_ROOT; };
@@ -159,6 +162,8 @@
 				03B57CDC2AC5B1C6005F56E0 /* VSCodeProject.h */,
 				"4CC7F503-61FC-435C-BA93-F9C1E6D46ABE" /* xcodeProject.cpp */,
 				"0C9DC8B7-7304-4A82-BAED-18F7A422ECA1" /* xcodeProject.h */,
+				03CED5002D2C344F00075C8E /* zedProject.h */,
+				03CED5012D2C344F00075C8E /* zedProject.cpp */,
 			);
 			name = projects;
 			path = src/projects;
@@ -355,6 +360,7 @@
 				"7F2BBCD1-F22D-454A-9100-33D1C12BEA70" /* androidStudioProject.cpp in Sources */,
 				"E79B31E1-CF27-4D77-B2F2-6AEC329A9F50" /* baseProject.cpp in Sources */,
 				"1A7D4C46-3FD3-4E35-9025-D0E93ECAD7DD" /* qtcreatorproject.cpp in Sources */,
+				03CED5022D2C344F00075C8E /* zedProject.cpp in Sources */,
 				03433CF32BF3B842001412CF /* android2024.cpp in Sources */,
 				"C2428661-BDEC-41D7-8150-C9BA5EE86C0C" /* visualStudioProject.cpp in Sources */,
 				"DBD7E2AC-672A-4FD9-B0A4-DF24111D17FB" /* xcodeProject.cpp in Sources */,

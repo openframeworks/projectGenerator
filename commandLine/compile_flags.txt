@@ -46,7 +46,7 @@ objective-c++
 -I./src/addons
 -I./src/projects
 -I./src/utils
--I./src/uuidxx
+-I./src/uuidxx/src
 -I../../../addons/ofxMicroUI/src
 -I../../../addons/ofxTools/src
 -I../../../addons/ofxTools/src/feature

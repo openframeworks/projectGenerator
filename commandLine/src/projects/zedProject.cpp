@@ -56,9 +56,9 @@ bool zedProject::saveProjectFile(){
 }
 
 void zedProject::addAddonBegin(const ofAddon& addon) {
-	alert("zedProject::addAddon() " + addon.name, 35);
-	std::string inc { "-I" + ofPathToString(addon.addonPath) };
-	copyTemplateFiles[0].appends.emplace_back(inc);
+	// alert("zedProject::addAddon() " + addon.name, 35);
+//	std::string inc { "-I" + ofPathToString(addon.addonPath) };
+//	copyTemplateFiles[0].appends.emplace_back(inc);
 }
 
 
@@ -67,7 +67,7 @@ void zedProject::addSrc(const fs::path & srcName, const fs::path & folder, SrcTy
 }
 
 void zedProject::addInclude(const fs::path & includeName){
-	alert ("addInclude " + ofPathToString(includeName), 34);
+	// alert ("addInclude " + ofPathToString(includeName), 34);
 	std::string inc { "-I" + ofPathToString(includeName) };
 	copyTemplateFiles[0].appends.emplace_back(inc);
 	// cppProperties.addToArray("/env/PROJECT_EXTRA_INCLUDES", includeName);

@@ -802,7 +802,7 @@ bool baseProject::copyTemplateFile::run() {
 		ofLogVerbose() << "copyTemplateFile from: " << from << " to: " << to;
 //		alert("base::copyTemplateFile from: " + from.string() + " to: " + to.string(), 33);
 
-		if (findReplaces.size()) {
+		if (findReplaces.size() || appends.size()) {
 			// Load file, replace contents, write to destination.
 
 			std::ifstream fileFrom(from);
@@ -819,6 +819,7 @@ bool baseProject::copyTemplateFile::run() {
 			}
 
 			for (auto & a : appends) {
+			     // alert(a, 35);
 			    contents += "\n" + a;
 			}
 
