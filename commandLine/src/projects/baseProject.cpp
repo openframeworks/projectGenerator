@@ -115,7 +115,7 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(string target)
 }
 
 bool baseProject::create(const fs::path & _path, string templateName){
-//	alert("baseProject::create " + path.string() + " : " + templateName, 35);
+//	alert("baseProject::create " + _path.string() + " : " + templateName, 35);
 	auto path = _path; // just because it is const
     fs::current_path(path);
 
@@ -142,6 +142,7 @@ bool baseProject::create(const fs::path & _path, string templateName){
 
 //	templatePath = normalizePath(getPlatformTemplateDir());
 	templatePath = getPlatformTemplateDir();
+
     ofLogNotice() << "templatePath: " << templatePath;
 	auto projectPath = fs::canonical(fs::current_path() / path);
 
@@ -149,7 +150,7 @@ bool baseProject::create(const fs::path & _path, string templateName){
 	projectDir = "";
 	projectPath = normalizePath(projectPath);
 	ofLogNotice() << "projectPath: " << projectPath;
-
+	
 	projectName = projectPath.filename().string();
 
 	// we had this in some projects. if we decide to keep this is the place
@@ -161,6 +162,7 @@ bool baseProject::create(const fs::path & _path, string templateName){
 	// it can be only "src"
 	fs::path projectSrc { projectDir / "src" };
 
+	
 	if (fs::exists(projectSrc) && fs::is_directory(projectSrc)) {
 		bDoesSrcDirExist = true;
 	} else {

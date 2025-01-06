@@ -688,6 +688,13 @@ int main(int argc, char ** argv) {
 
 
 			for (auto & t : targets) {
+				if(std::find(platformsOptions.begin(), platformsOptions.end(), t) != platformsOptions.end()) {
+//					alert ("target platform found " + t, 33);
+				} else {
+					alert ("target platform not found " + t, 35);
+					continue;
+				}
+				
 				consoleSpace();
 				ofLogNotice() << "-----------------------------------------------";
 				ofLogNotice() << "target platform is: [" << t << "]";
