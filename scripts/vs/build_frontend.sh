@@ -36,6 +36,7 @@ if [ -f "$SOURCE_FILE" ]; then
     cp "$SOURCE_FILE" "$DESTINATION_PATH/projectGenerator.exe"
     . "${SCRIPT_DIR}/secure.sh"
     secure "$DESTINATION_PATH/projectGenerator.exe" projectGenerator.pkl
+    chmod +x $DESTINATION_PATH/projectGenerator.exe
     echo "projectGenerator.exe File copied successfully."
 else
     # File does not exist
@@ -52,7 +53,8 @@ npm run
 echo "====== run"
 
 . "${SCRIPT_DIR}/secure.sh"
-secure "${_DIR}/projectGenerator.exe" projectGenerator.pkl
+secure "${DESTINATION_PATH}/projectGenerator.exe" projectGenerator.pkl
+chmod +x $DESTINATION_PATH/projectGenerator.exe
 
 # if [ "${BUILD_TEST}" == 1 ]; then
    npm run start:prod
