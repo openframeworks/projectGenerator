@@ -152,7 +152,7 @@ bool ofAddon::checkCorrectVariable(const string & variable, const string & state
 						 AddonMetaVariables.end(),
 						 variable) != AddonMetaVariables.end();
 	}
-	else if (state == "osx") {// Why only checking for osx?
+	else if ( state == "osx" || state == "macos" ) {// Why only checking for osx?
 		return std::find(AddonProjectVariables.begin(),
 						 AddonProjectVariables.end(),
 						 variable) != AddonProjectVariables.end();
@@ -785,7 +785,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 #define MERGE_MAC_LIBS_HACK
 #ifdef MERGE_MAC_LIBS_HACK
 
-	if (platform == "osx"  || platform == "macos"){
+	if ( platform == "osx"  || platform == "macos" ){
 		// Horrible hack to make it work with the bad idea of renaming osx to macos
 		getLibsRecursively(libsPath, libFiles, libs, "macos");
 		getLibsRecursively(libsPath, libFiles, libs, "osx");

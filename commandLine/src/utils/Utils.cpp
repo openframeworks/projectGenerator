@@ -89,7 +89,8 @@ std::string getPlatformString() {
 		return "vs";
 	#endif
 #elif defined(__APPLE_CC__)
-	return "osx";
+//	return "osx";
+	return "macos";
 #else
 	return {};
 #endif
@@ -219,11 +220,11 @@ static std::vector <string> platforms;
 bool isFolderNotCurrentPlatform(const string & folderName, const string & platform){
 	if( platforms.size() == 0 ){
 		platforms = {
+			"macos",
 			"osx",
 			"msys2",
 			"vs",
 			"ios",
-            "macos",
             "tvos",
 			"linux",
 			"linux64",

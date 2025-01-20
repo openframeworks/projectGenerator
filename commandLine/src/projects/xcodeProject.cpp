@@ -17,7 +17,7 @@ string xcodeProject::LOG_NAME = "xcodeProjectFile";
 
 xcodeProject::xcodeProject(const string & target) : baseProject(target){
 	// TODO: remove unused variables
-	if( target == "osx" ){
+	if( target == "osx" || target == "macos" ){
 		folderUUID = {
 			{ "src", 			"E4B69E1C0A3A1BDC003C02F2" },
 			{ "addons", 		"BB4B014C10F69532006C3DED" },
@@ -186,7 +186,7 @@ void xcodeProject::saveScheme(){
 	}
 	fs::create_directories(schemeFolder);
 
-	if (target == "osx") {
+	if ( target == "osx" || target == "macos" ) {
 		for (auto & f : { "Release", "Debug" }) {
 			copyTemplateFiles.push_back({
 				templatePath / ("emptyExample.xcodeproj/xcshareddata/xcschemes/emptyExample " + string(f) + ".xcscheme"),
@@ -236,7 +236,7 @@ void xcodeProject::renameProject(){ //base
 	addCommand("Set :objects:"+buildConfigurationListUUID+":name " + projectName);
 
 	// Just OSX here, debug app naming.
-	if( target == "osx" ){
+	if( target == "osx" || target == "macos" ){
 		// TODO: Hardcode to variable
 		// FIXME: Debug needed in name?
 		addCommand("Set :objects:E4B69B5B0A3A1756003C02F2:path " + projectName + "Debug.app");

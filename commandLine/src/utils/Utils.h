@@ -43,6 +43,8 @@ static std::map <ofTargetPlatform, std::string> platformsToString {
 };
 
 static std::vector < std::string > platformsOptions {
+	"macos",
+	"osx",
 	"android",
 	"ios",
 	"linux",
@@ -51,8 +53,6 @@ static std::vector < std::string > platformsOptions {
 	"linuxarmv7l",
 	"linuxaarch64",
 	"msys2",
-	"macos",
-	"osx",
 	"vs",
 	"vscode",
 	"zed",
