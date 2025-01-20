@@ -5,6 +5,7 @@
  *      Author: arturo
  */
 
+#include "defines.h"
 #include "Utils.h"
 #include "ofUtils.h"
 
@@ -15,6 +16,7 @@
 #include "VSCodeProject.h"
 #include "qtcreatorproject.h"
 #include "xcodeProject.h"
+#include "zedProject.h"
 
 #include "uuidxx.h"
 #include <algorithm>
@@ -73,7 +75,7 @@ std::string getPlatformString() {
 	if (
 		arch == "armv6l" ||
 		arch == "armv7l" ||
-		arch == "aarch64" 
+		arch == "aarch64"
 		) {
 			return "linux" + arch;
 		}
@@ -87,7 +89,8 @@ std::string getPlatformString() {
 		return "vs";
 	#endif
 #elif defined(__APPLE_CC__)
-	return "osx";
+//	return "osx";
+	return "macos";
 #else
 	return {};
 #endif
@@ -217,11 +220,11 @@ static std::vector <string> platforms;
 bool isFolderNotCurrentPlatform(const string & folderName, const string & platform){
 	if( platforms.size() == 0 ){
 		platforms = {
+			"macos",
 			"osx",
 			"msys2",
 			"vs",
 			"ios",
-            "macos",
             "tvos",
 			"linux",
 			"linux64",
@@ -281,7 +284,7 @@ void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & fol
                 shouldCheckPlatform = false;
 //                cout << "getFoldersRecursively shouldCheckPlatform = false : " << f.filename().string() << endl;
             }
-            
+
             if (fs::is_directory(f) && (!shouldCheckPlatform || !isFolderNotCurrentPlatform(f.filename().string(), platform))) {
                 getFoldersRecursively(f, folderNames, platform);
             }
@@ -306,12 +309,10 @@ void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props
 
 void getDllsRecursively(const fs::path & path, std::vector<fs::path> & dlls, string platform) {
 //	alert ("getDllsRecursively " + path.string(), 34);
-//	if (!fs::exists(path) || !fs::is_directory(path)) return;
 	if (!fs::exists(path) || !fs::is_directory(path)) {
 //		alert ("not found!");
 		return;
 	}
-
 
 	for (const auto & f : dirList(path)) {
 		if (fs::is_regular_file(f) && (f.extension() == ".dll" || f.extension() == ".so")) {
@@ -344,41 +345,19 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 			if ((f.extension() == ".framework") || (f.extension() == ".xcframework")) {
 				it.disable_recursion_pending();
 				continue;
-			} 
-                //else {
-//				auto stem = f.stem();
-//				auto archFound = std::find(LibraryBinary::archs.begin(), LibraryBinary::archs.end(), stem);
-//				if (archFound != LibraryBinary::archs.end()) {
-//					arch = *archFound;
-//					alert ("arch found: " + arch, 34);
-//				} else {
-//					auto targetFound = std::find(LibraryBinary::targets.begin(), LibraryBinary::targets.end(), stem);
-//					if (targetFound != LibraryBinary::targets.end()) {
-//						target = *targetFound;
-//                        alert ("target found: " + target, 34);
-//					}
-//				}
-//			}
+			}
+
 		} else {
 			auto ext = ofPathToString(f.extension());
 			bool platformFound = false;
 
-//			if(platform!=""){
-//				std::vector<string> splittedPath = ofSplitString(f.string(), fs::path("/").make_preferred().string());
-//				for(size_t j=0;j<splittedPath.size();j++){
-//					if(splittedPath[j]==platform){
-//						platformFound = true;
-//					}
-//				}
-//			}
-            
             if (!platform.empty() && f.string().find(platform) != std::string::npos) {
                platformFound = true;
             }
 
-			if (ext == ".a" || ext == ".lib" || ext == ".dylib" || ext == ".so" || ext == ".xcframework" || ext == ".framework" || (ext == ".dll" && platform != "vs")) {
+			if (ext == ".a" || ext == ".lib" || ext == ".dylib" || ext == ".so" || (ext == ".dll" && platform != "vs")) {
 				if (platformFound){
-                    
+
                     LibraryBinary lib(f);
                     if(lib.isValidFor(arch, target)){
 //                        alert ("adding lib " + f.string() + " arch: " +  arch + " target: " + target, 34);
@@ -449,7 +428,7 @@ unique_ptr<baseProject> getTargetProject(const string & targ) {
 			   targ == "linuxaarch64"
 			   ) {
 		return unique_ptr<VSCodeProject>(new VSCodeProject(targ));
-	} 
+	}
 	else if (targ == "android") {
 		return unique_ptr<AndroidStudioProject>(new AndroidStudioProject(targ));
 	}
@@ -457,6 +436,8 @@ unique_ptr<baseProject> getTargetProject(const string & targ) {
 		return unique_ptr<android2024Project>(new android2024Project(targ));
 	} else if (targ == "vscode") {
 		return unique_ptr<VSCodeProject>(new VSCodeProject(targ));
+	} else if (targ == "zed") {
+		return unique_ptr<zedProject>(new zedProject(targ));
 	} else if (targ == "qtcreator") {
 			return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));
 	} else {
@@ -560,7 +541,7 @@ void createBackup(const fs::path & path, const fs::path & backupPath) {
 		std::string datetimeStr = ofGetTimestampString("%Y-%m-%d");
 
 		fs::path backupDir = { backupPath / "backups" / datetimeStr };
-		if (fs::exists(backupDir)) {			
+		if (fs::exists(backupDir)) {
 			std::string hour = ofGetTimestampString("%H-%M");
 			backupDir = { backupPath / "backups" / (datetimeStr + "_" + hour) };
 		}
@@ -659,6 +640,3 @@ bool containsSourceFiles(const fs::path& dir) {
 // 		return fs::path("");
 // 	}
 // }
-
-
-
