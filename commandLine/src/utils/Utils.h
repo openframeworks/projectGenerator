@@ -51,9 +51,9 @@ static std::vector < std::string > platformsOptions {
 	"linuxarmv7l",
 	"linuxaarch64",
 	"msys2",
+	"macos",
 	"osx",
 	"vs",
-	
 	"vscode",
 	"zed",
 };
