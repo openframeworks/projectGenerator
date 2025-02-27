@@ -21,11 +21,11 @@ if [ -d "win-unpacked" ]; then
 
     cd "win-unpacked"
 
-    _DIR=$(pwd)
+    DIR=$(pwd)
 
     . "${SCRIPT_DIR}/secure.sh"
-    secure "{_DIR}/projectGenerator.exe" projectGenerator.pkl
-
+    secure "${DIR}/projectGenerator.exe" projectGenerator.pkl
+    chmod +x ${DIR}/projectGenerator.exe
     zip -r "../projectGenerator-vs-gui.zip" "."
     pwd
     ls
