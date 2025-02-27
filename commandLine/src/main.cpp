@@ -304,7 +304,6 @@ void recursiveUpdate(const fs::path & path, const string & target) {
 			}
 		}
 
-		fs::current_path(path);
 		updateProject(path, target, false);
 	}
 }
