@@ -885,7 +885,9 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 	// we want to set addonMakeName before cleaning the addon name, so it is preserved in the exact same way as it was passed, and the addons.make file can be (re)constructed properly
 	this->addonMakeName = addonName;
 
-//	addonName = cleanName(addonName);
+	if(parseCleanName){
+		addonName = cleanName(addonName);
+	}
 
 	if(addonName.empty()){
 		ofLogError("baseProject::addAddon") << "cant add addon with empty name";

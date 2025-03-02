@@ -26,6 +26,7 @@ using std::cout;
 using std::endl;
 
 static bool backupProjectFiles = false;
+static bool parseCleanName = true;
 
 static std::map <ofTargetPlatform, std::string> platformsToString {
 	{ OF_TARGET_ANDROID, "android" },
