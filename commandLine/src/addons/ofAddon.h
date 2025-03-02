@@ -25,17 +25,24 @@ const vector<string> parseStates {
 	"common",
 	"linux",
 	"linux64",
+	"linux/64",
 	"msys2",
 	"vs",
 	"linuxarmv6l",
 	"linuxarmv7l",
 	"linuxaarch64",
+	"linux/armv6l",
+	"linux/armv7l",
+	"linux/aarch64",
+	"linux/arm64",
 	"android/armeabi",
 	"android/armeabi-v7a",
 	"android/arm64-v8a",
 	"android/x86",
 	"android/x86_64",
 	"emscripten",
+	"emscripten/32",
+	"emscripten/64",
 	"android",
 	"ios",
 	"osx",
@@ -43,6 +50,7 @@ const vector<string> parseStates {
 	"macos",
 	"watchos",
 	"visionos",
+	"catos",
 };
 
 
@@ -136,6 +144,7 @@ public:
 
 	bool load(string addonName, const fs::path& projectDir, const string& targetPlatform);
 
+	void prepareForWrite();
 
 	void clear();
 

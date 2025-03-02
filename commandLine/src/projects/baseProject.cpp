@@ -531,6 +531,8 @@ void baseProject::addAddon(ofAddon & addon){
 			return;
 		}
 	}
+	
+	addon.prepareForWrite();
 
 	/*
 
@@ -561,6 +563,7 @@ void baseProject::addAddon(ofAddon & addon){
 	}
 //	alert("---> dependencies");
 	addons.emplace_back(addon);
+	
 
 	//ofLogVerbose("baseProject") << "libs in addAddon " << addon.libs.size();
 
@@ -583,7 +586,6 @@ void baseProject::addAddon(ofAddon & addon){
 
 	addAddonDefines(addon);
 	addAddonFrameworks(addon);
-//    addAddonXCFrameworks(addon);
     copyAddonData(addon);
     addAddonProps(addon);
 }

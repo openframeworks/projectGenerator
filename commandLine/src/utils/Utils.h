@@ -31,6 +31,7 @@ static std::map <ofTargetPlatform, std::string> platformsToString {
 	{ OF_TARGET_ANDROID, "android" },
 //	{ OF_TARGET_EMSCRIPTEN, "" },
 	{ OF_TARGET_IOS, "ios" },
+	{ OF_TARGET_IOS, "tvos" },
 	{ OF_TARGET_MACOS, "macos" },
 	{ OF_TARGET_LINUX, "linux" },
 	{ OF_TARGET_LINUX64, "linux64" },
@@ -150,8 +151,6 @@ std::string normalizePath(const std::string& path);
 fs::path normalizePath(const fs::path& path);
 
 bool containsSourceFiles(const fs::path& dir);
-// fs::path ofRelativeToOFPATH(const fs::path& path);
-
 /*
  Idea: create an object to hold the origin and destination files, with renames where needed
  and string substitution, so we can avoid opening and writing multiple times the same file, less ssd wear.
