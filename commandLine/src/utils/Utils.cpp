@@ -477,10 +477,11 @@ void alert(string msg, int color) {
 
 // TODO: Maybe rename this function to a more descriptive name.
 vector <fs::path> dirList(const fs::path & path) {
+	fs::path keyPath { fs::absolute(path) };
 	// map to cache recursive directory listing for subsequent usage
 	static std::map<fs::path, vector <fs::path >> dirListMap;
 
-	if (dirListMap.find(path) == dirListMap.end()) {
+	if (dirListMap.find(keyPath) == dirListMap.end()) {
 //		alert ("will list dir " + path.string(), 35);
 		fs::recursive_directory_iterator it { path };
 		fs::recursive_directory_iterator last {  };
@@ -494,12 +495,12 @@ vector <fs::path> dirList(const fs::path & path) {
 			}
 //			alert ("keep going " + it->path().filename().string(), 33);
 
-			dirListMap[path].emplace_back(it->path());
+			dirListMap[keyPath].emplace_back(it->path());
 		}
 	} else {
 //		alert("IN CACHE " + path.string());
 	}
-	return dirListMap[path];
+	return dirListMap[keyPath];
 }
 
 vector <fs::path> folderList(const fs::path & path) {
