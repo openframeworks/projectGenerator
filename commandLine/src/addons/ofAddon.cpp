@@ -773,6 +773,14 @@ void ofAddon::addToFolder(const fs::path& path, const fs::path & parentFolder){
 	filesToFolders[path] = folder;
 }
 
+
+void ofAddon::prepareForWrite() {
+	removeDuplicates(libs);
+	removeDuplicates(libFiles);
+	removeDuplicates(frameworks);
+	removeDuplicates(xcframeworks);
+}
+
 void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFolder) {
 	if (!fs::exists(libsPath)) {
 //		alert("file not found " + libsPath.string(), 35);
@@ -781,7 +789,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 //	alert ("parseLibsPath " + libsPath.string() + ", parent=" + parentFolder.string(), 35);
 
 
-	if (platform == "osx"  || platform == "macos"){
+	if (platform == "osx"  || platform == "macos" || platform == "ios" || platform == "tvos"){
 		// Horrible hack to make it work with the bad idea of renaming osx to macos
 		getLibsRecursively(libsPath, libFiles, libs, "macos");
 		getLibsRecursively(libsPath, libFiles, libs, "osx");
@@ -800,15 +808,6 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 
 	} else {
 		getLibsRecursively(libsPath, libFiles, libs, platform);
-	}
-
-	if (//platform == "osx"  ||
-		platform == "ios"  ||
-		platform == "tvos"){//} ||
-		//platform == "macos"){
-
-		getFrameworksRecursively(libsPath, platform);
-//		getXCFrameworksRecursively(libsPath, platform);
 	}
 
 	if (platform == "vs" || platform == "msys2"
