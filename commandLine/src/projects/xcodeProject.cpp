@@ -9,7 +9,6 @@
 #include <iostream>
 #include <fstream>
 
-
 using nlohmann::json;
 using nlohmann::json_pointer;
 
@@ -60,7 +59,7 @@ xcodeProject::xcodeProject(const string & target) : baseProject(target){
 		buildActionMaskUUID =	"1D60588E0D05DD3D006BFB54";
 		projRootUUID    = "29B97314FDCFA39411CA2CEA"; //mainGroup — OK
 		resourcesUUID   = 			"BB24DD8F10DA77E000E9C588";
-		buildPhaseResourcesUUID = 	"1D60588D0D05DD3D006BFB54";
+		copyBundleResourcesUUID = 	"1D60588D0D05DD3D006BFB54";
 		frameworksUUID  = "1DF5F4E00D08C38300B7A737";   //PBXFrameworksBuildPhase  // todo: check this?
 		afterPhaseUUID  = "928F60851B6710B200E2D791";
 		buildPhasesUUID = "9255DD331112741900D6945E";
@@ -244,16 +243,16 @@ void xcodeProject::renameProject(){ //base
 }
 
 fs::path getPathTo(fs::path path, string limit){
-    fs::path p;
-    vector <fs::path> folders = std::vector(path.begin(), path.end());
-    for(auto & f: folders){
-        p /= f;
-        if(f.string() == limit){
+	fs::path p;
+	vector <fs::path> folders = std::vector(path.begin(), path.end());
+	for(auto & f: folders){
+		p /= f;
+		if(f.string() == limit){
 //            alert("getPathTo "+  p.string(), 33);
-            return p;
-        }
-    }
-    return p;
+			return p;
+		}
+	}
+	return p;
 }
 
 
@@ -280,8 +279,8 @@ string xcodeProject::getFolderUUID(const fs::path & folder, fs::path base){//, b
 
 		if (folders.size()){
 			// Iterating every folder from full path
-            
-            
+
+
 			for (std::size_t a = 0; a < folders.size(); a++) {
 				fs::path fullPath{""};
 
@@ -295,7 +294,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, fs::path base){//, b
 				for (const auto& j : joinFolders) {
 					fullPath /= j;
 				}
-                
+
 //                alert("xcodeProject::getFolderUUID fullpath: " + fullPath.string(),33);
 
 				// Query if partial path is already stored. if not execute this following block
@@ -305,7 +304,7 @@ string xcodeProject::getFolderUUID(const fs::path & folder, fs::path base){//, b
 				}
 
 				else {
-                    
+
 					string thisUUID = generateUUID(fullPath);
 					folderUUID[fullPath] = thisUUID;
 					folderFromUUID[thisUUID] = fullPath;
@@ -337,59 +336,59 @@ string xcodeProject::getFolderUUID(const fs::path & folder, fs::path base){//, b
 //					}
 
 					addCommand("Add :objects:"+thisUUID+":isa string PBXGroup");
-                    
-                    
-                    bool bFolderPathSet = false;
-                    
+
+
+					bool bFolderPathSet = false;
+
 					if (folderName == "external_sources" || folderName == "local_addons") {
-                        
+
 						addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
-                        addCommand("Add :objects:"+thisUUID+":path string ");
-                        bFolderPathSet = true;
+						addCommand("Add :objects:"+thisUUID+":path string ");
+						bFolderPathSet = true;
 					}
-                    else {
-                        if (lastFolderUUID == projRootUUID ){//} ||
-                            //                            lastFolder == "external_sources" || lastFolder == "local_addons") { //
-                            
-                            
-                            
-                            // Base folders can be in a different depth,
-                            // so we cut folders to point to the right path
-                            // ROY: THIS hardly makes sense to me. I can see the purpose of it. base2 is never set to anything.
-                            fs::path base2 { "" };
-                            size_t diff = folders.size() - (a+1);
-                            for (size_t x=0; x<diff; x++) {
-                                base2 = base2.parent_path();
-                            }
+					else {
+						if (lastFolderUUID == projRootUUID ){//} ||
+							//                            lastFolder == "external_sources" || lastFolder == "local_addons") { //
+
+
+
+							// Base folders can be in a different depth,
+							// so we cut folders to point to the right path
+							// ROY: THIS hardly makes sense to me. I can see the purpose of it. base2 is never set to anything.
+							fs::path base2 { "" };
+							size_t diff = folders.size() - (a+1);
+							for (size_t x=0; x<diff; x++) {
+								base2 = base2.parent_path();
+							}
 //                            alert ("external_sources base = " + ofPathToString(base2) + " UUID: " + thisUUID, 33);
-                            addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
-                            addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(base2));
-                            bFolderPathSet = true;
-                        }else if(lastFolder == "external_sources" || lastFolder == "local_addons") { //
-                            addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
+							addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
+							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(base2));
+							bFolderPathSet = true;
+						}else if(lastFolder == "external_sources" || lastFolder == "local_addons") { //
+							addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
 //                            alert ("xxxx " + lastFolder + "  " + ofPathToString(base) + " UUID: " + thisUUID, 33);
-                            addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(getPathTo(base, folderName)));
-                            bFolderPathSet = true;
+							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(getPathTo(base, folderName)));
+							bFolderPathSet = true;
 						} else {
 							addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
 //							fs::path addonFolder { fs::path(fullPath).filename() };
 							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(fullPath.filename()));
-                            bFolderPathSet = true;
+							bFolderPathSet = true;
 						}
 					}
 
 					addCommand("Add :objects:"+thisUUID+":children array");
-                    
-                    if(!bFolderPathSet){
-                        if (folder.begin()->string() == "addons" || folder.begin()->string() == "src"){//} || folder.begin()->string() == "local_addons") {
-                            addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
-                            //						fs::path addonFolder { fs::path(fullPath).filename() };
-                            addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(fullPath.filename()));
-                            // alert ("group " + folder.string() + " : " + base.string() + " : " + addonFolder.string(), 32);
-                        } else {
-                            addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
-                        }
-                    }
+
+					if(!bFolderPathSet){
+						if (folder.begin()->string() == "addons" || folder.begin()->string() == "src"){//} || folder.begin()->string() == "local_addons") {
+							addCommand("Add :objects:"+thisUUID+":sourceTree string <group>");
+							//						fs::path addonFolder { fs::path(fullPath).filename() };
+							addCommand("Add :objects:"+thisUUID+":path string " + ofPathToString(fullPath.filename()));
+							// alert ("group " + folder.string() + " : " + base.string() + " : " + addonFolder.string(), 32);
+						} else {
+							addCommand("Add :objects:"+thisUUID+":sourceTree string SOURCE_ROOT");
+						}
+					}
 
 					// Add this new folder to its parent, projRootUUID if root
 					addCommand("Add :objects:"+lastFolderUUID+":children: string " + thisUUID);
@@ -406,8 +405,8 @@ string xcodeProject::getFolderUUID(const fs::path & folder, fs::path base){//, b
 
 void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type){
 //	alert ("xcodeProject::addSrc " + ofPathToString(srcFile) + " : " + ofPathToString(folder), 31);
-	
-    string ext = ofPathToString(srcFile.extension());
+
+	string ext = ofPathToString(srcFile.extension());
 
 //		.reference = true,
 //		.addToBuildPhase = true,
@@ -421,32 +420,39 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 	fp.addToBuildPhase = true;
 	fp.isSrc = true;
 
-	if( type == DEFAULT ){
-		if (ext == ".h" || ext == ".hpp"){
-			fp.addToBuildPhase = false;
-		}
-		else if (ext == ".xib"){
-			fp.addToBuildPhase	= false;
-			fp.addToBuildResource = true;
-			fp.addToResources = true;
-		}
-		else if (ext == ".metal"){
-			fp.addToBuildResource = true;
-			fp.addToResources = true;
-		}
-		else if(ext == ".entitlements"){
-			fp.addToBuildResource = true;
-			fp.addToResources = true;
-		}
-		else if(ext == ".info"){
-			fp.addToBuildResource = true;
-			fp.addToResources = true;
-		}
-		else if( target == "ios" ){
-			fp.addToBuildPhase	= true;
-			fp.addToResources = true;
-		}
+//	if( type == DEFAULT ){
+	if( target == "ios" ){
+		fp.addToBuildPhase	= true;
+		fp.addToResources = true;
 	}
+
+	if (ext == ".h" || ext == ".hpp"){
+		fp.addToBuildPhase = false;
+	}
+	else if (ext == ".xib"){
+		fp.addToBuildPhase	= false;
+		fp.addToBuildResource = true;
+		fp.addToResources = true;
+	}
+	else if (ext == ".metal"){
+		fp.addToBuildResource = true;
+		fp.addToResources = true;
+	}
+	else if(ext == ".entitlements"){
+		fp.addToBuildResource = true;
+		fp.addToResources = true;
+	}
+	else if(ext == ".info"){
+		fp.addToBuildResource = true;
+		fp.addToResources = true;
+	}
+	else if( ext == ".storyboard" ){
+		fp.addToBuildPhase	= false;
+		fp.copyBundleResources = true;
+	}
+
+
+	//	}
 
 
 	string UUID {
@@ -459,10 +465,10 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 }
 
 void xcodeProject::addCompileFlagsForMMFile(const fs::path & srcFile) {
-    
-    // This requires a moro thorough inspection on how to deal with these files, and determine if these need the -fno-objc-arc flag.
-    // This flag should be added on a file by file basis, rather than the way it is done below where these are added globally, as such messes up other things.
-    
+
+	// This requires a moro thorough inspection on how to deal with these files, and determine if these need the -fno-objc-arc flag.
+	// This flag should be added on a file by file basis, rather than the way it is done below where these are added globally, as such messes up other things.
+
 //	std::ifstream file(srcFile);
 //	std::string line;
 //	bool containsARCFunctions = false;
@@ -481,12 +487,12 @@ void xcodeProject::addCompileFlagsForMMFile(const fs::path & srcFile) {
 //			addCommand("Add :objects:"+c+":buildSettings:OTHER_CPLUSPLUSFLAGS: string -fno-objc-arc");
 //		}
 //	}
-    
+
 }
 
 
 void xcodeProject::addFramework(const fs::path & path, const fs::path & folder, bool isRelativeToSDK){
-    ofLogVerbose() << "Adding framework " << ofPathToString(path) << "  folder: " << folder;
+	ofLogVerbose() << "Adding framework " << ofPathToString(path) << "  folder: " << folder;
 //	 alert( "xcodeProject::addFramework " + ofPathToString(path) + " : " + ofPathToString(folder) , 33);
 	// path = the full path (w name) of this framework
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
@@ -499,7 +505,7 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder, 
 	fp.copyFilesBuildPhase = !isRelativeToSDK;
 	fp.isRelativeToSDK = isRelativeToSDK;
 	fp.frameworksBuildPhase = (target != "ios" && !folder.empty());
-	
+
 	string UUID;
 	if (isRelativeToSDK) {
 		fs::path frameworkPath { "System/Library/Frameworks/" + ofPathToString(path) + ".framework" } ;
@@ -507,11 +513,11 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder, 
 	} else {
 		UUID = addFile(path, folder, fp);
 	}
-	
+
 	if (!isRelativeToSDK) {
 		addCommand("# ----- FRAMEWORK_SEARCH_PATHS");
 		string parent { ofPathToString(path.parent_path()) };
-		
+
 		for (auto & c : buildConfigs) {
 			if (path.extension() == ".framework") {
 				addCommand("Add :objects:" + c + ":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + parent);
@@ -552,14 +558,14 @@ void xcodeProject::addLibrary(const LibraryBinary & lib){
 }
 
 void xcodeProject::addLDFLAG(const string& ldflag, LibType libType){
-    ofLogVerbose("xcodeProject::addLDFLAG") << ldflag;
+	ofLogVerbose("xcodeProject::addLDFLAG") << ldflag;
 	for (auto & c : buildConfigs) {
 		addCommand("Add :objects:"+c+":buildSettings:OTHER_LDFLAGS: string " + ldflag);
 	}
 }
 
 void xcodeProject::addCFLAG(const string& cflag, LibType libType){
-    ofLogVerbose("xcodeProject::addCFLAG") << cflag;
+	ofLogVerbose("xcodeProject::addCFLAG") << cflag;
 	for (auto & c : buildConfigs) {
 		// FIXME: add array here if it doesnt exist
 		addCommand("Add :objects:"+c+":buildSettings:OTHER_CFLAGS: string " + cflag);
@@ -604,43 +610,43 @@ void xcodeProject::addAfterRule(const string& rule){
 
 
 void xcodeProject::addAddonLibs(const ofAddon& addon){
-    for (auto & e : addon.libs) {
-        ofLogVerbose() << "adding addon libs: " << e.path;
-        addLibrary(e);
-        
-        fs::path dylibPath { e.path };
+	for (auto & e : addon.libs) {
+		ofLogVerbose() << "adding addon libs: " << e.path;
+		addLibrary(e);
 
-        //		cout << "dylibPath " << dylibPath << endl;
-        if (dylibPath.extension() == ".dylib") {
-            
-            if(addon.filesToFolders.find(dylibPath) == addon.filesToFolders.end()) {
-                addDylib(dylibPath, dylibPath.parent_path().lexically_relative(addon.pathToOF));
-            }else{
-                addDylib(dylibPath,addon.filesToFolders.at(dylibPath));
-            }
-        }
-    }
+		fs::path dylibPath { e.path };
+
+		//		cout << "dylibPath " << dylibPath << endl;
+		if (dylibPath.extension() == ".dylib") {
+
+			if(addon.filesToFolders.find(dylibPath) == addon.filesToFolders.end()) {
+				addDylib(dylibPath, dylibPath.parent_path().lexically_relative(addon.pathToOF));
+			}else{
+				addDylib(dylibPath,addon.filesToFolders.at(dylibPath));
+			}
+		}
+	}
 }
 
 void xcodeProject::addAddonSrcFiles(ofAddon& addon){
-    std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), [](const fs::path & a, const fs::path & b) {
-        return a.string() < b.string();
-    });
-    for (auto & e : addon.srcFiles) {
-        ofLogVerbose() << "adding addon srcFiles: " << e;
-        if(addon.filesToFolders.find(e) == addon.filesToFolders.end()) {
-            
-            addSrc(e,"");
-        }else{
-            addSrc(e,addon.filesToFolders.at(e));
-        }
-    }
+	std::sort(addon.srcFiles.begin(), addon.srcFiles.end(), [](const fs::path & a, const fs::path & b) {
+		return a.string() < b.string();
+	});
+	for (auto & e : addon.srcFiles) {
+		ofLogVerbose() << "adding addon srcFiles: " << e;
+		if(addon.filesToFolders.find(e) == addon.filesToFolders.end()) {
+
+			addSrc(e,"");
+		}else{
+			addSrc(e,addon.filesToFolders.at(e));
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------------------------
 void xcodeProject::addAddonFrameworks(const ofAddon& addon){
-    ofLogVerbose("xcodeProject::addAddonFrameworks") << addon.name;
-    
+	ofLogVerbose("xcodeProject::addAddonFrameworks") << addon.name;
+
 	std::vector <std::string> allFrameworks;
 	allFrameworks.reserve( addon.frameworks.size() + addon.xcframeworks.size() );
 	allFrameworks.insert( allFrameworks.end(), addon.frameworks.begin(), addon.frameworks.end() );
@@ -648,27 +654,27 @@ void xcodeProject::addAddonFrameworks(const ofAddon& addon){
 
 	for (auto & f : allFrameworks) {
 //    for (auto & f : addon.frameworks) {
-        ofLogVerbose() << "adding addon frameworks: " << f;
+		ofLogVerbose() << "adding addon frameworks: " << f;
 //		alert ("ADD ADDON FRAMEWORKS " + f, 33);
 
 		auto path = f;
 		// The only addon I've found using fixed path to system Frameworks is ofxCoreLocation
 		// https://github.com/robotconscience/ofxCoreLocation/blob/533ee4b0d380a4a1aafbe1c5923ae66c26b92d53/addon_config.mk#L32
-		
+
 		if (ofIsStringInString(f, "/System/Library/Frameworks")){
 			fs::path fullPath = f;
 			path = ofPathToString(fullPath.filename());
 		}
-		
+
 		bool isRelativeToSDK = false;
-        size_t found=path.find('/');
-        if (found==string::npos) {
+		size_t found=path.find('/');
+		if (found==string::npos) {
 			isRelativeToSDK = true;
-        }
+		}
 		fs::path folder = isRelativeToSDK ? "Frameworks" : addon.filesToFolders.at(f);
 		addFramework(path, folder, isRelativeToSDK);
 
-    }
+	}
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -722,24 +728,24 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 				addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
 			}
 		} else {
-			
-            if(folder.begin()->string() == "local_addons" || folder.begin()->string() == "external_sources"){
+
+			if(folder.begin()->string() == "local_addons" || folder.begin()->string() == "external_sources"){
 //                if(path.is_absolute()){
-                    addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
-                    addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
+					addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
+					addCommand("Add :objects:"+UUID+":sourceTree string SOURCE_ROOT");
 //                }else{
 //                    if (fs::exists( projectDir / path )) {
 //                        addCommand("Add :objects:"+UUID+":path string " + ofPathToString(projectDir /path));
 //                    }
 //                }
-            } else {
+			} else {
 				if (fp.isRelativeToSDK) {
 					addCommand("Add :objects:"+UUID+":path string " + ofPathToString(path));
 					addCommand("Add :objects:"+UUID+":sourceTree string SDKROOT");
 				} else {
 					addCommand("Add :objects:"+UUID+":sourceTree string <group>");
 				}
-            }
+			}
 		}
 
 //		string folderUUID;
@@ -752,9 +758,9 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 //		} else {
 //			folderUUID = getFolderUUID(folder, isFolder);
 //		}
-		
+
 		// Eventually remove isFolder and base parameter
-        std::string folderUUID { getFolderUUID(folder, path)};
+		std::string folderUUID { getFolderUUID(folder, path)};
 		//, isFolder) };
 
 
@@ -768,7 +774,8 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 				fp.codeSignOnCopy ||
 				fp.copyFilesBuildPhase ||
 				fp.addToBuildResource ||
-				fp.addToResources
+				fp.addToResources ||
+				fp.copyBundleResources
 				//|| fp.frameworksBuildPhase ~ I've just removed this one, favoring -InFrameworks
 			) {
 			addCommand("# ---- addToBuildPhase " + buildUUID);
@@ -780,6 +787,12 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 			// Not sure if it applies to everything, applies to srcFile.
 			addCommand("# ---- addToBuildPhase");
 			addCommand("Add :objects:"+buildActionMaskUUID+":files: string " + buildUUID);
+		}
+
+
+		if (fp.copyBundleResources) {
+			addCommand("# ---- copyBundleResources");
+			addCommand("Add :objects:"+copyBundleResourcesUUID+":files: string " + buildUUID);
 		}
 
 		if (fp.copyFilesBuildPhase) {
@@ -863,7 +876,7 @@ bool xcodeProject::saveProjectFile(){
 	}
 	fp.absolute = true;
 //	addFile("../../../libs/openframeworks", "", fp);
- 	addFile(fs::path{"bin"} / "data", "", fp);
+	addFile(fs::path{"bin"} / "data", "", fp);
 
 
 //	debugCommands = false;
@@ -888,13 +901,13 @@ bool xcodeProject::saveProjectFile(){
 		json j;
 		try {
 			j = json::parse(contents);
-			
+
 			// Ugly hack to make nlohmann json work with v 3.11.3
 //			auto dump = j.dump(1, '	');
 //			if (dump[0] == '[') {
 //				j = j[0];
 //			}
-			
+
 		} catch (json::parse_error & ex) {
 			ofLogError(xcodeProject::LOG_NAME) << "JSON parse error at byte" << ex.byte;
 			ofLogError(xcodeProject::LOG_NAME) << "fileName" << fileName;
@@ -921,7 +934,7 @@ bool xcodeProject::saveProjectFile(){
 							try {
 								j[p] = c.substr(stringStart);
 							} catch (std::exception & e) {
-								
+
 								ofLogError() << "substr " << c.substr(stringStart) << "\n" <<
 								"pointer " << p << "\n" <<
 								e.what();
@@ -936,7 +949,7 @@ bool xcodeProject::saveProjectFile(){
 								ofLogError() << "array " << e.what();
 							}
 						}
-					} 
+					}
 					catch (std::exception & e) {
 						cout << "pointer " << thispath;
 						ofLogError(xcodeProject::LOG_NAME) << "first json error ";
@@ -944,7 +957,7 @@ bool xcodeProject::saveProjectFile(){
 						ofLogError() << thispath;
 						ofLogError() << "-------------------------";
 					}
-					
+
 
 				}
 				else {
@@ -982,7 +995,7 @@ bool xcodeProject::saveProjectFile(){
 
 
 		std::ofstream jsonFile(fileName);
-		
+
 		// This is not pretty but address some differences in nlohmann json 3.11.2 to 3.11.3
 		auto dump = j.dump(1, '	');
 		if (dump[0] == '[') {
