@@ -260,8 +260,27 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 			nodeAdded.append_attribute("Include").set_value(srcFile.c_str());
 			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folder.c_str());*/
 
-		} else if (ext == ".storyboard" || ext == ".mm" || ext == ".m" || ext == ".swift" || ext == ".java" || ext == ".kotlin") {
+		} else if (ext == ".java" || ext == ".kotlin") {
 			// Do not add files for other platforms
+		} else if (
+			ext == ".storyboard" ||   // Xcode Interface Builder files
+			ext == ".xib" ||          // Xcode Interface Builder files
+			ext == ".xcassets" ||     // Xcode Asset catalogs
+			ext == ".xcconfig" ||     // Xcode build configuration files
+			ext == ".entitlements" || // Code signing entitlements (Apple-specific)
+			ext == ".plist" ||        // Property List files (Info.plist, macOS/iOS config)
+			ext == ".mm" ||           // Objective-C++
+			ext == ".m" ||            // Objective-C
+			ext == ".swift" ||        // Swift language files
+			ext == ".modulemap" ||    // Clang module definition (Xcode/Clang-specific)
+			ext == ".metal" ||        // Metal Shading Language (Apple GPU API)
+			ext == ".tbd" ||          // Text-based dynamic libraries (Apple SDKs)
+			ext == ".dylib" ||        // Dynamic libraries (macOS/iOS equivalent of .dll)
+			ext == ".framework" ||
+			ext == ".bundle" ||
+			ext == ".app" ||
+			ext == ".xcworkspace" ||
+			ext == ".xcodeproj") {
 		} else{
 			appendValue(doc, "ClCompile", "Include", srcFileString);
 
