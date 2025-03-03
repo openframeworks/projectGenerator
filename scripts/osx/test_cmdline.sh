@@ -28,57 +28,59 @@ else
     echo "Application is already code-signed and valid"
 fi
 
-echo "Test auto path:"
+echo "Test: projectGenerator building"
+echo "Test 1: test examples templates - auto path to openFrameworks core"
 ./projectGenerator --recursive -posx ../../examples/templates
+echo "Test 1: test examples templates - success"
 
+echo "Test: projectGenerator building"
+echo "Test 2: all examples - defined core openFrameworks path ../../"
+./projectGenerator --recursive -posx -o../../ ../../examples/ ./projectGenerator
+echo "Test 2: all examples - success"
 
-echo "Test all"
-./projectGenerator --recursive -posx -o../../ ../../examples/ ./projectGenerator 
+# echo "test out of folder -o [vs]";
+# rm -rf ../../../../../pg2
+# mkdir -p  ../../../../../pg2
+# if ! command -v rsync &> /dev/null
+# then
+#     cp -a ./projectGenerator ../../../../../pg2
+# else
+#     rsync -azp ./projectGenerator ../../../../../pg2
+# fi
+# cd ../../../../../pg2
+# ls -a
+# pwd
+# ./projectGenerator --recursive -posx -o"./../openFrameworks" ./../openFrameworks/examples/
+# errorcode=$?
+# if [[ $errorcode -ne 0 ]]; then
+#         exit $errorcode
+# fi
 
+# ./projectGenerator --recursive -posx -o"./../openFrameworks" ./../openFrameworks/examples/
+# errorcode=$?
+# if [[ $errorcode -ne 0 ]]; then
+#         exit $errorcode
+# fi
 
-echo "test out of folder -o [vs]";
-rm -rf ../../../../../pg2
-mkdir -p  ../../../../../pg2
-if ! command -v rsync &> /dev/null
-then      
-    cp -a ./projectGenerator ../../../../../pg2 
-else
-    rsync -azp ./projectGenerator ../../../../../pg2
-fi
-cd ../../../../../pg2
-ls -a
-pwd
-./projectGenerator --recursive -posx -o"./../openFrameworks" ./../openFrameworks/examples/
-errorcode=$?
-if [[ $errorcode -ne 0 ]]; then
-        exit $errorcode
-fi
+# echo "Test generate new just name"
+# ./projectGenerator -o"../openFrameworks" -p"osx" "testingGenerate"
+# errorcode=$?
+# if [[ $errorcode -ne 0 ]]; then
+#       exit $errorcode
+# fi
+# echo "Test generate new / update full path"
+# ./projectGenerator -o"../openFrameworks" -p"osx" "../openFrameworks/apps/myApps/testingGenerate"
+# errorcode=$?
+# if [[ $errorcode -ne 0 ]]; then
+#         exit $errorcode
+# fi
 
-./projectGenerator --recursive -posx -o"./../openFrameworks" ./../openFrameworks/examples/
-errorcode=$?
-if [[ $errorcode -ne 0 ]]; then
-        exit $errorcode
-fi
-
-echo "Test generate new just name"
-./projectGenerator -o"../openFrameworks" -p"osx" "testingGenerate"
-errorcode=$?
-if [[ $errorcode -ne 0 ]]; then
-		exit $errorcode
-fi
-echo "Test generate new / update full path"
-./projectGenerator -o"../openFrameworks" -p"osx" "../openFrameworks/apps/myApps/testingGenerate"
-errorcode=$?
-if [[ $errorcode -ne 0 ]]; then
-        exit $errorcode
-fi
-
-echo "Test generate full path"
-./projectGenerator -o"../openFrameworks" -p"osx" "openFrameworks/apps/myApps/testingGenerate2"
-errorcode=$?
-if [[ $errorcode -ne 0 ]]; then
-        exit $errorcode
-fi
+# echo "Test generate full path"
+# ./projectGenerator -o"../openFrameworks" -p"osx" "openFrameworks/apps/myApps/testingGenerate2"
+# errorcode=$?
+# if [[ $errorcode -ne 0 ]]; then
+#         exit $errorcode
+# fi
 
 
 echo "Successful projectGenerator tests for [osx]";

@@ -310,9 +310,12 @@ void baseProject::addAddon(const std::string & _addonName){
     ofLogVerbose("baseProject::addAddon") << _addonName;
 //	alert( "baseProject::addAddon " + _addonName );
     
-//    auto addonName = ofAddon::cleanName(_addonName);
-	auto addonName = _addonName;
-
+	std::string addonName;
+	if(parseCleanName){
+		addonName = ofAddon::cleanName(_addonName);
+	} else {
+		addonName = _addonName;
+	}
 
     // FIXME : not target, yes platform.
 //#ifdef TARGET_WIN32

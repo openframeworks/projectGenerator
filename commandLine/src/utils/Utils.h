@@ -26,6 +26,7 @@ using std::cout;
 using std::endl;
 
 static bool backupProjectFiles = false;
+static bool parseCleanName = true;
 
 static std::map <ofTargetPlatform, std::string> platformsToString {
 	{ OF_TARGET_ANDROID, "android" },
@@ -54,6 +55,7 @@ static std::vector < std::string > platformsOptions {
 	"msys2",
 	"osx",
 	"vs",
+	"tvos",
 };
 
 string generateUUID(const string & input);

@@ -28,7 +28,8 @@ enum optionIndex { UNKNOWN,
 	GET_HOST_PLATFORM,
 	COMMAND,
 	BACKUP_PROJECT_FILES,
-	FRAMEWORKS
+	FRAMEWORKS,
+	CLEANNAME_DISABLE
 };
 
 constexpr option::Descriptor usage[] = {
@@ -50,6 +51,8 @@ constexpr option::Descriptor usage[] = {
 	{ BACKUP_PROJECT_FILES, 0, "b", "backup", option::Arg::None, "  --backup, -b  \tbackup project files when replacing with template" },
 	
 	{ FRAMEWORKS, 0, "f", "frameworks", option::Arg::Optional, "  --frameworks, -f  \tframeworks list (such as Vision,ARKit)" },
+	
+	{ CLEANNAME_DISABLE, 0, "n", "cleanname", option::Arg::Optional, "  --cleanname, -f  \tcleanname" },
 
 	{ 0, 0, 0, 0, 0, 0 }
 };
@@ -90,6 +93,7 @@ bool bHelpRequested; // did we request help?
 bool bListTemplates; // did we request help?
 bool bDryRun; // do dry run (useful for debugging recursive update)
 bool bBackup;
+bool bCleanName = true;
 
 void consoleSpace() {
 	std::cout << std::endl;
@@ -462,6 +466,11 @@ int main(int argc, char ** argv) {
 	if (options[DRYRUN].count() > 0) {
 		bDryRun = true;
 	}
+	
+	if (options[CLEANNAME_DISABLE].count() > 0) {
+		bCleanName = false;
+	}
+	parseCleanName = bCleanName;
 
 	if (options[VERSION].count() > 0) {
 		printVersion();

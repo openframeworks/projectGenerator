@@ -100,7 +100,7 @@ bool xcodeProject::createProjectFile(){
 		   for (auto & f : {"openFrameworks-Info.plist", "of.entitlements"}) {
 			   copyTemplateFiles.push_back({normalizePath(templatePath / f), normalizePath(projectDir / f)});
 		   }
-	   } else if (target == "ios" || target == "macos") {
+	   } else if (target == "ios" || target == "tvos" || target == "visionos" || target == "catos" || target == "macos") {
 		   for (auto & f : {"ofxiOS-Info.plist", "ofxiOS_Prefix.pch"}) {
 			   copyTemplateFiles.push_back({normalizePath(templatePath / f), normalizePath(projectDir / f)});
 			   try {
@@ -420,11 +420,7 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 	fp.addToBuildPhase = true;
 	fp.isSrc = true;
 
-//	if( type == DEFAULT ){
-	if( target == "ios" ){
-		fp.addToBuildPhase	= true;
-		fp.addToResources = true;
-	}
+if( type == DEFAULT ){
 
 	if (ext == ".h" || ext == ".hpp"){
 		fp.addToBuildPhase = false;
@@ -450,44 +446,93 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 		fp.addToBuildPhase	= false;
 		fp.copyBundleResources = true;
 	}
+	else if( ext == ".plist" ){
+		fp.addToBuildPhase	= true;
+		fp.copyBundleResources = true;
+	}
+	else if (ext == ".swift"){
+		fp.addToBuildPhase = true;
+		for (auto &c : buildConfigs) {
+			addCommand("Add :objects:" + c + ":buildSettings:OTHER_SWIFT_FLAGS: string -cxx-interoperability-mode=swift-5.9");
+			// mark all Swift files as C++ interop available :)
+		}
+	}
+	else if (ext == ".xcassets"){
+		fp.addToBuildResource = true;
+		fp.addToResources = true;
+	}
+	else if (ext == ".modulemap") {
+		fp.addToBuildPhase = false;
+	}
+	else if (ext == ".bundle") {
+		fp.addToBuildResource = true;
+		fp.addToResources = true;
+	}
+	else if (ext == ".tbd") {
+		fp.linkBinaryWithLibraries = true;
+	}
 
 
-	//	}
-
-
+}
 	string UUID {
 		addFile(srcFile, folder, fp)
 	};
 
 	if (ext == ".mm" || ext == ".m") {
 		addCompileFlagsForMMFile(srcFile);
+	} else if (ext == ".cpp") {
+		if (containsObjectiveCPlusPlus(srcFile)) {
+			addCompileFlagsForMMFile(srcFile);
+		}
 	}
 }
 
 void xcodeProject::addCompileFlagsForMMFile(const fs::path & srcFile) {
 
-	// This requires a moro thorough inspection on how to deal with these files, and determine if these need the -fno-objc-arc flag.
-	// This flag should be added on a file by file basis, rather than the way it is done below where these are added globally, as such messes up other things.
+	std::ifstream file(srcFile);
+	if (!file.is_open()) return;
 
-//	std::ifstream file(srcFile);
-//	std::string line;
-//	bool containsARCFunctions = false;
-//#if __APPLE__
-//	std::regex arcRegex(R"(\b(alloc|dealloc)\b)");
-//
-//	while (std::getline(file, line)) {
-//		if (std::regex_search(line, arcRegex)) {
-//			containsARCFunctions = true;
-//			break;
-//		}
-//	}
-//#endif
-//	if (containsARCFunctions) {
-//		for (auto & c : buildConfigs) {
-//			addCommand("Add :objects:"+c+":buildSettings:OTHER_CPLUSPLUSFLAGS: string -fno-objc-arc");
-//		}
-//	}
+		bool requiresNoARC = false;
 
+		// Named regex for detecting ARC-related function calls in Objective-C++
+		const std::regex arcFunctionRegex(R"(\b(alloc|dealloc|retain|release|autorelease)\b)");
+
+		for (std::string line; std::getline(file, line); ) {
+			if (std::regex_search(line, arcFunctionRegex)) {
+				requiresNoARC = true;
+				break;
+			}
+		}
+
+		// Tag file as Objective-C++ in Xcode build settings
+		for (auto & c : buildConfigs) {
+			addCommand("Add :objects:" + c + ":buildSettings:OTHER_CPLUSPLUSFLAGS: string -x objective-c++");
+			
+			if (requiresNoARC) {
+				addCommand("Add :objects:" + c + ":buildSettings:OTHER_CPLUSPLUSFLAGS: string -fno-objc-arc");
+			}
+		}
+
+}
+
+bool xcodeProject::containsObjectiveCPlusPlus(const fs::path &filePath) {
+	std::ifstream file(filePath);
+	if (!file.is_open()) return false;
+
+	// Objective-C++ specific keywords to check -- this will fix the really hard to debug objc++ linking obiguous
+	std::vector<std::string> objcKeywords = {
+		"#import", "@interface", "@implementation", "@property",
+		"@synthesize", "@end"
+	};
+
+	for (std::string line; std::getline(file, line); ) {
+		for (const auto &keyword : objcKeywords) {
+			if (line.find(keyword) != std::string::npos) {
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 

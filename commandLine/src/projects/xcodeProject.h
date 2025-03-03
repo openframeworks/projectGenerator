@@ -3,6 +3,10 @@
 #include "baseProject.h"
 //#include <unordered_map>
 #include <map>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <regex>
 using std::string;
 
 class xcodeProject : public baseProject {
@@ -53,6 +57,8 @@ protected:
 	void addFramework(const fs::path & path, const fs::path & folder, bool isRelativeToSDK = false) override;
 	void addXCFramework(const fs::path & path, const fs::path & folder);
 	void addDylib(const fs::path & path, const fs::path & folder);
+	
+	bool containsObjectiveCPlusPlus(const fs::path &filePath);
 
 	void saveScheme();
 	void renameProject();
