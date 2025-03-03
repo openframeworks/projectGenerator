@@ -435,7 +435,7 @@ unique_ptr<baseProject> getTargetProject(const string & targ) {
 //	cout << "getTargetProject :" << getTargetString(targ) << endl;
 //	typedef xcodeProject pgProject;
 
-	if (targ == "osx" || targ == "ios" || targ == "macos") {
+	if (targ == "osx" || targ == "ios" || targ == "macos" || targ == "tvos" || targ == "catos" || targ == "visionos" || targ == "watchos") {
 		return unique_ptr<xcodeProject>(new xcodeProject(targ));
 	} else if (targ == "msys2") {
 //		return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));

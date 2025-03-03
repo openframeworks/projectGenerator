@@ -55,6 +55,7 @@ static std::vector < std::string > platformsOptions {
 	"msys2",
 	"osx",
 	"vs",
+	"tvos",
 };
 
 string generateUUID(const string & input);

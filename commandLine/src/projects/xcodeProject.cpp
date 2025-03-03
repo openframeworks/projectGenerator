@@ -100,7 +100,7 @@ bool xcodeProject::createProjectFile(){
 		   for (auto & f : {"openFrameworks-Info.plist", "of.entitlements"}) {
 			   copyTemplateFiles.push_back({normalizePath(templatePath / f), normalizePath(projectDir / f)});
 		   }
-	   } else if (target == "ios" || target == "macos") {
+	   } else if (target == "ios" || target == "tvos" || target == "visionos" || target == "catos" || target == "macos") {
 		   for (auto & f : {"ofxiOS-Info.plist", "ofxiOS_Prefix.pch"}) {
 			   copyTemplateFiles.push_back({normalizePath(templatePath / f), normalizePath(projectDir / f)});
 			   try {
