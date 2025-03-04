@@ -453,7 +453,7 @@ if( type == DEFAULT ){
 	else if (ext == ".swift"){
 		fp.addToBuildPhase = true;
 		for (auto &c : buildConfigs) {
-			addCommand("Add :objects:" + c + ":buildSettings:OTHER_SWIFT_FLAGS: string -cxx-interoperability-mode=swift-5.9");
+			addCommand("Add :objects:" + c + ":buildSettings:OTHER_SWIFT_FLAGS: string " + "-cxx-interoperability-mode=swift-5.9");
 			// mark all Swift files as C++ interop available :)
 		}
 	}
@@ -506,10 +506,10 @@ void xcodeProject::addCompileFlagsForMMFile(const fs::path & srcFile) {
 
 		// Tag file as Objective-C++ in Xcode build settings
 		for (auto & c : buildConfigs) {
-			addCommand("Add :objects:" + c + ":buildSettings:OTHER_CPLUSPLUSFLAGS: string -x objective-c++");
+//			addCommand("Add :objects:" + c + ":buildSettings:OTHER_CPLUSPLUSFLAGS: string " + "-xobjective-c++");
 			
 			if (requiresNoARC) {
-				addCommand("Add :objects:" + c + ":buildSettings:OTHER_CPLUSPLUSFLAGS: string -fno-objc-arc");
+				addCommand("Add :objects:" + c + ":buildSettings:OTHER_CPLUSPLUSFLAGS: string " + "-fno-objc-arc");
 			}
 		}
 
