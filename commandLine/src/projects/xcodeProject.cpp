@@ -10,7 +10,6 @@
 #include <iostream>
 
 using nlohmann::json;
-// using nlohmann::json_pointer;
 
 string xcodeProject::LOG_NAME = "xcodeProjectFile";
 
