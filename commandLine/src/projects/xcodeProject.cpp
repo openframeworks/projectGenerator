@@ -549,7 +549,7 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder, 
 	fp.codeSignOnCopy = !isRelativeToSDK;
 	fp.copyFilesBuildPhase = !isRelativeToSDK;
 	fp.isRelativeToSDK = isRelativeToSDK;
-	fp.frameworksBuildPhase = (target != "ios" && !folder.empty());
+	fp.frameworksBuildPhase = !folder.empty();
 
 	string UUID;
 	if (isRelativeToSDK) {
@@ -886,7 +886,7 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 			addCommand("Add :objects:E4B69B590A3A1756003C02F2:files: string " + tempUUID);
 		}
 
-		if (path.extension() == ".framework") {
+		if (path.extension() == ".framework" || path.extension() == ".xcframework") {
 			addCommand("# ---- Frameworks Folder " + UUID);
 			addCommand("Add :objects:901808C02053638E004A7774:children: string " + UUID);
 
