@@ -32,7 +32,7 @@ protected:
 		bool linkBinaryWithLibraries = false;
 		bool addToBuildResource = false;
 		bool addToResources = false;
-		bool frameworksBuildPhase = false;
+//		bool frameworksBuildPhase = false;
 		bool isSrc = false;
 		bool isGroupWithoutFolder = false;
 		bool isRelativeToSDK = false;
@@ -57,7 +57,7 @@ protected:
 	void addFramework(const fs::path & path, const fs::path & folder, bool isRelativeToSDK = false) override;
 	void addXCFramework(const fs::path & path, const fs::path & folder);
 	void addDylib(const fs::path & path, const fs::path & folder);
-	
+
 	bool containsObjectiveCPlusPlus(const fs::path &filePath);
 
 	void saveScheme();
@@ -68,7 +68,7 @@ protected:
 
 	string projRootUUID;
 	string resourcesUUID;
-	string frameworksUUID;
+//	string frameworksUUID;
 	string copyBundleResourcesUUID;
 	string afterPhaseUUID;
 	string buildPhasesUUID;
@@ -129,5 +129,8 @@ protected:
 
 		{ ".storyboard" , "wrapper.storyboard" },
 	};
+
+	// other uuid strings can be ported to here.
+	std::map<string, string> uuidMap;
 
 };
