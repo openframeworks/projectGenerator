@@ -530,7 +530,6 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder, 
 				addCommand("Add :objects:" + c + ":buildSettings:FRAMEWORK_SEARCH_PATHS: string " + parent);
 			}
 			if (path.extension() == ".xcframework") {
-				fp.addToBuildPhase = true;
 				addCommand("Add :objects:" + c + ":buildSettings:XCFRAMEWORK_SEARCH_PATHS: string " + parent);
 			}
 		}
