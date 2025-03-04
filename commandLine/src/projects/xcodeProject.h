@@ -130,6 +130,7 @@ protected:
 		{ ".storyboard" , "wrapper.storyboard" },
 	};
 
+	// other uuid strings can be ported to here.
 	std::map<string, string> uuidMap;
 
 };
