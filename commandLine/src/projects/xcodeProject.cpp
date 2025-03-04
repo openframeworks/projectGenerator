@@ -696,7 +696,7 @@ void xcodeProject::addAddonFrameworks(const ofAddon& addon){
 	
 	allFrameworks.reserve( addon.frameworks.size() + addon.xcframeworks.size() );
 	allFrameworks.insert( allFrameworks.end(), addon.frameworks.begin(), addon.frameworks.end() );
-//	allFrameworks.insert( allFrameworks.end(), addon.xcframeworks.begin(), addon.xcframeworks.end() );
+	allFrameworks.insert( allFrameworks.end(), addon.xcframeworks.begin(), addon.xcframeworks.end() );
 
 	for (auto & f : allFrameworks) {
 //    for (auto & f : addon.frameworks) {
