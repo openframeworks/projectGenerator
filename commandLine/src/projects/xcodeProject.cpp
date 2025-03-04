@@ -508,9 +508,9 @@ void xcodeProject::addCompileFlagsForMMFile(const fs::path & srcFile) {
 		for (auto & c : buildConfigs) {
 //			addCommand("Add :objects:" + c + ":buildSettings:OTHER_CPLUSPLUSFLAGS: string " + "-xobjective-c++");
 			
-			if (requiresNoARC) {
-				addCommand("Add :objects:" + c + ":buildSettings:OTHER_CPLUSPLUSFLAGS: string " + "-fno-objc-arc");
-			}
+//			if (requiresNoARC) {
+//				addCommand("Add :objects:" + c + ":buildSettings:OTHER_CPLUSPLUSFLAGS: string " + "-fno-objc-arc");
+//			}
 		}
 
 }
