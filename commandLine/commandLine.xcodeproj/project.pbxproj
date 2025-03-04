@@ -297,6 +297,8 @@
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
+			files = (
+			);
 			name = "Run Script";
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -491,7 +493,7 @@
 				OTHER_LDFLAGS = (
 					"$(OF_CORE_LIBS)",
 					"$(OF_CORE_FRAMEWORKS)",
-					"$(LIB_OF)",
+					"$(LIB_OF_RELEASE)",
 				);
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				baseConfigurationReference = E4EB6923138AFD0F00A09F29;
