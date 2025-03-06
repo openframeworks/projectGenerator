@@ -33,7 +33,9 @@ void ofAddon::getFrameworksRecursively(const fs::path & path, string platform) {
 						frameworks.emplace_back(f.string());
 					}
 					if (f.extension() == ".xcframework") {
+						if( platform != "macos" && platform != "osx" ){ //we don't want to add xcFrameworks for osx and just treat them like lib folders
 						xcframeworks.emplace_back(f.string());
+						}
 					}
 				}
 			}
