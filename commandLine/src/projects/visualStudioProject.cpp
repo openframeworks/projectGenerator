@@ -669,13 +669,9 @@ void visualStudioProject::addAddonIncludePaths(const ofAddon& addon) {
 			addInclude(dir.string());
 		} else{
 			fs::path normalizedDir = normalizePath(dir);
-			if (containsSourceFiles(normalizedDir)) {
-				normalizedDir = makeRelative(projectDir, dir);
-				ofLogVerbose() << "[vsproject]-uniqueIncludeDirs] contains src - Adding dir:: [" << normalizedDir.string() << "]";
-				addInclude(normalizedDir);
-			} else {
-				ofLogVerbose() << "[vsproject]-uniqueIncludeDirs] no src - not adding [" << normalizedDir.string() << "]";
-			}
+			normalizedDir = makeRelative(projectDir, dir);
+			ofLogVerbose() << "[vsproject]-uniqueIncludeDirs] Adding dir:: [" << normalizedDir.string() << "]";
+			addInclude(normalizedDir);
 		}
 	}
 }

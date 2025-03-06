@@ -825,32 +825,15 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 			}
 		}
 
-		// needed or the same?
-//		  if (fp.linkBinaryWithLibraries) { // Link Binary With Libraries
-//		  	addCommand("# --- linkBinaryWithLibraries");
-//		  	addCommand("Add :objects:" + uuidMap["linkBinaryWithLibraries"] + ":files: string " + buildUUID);
-//		  	alert (commands.back(), 95);
-//		  }
-
-//		if (fp.frameworksBuildPhase) { // Link Binary With Libraries
 		 if (fp.linkBinaryWithLibraries) { // Link Binary With Libraries
-			 auto tempUUID = generateUUID(ofPathToString(path) + "-InFrameworks");
-			 addCommand("Add :objects:" + tempUUID + ":fileRef string " + UUID);
-			 addCommand("Add :objects:" + tempUUID + ":isa string PBXBuildFile");
-		 	addCommand("# --- linkBinaryWithLibraries PBXFrameworksBuildPhase");
-//			 uuidMap["linkBinaryWithLibraries"] = "E4B69B590A3A1756003C02F2";
-		 	addCommand("Add :objects:" + uuidMap["linkBinaryWithLibraries"] + ":files: string " + tempUUID);
-			 alert (commands.back(), 96);
+			auto tempUUID = generateUUID(ofPathToString(path) + "-InFrameworks");
+			addCommand("Add :objects:" + tempUUID + ":fileRef string " + UUID);
+			addCommand("Add :objects:" + tempUUID + ":isa string PBXBuildFile");
+			addCommand("# --- linkBinaryWithLibraries PBXFrameworksBuildPhase");
+			//			 uuidMap["linkBinaryWithLibraries"] = "E4B69B590A3A1756003C02F2";
+			addCommand("Add :objects:" + uuidMap["linkBinaryWithLibraries"] + ":files: string " + tempUUID);
+			alert (commands.back(), 96);
 		 }
-
-
-	//		if ( path.extension() == ".framework" || path.extension() == ".xcframework" ) {
-			// addCommand("# ---- Frameworks Folder " + UUID);
-			// addCommand("Add :objects:901808C02053638E004A7774:children: string " + UUID);
-
-//			addCommand("# ---- PBXFrameworksBuildPhase " + buildUUID);
-//			addCommand("Add :objects:1D60588F0D05DD3D006BFB54:files: string " + buildUUID);
-//		}
 	}
 	return UUID;
 }
