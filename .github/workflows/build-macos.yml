@@ -63,6 +63,10 @@ jobs:
       - name: Setup CI setup environment / checkout oF
         run: |
           ./scripts/osx/ci_install_core.sh
+
+      - name: build_cmdline.sh
+        run: |
+          ./scripts/osx/build_cmdline.sh
       - name: Build PG macOS GUI and command line
         run: |
           # Move up one level to projectGenerator directory

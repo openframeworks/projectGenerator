@@ -38,7 +38,11 @@ echoDots(){
 
 package_app(){
 	if [[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
-		echo "package_app --"
+        echo "package_app --"
+    else
+        echo "package_app not on master/bleeding so will not package app"
+        return
+    fi
 		PLATFORM=$1
 		# Copy commandLine into electron .app
 		cd ${PG_DIR}
@@ -97,9 +101,6 @@ package_app(){
 		pwd
 		ls
 		echo "-------------"
-	else
-		echo "package_app not on master/bleeding so will not package app"	
-	fi
 }
 
 
@@ -210,19 +211,6 @@ echo "##[group]build_frontend"
 ${CURRENT_DIR}/build_frontend.sh
 echo "##[endgroup]"
 
-echo "##[group]build_frontend"
-${CURRENT_DIR}/build_frontend_arm64.sh
-echo "##[endgroup]"
-
-echo "Current directory: (should be projectGenerator)"
-pwd
-echo "Directory contents:"
-ls
-
-if [ -d "${PG_DIR}/projectGenerator-osx" ]; then
-	rm -rf ${PG_DIR}/projectGenerator-osx
-fi
-
 cd ${PG_DIR}
 echo "Current directory: (should be apps/projectGenerator)"
 pwd
@@ -235,6 +223,20 @@ echo "-------------"
 echo "  package_app osx"
 package_app osx
 
+echo "Current directory: (should be projectGenerator)"
+pwd
+echo "Directory contents:"
+ls
+
+if [ -d "${PG_DIR}/projectGenerator-osx" ]; then
+    rm -rf ${PG_DIR}/projectGenerator-osx
+fi
+
+cd ${CURRENT_DIR}
+
+echo "##[group]build_frontend"
+${CURRENT_DIR}/build_frontend_arm64.sh
+echo "##[endgroup]"
 
 # Clean up any previous arm64 packaging folder
 if [ -d "${PG_DIR}/projectGenerator-mac-arm64" ]; then
@@ -247,7 +249,6 @@ pwd
 echo "Directory contents:"
 ls
 echo "-------------"
-# Move the arm64 build folder to a dedicated folder for packaging
 mv frontend/dist/mac-arm64 ${PG_DIR}/projectGenerator-mac-arm64
 
 echo "-------------"
