@@ -138,7 +138,7 @@ public:
 	ofAddon() = default;
 	ofAddon(const ofAddon& other);
 
-	void getFrameworksRecursively(const fs::path & path, string platform = "");
+	void getFrameworksRecursively(const fs::path & path, string platform, string packageTarget = "");
 
 	static string cleanName(const string& name);
 

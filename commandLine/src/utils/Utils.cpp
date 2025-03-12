@@ -321,7 +321,7 @@ void getDllsRecursively(const fs::path & path, std::vector<fs::path> & dlls, str
 }
 
 
-void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFiles, std::vector < LibraryBinary > & libLibs, string platform, string arch, string target) {
+void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFiles, std::vector < LibraryBinary > & libLibs, string platform, string arch, string target, string actualTarget ) {
 //	alert ("getLibsRecursively " + path.string(), 34);
 //	alert ("platform " + platform, 34);
 //	alert ("arch " + arch, 34);
@@ -341,7 +341,7 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 
 		if (fs::is_directory(f)) {
 			// on osx, framework is a directory, let's not parse it....
-			if ((f.extension() == ".framework") || (f.extension() == ".xcframework" && (platform != "osx" && platform != "macos")) ) { //we want to treat .xcframeworks as regular libs for macos
+			if ((f.extension() == ".framework") || (f.extension() == ".xcframework" && (actualTarget != "osx" && actualTarget != "macos")) ) { //we want to treat .xcframeworks as regular libs for macos
 				it.disable_recursion_pending();
 				continue;
 			} 
