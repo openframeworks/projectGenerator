@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-
-# Script for CI / BOTS 
+# ci_install_core.sh
+# Script for CI / BOTS
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SCRIPT_DIR="$( cd "$( dirname "${CURRENT_DIR}"/../../ )" && pwd )"

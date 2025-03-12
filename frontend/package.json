@@ -1,7 +1,7 @@
 {
   "name": "projectGenerator",
   "productName": "projectGenerator",
-  "version": "0.67.0",
+  "version": "0.95.0",
   "description": "Build electron GUI openFrameworks projectGenerator",
   "license": "MIT",
   "main": "index.js",
@@ -11,14 +11,14 @@
     "url": "https://openframeworks.cc"
   },
   "engines": {
-    "node": ">=20.14.0"
+    "node": ">=23.9.0"
   },
   "scripts": {
     "start": "electron .",
     "start:prod": "electron .",
     "dist": "electron-builder",
     "dist:mac:x64": " electron-builder --mac --x64 --publish never",
-    "dist:mac:arm64": " electron-builder --mac --arm64 --publish never",
+    "dist:mac:arm64": " electron-builder --macos --arm64 --publish never",
     "dist:mac:universal": " electron-builder --mac --universal --publish never",
     "dist:win64": "electron-builder --win --x64 --publish never",
     "dist:win:arm64": "electron-builder --win --arm64 --publish never", 
@@ -27,7 +27,7 @@
     "dist:linux32": "electron-builder --linux --ia32 --publish never",
     "dist:linux:armv7l": "electron-builder --linux --armv7l --publish never",
     "dist:linux:arm64": "electron-builder --linux --arm64 --publish never",
-    "build:linux64": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=25.3.0 --platform=linux --arch=x64"
+    "build:linux64": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=35.0.1 --platform=linux --arch=x64"
   },
   "build": {
     "appId": "cc.openframeworks.projectGenerator",
@@ -93,14 +93,14 @@
     "electron-app"
   ],
   "dependencies": {
-    "@types/jquery": "^3.5.30",
+    "@types/jquery": "^3.5.32",
     "modclean": "^3.0.0-beta.1",
     "moniker": "^0.1.2",
     "n-readlines": "^1.0.1"
   },
   "devDependencies": {
-    "electron": "^31.2.0",
-    "electron-builder": "^24.13.3",
-    "@electron/packager": "^18.3.3"
+    "electron": "^35.0.1",
+    "electron-builder": "^25.1.8",
+    "@electron/packager": "^18.3.6"
   }
 }
