@@ -13,7 +13,7 @@
 
 
 
-void ofAddon::getFrameworksRecursively(const fs::path & path, string platform) {
+void ofAddon::getFrameworksRecursively(const fs::path & path, string platform, string packageTarget) {
 //	alert ("getFrameworksRecursively for " + platform + " : " + path.string(), 34);
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
 
@@ -33,7 +33,7 @@ void ofAddon::getFrameworksRecursively(const fs::path & path, string platform) {
 						frameworks.emplace_back(f.string());
 					}
 					if (f.extension() == ".xcframework") {
-						if( platform != "macos" && platform != "osx" ){ //we don't want to add xcFrameworks for osx and just treat them like lib folders
+						if( packageTarget == "ios" || packageTarget == "tvos" ){ //we don't want to add xcFrameworks for osx and just treat them like lib folders
 						xcframeworks.emplace_back(f.string());
 						}
 					}
@@ -793,11 +793,13 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 
 	if (platform == "osx"  || platform == "macos" || platform == "ios" || platform == "tvos"){
 		// Horrible hack to make it work with the bad idea of renaming osx to macos
-		getLibsRecursively(libsPath, libFiles, libs, "macos");
-		getLibsRecursively(libsPath, libFiles, libs, "osx");
+		// Note: we have to pass the platform through so we can do different things for osx and ios/tvos target as they both use "macos" for some reason
+		getLibsRecursively(libsPath, libFiles, libs, "macos", "", "", platform);
+		getLibsRecursively(libsPath, libFiles, libs, "osx", "", "", platform);
 
-		getFrameworksRecursively(libsPath, "macos");
-		getFrameworksRecursively(libsPath, "osx");
+		// Note: we have to pass the platform through so we can do different things for osx and ios/tvos target as they both use "macos" for some reason
+		getFrameworksRecursively(libsPath, "macos", platform);
+		getFrameworksRecursively(libsPath, "osx", platform);
 //		getXCFrameworksRecursively(libsPath, "macos");
 //		getXCFrameworksRecursively(libsPath, "osx");
 
