@@ -118,13 +118,7 @@ jobs:
           fi
       - name: Test cmdline
         run: ../openFrameworks/apps/projectGenerator/scripts/osx/test_cmdline.sh
-      - name: Zip macOS arm64 Build
-        run: |
-          echo "Zipping arm64 build..."
-          cd dist/mac-arm64
-          zip -r ../projectGenerator-arm64.zip projectGenerator.app
-          cd ../..
-          ls -lah dist/
+
       - name: Update Release macOS
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
         uses: softprops/action-gh-release@v2.0.8
