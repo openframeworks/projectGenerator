@@ -37,12 +37,12 @@ echoDots(){
 }
 
 package_app(){
-	if [[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
-        echo "package_app --"
-    else
-        echo "package_app not on master/bleeding so will not package app"
-        return
-    fi
+	# if [[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
+    #     echo "package_app --"
+    # else
+    #     echo "package_app not on master/bleeding so will not package app"
+    #     return
+    # fi
 		PLATFORM=$1
 		# Copy commandLine into electron .app
 		cd ${PG_DIR}
