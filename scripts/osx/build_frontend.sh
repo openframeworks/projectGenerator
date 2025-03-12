@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# build_frontend.sh
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SCRIPT_DIR="$( cd "$( dirname "${CURRENT_DIR}"/../../ )" && pwd )"
 PG_DIR="$( cd "$( dirname "${SCRIPT_DIR}/../../" )" && pwd )"

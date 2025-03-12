@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+# ci_build_pg.sh
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SCRIPT_DIR="$( cd "$( dirname "${CURRENT_DIR}"/../../ )" && pwd )"
@@ -209,6 +210,10 @@ echo "##[group]build_frontend"
 ${CURRENT_DIR}/build_frontend.sh
 echo "##[endgroup]"
 
+echo "##[group]build_frontend"
+${CURRENT_DIR}/build_frontend_arm64.sh
+echo "##[endgroup]"
+
 echo "Current directory: (should be projectGenerator)"
 pwd
 echo "Directory contents:"
@@ -229,6 +234,25 @@ mv frontend/dist/mac-universal ${PG_DIR}/projectGenerator-osx
 echo "-------------"
 echo "  package_app osx"
 package_app osx
+
+
+# Clean up any previous arm64 packaging folder
+if [ -d "${PG_DIR}/projectGenerator-mac-arm64" ]; then
+    rm -rf ${PG_DIR}/projectGenerator-mac-arm64
+fi
+
+cd ${PG_DIR}
+echo "Current directory: (should be apps/projectGenerator)"
+pwd
+echo "Directory contents:"
+ls
+echo "-------------"
+# Move the arm64 build folder to a dedicated folder for packaging
+mv frontend/dist/mac-arm64 ${PG_DIR}/projectGenerator-mac-arm64
+
+echo "-------------"
+echo "  package_app mac-arm64"
+package_app mac-arm64
 
 # echo "package_app ios"
 # npm run build:macos > /dev/null
