@@ -70,6 +70,8 @@ ICON_FILE = $(OF_PATH)/libs/openFrameworksCompiled/project/osx/$(ICON_NAME)
 
 HIGH_RESOLUTION_CAPABLE = NO
 
+CONFIGURATION_BUILD_DIR = ${SRCROOT}/bin
+
 // Optional include to keep any permanent settings as CODE_SIGN_IDENTITY. 
 #include? "App.xcconfig"
 
