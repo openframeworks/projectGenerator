@@ -26,7 +26,7 @@ echo "FRONTEND_DIR:  ${FRONTEND_DIR}"
 echo "CMD_DIR:  ${CMDLINE_DIR}"
 
 
-BASE_DIR="${GITHUB_WORKSPACE:-${OF_DIR}}"
+BASE_DIR="${OF_DIR}"
 echo "BASE_DIR: ${BASE_DIR}"
 
 # Define OF_ROOT relative to BASE_DIR.
