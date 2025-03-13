@@ -81,9 +81,9 @@ echo "Intended destination for projectGenerator files:"
 echo "${OF_ROOT}/apps/projectGenerator"
 
 if command -v rsync &> /dev/null; then
-    rsync -avzp --exclude='.git/' --exclude='.ccache/' ${PG_DIR} ${OF_ROOT}/apps/projectGenerator
+    rsync -avzp --exclude='.git/' --exclude='.ccache/' ${PG_DIR}/ ${OF_ROOT}/apps/projectGenerator/
 else
-    cp -X ${PG_DIR}/ ${OF_ROOT}/apps/projectGenerator 2> /dev/null
+    cp -X ${PG_DIR}/ ${OF_ROOT}/apps/projectGenerator/ 2> /dev/null
 fi
 
 ls apps/projectGenerator

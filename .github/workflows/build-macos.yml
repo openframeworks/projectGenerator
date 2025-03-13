@@ -77,7 +77,7 @@ jobs:
           echo "Changing directory to openFrameworks..."
           cd ../openFrameworks
           echo "Now in: $(pwd)"
-          echo "Listing apps/projectGenerator/scripts/osx:"
+          echo "Listing apps/projectGenerator/:"
           ls -lah apps/projectGenerator/
 
           echo "Executing build_cmdline.sh:"
