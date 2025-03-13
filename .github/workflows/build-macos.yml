@@ -71,7 +71,12 @@ jobs:
 
       - name: build_cmdline.sh
         run: |
-          cd ../openFrameworks
+          echo "build_cmdline.sh: $(pwd) "
+          cd ../
+          echo "build_cmdline.sh: ../ $(pwd) "
+          ls
+          cd openFrameworks/
+          echo "build_cmdline.sh: ../openFrameworks $(pwd) "
           ./apps/projectGenerator/scripts/osx/build_cmdline.sh
       - name: Build PG macOS GUI and command line
         run: |
