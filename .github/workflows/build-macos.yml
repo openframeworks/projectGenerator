@@ -135,6 +135,11 @@ jobs:
           else
             echo "projectGenerator-osx.zip NOT found at level 0"
           fi
+          if [ -f "projectGenerator-osx-arm64.zip" ]; then
+            echo "projectGenerator-osx-arm64.zip found at level 0"
+          else
+            echo "projectGenerator-osx-arm64.zip NOT found at level 0"
+          fi
       - name: Test cmdline
         run: ../openFrameworks/apps/projectGenerator/scripts/osx/test_cmdline.sh
 
