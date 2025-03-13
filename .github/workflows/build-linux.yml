@@ -85,6 +85,28 @@ jobs:
           pwd
           ls
 
+      - name: Build and Package projectGenerator Linux GUI
+        shell: bash
+        run: |
+          cd ../openFrameworks/apps/projectGenerator/frontend
+          npm install
+          npm update
+          npm run dist:linux:arm64
+          cd dist
+          pwd
+          ls
+
+      - name: Build and Package projectGenerator Linux GUI
+        shell: bash
+        run: |
+          cd ../openFrameworks/apps/projectGenerator/frontend
+          npm install
+          npm update
+          npm run dist:linux:armv7l
+          cd dist
+          pwd
+          ls
+
       - name: List output frontend dist dir
         run: ls -lah ./../openFrameworks/apps/projectGenerator/frontend/dist
 
