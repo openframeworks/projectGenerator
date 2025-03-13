@@ -64,9 +64,15 @@ jobs:
         run: |
           ./scripts/osx/ci_install_core.sh
 
+      - name: List Repository Structure
+        run: |
+          echo "GITHUB_WORKSPACE is: $GITHUB_WORKSPACE"
+          ls -lah $GITHUB_WORKSPACE
+
       - name: build_cmdline.sh
         run: |
-          ./openFrameworks/apps/projectGenerator/scripts/osx/build_cmdline.sh
+          cd ../openFrameworks
+          ./apps/projectGenerator/scripts/osx/build_cmdline.sh
       - name: Build PG macOS GUI and command line
         run: |
           # Move up one level to projectGenerator directory
@@ -129,7 +135,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
-          files: dist/projectGenerator-mac-arm64.zip
+          files: projectGenerator-mac-arm64.zip
       - name: Update Release macOS
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
         uses: softprops/action-gh-release@v2.0.8
