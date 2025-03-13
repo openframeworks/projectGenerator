@@ -63,6 +63,25 @@ jobs:
       - name: Setup CI setup environment / checkout oF
         run: |
           ./scripts/osx/ci_install_core.sh
+
+      - name: List Repository Structure
+        run: |
+          echo "GITHUB_WORKSPACE is: $GITHUB_WORKSPACE"
+          ls -lah $GITHUB_WORKSPACE
+
+      - name: build_cmdline.sh
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Listing repository root:"
+          ls -lah ..
+          echo "Changing directory to openFrameworks..."
+          cd ../openFrameworks
+          echo "Now in: $(pwd)"
+          echo "Listing apps/projectGenerator/:"
+          ls -lah apps/projectGenerator/
+
+          echo "Executing build_cmdline.sh:"
+          ./apps/projectGenerator/scripts/osx/build_cmdline.sh
       - name: Build PG macOS GUI and command line
         run: |
           # Move up one level to projectGenerator directory
@@ -116,6 +135,11 @@ jobs:
           else
             echo "projectGenerator-osx.zip NOT found at level 0"
           fi
+          if [ -f "projectGenerator-osx-arm64.zip" ]; then
+            echo "projectGenerator-osx-arm64.zip found at level 0"
+          else
+            echo "projectGenerator-osx-arm64.zip NOT found at level 0"
+          fi
       - name: Test cmdline
         run: ../openFrameworks/apps/projectGenerator/scripts/osx/test_cmdline.sh
 
@@ -125,7 +149,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
-          files: dist/projectGenerator-mac-arm64.zip
+          files: projectGenerator-mac-arm64.zip
       - name: Update Release macOS
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
         uses: softprops/action-gh-release@v2.0.8

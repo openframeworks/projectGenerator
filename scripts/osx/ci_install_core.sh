@@ -1,19 +1,23 @@
 #!/bin/bash
 set -e
 
-# ci_install_core.sh
+
 # Script for CI / BOTS
 
+ORIGINAL_DIR=$(pwd)
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SCRIPT_DIR="$( cd "$( dirname "${CURRENT_DIR}"/../../ )" && pwd )"
 PG_DIR="$( cd "$( dirname "${SCRIPT_DIR}/../../" )" && pwd )"
 
-OF_DIR="$( cd "$( dirname "${PG_DIR}/../../../" )" && pwd )"
+OF_DIR="$( cd "$( dirname "${PG_DIR}/../../" )" && pwd )"
 
 FRONTEND_DIR="$( cd "$( dirname "${PG_DIR}/frontend" )" && pwd )"
 
 CMDLINE_DIR="$( cd "$( dirname "${PG_DIR}/commandLine" )" && pwd )"
 
+cd "$CURRENT_DIR"
+
+ls -ld $(pwd)
 
 echo "CURRENT_DIR:  ${CURRENT_DIR}"
 echo "SCRIPT_DIR:  ${SCRIPT_DIR}"
@@ -21,37 +25,29 @@ echo "PG_DIR:  ${PG_DIR}"
 echo "FRONTEND_DIR:  ${FRONTEND_DIR}"
 echo "CMD_DIR:  ${CMDLINE_DIR}"
 
-echo "SCRIPT dir:"
-pwd
 
-cd ../
+BASE_DIR="${OF_DIR}"
+echo "BASE_DIR: ${BASE_DIR}"
 
-OF_ROOT=${PWD}/openFrameworks
-
+# Define OF_ROOT relative to BASE_DIR.
+OF_ROOT="${BASE_DIR}/openFrameworks"
 echo "====== OF_DIR: ${OF_ROOT}"
 
-echo "Current directory:"
-pwd
-echo "Directory contents:"
-ls
+# List current directory to verify permissions.
+echo "Current directory: $(pwd)"
+ls -ld "$(pwd)"
 
-
-pg_root=${PWD}/openFrameworks/apps/projectGenerator
-pwd
-echo "ci setup - ${PWD}"
-ls
+# Now, clone if not already present.
 if [ -d "${OF_ROOT}/.git" ]; then
-	echo 'OF already cloned, using it'
-	cd ${OF_ROOT}
-	git pull
-	git submodule init
-	git submodule update --recursive
-	cd ..
+    echo 'OF already cloned, using it'
+    cd "${OF_ROOT}"
+    git pull
+    git submodule init
+    git submodule update --recursive
+    cd "${BASE_DIR}"
 else
-	echo "cloning of"
-	git clone --depth=1 https://github.com/openframeworks/openFrameworks
-	pwd 
-	ls
+    echo "cloning openFrameworks"
+    git clone --depth=1 https://github.com/openframeworks/openFrameworks "${OF_ROOT}"
 fi
 	
 cd ${OF_ROOT}
@@ -71,29 +67,28 @@ fi
 
 echo "ci install complete ---"
 
-echo "Current directory:  ---"
-pwd
-
-echo "Directory ../ contents:  ---"
-cd ../
-pwd
-ls
+echo "Current directory:  $(pwd) ---"
+echo "Directory ../ contents:  $(pwd) ---"
 echo "------------------"
 
-echo "copying pg to oF dir"
-pwd
+cd ${OF_ROOT}
+echo "Current directory: $(pwd)"
+echo "Directory contents:"
 ls
+
 echo "------------------"
-mkdir -p openFrameworks/apps/projectGenerator
+echo "Intended destination for projectGenerator files:"
+echo "${OF_ROOT}/apps/projectGenerator"
 
 if command -v rsync &> /dev/null; then
-	rsync -avzp --exclude='.git/' --exclude='.ccache/' projectGenerator/ openFrameworks/apps/projectGenerator/
+    rsync -avzp --exclude='.git/' --exclude='.ccache/' ${PG_DIR}/ ${OF_ROOT}/apps/projectGenerator/
 else
-	cp -X projectGenerator/ openFrameworks/apps/projectGenerator/ 2> /dev/null
+    cp -X ${PG_DIR}/ ${OF_ROOT}/apps/projectGenerator/ 2> /dev/null
 fi
 
-echo "------------------"
+ls apps/projectGenerator
 
 
 
+cd "$ORIGINAL_DIR"
 
