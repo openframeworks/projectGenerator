@@ -8,8 +8,7 @@
 #include "Utils.h"
 #include "ofUtils.h"
 
-#include "android2024.h"
-#include "androidStudioProject.h"
+#include "android.h"
 #include "CBWinProject.h"
 #include "visualStudioProject.h"
 #include "VSCodeProject.h"
@@ -449,12 +448,9 @@ unique_ptr<baseProject> getTargetProject(const string & targ) {
 			   targ == "linuxaarch64"
 			   ) {
 		return unique_ptr<VSCodeProject>(new VSCodeProject(targ));
-	} 
-	else if (targ == "android") {
-		return unique_ptr<AndroidStudioProject>(new AndroidStudioProject(targ));
 	}
-	else if (targ == "android2024") {
-		return unique_ptr<android2024Project>(new android2024Project(targ));
+	else if (targ == "android") {
+		return unique_ptr<androidProject>(new androidProject(targ));
 	} else if (targ == "vscode") {
 		return unique_ptr<VSCodeProject>(new VSCodeProject(targ));
 	} else if (targ == "qtcreator") {

@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		03433CF32BF3B842001412CF /* android2024.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 03433CF22BF3B842001412CF /* android2024.cpp */; };
+		03433CF32BF3B842001412CF /* android.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 03433CF22BF3B842001412CF /* android.cpp */; };
 		03B57CDD2AC5B1C6005F56E0 /* VSCodeProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 03B57CDB2AC5B1C6005F56E0 /* VSCodeProject.cpp */; };
 		"1A7D4C46-3FD3-4E35-9025-D0E93ECAD7DD" /* qtcreatorproject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "C5A3016A-B663-4FE7-B6E6-421C5F168447" /* qtcreatorproject.cpp */; };
 		"200CCA92-FAEE-4CEB-903B-ABB0D56B991F" /* ofAddon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "41F34CBC-2E3E-4C3D-B106-F9D6746B6FF0" /* ofAddon.cpp */; };
@@ -15,7 +15,6 @@
 		"317CCC6B-35DE-4343-B4DC-3C797333928C" /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "7F3C8ACE-56BA-44A0-B365-8499922F1F2C" /* Utils.cpp */; };
 		"4E6F0A21-B0FF-4E2A-AACF-E1910A0DDE78" /* CBWinProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "D8A84D0F-1123-44F7-9D8D-79F8E2A0BFF4" /* CBWinProject.cpp */; };
 		"653DA9D7-3254-4370-BF70-E18AF5925484" /* CBLinuxProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "546BDD51-ACDD-44C1-9C31-E1F3AD19A245" /* CBLinuxProject.cpp */; };
-		"7F2BBCD1-F22D-454A-9100-33D1C12BEA70" /* androidStudioProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "FFD740F7-8E04-4563-A856-D4E402AF9C0E" /* androidStudioProject.cpp */; };
 		"B07B8E19-F9DE-4E97-8833-859CD9267D30" /* LibraryBinary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "1EFA4702-B4F3-4556-9C12-4FE21FD503D0" /* LibraryBinary.cpp */; };
 		BF879F5D2C0F7CEB00200951 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF879F5C2C0F7CEB00200951 /* AVFoundation.framework */; };
 		BF879F5F2C0F7ED500200951 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF879F5E2C0F7ED500200951 /* Foundation.framework */; };
@@ -50,8 +49,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		03433CF12BF3B842001412CF /* android2024.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = android2024.h; sourceTree = "<group>"; };
-		03433CF22BF3B842001412CF /* android2024.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = android2024.cpp; sourceTree = "<group>"; };
+		03433CF12BF3B842001412CF /* android.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = android.h; sourceTree = "<group>"; };
+		03433CF22BF3B842001412CF /* android.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = android.cpp; sourceTree = "<group>"; };
 		03B57CDB2AC5B1C6005F56E0 /* VSCodeProject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VSCodeProject.cpp; sourceTree = "<group>"; };
 		03B57CDC2AC5B1C6005F56E0 /* VSCodeProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VSCodeProject.h; sourceTree = "<group>"; };
 		"0C9DC8B7-7304-4A82-BAED-18F7A422ECA1" /* xcodeProject.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = xcodeProject.h; path = src/projects/xcodeProject.h; sourceTree = SOURCE_ROOT; };
@@ -70,7 +69,6 @@
 		"52F09B38-455F-4FF2-8E8A-DCA504E2FE8D" /* baseProject.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = baseProject.h; path = src/projects/baseProject.h; sourceTree = SOURCE_ROOT; };
 		"546BDD51-ACDD-44C1-9C31-E1F3AD19A245" /* CBLinuxProject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = CBLinuxProject.cpp; path = src/projects/CBLinuxProject.cpp; sourceTree = SOURCE_ROOT; };
 		"7BB75687-3F31-4D10-BE6A-C7918D1A678D" /* visualStudioProject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = visualStudioProject.cpp; path = src/projects/visualStudioProject.cpp; sourceTree = SOURCE_ROOT; };
-		"7D752B3A-9B2F-45F6-94D3-60D5A9600B13" /* androidStudioProject.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = androidStudioProject.h; path = src/projects/androidStudioProject.h; sourceTree = SOURCE_ROOT; };
 		"7F3C8ACE-56BA-44A0-B365-8499922F1F2C" /* Utils.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = Utils.cpp; path = src/utils/Utils.cpp; sourceTree = SOURCE_ROOT; };
 		"9314E210-0C9D-4025-9840-CD8122E2DC3D" /* LibraryBinary.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = LibraryBinary.h; path = src/utils/LibraryBinary.h; sourceTree = SOURCE_ROOT; };
 		"9FAE80C7-5F2A-4E9D-9487-9E2667DE93DA" /* Utils.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = Utils.h; path = src/utils/Utils.h; sourceTree = SOURCE_ROOT; };
@@ -89,7 +87,6 @@
 		E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofApp.h; path = src/ofApp.h; sourceTree = SOURCE_ROOT; };
 		E4B6FCAD0C3E899E008CF71C /* openFrameworks-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "openFrameworks-Info.plist"; sourceTree = "<group>"; };
 		E4EB6923138AFD0F00A09F29 /* Project.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Project.xcconfig; sourceTree = "<group>"; };
-		"FFD740F7-8E04-4563-A856-D4E402AF9C0E" /* androidStudioProject.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = androidStudioProject.cpp; path = src/projects/androidStudioProject.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,10 +142,8 @@
 				"DDA07621-E95C-4267-B1B9-0127E0215328" /* CBLinuxProject.h */,
 				"D8A84D0F-1123-44F7-9D8D-79F8E2A0BFF4" /* CBWinProject.cpp */,
 				"1CFE3EC7-9370-47FF-A02D-1932663E6C10" /* CBWinProject.h */,
-				03433CF22BF3B842001412CF /* android2024.cpp */,
-				03433CF12BF3B842001412CF /* android2024.h */,
-				"FFD740F7-8E04-4563-A856-D4E402AF9C0E" /* androidStudioProject.cpp */,
-				"7D752B3A-9B2F-45F6-94D3-60D5A9600B13" /* androidStudioProject.h */,
+				03433CF22BF3B842001412CF /* android.cpp */,
+				03433CF12BF3B842001412CF /* android.h */,
 				"247AA402-B7FD-4D0C-BB21-F3A90A35ADE7" /* baseProject.cpp */,
 				"52F09B38-455F-4FF2-8E8A-DCA504E2FE8D" /* baseProject.h */,
 				"C5A3016A-B663-4FE7-B6E6-421C5F168447" /* qtcreatorproject.cpp */,
@@ -352,10 +347,9 @@
 				"200CCA92-FAEE-4CEB-903B-ABB0D56B991F" /* ofAddon.cpp in Sources */,
 				"653DA9D7-3254-4370-BF70-E18AF5925484" /* CBLinuxProject.cpp in Sources */,
 				"4E6F0A21-B0FF-4E2A-AACF-E1910A0DDE78" /* CBWinProject.cpp in Sources */,
-				"7F2BBCD1-F22D-454A-9100-33D1C12BEA70" /* androidStudioProject.cpp in Sources */,
 				"E79B31E1-CF27-4D77-B2F2-6AEC329A9F50" /* baseProject.cpp in Sources */,
 				"1A7D4C46-3FD3-4E35-9025-D0E93ECAD7DD" /* qtcreatorproject.cpp in Sources */,
-				03433CF32BF3B842001412CF /* android2024.cpp in Sources */,
+				03433CF32BF3B842001412CF /* android.cpp in Sources */,
 				"C2428661-BDEC-41D7-8150-C9BA5EE86C0C" /* visualStudioProject.cpp in Sources */,
 				"DBD7E2AC-672A-4FD9-B0A4-DF24111D17FB" /* xcodeProject.cpp in Sources */,
 				"B07B8E19-F9DE-4E97-8833-859CD9267D30" /* LibraryBinary.cpp in Sources */,
