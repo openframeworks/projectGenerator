@@ -53,6 +53,8 @@ jobs:
             echo "RELEASE=bleeding" >> $GITHUB_ENV
             echo "PRERELEASE=true" >> $GITHUB_ENV
           fi
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
       
       - name: Install
         run: ./scripts/linux/ci_install_core.sh
@@ -167,14 +169,9 @@ jobs:
           tag_name: ${{ env.RELEASE }}
           files: projectGenerator-linux-armv7l-gui.gz
 
-      - name: Extract Tag Name
-        run: |
-          TAG_NAME=${GITHUB_REF#refs/tags/}
-          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
-          echo "Detected Tag: ${TAG_NAME}"
-
       - name: Get Release ID for the Tag
         id: get_release
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
         run: |
           RELEASE_ID=$(curl -s \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
@@ -190,6 +187,7 @@ jobs:
           echo "Found Release ID: ${RELEASE_ID}"
 
       - name: Update Release Description
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
         run: |
           curl -X PATCH \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
