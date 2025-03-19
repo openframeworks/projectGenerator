@@ -2,9 +2,9 @@
 
 #include "baseProject.h"
 
-class AndroidStudioProject : public baseProject {
+class androidProject : public baseProject {
 public:
-	AndroidStudioProject(const std::string & target);
+	androidProject(const std::string & target);
 
     bool createProjectFile() override;
     void addInclude(const fs::path & includeName) override {}
@@ -16,8 +16,9 @@ public:
     void addAfterRule(const std::string& script) override {}
     void addDefine(const std::string& define, LibType libType = RELEASE_LIB) override {}
     
+    
     //TODO: not sure if the following function should return false. as it will stop the further execution in  baseProject::create and make it to return as it had failed.
 	bool loadProjectFile() override { return false; };
-	bool saveProjectFile() override { return false; };
+    bool saveProjectFile() override { return false; };
 	static std::string LOG_NAME;
 };

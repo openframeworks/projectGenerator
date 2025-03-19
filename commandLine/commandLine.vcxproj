@@ -264,8 +264,7 @@
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\addons\ofAddon.cpp" />
-    <ClCompile Include="src\projects\androidStudioProject.cpp" />
-    <ClCompile Include="src\projects\android2024.cpp" />
+    <ClCompile Include="src\projects\android.cpp" />
     <ClCompile Include="src\projects\baseProject.cpp" />
     <ClCompile Include="src\projects\CBLinuxProject.cpp" />
     <ClCompile Include="src\projects\CBWinProject.cpp" />
@@ -280,8 +279,7 @@
   <ItemGroup>
     <ClInclude Include="src\optionparser.h" />
     <ClInclude Include="src\addons\ofAddon.h" />
-    <ClInclude Include="src\projects\androidStudioProject.h" />
-    <ClInclude Include="src\projects\android2024.h" />
+    <ClInclude Include="src\projects\android.h" />
     <ClInclude Include="src\projects\baseProject.h" />
     <ClInclude Include="src\projects\CBLinuxProject.h" />
     <ClInclude Include="src\projects\CBWinProject.h" />
