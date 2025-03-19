@@ -167,22 +167,34 @@ jobs:
           tag_name: ${{ env.RELEASE }}
           files: projectGenerator-linux-armv7l-gui.gz
 
-       - name: Get Latest Nightly Release ID
+      - name: Extract Tag Name
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+          echo "Detected Tag: ${TAG_NAME}"
+
+      - name: Get Release ID for the Tag
         id: get_release
         run: |
           RELEASE_ID=$(curl -s \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/openframeworks/projectGenerator/releases | jq '.[] | select(.tag_name=="nightly") | .id')
+            https://api.github.com/repos/openframeworks/projectGenerator/releases | jq -r '.[] | select(.tag_name=="${{ env.TAG_NAME }}") | .id')
+
+          if [ -z "$RELEASE_ID" ]; then
+            echo "Release ID not found for tag: ${{ env.TAG_NAME }}"
+            exit 1
+          fi
+
           echo "RELEASE_ID=${RELEASE_ID}" >> $GITHUB_ENV
           echo "Found Release ID: ${RELEASE_ID}"
 
-      - name: Update Nightly Release Description
+      - name: Update Release Description
         run: |
           curl -X PATCH \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/openframeworks/projectGenerator/releases/${{ env.RELEASE_ID }} \
             -d '{
-              "body": "Updated nightly release: '"$(date '+%Y-%m-%d %H:%M:%S')"'"
+              "body": "Updated release for tag: ${{ env.TAG_NAME }} - '"$(date '+%Y-%m-%d %H:%M:%S')"'"
             }'
