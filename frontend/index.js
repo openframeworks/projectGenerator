@@ -1198,6 +1198,74 @@ ipcMain.on('checkMultiUpdatePath', (event, arg) => {
     }
 });
 
+function getVisualStudioPath(version) {
+    return new Promise((resolve, reject) => {
+        exec(`"C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe" -latest -prerelease -format json`, (error, stdout, stderr) => {
+            if (error) {
+                reject("vswhere.exe not found. Ensure Visual Studio is installed.");
+                return;
+            }
+
+            try {
+                const installations = JSON.parse(stdout);
+                const vsInstall = installations.find(install =>
+                    install.displayName.includes("Visual Studio") && install.catalog.productDisplayVersion.startsWith(version)
+                );
+
+                if (vsInstall) {
+                    resolve(path.join(vsInstall.installationPath, "Common7", "IDE", "devenv.exe"));
+                } else {
+                    reject(`No Visual Studio ${version} installation found.`);
+                }
+            } catch (parseError) {
+                reject("Error parsing vswhere output.");
+            }
+        });
+    });
+}
+
+async function openVisualStudio(windowsPath) {
+    console.log(`Opening project: ${windowsPath} in ${platform}`);
+
+    if (platform === 'vscode') {
+        console.log("Opening in VS Code...");
+        exec(`code "${windowsPath}"`, (error, stdout, stderr) => {
+            if (error) {
+                console.error("Could not open VS Code:", stderr);
+                console.log("Falling back to system handler...");
+                exec(`start "" "${windowsPath}"`);
+            }
+        });
+        return;
+    }
+
+    let isVS2019Project = false;
+    const solutionFile = path.join(path.dirname(windowsPath), path.basename(windowsPath));
+
+    if (fs.existsSync(solutionFile)) {
+        const fileContent = fs.readFileSync(solutionFile, 'utf8');
+        if (fileContent.includes("VisualStudioVersion = 16.0")) {
+            isVS2019Project = true;
+        }
+    }
+
+    try {
+        if (isVS2019Project) {
+            console.log("Detected VS2019 project, searching for VS2019 installation...");
+            const vs2019Path = await getVisualStudioPath("16");
+            exec(`"${vs2019Path}" "${windowsPath}"`);
+        } else {
+            console.log("Opening in VS2022 by default...");
+            const vs2022Path = await getVisualStudioPath("17");
+            exec(`"${vs2022Path}" "${windowsPath}"`);
+        }
+    } catch (error) {
+        console.error("Could not open Visual Studio:", error);
+        console.log("Falling back to default system handler...");
+        exec(`start "" "${windowsPath}"`);
+    }
+}
+
 ipcMain.on('launchProjectinIDE', (event, arg) => {
     const {
         projectPath,
@@ -1243,12 +1311,27 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
         }
     } else if( arg.platform == 'android'){
         console.log("Launching ", fullPath)
-        exec('studio ' + fullPath, (error, stdout, stderr) => {
-            if(error){
+        console.log("Launching Android Studio at", fullPath);
+        let command;
+
+        if (os.platform() === 'darwin') {  // macOS
+            command = `open -a "Android Studio" "${fullPath}"`;
+        } else if (os.platform() === 'linux') {  // Linux
+            command = `studio "${fullPath}" || xdg-open "${fullPath}"`;
+        } else if (os.platform() === 'win32') {  // Windows
+            command = `start "" "studio64.exe" "${fullPath}"`;
+        } else {
+            console.error("Unsupported OS for launching Android Studio");
+            return;
+        }
+
+        exec(command, (error, stdout, stderr) => {
+            if (error) {
+                console.error("Could not launch Android Studio:", stderr);
                 event.sender.send('sendUIMessage',
-                '<strong>Error!</strong><br>' +
-                '<span>Could not launch Android Studio. Make sure the command-line launcher is installed by running <i>Tools -> Create Command-line Launcher...</i> inside Android Studio and try again</span>'
-            );
+                    '<strong>Error!</strong><br>' +
+                    '<span>Could not launch Android Studio. Make sure the command-line launcher is installed by running <i>Tools -> Create Command-line Launcher...</i> inside Android Studio and try again.</span>'
+                );
             }
         });
     } else if( hostplatform == 'windows'){
@@ -1257,12 +1340,9 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
 		if(arg.platform == 'vscode' ){
 			windowsPath = path.join(fullPath, projectName + '.code-workspace');
 		}
-        
         console.log( windowsPath );
         windowsPath = "\"" + windowsPath + "\"";
-        exec('start ' + "\"\"" + " " + windowsPath, (error, stdout, stderr) => {
-            return;
-        });
+        openVisualStudio(windowsPath);
     }
 });
 
