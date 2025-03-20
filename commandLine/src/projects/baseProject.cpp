@@ -22,7 +22,7 @@ baseProject::baseProject(const string & _target) : target(_target) {
 	bLoaded = false;
 }
 
-fs::path baseProject::getPlatformTemplateDir() {
+fs::path baseProject::getPlatformTemplateDir(std::string templateDir) {
 	string folder { target };
 	if ( target == "msys2"
 		|| target == "linux"
@@ -33,12 +33,10 @@ fs::path baseProject::getPlatformTemplateDir() {
 	) {
 		folder = "vscode";
 	}
-    
-//	if ( target == "qtcreator" ) {
-//		return getOFRoot()
-//	}
-	
-	return getOFRoot() / templatesFolder / folder;
+	if (templateDir != "") {
+		folder = templateDir;
+	}
+	return fs::weakly_canonical(getOFRoot() / templatesFolder / folder);
 }
 
 
@@ -139,26 +137,25 @@ bool baseProject::create(const fs::path & _path, string templateName){
 
 	addons.clear();
 	extSrcPaths.clear();
-
-	templatePath = normalizePath(getPlatformTemplateDir());
+	auto pathTemplate = getPlatformTemplateDir(templateName);
+	if (fs::exists(pathTemplate)) {
+		templatePath = normalizePath(pathTemplate);
+	} else {
+		ofLogError() << "templatePath does not exist: [" << templatePath << "]";
+	}
+	if (fs::exists(templatePath)) {
+		templatePath = normalizePath(pathTemplate);
+	} else {
+		ofLogError() << "templatePath does not exist: [" << templatePath << "]";
+	}
     ofLogNotice() << "templatePath: [" << templatePath << "]";
 	auto projectPath = fs::canonical(fs::current_path() / path);
-	
 	projectDir = path;
 	projectPath = normalizePath(projectPath);
 	ofLogNotice() << "projectPath: [" << projectPath << "]";
-	
 	projectName = projectPath.filename().string();
-	
-	// we had this in some projects. if we decide to keep this is the place
-	//	if (!fs::exists(projectDir)) {
-	//		fs::create_directory(projectDir);
-	//	}
 	bool bDoesSrcDirExist = false;
-
-	// it can be only "src"
 	fs::path projectSrc { projectDir / "src" };
-	
 	if (fs::exists(projectSrc) && fs::is_directory(projectSrc)) {
 		bDoesSrcDirExist = true;
 	} else {
@@ -175,18 +172,14 @@ bool baseProject::create(const fs::path & _path, string templateName){
 		}
 	}
 	bool ret = createProjectFile();
-	if(!ret) return false;
-
-//	cout << "after return : " << templateName << endl;
-	if(!empty(templateName)){
-//		cout << "templateName not empty " << templateName << endl;
-//		return getOFRoot() / templatesFolder / target;
-
+	if (!ret) {
+		ofLogError() << "{ \"errorMessage\": \"" << "baseProject::create createProjectFile failed" << "\", \"status:\" \"EXIT_FAILURE\" }";
+		return false;
+	}
+	if (templateName != "" && !empty(templateName)) {
 		fs::path templateDir = getOFRoot() / templatesFolder / templateName;
-		ofLogNotice() << "templateDir: [" << templateDir << "]";
 		templateDir = normalizePath(templateDir);
-//		alert("templateDir " + templateDir.string());
-
+		ofLogNotice() << "templateDir: [" << templateDir << "]";
 		auto templateConfig = parseTemplate(templateDir);
 		if(templateConfig){
 			recursiveTemplateCopy(templateDir, projectDir);
@@ -208,13 +201,13 @@ bool baseProject::create(const fs::path & _path, string templateName){
 			ofLogWarning() << "Cannot find " << templateName << " using platform template only";
 		}
 	}
-
 	ret = loadProjectFile();
-
-	if(!ret) return false;
+	if (!ret) {
+		ofLogError() << "{ \"errorMessage\": \"" << "baseProject::create loadProjectFile failed" << "\", \"status:\" \"EXIT_FAILURE\" }";
+		return false;
+	}
 
 	parseConfigMake();
-
 	if (bDoesSrcDirExist){
 		vector <fs::path> fileNames;
 
@@ -548,7 +541,6 @@ void baseProject::addAddon(ofAddon & addon){
 	 unless there is one addon added which needs another, and it needs another.
 
 	 */
-//	alert("---> dependencies");
 	for (auto & d : addon.dependencies) {
 		bool found = false;
 		for (auto & a : addons) {
@@ -564,12 +556,8 @@ void baseProject::addAddon(ofAddon & addon){
 			ofLogVerbose() << "trying to add duplicated addon dependency! skipping: " << d;
 		}
 	}
-//	alert("---> dependencies");
 	addons.emplace_back(addon);
 	
-
-	//ofLogVerbose("baseProject") << "libs in addAddon " << addon.libs.size();
-
     addAddonBegin(addon);
 
     addAddonDllsToCopy(addon);

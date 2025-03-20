@@ -513,6 +513,7 @@ int main(int argc, char ** argv) {
 		if (options[TEMPLATE].arg != NULL) {
 			string templateString(options[TEMPLATE].arg);
 			templateName = templateString;
+			ofLogNotice() << "{ \"Template\": \"" << templateName << "\" }";
 		}
 	}
 
@@ -520,6 +521,7 @@ int main(int argc, char ** argv) {
 		if (options[PLATFORMS].arg != NULL) {
 			string platformString(options[PLATFORMS].arg);
 			addPlatforms(platformString);
+			ofLogNotice() << "{ \"Platform\": \"" << platformString << "\" }";
 		}
 	}
 
@@ -581,9 +583,9 @@ int main(int argc, char ** argv) {
 
 	// try to get the OF_PATH as an environt variable
 
-	if (bVerbose) {
+	//if (bVerbose) {
 		ofSetLogLevel(OF_LOG_VERBOSE);
-	}
+	//}
 
 	if (projectName == "") {
 		printHelp();
@@ -678,25 +680,22 @@ int main(int argc, char ** argv) {
 		}
 	} else {
 		if (mode == PG_MODE_UPDATE && !isGoodProjectPath(projectPath)) {
-			ofLogError() << "there is no src folder in this project path to update, maybe use create instead? (or use force to force updating)";
+			messageError("there is no src folder in this project path to update, maybe use create instead? (or use force to force updating");
 		} else {
-			nProjectsCreated += 1;
-
+			
 			ofLogNotice() << "setting OF path to: [" << ofPath << "]";
 			if (busingEnvVar) {
 				ofLogNotice() << "from PG_OF_PATH environment variable";
 			} else {
 				ofLogNotice() << "from -o option";
 			}
-
-			
 			for (auto & t : targets) {
 				consoleSpace();
 				ofLogNotice() << "-----------------------------------------------";
 				ofLogNotice() << "target platform is: [" << t << "]";
 //				ofLogNotice() << "project path is: [" << projectPath << "]";
 				if (templateName != "") {
-					ofLogNotice() << "using additional template " << templateName;
+					ofLogNotice() << "using additional template [" << templateName << "]";
 				}
 				ofLogVerbose() << "setting up new project " << projectPath;
 
@@ -706,7 +705,7 @@ int main(int argc, char ** argv) {
 					ofLogNotice() << "project updated! ";
 				} else {
 					if (!bDryRun) {
-//						ofLogNotice() << "project path is: [" << projectPath << "]";
+						ofLogNotice() << "project path is: [" << projectPath << "]";
 						auto project = getTargetProject(t);
 						project->create(projectPath, templateName);
 						if(bAddonsPassedIn){
@@ -726,6 +725,7 @@ int main(int argc, char ** argv) {
 						project->save();
 					}
 					ofLogNotice() << "project created! ";
+					nProjectsCreated += 1;
 				}
 				ofLogNotice() << "-----------------------------------------------";
 			}
@@ -734,12 +734,14 @@ int main(int argc, char ** argv) {
 
 	consoleSpace();
 	float elapsedTime = ofGetElapsedTimef() - startTime;
-	if (nProjectsCreated > 0) std::cout << nProjectsCreated << " project created ";
-	if (nProjectsUpdated == 1) std::cout << nProjectsUpdated << " project updated ";
+	if (nProjectsCreated > 0) std::cout << nProjectsCreated << " project created at " << projectPath;
+	if (nProjectsUpdated == 1) std::cout << nProjectsUpdated << " project updated at " << projectPath;
 	if (nProjectsUpdated > 1) std::cout << nProjectsUpdated << " projects updated ";
 	ofLogNotice() << "in " << elapsedTime << " seconds" << std::endl;
 	consoleSpace();
-
+	std::cout << "{ \"inSeconds\": \"" << elapsedTime << "\" }" << std::endl;
+	std::cout << "{ \"status\": \"" << "EXIT_OK" << "\" }";
 	messageReturn("status", "EXIT_OK");
+
 	return EXIT_OK;
 }
