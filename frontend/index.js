@@ -107,7 +107,8 @@ function getDefaultTemplateForPlatform(platformId) {
         "linux64": "Linux 64 (VS Code/Make)",
         "linuxarmv6l": "Arm 32 (VS Code/Make)",
         "linuxaarch64": "Arm 64 (VS Code/Make)",
-        "vscode": "VS Code"
+        "vscode": "VS Code",
+        "vs2019": "Windows (Visual Studio 2019)",
     };
 
     return defaultTemplates[platformId] || "Unknown Template";
@@ -252,6 +253,8 @@ const templates = {
     "tvOS": "Apple tvOS template",
     "unittest": "Unit test no window application",
     "vscode": "Visual Studio Code",
+    "vs2019": "Visual Studio 2019",
+
 };
 
 let defaultOfPath = settings["defaultOfPath"];
@@ -888,7 +891,8 @@ function updateFunction(event, update) {
     }
 
     if (templateList != null) {
-        templateString = `-t"${templateList.join(",")}"`;
+        const uniqueTemplates = [...new Set(templateList)];
+        templateString = `-t"${uniqueTemplates.join(",")}"`;
     }
 
     if (ofPath != null) {
@@ -1111,7 +1115,8 @@ ipcMain.on('pickUpdatePath', async (event, arg) => {
         });
         if (filenames !== undefined && filenames.filePaths.length > 0) {
             // defaultOfPath = filenames.filePaths[0]; // TODO: IS THIS CORRECT?
-            event.sender.send('setUpdatePath', filenames.filePaths[0]);
+            const formattedPath = process.platform === "win32" ? filenames.filePaths[0].replace(/\//g, "\\") : filenames.filePaths[0];
+            event.sender.send('setUpdatePath', formattedPath);
         }
     } catch(err) {
         console.error('pickUpdatePath', err);
@@ -1133,7 +1138,8 @@ ipcMain.on('pickProjectPath', async (event, arg) => {
             defaultPath: arg
         });
         if (filenames !== undefined && filenames.filePaths.length > 0) {
-            event.sender.send('setProjectPath', filenames.filePaths[0]);
+            const formattedPath = process.platform === "win32" ? filenames.filePaths[0].replace(/\//g, "\\") : filenames.filePaths[0];
+            event.sender.send('setProjectPath', formattedPath);
         }
     } catch(err) {
         console.error('pickProjectPath', err);
@@ -1198,6 +1204,92 @@ ipcMain.on('checkMultiUpdatePath', (event, arg) => {
     }
 });
 
+function getVisualStudioPath(version) {
+    return new Promise((resolve, reject) => {
+        exec(`"C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe" -latest -prerelease -format json`, (error, stdout, stderr) => {
+            if (error) {
+                reject("vswhere.exe not found. Ensure Visual Studio is installed.");
+                return;
+            }
+
+            try {
+                const installations = JSON.parse(stdout);
+                const vsInstall = installations.find(install =>
+                    install.displayName.includes("Visual Studio") && install.catalog.productDisplayVersion.startsWith(version)
+                );
+
+                if (vsInstall) {
+                    resolve(path.join(vsInstall.installationPath, "Common7", "IDE", "devenv.exe"));
+                } else {
+                    reject(`No Visual Studio ${version} installation found.`);
+                }
+            } catch (parseError) {
+                reject("Error parsing vswhere output.");
+            }
+        });
+    });
+}
+
+async function openVisualStudio(windowsPath) {
+    console.log(`Opening project: ${windowsPath} in ${platform}`);
+
+    if (platform === 'vscode') {
+        console.log("Opening in VS Code...");
+        exec(`code "${windowsPath}"`, (error, stdout, stderr) => {
+            if (error) {
+                console.error("Could not open VS Code:", stderr);
+                console.log("Falling back to system handler...");
+                exec(`start "" "${windowsPath}"`);
+            }
+        });
+        return;
+    }
+
+    let isVS2019Project = false;
+    const windowsPathEscaped = windowsPath.replace(/\\/g, '\\\\');
+    solutionFile = path.resolve(windowsPath.trim().replace(/^"+|"+$/g, ''));
+    console.log("VS Solution File Content: " + solutionFile);
+    if (fs.existsSync(solutionFile)) {
+        const fileContent = fs.readFileSync(solutionFile, 'utf8');
+        if (fileContent.match(/VisualStudioVersion = 16\.\d+/)) {
+            console.log("Detected VS2019!");
+            isVS2019Project = true;
+        } else {
+            console.log("VS2019 Not Detected.");
+        }
+    } else {
+        console.error("Error: Solution file does not exist: " + solutionFile);
+    }
+
+    try {
+        if (isVS2019Project) {
+            console.log("Detected VS2019 project, opening in VS2019...");
+            const vs2019Path = await getVisualStudioPath("16");
+            const vs2019PathEscaped = vs2019Path.replace(/\\/g, '\\\\');
+            console.log(`Opening in VS2022 by default.. path:[${vs2019PathEscaped}] command:start "" "${vs2019PathEscaped}" "${windowsPathEscaped}"`);
+            exec(`start "" "${vs2019PathEscaped}" ${windowsPathEscaped}`, (error, stdout, stderr) => {
+                if (error) {
+                    console.error("Error opening in VS2019:", stderr);
+                }
+            });
+        } else {
+            const vs2022Path = await getVisualStudioPath("17");
+            const vs2022PathEscaped = vs2022Path.replace(/\\/g, '\\\\');
+            console.log(`Opening in VS2022 by default.. path:[${vs2022PathEscaped}] command:start "" "${vs2022PathEscaped}" "${windowsPathEscaped}"`);
+            exec(`start "" "${vs2022PathEscaped}" ${windowsPathEscaped}`, (error, stdout, stderr) => {
+                if (error) {
+                    console.error("Error opening in VS2022:", stderr);
+                }
+            });
+
+        }
+    } catch (error) {
+        console.error("Could not open Visual Studio:", error);
+        console.log("Falling back to default system handler...");
+        exec('start "" "' + windowsPath + '"');
+    }
+}
+
 ipcMain.on('launchProjectinIDE', (event, arg) => {
     const {
         projectPath,
@@ -1243,12 +1335,28 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
         }
     } else if( arg.platform == 'android'){
         console.log("Launching ", fullPath)
-        exec('studio ' + fullPath, (error, stdout, stderr) => {
-            if(error){
+        console.log("Launching Android Studio at", fullPath);
+        let command;
+
+        if (os.platform() === 'darwin') {  // macOS
+            command = `open -a "Android Studio" "${fullPath}"`;
+        } else if (os.platform() === 'linux') {  // Linux
+            command = `studio "${fullPath}" || xdg-open "${fullPath}"`;
+        } else if (os.platform() === 'win32') {  // Windows
+            const studioPath = `"C:\\Program Files\\Android\\Android Studio\\bin\\studio64.exe"`;
+            command = `start "" ${studioPath} "${fullPath}"`;
+        } else {
+            console.error("Unsupported OS for launching Android Studio");
+            return;
+        }
+
+        exec(command, (error, stdout, stderr) => {
+            if (error) {
+                console.error("Could not launch Android Studio:", stderr);
                 event.sender.send('sendUIMessage',
-                '<strong>Error!</strong><br>' +
-                '<span>Could not launch Android Studio. Make sure the command-line launcher is installed by running <i>Tools -> Create Command-line Launcher...</i> inside Android Studio and try again</span>'
-            );
+                    '<strong>Error!</strong><br>' +
+                    '<span>Could not launch Android Studio. Make sure the command-line launcher is installed by running <i>Tools -> Create Command-line Launcher...</i> inside Android Studio and try again.</span>'
+                );
             }
         });
     } else if( hostplatform == 'windows'){
@@ -1257,12 +1365,9 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
 		if(arg.platform == 'vscode' ){
 			windowsPath = path.join(fullPath, projectName + '.code-workspace');
 		}
-        
         console.log( windowsPath );
         windowsPath = "\"" + windowsPath + "\"";
-        exec('start ' + "\"\"" + " " + windowsPath, (error, stdout, stderr) => {
-            return;
-        });
+        openVisualStudio(windowsPath);
     }
 });
 

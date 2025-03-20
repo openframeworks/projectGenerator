@@ -439,7 +439,7 @@ unique_ptr<baseProject> getTargetProject(const string & targ) {
 	} else if (targ == "msys2") {
 //		return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));
 		return unique_ptr<VSCodeProject>(new VSCodeProject(targ));
-	} else if (targ == "vs") {
+	} else if (targ == "vs" || targ == "vs2019") {
 		return unique_ptr<visualStudioProject>(new visualStudioProject(targ));
 	} else if (targ == "linux" ||
 			   targ == "linux64" ||
