@@ -53,8 +53,8 @@ bool androidProject::createProjectFile(){
 	// Copy the `src/` folder from the template
 	try {
 		fs::copy(
-			templatePath / "ofApp" / "src",
-			projectDir / "ofApp" / "src",
+			templatePath / "ofApp",
+			projectDir / "ofApp",
 			fs::copy_options::recursive | (bOverwrite ? fs::copy_options::overwrite_existing : fs::copy_options::update_existing)
 		);
 	} catch (fs::filesystem_error & e) {
@@ -63,7 +63,7 @@ bool androidProject::createProjectFile(){
 	}
 
 	try {
-		fs::copy(templatePath / "res", projectDir / "ofApp/res", fs::copy_options::recursive);
+		fs::copy(templatePath / "ofApp/src/res", projectDir / "ofApp/src/res", fs::copy_options::recursive);
 	} catch (fs::filesystem_error & e) {
 		ofLogError(LOG_NAME) << "Error copying res folder: " << e.what();
 	}
@@ -78,8 +78,8 @@ bool androidProject::createProjectFile(){
 	}
 
 	findandreplaceInTexfile(projectDir / "ofApp/res/values/strings.xml", "TEMPLATE_APP_NAME", projectName);
-	fs::path from = projectDir / "srcJava/cc/openframeworks/APP_NAME";
-	fs::path to = projectDir / ("srcJava/cc/openframeworks/" + projectName);
+	fs::path from = projectDir / "ofApp/src/java/cc/openframeworks/android";
+	fs::path to = projectDir / ("ofApp/src/java/cc/openframeworks/android");
 	
 	try {
 		fs::create_directories(to.parent_path());
@@ -87,8 +87,6 @@ bool androidProject::createProjectFile(){
 	} catch (const std::exception & e) {
 		ofLogError(LOG_NAME) << "Error renaming package directory: " << e.what();
 	}
-
-	findandreplaceInTexfile(to / "OFActivity.java", "TEMPLATE_APP_NAME", projectName);
 
 	ofLogNotice(LOG_NAME) << "Android Project created successfully!";
 	return true;
