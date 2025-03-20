@@ -1343,7 +1343,8 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
         } else if (os.platform() === 'linux') {  // Linux
             command = `studio "${fullPath}" || xdg-open "${fullPath}"`;
         } else if (os.platform() === 'win32') {  // Windows
-            command = `start "" "studio64.exe" "${fullPath}"`;
+            const studioPath = `"C:\\Program Files\\Android\\Android Studio\\bin\\studio64.exe"`;
+            command = `start "" ${studioPath} "${fullPath}"`;
         } else {
             console.error("Unsupported OS for launching Android Studio");
             return;
