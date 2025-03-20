@@ -170,10 +170,10 @@ jobs:
           tag_name: ${{ env.RELEASE }}
           files: projectGenerator-linux-armv7l-gui.gz
 
-      - name: Run latest-tag
+      - name: Update Latest Tag - DateTime
         uses: EndBug/latest-tag@latest
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
         with:
           ref: nightly
           description: Latest Always Nightly Builds
-          force-branch: false
+          force-branch: true
