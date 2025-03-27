@@ -790,8 +790,13 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 			addCommand("Add :objects:" + copyBundleResourcesUUID + ":files: string " + buildUUID);
 		}
 
-//		if (fp.copyFilesBuildPhase) {
-//			// If we are going to add xcframeworks to copy files -> destination frameworks, we should include here
+		if (fp.copyFilesBuildPhase) {
+			//			// If we are going to add xcframeworks to copy files -> destination frameworks, we should include here
+			if (path.extension() == ".framework") {
+				addCommand("# ---- copyPhase Frameworks " + buildUUID);
+				addCommand("Add :objects:E4C2427710CC5ABF004149E2:files: string " + buildUUID);
+			}
+		}
 //			//			if (path.extension() == ".framework" || path.extension() == ".xcframework") {
 //			// This now includes both .framework and .xcframework
 //			if (fileType == "wrapper.framework" || fileType == ".xcframework") {
