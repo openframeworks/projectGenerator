@@ -583,9 +583,9 @@ int main(int argc, char ** argv) {
 
 	// try to get the OF_PATH as an environt variable
 
-	//if (bVerbose) {
+	if (bVerbose) {
 		ofSetLogLevel(OF_LOG_VERBOSE);
-	//}
+	}
 
 	if (projectName == "") {
 		printHelp();
