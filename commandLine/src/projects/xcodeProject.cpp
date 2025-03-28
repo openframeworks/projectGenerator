@@ -222,12 +222,25 @@ bool xcodeProject::loadProjectFile() { //base
 	
 	// if ofRoot is not relative to the project path,
 	// set correct addons and openFrameworks folders
+	
+	bool updateOFPath = false;
+	
+	fs::path of = getOFRoot();
 	if (!ofIsPathInPath(fs::current_path(), getOFRoot())) {
-		addCommand("Set :objects:" + folderUUID["openFrameworks"] + ":path string " + getOFRoot().string() + "/libs/openFrameworks");
+		updateOFPath = true;
 		addCommand("Set :objects:" + folderUUID["openFrameworks"] + ":sourceTree string <absolute>");
-		
-		addCommand("Set :objects:" + folderUUID["addons"] + ":path string " + getOFRoot().string() + "/addons");
 		addCommand("Set :objects:" + folderUUID["addons"] + ":sourceTree string <absolute>");
+	} else {
+		// inside OF Root but not in usual depth
+		if (!fs::equivalent(getOFRoot(), "../../..")) {
+			updateOFPath = true;
+			of = fs::relative(getOFRoot(), fs::current_path());
+		}
+	}
+	
+	if (updateOFPath) {
+		addCommand("Set :objects:" + folderUUID["openFrameworks"] + ":path string " + of.string() + "/libs/openFrameworks");
+		addCommand("Set :objects:" + folderUUID["addons"] + ":path string " + of.string() + "/addons");
 	}
 
 	return true;
