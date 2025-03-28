@@ -61,7 +61,6 @@ protected:
 	bool containsObjectiveCPlusPlus(const fs::path &filePath);
 
 	void saveScheme();
-	void renameProject();
 
 	string addFile(const fs::path & path, const fs::path & folder, const fileProperties & fp);
 	void addCommand(const string & command);

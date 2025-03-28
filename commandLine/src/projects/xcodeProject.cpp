@@ -210,22 +210,27 @@ bool xcodeProject::loadProjectFile() { //base
 	addCommand("# ---- PG VERSION " + getPGVersion());
 	addCommand("Add :_OFProjectGeneratorVersion string " + getPGVersion());
 
-	renameProject();
-	// MARK: just to return something.
-	return true;
-}
-
-// FIXME: mover pra dentro do loadProjectfile
-void xcodeProject::renameProject() { //base
-	// FIXME: review BUILT_PRODUCTS_DIR
-	addCommand("Set :objects:" + buildConfigurationListUUID + ":name " + projectName);
+	// Rename Project
+	addCommand("Set :objects:" + buildConfigurationListUUID + ":name string " + projectName);
 
 	// Just OSX here, debug app naming.
 	if (target == "osx") {
 		// TODO: Hardcode to variable
 		// FIXME: Debug needed in name?
-		addCommand("Set :objects:E4B69B5B0A3A1756003C02F2:path " + projectName + "Debug.app");
+		addCommand("Set :objects:E4B69B5B0A3A1756003C02F2:path string " + projectName + "Debug.app");
 	}
+	
+	// if ofRoot is not relative to the project path,
+	// set correct addons and openFrameworks folders
+	if (!ofIsPathInPath(fs::current_path(), getOFRoot())) {
+		addCommand("Set :objects:" + folderUUID["openFrameworks"] + ":path string " + getOFRoot().string() + "/libs/openFrameworks");
+		addCommand("Set :objects:" + folderUUID["openFrameworks"] + ":sourceTree string <absolute>");
+		
+		addCommand("Set :objects:" + folderUUID["addons"] + ":path string " + getOFRoot().string() + "/addons");
+		addCommand("Set :objects:" + folderUUID["addons"] + ":sourceTree string <absolute>");
+	}
+
+	return true;
 }
 
 fs::path getPathTo(fs::path path, string limit) {
@@ -916,6 +921,7 @@ bool xcodeProject::saveProjectFile() {
 					//if (cols[0] == "Set") {
 					try {
 						json::json_pointer p { json::json_pointer(thispath) };
+//						alert (thispath, 95);
 
 						if (cols[2] == "string") {
 							// find position after find word
@@ -947,7 +953,7 @@ bool xcodeProject::saveProjectFile() {
 
 				} else {
 					thispath = thispath.substr(0, thispath.length() - 1);
-					//					cout << thispath << endl;
+//					alert (thispath, 95);
 					json::json_pointer p = json::json_pointer(thispath);
 					try {
 						// Fixing XCode one item array issue
