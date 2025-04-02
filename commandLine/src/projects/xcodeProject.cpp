@@ -155,21 +155,6 @@ bool xcodeProject::createProjectFile() {
 		if (fs::exists(templateDataDir) && fs::is_directory(templateDataDir)) {
 			baseProject::recursiveCopyContents(templateDataDir, projectDataDir);
 		}
-		if (fs::exists(templateBinDir) && fs::is_directory(templateBinDir)) {
-#ifdef TARGET_OS_MAC
-			try {
-				//  extended attributes on macOS
-				std::string command = "xattr -w com.apple.xcode.CreatedByBuildSystem true " + templateBinDir.string();
-				if (std::system(command.c_str()) != 0) {
-					std::cerr << "Failed to set extended attributes on " << templateBinDir.string() << std::endl;
-				} else {
-					ofLogVerbose("xcodeProject") << "xattr set correctly for /bin" << endl;
-				}
-			} catch (const std::exception & e) {
-				std::cout << "xcodeProject::createProjectFile() error " << e.what() << std::endl;
-			}
-#endif
-		}
 	}
 	return true;
 }
