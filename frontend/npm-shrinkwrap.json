@@ -42,9 +42,9 @@
       }
     },
     "node_modules/@electron/asar": {
-      "version": "3.3.1",
-      "resolved": "https://registry.npmjs.org/@electron/asar/-/asar-3.3.1.tgz",
-      "integrity": "sha512-WtpC/+34p0skWZiarRjLAyqaAX78DofhDxnREy/V5XHfu1XEXbFCSSMcDQ6hNCPJFaPy8/NnUgYuf9uiCkvKPg==",
+      "version": "3.4.0",
+      "resolved": "https://registry.npmjs.org/@electron/asar/-/asar-3.4.0.tgz",
+      "integrity": "sha512-8ZAmXjsQ17wJxdv4755hZ1Xiw85dwETlWYQwl+imww18CaEK4bxPvAotJEfIZGbRMrNEJOTMyuVQD+yDY03N5Q==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
@@ -665,9 +665,9 @@
       "license": "MIT"
     },
     "node_modules/@types/node": {
-      "version": "22.13.10",
-      "resolved": "https://registry.npmjs.org/@types/node/-/node-22.13.10.tgz",
-      "integrity": "sha512-I6LPUvlRH+O6VRUqYOcMudhaIdUVWfsjnZavnsraHvpBwaEyMN29ry+0UVJhImYL16xsscu0aske3yA+uPOWfw==",
+      "version": "22.13.17",
+      "resolved": "https://registry.npmjs.org/@types/node/-/node-22.13.17.tgz",
+      "integrity": "sha512-nAJuQXoyPj04uLgu+obZcSmsfOenUg6DxPKogeUy6yNCFwWaj5sBF8/G/pNo8EtBJjAfSVgfIlugR/BCOleO+g==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
@@ -2255,9 +2255,9 @@
       }
     },
     "node_modules/electron": {
-      "version": "35.0.1",
-      "resolved": "https://registry.npmjs.org/electron/-/electron-35.0.1.tgz",
-      "integrity": "sha512-iQonj6lnPhqfqha2KXx6LzV1dnu6UPTCWK+b7f9Zvg828umGemi22DKbcJ3/q+Opn7iUVTWyqp9z1JQqkIi6OA==",
+      "version": "35.1.2",
+      "resolved": "https://registry.npmjs.org/electron/-/electron-35.1.2.tgz",
+      "integrity": "sha512-ipYSDZEV3+PpHfJ8/oWlpMCvxwutX6xLvBz2HRPgEzSFzgLmGO7YXTjEow4DhDtCpGE+b95NTGoJaRAVQi5n7A==",
       "dev": true,
       "hasInstallScript": true,
       "license": "MIT",
@@ -4341,9 +4341,9 @@
       "optional": true
     },
     "node_modules/node-api-version": {
-      "version": "0.2.0",
-      "resolved": "https://registry.npmjs.org/node-api-version/-/node-api-version-0.2.0.tgz",
-      "integrity": "sha512-fthTTsi8CxaBXMaBAD7ST2uylwvsnYxh2PfaScwpMhos6KlSFajXQPcM4ogNE1q2s3Lbz9GCGqeIHC+C6OZnKg==",
+      "version": "0.2.1",
+      "resolved": "https://registry.npmjs.org/node-api-version/-/node-api-version-0.2.1.tgz",
+      "integrity": "sha512-2xP/IGGMmmSQpI1+O/k72jF/ykvZ89JeuKX3TLJAYPDVLUalrshrLHkeVcCCZqG/eEa635cr8IBYzgnDvM2O8Q==",
       "dev": true,
       "license": "MIT",
       "dependencies": {

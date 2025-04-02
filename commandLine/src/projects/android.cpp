@@ -10,29 +10,39 @@ androidProject::androidProject(const std::string & target) : baseProject(target)
 
 bool androidProject::createProjectFile(){
 
+	bOverwrite = false;
 	for (auto & f : vector<fs::path> {
 		"build.gradle",
 		"gradle",
-		"gradle.properties",
-		"local.properties",
 		"ofApp/gradle.properties",
 		"ofApp/proguard-rules.pro",
 		"ofApp/src/AndroidManifest.xml",
 		"ofApp/src/ic_launcher-playstore.png",
-		"ofApp/src/CMakeLists.txt",
-		"ofApp/src/main/main.txt",
-		"ofApp/build.gradle",
-		"src/ofApp.h",
-		"src/ofApp.cpp",
-		"src/main.cpp",
 		"proguard.cfg",
 		"settings.gradle",
 		"template.config",
+		"src/main.cpp",
 	}) {
 		copyTemplateFiles.push_back({
 			templatePath / f,
 			projectDir / f
 		});
+	}
+	for (auto & f : vector<fs::path> {
+		"src/ofApp.h",
+		"src/ofApp.cpp",
+		"ofApp/src/CMakeLists.txt",
+		"ofApp/src/java/cc/openframeworks/android/OFActivity.java",
+		"local.properties",
+		"gradle.properties",
+		"ofApp/build.gradle",
+	}) {
+		if (!fs::exists(projectDir / f)) {
+			copyTemplateFiles.push_back({
+				templatePath / f,
+				projectDir / f
+			});
+		}
 	}
 	copyTemplateFiles.push_back({
 		templatePath / "ofApp" / "build.gradle",
@@ -61,6 +71,8 @@ bool androidProject::createProjectFile(){
 		ofLogError(LOG_NAME) << "Copy failed: " << e.what();
 		return false;
 	}
+	
+	
 
 	try {
 		fs::copy(templatePath / "ofApp/src/res", projectDir / "ofApp/src/res", fs::copy_options::recursive);
