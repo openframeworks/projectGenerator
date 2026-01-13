@@ -1,8 +1,8 @@
 #pragma once
 
+#include <algorithm>
 #include <string>
 #include <vector>
-
 
 #include "ofConstants.h"
 #include "defines.h"
