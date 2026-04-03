@@ -16,7 +16,7 @@
       },
       "devDependencies": {
         "@electron/packager": "^18.3.6",
-        "electron": "^35.0.1",
+        "electron": "^39.8.5",
         "electron-builder": "^25.1.8"
       },
       "engines": {
@@ -2255,9 +2255,9 @@
       }
     },
     "node_modules/electron": {
-      "version": "35.1.2",
-      "resolved": "https://registry.npmjs.org/electron/-/electron-35.1.2.tgz",
-      "integrity": "sha512-ipYSDZEV3+PpHfJ8/oWlpMCvxwutX6xLvBz2HRPgEzSFzgLmGO7YXTjEow4DhDtCpGE+b95NTGoJaRAVQi5n7A==",
+      "version": "39.8.5",
+      "resolved": "https://registry.npmjs.org/electron/-/electron-39.8.5.tgz",
+      "integrity": "sha512-q6+LiQIcTadSyvtPgLDQkCtVA9jQJXQVMrQcctfOJILh6OFMN+UJJLRkuUTy8CZDYeCIBn1ZycqsL1dAXugxZA==",
       "dev": true,
       "hasInstallScript": true,
       "license": "MIT",

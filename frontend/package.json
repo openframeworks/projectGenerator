@@ -99,7 +99,7 @@
     "n-readlines": "^1.0.1"
   },
   "devDependencies": {
-    "electron": "^35.0.1",
+    "electron": "^39.8.5",
     "electron-builder": "^25.1.8",
     "@electron/packager": "^18.3.6"
   }
