@@ -1,6 +1,6 @@
 //nodeRequire is used instead of require due to clash with node and jquery
 //see section - I can not use jQuery/RequireJS/Meteor/AngularJS in Electron : https://www.electronjs.org/docs/latest/faq/
-const { ipcRenderer } = nodeRequire('electron');
+const { ipcRenderer, webUtils } = nodeRequire('electron');
 path = nodeRequire('path');
 fs = nodeRequire('fs');
 
@@ -911,7 +911,8 @@ function onDropFile( e ){
             const files = e.originalEvent.dataTransfer.files;
             // import single project folder
             $("#projectName").val( files[0].name );
-            const projectFullPath = files[0].path;
+            // Electron 32+ removed the File.path augmentation; use webUtils.getPathForFile instead.
+            const projectFullPath = webUtils.getPathForFile( files[0] );
             const projectParentPath = path.normalize(projectFullPath + '/..');
             $("#projectPath").val( projectParentPath ).triggerHandler('change');
 
