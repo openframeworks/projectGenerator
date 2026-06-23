@@ -59,11 +59,8 @@ npm audit fix
 echo "Building openFrameworks Frontend ${FRONTEND_TARGET}"
 npm install
 echo "====== install"
-npm update 
+npm update
 echo "====== update"
-npm install -g clean-modules
-clean-modules -y
-echo "====== clean"
 npm run
 echo "====== run"
 
