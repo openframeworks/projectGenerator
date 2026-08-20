@@ -51,6 +51,7 @@ let settings = {};
 /** @type Settings */
 const templateSettings = {
     defaultOfPath: "",
+    emsdkPath: "",
     advancedMode: false,
     defaultPlatform: '',
     showConsole: false,
@@ -337,6 +338,7 @@ app.on('ready', () => {
         mainWindow.webContents.send('cwd', __dirname);
         mainWindow.webContents.send('cwd', process.resourcesPath);
         mainWindow.webContents.send('setStartingProject', startingProject);
+        mainWindow.webContents.send('setGuiVersion', app.getVersion());
         mainWindow.webContents.send('setDefaults', settings);
         mainWindow.webContents.send('setup', '');
         mainWindow.webContents.send('checkOfPathAfterSetup', '');
@@ -1148,6 +1150,28 @@ ipcMain.on('pickOfPath', async (event, arg) => {
     dialogIsOpen = false;
 });
 
+ipcMain.on('pickEmsdkPath', async (event, arg) => {
+    if(dialogIsOpen){
+        return;
+    }
+
+    dialogIsOpen = true;
+    try {
+        const filenames = await dialog.showOpenDialog(mainWindow, {
+            title: 'select the root of the Emscripten SDK (emsdk)',
+            properties: ['openDirectory'],
+            filters: [],
+            defaultPath: arg
+        });
+        if (filenames !== undefined && filenames.filePaths.length > 0) {
+            event.sender.send('setEmsdkPath', filenames.filePaths[0]);
+        }
+    } catch(err) {
+        console.error('pickEmsdkPath', err);
+    }
+    dialogIsOpen = false;
+});
+
 ipcMain.on('pickUpdatePath', async (event, arg) => {
     if(dialogIsOpen){
         return;
@@ -1495,57 +1519,92 @@ function serveAndPreviewEmscripten(rootDir, htmlFile, event) {
     });
 }
 
-ipcMain.on('buildEmscripten', (event, { projectName, projectPath, configuration }) => {
+// prepends the emsdk root + its bundled toolchain dir to PATH so emcc/em++/emmake
+// resolve even when this app wasn't launched from a terminal with emsdk_env.sh sourced
+function resolveEmsdkEnv(emsdkPath) {
+    const env = { ...process.env };
+    if (emsdkPath) {
+        const additions = [emsdkPath, path.join(emsdkPath, 'upstream', 'emscripten')];
+        env.PATH = additions.join(path.delimiter) + path.delimiter + (env.PATH || '');
+        env.EMSDK = emsdkPath;
+    }
+    return env;
+}
+
+ipcMain.on('buildEmscripten', (event, { projectName, projectPath, configuration, emsdkPath }) => {
     const projectDir = path.join(projectPath, projectName);
     const target = configuration === 'Debug' ? 'Debug' : 'Release';
+    const buildEnv = resolveEmsdkEnv(emsdkPath);
 
     if (!fs.existsSync(path.join(projectDir, 'Makefile'))) {
-        event.sender.send('sendUIMessage', `<strong>Error...</strong><br>No Makefile found in <span class="monospace">${projectDir}</span>. Generate the project with the Emscripten template first.`);
+        event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br>No Makefile found in <span class="monospace">${projectDir}</span>. Generate the project with the Emscripten template first.`);
+        event.sender.send('buildEmscriptenDone');
         return;
     }
 
-    const child = spawn('make', [target], { cwd: projectDir, windowsHide: true });
-    let stderr = '';
+    event.sender.send('consoleMessage', `<br><em>Building Emscripten ${target}...</em><br>`);
 
-    child.stdout.on('data', (chunk) => event.sender.send('consoleMessage', chunk.toString()));
-    child.stderr.on('data', (chunk) => {
-        stderr += chunk.toString();
-        event.sender.send('consoleMessage', chunk.toString());
-    });
+    // emmake sets CC/CXX/AR/etc to point at the emscripten toolchain, which is the
+    // documented-correct way to make a Makefile-based build actually target
+    // Emscripten rather than the host compiler - fall back to plain make if it's
+    // not on PATH (e.g. no emsdkPath configured and emsdk_env.sh was never sourced).
+    const runBuild = (useEmmake) => {
+        const cmd = useEmmake ? (hostplatform === 'windows' ? 'emmake.bat' : 'emmake') : 'make';
+        const args = useEmmake ? ['make', target] : [target];
+        const child = spawn(cmd, args, { cwd: projectDir, windowsHide: true, env: buildEnv });
+        let stderr = '';
 
-    child.on('error', (error) => {
-        event.sender.send('sendUIMessage',
-            '<strong>Error...</strong><br>Could not run make. Make sure the Emscripten SDK is installed and activated '
-            + '(run <span class="monospace">source emsdk_env.sh</span> in the terminal you launched this app from) '
-            + 'so emcc/em++/make are on PATH.<br><span class="monospace">' + error.message + '</span>'
-        );
-    });
+        child.stdout.on('data', (chunk) => event.sender.send('consoleMessage', chunk.toString()));
+        child.stderr.on('data', (chunk) => {
+            stderr += chunk.toString();
+            event.sender.send('consoleMessage', chunk.toString());
+        });
 
-    child.on('close', (code) => {
-        if (code !== 0) {
+        child.on('error', (error) => {
+            if (useEmmake) {
+                event.sender.send('consoleMessage', `<br><em>emmake not found on PATH, falling back to plain make...</em><br>`);
+                runBuild(false);
+                return;
+            }
             event.sender.send('sendUIMessage',
-                `<strong>Error...</strong><br>Emscripten ${target} build failed (exit code ${code}).`
-                + '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stderr + '</textarea></div>'
+                '<!--modal-context:none:-->\n<strong>Error...</strong><br>Could not run make. Make sure the Emscripten SDK is installed and activated '
+                + '(set the Emscripten SDK path in Settings, or run <span class="monospace">source emsdk_env.sh</span> in the terminal you launched this app from) '
+                + 'so emcc/em++/make are on PATH.<br><span class="monospace">' + error.message + '</span>'
             );
-            return;
-        }
+            event.sender.send('buildEmscriptenDone');
+        });
 
-        const binDir = path.join(projectDir, 'bin');
-        let htmlFile = null;
-        try {
-            const candidates = fs.readdirSync(binDir).filter((f) => f.endsWith('.html'));
-            htmlFile = candidates.includes('index.html') ? 'index.html' : candidates[0];
-        } catch (error) {
-            // binDir missing or unreadable - htmlFile stays null, handled below
-        }
+        child.on('close', (code) => {
+            if (code !== 0) {
+                event.sender.send('sendUIMessage',
+                    `<!--modal-context:none:-->\n<strong>Error...</strong><br>Emscripten ${target} build failed (exit code ${code}).`
+                    + '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stderr + '</textarea></div>'
+                );
+                event.sender.send('buildEmscriptenDone');
+                return;
+            }
 
-        if (!htmlFile) {
-            event.sender.send('sendUIMessage', `<strong>Error...</strong><br>Build succeeded but no .html output was found in <span class="monospace">${binDir}</span>`);
-            return;
-        }
+            const binDir = path.join(projectDir, 'bin');
+            let htmlFile = null;
+            try {
+                const candidates = fs.readdirSync(binDir).filter((f) => f.endsWith('.html'));
+                htmlFile = candidates.includes('index.html') ? 'index.html' : candidates[0];
+            } catch (error) {
+                // binDir missing or unreadable - htmlFile stays null, handled below
+            }
 
-        serveAndPreviewEmscripten(binDir, htmlFile, event);
-    });
+            if (!htmlFile) {
+                event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br>Build succeeded but no .html output was found in <span class="monospace">${binDir}</span>`);
+                event.sender.send('buildEmscriptenDone');
+                return;
+            }
+
+            serveAndPreviewEmscripten(binDir, htmlFile, event);
+            event.sender.send('buildEmscriptenDone');
+        });
+    };
+
+    runBuild(true);
 });
 
 ipcMain.on('quit', (event, arg) => {

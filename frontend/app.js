@@ -37,6 +37,12 @@ ipcRenderer.on('setOfPath', (event, arg) => {
     setOFPath(arg);
 });
 
+ipcRenderer.on('setEmsdkPath', (event, arg) => {
+    $("#emsdkPath").val(arg);
+    defaultSettings.emsdkPath = arg;
+    saveDefaultSettings();
+});
+
 ipcRenderer.on('cwd', (event, arg) => {
     console.log(arg);
 });
@@ -97,8 +103,13 @@ ipcRenderer.on('setup', (event, arg) => {
 ipcRenderer.on('setDefaults', (event, arg) => {
     defaultSettings = arg;
     setOFPath(defaultSettings.defaultOfPath);
+    $("#emsdkPath").val(defaultSettings.emsdkPath || '');
     enableAdvancedMode(defaultSettings.advancedMode);
 
+});
+
+ipcRenderer.on('setGuiVersion', (event, version) => {
+    $("#guiVersionDisplay").val(version);
 });
 
 //-------------------------------------------
@@ -693,6 +704,8 @@ function setup() {
             buildAndPreviewEmscripten();
         });
 
+        $('#emscriptenConfig').dropdown();
+
          $("#verboseOption").checkbox();
          $("#verboseOption").on("change", () => {
             if ($("#verboseOption").filter(":checked").length > 0) {
@@ -752,7 +765,18 @@ function setup() {
                 $("#ofPath").blur();
             }
         });
-    
+
+        // updates emsdkPath when the field is manually changed
+        $("#emsdkPath").on('blur', () => {
+            defaultSettings.emsdkPath = $("#emsdkPath").val();
+            saveDefaultSettings();
+        }).on('keypress', (e) => {
+            if(e.which == 13){
+                e.preventDefault();
+                $("#emsdkPath").blur();
+            }
+        });
+
         /* Stuff for the console setting (removed from UI) */
         $("#consoleToggle").on("change", function () {
             enableConsole( $(this).is(':checked') );
@@ -1289,6 +1313,10 @@ function browseOfPath() {
     ipcRenderer.send('pickOfPath', ''); // current path could go here (but the OS also remembers the last used folder)
 }
 
+function browseEmsdkPath() {
+    ipcRenderer.send('pickEmsdkPath', $("#emsdkPath").val());
+}
+
 function browseProjectPath() {
     let projectPath = $("#projectPath").val();
     if (projectPath === ''){
@@ -1386,6 +1414,16 @@ function getRandomSketchName(){
 }
 
 function launchInIDE(){
+    const templatePicked = $("#templatesDropdown .active");
+    const templateValueArray = [];
+    for (let i = 0; i < templatePicked.length; i++){
+        templateValueArray.push($(templatePicked[i]).attr("data-value"));
+    }
+    if (templateValueArray.includes('emscripten')) {
+        displayModal('<!--modal-context:none:-->\n<strong>Emscripten</strong><br>There is no IDE project for the Emscripten template - use "Build &amp; Preview" instead.');
+        return;
+    }
+
     const platform = getPlatformList()[0];
 
     const project = {
@@ -1412,12 +1450,20 @@ function launchFolder(){
 function buildAndPreviewEmscripten(){
     if (lastGeneratedProject == null) return;
 
+    $("#EmscriptenPreviewButton").addClass('loading disabled').text('Building...');
+    $('body').addClass('enableConsole showConsole');
+
     ipcRenderer.send('buildEmscripten', {
         projectName: lastGeneratedProject.projectName,
         projectPath: lastGeneratedProject.projectPath,
-        configuration: $("#emscriptenConfig").val(),
+        configuration: $("#emscriptenConfig").dropdown('get value') || 'Release',
+        emsdkPath: $("#emsdkPath").val(),
     });
 }
+
+ipcRenderer.on('buildEmscriptenDone', () => {
+    $("#EmscriptenPreviewButton").removeClass('loading disabled').text('Build & Preview');
+});
 
 function getOFVersion() {
     console.log('getOFVersion:sending');

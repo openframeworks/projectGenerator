@@ -313,15 +313,28 @@
 					</div>
 					</div>
 					<div class="field">
+						<label>Emscripten SDK path (optional, used by Build &amp; Preview):</label>
+						<div class="ui icon input fluid">
+							<input type="text" placeholder="emsdk path..." id="emsdkPath">
+							<i class="search link icon" onclick="browseEmsdkPath()"></i>
+						</div>
+					</div>
+					<div class="field">
 						<label>Platform:</label>
 						<div class="ui icon input fluid">
 						<input type="text" placeholder="Platform..." id="platformDisplay" readonly>
 						</div>
 					</div>
 					<div class="field">
-						<label>Version:</label>
+						<label>commandLine PG Version:</label>
 						<div class="ui icon input fluid">
 						<input type="text" placeholder="Version..." id="versionDisplay" readonly>
+						</div>
+					</div>
+					<div class="field">
+						<label>GUI Version:</label>
+						<div class="ui icon input fluid">
+						<input type="text" placeholder="Version..." id="guiVersionDisplay" readonly>
 						</div>
 					</div>
 
@@ -392,10 +405,15 @@
 			<div class="actions">
 				<div class="ui cancel button" id="IDEButton" style="display: none;">Open in IDE</div>
 				<div class="ui cancel button" id="FolderButton" style="display: none;">Open Folder</div>
-				<select id="emscriptenConfig" style="display: none;">
-					<option value="Release" selected>Release</option>
-					<option value="Debug">Debug</option>
-				</select>
+				<div class="ui selection dropdown button" id="emscriptenConfig" style="display: none; min-width: 8em;">
+					<input type="hidden" value="Release">
+					<i class="dropdown icon"></i>
+					<div class="text">Release</div>
+					<div class="menu">
+						<div class="item" data-value="Release">Release</div>
+						<div class="item" data-value="Debug">Debug</div>
+					</div>
+				</div>
 				<div class="ui cancel button" id="EmscriptenPreviewButton" style="display: none;">Build &amp; Preview</div>
 				<div class="ui cancel button">Close</div>
 			</div>
