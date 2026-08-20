@@ -85,7 +85,6 @@
   ],
   "dependencies": {
     "@types/jquery": "^3.5.32",
-    "modclean": "^3.0.0-beta.1",
     "moniker": "^0.1.2",
     "n-readlines": "^1.0.1"
   },
