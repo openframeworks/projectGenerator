@@ -681,7 +681,11 @@ function setup() {
 
         $("#FolderButton").on("click", () => {
             disableButtonTemporarily($("#FolderButton"));
-            launchFolder();
+            if (modalFolderPath) {
+                ipcRenderer.send('openPath', modalFolderPath);
+            } else {
+                launchFolder();
+            }
         });
 
         $("#EmscriptenPreviewButton").on("click", () => {
@@ -1216,7 +1220,21 @@ function openFolder() {
 }
 
 //----------------------------------------
+// set by displayModal() when a message carries a modal-context marker -
+// lets the Folder button open something other than the current project
+let modalFolderPath = null;
+
 function displayModal(message) {
+    let modalType = null;
+    const contextMatch = message.match(/<!--modal-context:([a-z-]+):([^>]*)-->/);
+    if (contextMatch) {
+        modalType = contextMatch[1];
+        modalFolderPath = contextMatch[2] || null;
+        message = message.replace(contextMatch[0], '');
+    } else {
+        modalFolderPath = null;
+    }
+
     $("#uiModal .content")
         .html(message)
         .find('*[data-toggle="external_target"]')
@@ -1227,18 +1245,26 @@ function displayModal(message) {
 
     const isEmscripten = lastGeneratedProject != null && lastGeneratedProject.templateList.includes('emscripten');
 
-    if (message.indexOf("Success!") > -1){
-        $("#IDEButton").show();
+    $("#IDEButton").hide();
+    $("#FolderButton").hide();
+    $("#emscriptenConfig").hide();
+    $("#EmscriptenPreviewButton").hide();
+
+    if (modalType === 'addon-success') {
+        $("#FolderButton").show();
+    } else if (modalType === 'none') {
+        // only Close makes sense here (e.g. addon validation errors, emscripten build messages)
+    } else if (message.indexOf("Success!") > -1){
         $("#FolderButton").show();
         if (isEmscripten) {
+            // emscripten has no xcodeproj/sln to open - Build & Preview replaces "Open in IDE" here
             $("#emscriptenConfig").show();
             $("#EmscriptenPreviewButton").show();
+        } else {
+            $("#IDEButton").show();
         }
     } else {
-        $("#IDEButton").hide();
         $("#FolderButton").show();
-        $("#emscriptenConfig").hide();
-        $("#EmscriptenPreviewButton").hide();
     }
 
     $("#uiModal").modal('show');
@@ -1333,9 +1359,14 @@ function cloneAddonFromGit(){
     if (raw === '') return;
 
     const [url, ref] = raw.split('#');
+    $("#addonGitUrl").prop('disabled', true).attr('placeholder', 'Cloning...').val('');
+    $('body').addClass('enableConsole showConsole');
     ipcRenderer.send('cloneAddon', { ofPath: $("#ofPath").val(), url, ref: ref || '' });
-    $("#addonGitUrl").val('');
 }
+
+ipcRenderer.on('cloneAddonDone', () => {
+    $("#addonGitUrl").prop('disabled', false).attr('placeholder', 'git URL, optionally url#branch-or-commit...');
+});
 
 function getRandomSketchName(){
     const projectPath = $("#projectPath").val();

@@ -761,15 +761,19 @@ ipcMain.on('cloneAddon', (event, { ofPath, url, ref }) => {
     const name = path.basename(url, '.git');
 
     if (!/^ofx/i.test(name) || name.includes('/') || name.includes('\\')) {
-        event.sender.send('sendUIMessage', `<strong>Error...</strong><br>Addon folder name should start with "ofx" (got "${name}").`);
+        event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br>Addon folder name should start with "ofx" (got "${name}").`);
+        event.sender.send('cloneAddonDone');
         return;
     }
 
     const destDir = path.join(addonsDir, name);
     if (fs.existsSync(destDir)) {
-        event.sender.send('sendUIMessage', `<strong>Error...</strong><br><span class="monospace">${name}</span> already exists in your addons folder.`);
+        event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br><span class="monospace">${name}</span> already exists in your addons folder.`);
+        event.sender.send('cloneAddonDone');
         return;
     }
+
+    event.sender.send('consoleMessage', `<br><em>Cloning ${url} into ${destDir}...</em><br>`);
 
     const child = spawn('git', ['clone', '--recursive', url, destDir], { cwd: addonsDir, windowsHide: true });
     let stderr = '';
@@ -780,18 +784,21 @@ ipcMain.on('cloneAddon', (event, { ofPath, url, ref }) => {
     });
 
     child.on('error', (error) => {
-        event.sender.send('sendUIMessage', `<strong>Error...</strong><br>Could not run git. Make sure git is installed and on PATH.<br><span class="monospace">${error.message}</span>`);
+        event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br>Could not run git. Make sure git is installed and on PATH.<br><span class="monospace">${error.message}</span>`);
+        event.sender.send('cloneAddonDone');
     });
 
     child.on('close', (code) => {
         if (code !== 0) {
-            event.sender.send('sendUIMessage', `<strong>Error...</strong><br>git clone failed (exit code ${code}).<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">${stderr}</textarea></div>`);
+            event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br>git clone failed (exit code ${code}).<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">${stderr}</textarea></div>`);
+            event.sender.send('cloneAddonDone');
             return;
         }
 
         const finish = () => {
-            event.sender.send('sendUIMessage', `<strong>Success!</strong><br>Added addon <span class="monospace">${name}</span>.`);
             refreshAddonList(event, ofPath);
+            event.sender.send('sendUIMessage', `<!--modal-context:addon-success:${destDir}-->\n<strong>Success!</strong><br>Added addon <span class="monospace">${name}</span>.`);
+            event.sender.send('cloneAddonDone');
         };
 
         if (ref) {
@@ -800,7 +807,7 @@ ipcMain.on('cloneAddon', (event, { ofPath, url, ref }) => {
             checkout.stderr.on('data', (chunk) => event.sender.send('consoleMessage', chunk.toString()));
             checkout.on('close', (checkoutCode) => {
                 if (checkoutCode !== 0) {
-                    event.sender.send('sendUIMessage', `<strong>Warning</strong><br>Cloned ${name} but could not check out "${ref}".`);
+                    event.sender.send('consoleMessage', `<br><em>Warning: cloned ${name} but could not check out "${ref}"</em><br>`);
                 }
                 finish();
             });
@@ -1584,6 +1591,10 @@ ipcMain.on('openExternal', (event, url) => {
 
 ipcMain.on('showItemInFolder', (event, p) => {
     shell.showItemInFolder(p);
+});
+
+ipcMain.on('openPath', (event, p) => {
+    shell.openPath(p);
 });
 
 ipcMain.on('command', (event, customArg) => {
