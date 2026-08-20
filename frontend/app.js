@@ -552,7 +552,6 @@ function setup() {
         $('#commandButton').click(() => {
             disableButtonTemporarily($("#commandButton"));
             const customArg = $('#commandInput').val();
-            customArg = customArg.replace(/[`$&|<>]/g, '\\$&');
             ipcRenderer.send('command', customArg);
         });
        
