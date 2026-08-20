@@ -1,14 +1,17 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 contextBridge.exposeInMainWorld('ipcWrapper', {
+  getPathForFile: (file) => webUtils.getPathForFile(file),
   send: (channel, data) => {
     ipcRenderer.send(channel, data);
   },
   sendSync: (channel, data) => {
     return ipcRenderer.sendSync(channel, data);
   },
+  // app.js callbacks keep the (event, arg) shape they had under nodeIntegration,
+  // but the real IpcRendererEvent isn't clonable across the bridge - pass null.
   on: (channel, func) => {
-    ipcRenderer.on(channel, (event, ...args) => func(...args));
+    ipcRenderer.on(channel, (event, ...args) => func(null, ...args));
   },
   path: {
     join: (...args) => ipcRenderer.sendSync('path', ['join', args]),

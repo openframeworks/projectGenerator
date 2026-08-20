@@ -1,11 +1,13 @@
-//nodeRequire is used instead of require due to clash with node and jquery
-//see section - I can not use jQuery/RequireJS/Meteor/AngularJS in Electron : https://www.electronjs.org/docs/latest/faq/
-const { ipcRenderer, webUtils } = nodeRequire('electron');
-path = nodeRequire('path');
-fs = nodeRequire('fs');
+// no direct node/electron access here - nodeIntegration is off, contextIsolation is on.
+// everything goes through the contextBridge API exposed by preload.js
+const ipcRenderer = window.ipcWrapper;
+const path = window.ipcWrapper.path;
+const fs = window.ipcWrapper.fs;
+const webUtils = { getPathForFile: window.ipcWrapper.getPathForFile };
 
 let platforms;
 let templates;
+let lastGeneratedProject = null;
 
 // var platforms = {
 //     "osx": "OS X (Xcode)",
