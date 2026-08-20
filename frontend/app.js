@@ -684,6 +684,11 @@ function setup() {
             launchFolder();
         });
 
+        $("#EmscriptenPreviewButton").on("click", () => {
+            disableButtonTemporarily($("#EmscriptenPreviewButton"));
+            buildAndPreviewEmscripten();
+        });
+
          $("#verboseOption").checkbox();
          $("#verboseOption").on("change", () => {
             if ($("#verboseOption").filter(":checked").length > 0) {
@@ -1035,6 +1040,7 @@ function generate() {
     } else if (gen.platformList == null || lengthOfPlatforms == 0) {
         $("#platformsDropdown").oneTimeTooltip("Please select a platform first.");
     } else {
+        lastGeneratedProject = { projectName: gen.projectName, projectPath: gen.projectPath, templateList: gen.templateList };
         ipcRenderer.send('generate', gen);
     }
 }
@@ -1219,12 +1225,20 @@ function displayModal(message) {
             ipcRenderer.send('openExternal', $(e.currentTarget).prop("href") );
         });
 
+    const isEmscripten = lastGeneratedProject != null && lastGeneratedProject.templateList.includes('emscripten');
+
     if (message.indexOf("Success!") > -1){
         $("#IDEButton").show();
         $("#FolderButton").show();
+        if (isEmscripten) {
+            $("#emscriptenConfig").show();
+            $("#EmscriptenPreviewButton").show();
+        }
     } else {
         $("#IDEButton").hide();
         $("#FolderButton").show();
+        $("#emscriptenConfig").hide();
+        $("#EmscriptenPreviewButton").hide();
     }
 
     $("#uiModal").modal('show');
@@ -1361,6 +1375,16 @@ function launchFolder(){
     };
 
     ipcRenderer.send('launchFolder', project );
+}
+
+function buildAndPreviewEmscripten(){
+    if (lastGeneratedProject == null) return;
+
+    ipcRenderer.send('buildEmscripten', {
+        projectName: lastGeneratedProject.projectName,
+        projectPath: lastGeneratedProject.projectPath,
+        configuration: $("#emscriptenConfig").val(),
+    });
 }
 
 function getOFVersion() {

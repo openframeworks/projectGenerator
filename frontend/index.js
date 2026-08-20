@@ -1417,6 +1417,130 @@ ipcMain.on('launchFolder', async (event, arg) => {
     }
 });
 
+const emscriptenMimeTypes = {
+    '.html': 'text/html',
+    '.js': 'text/javascript',
+    '.wasm': 'application/wasm',
+    '.data': 'application/octet-stream',
+    '.css': 'text/css',
+    '.json': 'application/json',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.svg': 'image/svg+xml',
+};
+
+// serves rootDir over loopback-only http (emscripten's wasm/fetch glue needs http://, not file://)
+// and opens it in a new BrowserWindow. server is torn down when that window closes.
+function serveAndPreviewEmscripten(rootDir, htmlFile, event) {
+    const normalizedRoot = path.normalize(rootDir);
+
+    const server = http.createServer((req, res) => {
+        let reqPath;
+        try {
+            reqPath = decodeURIComponent(new URL(req.url, 'http://127.0.0.1').pathname);
+        } catch (e) {
+            res.writeHead(400);
+            res.end('Bad request');
+            return;
+        }
+
+        const filePath = path.normalize(path.join(normalizedRoot, reqPath === '/' ? htmlFile : reqPath));
+        if (filePath !== normalizedRoot && !filePath.startsWith(normalizedRoot + path.sep)) {
+            res.writeHead(403);
+            res.end('Forbidden');
+            return;
+        }
+
+        fs.readFile(filePath, (err, data) => {
+            if (err) {
+                res.writeHead(404);
+                res.end('Not found');
+                return;
+            }
+            const ext = path.extname(filePath).toLowerCase();
+            res.writeHead(200, { 'Content-Type': emscriptenMimeTypes[ext] || 'application/octet-stream' });
+            res.end(data);
+        });
+    });
+
+    server.listen(0, '127.0.0.1', () => {
+        const { port } = server.address();
+        const previewUrl = `http://127.0.0.1:${port}/${htmlFile}`;
+
+        const previewWindow = new BrowserWindow({
+            width: 960,
+            height: 720,
+            title: 'Emscripten Preview',
+            webPreferences: {
+                nodeIntegration: false,
+                contextIsolation: true,
+                sandbox: true,
+            },
+        });
+        previewWindow.loadURL(previewUrl);
+        previewWindow.on('closed', () => server.close());
+
+        event.sender.send('consoleMessage', `<br><em>Preview running at ${previewUrl}</em><br>`);
+    });
+
+    server.on('error', (error) => {
+        event.sender.send('sendUIMessage', `<strong>Error...</strong><br>Could not start the preview server: ${error.message}`);
+    });
+}
+
+ipcMain.on('buildEmscripten', (event, { projectName, projectPath, configuration }) => {
+    const projectDir = path.join(projectPath, projectName);
+    const target = configuration === 'Debug' ? 'Debug' : 'Release';
+
+    if (!fs.existsSync(path.join(projectDir, 'Makefile'))) {
+        event.sender.send('sendUIMessage', `<strong>Error...</strong><br>No Makefile found in <span class="monospace">${projectDir}</span>. Generate the project with the Emscripten template first.`);
+        return;
+    }
+
+    const child = spawn('make', [target], { cwd: projectDir, windowsHide: true });
+    let stderr = '';
+
+    child.stdout.on('data', (chunk) => event.sender.send('consoleMessage', chunk.toString()));
+    child.stderr.on('data', (chunk) => {
+        stderr += chunk.toString();
+        event.sender.send('consoleMessage', chunk.toString());
+    });
+
+    child.on('error', (error) => {
+        event.sender.send('sendUIMessage',
+            '<strong>Error...</strong><br>Could not run make. Make sure the Emscripten SDK is installed and activated '
+            + '(run <span class="monospace">source emsdk_env.sh</span> in the terminal you launched this app from) '
+            + 'so emcc/em++/make are on PATH.<br><span class="monospace">' + error.message + '</span>'
+        );
+    });
+
+    child.on('close', (code) => {
+        if (code !== 0) {
+            event.sender.send('sendUIMessage',
+                `<strong>Error...</strong><br>Emscripten ${target} build failed (exit code ${code}).`
+                + '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stderr + '</textarea></div>'
+            );
+            return;
+        }
+
+        const binDir = path.join(projectDir, 'bin');
+        let htmlFile = null;
+        try {
+            const candidates = fs.readdirSync(binDir).filter((f) => f.endsWith('.html'));
+            htmlFile = candidates.includes('index.html') ? 'index.html' : candidates[0];
+        } catch (error) {
+            // binDir missing or unreadable - htmlFile stays null, handled below
+        }
+
+        if (!htmlFile) {
+            event.sender.send('sendUIMessage', `<strong>Error...</strong><br>Build succeeded but no .html output was found in <span class="monospace">${binDir}</span>`);
+            return;
+        }
+
+        serveAndPreviewEmscripten(binDir, htmlFile, event);
+    });
+});
+
 ipcMain.on('quit', (event, arg) => {
     app.quit();
 });
