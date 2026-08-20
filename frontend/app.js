@@ -701,6 +701,8 @@ function setup() {
             const ofpath = $("#ofPath").val();
             defaultSettings.defaultOfPath = ofpath;
             console.log("ofPath val " + ofpath);
+            $("#ofPathStatusText").text(ofpath || '(no openFrameworks path set)');
+            $("#ofPathStatusBar").attr('title', ofpath);
             if(isFirstTimeSierra) {
                 //ipcRenderer.sendSync('firstTimeSierra', "xattr -r -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app");
                 //$("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
@@ -1310,6 +1312,15 @@ function rescanAddons() {
         'projectPath': $("#projectPath").val(),
     };
     ipcRenderer.send('isOFProjectFolder', projectInfo);     // <- this forces addon reload
+}
+
+function cloneAddonFromGit(){
+    const raw = $("#addonGitUrl").val().trim();
+    if (raw === '') return;
+
+    const [url, ref] = raw.split('#');
+    ipcRenderer.send('cloneAddon', { ofPath: $("#ofPath").val(), url, ref: ref || '' });
+    $("#addonGitUrl").val('');
 }
 
 function getRandomSketchName(){

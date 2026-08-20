@@ -111,11 +111,14 @@
 				</a>
 			</div>
 		</div>
+		<div class="undraggable" id="ofPathStatusBar" style="background-color:#222; color:#999; font-size:11px; padding:4px 12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+			Targeting: <span id="ofPathStatusText">(no openFrameworks path set)</span>
+		</div>
 		</div>
 		</div>
 
 
-		<div class="main ui container" style="padding: 130px 40px 50px 40px">
+		<div class="main ui container" style="padding: 150px 40px 50px 40px">
 
 			<!------------------------------- create -------------------------------->
 			<div class="ui tab active" data-tab="create">
@@ -167,7 +170,16 @@
 							<a class="ui icon tooltip" href="#rescanAddons" onclick="rescanAddons()" data-content="Click to reload addons folder" data-position="right center" id="adons-refresh-icon">
 								<i class="refresh icon"></i>
 							</a>
+							<a class="ui icon tooltip" href="#addAddonFromGit" onclick="$('#addonGitCloneSection').toggle()" data-content="Add an addon from a git URL" data-position="right center" id="addon-git-icon">
+								<i class="cloud download icon"></i>
+							</a>
 						</label>
+						<div class="field" id="addonGitCloneSection" style="display:none; margin-bottom:0.5em;">
+							<div class="ui icon input fluid">
+								<input type="text" placeholder="git URL, optionally url#branch-or-commit..." id="addonGitUrl">
+								<i class="download link icon" onclick="cloneAddonFromGit()"></i>
+							</div>
+						</div>
 						<div class="ui multiple search selection dropdown" id="addonsDropdown">
 							<input name="addons" type="hidden">
 							<i class="dropdown icon"></i>

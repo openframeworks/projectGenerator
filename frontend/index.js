@@ -754,6 +754,62 @@ ipcMain.on('refreshAddonList', refreshAddonList);
 
 ipcMain.on('refreshPlatformList', refreshPlatformList);
 
+ipcMain.on('cloneAddon', (event, { ofPath, url, ref }) => {
+    if (!url) return;
+
+    const addonsDir = path.join(ofPath, 'addons');
+    const name = path.basename(url, '.git');
+
+    if (!/^ofx/i.test(name) || name.includes('/') || name.includes('\\')) {
+        event.sender.send('sendUIMessage', `<strong>Error...</strong><br>Addon folder name should start with "ofx" (got "${name}").`);
+        return;
+    }
+
+    const destDir = path.join(addonsDir, name);
+    if (fs.existsSync(destDir)) {
+        event.sender.send('sendUIMessage', `<strong>Error...</strong><br><span class="monospace">${name}</span> already exists in your addons folder.`);
+        return;
+    }
+
+    const child = spawn('git', ['clone', '--recursive', url, destDir], { cwd: addonsDir, windowsHide: true });
+    let stderr = '';
+    child.stdout.on('data', (chunk) => event.sender.send('consoleMessage', chunk.toString()));
+    child.stderr.on('data', (chunk) => {
+        stderr += chunk.toString();
+        event.sender.send('consoleMessage', chunk.toString());
+    });
+
+    child.on('error', (error) => {
+        event.sender.send('sendUIMessage', `<strong>Error...</strong><br>Could not run git. Make sure git is installed and on PATH.<br><span class="monospace">${error.message}</span>`);
+    });
+
+    child.on('close', (code) => {
+        if (code !== 0) {
+            event.sender.send('sendUIMessage', `<strong>Error...</strong><br>git clone failed (exit code ${code}).<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">${stderr}</textarea></div>`);
+            return;
+        }
+
+        const finish = () => {
+            event.sender.send('sendUIMessage', `<strong>Success!</strong><br>Added addon <span class="monospace">${name}</span>.`);
+            refreshAddonList(event, ofPath);
+        };
+
+        if (ref) {
+            const checkout = spawn('git', ['checkout', ref], { cwd: destDir, windowsHide: true });
+            checkout.stdout.on('data', (chunk) => event.sender.send('consoleMessage', chunk.toString()));
+            checkout.stderr.on('data', (chunk) => event.sender.send('consoleMessage', chunk.toString()));
+            checkout.on('close', (checkoutCode) => {
+                if (checkoutCode !== 0) {
+                    event.sender.send('sendUIMessage', `<strong>Warning</strong><br>Cloned ${name} but could not check out "${ref}".`);
+                }
+                finish();
+            });
+        } else {
+            finish();
+        }
+    });
+});
+
 ipcMain.on('refreshTemplateList', (event, arg) => {
     console.log("refreshTemplateList");
     const { selectedPlatforms, ofPath, bMulti } = arg;
