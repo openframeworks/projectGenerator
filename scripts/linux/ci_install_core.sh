@@ -61,6 +61,13 @@ pwd
 echo "Directory ../ contents:"
 ls
 
+# works around openframeworks/openFrameworks#8543 - libunwind-dev ships held/broken
+# on GitHub-hosted ubuntu-22.04(-arm) runners, which breaks libgstreamer1.0-dev below
+sudo apt-get update
+sudo apt-mark unhold libunwind-dev libunwind8 2>/dev/null || true
+sudo apt-get install -y --fix-broken || true
+sudo apt-get install -y libunwind-dev || true
+
 sudo ./scripts/linux/ubuntu/install_dependencies.sh -y;
 if [ -d "libs/glfw" ]; then
 	echo 'libs installed, using them'
