@@ -6,10 +6,13 @@
   background-color: #333;
   color: #FFF;
   height: 100px;
+  min-height: 60px;
+  max-height: 60vh;
   position: fixed;
   bottom: 0;
   box-shadow: inset 0px 0px 9px 0px rgba(0,0,0,0.75);
   overflow-y: scroll;
+  resize: vertical;
   padding: 0 40px;
   margin-bottom: -80px;
   transition: margin-bottom .2s ease-in-out;

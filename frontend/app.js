@@ -1188,11 +1188,12 @@ function enableAdvancedMode(isAdvanced) {
 
 function enableConsole( showConsole ){
 	if( showConsole ) {
-		// this has to be in body for CSS reasons
-		$("body").addClass('showConsole');
+		// .enableConsole and .showConsole both have to be on body for CSS reasons -
+		// enableConsole alone leaves the console panel slid off-screen (see index.css)
+		$("body").addClass('enableConsole showConsole');
 	}
 	else {
-		$("body").removeClass('showConsole');
+		$("body").removeClass('enableConsole showConsole');
 	}
 	defaultSettings['showConsole'] = showConsole;
 	saveDefaultSettings();
