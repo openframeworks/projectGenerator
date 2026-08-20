@@ -1105,6 +1105,10 @@ function updateRecursive() {
     } else if (platformValueArray.length === 0) {
         displayModal("Please select a platform first.");
     } else {
+        // this is a recursive multi-project update, not a single generated project -
+        // clear any stale single-project state so its success modal can't show a
+        // leftover Build & Preview button from an earlier emscripten generate/update
+        lastGeneratedProject = null;
         ipcRenderer.send('update', gen);
     }
 }
