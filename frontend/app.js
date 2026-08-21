@@ -352,10 +352,8 @@ ipcRenderer.on('selectAddons', (event, arg) => {
         $('#missingAddonList').empty();
         $('#missingAddonList').append("<b>" + neededAddons.join(", ") + "</b>");
         $("#missingAddonMessage").show();
-        $("#adons-refresh-icon").show();
 
     } else {
-        $("#adons-refresh-icon").hide();
         $("#missingAddonMessage").hide();
 
         // $("#generate-mode-section").removeClass("has-missing-addons");
@@ -1132,7 +1130,6 @@ function switchGenerateMode(mode) {
         $("#localAddonMessage").hide();
         $("#nameRandomiser").hide();
         $("#revealProjectFiles").show();
-        $("#adons-refresh-icon").hide();
         if(!defaultSettings.advancedMode){
             $("#consoleContainer").hide();
         }
@@ -1160,7 +1157,6 @@ function switchGenerateMode(mode) {
         $("#localAddonMessage").hide();
         $("#nameRandomiser").show();
         $("#revealProjectFiles").hide();
-        $("#adons-refresh-icon").hide();
         if(!defaultSettings.advancedMode){
             $("#consoleContainer").hide();
         }
