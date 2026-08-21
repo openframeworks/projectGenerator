@@ -1020,6 +1020,7 @@ function updateFunction(event, update) {
                 '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + error.message + '</textarea></div>'
             );
         }
+        event.sender.send('updateMultipleDone');
     });
 }
 

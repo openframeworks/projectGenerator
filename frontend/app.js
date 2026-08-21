@@ -409,6 +409,10 @@ ipcRenderer.on('updateCompleted', (event, isSuccessful) => {
     }
 });
 
+ipcRenderer.on('updateMultipleDone', () => {
+    $("#updateMultipleButton").removeClass('loading disabled').text('Update multiple');
+});
+
 ipcRenderer.on('setRandomisedSketchName', (event, newName) => {
     $("#projectName").val(newName);
 });
@@ -1107,6 +1111,8 @@ function updateRecursive() {
         // clear any stale single-project state so its success modal can't show a
         // leftover Build & Preview button from an earlier emscripten generate/update
         lastGeneratedProject = null;
+        $("#updateMultipleButton").addClass('loading disabled').text('Updating...');
+        $('body').addClass('enableConsole showConsole');
         ipcRenderer.send('update', gen);
     }
 }
