@@ -1524,8 +1524,12 @@ function serveAndPreviewEmscripten(rootDir, htmlFile, event) {
 function resolveEmsdkEnv(emsdkPath) {
     const env = { ...process.env };
     if (emsdkPath) {
+        // Windows env var names are case-insensitive but JS object keys aren't - the
+        // real key is usually "Path", not "PATH". Update whichever key already exists
+        // so we extend it instead of creating a second, conflicting one.
+        const pathKey = Object.keys(env).find((k) => k.toUpperCase() === 'PATH') || 'PATH';
         const additions = [emsdkPath, path.join(emsdkPath, 'upstream', 'emscripten')];
-        env.PATH = additions.join(path.delimiter) + path.delimiter + (env.PATH || '');
+        env[pathKey] = additions.join(path.delimiter) + path.delimiter + (env[pathKey] || '');
         env.EMSDK = emsdkPath;
     }
     return env;
