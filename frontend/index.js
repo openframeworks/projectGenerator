@@ -1617,17 +1617,15 @@ ipcMain.on('quit', (event, arg) => {
 });
 
 ipcMain.on('saveDefaultSettings', (event, defaultSettings) => {
-    fs.writeFile(
-        path.resolve(__dirname, 'settings.json'),
-        defaultSettings,
-        (err) => {
-            if (err) {
-                event.returnValue = "Unable to save defaultSettings to settings.json... (Error=" + err.code + ")";
-            } else {
-                event.returnValue = "Updated default settings for the PG. (written to settings.json)";
-            }
-        }
-    );
+    // sendSync from the renderer expects returnValue set before this handler returns -
+    // fs.writeFile is async and would resolve after that, so a quit right after e.g.
+    // picking a new OF path could race past the actual disk write and lose it (#602)
+    try {
+        fs.writeFileSync(path.resolve(__dirname, 'settings.json'), defaultSettings);
+        event.returnValue = "Updated default settings for the PG. (written to settings.json)";
+    } catch (err) {
+        event.returnValue = "Unable to save defaultSettings to settings.json... (Error=" + err.code + ")";
+    }
 });
 
 ipcMain.on('path', (event, [ key, args ]) => {
