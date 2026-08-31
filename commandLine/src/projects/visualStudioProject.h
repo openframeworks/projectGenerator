@@ -50,4 +50,6 @@ protected:
 	void addSrcFiles(ofAddon& addon, const vector<fs::path> &filepaths, SrcType type, bool bFindInFilesToFolder = true) override;
 
 	void addCompileOption(const string& nodeName, const string& value, const string& delimiter, LibType libType = RELEASE_LIB);
+
+	void addClCompileAsC(const string & srcFileString, const string & folderString);
 };

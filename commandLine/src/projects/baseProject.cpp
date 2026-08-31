@@ -22,7 +22,13 @@ baseProject::baseProject(const string & _target) : target(_target) {
 	bLoaded = false;
 }
 
-fs::path baseProject::getPlatformTemplateDir(std::string templateDir) {
+fs::path baseProject::getPlatformTemplateDir() {
+	// This must always resolve to the platform's own base template (the one
+	// holding emptyExample.xcodeproj / platform Makefiles, etc.) - an extra
+	// template requested via `templateName` (gitignore, gl3.2, nofmod, ...)
+	// is layered on top afterwards via recursiveTemplateCopy and must never
+	// replace this folder, or createProjectFile() ends up copying from a
+	// template with no platform project file at all (see #8479).
 	string folder { target };
 	if ( target == "msys2"
 		|| target == "linux"
@@ -32,9 +38,6 @@ fs::path baseProject::getPlatformTemplateDir(std::string templateDir) {
 		|| target == "linuxaarch64"
 	) {
 		folder = "vscode";
-	}
-	if (templateDir != "") {
-		folder = templateDir;
 	}
 	return fs::weakly_canonical(getOFRoot() / templatesFolder / folder);
 }
@@ -137,7 +140,7 @@ bool baseProject::create(const fs::path & _path, string templateName){
 
 	addons.clear();
 	extSrcPaths.clear();
-	auto pathTemplate = getPlatformTemplateDir(templateName);
+	auto pathTemplate = getPlatformTemplateDir();
 	if (fs::exists(pathTemplate)) {
 		templatePath = normalizePath(pathTemplate);
 	} else {
@@ -659,7 +662,7 @@ void baseProject::addSrcFiles(ofAddon& addon, const vector<fs::path> &filepaths,
 		}
 		fs::path normalizedDir = makeRelative(getOFRoot(), s);
 		ofLogVerbose("baseProject::addSrcFiles") << "Adding addon " << toString(type) << " source file: [" << s.string() << "] folder:[" << addon.filesToFolders[s].string() << "]";
-		addSrc(normalizedDir, addon.filesToFolders[s]);
+		addSrc(normalizedDir, addon.filesToFolders[s], type);
 	}
 }
 
