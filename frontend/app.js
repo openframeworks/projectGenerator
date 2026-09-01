@@ -806,10 +806,12 @@ function setup() {
 
         $("#detachConsole").checkbox();
         $("#detachConsole").prop('checked', !!defaultSettings['detachConsole']);
+        updateConsoleDockVisibility();
         $("#detachConsole").on('change', function(){
             const enabled = $(this).is(':checked');
             defaultSettings['detachConsole'] = enabled;
             saveDefaultSettings();
+            updateConsoleDockVisibility();
             ipcRenderer.send('setDetachConsole', enabled);
         });
 
@@ -1323,6 +1325,21 @@ function openConsoleForOperation() {
     $('body').addClass('showConsole');
 }
 
+// the docked console and the detached window are mutually exclusive - hide the
+// dock entirely while the console is detached, instead of just skipping its auto-open
+function updateConsoleDockVisibility() {
+    $('#consoleContainer').toggle(!defaultSettings['detachConsole']);
+}
+
+// syncs the checkbox back off if the console window was closed directly (its own
+// close button) rather than via the checkbox, so the two don't fall out of sync
+ipcRenderer.on('consoleWindowClosed', () => {
+    $("#detachConsole").checkbox('set unchecked');
+    defaultSettings['detachConsole'] = false;
+    saveDefaultSettings();
+    updateConsoleDockVisibility();
+});
+
 //-----------------------------------------------------------------------------------
 // Button calls
 //-----------------------------------------------------------------------------------
@@ -1484,6 +1501,20 @@ function buildAndPreviewEmscripten(){
 
 ipcRenderer.on('buildEmscriptenDone', () => {
     $("#EmscriptenPreviewButton").removeClass('loading disabled').text('Build & Preview');
+});
+
+function ofMenuButtonFor(command) {
+    return command === 'status' ? $('#ofMenuStatusButton') : $('#ofMenuUpdateLibsButton');
+}
+
+function runOfMenuCommand(command) {
+    ofMenuButtonFor(command).addClass('loading disabled');
+    openConsoleForOperation();
+    ipcRenderer.send('runOfMenu', { command, ofPath: $("#ofPath").val() });
+}
+
+ipcRenderer.on('ofMenuDone', (event, { command }) => {
+    ofMenuButtonFor(command).removeClass('loading disabled');
 });
 
 function getOFVersion() {
