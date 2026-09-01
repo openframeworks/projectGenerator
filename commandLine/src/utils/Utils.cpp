@@ -582,10 +582,13 @@ EmscriptenSDK resolveEmscriptenSDK() {
 		if (tryBinDir(fs::path(dir))) return sdk;
 	}
 
+	// prefer the shared Homebrew bin dir over the formula's private keg - emmake/emcc
+	// shell out to python3, which only resolves if that shared dir is on PATH too
 #ifdef TARGET_OSX
-	if (tryBinDir("/opt/homebrew/opt/emscripten/bin") || tryBinDir("/usr/local/opt/emscripten/bin")) return sdk;
+	if (tryBinDir("/opt/homebrew/bin") || tryBinDir("/usr/local/bin")
+		|| tryBinDir("/opt/homebrew/opt/emscripten/bin") || tryBinDir("/usr/local/opt/emscripten/bin")) return sdk;
 #elif defined(TARGET_LINUX)
-	if (tryBinDir("/home/linuxbrew/.linuxbrew/opt/emscripten/bin")) return sdk;
+	if (tryBinDir("/home/linuxbrew/.linuxbrew/bin") || tryBinDir("/home/linuxbrew/.linuxbrew/opt/emscripten/bin")) return sdk;
 #endif
 
 	return sdk;
