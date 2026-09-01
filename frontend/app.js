@@ -1202,6 +1202,7 @@ function enableAdvancedMode(isAdvanced) {
          $('#commandInput').show();
         $('#commandButton').show();
         $('#ofPathButton').show();
+        $('#emsdkField').show();
 
 
     } else {
@@ -1218,6 +1219,7 @@ function enableAdvancedMode(isAdvanced) {
         $('#commandInput').hide();
         $('#commandButton').hide();
         $('#ofPathButton').hide();
+        $('#emsdkField').hide();
         $("body").removeClass('advanced');
         $('a.updateMultiMenuOption').hide();
     }

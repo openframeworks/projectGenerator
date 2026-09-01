@@ -313,13 +313,6 @@
 					</div>
 					</div>
 					<div class="field">
-						<label>Emscripten SDK path (optional, used by Build &amp; Preview):</label>
-						<div class="ui icon input fluid">
-							<input type="text" placeholder="emsdk path..." id="emsdkPath">
-							<i class="search link icon" onclick="browseEmsdkPath()"></i>
-						</div>
-					</div>
-					<div class="field">
 						<label>Platform:</label>
 						<div class="ui icon input fluid">
 						<input type="text" placeholder="Platform..." id="platformDisplay" readonly>
@@ -355,6 +348,14 @@
 						<div class="ui checkbox advanced">
 							<input type="checkbox" name="Advanced" id="advancedOptions">
 							<label>Advanced options</label>
+						</div>
+					</div>
+
+					<div class="field advanced" id="emsdkField" style="display: none">
+						<label>Emscripten SDK path (optional, used by Build &amp; Preview):</label>
+						<div class="ui icon input fluid">
+							<input type="text" placeholder="emsdk path..." id="emsdkPath">
+							<i class="search link icon" onclick="browseEmsdkPath()"></i>
 						</div>
 					</div>
 
