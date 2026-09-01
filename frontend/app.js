@@ -106,6 +106,13 @@ ipcRenderer.on('setDefaults', (event, arg) => {
     $("#emsdkPath").val(defaultSettings.emsdkPath || '');
     enableAdvancedMode(defaultSettings.advancedMode);
 
+    ipcRenderer.send('getEmsdk');
+});
+
+ipcRenderer.on('emsdkResult', (event, arg) => {
+    if (arg && arg.found && arg.emccDir) {
+        $("#emsdkPath").attr('placeholder', 'auto-detected: ' + arg.emccDir);
+    }
 });
 
 ipcRenderer.on('setGuiVersion', (event, version) => {

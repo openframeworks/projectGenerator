@@ -553,6 +553,45 @@ std::string getPGVersion() {
 }
 
 
+EmscriptenSDK resolveEmscriptenSDK() {
+	EmscriptenSDK sdk;
+#ifdef TARGET_WIN32
+	const string emccName = "emcc.bat";
+	const string pathSep = ";";
+#else
+	const string emccName = "emcc";
+	const string pathSep = ":";
+#endif
+
+	auto tryBinDir = [&](const fs::path & dir) {
+		std::error_code ec;
+		if (fs::exists(dir / emccName, ec)) {
+			sdk.binDir = dir;
+			sdk.found = true;
+		}
+		return sdk.found;
+	};
+
+	auto emsdkEnv = ofGetEnv("EMSDK");
+	if (!emsdkEnv.empty() && (tryBinDir(fs::path(emsdkEnv) / "upstream" / "emscripten") || tryBinDir(emsdkEnv))) {
+		sdk.emsdk = emsdkEnv;
+		return sdk;
+	}
+
+	for (const auto & dir : ofSplitString(ofGetEnv("PATH"), pathSep, true, true)) {
+		if (tryBinDir(fs::path(dir))) return sdk;
+	}
+
+#ifdef TARGET_OSX
+	if (tryBinDir("/opt/homebrew/opt/emscripten/bin") || tryBinDir("/usr/local/opt/emscripten/bin")) return sdk;
+#elif defined(TARGET_LINUX)
+	if (tryBinDir("/home/linuxbrew/.linuxbrew/opt/emscripten/bin")) return sdk;
+#endif
+
+	return sdk;
+}
+
+
 bool ofIsPathInPath(const fs::path & path, const fs::path & base) {
 	auto rel = fs::relative(path, base);
 	return !rel.empty() && rel.native()[0] != '.';

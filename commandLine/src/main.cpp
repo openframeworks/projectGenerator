@@ -26,6 +26,7 @@ enum optionIndex { UNKNOWN,
 	VERSION,
 	GET_OFPATH,
 	GET_HOST_PLATFORM,
+	GET_EMSDK,
 	COMMAND,
 	BACKUP_PROJECT_FILES,
 	FRAMEWORKS,
@@ -47,6 +48,7 @@ constexpr option::Descriptor usage[] = {
 	{ VERSION, 0, "w", "version", option::Arg::None, "  --version, -w  \treturn the current version" },
 	{ GET_OFPATH, 0, "g", "getofpath", option::Arg::None, "  --getofpath, -g  \treturn the current ofPath" },
 	{ GET_HOST_PLATFORM, 0, "i", "platform", option::Arg::None, "  --getplatform, -i  \treturn the current host platform" },
+	{ GET_EMSDK, 0, "e", "getemsdk", option::Arg::None, "  --getemsdk, -e  \tdetect the Emscripten SDK (EMSDK env var, PATH, or a Homebrew install) and return its location" },
 	{ COMMAND, 0, "c", "command", option::Arg::None, "  --command, -c \truns command" },
 	{ BACKUP_PROJECT_FILES, 0, "b", "backup", option::Arg::None, "  --backup, -b  \tbackup project files when replacing with template" },
 	
@@ -506,6 +508,12 @@ int main(int argc, char ** argv) {
 
 	if (options[GET_HOST_PLATFORM].count() > 0) {
 		ofLogNotice() <<  "{ \"ofHostPlatform\": \"" << platformsToString[ofGetTargetPlatform()] << "\" }";
+		return EXIT_OK;
+	}
+
+	if (options[GET_EMSDK].count() > 0) {
+		auto sdk = resolveEmscriptenSDK();
+		ofLogNotice() << "{ \"emsdk\": " << sdk.emsdk << ", \"emccDir\": " << sdk.binDir << ", \"found\": " << (sdk.found ? "true" : "false") << " }";
 		return EXIT_OK;
 	}
 
