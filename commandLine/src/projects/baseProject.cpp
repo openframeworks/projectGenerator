@@ -23,12 +23,7 @@ baseProject::baseProject(const string & _target) : target(_target) {
 }
 
 fs::path baseProject::getPlatformTemplateDir() {
-	// This must always resolve to the platform's own base template (the one
-	// holding emptyExample.xcodeproj / platform Makefiles, etc.) - an extra
-	// template requested via `templateName` (gitignore, gl3.2, nofmod, ...)
-	// is layered on top afterwards via recursiveTemplateCopy and must never
-	// replace this folder, or createProjectFile() ends up copying from a
-	// template with no platform project file at all (see #8479).
+	// always the platform's own base template - extra templates are overlaid later via recursiveTemplateCopy (#8479)
 	string folder { target };
 	if ( target == "msys2"
 		|| target == "linux"

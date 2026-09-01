@@ -338,7 +338,14 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 		auto f = it->path();
 //		alert ("file: "+f.string(), 33);
 
-		if (fs::is_directory(f)) {
+		// use the iterator's cached entry, not fs::is_directory(f), to avoid re-resolving symlinks (#8545)
+		std::error_code dirEc;
+		bool isDir = it->is_directory(dirEc);
+		if (dirEc) {
+			continue;
+		}
+
+		if (isDir) {
 			// on osx, framework is a directory, let's not parse it....
 			if ((f.extension() == ".framework") || (f.extension() == ".xcframework" && (actualTarget != "osx" && actualTarget != "macos")) ) { //we want to treat .xcframeworks as regular libs for macos
 				it.disable_recursion_pending();

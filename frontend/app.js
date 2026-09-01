@@ -1072,6 +1072,9 @@ function generate() {
     } else {
         lastGeneratedProject = { projectName: gen.projectName, projectPath: gen.projectPath, templateList: gen.templateList };
         ipcRenderer.send('generate', gen);
+
+        // don't let a stale template pick leak into the next generate
+        $('#templatesDropdown').dropdown('clear');
     }
 }
 
@@ -1114,6 +1117,9 @@ function updateRecursive() {
         $("#updateMultipleButton").addClass('loading disabled').text('Updating...');
         $('body').addClass('enableConsole showConsole');
         ipcRenderer.send('update', gen);
+
+        // don't let a stale template pick leak into the next update
+        $('#templatesDropdownMulti').dropdown('clear');
     }
 }
 

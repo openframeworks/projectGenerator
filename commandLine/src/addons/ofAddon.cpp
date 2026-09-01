@@ -843,11 +843,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 //        alert("fixpath after  " + ofPathToString(s));
 		addToFolder(s, parentFolder);
 
-		// getLibsRecursively picks up source files sitting alongside an
-		// addon's prebuilt libs (e.g. ofxLua's bundled lua/lpeg C sources).
-		// They must be classified by extension rather than dumped into
-		// srcFiles, or a .c file compiles as C++ and mangles its symbols
-		// (see #8546).
+		// classify by extension instead of dumping everything into srcFiles (#8546)
 		string ext = ofPathToString(s.extension());
 		if (ext == ".c") {
 			csrcFiles.emplace_back(s);
