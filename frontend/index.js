@@ -1689,22 +1689,20 @@ ipcMain.on('buildEmscripten', (event, { projectName, projectPath, configuration,
                     return;
                 }
 
-                const binDir = path.join(projectDir, 'bin');
-                let htmlFile = null;
-                try {
-                    const candidates = fs.readdirSync(binDir).filter((f) => f.endsWith('.html'));
-                    htmlFile = candidates.includes('index.html') ? 'index.html' : candidates[0];
-                } catch (error) {
-                    // binDir missing or unreadable - htmlFile stays null, handled below
-                }
+                // matches PLATFORM_PROJECT_(RELEASE|DEBUG)_TARGET in
+                // libs/openFrameworksCompiled/project/emscripten/config.emscripten.default.mk:
+                // bin/em/$(BIN_NAME)/index.html, where BIN_NAME is <name>_debug for Debug
+                const binName = target === 'Debug' ? `${projectName}_debug` : projectName;
+                const emOutputDir = path.join(projectDir, 'bin', 'em', binName);
+                const htmlFile = fs.existsSync(path.join(emOutputDir, 'index.html')) ? 'index.html' : null;
 
                 if (!htmlFile) {
-                    event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br>Build succeeded but no .html output was found in <span class="monospace">${binDir}</span>`);
+                    event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br>Build succeeded but no .html output was found in <span class="monospace">${emOutputDir}</span>`);
                     event.sender.send('buildEmscriptenDone');
                     return;
                 }
 
-                serveAndPreviewEmscripten(binDir, htmlFile, event);
+                serveAndPreviewEmscripten(emOutputDir, htmlFile, event);
                 event.sender.send('buildEmscriptenDone');
             });
         };

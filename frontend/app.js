@@ -781,9 +781,8 @@ function setup() {
             }
         });
 
-        // the console dock is always available, independent of Advanced options -
-        // only whether it's expanded (showConsole) is a persisted preference
-        $("body").addClass('enableConsole');
+        // the console dock is always present as a collapsed peek strip - only
+        // whether it's expanded (showConsole) is a persisted preference
         if (defaultSettings['showConsole']) { $("body").addClass('showConsole'); }
         $("#showConsole").on('click', function(){
             $('body').addClass('showConsole');
@@ -1325,7 +1324,7 @@ function consoleMessage(orig_message) {
 // console is detached into its own window, so output isn't shown in both places
 function openConsoleForOperation() {
     if (defaultSettings['detachConsole']) return;
-    $('body').addClass('enableConsole showConsole');
+    $('body').addClass('showConsole');
 }
 
 //-----------------------------------------------------------------------------------

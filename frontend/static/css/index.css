@@ -1,7 +1,9 @@
 
 /* - - - - - - - - - -  CONSOLE STYLING - - - - - - - - - - - - - - - - - - - */
+/* Always present as a collapsed peek strip at the bottom - no class needed to
+   make it exist at all. .showConsole is the only toggle, purely expand/collapse. */
 #consoleContainer {
-  display: none;
+  display: block;
   width: 100%;
   background-color: #333;
   color: #FFF;
@@ -41,13 +43,8 @@
   border-color: transparent;
 }
 
-body.enableConsole
- {
+body {
   padding-bottom: 20px;
-}
-
-body.enableConsole #consoleContainer {
-  display: block;
 }
 
 #console {
@@ -79,10 +76,10 @@ body.showConsole #hideConsole {
   display: inline;
 }
 
-body.enableConsole.showConsole {
+body.showConsole {
   padding-bottom: 100px; /* same height as console */
 }
-body.enableConsole.showConsole #consoleContainer {
+body.showConsole #consoleContainer {
   margin-bottom: 0;
 }
 
