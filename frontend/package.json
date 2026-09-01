@@ -67,6 +67,8 @@
       "index.js",
       "app.js",
       "preload.js",
+      "console-window.html",
+      "app-console-window.js",
       "!**/*.ts",
       "!*.map",
       "!package.json",

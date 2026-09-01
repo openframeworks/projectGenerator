@@ -1088,6 +1088,7 @@ function generate() {
         $("#platformsDropdown").oneTimeTooltip("Please select a platform first.");
     } else {
         lastGeneratedProject = { projectName: gen.projectName, projectPath: gen.projectPath, templateList: gen.templateList };
+        $('body').addClass('enableConsole showConsole');
         ipcRenderer.send('generate', gen);
 
         // don't let a stale template pick leak into the next generate
