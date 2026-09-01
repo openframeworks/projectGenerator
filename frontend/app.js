@@ -567,16 +567,10 @@ function setup() {
 
        
         $('#ofPathButton').click(() => {
-            disableButtonTemporarily($("#commandButton"));
+            disableButtonTemporarily($("#ofPathButton"));
             getOFPath();
         });
-        
-        $('#commandButton').click(() => {
-            disableButtonTemporarily($("#commandButton"));
-            const customArg = $('#commandInput').val();
-            ipcRenderer.send('command', customArg);
-        });
-       
+
         console.log("App is translocated: " + isFirstTimeSierra);
  
         $('.main.menu .item').tab({
@@ -786,14 +780,20 @@ function setup() {
             }
         });
 
-        /* Stuff for the console setting (removed from UI) */
-        $("#consoleToggle").on("change", function () {
-            enableConsole( $(this).is(':checked') );
+        // the console dock is always available, independent of Advanced options -
+        // only whether it's expanded (showConsole) is a persisted preference
+        $("body").addClass('enableConsole');
+        if (defaultSettings['showConsole']) { $("body").addClass('showConsole'); }
+        $("#showConsole").on('click', function(){
+            $('body').addClass('showConsole');
+            defaultSettings['showConsole'] = true;
+            saveDefaultSettings();
         });
-        // enable console? (hiddens setting)
-        if(defaultSettings['showConsole']){ $("body").addClass('enableConsole'); }
-        $("#showConsole").on('click', function(){ $('body').addClass('showConsole'); });
-        $("#hideConsole").on('click', function(){ $('body').removeClass('showConsole'); });
+        $("#hideConsole").on('click', function(){
+            $('body').removeClass('showConsole');
+            defaultSettings['showConsole'] = false;
+            saveDefaultSettings();
+        });
 
         // initialise the overall-use modal
         $("#uiModal").modal({
@@ -1199,8 +1199,6 @@ function enableAdvancedMode(isAdvanced) {
         $('#sourceExtraSection').show();
         $('#templateSection').show();
         $('#templateSectionMulti').show();
-         $('#commandInput').show();
-        $('#commandButton').show();
         $('#ofPathButton').show();
         $('#emsdkField').show();
 
@@ -1216,34 +1214,14 @@ function enableAdvancedMode(isAdvanced) {
         $('#templateSection').show();
         $('#templateSectionMulti').show();
 
-        $('#commandInput').hide();
-        $('#commandButton').hide();
         $('#ofPathButton').hide();
         $('#emsdkField').hide();
         $("body").removeClass('advanced');
         $('a.updateMultiMenuOption').hide();
     }
-    enableConsole(isAdvanced);
     defaultSettings.advancedMode = isAdvanced;
     saveDefaultSettings();
     //$("#advancedToggle").prop('checked', defaultSettings['advancedMode'] );
-}
-
-/* Stuff for the console setting (removed from UI) */
-
-function enableConsole( showConsole ){
-	if( showConsole ) {
-		// .enableConsole and .showConsole both have to be on body for CSS reasons -
-		// enableConsole alone leaves the console panel slid off-screen (see index.css)
-		$("body").addClass('enableConsole showConsole');
-	}
-	else {
-		$("body").removeClass('enableConsole showConsole');
-	}
-	defaultSettings['showConsole'] = showConsole;
-	saveDefaultSettings();
-    $("#consoleContainer").show();
-	$("#consoleToggle").prop('checked', defaultSettings['showConsole'] );
 }
 
 //----------------------------------------
@@ -1509,15 +1487,6 @@ function getOFPath() {
     console.log('getOFPath:sending');
     ipcRenderer.send('getOFPath');
 }
-
-
-ipcRenderer.on('commandResult', (event, result) => {
-    if (result.success) {
-        console.log('Command executed successfully:', result.message);
-    } else {
-        console.error('Command execution failed:', result.message);
-    }
-});
 
 
 ipcRenderer.on('ofPathResult', (event, result) => {

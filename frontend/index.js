@@ -1692,26 +1692,6 @@ ipcMain.on('openPath', (event, p) => {
     shell.openPath(p);
 });
 
-ipcMain.on('command', (event, customArg) => {
-    // customArg is passed as a single, literal argv element to the PG binary's
-    // -c/--command option - never through a shell - so arbitrary characters
-    // (quotes, semicolons, backticks, etc) in the "advanced command" field can't
-    // break out into shell injection.
-    execFile(getPgPath(), ['-c', customArg], { maxBuffer: Infinity }, (error, stdout, stderr) => {
-        if (error) {
-            event.sender.send('commandResult', {
-                success: false,
-                message: error.message
-            });
-        } else {
-            event.sender.send('commandResult', {
-                success: true,
-                message: stdout
-            });
-        }
-    });
-});
-
 ipcMain.on('getOFPath', (event) => {
     execFile(getPgPath(), ['--getofpath'], { maxBuffer: Infinity }, (error, stdout, stderr) => {
         if (error) {
