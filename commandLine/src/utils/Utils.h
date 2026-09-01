@@ -150,6 +150,8 @@ struct EmscriptenSDK {
 };
 EmscriptenSDK resolveEmscriptenSDK();
 
+int runOfMenu(const std::string & subcommand);
+
 fs::path makeRelative(const fs::path& from, const fs::path& to);
 
 bool ofIsPathInPath(const fs::path & path, const fs::path & base);

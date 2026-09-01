@@ -23,16 +23,19 @@
 #include <regex>
 #include <array>
 #include <stdio.h>
+#include <cstdlib>
 
 #ifdef TARGET_WIN32
 	#include <direct.h>
 	#define GetCurrentDir _getcwd
 #elif defined(TARGET_LINUX)
 	#include <unistd.h>
+	#include <sys/wait.h>
 	#define GetCurrentDir getcwd
 #else
 	#include <mach-o/dyld.h>	/* _NSGetExecutablePath */
 	#include <limits.h>		/* PATH_MAX */
+	#include <sys/wait.h>
 #endif
 
 
@@ -592,6 +595,36 @@ EmscriptenSDK resolveEmscriptenSDK() {
 #endif
 
 	return sdk;
+}
+
+
+int runOfMenu(const string & subcommand) {
+	fs::path ofMenuScript = getOFRoot() / "scripts" / "of.sh";
+	if (!fs::exists(ofMenuScript)) {
+		ofLogError() << "{ \"errorMessage\": \"scripts/of.sh not found - this openFrameworks checkout doesn't have oF Menu\" }";
+		return 65; // EXIT_DATAERR
+	}
+
+	string args;
+	if (subcommand == "status") {
+		args = "status";
+	} else if (subcommand == "update-libs") {
+		args = "update libs";
+	} else {
+		ofLogError() << "{ \"errorMessage\": \"unknown ofmenu command: " << subcommand << "\" }";
+		return 64; // EXIT_USAGE
+	}
+
+	// of.sh (scripts/ui.sh) disables colour and interactive prompts on its own once
+	// it detects stdout isn't a tty, so this passes straight through as plain text
+	// to whatever spawned us - no capturing/parsing needed here.
+	string cmdLine = "bash \"" + ofMenuScript.string() + "\" " + args;
+	int ret = std::system(cmdLine.c_str());
+#ifdef TARGET_WIN32
+	return ret;
+#else
+	return WIFEXITED(ret) ? WEXITSTATUS(ret) : 1;
+#endif
 }
 
 

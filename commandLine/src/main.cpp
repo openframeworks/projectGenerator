@@ -27,6 +27,7 @@ enum optionIndex { UNKNOWN,
 	GET_OFPATH,
 	GET_HOST_PLATFORM,
 	GET_EMSDK,
+	OFMENU,
 	COMMAND,
 	BACKUP_PROJECT_FILES,
 	FRAMEWORKS,
@@ -49,6 +50,7 @@ constexpr option::Descriptor usage[] = {
 	{ GET_OFPATH, 0, "g", "getofpath", option::Arg::None, "  --getofpath, -g  \treturn the current ofPath" },
 	{ GET_HOST_PLATFORM, 0, "i", "platform", option::Arg::None, "  --getplatform, -i  \treturn the current host platform" },
 	{ GET_EMSDK, 0, "e", "getemsdk", option::Arg::None, "  --getemsdk, -e  \tdetect the Emscripten SDK (EMSDK env var, PATH, or a Homebrew install) and return its location" },
+	{ OFMENU, 0, "m", "ofmenu", option::Arg::Optional, "  --ofmenu, -m  \trun an oF Menu (scripts/of.sh) command: status | update-libs" },
 	{ COMMAND, 0, "c", "command", option::Arg::None, "  --command, -c \truns command" },
 	{ BACKUP_PROJECT_FILES, 0, "b", "backup", option::Arg::None, "  --backup, -b  \tbackup project files when replacing with template" },
 	
@@ -515,6 +517,11 @@ int main(int argc, char ** argv) {
 		auto sdk = resolveEmscriptenSDK();
 		ofLogNotice() << "{ \"emsdk\": " << sdk.emsdk << ", \"emccDir\": " << sdk.binDir << ", \"found\": " << (sdk.found ? "true" : "false") << " }";
 		return EXIT_OK;
+	}
+
+	if (options[OFMENU].count() > 0) {
+		string subcommand = options[OFMENU].arg ? options[OFMENU].arg : "status";
+		return runOfMenu(subcommand);
 	}
 
 	if (options[TEMPLATE].count() > 0) {
