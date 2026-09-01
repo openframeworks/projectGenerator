@@ -55,6 +55,7 @@ const templateSettings = {
     advancedMode: false,
     defaultPlatform: '',
     showConsole: false,
+    detachConsole: false,
     showDeveloperTools: false,
     defaultRelativeProjectPath: "apps/myApps",
     useDictionaryNameGenerator: true
@@ -272,10 +273,72 @@ const startingProject = getStartingProjectName();
 // be closed automatically when the JavaScript object is GCed.
 let mainWindow = null;
 
+// Without this, two copies of the app can run at once and both write
+// settings.json with their own stale in-memory copy - whichever saves last
+// silently clobbers the other's changes (e.g. a toggled setting reverting
+// itself for no visible reason). Second launch just focuses the existing window.
+if (!app.requestSingleInstanceLock()) {
+    app.quit();
+} else {
+    app.on('second-instance', () => {
+        if (mainWindow) {
+            if (mainWindow.isMinimized()) mainWindow.restore();
+            mainWindow.focus();
+        }
+    });
+}
+
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
     app.quit();
     process.exit();
+});
+
+//---------------------------------------------------------
+// detachable console window - an alternative to the docked in-window console,
+// toggled from Settings. Fed by relayConsoleMessage below rather than by
+// touching every existing `event.sender.send('consoleMessage', ...)` call site.
+let consoleWindow = null;
+
+function openConsoleWindow() {
+    if (consoleWindow) {
+        consoleWindow.focus();
+        return;
+    }
+    consoleWindow = new BrowserWindow({
+        width: 500,
+        height: 400,
+        title: 'Console',
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js'),
+            nodeIntegration: false,
+            contextIsolation: true,
+            sandbox: true,
+        }
+    });
+    consoleWindow.loadFile(path.join(__dirname, 'console-window.html'));
+    consoleWindow.on('closed', () => { consoleWindow = null; });
+}
+
+function closeConsoleWindow() {
+    if (consoleWindow) {
+        consoleWindow.close();
+        consoleWindow = null;
+    }
+}
+
+ipcMain.on('setDetachConsole', (event, enabled) => {
+    if (enabled) {
+        openConsoleWindow();
+    } else {
+        closeConsoleWindow();
+    }
+});
+
+ipcMain.on('relayConsoleMessage', (event, msg) => {
+    if (consoleWindow) {
+        consoleWindow.webContents.send('consoleMessage', msg);
+    }
 });
 
 /**
@@ -329,7 +392,12 @@ app.on('ready', () => {
     if (settings["showDeveloperTools"]) {
         mainWindow.webContents.openDevTools();
     }
-    
+
+    if (settings["detachConsole"]) {
+        openConsoleWindow();
+    }
+
+
     //when the window is loaded send the defaults
     mainWindow.webContents.on('did-finish-load', () => {
         //refreshAddonList();

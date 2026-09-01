@@ -399,6 +399,7 @@ ipcRenderer.on('sendUIMessage', (event, arg) => {
 //-------------------------------------------
 ipcRenderer.on('consoleMessage', (event, msg) => {
     consoleMessage(msg);
+    ipcRenderer.send('relayConsoleMessage', msg);
 });
 
 //-------------------------------------------
@@ -793,6 +794,15 @@ function setup() {
             $('body').removeClass('showConsole');
             defaultSettings['showConsole'] = false;
             saveDefaultSettings();
+        });
+
+        $("#detachConsole").checkbox();
+        $("#detachConsole").prop('checked', !!defaultSettings['detachConsole']);
+        $("#detachConsole").on('change', function(){
+            const enabled = $(this).is(':checked');
+            defaultSettings['detachConsole'] = enabled;
+            saveDefaultSettings();
+            ipcRenderer.send('setDetachConsole', enabled);
         });
 
         // initialise the overall-use modal
