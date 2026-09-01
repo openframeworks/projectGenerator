@@ -317,7 +317,14 @@ function openConsoleWindow() {
         }
     });
     consoleWindow.loadFile(path.join(__dirname, 'console-window.html'));
-    consoleWindow.on('closed', () => { consoleWindow = null; });
+    consoleWindow.on('closed', () => {
+        consoleWindow = null;
+        // covers the window's own close button, not just the Settings checkbox -
+        // keeps the checkbox from silently going stale relative to what's actually open
+        if (mainWindow && !mainWindow.webContents.isDestroyed()) {
+            mainWindow.webContents.send('consoleWindowClosed');
+        }
+    });
 }
 
 function closeConsoleWindow() {
@@ -1093,6 +1100,24 @@ function updateFunction(event, update) {
 }
 
 ipcMain.on('update', updateFunction);
+
+ipcMain.on('runOfMenu', (event, { command, ofPath }) => {
+    const args = [];
+    if (ofPath) {
+        args.push(`-o${ofPath}`);
+    }
+    args.push(`-m${command}`);
+
+    runPG(args, event, (error, stdout, stderr) => {
+        if (error) {
+            event.sender.send('sendUIMessage',
+                `<!--modal-context:none:-->\n<strong>Error...</strong><br>oF Menu (${command}) failed.` +
+                '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + (stderr || error.message) + '</textarea></div>'
+            );
+        }
+        event.sender.send('ofMenuDone', { command });
+    });
+});
 
 /** @typedef {{
  *     projectName: string,

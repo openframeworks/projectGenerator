@@ -105,6 +105,9 @@
 				<a class="item updateMultiMenuOption menuItem" data-tab="updateMulti" style="display: none" id="updateMenuButton">
 					<div style="padding:6px;">update multiple</div>
 				</a>
+				<a class="item updateMultiMenuOption menuItem" data-tab="ofMenu" style="display: none" id="ofMenuButton">
+					<div style="padding:6px;">oF Menu</div>
+				</a>
 				<a class="item right floated menuItem" data-tab="settings" id="settingsMenuButton">
 					<div style="-webkit-app-region: no-drag !important; padding:6px;"><i class="setting link icon"></i>
 					</div>
@@ -299,6 +302,20 @@
 					<div class="ui hidden divider"></div>
 					<div class="field">
 						<div class="ui orange button" id="updateMultipleButton" onclick="updateRecursive()">Update multiple</div>
+					</div>
+				</div>
+			</div>
+			<!------------------------------- oF Menu -------------------------------->
+			<div class="ui tab" data-tab="ofMenu">
+				<div class="ui message">
+					<p>Runs <span class="monospace">scripts/of.sh</span> against the configured openFrameworks path. Output streams to the console below.</p>
+				</div>
+				<div class="ui form">
+					<div class="field">
+						<div class="ui olive button" id="ofMenuStatusButton" onclick="runOfMenuCommand('status')">Check Status</div>
+					</div>
+					<div class="field">
+						<div class="ui orange button" id="ofMenuUpdateLibsButton" onclick="runOfMenuCommand('update-libs')">Download / Update Libraries</div>
 					</div>
 				</div>
 			</div>
