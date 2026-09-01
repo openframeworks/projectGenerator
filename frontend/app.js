@@ -652,6 +652,15 @@ function setup() {
                 projectPath: $("#projectPath").val()
             };
 
+            // a template pick belongs to the project it was made for - clear it as
+            // soon as the user points at a different project (rather than right after
+            // generate), so it can't silently carry over, while still surviving repeated
+            // generates of the same project
+            if (lastGeneratedProject
+                && (lastGeneratedProject.projectName !== project.projectName || lastGeneratedProject.projectPath !== project.projectPath)) {
+                $('#templatesDropdown').dropdown('clear');
+            }
+
         	// check if project exists
         	ipcRenderer.send('isOFProjectFolder', project);
 
@@ -1086,21 +1095,12 @@ function generate() {
     } else if (gen.platformList == null || lengthOfPlatforms == 0) {
         $("#platformsDropdown").oneTimeTooltip("Please select a platform first.");
     } else {
-        // only clear the template pick when this is a genuinely different project than
-        // last time - otherwise iterating on the same project (generate, tweak, build,
-        // regenerate) forces re-picking Emscripten every single time. Still resets for
-        // a new/different project, so a stale pick can't silently carry over to it.
-        const isSameProjectAsLastTime = lastGeneratedProject
-            && lastGeneratedProject.projectName === gen.projectName
-            && lastGeneratedProject.projectPath === gen.projectPath;
-
+        // the template pick is cleared in the #projectName change handler instead,
+        // as soon as the user points at a different project - not here, so a plain
+        // single generate doesn't wipe the pick you just used
         lastGeneratedProject = { projectName: gen.projectName, projectPath: gen.projectPath, templateList: gen.templateList };
         openConsoleForOperation();
         ipcRenderer.send('generate', gen);
-
-        if (!isSameProjectAsLastTime) {
-            $('#templatesDropdown').dropdown('clear');
-        }
     }
 }
 
@@ -1168,9 +1168,6 @@ function switchGenerateMode(mode) {
         $("#localAddonMessage").hide();
         $("#nameRandomiser").hide();
         $("#revealProjectFiles").show();
-        if(!defaultSettings.advancedMode){
-            $("#consoleContainer").hide();
-        }
         $("#extraContainer").hide();
 
         console.log('Switching GenerateMode to Update...');
@@ -1195,9 +1192,6 @@ function switchGenerateMode(mode) {
         $("#localAddonMessage").hide();
         $("#nameRandomiser").show();
         $("#revealProjectFiles").hide();
-        if(!defaultSettings.advancedMode){
-            $("#consoleContainer").hide();
-        }
         $("#extraContainer").hide();
 
         console.log('Switching GenerateMode to Create...');
@@ -1220,7 +1214,9 @@ function enableAdvancedMode(isAdvanced) {
         $('#templateSectionMulti').show();
         $('#ofPathButton').show();
         $('#emsdkField').show();
-
+        if (!defaultSettings['detachConsole']) {
+            $('body').addClass('showConsole');
+        }
 
     } else {
         $('#platformsDropdown').removeClass("disabled");
