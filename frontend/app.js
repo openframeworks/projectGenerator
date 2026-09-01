@@ -1087,12 +1087,21 @@ function generate() {
     } else if (gen.platformList == null || lengthOfPlatforms == 0) {
         $("#platformsDropdown").oneTimeTooltip("Please select a platform first.");
     } else {
+        // only clear the template pick when this is a genuinely different project than
+        // last time - otherwise iterating on the same project (generate, tweak, build,
+        // regenerate) forces re-picking Emscripten every single time. Still resets for
+        // a new/different project, so a stale pick can't silently carry over to it.
+        const isSameProjectAsLastTime = lastGeneratedProject
+            && lastGeneratedProject.projectName === gen.projectName
+            && lastGeneratedProject.projectPath === gen.projectPath;
+
         lastGeneratedProject = { projectName: gen.projectName, projectPath: gen.projectPath, templateList: gen.templateList };
-        $('body').addClass('enableConsole showConsole');
+        openConsoleForOperation();
         ipcRenderer.send('generate', gen);
 
-        // don't let a stale template pick leak into the next generate
-        $('#templatesDropdown').dropdown('clear');
+        if (!isSameProjectAsLastTime) {
+            $('#templatesDropdown').dropdown('clear');
+        }
     }
 }
 
@@ -1133,7 +1142,7 @@ function updateRecursive() {
         // leftover Build & Preview button from an earlier emscripten generate/update
         lastGeneratedProject = null;
         $("#updateMultipleButton").addClass('loading disabled').text('Updating...');
-        $('body').addClass('enableConsole showConsole');
+        openConsoleForOperation();
         ipcRenderer.send('update', gen);
 
         // don't let a stale template pick leak into the next update
@@ -1312,6 +1321,13 @@ function consoleMessage(orig_message) {
     $("#consoleContainer").scrollTop($('#console').offset().top); // scrolls console to bottom
 }
 
+// force the docked console open for a build/generate/update - skipped when the
+// console is detached into its own window, so output isn't shown in both places
+function openConsoleForOperation() {
+    if (defaultSettings['detachConsole']) return;
+    $('body').addClass('enableConsole showConsole');
+}
+
 //-----------------------------------------------------------------------------------
 // Button calls
 //-----------------------------------------------------------------------------------
@@ -1399,7 +1415,7 @@ function cloneAddonFromGit(){
 
     const [url, ref] = raw.split('#');
     $("#addonGitUrl").prop('disabled', true).attr('placeholder', 'Cloning...').val('');
-    $('body').addClass('enableConsole showConsole');
+    openConsoleForOperation();
     ipcRenderer.send('cloneAddon', { ofPath: $("#ofPath").val(), url, ref: ref || '' });
 }
 
@@ -1461,7 +1477,7 @@ function buildAndPreviewEmscripten(){
     if (lastGeneratedProject == null) return;
 
     $("#EmscriptenPreviewButton").addClass('loading disabled').text('Building...');
-    $('body').addClass('enableConsole showConsole');
+    openConsoleForOperation();
 
     ipcRenderer.send('buildEmscripten', {
         projectName: lastGeneratedProject.projectName,
