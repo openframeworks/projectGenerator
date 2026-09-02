@@ -842,7 +842,20 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		s = fixPath(s);
 //        alert("fixpath after  " + ofPathToString(s));
 		addToFolder(s, parentFolder);
-		srcFiles.emplace_back(s);
+
+		// classify by extension instead of dumping everything into srcFiles (#8546)
+		string ext = ofPathToString(s.extension());
+		if (ext == ".c") {
+			csrcFiles.emplace_back(s);
+		} else if (ext == ".cpp" || ext == ".cc" || ext == ".cxx") {
+			cppsrcFiles.emplace_back(s);
+		} else if (ext == ".m" || ext == ".mm") {
+			objcsrcFiles.emplace_back(s);
+		} else if (ext == ".h" || ext == ".hpp") {
+			headersrcFiles.emplace_back(s);
+		} else {
+			srcFiles.emplace_back(s);
+		}
 	}
 
 	// so addons will never be system.

@@ -22,7 +22,8 @@ baseProject::baseProject(const string & _target) : target(_target) {
 	bLoaded = false;
 }
 
-fs::path baseProject::getPlatformTemplateDir(std::string templateDir) {
+fs::path baseProject::getPlatformTemplateDir() {
+	// always the platform's own base template - extra templates are overlaid later via recursiveTemplateCopy (#8479)
 	string folder { target };
 	if ( target == "msys2"
 		|| target == "linux"
@@ -32,9 +33,6 @@ fs::path baseProject::getPlatformTemplateDir(std::string templateDir) {
 		|| target == "linuxaarch64"
 	) {
 		folder = "vscode";
-	}
-	if (templateDir != "") {
-		folder = templateDir;
 	}
 	return fs::weakly_canonical(getOFRoot() / templatesFolder / folder);
 }
@@ -137,7 +135,7 @@ bool baseProject::create(const fs::path & _path, string templateName){
 
 	addons.clear();
 	extSrcPaths.clear();
-	auto pathTemplate = getPlatformTemplateDir(templateName);
+	auto pathTemplate = getPlatformTemplateDir();
 	if (fs::exists(pathTemplate)) {
 		templatePath = normalizePath(pathTemplate);
 	} else {
@@ -659,7 +657,7 @@ void baseProject::addSrcFiles(ofAddon& addon, const vector<fs::path> &filepaths,
 		}
 		fs::path normalizedDir = makeRelative(getOFRoot(), s);
 		ofLogVerbose("baseProject::addSrcFiles") << "Adding addon " << toString(type) << " source file: [" << s.string() << "] folder:[" << addon.filesToFolders[s].string() << "]";
-		addSrc(normalizedDir, addon.filesToFolders[s]);
+		addSrc(normalizedDir, addon.filesToFolders[s], type);
 	}
 }
 

@@ -1,9 +1,10 @@
 const fs = require('fs');
 const path = require('path');
+const http = require('http');
 const moniker = require('moniker');
 const process = require('process');
 const os = require("os");
-const exec = require('child_process').exec;
+const { execFile, spawn } = require('child_process');
 
 const {
     app,
@@ -50,9 +51,11 @@ let settings = {};
 /** @type Settings */
 const templateSettings = {
     defaultOfPath: "",
+    emsdkPath: "",
     advancedMode: false,
     defaultPlatform: '',
     showConsole: false,
+    detachConsole: false,
     showDeveloperTools: false,
     defaultRelativeProjectPath: "apps/myApps",
     useDictionaryNameGenerator: true
@@ -196,18 +199,6 @@ console.log(`Operating system platform: ${platform}`);
 //     }
 // });
 
-// Execute a shell command using exec
-exec('ls', (error, stdout, stderr) => {
-    if (error) {
-        console.error(`Error executing command: ${error.message}`);
-        return;
-    }
-    if (stderr) {
-        console.error(`Error in command output: ${stderr}`);
-        return;
-    }
-    console.log(`Command output: ${stdout}`);
-});
 // hide some addons, per https://github.com/openframeworks/projectGenerator/issues/62
 
 const addonsToSkip = [
@@ -282,10 +273,79 @@ const startingProject = getStartingProjectName();
 // be closed automatically when the JavaScript object is GCed.
 let mainWindow = null;
 
+// Without this, two copies of the app can run at once and both write
+// settings.json with their own stale in-memory copy - whichever saves last
+// silently clobbers the other's changes (e.g. a toggled setting reverting
+// itself for no visible reason). Second launch just focuses the existing window.
+if (!app.requestSingleInstanceLock()) {
+    app.quit();
+} else {
+    app.on('second-instance', () => {
+        if (mainWindow) {
+            if (mainWindow.isMinimized()) mainWindow.restore();
+            mainWindow.focus();
+        }
+    });
+}
+
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
     app.quit();
     process.exit();
+});
+
+//---------------------------------------------------------
+// detachable console window - an alternative to the docked in-window console,
+// toggled from Settings. Fed by relayConsoleMessage below rather than by
+// touching every existing `event.sender.send('consoleMessage', ...)` call site.
+let consoleWindow = null;
+
+function openConsoleWindow() {
+    if (consoleWindow) {
+        consoleWindow.focus();
+        return;
+    }
+    consoleWindow = new BrowserWindow({
+        width: 500,
+        height: 400,
+        title: 'Console',
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js'),
+            nodeIntegration: false,
+            contextIsolation: true,
+            sandbox: true,
+        }
+    });
+    consoleWindow.loadFile(path.join(__dirname, 'console-window.html'));
+    consoleWindow.on('closed', () => {
+        consoleWindow = null;
+        // covers the window's own close button, not just the Settings checkbox -
+        // keeps the checkbox from silently going stale relative to what's actually open
+        if (mainWindow && !mainWindow.webContents.isDestroyed()) {
+            mainWindow.webContents.send('consoleWindowClosed');
+        }
+    });
+}
+
+function closeConsoleWindow() {
+    if (consoleWindow) {
+        consoleWindow.close();
+        consoleWindow = null;
+    }
+}
+
+ipcMain.on('setDetachConsole', (event, enabled) => {
+    if (enabled) {
+        openConsoleWindow();
+    } else {
+        closeConsoleWindow();
+    }
+});
+
+ipcMain.on('relayConsoleMessage', (event, msg) => {
+    if (consoleWindow) {
+        consoleWindow.webContents.send('consoleMessage', msg);
+    }
 });
 
 /**
@@ -325,9 +385,10 @@ app.on('ready', () => {
         resizable: true, // TODO: fix to false, true for debug
         frame: false,
         webPreferences: {
-            //preload: path.join(__dirname, 'preload.js'),
-            nodeIntegration: true,
-            contextIsolation: false,
+            preload: path.join(__dirname, 'preload.js'),
+            nodeIntegration: false,
+            contextIsolation: true,
+            sandbox: true,
         }
     });
 
@@ -338,7 +399,12 @@ app.on('ready', () => {
     if (settings["showDeveloperTools"]) {
         mainWindow.webContents.openDevTools();
     }
-    
+
+    if (settings["detachConsole"]) {
+        openConsoleWindow();
+    }
+
+
     //when the window is loaded send the defaults
     mainWindow.webContents.on('did-finish-load', () => {
         //refreshAddonList();
@@ -347,6 +413,7 @@ app.on('ready', () => {
         mainWindow.webContents.send('cwd', __dirname);
         mainWindow.webContents.send('cwd', process.resourcesPath);
         mainWindow.webContents.send('setStartingProject', startingProject);
+        mainWindow.webContents.send('setGuiVersion', app.getVersion());
         mainWindow.webContents.send('setDefaults', settings);
         mainWindow.webContents.send('setup', '');
         mainWindow.webContents.send('checkOfPathAfterSetup', '');
@@ -764,6 +831,69 @@ ipcMain.on('refreshAddonList', refreshAddonList);
 
 ipcMain.on('refreshPlatformList', refreshPlatformList);
 
+ipcMain.on('cloneAddon', (event, { ofPath, url, ref }) => {
+    if (!url) return;
+
+    const addonsDir = path.join(ofPath, 'addons');
+    const name = path.basename(url, '.git');
+
+    if (!/^ofx/i.test(name) || name.includes('/') || name.includes('\\')) {
+        event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br>Addon folder name should start with "ofx" (got "${name}").`);
+        event.sender.send('cloneAddonDone');
+        return;
+    }
+
+    const destDir = path.join(addonsDir, name);
+    if (fs.existsSync(destDir)) {
+        event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br><span class="monospace">${name}</span> already exists in your addons folder.`);
+        event.sender.send('cloneAddonDone');
+        return;
+    }
+
+    event.sender.send('consoleMessage', `<br><em>Cloning ${url} into ${destDir}...</em><br>`);
+
+    const child = spawn('git', ['clone', '--recursive', url, destDir], { cwd: addonsDir, windowsHide: true });
+    let stderr = '';
+    child.stdout.on('data', (chunk) => event.sender.send('consoleMessage', chunk.toString()));
+    child.stderr.on('data', (chunk) => {
+        stderr += chunk.toString();
+        event.sender.send('consoleMessage', chunk.toString());
+    });
+
+    child.on('error', (error) => {
+        event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br>Could not run git. Make sure git is installed and on PATH.<br><span class="monospace">${error.message}</span>`);
+        event.sender.send('cloneAddonDone');
+    });
+
+    child.on('close', (code) => {
+        if (code !== 0) {
+            event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br>git clone failed (exit code ${code}).<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">${stderr}</textarea></div>`);
+            event.sender.send('cloneAddonDone');
+            return;
+        }
+
+        const finish = () => {
+            refreshAddonList(event, ofPath);
+            event.sender.send('sendUIMessage', `<!--modal-context:addon-success:${destDir}-->\n<strong>Success!</strong><br>Added addon <span class="monospace">${name}</span>.`);
+            event.sender.send('cloneAddonDone');
+        };
+
+        if (ref) {
+            const checkout = spawn('git', ['checkout', ref], { cwd: destDir, windowsHide: true });
+            checkout.stdout.on('data', (chunk) => event.sender.send('consoleMessage', chunk.toString()));
+            checkout.stderr.on('data', (chunk) => event.sender.send('consoleMessage', chunk.toString()));
+            checkout.on('close', (checkoutCode) => {
+                if (checkoutCode !== 0) {
+                    event.sender.send('consoleMessage', `<br><em>Warning: cloned ${name} but could not check out "${ref}"</em><br>`);
+                }
+                finish();
+            });
+        } else {
+            finish();
+        }
+    });
+});
+
 ipcMain.on('refreshTemplateList', (event, arg) => {
     console.log("refreshTemplateList");
     const { selectedPlatforms, ofPath, bMulti } = arg;
@@ -827,26 +957,73 @@ ipcMain.on('getRandomSketchName', (event, projectPath) => {
     // event.sender.send('setGenerateMode', 'createMode'); // it's a new sketch name, we are in create mode
 });
 
+// raw executable path, no quoting - always launched via execFile/spawn argv, never a shell
 function getPgPath() {
     let pgApp = "";
     try {
         if (hostplatform == "linux" || hostplatform == "linux64") { // ???: when appear there linux64?
             pgApp = path.join(defaultOfPath, "apps/projectGenerator/commandLine/bin/projectGenerator");
-            //pgApp = "projectGenerator";
         } else {
             pgApp = path.normalize(path.join(__dirname, "app", "projectGenerator"));
         }
 
-        if (hostplatform == 'osx' || hostplatform == 'linux' || hostplatform == 'linux64') {
-            pgApp = pgApp.replace(/ /g, '\\ ');
-        } else {
-            pgApp = "\"" + pgApp + "\"";
+        if (hostplatform == "windows") {
+            pgApp += ".exe";
         }
     } catch (error) {
         console.error("Error determining project generator path:", error);
         pgApp = ""; // Return an empty string or some default path in case of error
     }
     return pgApp;
+}
+
+// runs PG via argv (no shell), streaming stdout/stderr to the console panel as it arrives
+function runPG(args, event, callback) {
+    const pgApp = getPgPath();
+    const displayCommand = [pgApp, ...args].join(' ');
+
+    let child;
+    try {
+        child = spawn(pgApp, args, { windowsHide: true });
+    } catch (error) {
+        callback(error, '', error.message);
+        return;
+    }
+
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout.on('data', (chunk) => {
+        const text = chunk.toString();
+        stdout += text;
+        if (event && event.sender && !event.sender.isDestroyed()) {
+            event.sender.send('consoleMessage', text);
+        }
+    });
+
+    child.stderr.on('data', (chunk) => {
+        const text = chunk.toString();
+        stderr += text;
+        if (event && event.sender && !event.sender.isDestroyed()) {
+            event.sender.send('consoleMessage', text);
+        }
+    });
+
+    child.on('error', (error) => {
+        callback(error, stdout, stderr || error.message);
+    });
+
+    child.on('close', (code) => {
+        if (event && event.sender && !event.sender.isDestroyed()) {
+            event.sender.send('consoleMessage', `<br><em>(command used: ${displayCommand})</em><br>`);
+        }
+        if (code === 0) {
+            callback(null, stdout, stderr);
+        } else {
+            const error = new Error(stderr || `projectGenerator exited with code ${code}`);
+            callback(error, stdout, stderr);
+        }
+    });
 }
 
 
@@ -866,13 +1043,6 @@ function getPgPath() {
 function updateFunction(event, update) {
     console.log(update);
 
-    let updatePathString = "";
-    let pathString = "";
-    let platformString = "";
-    let templateString = "";
-    let recursiveString = "";
-    let verboseString = "";
-
     const {
         updatePath,
         platformList,
@@ -882,71 +1052,72 @@ function updateFunction(event, update) {
         verbose
     } = update;
 
-    if (updatePath != null) {
-        updatePathString = `"${updatePath}"`;
+    const args = [];
+
+    if (updateRecursive == true) {
+        args.push('-r');
+    }
+
+    if (verbose == true) {
+        args.push('-v');
+    }
+
+    if (ofPath != null) {
+        args.push(`-o${ofPath}`);
     }
 
     if (platformList != null) {
-        platformString = `-p"${platformList.join(",")}"`;
+        args.push(`-p${platformList.join(",")}`);
     }
 
     if (templateList != null) {
         const uniqueTemplates = [...new Set(templateList)];
-        templateString = `-t"${uniqueTemplates.join(",")}"`;
+        args.push(`-t${uniqueTemplates.join(",")}`);
     }
 
-    if (ofPath != null) {
-        pathString = `-o"${ofPath}"`;
+    if (updatePath != null) {
+        args.push(updatePath);
     }
 
-    if (updateRecursive == true) {
-        recursiveString = "-r";
-    }
-
-    if (verbose == true) {
-        verboseString = "-v";
-    }
-
-    const pgApp = getPgPath();
-    
-    const wholeString = [
-        pgApp,
-        recursiveString,
-        verboseString,
-        pathString,
-        platformString,
-        templateString,
-        updatePathString
-    ].join(" ");
-
-    exec(wholeString, { maxBuffer : Infinity }, (error, stdout, stderr) => {
+    runPG(args, event, (error, stdout, stderr) => {
         if (error === null) {
-            event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
             event.sender.send('sendUIMessage',
                 '<strong>Success!</strong><br>' +
                 'Updating your project was successful! <a href="file:///' + updatePath + '" class="monospace" data-toggle="external_target">' + updatePath + '</a><br><br>' +
                 '<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
-                '<div id="fullConsoleOutput"><br><textarea class="selectable">' + stdout + '\n\n\n(command used:' + wholeString + ')\n\n\n</textarea></div>'
+                '<div id="fullConsoleOutput"><br><textarea class="selectable">' + stdout + '</textarea></div>'
             );
-
-            //
             event.sender.send('updateCompleted', true);
         } else {
-            event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + error.message);
             event.sender.send('sendUIMessage',
                 '<strong>Error...</strong><br>' +
                 'There was a problem updating your project... <span class="monospace">' + updatePath + '</span>' +
-                '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + error.message + '\n\n\n(command used:' + wholeString + ')\n\n\n</textarea></div>'
+                '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + error.message + '</textarea></div>'
             );
         }
+        event.sender.send('updateMultipleDone');
     });
-
-    console.log(wholeString);
-
-    //console.log(__dirname);
 }
 
 ipcMain.on('update', updateFunction);
+
+ipcMain.on('runOfMenu', (event, { command, ofPath }) => {
+    const args = [];
+    if (ofPath) {
+        args.push(`-o${ofPath}`);
+    }
+    args.push(`-m${command}`);
+
+    runPG(args, event, (error, stdout, stderr) => {
+        if (error) {
+            event.sender.send('sendUIMessage',
+                `<!--modal-context:none:-->\n<strong>Error...</strong><br>oF Menu (${command}) failed.` +
+                '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + (stderr || error.message) + '</textarea></div>'
+            );
+        }
+        event.sender.send('ofMenuDone', { command });
+    });
+});
 
 /** @typedef {{
  *     projectName: string,
@@ -964,14 +1135,6 @@ ipcMain.on('update', updateFunction);
  * @param {GenerateArgument} generate
  */
 function generateFunction(event, generate) {
-    let projectString = "";
-    let pathString = "";
-    let addonString = "";
-    let platformString = "";
-    let templateString = "";
-    let verboseString = "";
-    let sourceExtraString = "";
-
     const {
         platformList,
         templateList,
@@ -983,74 +1146,58 @@ function generateFunction(event, generate) {
         projectName,
     } = generate;
 
-    if (platformList != null) {
-        platformString = `-p"${platformList.join(",")}"`;
-    }
+    const args = [];
 
-    if (templateList != null) {
-        templateString = `-t"${templateList.join(",")}"`;
-    }
-
-    if (addonList != null &&
-        Array.isArray(addonList) &&
-        addonList.length > 0)
-    {
-        addonString = `-a"${addonList.join(",")}"`;
-    } else {
-        addonString = '-a" "';
+    if (verbose === true) {
+        args.push('-v');
     }
 
     if (ofPath != null) {
-        pathString = `-o"${ofPath}"`;
-    }
-    
-    if (sourcePath != null && sourcePath.length > 0) {
-        sourceExtraString = `-s"${sourcePath}"`;
+        args.push(`-o${ofPath}`);
     }
 
-    if (verbose === true) {
-        verboseString = "-v";
+    if (addonList != null && Array.isArray(addonList) && addonList.length > 0) {
+        args.push(`-a${addonList.join(",")}`);
+    } else {
+        args.push('-a ');
+    }
+
+    if (platformList != null) {
+        args.push(`-p${platformList.join(",")}`);
+    }
+
+    if (sourcePath != null && sourcePath.length > 0) {
+        args.push(`-s${sourcePath}`);
+    }
+
+    if (templateList != null) {
+        args.push(`-t${templateList.join(",")}`);
     }
 
     if (projectName != null && projectPath != null) {
-        projectString = `"${path.join(projectPath, projectName)}"`;
+        args.push(path.join(projectPath, projectName));
     }
 
-    const pgApp = getPgPath();
-    const wholeString = [
-        pgApp,
-        verboseString,
-        pathString,
-        addonString,
-        platformString,
-        sourceExtraString,
-        templateString,
-        projectString
-    ].join(' ');
+    const fullPath = path.join(projectPath, projectName);
 
-    exec(wholeString, { maxBuffer : Infinity }, (error, stdout, stderr) => {
-        const text = stdout; //Big text with many line breaks
-        const lines = text.split(os.EOL); //Will return an array of lines on every OS node works
+    runPG(args, event, (error, stdout, stderr) => {
+        const lines = stdout.split(os.EOL);
         const wasError = lines.some(line => (line.indexOf("Result:") > -1 && line.indexOf("error") > -1));
-        
+
         // wasError = did the PG spit out an error (like a bad path, etc)
         // error = did node have an error running this command line app
 
-        const fullPath = path.join(projectPath, projectName);
         if (error === null && wasError === false) {
-            event.sender.send('consoleMessage', `<strong>${wholeString}</strong><br>${stdout}`);
             event.sender.send('sendUIMessage',
                 '<strong>Success!</strong><br>'
                 + 'Your can now find your project in <a href="file:///' + fullPath + '" data-toggle="external_target" class="monospace">' + fullPath + '</a><br><br>'
                 + '<div id="fullConsoleOutput" class="not-hidden"><br>'
-                + '<textarea class="selectable">' + stdout + '\n\n\n(command used: ' + wholeString + ')\n\n\n</textarea></div>'
+                + '<textarea class="selectable">' + stdout + '</textarea></div>'
             );
             event.sender.send('generateCompleted', true);
         } else if (error !== null) {
-            event.sender.send('consoleMessage', `<strong>${wholeString}</strong><br>${error.message}`);
             // note: stderr mostly seems to be also included in error.message
-            // also available: error.code, error.killed, error.signal, error.cmd
-            // info: error.code=127 means commandLinePG was not found
+            // info: error.code=ENOENT means commandLinePG was not found
             event.sender.send('sendUIMessage',
                 '<strong>Error...</strong><br>'
                 + 'There was a problem generating your project... <span class="monospace">' + fullPath + '</span>'
@@ -1058,18 +1205,15 @@ function generateFunction(event, generate) {
                 + '<textarea class="selectable">' + error.message + '</textarea></div>'
             );
         } else if (wasError === true) {
-            event.sender.send('consoleMessage', "<strong>" + wholeString + "</strong><br>" + stdout);
             event.sender.send('sendUIMessage',
                 '<strong>Error!</strong><br>'
                 + '<strong>Error...</strong><br>'
                 + 'There was a problem generating your project... <span class="monospace">' + fullPath + '</span>'
                 + '<div id="fullConsoleOutput" class="not-hidden"><br>'
-                + '<textarea class="selectable">' + stdout + '\n\n\n(command used: ' + wholeString + ')\n\n\n</textarea></div>'
+                + '<textarea class="selectable">' + stdout + '</textarea></div>'
             );
         }
     });
-
-    console.log(wholeString);
 }
 
 ipcMain.on('generate', generateFunction);
@@ -1096,6 +1240,28 @@ ipcMain.on('pickOfPath', async (event, arg) => {
         }
     } catch(err) {
         console.error('pickOfPath', err);
+    }
+    dialogIsOpen = false;
+});
+
+ipcMain.on('pickEmsdkPath', async (event, arg) => {
+    if(dialogIsOpen){
+        return;
+    }
+
+    dialogIsOpen = true;
+    try {
+        const filenames = await dialog.showOpenDialog(mainWindow, {
+            title: 'select the root of the Emscripten SDK (emsdk)',
+            properties: ['openDirectory'],
+            filters: [],
+            defaultPath: arg
+        });
+        if (filenames !== undefined && filenames.filePaths.length > 0) {
+            event.sender.send('setEmsdkPath', filenames.filePaths[0]);
+        }
+    } catch(err) {
+        console.error('pickEmsdkPath', err);
     }
     dialogIsOpen = false;
 });
@@ -1206,7 +1372,8 @@ ipcMain.on('checkMultiUpdatePath', (event, arg) => {
 
 function getVisualStudioPath(version) {
     return new Promise((resolve, reject) => {
-        exec(`"C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe" -latest -prerelease -format json`, (error, stdout, stderr) => {
+        const vswherePath = "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe";
+        execFile(vswherePath, ['-latest', '-prerelease', '-format', 'json'], (error, stdout, stderr) => {
             if (error) {
                 reject("vswhere.exe not found. Ensure Visual Studio is installed.");
                 return;
@@ -1230,24 +1397,24 @@ function getVisualStudioPath(version) {
     });
 }
 
+// windowsPath is raw/unquoted - the .sln or .code-workspace file
 async function openVisualStudio(windowsPath) {
     console.log(`Opening project: ${windowsPath} in ${platform}`);
 
     if (platform === 'vscode') {
         console.log("Opening in VS Code...");
-        exec(`code "${windowsPath}"`, (error, stdout, stderr) => {
+        execFile('code', [windowsPath], (error) => {
             if (error) {
-                console.error("Could not open VS Code:", stderr);
+                console.error("Could not open VS Code:", error.message);
                 console.log("Falling back to system handler...");
-                exec(`start "" "${windowsPath}"`);
+                shell.openPath(windowsPath);
             }
         });
         return;
     }
 
     let isVS2019Project = false;
-    const windowsPathEscaped = windowsPath.replace(/\\/g, '\\\\');
-    solutionFile = path.resolve(windowsPath.trim().replace(/^"+|"+$/g, ''));
+    const solutionFile = path.resolve(windowsPath);
     console.log("VS Solution File Content: " + solutionFile);
     if (fs.existsSync(solutionFile)) {
         const fileContent = fs.readFileSync(solutionFile, 'utf8');
@@ -1262,31 +1429,18 @@ async function openVisualStudio(windowsPath) {
     }
 
     try {
-        if (isVS2019Project) {
-            console.log("Detected VS2019 project, opening in VS2019...");
-            const vs2019Path = await getVisualStudioPath("16");
-            const vs2019PathEscaped = vs2019Path.replace(/\\/g, '\\\\');
-            console.log(`Opening in VS2022 by default.. path:[${vs2019PathEscaped}] command:start "" "${vs2019PathEscaped}" "${windowsPathEscaped}"`);
-            exec(`start "" "${vs2019PathEscaped}" ${windowsPathEscaped}`, (error, stdout, stderr) => {
-                if (error) {
-                    console.error("Error opening in VS2019:", stderr);
-                }
-            });
-        } else {
-            const vs2022Path = await getVisualStudioPath("17");
-            const vs2022PathEscaped = vs2022Path.replace(/\\/g, '\\\\');
-            console.log(`Opening in VS2022 by default.. path:[${vs2022PathEscaped}] command:start "" "${vs2022PathEscaped}" "${windowsPathEscaped}"`);
-            exec(`start "" "${vs2022PathEscaped}" ${windowsPathEscaped}`, (error, stdout, stderr) => {
-                if (error) {
-                    console.error("Error opening in VS2022:", stderr);
-                }
-            });
-
-        }
+        const vsVersion = isVS2019Project ? "16" : "17";
+        console.log(`Opening in VS${isVS2019Project ? "2019" : "2022"}...`);
+        const vsPath = await getVisualStudioPath(vsVersion);
+        execFile(vsPath, [windowsPath], (error) => {
+            if (error) {
+                console.error(`Error opening in VS${isVS2019Project ? "2019" : "2022"}:`, error.message);
+            }
+        });
     } catch (error) {
         console.error("Could not open Visual Studio:", error);
         console.log("Falling back to default system handler...");
-        exec('start "" "' + windowsPath + '"');
+        shell.openPath(windowsPath);
     }
 }
 
@@ -1306,67 +1460,64 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
     // // launch xcode
     if( arg.platform == 'osx' || arg.platform == 'ios' || arg.platform == 'macos' || arg.platform == 'tvos' ){
         if(hostplatform == 'osx'){
-            let osxPath = path.join(fullPath, projectName + '.xcodeproj');
+            const osxPath = path.join(fullPath, projectName + '.xcodeproj');
             console.log( osxPath );
-            osxPath = "\"" + osxPath + "\"";
-
-            exec('open ' + osxPath, (error, stdout, stderr) => {
-                return;
-            });
+            shell.openPath(osxPath);
         }
     } else if( hostplatform == 'osx' && arg.platform == 'vscode'){
         if(hostplatform == 'osx'){
-            let osxPath = path.join(fullPath, projectName + '.code-workspace');
+            const osxPath = path.join(fullPath, projectName + '.code-workspace');
             console.log( osxPath );
-            osxPath = "\"" + osxPath + "\"";
-
-            exec('open ' + osxPath, (error, stdout, stderr) => {
-                return;
-            });
+            shell.openPath(osxPath);
         }
     } else if( arg.platform == 'linux' || arg.platform == 'linux64' ){
         if(hostplatform == 'linux'){
-            let linuxPath = path.join(fullPath, projectName + '.code-workspace');
-            linuxPath = linuxPath.replace(/ /g, '\\ ');
+            const linuxPath = path.join(fullPath, projectName + '.code-workspace');
             console.log( linuxPath );
-            exec('xdg-open ' + linuxPath, (error, stdout, stderr) => {
-                return;
-            });
+            shell.openPath(linuxPath);
         }
     } else if( arg.platform == 'android'){
-        console.log("Launching ", fullPath)
         console.log("Launching Android Studio at", fullPath);
-        let command;
 
-        if (os.platform() === 'darwin') {  // macOS
-            command = `open -a "Android Studio" "${fullPath}"`;
-        } else if (os.platform() === 'linux') {  // Linux
-            command = `studio "${fullPath}" || xdg-open "${fullPath}"`;
-        } else if (os.platform() === 'win32') {  // Windows
-            const studioPath = `"C:\\Program Files\\Android\\Android Studio\\bin\\studio64.exe"`;
-            command = `start "" ${studioPath} "${fullPath}"`;
+        const reportLaunchError = () => {
+            event.sender.send('sendUIMessage',
+                '<strong>Error!</strong><br>' +
+                '<span>Could not launch Android Studio. Make sure the command-line launcher is installed by running <i>Tools -> Create Command-line Launcher...</i> inside Android Studio and try again.</span>'
+            );
+        };
+
+        if (os.platform() === 'darwin') {
+            execFile('open', ['-a', 'Android Studio', fullPath], (error) => {
+                if (error) {
+                    console.error("Could not launch Android Studio:", error.message);
+                    reportLaunchError();
+                }
+            });
+        } else if (os.platform() === 'linux') {
+            execFile('studio', [fullPath], (error) => {
+                if (error) {
+                    console.log("studio launcher not found, falling back to default handler");
+                    shell.openPath(fullPath).catch(() => reportLaunchError());
+                }
+            });
+        } else if (os.platform() === 'win32') {
+            const studioPath = "C:\\Program Files\\Android\\Android Studio\\bin\\studio64.exe";
+            execFile(studioPath, [fullPath], (error) => {
+                if (error) {
+                    console.error("Could not launch Android Studio:", error.message);
+                    reportLaunchError();
+                }
+            });
         } else {
             console.error("Unsupported OS for launching Android Studio");
-            return;
         }
-
-        exec(command, (error, stdout, stderr) => {
-            if (error) {
-                console.error("Could not launch Android Studio:", stderr);
-                event.sender.send('sendUIMessage',
-                    '<strong>Error!</strong><br>' +
-                    '<span>Could not launch Android Studio. Make sure the command-line launcher is installed by running <i>Tools -> Create Command-line Launcher...</i> inside Android Studio and try again.</span>'
-                );
-            }
-        });
     } else if( hostplatform == 'windows'){
         let windowsPath = path.join(fullPath, projectName + '.sln');
-        
+
 		if(arg.platform == 'vscode' ){
 			windowsPath = path.join(fullPath, projectName + '.code-workspace');
 		}
         console.log( windowsPath );
-        windowsPath = "\"" + windowsPath + "\"";
         openVisualStudio(windowsPath);
     }
 });
@@ -1391,22 +1542,214 @@ ipcMain.on('launchFolder', async (event, arg) => {
     }
 });
 
+const emscriptenMimeTypes = {
+    '.html': 'text/html',
+    '.js': 'text/javascript',
+    '.wasm': 'application/wasm',
+    '.data': 'application/octet-stream',
+    '.css': 'text/css',
+    '.json': 'application/json',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.svg': 'image/svg+xml',
+};
+
+// serves rootDir over loopback-only http (emscripten's wasm/fetch glue needs http://, not file://)
+// and opens it in a new BrowserWindow. server is torn down when that window closes.
+function serveAndPreviewEmscripten(rootDir, htmlFile, event) {
+    const normalizedRoot = path.normalize(rootDir);
+
+    const server = http.createServer((req, res) => {
+        let reqPath;
+        try {
+            reqPath = decodeURIComponent(new URL(req.url, 'http://127.0.0.1').pathname);
+        } catch (e) {
+            res.writeHead(400);
+            res.end('Bad request');
+            return;
+        }
+
+        const filePath = path.normalize(path.join(normalizedRoot, reqPath === '/' ? htmlFile : reqPath));
+        if (filePath !== normalizedRoot && !filePath.startsWith(normalizedRoot + path.sep)) {
+            res.writeHead(403);
+            res.end('Forbidden');
+            return;
+        }
+
+        fs.readFile(filePath, (err, data) => {
+            if (err) {
+                res.writeHead(404);
+                res.end('Not found');
+                return;
+            }
+            const ext = path.extname(filePath).toLowerCase();
+            res.writeHead(200, { 'Content-Type': emscriptenMimeTypes[ext] || 'application/octet-stream' });
+            res.end(data);
+        });
+    });
+
+    server.listen(0, '127.0.0.1', () => {
+        const { port } = server.address();
+        const previewUrl = `http://127.0.0.1:${port}/${htmlFile}`;
+
+        const previewWindow = new BrowserWindow({
+            width: 960,
+            height: 720,
+            title: 'Emscripten Preview',
+            webPreferences: {
+                nodeIntegration: false,
+                contextIsolation: true,
+                sandbox: true,
+            },
+        });
+        previewWindow.loadURL(previewUrl);
+        previewWindow.on('closed', () => server.close());
+
+        event.sender.send('consoleMessage', `<br><em>Preview running at ${previewUrl}</em><br>`);
+    });
+
+    server.on('error', (error) => {
+        event.sender.send('sendUIMessage', `<strong>Error...</strong><br>Could not start the preview server: ${error.message}`);
+    });
+}
+
+// prepends the emsdk root + its bundled toolchain dir to PATH so emcc/em++/emmake
+// resolve even when this app wasn't launched from a terminal with emsdk_env.sh sourced
+function resolveEmsdkEnv(emsdkPath, emccDir) {
+    const env = { ...process.env };
+    // Windows env var names are case-insensitive but JS object keys aren't - the
+    // real key is usually "Path", not "PATH". Update whichever key already exists
+    // so we extend it instead of creating a second, conflicting one.
+    const pathKey = Object.keys(env).find((k) => k.toUpperCase() === 'PATH') || 'PATH';
+    const additions = [];
+    if (emsdkPath) {
+        additions.push(emsdkPath, path.join(emsdkPath, 'upstream', 'emscripten'));
+        env.EMSDK = emsdkPath;
+    }
+    if (emccDir) {
+        additions.push(emccDir);
+    }
+    if (additions.length) {
+        env[pathKey] = additions.join(path.delimiter) + path.delimiter + (env[pathKey] || '');
+    }
+    return env;
+}
+
+// asks the PG binary to detect emcc via EMSDK / PATH / a Homebrew install (see resolveEmscriptenSDK in Utils.cpp)
+function detectEmsdk(callback) {
+    execFile(getPgPath(), ['-e'], { maxBuffer: Infinity }, (error, stdout) => {
+        if (error) return callback(null);
+        try {
+            const lastLine = stdout.trim().split('\n').pop();
+            const jsonOutput = lastLine.match(/\{.*\}/);
+            const data = jsonOutput ? JSON.parse(jsonOutput[0]) : null;
+            callback(data && data.found ? data : null);
+        } catch (e) {
+            callback(null);
+        }
+    });
+}
+
+ipcMain.on('getEmsdk', (event) => {
+    detectEmsdk((data) => {
+        event.sender.send('emsdkResult', data || { found: false });
+    });
+});
+
+ipcMain.on('buildEmscripten', (event, { projectName, projectPath, configuration, emsdkPath }) => {
+    const projectDir = path.join(projectPath, projectName);
+    const target = configuration === 'Debug' ? 'Debug' : 'Release';
+
+    if (!fs.existsSync(path.join(projectDir, 'Makefile'))) {
+        event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br>No Makefile found in <span class="monospace">${projectDir}</span>. Generate the project with the Emscripten template first.`);
+        event.sender.send('buildEmscriptenDone');
+        return;
+    }
+
+    event.sender.send('consoleMessage', `<br><em>Building Emscripten ${target}...</em><br>`);
+
+    detectEmsdk((detected) => {
+        const buildEnv = resolveEmsdkEnv(emsdkPath, detected && detected.emccDir);
+        if (detected && detected.emccDir) {
+            event.sender.send('consoleMessage', `<em>Using Emscripten toolchain: ${detected.emccDir}</em><br>`);
+        }
+
+        // emmake sets CC/CXX/AR/etc to point at the emscripten toolchain, which is the
+        // documented-correct way to make a Makefile-based build actually target
+        // Emscripten rather than the host compiler - fall back to plain make if it's
+        // not on PATH (e.g. no emsdkPath configured and emsdk_env.sh was never sourced).
+        const runBuild = (useEmmake) => {
+            const cmd = useEmmake ? (hostplatform === 'windows' ? 'emmake.bat' : 'emmake') : 'make';
+            const args = useEmmake ? ['make', target] : [target];
+            const child = spawn(cmd, args, { cwd: projectDir, windowsHide: true, env: buildEnv });
+            let stderr = '';
+
+            child.stdout.on('data', (chunk) => event.sender.send('consoleMessage', chunk.toString()));
+            child.stderr.on('data', (chunk) => {
+                stderr += chunk.toString();
+                event.sender.send('consoleMessage', chunk.toString());
+            });
+
+            child.on('error', (error) => {
+                if (useEmmake) {
+                    event.sender.send('consoleMessage', `<br><em>emmake not found on PATH, falling back to plain make...</em><br>`);
+                    runBuild(false);
+                    return;
+                }
+                event.sender.send('sendUIMessage',
+                    '<!--modal-context:none:-->\n<strong>Error...</strong><br>Could not run make. Make sure the Emscripten SDK is installed and activated '
+                    + '(set the Emscripten SDK path in Settings, or run <span class="monospace">source emsdk_env.sh</span> in the terminal you launched this app from) '
+                    + 'so emcc/em++/make are on PATH.<br><span class="monospace">' + error.message + '</span>'
+                );
+                event.sender.send('buildEmscriptenDone');
+            });
+
+            child.on('close', (code) => {
+                if (code !== 0) {
+                    event.sender.send('sendUIMessage',
+                        `<!--modal-context:none:-->\n<strong>Error...</strong><br>Emscripten ${target} build failed (exit code ${code}).`
+                        + '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stderr + '</textarea></div>'
+                    );
+                    event.sender.send('buildEmscriptenDone');
+                    return;
+                }
+
+                // matches PLATFORM_PROJECT_(RELEASE|DEBUG)_TARGET in
+                // libs/openFrameworksCompiled/project/emscripten/config.emscripten.default.mk:
+                // bin/em/$(BIN_NAME)/index.html, where BIN_NAME is <name>_debug for Debug
+                const binName = target === 'Debug' ? `${projectName}_debug` : projectName;
+                const emOutputDir = path.join(projectDir, 'bin', 'em', binName);
+                const htmlFile = fs.existsSync(path.join(emOutputDir, 'index.html')) ? 'index.html' : null;
+
+                if (!htmlFile) {
+                    event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br>Build succeeded but no .html output was found in <span class="monospace">${emOutputDir}</span>`);
+                    event.sender.send('buildEmscriptenDone');
+                    return;
+                }
+
+                serveAndPreviewEmscripten(emOutputDir, htmlFile, event);
+                event.sender.send('buildEmscriptenDone');
+            });
+        };
+
+        runBuild(true);
+    });
+});
+
 ipcMain.on('quit', (event, arg) => {
     app.quit();
 });
 
 ipcMain.on('saveDefaultSettings', (event, defaultSettings) => {
-    fs.writeFile(
-        path.resolve(__dirname, 'settings.json'),
-        defaultSettings,
-        (err) => {
-            if (err) {
-                event.returnValue = "Unable to save defaultSettings to settings.json... (Error=" + err.code + ")";
-            } else {
-                event.returnValue = "Updated default settings for the PG. (written to settings.json)";
-            }
-        }
-    );
+    // sendSync from the renderer expects returnValue set before this handler returns -
+    // fs.writeFile is async and would resolve after that, so a quit right after e.g.
+    // picking a new OF path could race past the actual disk write and lose it (#602)
+    try {
+        fs.writeFileSync(path.resolve(__dirname, 'settings.json'), defaultSettings);
+        event.returnValue = "Updated default settings for the PG. (written to settings.json)";
+    } catch (err) {
+        event.returnValue = "Unable to save defaultSettings to settings.json... (Error=" + err.code + ")";
+    }
 });
 
 ipcMain.on('path', (event, [ key, args ]) => {
@@ -1436,36 +1779,12 @@ ipcMain.on('showItemInFolder', (event, p) => {
     shell.showItemInFolder(p);
 });
 
-ipcMain.on('firstTimeSierra', (event, command) => {
-    exec(command, (error, stdout, stderr) => {
-        console.log(stdout, stderr);
-    });
-});
-
-ipcMain.on('command', (event, customArg) => {
-    const pgApp = getPgPath();
-    const command = `${pgApp} -c "${customArg}"`;
-
-    exec(command, { maxBuffer: Infinity }, (error, stdout, stderr) => {
-        if (error) {
-            event.sender.send('commandResult', {
-                success: false,
-                message: error.message
-            });
-        } else {
-            event.sender.send('commandResult', {
-                success: true,
-                message: stdout
-            });
-        }
-    });
+ipcMain.on('openPath', (event, p) => {
+    shell.openPath(p);
 });
 
 ipcMain.on('getOFPath', (event) => {
-    const pgApp = getPgPath();
-    const command = `${pgApp} --getofpath`;
-
-    exec(command, { maxBuffer: Infinity }, (error, stdout, stderr) => {
+    execFile(getPgPath(), ['--getofpath'], { maxBuffer: Infinity }, (error, stdout, stderr) => {
         if (error) {
              console.log( 'getOFPath error' );
             event.sender.send('ofPathResult', {
@@ -1499,10 +1818,7 @@ ipcMain.on('getOFPath', (event) => {
 });
 
 ipcMain.on('getHostType', (event) => {
-    const pgApp = getPgPath();
-    const command = `${pgApp} -i`;
-
-    exec(command, { maxBuffer: Infinity }, (error, stdout, stderr) => {
+    execFile(getPgPath(), ['-i'], { maxBuffer: Infinity }, (error, stdout, stderr) => {
         if (error) {
             console.log( 'getHostType error' );
             event.sender.send('ofPlatformResult', {
@@ -1535,10 +1851,7 @@ ipcMain.on('getHostType', (event) => {
 });
 
 ipcMain.on('getVersion', (event) => {
-    const pgApp = getPgPath();
-    const command = `${pgApp} -w`;
-
-    exec(command, { maxBuffer: Infinity }, (error, stdout, stderr) => {
+    execFile(getPgPath(), ['-w'], { maxBuffer: Infinity }, (error, stdout, stderr) => {
         if (error) {
             console.log( 'getVersion error' );
             event.sender.send('ofVersionResult', {

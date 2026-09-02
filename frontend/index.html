@@ -105,17 +105,23 @@
 				<a class="item updateMultiMenuOption menuItem" data-tab="updateMulti" style="display: none" id="updateMenuButton">
 					<div style="padding:6px;">update multiple</div>
 				</a>
+				<a class="item updateMultiMenuOption menuItem" data-tab="ofMenu" style="display: none" id="ofMenuButton">
+					<div style="padding:6px;">oF Menu</div>
+				</a>
 				<a class="item right floated menuItem" data-tab="settings" id="settingsMenuButton">
 					<div style="-webkit-app-region: no-drag !important; padding:6px;"><i class="setting link icon"></i>
 					</div>
 				</a>
 			</div>
 		</div>
+		<div class="undraggable" id="ofPathStatusBar" style="background-color:#222; color:#999; font-size:11px; padding:4px 12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+			Targeting: <span id="ofPathStatusText">(no openFrameworks path set)</span>
+		</div>
 		</div>
 		</div>
 
 
-		<div class="main ui container" style="padding: 130px 40px 50px 40px">
+		<div class="main ui container" style="padding: 150px 40px 50px 40px">
 
 			<!------------------------------- create -------------------------------->
 			<div class="ui tab active" data-tab="create">
@@ -167,7 +173,16 @@
 							<a class="ui icon tooltip" href="#rescanAddons" onclick="rescanAddons()" data-content="Click to reload addons folder" data-position="right center" id="adons-refresh-icon">
 								<i class="refresh icon"></i>
 							</a>
+							<a class="ui icon tooltip" href="#addAddonFromGit" onclick="$('#addonGitCloneSection').toggle()" data-content="Add an addon from a git URL" data-position="right center" id="addon-git-icon">
+								<i class="cloud download icon"></i>
+							</a>
 						</label>
+						<div class="field" id="addonGitCloneSection" style="display:none; margin-bottom:0.5em;">
+							<div class="ui icon input fluid">
+								<input type="text" placeholder="git URL, optionally url#branch-or-commit..." id="addonGitUrl">
+								<i class="download link icon" onclick="cloneAddonFromGit()"></i>
+							</div>
+						</div>
 						<div class="ui multiple search selection dropdown" id="addonsDropdown">
 							<input name="addons" type="hidden">
 							<i class="dropdown icon"></i>
@@ -290,6 +305,20 @@
 					</div>
 				</div>
 			</div>
+			<!------------------------------- oF Menu -------------------------------->
+			<div class="ui tab" data-tab="ofMenu">
+				<div class="ui message">
+					<p>Runs <span class="monospace">scripts/of.sh</span> against the configured openFrameworks path. Output streams to the console below.</p>
+				</div>
+				<div class="ui form">
+					<div class="field">
+						<div class="ui olive button" id="ofMenuStatusButton" onclick="runOfMenuCommand('status')">Check Status</div>
+					</div>
+					<div class="field">
+						<div class="ui orange button" id="ofMenuUpdateLibsButton" onclick="runOfMenuCommand('update-libs')">Download / Update Libraries</div>
+					</div>
+				</div>
+			</div>
 			<!------------------------------- settings -------------------------------->
 			<div class="ui tab" data-tab="settings">
 				<div class="ui form">
@@ -307,9 +336,15 @@
 						</div>
 					</div>
 					<div class="field">
-						<label>Version:</label>
+						<label>commandLine PG Version:</label>
 						<div class="ui icon input fluid">
 						<input type="text" placeholder="Version..." id="versionDisplay" readonly>
+						</div>
+					</div>
+					<div class="field">
+						<label>GUI Version:</label>
+						<div class="ui icon input fluid">
+						<input type="text" placeholder="Version..." id="guiVersionDisplay" readonly>
 						</div>
 					</div>
 
@@ -327,19 +362,24 @@
 						</div>
 					</div>
 					<div class="field">
+						<div class="ui checkbox">
+							<input type="checkbox" name="DetachConsole" id="detachConsole">
+							<label>Open console in its own window</label>
+						</div>
+					</div>
+					<div class="field">
 						<div class="ui checkbox advanced">
 							<input type="checkbox" name="Advanced" id="advancedOptions">
 							<label>Advanced options</label>
 						</div>
 					</div>
 
-					<div class="field">
-						<div class="ui input fluid advanced disabled">
-						<input type="text" id="commandInput" placeholder="">
+					<div class="field advanced" id="emsdkField" style="display: none">
+						<label>Emscripten SDK path (optional, used by Build &amp; Preview):</label>
+						<div class="ui icon input fluid">
+							<input type="text" placeholder="emsdk path..." id="emsdkPath">
+							<i class="search link icon" onclick="browseEmsdkPath()"></i>
 						</div>
-    				</div>
-    				<div class="field">
-						<div class="ui orange button advanced" id="commandButton" style="display: none" >Run cmd</div>
 					</div>
 
 					<div class="field">
@@ -380,6 +420,16 @@
 			<div class="actions">
 				<div class="ui cancel button" id="IDEButton" style="display: none;">Open in IDE</div>
 				<div class="ui cancel button" id="FolderButton" style="display: none;">Open Folder</div>
+				<div class="ui selection dropdown button" id="emscriptenConfig" style="display: none; min-width: 8em;">
+					<input type="hidden" value="Release">
+					<i class="dropdown icon"></i>
+					<div class="text">Release</div>
+					<div class="menu">
+						<div class="item" data-value="Release">Release</div>
+						<div class="item" data-value="Debug">Debug</div>
+					</div>
+				</div>
+				<div class="ui cancel button" id="EmscriptenPreviewButton" style="display: none;">Build &amp; Preview</div>
 				<div class="ui cancel button">Close</div>
 			</div>
 		</div>
@@ -404,17 +454,6 @@
 				<p>Welcome to the console :)</p>
 			</div>
 		</section>
-
-                <script>
-                window.nodeRequire = require;
-                delete window.require;
-                delete window.exports;
-                delete window.module;
-
-
-                </script>
-
-
 
 		<script type="text/javascript" src="static/js/jquery.min.js"></script>
 		<script type="text/javascript" src="static/js/semantic.min.js"></script>

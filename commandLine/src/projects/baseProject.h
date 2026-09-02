@@ -82,7 +82,7 @@ public:
 
 	std::vector<Template> listAvailableTemplates(std::string target);
 	std::unique_ptr<baseProject::Template> parseTemplate(const fs::path & templateDir);
-	virtual fs::path getPlatformTemplateDir(std::string templateDir);
+	virtual fs::path getPlatformTemplateDir();
 
 	pugi::xml_document doc;
 	bool bLoaded;

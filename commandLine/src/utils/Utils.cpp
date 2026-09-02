@@ -23,16 +23,19 @@
 #include <regex>
 #include <array>
 #include <stdio.h>
+#include <cstdlib>
 
 #ifdef TARGET_WIN32
 	#include <direct.h>
 	#define GetCurrentDir _getcwd
 #elif defined(TARGET_LINUX)
 	#include <unistd.h>
+	#include <sys/wait.h>
 	#define GetCurrentDir getcwd
 #else
 	#include <mach-o/dyld.h>	/* _NSGetExecutablePath */
 	#include <limits.h>		/* PATH_MAX */
+	#include <sys/wait.h>
 #endif
 
 
@@ -338,7 +341,14 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 		auto f = it->path();
 //		alert ("file: "+f.string(), 33);
 
-		if (fs::is_directory(f)) {
+		// use the iterator's cached entry, not fs::is_directory(f), to avoid re-resolving symlinks (#8545)
+		std::error_code dirEc;
+		bool isDir = it->is_directory(dirEc);
+		if (dirEc) {
+			continue;
+		}
+
+		if (isDir) {
 			// on osx, framework is a directory, let's not parse it....
 			if ((f.extension() == ".framework") || (f.extension() == ".xcframework" && (actualTarget != "osx" && actualTarget != "macos")) ) { //we want to treat .xcframeworks as regular libs for macos
 				it.disable_recursion_pending();
@@ -543,6 +553,78 @@ fs::path getUserHomeDir() {
 
 std::string getPGVersion() {
 	return PG_VERSION;
+}
+
+
+EmscriptenSDK resolveEmscriptenSDK() {
+	EmscriptenSDK sdk;
+#ifdef TARGET_WIN32
+	const string emccName = "emcc.bat";
+	const string pathSep = ";";
+#else
+	const string emccName = "emcc";
+	const string pathSep = ":";
+#endif
+
+	auto tryBinDir = [&](const fs::path & dir) {
+		std::error_code ec;
+		if (fs::exists(dir / emccName, ec)) {
+			sdk.binDir = dir;
+			sdk.found = true;
+		}
+		return sdk.found;
+	};
+
+	auto emsdkEnv = ofGetEnv("EMSDK");
+	if (!emsdkEnv.empty() && (tryBinDir(fs::path(emsdkEnv) / "upstream" / "emscripten") || tryBinDir(emsdkEnv))) {
+		sdk.emsdk = emsdkEnv;
+		return sdk;
+	}
+
+	for (const auto & dir : ofSplitString(ofGetEnv("PATH"), pathSep, true, true)) {
+		if (tryBinDir(fs::path(dir))) return sdk;
+	}
+
+	// prefer the shared Homebrew bin dir over the formula's private keg - emmake/emcc
+	// shell out to python3, which only resolves if that shared dir is on PATH too
+#ifdef TARGET_OSX
+	if (tryBinDir("/opt/homebrew/bin") || tryBinDir("/usr/local/bin")
+		|| tryBinDir("/opt/homebrew/opt/emscripten/bin") || tryBinDir("/usr/local/opt/emscripten/bin")) return sdk;
+#elif defined(TARGET_LINUX)
+	if (tryBinDir("/home/linuxbrew/.linuxbrew/bin") || tryBinDir("/home/linuxbrew/.linuxbrew/opt/emscripten/bin")) return sdk;
+#endif
+
+	return sdk;
+}
+
+
+int runOfMenu(const string & subcommand) {
+	fs::path ofMenuScript = getOFRoot() / "scripts" / "of.sh";
+	if (!fs::exists(ofMenuScript)) {
+		ofLogError() << "{ \"errorMessage\": \"scripts/of.sh not found - this openFrameworks checkout doesn't have oF Menu\" }";
+		return 65; // EXIT_DATAERR
+	}
+
+	string args;
+	if (subcommand == "status") {
+		args = "status";
+	} else if (subcommand == "update-libs") {
+		args = "update libs";
+	} else {
+		ofLogError() << "{ \"errorMessage\": \"unknown ofmenu command: " << subcommand << "\" }";
+		return 64; // EXIT_USAGE
+	}
+
+	// of.sh (scripts/ui.sh) disables colour and interactive prompts on its own once
+	// it detects stdout isn't a tty, so this passes straight through as plain text
+	// to whatever spawned us - no capturing/parsing needed here.
+	string cmdLine = "bash \"" + ofMenuScript.string() + "\" " + args;
+	int ret = std::system(cmdLine.c_str());
+#ifdef TARGET_WIN32
+	return ret;
+#else
+	return WIFEXITED(ret) ? WEXITSTATUS(ret) : 1;
+#endif
 }
 
 

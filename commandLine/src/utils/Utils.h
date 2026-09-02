@@ -143,6 +143,15 @@ vector <string> fileToStrings (const fs::path & file);
 fs::path getUserHomeDir();
 std::string getPGVersion();
 
+struct EmscriptenSDK {
+	fs::path emsdk;
+	fs::path binDir;
+	bool found = false;
+};
+EmscriptenSDK resolveEmscriptenSDK();
+
+int runOfMenu(const std::string & subcommand);
+
 fs::path makeRelative(const fs::path& from, const fs::path& to);
 
 bool ofIsPathInPath(const fs::path & path, const fs::path & base);

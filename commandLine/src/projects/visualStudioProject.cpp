@@ -281,6 +281,8 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 			ext == ".app" ||
 			ext == ".xcworkspace" ||
 			ext == ".xcodeproj") {
+		} else if (ext == ".c") {
+			addClCompileAsC(srcFileString, folderString);
 		} else{
 			appendValue(doc, "ClCompile", "Include", srcFileString);
 
@@ -301,22 +303,7 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 			break;
 		}
 		case C:{
-			pugi::xml_node node = appendValue(doc, "ClCompile", "Include", srcFileString);
-
-			if(!node.child("CompileAs")){
-				pugi::xml_node compileAs = node.append_child("CompileAs");
-				compileAs.append_attribute("Condition").set_value("'$(Configuration)|$(Platform)'=='Debug|x64'");
-				compileAs.set_value("Default");
-
-				compileAs = node.append_child("CompileAs");
-				compileAs.append_attribute("Condition").set_value("'$(Configuration)|$(Platform)'=='Release|x64'");
-				compileAs.set_value("Default");
-			}
-
-			pugi::xml_node nodeFilters = filterXmlDoc.select_node("//ItemGroup[ClCompile]").node();
-			pugi::xml_node nodeAdded = nodeFilters.append_child("ClCompile");
-			nodeAdded.append_attribute("Include").set_value(srcFileString.c_str());
-			nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folderString.c_str());
+			addClCompileAsC(srcFileString, folderString);
 			break;
 		}
 		case HEADER:{
@@ -338,6 +325,27 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 		}
 		}
 	}
+}
+
+void visualStudioProject::addClCompileAsC(const string & srcFileString, const string & folderString){
+	pugi::xml_node node = appendValue(doc, "ClCompile", "Include", srcFileString);
+
+	if(!node.child("CompileAs")){
+		static const std::vector<string> configurations { "Debug", "Release" };
+		static const std::vector<string> platforms { "x64", "ARM64", "ARM64EC" };
+		for(const auto & configuration : configurations){
+			for(const auto & platformName : platforms){
+				pugi::xml_node compileAs = node.append_child("CompileAs");
+				compileAs.append_attribute("Condition").set_value(("'$(Configuration)|$(Platform)'=='" + configuration + "|" + platformName + "'").c_str());
+				compileAs.set_value("CompileAsC");
+			}
+		}
+	}
+
+	pugi::xml_node nodeFilters = filterXmlDoc.select_node("//ItemGroup[ClCompile]").node();
+	pugi::xml_node nodeAdded = nodeFilters.append_child("ClCompile");
+	nodeAdded.append_attribute("Include").set_value(srcFileString.c_str());
+	nodeAdded.append_child("Filter").append_child(pugi::node_pcdata).set_value(folderString.c_str());
 }
 
 bool exclusiveAppend( string& values, string item, string delimiter = ";") {
@@ -709,7 +717,7 @@ void visualStudioProject::addSrcFiles(ofAddon& addon, const vector<fs::path> &fi
 			addon.filesToFolders[s] = fs::path{""};
 		}
 		ofLogVerbose("visualStudioProject::addSrcFiles") << "Adding addon " << toString(type) << " source file: [" << s.string() << "] folder:[" << addon.filesToFolders[s].string() << "]";
-		addSrc(s, addon.filesToFolders[s]);
+		addSrc(s, addon.filesToFolders[s], type);
 	}
 }
 

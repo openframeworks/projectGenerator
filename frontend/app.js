@@ -1,11 +1,13 @@
-//nodeRequire is used instead of require due to clash with node and jquery
-//see section - I can not use jQuery/RequireJS/Meteor/AngularJS in Electron : https://www.electronjs.org/docs/latest/faq/
-const { ipcRenderer, webUtils } = nodeRequire('electron');
-path = nodeRequire('path');
-fs = nodeRequire('fs');
+// no direct node/electron access here - nodeIntegration is off, contextIsolation is on.
+// everything goes through the contextBridge API exposed by preload.js
+const ipcRenderer = window.ipcWrapper;
+const path = window.ipcWrapper.path;
+const fs = window.ipcWrapper.fs;
+const webUtils = { getPathForFile: window.ipcWrapper.getPathForFile };
 
 let platforms;
 let templates;
+let lastGeneratedProject = null;
 
 // var platforms = {
 //     "osx": "OS X (Xcode)",
@@ -33,6 +35,12 @@ let numAddedSrcPaths = 1;
 //-------------------------------------------
 ipcRenderer.on('setOfPath', (event, arg) => {
     setOFPath(arg);
+});
+
+ipcRenderer.on('setEmsdkPath', (event, arg) => {
+    $("#emsdkPath").val(arg);
+    defaultSettings.emsdkPath = arg;
+    saveDefaultSettings();
 });
 
 ipcRenderer.on('cwd', (event, arg) => {
@@ -95,8 +103,20 @@ ipcRenderer.on('setup', (event, arg) => {
 ipcRenderer.on('setDefaults', (event, arg) => {
     defaultSettings = arg;
     setOFPath(defaultSettings.defaultOfPath);
+    $("#emsdkPath").val(defaultSettings.emsdkPath || '');
     enableAdvancedMode(defaultSettings.advancedMode);
 
+    ipcRenderer.send('getEmsdk');
+});
+
+ipcRenderer.on('emsdkResult', (event, arg) => {
+    if (arg && arg.found && arg.emccDir) {
+        $("#emsdkPath").attr('placeholder', 'auto-detected: ' + arg.emccDir);
+    }
+});
+
+ipcRenderer.on('setGuiVersion', (event, version) => {
+    $("#guiVersionDisplay").val(version);
 });
 
 //-------------------------------------------
@@ -339,10 +359,8 @@ ipcRenderer.on('selectAddons', (event, arg) => {
         $('#missingAddonList').empty();
         $('#missingAddonList').append("<b>" + neededAddons.join(", ") + "</b>");
         $("#missingAddonMessage").show();
-        $("#adons-refresh-icon").show();
 
     } else {
-        $("#adons-refresh-icon").hide();
         $("#missingAddonMessage").hide();
 
         // $("#generate-mode-section").removeClass("has-missing-addons");
@@ -381,6 +399,7 @@ ipcRenderer.on('sendUIMessage', (event, arg) => {
 //-------------------------------------------
 ipcRenderer.on('consoleMessage', (event, msg) => {
     consoleMessage(msg);
+    ipcRenderer.send('relayConsoleMessage', msg);
 });
 
 //-------------------------------------------
@@ -396,6 +415,10 @@ ipcRenderer.on('updateCompleted', (event, isSuccessful) => {
     if (isSuccessful === true) {
         // eventual callback after update completed
     }
+});
+
+ipcRenderer.on('updateMultipleDone', () => {
+    $("#updateMultipleButton").removeClass('loading disabled').text('Update multiple');
 });
 
 ipcRenderer.on('setRandomisedSketchName', (event, newName) => {
@@ -545,17 +568,10 @@ function setup() {
 
        
         $('#ofPathButton').click(() => {
-            disableButtonTemporarily($("#commandButton"));
+            disableButtonTemporarily($("#ofPathButton"));
             getOFPath();
         });
-        
-        $('#commandButton').click(() => {
-            disableButtonTemporarily($("#commandButton"));
-            const customArg = $('#commandInput').val();
-            customArg = customArg.replace(/[`$&|<>]/g, '\\$&');
-            ipcRenderer.send('command', customArg);
-        });
-       
+
         console.log("App is translocated: " + isFirstTimeSierra);
  
         $('.main.menu .item').tab({
@@ -636,6 +652,15 @@ function setup() {
                 projectPath: $("#projectPath").val()
             };
 
+            // a template pick belongs to the project it was made for - clear it as
+            // soon as the user points at a different project (rather than right after
+            // generate), so it can't silently carry over, while still surviving repeated
+            // generates of the same project
+            if (lastGeneratedProject
+                && (lastGeneratedProject.projectName !== project.projectName || lastGeneratedProject.projectPath !== project.projectPath)) {
+                $('#templatesDropdown').dropdown('clear');
+            }
+
         	// check if project exists
         	ipcRenderer.send('isOFProjectFolder', project);
 
@@ -680,8 +705,19 @@ function setup() {
 
         $("#FolderButton").on("click", () => {
             disableButtonTemporarily($("#FolderButton"));
-            launchFolder();
+            if (modalFolderPath) {
+                ipcRenderer.send('openPath', modalFolderPath);
+            } else {
+                launchFolder();
+            }
         });
+
+        $("#EmscriptenPreviewButton").on("click", () => {
+            disableButtonTemporarily($("#EmscriptenPreviewButton"));
+            buildAndPreviewEmscripten();
+        });
+
+        $('#emscriptenConfig').dropdown();
 
          $("#verboseOption").checkbox();
          $("#verboseOption").on("change", () => {
@@ -700,6 +736,8 @@ function setup() {
             const ofpath = $("#ofPath").val();
             defaultSettings.defaultOfPath = ofpath;
             console.log("ofPath val " + ofpath);
+            $("#ofPathStatusText").text(ofpath || '(no openFrameworks path set)');
+            $("#ofPathStatusBar").attr('title', ofpath);
             if(isFirstTimeSierra) {
                 //ipcRenderer.sendSync('firstTimeSierra', "xattr -r -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app");
                 //$("#projectPath").val(ofpath + "/apps/myApps").trigger('change');
@@ -740,15 +778,42 @@ function setup() {
                 $("#ofPath").blur();
             }
         });
-    
-        /* Stuff for the console setting (removed from UI) */
-        $("#consoleToggle").on("change", function () {
-            enableConsole( $(this).is(':checked') );
+
+        // updates emsdkPath when the field is manually changed
+        $("#emsdkPath").on('blur', () => {
+            defaultSettings.emsdkPath = $("#emsdkPath").val();
+            saveDefaultSettings();
+        }).on('keypress', (e) => {
+            if(e.which == 13){
+                e.preventDefault();
+                $("#emsdkPath").blur();
+            }
         });
-        // enable console? (hiddens setting)
-        if(defaultSettings['showConsole']){ $("body").addClass('enableConsole'); }
-        $("#showConsole").on('click', function(){ $('body').addClass('showConsole'); });
-        $("#hideConsole").on('click', function(){ $('body').removeClass('showConsole'); });
+
+        // the console dock is always present as a collapsed peek strip - only
+        // whether it's expanded (showConsole) is a persisted preference
+        if (defaultSettings['showConsole']) { $("body").addClass('showConsole'); }
+        $("#showConsole").on('click', function(){
+            $('body').addClass('showConsole');
+            defaultSettings['showConsole'] = true;
+            saveDefaultSettings();
+        });
+        $("#hideConsole").on('click', function(){
+            $('body').removeClass('showConsole');
+            defaultSettings['showConsole'] = false;
+            saveDefaultSettings();
+        });
+
+        $("#detachConsole").checkbox();
+        $("#detachConsole").prop('checked', !!defaultSettings['detachConsole']);
+        updateConsoleDockVisibility();
+        $("#detachConsole").on('change', function(){
+            const enabled = $(this).is(':checked');
+            defaultSettings['detachConsole'] = enabled;
+            saveDefaultSettings();
+            updateConsoleDockVisibility();
+            ipcRenderer.send('setDetachConsole', enabled);
+        });
 
         // initialise the overall-use modal
         $("#uiModal").modal({
@@ -1032,6 +1097,11 @@ function generate() {
     } else if (gen.platformList == null || lengthOfPlatforms == 0) {
         $("#platformsDropdown").oneTimeTooltip("Please select a platform first.");
     } else {
+        // the template pick is cleared in the #projectName change handler instead,
+        // as soon as the user points at a different project - not here, so a plain
+        // single generate doesn't wipe the pick you just used
+        lastGeneratedProject = { projectName: gen.projectName, projectPath: gen.projectPath, templateList: gen.templateList };
+        openConsoleForOperation();
         ipcRenderer.send('generate', gen);
     }
 }
@@ -1068,7 +1138,16 @@ function updateRecursive() {
     } else if (platformValueArray.length === 0) {
         displayModal("Please select a platform first.");
     } else {
+        // this is a recursive multi-project update, not a single generated project -
+        // clear any stale single-project state so its success modal can't show a
+        // leftover Build & Preview button from an earlier emscripten generate/update
+        lastGeneratedProject = null;
+        $("#updateMultipleButton").addClass('loading disabled').text('Updating...');
+        openConsoleForOperation();
         ipcRenderer.send('update', gen);
+
+        // don't let a stale template pick leak into the next update
+        $('#templatesDropdownMulti').dropdown('clear');
     }
 }
 
@@ -1091,10 +1170,6 @@ function switchGenerateMode(mode) {
         $("#localAddonMessage").hide();
         $("#nameRandomiser").hide();
         $("#revealProjectFiles").show();
-        $("#adons-refresh-icon").hide();
-        if(!defaultSettings.advancedMode){
-            $("#consoleContainer").hide();
-        }
         $("#extraContainer").hide();
 
         console.log('Switching GenerateMode to Update...');
@@ -1119,10 +1194,6 @@ function switchGenerateMode(mode) {
         $("#localAddonMessage").hide();
         $("#nameRandomiser").show();
         $("#revealProjectFiles").hide();
-        $("#adons-refresh-icon").hide();
-        if(!defaultSettings.advancedMode){
-            $("#consoleContainer").hide();
-        }
         $("#extraContainer").hide();
 
         console.log('Switching GenerateMode to Create...');
@@ -1143,10 +1214,11 @@ function enableAdvancedMode(isAdvanced) {
         $('#sourceExtraSection').show();
         $('#templateSection').show();
         $('#templateSectionMulti').show();
-         $('#commandInput').show();
-        $('#commandButton').show();
         $('#ofPathButton').show();
-
+        $('#emsdkField').show();
+        if (!defaultSettings['detachConsole']) {
+            $('body').addClass('showConsole');
+        }
 
     } else {
         $('#platformsDropdown').removeClass("disabled");
@@ -1159,32 +1231,14 @@ function enableAdvancedMode(isAdvanced) {
         $('#templateSection').show();
         $('#templateSectionMulti').show();
 
-        $('#commandInput').hide();
-        $('#commandButton').hide();
         $('#ofPathButton').hide();
+        $('#emsdkField').hide();
         $("body").removeClass('advanced');
         $('a.updateMultiMenuOption').hide();
     }
-    enableConsole(isAdvanced);
     defaultSettings.advancedMode = isAdvanced;
     saveDefaultSettings();
     //$("#advancedToggle").prop('checked', defaultSettings['advancedMode'] );
-}
-
-/* Stuff for the console setting (removed from UI) */
-
-function enableConsole( showConsole ){
-	if( showConsole ) {
-		// this has to be in body for CSS reasons
-		$("body").addClass('showConsole');
-	}
-	else {
-		$("body").removeClass('showConsole');
-	}
-	defaultSettings['showConsole'] = showConsole;
-	saveDefaultSettings();
-    $("#consoleContainer").show();
-	$("#consoleToggle").prop('checked', defaultSettings['showConsole'] );
 }
 
 //----------------------------------------
@@ -1207,7 +1261,21 @@ function openFolder() {
 }
 
 //----------------------------------------
+// set by displayModal() when a message carries a modal-context marker -
+// lets the Folder button open something other than the current project
+let modalFolderPath = null;
+
 function displayModal(message) {
+    let modalType = null;
+    const contextMatch = message.match(/<!--modal-context:([a-z-]+):([^>]*)-->/);
+    if (contextMatch) {
+        modalType = contextMatch[1];
+        modalFolderPath = contextMatch[2] || null;
+        message = message.replace(contextMatch[0], '');
+    } else {
+        modalFolderPath = null;
+    }
+
     $("#uiModal .content")
         .html(message)
         .find('*[data-toggle="external_target"]')
@@ -1216,11 +1284,27 @@ function displayModal(message) {
             ipcRenderer.send('openExternal', $(e.currentTarget).prop("href") );
         });
 
-    if (message.indexOf("Success!") > -1){
-        $("#IDEButton").show();
+    const isEmscripten = lastGeneratedProject != null && lastGeneratedProject.templateList.includes('emscripten');
+
+    $("#IDEButton").hide();
+    $("#FolderButton").hide();
+    $("#emscriptenConfig").hide();
+    $("#EmscriptenPreviewButton").hide();
+
+    if (modalType === 'addon-success') {
         $("#FolderButton").show();
+    } else if (modalType === 'none') {
+        // only Close makes sense here (e.g. addon validation errors, emscripten build messages)
+    } else if (message.indexOf("Success!") > -1){
+        $("#FolderButton").show();
+        if (isEmscripten) {
+            // emscripten has no xcodeproj/sln to open - Build & Preview replaces "Open in IDE" here
+            $("#emscriptenConfig").show();
+            $("#EmscriptenPreviewButton").show();
+        } else {
+            $("#IDEButton").show();
+        }
     } else {
-        $("#IDEButton").hide();
         $("#FolderButton").show();
     }
 
@@ -1234,6 +1318,32 @@ function consoleMessage(orig_message) {
     $("#consoleContainer").scrollTop($('#console').offset().top); // scrolls console to bottom
 }
 
+// force the docked console open for a build/generate/update - skipped when the
+// console is detached into its own window, so output isn't shown in both places
+function openConsoleForOperation() {
+    if (defaultSettings['detachConsole']) return;
+    $('body').addClass('showConsole');
+}
+
+// the docked console and the detached window are mutually exclusive - hide the
+// dock entirely while the console is detached, instead of just skipping its auto-open
+function updateConsoleDockVisibility() {
+    $('#consoleContainer').toggle(!defaultSettings['detachConsole']);
+}
+
+// syncs the checkbox back off if the console window was closed directly (its own
+// close button) rather than via the checkbox, so the two don't fall out of sync
+ipcRenderer.on('consoleWindowClosed', () => {
+    // .checkbox('uncheck')/('set unchecked') don't reliably flip this checkbox's
+    // visual state in the vendored semantic.min.js build here - set both the
+    // input and the wrapper's checked class directly instead
+    $("#detachConsole").prop('checked', false);
+    $("#detachConsole").closest('.ui.checkbox').removeClass('checked');
+    defaultSettings['detachConsole'] = false;
+    saveDefaultSettings();
+    updateConsoleDockVisibility();
+});
+
 //-----------------------------------------------------------------------------------
 // Button calls
 //-----------------------------------------------------------------------------------
@@ -1243,6 +1353,10 @@ function quit(){
 }
 function browseOfPath() {
     ipcRenderer.send('pickOfPath', ''); // current path could go here (but the OS also remembers the last used folder)
+}
+
+function browseEmsdkPath() {
+    ipcRenderer.send('pickEmsdkPath', $("#emsdkPath").val());
 }
 
 function browseProjectPath() {
@@ -1311,6 +1425,20 @@ function rescanAddons() {
     ipcRenderer.send('isOFProjectFolder', projectInfo);     // <- this forces addon reload
 }
 
+function cloneAddonFromGit(){
+    const raw = $("#addonGitUrl").val().trim();
+    if (raw === '') return;
+
+    const [url, ref] = raw.split('#');
+    $("#addonGitUrl").prop('disabled', true).attr('placeholder', 'Cloning...').val('');
+    openConsoleForOperation();
+    ipcRenderer.send('cloneAddon', { ofPath: $("#ofPath").val(), url, ref: ref || '' });
+}
+
+ipcRenderer.on('cloneAddonDone', () => {
+    $("#addonGitUrl").prop('disabled', false).attr('placeholder', 'git URL, optionally url#branch-or-commit...');
+});
+
 function getRandomSketchName(){
     const projectPath = $("#projectPath").val();
     if (projectPath === '') {
@@ -1328,6 +1456,16 @@ function getRandomSketchName(){
 }
 
 function launchInIDE(){
+    const templatePicked = $("#templatesDropdown .active");
+    const templateValueArray = [];
+    for (let i = 0; i < templatePicked.length; i++){
+        templateValueArray.push($(templatePicked[i]).attr("data-value"));
+    }
+    if (templateValueArray.includes('emscripten')) {
+        displayModal('<!--modal-context:none:-->\n<strong>Emscripten</strong><br>There is no IDE project for the Emscripten template - use "Build &amp; Preview" instead.');
+        return;
+    }
+
     const platform = getPlatformList()[0];
 
     const project = {
@@ -1350,6 +1488,38 @@ function launchFolder(){
 
     ipcRenderer.send('launchFolder', project );
 }
+
+function buildAndPreviewEmscripten(){
+    if (lastGeneratedProject == null) return;
+
+    $("#EmscriptenPreviewButton").addClass('loading disabled').text('Building...');
+    openConsoleForOperation();
+
+    ipcRenderer.send('buildEmscripten', {
+        projectName: lastGeneratedProject.projectName,
+        projectPath: lastGeneratedProject.projectPath,
+        configuration: $("#emscriptenConfig").dropdown('get value') || 'Release',
+        emsdkPath: $("#emsdkPath").val(),
+    });
+}
+
+ipcRenderer.on('buildEmscriptenDone', () => {
+    $("#EmscriptenPreviewButton").removeClass('loading disabled').text('Build & Preview');
+});
+
+function ofMenuButtonFor(command) {
+    return command === 'status' ? $('#ofMenuStatusButton') : $('#ofMenuUpdateLibsButton');
+}
+
+function runOfMenuCommand(command) {
+    ofMenuButtonFor(command).addClass('loading disabled');
+    openConsoleForOperation();
+    ipcRenderer.send('runOfMenu', { command, ofPath: $("#ofPath").val() });
+}
+
+ipcRenderer.on('ofMenuDone', (event, { command }) => {
+    ofMenuButtonFor(command).removeClass('loading disabled');
+});
 
 function getOFVersion() {
     console.log('getOFVersion:sending');
@@ -1374,15 +1544,6 @@ function getOFPath() {
     console.log('getOFPath:sending');
     ipcRenderer.send('getOFPath');
 }
-
-
-ipcRenderer.on('commandResult', (event, result) => {
-    if (result.success) {
-        console.log('Command executed successfully:', result.message);
-    } else {
-        console.error('Command execution failed:', result.message);
-    }
-});
 
 
 ipcRenderer.on('ofPathResult', (event, result) => {

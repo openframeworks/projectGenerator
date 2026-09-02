@@ -399,6 +399,10 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 	fp.addToBuildPhase = true;
 	fp.isSrc = true;
 
+	if (type == HEADER || (type == DEFAULT && (ext == ".h" || ext == ".hpp"))) {
+		fp.addToBuildPhase = false;
+	}
+
 	if (type == DEFAULT) {
 
 		if (ext == ".h" || ext == ".hpp") {
