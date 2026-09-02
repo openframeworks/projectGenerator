@@ -222,6 +222,8 @@ bool isFolderNotCurrentPlatform(const string & folderName, const string & platfo
 			"osx",
 			"msys2",
 			"vs",
+			"vs2019",
+			"vs2026",
 			"ios",
             "macos",
             "tvos",
@@ -242,11 +244,11 @@ bool isFolderNotCurrentPlatform(const string & folderName, const string & platfo
 
 	for (auto & p : platforms) {
         if (folderName == p) {
-            if (folderName == "win32" && (platform == "vs" || platform == "mysys2") ) {
+            if (folderName == "win32" && (platform == "vs" || platform == "vs2019" || platform == "vs2026" || platform == "msys2") ) {
                 cout << "isFolderNotCurrentPlatform win32 for vs/msys2 return false" << folderName << " platformCheck:" << p << endl;
                 return false;
             }
-            if (folderName == "posix" && (platform != "vs" && platform != "mysys2") ) {
+            if (folderName == "posix" && (platform != "vs" && platform != "vs2019" && platform != "vs2026" && platform != "msys2") ) {
                 cout << "isFolderNotCurrentPlatform posix for !vs/msys2 return false" << folderName << " platformCheck:" << p << endl;
                 return false;
             }
@@ -385,7 +387,7 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
                platformFound = true;
             }
 
-			if (ext == ".a" || ext == ".lib" || ext == ".dylib" || ext == ".so" || ext == ".xcframework" || ext == ".framework" || (ext == ".dll" && platform != "vs")) {
+			if (ext == ".a" || ext == ".lib" || ext == ".dylib" || ext == ".so" || ext == ".xcframework" || ext == ".framework" || (ext == ".dll" && platform != "vs" && platform != "vs2019" && platform != "vs2026")) {
 				if (platformFound){
                     
                     LibraryBinary lib(f);
@@ -449,7 +451,7 @@ unique_ptr<baseProject> getTargetProject(const string & targ) {
 	} else if (targ == "msys2") {
 //		return unique_ptr<QtCreatorProject>(new QtCreatorProject(targ));
 		return unique_ptr<VSCodeProject>(new VSCodeProject(targ));
-	} else if (targ == "vs" || targ == "vs2019") {
+	} else if (targ == "vs" || targ == "vs2019" || targ == "vs2026") {
 		return unique_ptr<visualStudioProject>(new visualStudioProject(targ));
 	} else if (targ == "linux" ||
 			   targ == "linux64" ||
