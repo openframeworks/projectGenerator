@@ -1334,7 +1334,11 @@ function updateConsoleDockVisibility() {
 // syncs the checkbox back off if the console window was closed directly (its own
 // close button) rather than via the checkbox, so the two don't fall out of sync
 ipcRenderer.on('consoleWindowClosed', () => {
-    $("#detachConsole").checkbox('set unchecked');
+    // .checkbox('uncheck')/('set unchecked') don't reliably flip this checkbox's
+    // visual state in the vendored semantic.min.js build here - set both the
+    // input and the wrapper's checked class directly instead
+    $("#detachConsole").prop('checked', false);
+    $("#detachConsole").closest('.ui.checkbox').removeClass('checked');
     defaultSettings['detachConsole'] = false;
     saveDefaultSettings();
     updateConsoleDockVisibility();
