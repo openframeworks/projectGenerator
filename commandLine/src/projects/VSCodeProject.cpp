@@ -95,8 +95,21 @@ bool VSCodeProject::createProjectFile(){
 		ofLogError(LOG_NAME) << "error copying folder " << templatePath.string() << " : " << projectDir.string() << " : " << e.what();
 		return false;
 	}
-	
-	
+
+	// template default is ucrt64; rewrite to the chosen MSYS2 environment if different
+	if (msys2Environment != "ucrt64") {
+		for (const auto & f : { projectDir / ".vscode" / "tasks.json", projectDir / ".vscode" / "c_cpp_properties.json" }) {
+			std::ifstream in(f);
+			if (!in) continue;
+			std::string contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+			in.close();
+			replaceAll(contents, "ucrt64", msys2Environment);
+			std::ofstream out(f);
+			out << contents;
+		}
+	}
+
+
 	workspace.fileName = fs::path {
 		projectDir / (projectName + ".code-workspace")};
 	cppProperties.fileName = fs::path {

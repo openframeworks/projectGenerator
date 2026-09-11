@@ -885,6 +885,9 @@ function setup() {
             });
 
 
+        $('#msys2EnvDropdown').dropdown();
+        $('#msys2EnvDropdown').dropdown('set exactly', 'ucrt64');
+
         // reflesh template dropdown list depends on selected platforms
         $("#platformsDropdown").on('change', () => {
             const selectedPlatforms = $("#platformsDropdown input").val();
@@ -896,6 +899,11 @@ function setup() {
             }
             console.log(arg);
             ipcRenderer.send('refreshTemplateList', arg);
+            if (selectedPlatformArray.includes('vscode')) {
+                $('#msys2EnvField').show();
+            } else {
+                $('#msys2EnvField').hide();
+            }
         })
         $("#platformsDropdownMulti").on('change', () => {
             const selectedPlatforms = $("#platformsDropdownMulti input").val();
@@ -1086,7 +1094,8 @@ function generate() {
         templateList: templateValueArray,
         addonList: addonValueArray,  //$("#addonsDropdown").val();
         ofPath: $("#ofPath").val(),
-        verbose: bVerbose
+        verbose: bVerbose,
+        msys2Env: $('#msys2EnvDropdown').dropdown('get value')
     };
 
     // console.log(gen);

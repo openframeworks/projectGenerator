@@ -98,6 +98,10 @@ public:
 
 	virtual void addFramework(const fs::path & path, const fs::path & folder, bool isRelativeToSDK = false){};
 
+	// MSYS2 environment (ucrt64 | mingw64 | clang64) - only meaningful for VSCodeProject,
+	// a no-op everywhere else so callers don't need to know which target this applies to
+	virtual void setMsys2Environment(const std::string & env) {}
+
 
 #ifdef OFADDON_OUTPUT_JSON_DEBUG
     void saveAddonsToJson(){
@@ -153,7 +157,7 @@ protected:
     virtual void addCPPFLAG(const std::string& cppflag, LibType libType = RELEASE_LIB) = 0; // CXX_FLAGS
     virtual void addAfterRule(const std::string& script) = 0;
     virtual void addDefine(const std::string& define, LibType libType = RELEASE_LIB) = 0;
-    
+
     void copyAddonData(ofAddon& addon);
     
     

@@ -1128,6 +1128,7 @@ ipcMain.on('runOfMenu', (event, { command, ofPath }) => {
  *     addonList: Array<string>,
  *     ofPath: string,
  *     verbose: boolean,
+ *     msys2Env: string,
  * }} GenerateArgument */
 
 /**
@@ -1144,6 +1145,7 @@ function generateFunction(event, generate) {
         verbose,
         projectPath,
         projectName,
+        msys2Env,
     } = generate;
 
     const args = [];
@@ -1172,6 +1174,10 @@ function generateFunction(event, generate) {
 
     if (templateList != null) {
         args.push(`-t${templateList.join(",")}`);
+    }
+
+    if (msys2Env != null && msys2Env.length > 0) {
+        args.push(`-k${msys2Env}`);
     }
 
     if (projectName != null && projectPath != null) {
