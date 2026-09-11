@@ -29,6 +29,70 @@ let localAddons = [];
 let numAddedSrcPaths = 1;
 
 //-----------------------------------------------------------------------------------
+// i18n
+//-----------------------------------------------------------------------------------
+
+let STRINGS = {};
+let AVAILABLE_LANGS = [];
+let currentLang = 'en';
+
+function t(key, params) {
+    let str = (STRINGS && STRINGS[key]) || key;
+    if (params) {
+        for (const k in params) {
+            str = str.split('{{' + k + '}}').join(params[k]);
+        }
+    }
+    return str;
+}
+
+function applyTranslations() {
+    $('[data-i18n]').each(function () {
+        $(this).text(t($(this).attr('data-i18n')));
+    });
+    $('[data-i18n-placeholder]').each(function () {
+        $(this).attr('placeholder', t($(this).attr('data-i18n-placeholder')));
+    });
+    $('[data-i18n-content]').each(function () {
+        $(this).attr('data-content', t($(this).attr('data-i18n-content')));
+    });
+
+    // not a static [data-i18n] target - JS overwrites its text with the live OF path,
+    // falling back to this same string, so re-derive from the actual source of truth
+    // (the input) rather than guessing from whatever text happens to be displayed
+    if (!$('#ofPath').val()) {
+        $('#ofPathStatusText').text(t('statusBar.noPath'));
+    }
+
+    // has an embedded link, so it's built as HTML rather than a plain [data-i18n] text swap
+    const rescanLink = '<a href="#rescanAddons" onclick="rescanAddons()">' + t('msgBox.missingAddons.linkText') + '</a>';
+    $('#missingAddonBody2').html(t('msgBox.missingAddons.body2Suffix', { link: rescanLink }));
+
+    $('#ofMenuDescription').html(t('ofMenu.description', { script: '<span class="monospace">scripts/of.sh</span>' }));
+
+    $('#ofPathSierraEasyFix').html(`<strong>${t('msgBox.sierra.easyFixLabel')}</strong> ${t('msgBox.sierra.easyFix')}`);
+    $('#ofPathSierraPermanentFix').html(`<strong>${t('msgBox.sierra.permanentFixLabel')}</strong> ${t('msgBox.sierra.permanentFix')}`);
+}
+
+function populateLanguageDropdown() {
+    const menu = $('#languageDropdown .menu');
+    menu.empty();
+    for (const { code, name } of AVAILABLE_LANGS) {
+        $('<div/>', { class: 'item', 'data-value': code }).text(name).appendTo(menu);
+    }
+    $('#languageDropdown').dropdown();
+    $('#languageDropdown').dropdown('set exactly', currentLang);
+}
+
+ipcRenderer.on('setTranslations', (event, data) => {
+    STRINGS = data.strings;
+    AVAILABLE_LANGS = data.available;
+    currentLang = data.lang;
+    applyTranslations();
+    populateLanguageDropdown();
+});
+
+//-----------------------------------------------------------------------------------
 // IPC
 //-----------------------------------------------------------------------------------
 
@@ -418,7 +482,7 @@ ipcRenderer.on('updateCompleted', (event, isSuccessful) => {
 });
 
 ipcRenderer.on('updateMultipleDone', () => {
-    $("#updateMultipleButton").removeClass('loading disabled').text('Update multiple');
+    $("#updateMultipleButton").removeClass('loading disabled').text(t('button.updateMultiple'));
 });
 
 ipcRenderer.on('setRandomisedSketchName', (event, newName) => {
@@ -737,7 +801,7 @@ function setup() {
             const ofpath = $("#ofPath").val();
             defaultSettings.defaultOfPath = ofpath;
             console.log("ofPath val " + ofpath);
-            $("#ofPathStatusText").text(ofpath || '(no openFrameworks path set)');
+            $("#ofPathStatusText").text(ofpath || t('statusBar.noPath'));
             $("#ofPathStatusBar").attr('title', ofpath);
             if(isFirstTimeSierra) {
                 //ipcRenderer.sendSync('firstTimeSierra', "xattr -r -d com.apple.quarantine " + ofpath + "/projectGenerator-osx/projectGenerator.app");
@@ -885,6 +949,14 @@ function setup() {
                 $("#dropZoneUpdate").removeClass("accept deny");
             });
 
+
+        $('#languageDropdown').on('change', () => {
+            const lang = $('#languageDropdown').dropdown('get value');
+            if (!lang || lang === currentLang) return;
+            defaultSettings.language = lang;
+            saveDefaultSettings();
+            ipcRenderer.send('setLanguage', lang);
+        });
 
         // reflesh template dropdown list depends on selected platforms
         $("#platformsDropdown").on('change', () => {
@@ -1092,11 +1164,11 @@ function generate() {
 
     // console.log(gen);
     if (gen.projectName === '') {
-        $("#projectName").oneTimeTooltip("Please name your sketch first.");
+        $("#projectName").oneTimeTooltip(t('tooltip.nameProjectFirst'));
     } else if (gen.projectPath === '') {
-        $("#projectPath").oneTimeTooltip("Your project path is empty...");
+        $("#projectPath").oneTimeTooltip(t('tooltip.projectPathEmpty'));
     } else if (gen.platformList == null || lengthOfPlatforms == 0) {
-        $("#platformsDropdown").oneTimeTooltip("Please select a platform first.");
+        $("#platformsDropdown").oneTimeTooltip(t('tooltip.selectPlatformFirst'));
     } else {
         // the template pick is cleared in the #projectName change handler instead,
         // as soon as the user points at a different project - not here, so a plain
@@ -1135,15 +1207,15 @@ function updateRecursive() {
     };
 
     if (gen.updatePath === '') {
-        displayModal("Please set update path");
+        displayModal(t('modal.setUpdatePath'));
     } else if (platformValueArray.length === 0) {
-        displayModal("Please select a platform first.");
+        displayModal(t('tooltip.selectPlatformFirst'));
     } else {
         // this is a recursive multi-project update, not a single generated project -
         // clear any stale single-project state so its success modal can't show a
         // leftover Build & Preview button from an earlier emscripten generate/update
         lastGeneratedProject = null;
-        $("#updateMultipleButton").addClass('loading disabled').text('Updating...');
+        $("#updateMultipleButton").addClass('loading disabled').text(t('button.updating'));
         openConsoleForOperation();
         ipcRenderer.send('update', gen);
 
@@ -1296,7 +1368,7 @@ function displayModal(message) {
         $("#FolderButton").show();
     } else if (modalType === 'none') {
         // only Close makes sense here (e.g. addon validation errors, emscripten build messages)
-    } else if (message.indexOf("Success!") > -1){
+    } else if (modalType === 'project-success'){
         $("#FolderButton").show();
         if (isEmscripten) {
             // emscripten has no xcodeproj/sln to open - Build & Preview replaces "Open in IDE" here
@@ -1370,7 +1442,7 @@ function browseProjectPath() {
 
 function clearExtraSourceList(){
     $("#sourceExtraSection").empty();
-    $("#sourceExtraSection").append("<label>Additional source folders:</label>");
+    $("#sourceExtraSection").append(`<label data-i18n="field.additionalSourceFolders">${t('field.additionalSourceFolders')}</label>`);
     
     checkAddSourcePath(-1);
     numAddedSrcPaths = 1;
@@ -1383,7 +1455,7 @@ function checkAddSourcePath(index){
         const nextIndex = index + 1;
         const extrafield = `<div class="field">
            <div class="ui icon input fluid">
-               <input type="text" placeholder="Extra source path..." id="sourceExtra-${nextIndex}"> \
+               <input type="text" placeholder="${t('placeholder.extraSourcePath')}" id="sourceExtra-${nextIndex}"> \
                <i class="search link icon" onclick="browseSourcePath(${nextIndex})"></i> \
            </div>
         </div>`;
@@ -1443,7 +1515,7 @@ ipcRenderer.on('cloneAddonDone', () => {
 function getRandomSketchName(){
     const projectPath = $("#projectPath").val();
     if (projectPath === '') {
-        $("#projectPath").oneTimeTooltip('Please specify a path first...');
+        $("#projectPath").oneTimeTooltip(t('tooltip.specifyPathFirst'));
     }
     else {
         const result = ipcRenderer.sendSync('getRandomSketchName', projectPath);
@@ -1463,7 +1535,7 @@ function launchInIDE(){
         templateValueArray.push($(templatePicked[i]).attr("data-value"));
     }
     if (templateValueArray.includes('emscripten')) {
-        displayModal('<!--modal-context:none:-->\n<strong>Emscripten</strong><br>There is no IDE project for the Emscripten template - use "Build &amp; Preview" instead.');
+        displayModal(`<!--modal-context:none:-->\n<strong>Emscripten</strong><br>${t('modal.emscriptenNoIde')}`);
         return;
     }
 
@@ -1493,7 +1565,7 @@ function launchFolder(){
 function buildAndPreviewEmscripten(){
     if (lastGeneratedProject == null) return;
 
-    $("#EmscriptenPreviewButton").addClass('loading disabled').text('Building...');
+    $("#EmscriptenPreviewButton").addClass('loading disabled').text(t('button.building'));
     openConsoleForOperation();
 
     ipcRenderer.send('buildEmscripten', {
@@ -1505,7 +1577,7 @@ function buildAndPreviewEmscripten(){
 }
 
 ipcRenderer.on('buildEmscriptenDone', () => {
-    $("#EmscriptenPreviewButton").removeClass('loading disabled').text('Build & Preview');
+    $("#EmscriptenPreviewButton").removeClass('loading disabled').text(t('button.buildPreview'));
 });
 
 function ofMenuButtonFor(command) {
