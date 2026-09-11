@@ -1584,6 +1584,7 @@ ipcMain.on('downloadModularLibs', async (event, { ofPath, tag, names }) => {
  *     verbose: boolean,
  *     defines: string,
  *     postBuild: string,
+ *     msys2Env: string,
  * }} GenerateArgument */
 
 /**
@@ -1602,6 +1603,7 @@ function generateFunction(event, generate) {
         projectName,
         defines,
         postBuild,
+        msys2Env,
     } = generate;
 
     const args = [];
@@ -1638,6 +1640,10 @@ function generateFunction(event, generate) {
 
     if (postBuild != null && postBuild.length > 0) {
         args.push(`-P${postBuild}`);
+    }
+
+    if (msys2Env != null && msys2Env.length > 0) {
+        args.push(`-k${msys2Env}`);
     }
 
     if (projectName != null && projectPath != null) {

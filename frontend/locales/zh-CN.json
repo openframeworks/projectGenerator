@@ -150,5 +150,8 @@
   "field.glVersion": "OpenGL 版本（桌面）：",
   "option.glDefault": "默认（OpenGL 2.1）",
   "field.postBuild": "编译后脚本：",
-  "placeholder.postBuild": "项目编译后运行 - Xcode Run Script / VS 生成后事件"
+  "placeholder.postBuild": "项目编译后运行 - Xcode Run Script / VS 生成后事件",
+  "field.msys2Env": "MSYS2 环境 (VS Code):",
+  "option.msys2Ucrt64": "UCRT64 (默认)",
+  "option.msys2Mingw64": "MINGW64 (旧版)"
 }

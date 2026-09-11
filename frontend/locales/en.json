@@ -150,5 +150,8 @@
   "field.glVersion": "OpenGL version (desktop):",
   "option.glDefault": "Default (OpenGL 2.1)",
   "field.postBuild": "Post-build script:",
-  "placeholder.postBuild": "Runs after the project compiles - Xcode run script / VS post-build event"
+  "placeholder.postBuild": "Runs after the project compiles - Xcode run script / VS post-build event",
+  "field.msys2Env": "MSYS2 environment (VS Code):",
+  "option.msys2Ucrt64": "UCRT64 (default)",
+  "option.msys2Mingw64": "MINGW64 (legacy)"
 }

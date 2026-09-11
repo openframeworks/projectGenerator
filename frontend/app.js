@@ -993,6 +993,8 @@ function setup() {
         $('#rendererDropdown').dropdown();
         $('#glDropdown, #webglDropdown, #glesDropdown').dropdown();
         $('#rendererDropdown').dropdown('set exactly', 'default');
+        $('#msys2EnvDropdown').dropdown();
+        $('#msys2EnvDropdown').dropdown('set exactly', 'ucrt64');
 
         // reflesh template dropdown list depends on selected platforms
         $("#platformsDropdown").on('change', () => {
@@ -1224,7 +1226,8 @@ function generate() {
         ofPath: $("#ofPath").val(),
         verbose: bVerbose,
         defines: definesArr.join(','),
-        postBuild: $('#postBuildScript').val().trim()
+        postBuild: $('#postBuildScript').val().trim(),
+        msys2Env: $('#msys2EnvField').css('display') !== 'none' ? $('#msys2EnvDropdown').dropdown('get value') : ''
     };
 
     // console.log(gen);
@@ -1408,6 +1411,8 @@ function updateRendererFieldVisibility() {
     });
     const gl = $('#glDropdown').dropdown('get value');
     if (gl !== 'default' && parseFloat(gl) > maxGL) $('#glDropdown').dropdown('set selected', 'default');
+
+    $('#msys2EnvField').toggle(selectedPlatforms.includes('vscode'));
 }
 
 //----------------------------------------

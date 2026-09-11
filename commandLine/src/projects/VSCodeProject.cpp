@@ -9,6 +9,7 @@
 #include "ofLog.h"
 #include "Utils.h"
 #include <nlohmann/json.hpp>
+#include <regex>
 
 
 using json = nlohmann::json;
@@ -95,8 +96,25 @@ bool VSCodeProject::createProjectFile(){
 		ofLogError(LOG_NAME) << "error copying folder " << templatePath.string() << " : " << projectDir.string() << " : " << e.what();
 		return false;
 	}
-	
-	
+
+	// point the template's msys2_shell flag and msys64/<env> paths at the chosen MSYS2 environment
+	static const std::regex shellFlag(R"re("-(mingw64|ucrt64|clang64)")re");
+	static const std::regex envPath(R"re(msys64([/\\]+)(mingw64|ucrt64|clang64)([/\\]))re");
+	for (const auto & f : { projectDir / ".vscode" / "tasks.json", projectDir / ".vscode" / "c_cpp_properties.json" }) {
+		std::ifstream in(f);
+		if (!in) continue;
+		std::string contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+		in.close();
+		contents = std::regex_replace(contents, shellFlag, "\"-" + msys2Environment + "\"");
+		contents = std::regex_replace(contents, envPath, "msys64$1" + msys2Environment + "$3");
+		if (msys2Environment == "clang64") {
+			replaceAll(contents, "bin/g++.exe", "bin/clang++.exe");
+		}
+		std::ofstream out(f);
+		out << contents;
+	}
+
+
 	workspace.fileName = fs::path {
 		projectDir / (projectName + ".code-workspace")};
 	cppProperties.fileName = fs::path {
