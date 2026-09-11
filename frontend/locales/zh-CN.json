@@ -151,5 +151,8 @@
   "option.glDefault": "默认（OpenGL 2.1）",
   "field.postBuild": "编译后脚本：",
   "placeholder.postBuild": "项目编译后运行 - Xcode Run Script / VS 生成后事件",
-  "downloads.wasm64Confirm": "WASM64 库会替换已安装的 lib/emscripten 库（32 位库将被删除）。是否继续？"
+  "downloads.wasm64Confirm": "WASM64 库会替换已安装的 lib/emscripten 库（32 位库将被删除）。是否继续？",
+  "field.msys2Env": "MSYS2 环境 (VS Code):",
+  "option.msys2Ucrt64": "UCRT64 (默认)",
+  "option.msys2Mingw64": "MINGW64 (旧版)"
 }

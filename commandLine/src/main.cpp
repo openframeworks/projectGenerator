@@ -33,7 +33,8 @@ enum optionIndex { UNKNOWN,
 	FRAMEWORKS,
 	CLEANNAME_DISABLE,
 	DEFINES,
-	POSTBUILD
+	POSTBUILD,
+	MSYS2ENV
 };
 
 constexpr option::Descriptor usage[] = {
@@ -62,6 +63,7 @@ constexpr option::Descriptor usage[] = {
 
 	{ DEFINES, 0, "D", "defines", option::Arg::Optional, "  --defines, -D  \tpreprocessor defines list (such as OF_USE_ANGLE=1,MY_FLAG)" },
 	{ POSTBUILD, 0, "P", "postbuild", option::Arg::Optional, "  --postbuild, -P  \tscript to run after the project compiles (Xcode run script / VS post-build event)" },
+	{ MSYS2ENV, 0, "k", "msys2env", option::Arg::Optional, "  --msys2env, -k  \tMSYS2 environment for the VSCode target: ucrt64 (default) | mingw64 | clang64" },
 
 	{ 0, 0, 0, 0, 0, 0 }
 };
@@ -93,6 +95,7 @@ vector<string> defines;
 string postBuildScript;
 string ofPathEnv;
 string templateName;
+string msys2Env = "ucrt64";
 
 bool busingEnvVar;
 bool bVerbose;
@@ -260,6 +263,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 
 	if (!bDryRun) {
 		auto project = getTargetProject(target);
+		project->setMsys2Environment(msys2Env);
 		project->create(path, templateName);
 
 		if (bConsiderParameterAddons && bAddonsPassedIn) {
@@ -561,6 +565,15 @@ int main(int argc, char ** argv) {
 		addPlatforms("vscode");
 	}
 
+	if (options[MSYS2ENV].count() > 0 && options[MSYS2ENV].arg != NULL) {
+		std::string env = ofToLower(ofTrim(options[MSYS2ENV].arg));
+		if (env == "ucrt64" || env == "mingw64" || env == "clang64") {
+			msys2Env = env;
+		} else {
+			ofLogWarning() << "unknown msys2 environment " << env << ", using " << msys2Env;
+		}
+	}
+
 	if (options[ADDONS].count() > 0) {
 		bAddonsPassedIn = true; // could be empty
 		if (options[ADDONS].arg != NULL) {
@@ -745,6 +758,7 @@ int main(int argc, char ** argv) {
 					if (!bDryRun) {
 						ofLogNotice() << "project path is: [" << projectPath << "]";
 						auto project = getTargetProject(t);
+						project->setMsys2Environment(msys2Env);
 						project->create(projectPath, templateName);
 						if(bAddonsPassedIn){
 							for (auto & addon : addons) {
