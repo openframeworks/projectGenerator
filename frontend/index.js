@@ -63,6 +63,30 @@ const templateSettings = {
 
 
 
+// mirrors isGoodOFPath() in commandLine/src/main.cpp
+function isGoodOFPath(p) {
+    try {
+        return ['addons', 'libs', 'scripts'].every((folder) => {
+            const full = path.join(p, folder);
+            return fs.existsSync(full) && fs.statSync(full).isDirectory();
+        });
+    } catch (e) {
+        return false;
+    }
+}
+
+// mirrors findOFPathUpwards() in commandLine/src/main.cpp
+function findOFPathUpwards(startPath) {
+    let current = path.resolve(startPath);
+    let previous = null;
+    while (current !== previous) {
+        if (isGoodOFPath(current)) return current;
+        previous = current;
+        current = path.dirname(current);
+    }
+    return null;
+}
+
 /**
  * Determines the current platform based on process information.
  * @returns {string} The platform identifier.
@@ -256,10 +280,18 @@ if (!path.isAbsolute(defaultOfPath)) {
     // arturo, this may differ on linux, if putting ../ in settings doesn't work for the default path
     // take a look at this...
 
+    let fixedDepthGuess;
     if (hostplatform == "windows" || hostplatform == "linux" || hostplatform == "linux64" ){
-    	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../../"), defaultOfPath));
+    	fixedDepthGuess = path.resolve(path.join(path.join(__dirname, "../../../"), defaultOfPath));
     } else if(hostplatform == "osx"){
-    	defaultOfPath = path.resolve(path.join(path.join(__dirname, "../../../"), defaultOfPath));
+    	fixedDepthGuess = path.resolve(path.join(path.join(__dirname, "../../../"), defaultOfPath));
+    }
+
+    // validate the fixed-depth guess, else search upward from this app's own location
+    if (isGoodOFPath(fixedDepthGuess)) {
+        defaultOfPath = fixedDepthGuess;
+    } else {
+        defaultOfPath = findOFPathUpwards(__dirname) || fixedDepthGuess;
     }
 
     settings["defaultOfPath"] = defaultOfPath || "";
@@ -977,10 +1009,34 @@ function getPgPath() {
     return pgApp;
 }
 
+// clear error when the cmdLine binary hasn't been built/copied into frontend/app/ yet
+function pgMissingError(pgApp) {
+    return new Error(
+        `commandLine binary not found at "${pgApp}". Build it first (commandLine/, via make/xcodebuild/MSBuild) ` +
+        `then copy it into frontend/app/ - see scripts/<platform>/build_frontend.sh, which does both.`
+    );
+}
+
+// wraps execFile(getPgPath(), ...) with the same missing-binary check as runPG()
+function execPG(args, callback) {
+    const pgApp = getPgPath();
+    if (!pgApp || !fs.existsSync(pgApp)) {
+        callback(pgMissingError(pgApp), '', '');
+        return;
+    }
+    execFile(pgApp, args, { maxBuffer: Infinity }, callback);
+}
+
 // runs PG via argv (no shell), streaming stdout/stderr to the console panel as it arrives
 function runPG(args, event, callback) {
     const pgApp = getPgPath();
     const displayCommand = [pgApp, ...args].join(' ');
+
+    if (!pgApp || !fs.existsSync(pgApp)) {
+        const error = pgMissingError(pgApp);
+        callback(error, '', error.message);
+        return;
+    }
 
     let child;
     try {
@@ -1637,7 +1693,7 @@ function resolveEmsdkEnv(emsdkPath, emccDir) {
 
 // asks the PG binary to detect emcc via EMSDK / PATH / a Homebrew install (see resolveEmscriptenSDK in Utils.cpp)
 function detectEmsdk(callback) {
-    execFile(getPgPath(), ['-e'], { maxBuffer: Infinity }, (error, stdout) => {
+    execPG(['-e'], (error, stdout) => {
         if (error) return callback(null);
         try {
             const lastLine = stdout.trim().split('\n').pop();
@@ -1784,13 +1840,19 @@ ipcMain.on('openPath', (event, p) => {
 });
 
 ipcMain.on('getOFPath', (event) => {
-    execFile(getPgPath(), ['--getofpath'], { maxBuffer: Infinity }, (error, stdout, stderr) => {
+    execPG(['--getofpath'], (error, stdout, stderr) => {
         if (error) {
-             console.log( 'getOFPath error' );
-            event.sender.send('ofPathResult', {
-                success: false,
-                message: error.message
-            });
+            console.log('getOFPath error:', error.message);
+            // cmdLine unavailable - fall back to the same search it would have done
+            const found = findOFPathUpwards(__dirname);
+            if (found) {
+                event.sender.send('ofPathResult', { success: true, message: found });
+            } else {
+                event.sender.send('ofPathResult', {
+                    success: false,
+                    message: error.message
+                });
+            }
         } else {
             try {
                  // Assuming the JSON object is on the last line
@@ -1818,7 +1880,7 @@ ipcMain.on('getOFPath', (event) => {
 });
 
 ipcMain.on('getHostType', (event) => {
-    execFile(getPgPath(), ['-i'], { maxBuffer: Infinity }, (error, stdout, stderr) => {
+    execPG(['-i'], (error, stdout, stderr) => {
         if (error) {
             console.log( 'getHostType error' );
             event.sender.send('ofPlatformResult', {
@@ -1851,7 +1913,7 @@ ipcMain.on('getHostType', (event) => {
 });
 
 ipcMain.on('getVersion', (event) => {
-    execFile(getPgPath(), ['-w'], { maxBuffer: Infinity }, (error, stdout, stderr) => {
+    execPG(['-w'], (error, stdout, stderr) => {
         if (error) {
             console.log( 'getVersion error' );
             event.sender.send('ofVersionResult', {
