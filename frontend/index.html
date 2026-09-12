@@ -228,6 +228,29 @@
 						</div>
 						<div id="test"></div>
 					</div>
+					<div class="field" id="rendererField" style="display: none">
+						<label>Renderer:</label>
+						<div class="ui selection dropdown" id="rendererDropdown">
+							<input type="hidden" id="rendererValue" value="default">
+							<i class="dropdown icon"></i>
+							<div class="text">Default (OpenGL)</div>
+							<div class="menu">
+								<div class="item" data-value="default">Default (OpenGL)</div>
+								<div class="item" data-value="angle">ANGLE (OF_USE_ANGLE)</div>
+								<div class="item" data-value="dawn">Dawn / WebGPU (OF_USE_DAWN)</div>
+							</div>
+						</div>
+					</div>
+					<div class="field">
+						<label>Custom defines: &nbsp;
+							<a class="ui icon tooltip" href="#" data-content="Comma-separated preprocessor defines, e.g. MY_FLAG,OTHER_FLAG=1" data-position="right center">
+								<i class="help circle icon"></i>
+							</a>
+						</label>
+						<div class="ui icon input fluid">
+							<input type="text" placeholder="MY_FLAG,OTHER_FLAG=1..." id="customDefines">
+						</div>
+					</div>
 					<div id="templateSection" class="field">
 						<label data-i18n="field.template">Template:</label>
 						<div class="ui multiple search selection dropdown" id="templatesDropdown">

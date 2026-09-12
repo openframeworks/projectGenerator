@@ -1239,6 +1239,7 @@ ipcMain.on('runOfMenu', (event, { command, ofPath }) => {
  *     addonList: Array<string>,
  *     ofPath: string,
  *     verbose: boolean,
+ *     defines: string,
  * }} GenerateArgument */
 
 /**
@@ -1255,6 +1256,7 @@ function generateFunction(event, generate) {
         verbose,
         projectPath,
         projectName,
+        defines,
     } = generate;
 
     const args = [];
@@ -1283,6 +1285,10 @@ function generateFunction(event, generate) {
 
     if (templateList != null) {
         args.push(`-t${templateList.join(",")}`);
+    }
+
+    if (defines != null && defines.length > 0) {
+        args.push(`-D${defines}`);
     }
 
     if (projectName != null && projectPath != null) {

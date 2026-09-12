@@ -962,7 +962,13 @@ bool xcodeProject::saveProjectFile() {
 							//							alert (c, 31);
 							//							cout << "this is not array, creating" << endl;
 							//							cout << thispath << endl;
-							auto v { j[p] };
+							// NOTE: must be copy-init (=), not brace-init ({}) - nlohmann::json's
+							// initializer_list constructor wraps a single json value in an array,
+							// so `auto v { j[p] }` on a null j[p] makes v == [null] rather than
+							// null, and that gets pushed into the array below instead of being
+							// correctly skipped, corrupting every freshly-created array key with a
+							// leading [null] element (e.g. GCC_PREPROCESSOR_DEFINITIONS via addDefine)
+							auto v = j[p];
 							j[p] = json::array();
 							if (!v.is_null()) {
 								//								cout << "thispath " << thispath << endl;
