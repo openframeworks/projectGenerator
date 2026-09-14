@@ -231,7 +231,7 @@ import_certificate(){
         security unlock-keychain -p actions $KEY_CHAIN
 
         echo "Importing signing certificates"
-        sudo security import $CERTIFICATE_P12 -k $KEY_CHAIN -P $CERTIFICATE_PASSWORD -T /usr/bin/codesign;
+        security import $CERTIFICATE_P12 -k $KEY_CHAIN -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign;
 
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k actions $KEY_CHAIN
 
