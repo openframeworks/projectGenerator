@@ -143,6 +143,12 @@ bool ofAddon::checkCorrectPlatform(const string & state) {
 		if (platform == state) {
 			return true;
 		}
+		// vs2019/vs2026 are still MSVC/Visual Studio - a plain "vs:" section in
+		// addon_config.mk applies to all of them, so addons don't need a
+		// duplicate vs2019:/vs2026: section just to be recognized for those targets
+		if (state == "vs" && (platform == "vs2019" || platform == "vs2026")) {
+			return true;
+		}
 	}
 	return false;
 }
@@ -814,7 +820,7 @@ void ofAddon::parseLibsPath(const fs::path & libsPath, const fs::path & parentFo
 		getLibsRecursively(libsPath, libFiles, libs, platform);
 	}
 
-	if (platform == "vs" || platform == "msys2"
+	if (platform == "vs" || platform == "vs2019" || platform == "vs2026" || platform == "msys2"
 		   || platform == "vscode"
 		   || platform == "linux"
 		   || platform == "linux64"
@@ -973,7 +979,7 @@ bool ofAddon::load(string addonName, const fs::path& projectDir, const string& t
 		addToFolder(s, parentFolder);
 	}
 
-	if (platform == "vs" || platform == "msys2") {
+	if (platform == "vs" || platform == "vs2019" || platform == "vs2026" || platform == "msys2") {
 		// here addonPath is the same as path.
 		getPropsRecursively(addonPath, propsFiles, platform);
 	}

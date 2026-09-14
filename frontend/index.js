@@ -124,13 +124,19 @@ console.log(`Detected platform: ${platformId}`);
 console.log(`Default template: ${defaultTemplate}`);
 
 
+// set on first run only (no settings.json yet, or one missing defaultPlatform) so a
+// later async check can upgrade a fresh Windows default from vs (2022) to vs2026 if
+// installed - never overrides a value the user already has saved
+let needsWindowsVsDefaultCheck = false;
+
 try {
     const settingsJsonString = fs.readFileSync(path.resolve(__dirname, 'settings.json'), 'utf-8');
     settings = JSON.parse(settingsJsonString);
     console.log(settings);
 
     if (!settings.defaultPlatform) {
-        settings.defaultPlatform = getDefaultTemplateForPlatform(getCurrentPlatform());
+        settings.defaultPlatform = getCurrentPlatform() === 'windows' ? 'vs' : getCurrentPlatform();
+        needsWindowsVsDefaultCheck = settings.defaultPlatform === 'vs';
     }
 
 } catch (e) {
@@ -166,6 +172,7 @@ try {
         defaultRelativeProjectPath: "apps/myApps",
         useDictionaryNameGenerator: true,
     };
+    needsWindowsVsDefaultCheck = myPlatform === 'vs';
 }
 
 for(const key in templateSettings) {
@@ -211,7 +218,9 @@ const addonsToSkip = [
 
 const platforms = {
     "osx": "OS X (Xcode)",
-    "vs": "Windows (Visual Studio)",
+    "vs": "Windows (Visual Studio 2022)",
+    "vs2019": "Windows (Visual Studio 2019)",
+    "vs2026": "Windows (Visual Studio 2026)",
     "msys2": "Windows (msys2/mingw)",
     "ios": "iOS (Xcode)",
     "macos": "Mega iOS/tvOS/macOS (Xcode)",
@@ -244,8 +253,6 @@ const templates = {
     "tvOS": "Apple tvOS template",
     "unittest": "Unit test no window application",
     "vscode": "Visual Studio Code",
-    "vs2019": "Visual Studio 2019",
-
 };
 
 let defaultOfPath = settings["defaultOfPath"];
@@ -377,7 +384,16 @@ function toLetters(num) {
 //-------------------------------------------------------- window
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', () => {
+app.on('ready', async () => {
+    if (needsWindowsVsDefaultCheck) {
+        try {
+            await getVisualStudioPath('2026');
+            settings.defaultPlatform = 'vs2026'; // found - prefer it over the vs (2022) fallback
+        } catch (e) {
+            // VS2026 not installed - keep the vs (2022) default already set
+        }
+    }
+
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: 600,
