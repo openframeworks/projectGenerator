@@ -69,6 +69,7 @@
       "preload.js",
       "console-window.html",
       "app-console-window.js",
+      "locales/**/*",
       "!**/*.ts",
       "!*.map",
       "!package.json",

@@ -100,13 +100,13 @@
 				<div class="item" style="width:40px;">
 				</div>
 				<a class="item active menuItem" data-tab="create" id="createMenuButon">
-					<div style="padding:6px;">create / update</div>
+					<div style="padding:6px;" data-i18n="nav.create">create / update</div>
 				</a>
 				<a class="item updateMultiMenuOption menuItem" data-tab="updateMulti" style="display: none" id="updateMenuButton">
-					<div style="padding:6px;">update multiple</div>
+					<div style="padding:6px;" data-i18n="nav.updateMultiple">update multiple</div>
 				</a>
 				<a class="item updateMultiMenuOption menuItem" data-tab="ofMenu" style="display: none" id="ofMenuButton">
-					<div style="padding:6px;">oF Menu</div>
+					<div style="padding:6px;" data-i18n="nav.ofMenu">oF Menu</div>
 				</a>
 				<a class="item right floated menuItem" data-tab="settings" id="settingsMenuButton">
 					<div style="-webkit-app-region: no-drag !important; padding:6px;"><i class="setting link icon"></i>
@@ -115,7 +115,7 @@
 			</div>
 		</div>
 		<div class="undraggable" id="ofPathStatusBar" style="background-color:#222; color:#999; font-size:11px; padding:4px 12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-			Targeting: <span id="ofPathStatusText">(no openFrameworks path set)</span>
+			<span data-i18n="statusBar.targeting">Targeting:</span> <span id="ofPathStatusText">(no openFrameworks path set)</span>
 		</div>
 		</div>
 		</div>
@@ -127,8 +127,8 @@
 			<div class="ui tab active" data-tab="create">
 				<div class="ui form">
 					<div class="field">
-						<label>Project name: &nbsp;
-							<a class="ui icon tooltip" href="#" data-toggle="external_target" data-content="Click to open your project in your default file browser." data-position="left bottom" id="revealProjectFiles">
+						<label><span data-i18n="field.projectName">Project name:</span> &nbsp;
+							<a class="ui icon tooltip" href="#" data-toggle="external_target" data-content="Click to open your project in your default file browser." data-i18n-content="tooltip.revealProjectFiles" data-position="left bottom" id="revealProjectFiles">
 								<i class="external icon"></i>
 							</a>
 							<!-- <a class="ui icon tooltip" href="#randomName" onclick="getRandomSketchName()" id="nameRandomiser" data-content="Click to generate a random sketch name" data-position="right center">
@@ -140,53 +140,53 @@
 						<div class="fields">
 							<div class="field">
 								<div class="ui icon input fluid" style="width:250px;">
-								<input type="text" placeholder="Project name..." id="projectName">
+								<input type="text" placeholder="Project name..." data-i18n-placeholder="placeholder.projectName" id="projectName">
 
 								<i class="random link icon" onclick="getRandomSketchName()" ></i>
 
 								</div>
 							</div>
 							<div class="field" style="padding-left:20px">
-								<div class="ui grey button" onclick="browseImportProject()">import</div>
+								<div class="ui grey button" data-i18n="button.import" onclick="browseImportProject()">import</div>
 							</div>
 						</div>
 					</div>
 					<div class="field">
-						<label>Project path:</label>
+						<label data-i18n="field.projectPath">Project path:</label>
 						<div class="ui icon input fluid">
-							<input type="text" placeholder="Project path..." id="projectPath">
+							<input type="text" placeholder="Project path..." data-i18n-placeholder="placeholder.projectPath" id="projectPath">
 							<i class="search link icon" onclick="browseProjectPath()"></i>
 						</div>
 					</div>
                     <div id="sourceExtraSection" class="field">
-                        <label>Additional source folders:</label>
+                        <label data-i18n="field.additionalSourceFolders">Additional source folders:</label>
                         <div class="field">
                             <div class="ui icon input fluid">
-                                <input type="text" placeholder="Extra source path..." id="sourceExtra-0">
+                                <input type="text" placeholder="Extra source path..." data-i18n-placeholder="placeholder.extraSourcePath" id="sourceExtra-0">
                                 <i class="search link icon" onclick="browseSourcePath(0)"></i>
                             </div>
                         </div>
                     </div>
 					<div class="field">
 						<label>
-							<a class="tooltip" href="http://www.ofxaddons.com/" data-toggle="external_target" data-content="Get more addons at ofxAddons.com" data-position="right center" id="ofx-addons-link">Addons</a>: &nbsp;
-							<a class="ui icon tooltip" href="#rescanAddons" onclick="rescanAddons()" data-content="Click to reload addons folder" data-position="right center" id="adons-refresh-icon">
+							<a class="tooltip" href="http://www.ofxaddons.com/" data-toggle="external_target" data-content="Get more addons at ofxAddons.com" data-i18n-content="tooltip.ofxAddonsLink" data-position="right center" id="ofx-addons-link" data-i18n="field.addons">Addons</a>: &nbsp;
+							<a class="ui icon tooltip" href="#rescanAddons" onclick="rescanAddons()" data-content="Click to reload addons folder" data-i18n-content="tooltip.rescanAddons" data-position="right center" id="adons-refresh-icon">
 								<i class="refresh icon"></i>
 							</a>
-							<a class="ui icon tooltip" href="#addAddonFromGit" onclick="$('#addonGitCloneSection').toggle()" data-content="Add an addon from a git URL" data-position="right center" id="addon-git-icon">
+							<a class="ui icon tooltip" href="#addAddonFromGit" onclick="$('#addonGitCloneSection').toggle()" data-content="Add an addon from a git URL" data-i18n-content="tooltip.addAddonFromGit" data-position="right center" id="addon-git-icon">
 								<i class="cloud download icon"></i>
 							</a>
 						</label>
 						<div class="field" id="addonGitCloneSection" style="display:none; margin-bottom:0.5em;">
 							<div class="ui icon input fluid">
-								<input type="text" placeholder="git URL, optionally url#branch-or-commit..." id="addonGitUrl">
+								<input type="text" placeholder="git URL, optionally url#branch-or-commit..." data-i18n-placeholder="placeholder.addonGitUrl" id="addonGitUrl">
 								<i class="download link icon" onclick="cloneAddonFromGit()"></i>
 							</div>
 						</div>
 						<div class="ui multiple search selection dropdown" id="addonsDropdown">
 							<input name="addons" type="hidden">
 							<i class="dropdown icon"></i>
-							<div class="default text">Addons...</div>
+							<div class="default text" data-i18n="placeholder.addons">Addons...</div>
 							<div class="menu " id="addonsList">
 							</div>
 						</div>
@@ -194,46 +194,46 @@
 
 					<div class="ui red message" id="missingAddonMessage" style="display: none">
 						<p>
-							<div class="header">
+							<div class="header" data-i18n="msgBox.missingAddons.header">
 								Missing addons
 							</div>
 						</p>
-						<p>You are attempting to update a project that is missing the following addons:</p>
+						<p data-i18n="msgBox.missingAddons.body1">You are attempting to update a project that is missing the following addons:</p>
 						<p><div id="missingAddonList">...</div></p>
-						<p>Please download the missing addons and put them in your addons folder, then <a href="#rescanAddons" onclick="rescanAddons()">rescan it</a>.</p>
-						<p>If you choose to update this project without these addons, you may overwrite the settings on the project.</p>
+						<p id="missingAddonBody2">Please download the missing addons and put them in your addons folder, then <a href="#rescanAddons" onclick="rescanAddons()">rescan it</a>.</p>
+						<p data-i18n="msgBox.missingAddons.body3">If you choose to update this project without these addons, you may overwrite the settings on the project.</p>
 					</div>
 
 					<div class="ui yellow message" id="localAddonMessage" style="display: none">
 						<p>
-							<div class="header">
+							<div class="header" data-i18n="msgBox.localAddons.header">
 								Local addons
 							</div>
 						</p>
-						<p>You are attempting to update a project that is using the following local addons:</p>
+						<p data-i18n="msgBox.localAddons.body1">You are attempting to update a project that is using the following local addons:</p>
 						<p><div id="localAddonList">...</div></p>
-						<p>To alter these local addons, edit the addons.make file inside this project and reimport</p>
+						<p data-i18n="msgBox.localAddons.body2">To alter these local addons, edit the addons.make file inside this project and reimport</p>
 					</div>
 
 
 
 					<div class="field">
-						<label>Platforms:</label>
+						<label data-i18n="field.platforms">Platforms:</label>
 						<div class="ui multiple search selection dropdown" id="platformsDropdown">
 							<input name="platforms" type="hidden">
 							<i class="dropdown icon"></i>
-							<div class="default text">Platforms...</div>
+							<div class="default text" data-i18n="placeholder.platforms">Platforms...</div>
 							<div class="menu" id="platformList">
 							</div>
 						</div>
 						<div id="test"></div>
 					</div>
 					<div id="templateSection" class="field">
-						<label>Template:</label>
+						<label data-i18n="field.template">Template:</label>
 						<div class="ui multiple search selection dropdown" id="templatesDropdown">
 							<input name="templates" type="hidden">
 							<i class="dropdown icon"></i>
-							<div class="default text">Template...</div>
+							<div class="default text" data-i18n="placeholder.template">Template...</div>
 							<div class="menu" id="templateList">
 							</div>
 						</div>
@@ -242,10 +242,10 @@
 
 					<div class="ui hidden divider"></div>
 					<div class="field">
-						<div class="ui olive button" id="generateButton" onclick="generate()">Generate</div>
-						<div class="ui orange button" id="updateButton" style="display: none" onclick="generate()">Update</div>
-						<div class="ui cancel button" id="mainIDEButton" style="display: none;">Open in IDE</div>
-						<div class="ui cancel button" id="mainFolderButton" style="display: none;">Open Folder</div>
+						<div class="ui olive button" id="generateButton" data-i18n="button.generate" onclick="generate()">Generate</div>
+						<div class="ui orange button" id="updateButton" style="display: none" data-i18n="button.update" onclick="generate()">Update</div>
+						<div class="ui cancel button" id="mainIDEButton" style="display: none;" data-i18n="button.openInIDE">Open in IDE</div>
+						<div class="ui cancel button" id="mainFolderButton" style="display: none;" data-i18n="button.openFolder">Open Folder</div>
 					</div>
      
 				</div>
@@ -257,43 +257,43 @@
 			<div class="ui tab" data-tab="updateMulti">
 				<div class="ui message">
 					<p>
-						<div class="header">
+						<div class="header" data-i18n="warning.header">
 							Warning
 						</div>
 					</p>
-					<p>This updates existing projects <em>recursively</em> in the selected directory. For example, to generate examples for a specific platform, you'd choose the examples folder as the update path. </p>
+					<p data-i18n="warning.updateMultipleBody">This updates existing projects <em>recursively</em> in the selected directory. For example, to generate examples for a specific platform, you'd choose the examples folder as the update path. </p>
 				</div>
 				<div class="ui form">
 					<div class="field">
-						<label>Update path:</label>
+						<label data-i18n="field.updatePath">Update path:</label>
 						<div class="ui icon input fluid">
-							<input type="text" placeholder="Update path..." id="updateMultiplePath">
+							<input type="text" placeholder="Update path..." data-i18n-placeholder="placeholder.updatePath" id="updateMultiplePath">
 							<i class="search link icon" onclick="getUpdatePath()"></i>
 						</div>
 					</div>
 					<div class="ui negative message" id="updateMultipleWrongMessage" style="display: none">
-						<div class="header">
+						<div class="header" data-i18n="msgBox.updatePathWrong.header">
 							Update path doesn't exist
 						</div>
-						<p>Please set the path to the root of the folders you want to update. The folder needs to exists.
+						<p data-i18n="msgBox.updatePathWrong.body">Please set the path to the root of the folders you want to update. The folder needs to exists.
 						</p>
 					</div>
 					<div class="field">
-						<label>Platforms:</label>
+						<label data-i18n="field.platforms">Platforms:</label>
 						<div class="ui multiple search selection dropdown" id="platformsDropdownMulti">
 							<input name="addons" type="hidden">
 							<i class="dropdown icon"></i>
-							<div class="default text">Platforms...</div>
+							<div class="default text" data-i18n="placeholder.platforms">Platforms...</div>
 							<div class="menu" id="platformListMulti">
 							</div>
 						</div>
 					</div>
 					<div id="templateSectionMulti" class="field">
-						<label>Template:</label>
+						<label data-i18n="field.template">Template:</label>
 						<div class="ui multiple search selection dropdown" id="templatesDropdownMulti">
 							<input name="templates" type="hidden">
 							<i class="dropdown icon"></i>
-							<div class="default text">Template...</div>
+							<div class="default text" data-i18n="placeholder.template">Template...</div>
 							<div class="menu" id="templateListMulti">
 							</div>
 						</div>
@@ -301,21 +301,21 @@
 					</div>
 					<div class="ui hidden divider"></div>
 					<div class="field">
-						<div class="ui orange button" id="updateMultipleButton" onclick="updateRecursive()">Update multiple</div>
+						<div class="ui orange button" id="updateMultipleButton" data-i18n="button.updateMultiple" onclick="updateRecursive()">Update multiple</div>
 					</div>
 				</div>
 			</div>
 			<!------------------------------- oF Menu -------------------------------->
 			<div class="ui tab" data-tab="ofMenu">
 				<div class="ui message">
-					<p>Runs <span class="monospace">scripts/of.sh</span> against the configured openFrameworks path. Output streams to the console below.</p>
+					<p id="ofMenuDescription">Runs <span class="monospace">scripts/of.sh</span> against the configured openFrameworks path. Output streams to the console below.</p>
 				</div>
 				<div class="ui form">
 					<div class="field">
-						<div class="ui olive button" id="ofMenuStatusButton" onclick="runOfMenuCommand('status')">Check Status</div>
+						<div class="ui olive button" id="ofMenuStatusButton" data-i18n="button.checkStatus" onclick="runOfMenuCommand('status')">Check Status</div>
 					</div>
 					<div class="field">
-						<div class="ui orange button" id="ofMenuUpdateLibsButton" onclick="runOfMenuCommand('update-libs')">Download / Update Libraries</div>
+						<div class="ui orange button" id="ofMenuUpdateLibsButton" data-i18n="button.downloadUpdateLibraries" onclick="runOfMenuCommand('update-libs')">Download / Update Libraries</div>
 					</div>
 				</div>
 			</div>
@@ -323,80 +323,90 @@
 			<div class="ui tab" data-tab="settings">
 				<div class="ui form">
 					<div class="field">
-					<label>openFrameworks path:</label>
+					<label data-i18n="field.ofPath">openFrameworks path:</label>
 					<div class="ui icon input fluid">
-						<input type="text" placeholder="openFrameworks path..." id="ofPath">
+						<input type="text" placeholder="openFrameworks path..." data-i18n-placeholder="placeholder.ofPath" id="ofPath">
 						<i class="search link icon" onclick="browseOfPath()"></i>
 					</div>
 					</div>
 					<div class="field">
-						<label>Platform:</label>
+						<label data-i18n="field.platform">Platform:</label>
 						<div class="ui icon input fluid">
-						<input type="text" placeholder="Platform..." id="platformDisplay" readonly>
+						<input type="text" placeholder="Platform..." data-i18n-placeholder="placeholder.platform" id="platformDisplay" readonly>
 						</div>
 					</div>
 					<div class="field">
-						<label>commandLine PG Version:</label>
+						<label data-i18n="field.cmdLineVersion">commandLine PG Version:</label>
 						<div class="ui icon input fluid">
-						<input type="text" placeholder="Version..." id="versionDisplay" readonly>
+						<input type="text" placeholder="Version..." data-i18n-placeholder="placeholder.version" id="versionDisplay" readonly>
 						</div>
 					</div>
 					<div class="field">
-						<label>GUI Version:</label>
+						<label data-i18n="field.guiVersion">GUI Version:</label>
 						<div class="ui icon input fluid">
-						<input type="text" placeholder="Version..." id="guiVersionDisplay" readonly>
+						<input type="text" placeholder="Version..." data-i18n-placeholder="placeholder.version" id="guiVersionDisplay" readonly>
+						</div>
+					</div>
+					<div class="field">
+						<label data-i18n="field.language">Language:</label>
+						<div class="ui selection dropdown" id="languageDropdown">
+							<input type="hidden">
+							<i class="dropdown icon"></i>
+							<div class="text">English</div>
+							<div class="menu">
+							</div>
 						</div>
 					</div>
 
 					<div class="ui negative message" id="ofPathWrongMessage" style="display: none">
-						<div class="header">
+						<div class="header" data-i18n="msgBox.ofPathWrong.header">
 							openFrameworks path is wrong
 						</div>
-						<p>Please set the OF path to root of openframeworks (ie, the folder which has "addons", "libs", in it)
+						<p data-i18n="msgBox.ofPathWrong.body">Please set the OF path to root of openframeworks (ie, the folder which has "addons", "libs", in it)
 						</p>
 					</div>
 					<div class="field">
 						<div class="ui checkbox verbose">
 							<input type="checkbox" name="Verbose" id="verboseOption">
-							<label>Verbose output</label>
+							<label data-i18n="checkbox.verboseOutput">Verbose output</label>
 						</div>
 					</div>
 					<div class="field">
 						<div class="ui checkbox">
 							<input type="checkbox" name="DetachConsole" id="detachConsole">
-							<label>Open console in its own window</label>
+							<label data-i18n="checkbox.detachConsole">Open console in its own window</label>
 						</div>
 					</div>
 					<div class="field">
 						<div class="ui checkbox advanced">
 							<input type="checkbox" name="Advanced" id="advancedOptions">
-							<label>Advanced options</label>
+							<label data-i18n="checkbox.advancedOptions">Advanced options</label>
 						</div>
 					</div>
 
 					<div class="field advanced" id="emsdkField" style="display: none">
-						<label>Emscripten SDK path (optional, used by Build &amp; Preview):</label>
+						<label data-i18n="field.emsdkPath">Emscripten SDK path (optional, used by Build &amp; Preview):</label>
 						<div class="ui icon input fluid">
-							<input type="text" placeholder="emsdk path..." id="emsdkPath">
+							<input type="text" placeholder="emsdk path..." data-i18n-placeholder="placeholder.emsdkPath" id="emsdkPath">
 							<i class="search link icon" onclick="browseEmsdkPath()"></i>
 						</div>
 					</div>
 
 					<div class="field">
-						<div class="ui olive button advanced" id="ofPathButton" style="display: none" >ofPath</div>
+						<div class="ui olive button advanced" id="ofPathButton" style="display: none" data-i18n="button.ofPath">ofPath</div>
 					</div>
 
     		
 
 
                                         <div class="ui negative message" id="ofPathSierraMessage" style="position: absolute; top:-10px; left:0px; width:100%; display:none;">
-                                            <div class="header">
+                                            <div class="header" data-i18n="msgBox.sierra.header">
                                                 ACTION NEEDED: macOS quarantine warning
                                             </div>
 
-                                            <p>macOS is running this app from a temporary, randomized location because it still has a "downloaded from the internet" flag. This can confuse auto-detection of your openFrameworks path.</p>
-                                            <p><strong>Easiest fix:</strong> just set the OF path below to the folder containing "addons" and "libs".</p>
-                                            <p><strong>Permanent fix:</strong> close this app, move ProjectGenerator.app anywhere via Finder (e.g. to your Desktop) and back, then relaunch.</p>
+                                            <p data-i18n="msgBox.sierra.body">macOS is running this app from a temporary, randomized location because it still has a "downloaded from the internet" flag. This can confuse auto-detection of your openFrameworks path.</p>
+                                            <p id="ofPathSierraEasyFix"><strong>Easiest fix:</strong> just set the OF path below to the folder containing "addons" and "libs".</p>
+                                            <p id="ofPathSierraPermanentFix"><strong>Permanent fix:</strong> close this app, move ProjectGenerator.app anywhere via Finder (e.g. to your Desktop) and back, then relaunch.</p>
                                         </div>
 
 				</div>
@@ -408,7 +418,7 @@
 
 		<div class="ui small modal" id="ofPathError">
 			<div class="content">
-				<div class="description">
+				<div class="description" data-i18n="modal.ofPathError">
 					Please fix the openFrameworks path before procceeding.
 				</div>
 			</div>
@@ -417,22 +427,22 @@
 		<!-- begin JS UI modal -->
 		<div class="ui modal" id="uiModal" tabindex="-1" role="dialog">
 			<div class="content">
-				<p>Sorry, I've got nothing to say...</p>
+				<p data-i18n="modal.default">Sorry, I've got nothing to say...</p>
 			</div>
 			<div class="actions">
-				<div class="ui cancel button" id="IDEButton" style="display: none;">Open in IDE</div>
-				<div class="ui cancel button" id="FolderButton" style="display: none;">Open Folder</div>
+				<div class="ui cancel button" id="IDEButton" style="display: none;" data-i18n="button.openInIDE">Open in IDE</div>
+				<div class="ui cancel button" id="FolderButton" style="display: none;" data-i18n="button.openFolder">Open Folder</div>
 				<div class="ui selection dropdown button" id="emscriptenConfig" style="display: none; min-width: 8em;">
 					<input type="hidden" value="Release">
 					<i class="dropdown icon"></i>
-					<div class="text">Release</div>
+					<div class="text" data-i18n="dropdown.release">Release</div>
 					<div class="menu">
-						<div class="item" data-value="Release">Release</div>
-						<div class="item" data-value="Debug">Debug</div>
+						<div class="item" data-value="Release" data-i18n="dropdown.release">Release</div>
+						<div class="item" data-value="Debug" data-i18n="dropdown.debug">Debug</div>
 					</div>
 				</div>
-				<div class="ui cancel button" id="EmscriptenPreviewButton" style="display: none;">Build &amp; Preview</div>
-				<div class="ui cancel button">Close</div>
+				<div class="ui cancel button" id="EmscriptenPreviewButton" style="display: none;" data-i18n="button.buildPreview">Build &amp; Preview</div>
+				<div class="ui cancel button" data-i18n="button.close">Close</div>
 			</div>
 		</div>
 		<!-- end modal -->
@@ -442,7 +452,7 @@
 			<div class="content">
 				<div id="dropZoneOverlay"></div>
 				<div id="dropZone">
-					<p>Drop any project folder here to import it.</p>
+					<p data-i18n="fileDrop.text">Drop any project folder here to import it.</p>
 				</div>
 			</div>
 		</div>
@@ -450,10 +460,10 @@
 
 		<!-- console area -->
 		<section class="ui" id="consoleContainer">
-			<span id="showConsole">Show Console</span>
-			<span id="hideConsole">Hide</span>
+			<span id="showConsole" data-i18n="console.show">Show Console</span>
+			<span id="hideConsole" data-i18n="console.hide">Hide</span>
 			<div id="console" class="selectable">
-				<p>Welcome to the console :)</p>
+				<p data-i18n="console.welcome">Welcome to the console :)</p>
 			</div>
 		</section>
 

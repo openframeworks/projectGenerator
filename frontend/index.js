@@ -58,7 +58,8 @@ const templateSettings = {
     detachConsole: false,
     showDeveloperTools: false,
     defaultRelativeProjectPath: "apps/myApps",
-    useDictionaryNameGenerator: true
+    useDictionaryNameGenerator: true,
+    language: ""
 };
 
 
@@ -198,7 +199,59 @@ for(const key in templateSettings) {
     }
 }
 
+//--------------------------------------------------------- i18n
+const AVAILABLE_LANGUAGES = ['en', 'es', 'fr', 'de', 'pt', 'ja', 'ko', 'zh-CN', 'ru'];
+const translations = {};
+for (const lang of AVAILABLE_LANGUAGES) {
+    translations[lang] = JSON.parse(fs.readFileSync(path.join(__dirname, 'locales', lang + '.json'), 'utf-8'));
+}
 
+// app.getLocale() is like "en-US", "zh-Hans-CN", "pt-BR" - match exactly first,
+// then fall back to the bare language subtag, then English. Only reliable after
+// 'ready', so detection itself happens there - this just matches against what
+// it returns.
+function matchOSLocale(locale) {
+    if (translations[locale]) return locale;
+    const base = locale.split('-')[0].toLowerCase();
+    if (base === 'zh') return 'zh-CN';
+    return translations[base] ? base : 'en';
+}
+
+function t(key, params) {
+    const lang = translations[settings.language] ? settings.language : 'en';
+    let str = translations[lang][key] || translations.en[key] || key;
+    if (params) {
+        for (const k in params) {
+            str = str.split('{{' + k + '}}').join(params[k]);
+        }
+    }
+    return str;
+}
+
+function sendTranslations(webContents) {
+    const lang = translations[settings.language] ? settings.language : 'en';
+    webContents.send('setTranslations', {
+        lang,
+        strings: translations[lang],
+        available: AVAILABLE_LANGUAGES.map((code) => ({ code, name: translations[code]['language.name'] })),
+    });
+}
+
+// the renderer's own saveDefaultSettings() (triggered by the language dropdown's
+// change handler, same as every other settings field) persists this to disk -
+// this just keeps main's copy in sync so its own t() calls use the new language
+ipcMain.on('setLanguage', (event, lang) => {
+    settings.language = translations[lang] ? lang : 'en';
+    sendTranslations(event.sender);
+});
+
+// set on first run only (no settings.json yet, or one missing language) so the
+// app.on('ready') handler below can fill it from the OS locale - never overrides
+// a language the user already picked in Settings
+const needsLanguageDetection = !settings.language;
+if (needsLanguageDetection) {
+    settings.language = 'en';
+}
 
 console.log("detected platform: " + hostplatform + " in " + __dirname);
 
@@ -410,6 +463,10 @@ function toLetters(num) {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', () => {
+    if (needsLanguageDetection) {
+        settings.language = matchOSLocale(app.getLocale());
+    }
+
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: 600,
@@ -446,6 +503,7 @@ app.on('ready', () => {
         mainWindow.webContents.send('cwd', process.resourcesPath);
         mainWindow.webContents.send('setStartingProject', startingProject);
         mainWindow.webContents.send('setGuiVersion', app.getVersion());
+        sendTranslations(mainWindow.webContents);
         mainWindow.webContents.send('setDefaults', settings);
         mainWindow.webContents.send('setup', '');
         mainWindow.webContents.send('checkOfPathAfterSetup', '');
@@ -593,11 +651,7 @@ function refreshAddonList(event, ofPathValue) {
         console.error("Error in refreshAddonList:", error);
 
         // Send an error message to the renderer process
-        event.sender.send('sendUIMessage', {
-            type: 'error',
-            message: 'An error occurred while refreshing the addon list. Please check the console for more details.',
-            error: error.message,
-        });
+        event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>${t('msg.error')}</strong><br>${t('msg.addonListRefreshError')}<br><span class="monospace">${error.message}</span>`);
 
         // Return false as the operation was unsuccessful
         event.returnValue = false;
@@ -870,14 +924,14 @@ ipcMain.on('cloneAddon', (event, { ofPath, url, ref }) => {
     const name = path.basename(url, '.git');
 
     if (!/^ofx/i.test(name) || name.includes('/') || name.includes('\\')) {
-        event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br>Addon folder name should start with "ofx" (got "${name}").`);
+        event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>${t('msg.error')}</strong><br>${t('addon.invalidName', { name })}`);
         event.sender.send('cloneAddonDone');
         return;
     }
 
     const destDir = path.join(addonsDir, name);
     if (fs.existsSync(destDir)) {
-        event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br><span class="monospace">${name}</span> already exists in your addons folder.`);
+        event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>${t('msg.error')}</strong><br>${t('addon.alreadyExists', { name: `<span class="monospace">${name}</span>` })}`);
         event.sender.send('cloneAddonDone');
         return;
     }
@@ -893,20 +947,20 @@ ipcMain.on('cloneAddon', (event, { ofPath, url, ref }) => {
     });
 
     child.on('error', (error) => {
-        event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br>Could not run git. Make sure git is installed and on PATH.<br><span class="monospace">${error.message}</span>`);
+        event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>${t('msg.error')}</strong><br>${t('addon.gitNotFound')}<br><span class="monospace">${error.message}</span>`);
         event.sender.send('cloneAddonDone');
     });
 
     child.on('close', (code) => {
         if (code !== 0) {
-            event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br>git clone failed (exit code ${code}).<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">${stderr}</textarea></div>`);
+            event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>${t('msg.error')}</strong><br>${t('addon.cloneFailed', { code })}<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">${stderr}</textarea></div>`);
             event.sender.send('cloneAddonDone');
             return;
         }
 
         const finish = () => {
             refreshAddonList(event, ofPath);
-            event.sender.send('sendUIMessage', `<!--modal-context:addon-success:${destDir}-->\n<strong>Success!</strong><br>Added addon <span class="monospace">${name}</span>.`);
+            event.sender.send('sendUIMessage', `<!--modal-context:addon-success:${destDir}-->\n<strong>${t('msg.success')}</strong><br>${t('addon.added', { name: `<span class="monospace">${name}</span>` })}`);
             event.sender.send('cloneAddonDone');
         };
 
@@ -1137,17 +1191,18 @@ function updateFunction(event, update) {
 
     runPG(args, event, (error, stdout, stderr) => {
         if (error === null) {
+            const link = `<a href="file:///${updatePath}" class="monospace" data-toggle="external_target">${updatePath}</a>`;
             event.sender.send('sendUIMessage',
-                '<strong>Success!</strong><br>' +
-                'Updating your project was successful! <a href="file:///' + updatePath + '" class="monospace" data-toggle="external_target">' + updatePath + '</a><br><br>' +
-                '<button class="btn btn-default console-feature" onclick="$(\'#fullConsoleOutput\').toggle();">Show full log</button><br>' +
+                `<!--modal-context:project-success:${updatePath}-->\n<strong>${t('msg.success')}</strong><br>` +
+                t('update.success', { link }) + '<br><br>' +
+                `<button class="btn btn-default console-feature" onclick="$('#fullConsoleOutput').toggle();">${t('update.showFullLog')}</button><br>` +
                 '<div id="fullConsoleOutput"><br><textarea class="selectable">' + stdout + '</textarea></div>'
             );
             event.sender.send('updateCompleted', true);
         } else {
             event.sender.send('sendUIMessage',
-                '<strong>Error...</strong><br>' +
-                'There was a problem updating your project... <span class="monospace">' + updatePath + '</span>' +
+                `<strong>${t('msg.error')}</strong><br>` +
+                t('update.error') + ' <span class="monospace">' + updatePath + '</span>' +
                 '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + error.message + '</textarea></div>'
             );
         }
@@ -1167,7 +1222,7 @@ ipcMain.on('runOfMenu', (event, { command, ofPath }) => {
     runPG(args, event, (error, stdout, stderr) => {
         if (error) {
             event.sender.send('sendUIMessage',
-                `<!--modal-context:none:-->\n<strong>Error...</strong><br>oF Menu (${command}) failed.` +
+                `<!--modal-context:none:-->\n<strong>${t('msg.error')}</strong><br>${t('ofMenu.failed', { command })}` +
                 '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + (stderr || error.message) + '</textarea></div>'
             );
         }
@@ -1244,9 +1299,10 @@ function generateFunction(event, generate) {
         // error = did node have an error running this command line app
 
         if (error === null && wasError === false) {
+            const link = `<a href="file:///${fullPath}" data-toggle="external_target" class="monospace">${fullPath}</a>`;
             event.sender.send('sendUIMessage',
-                '<strong>Success!</strong><br>'
-                + 'Your can now find your project in <a href="file:///' + fullPath + '" data-toggle="external_target" class="monospace">' + fullPath + '</a><br><br>'
+                `<!--modal-context:project-success:${fullPath}-->\n<strong>${t('msg.success')}</strong><br>`
+                + t('generate.success', { link }) + '<br><br>'
                 + '<div id="fullConsoleOutput" class="not-hidden"><br>'
                 + '<textarea class="selectable">' + stdout + '</textarea></div>'
             );
@@ -1255,16 +1311,16 @@ function generateFunction(event, generate) {
             // note: stderr mostly seems to be also included in error.message
             // info: error.code=ENOENT means commandLinePG was not found
             event.sender.send('sendUIMessage',
-                '<strong>Error...</strong><br>'
-                + 'There was a problem generating your project... <span class="monospace">' + fullPath + '</span>'
+                `<strong>${t('msg.error')}</strong><br>`
+                + t('generate.error') + ' <span class="monospace">' + fullPath + '</span>'
                 + '<div id="fullConsoleOutput" class="not-hidden"><br>'
                 + '<textarea class="selectable">' + error.message + '</textarea></div>'
             );
         } else if (wasError === true) {
             event.sender.send('sendUIMessage',
-                '<strong>Error!</strong><br>'
-                + '<strong>Error...</strong><br>'
-                + 'There was a problem generating your project... <span class="monospace">' + fullPath + '</span>'
+                `<strong>${t('msg.errorBang')}</strong><br>`
+                + `<strong>${t('msg.error')}</strong><br>`
+                + t('generate.error') + ' <span class="monospace">' + fullPath + '</span>'
                 + '<div id="fullConsoleOutput" class="not-hidden"><br>'
                 + '<textarea class="selectable">' + stdout + '</textarea></div>'
             );
@@ -1537,8 +1593,8 @@ ipcMain.on('launchProjectinIDE', (event, arg) => {
 
         const reportLaunchError = () => {
             event.sender.send('sendUIMessage',
-                '<strong>Error!</strong><br>' +
-                '<span>Could not launch Android Studio. Make sure the command-line launcher is installed by running <i>Tools -> Create Command-line Launcher...</i> inside Android Studio and try again.</span>'
+                `<strong>${t('msg.errorBang')}</strong><br>` +
+                `<span>${t('android.launchError')}</span>`
             );
         };
 
@@ -1665,7 +1721,7 @@ function serveAndPreviewEmscripten(rootDir, htmlFile, event) {
     });
 
     server.on('error', (error) => {
-        event.sender.send('sendUIMessage', `<strong>Error...</strong><br>Could not start the preview server: ${error.message}`);
+        event.sender.send('sendUIMessage', `<strong>${t('msg.error')}</strong><br>${t('emscripten.serverError', { error: error.message })}`);
     });
 }
 
@@ -1717,7 +1773,7 @@ ipcMain.on('buildEmscripten', (event, { projectName, projectPath, configuration,
     const target = configuration === 'Debug' ? 'Debug' : 'Release';
 
     if (!fs.existsSync(path.join(projectDir, 'Makefile'))) {
-        event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br>No Makefile found in <span class="monospace">${projectDir}</span>. Generate the project with the Emscripten template first.`);
+        event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>${t('msg.error')}</strong><br>${t('emscripten.noMakefile', { path: `<span class="monospace">${projectDir}</span>` })}`);
         event.sender.send('buildEmscriptenDone');
         return;
     }
@@ -1753,9 +1809,9 @@ ipcMain.on('buildEmscripten', (event, { projectName, projectPath, configuration,
                     return;
                 }
                 event.sender.send('sendUIMessage',
-                    '<!--modal-context:none:-->\n<strong>Error...</strong><br>Could not run make. Make sure the Emscripten SDK is installed and activated '
-                    + '(set the Emscripten SDK path in Settings, or run <span class="monospace">source emsdk_env.sh</span> in the terminal you launched this app from) '
-                    + 'so emcc/em++/make are on PATH.<br><span class="monospace">' + error.message + '</span>'
+                    `<!--modal-context:none:-->\n<strong>${t('msg.error')}</strong><br>`
+                    + t('emscripten.makeNotFound', { cmd: '<span class="monospace">source emsdk_env.sh</span>' })
+                    + '<br><span class="monospace">' + error.message + '</span>'
                 );
                 event.sender.send('buildEmscriptenDone');
             });
@@ -1763,7 +1819,7 @@ ipcMain.on('buildEmscripten', (event, { projectName, projectPath, configuration,
             child.on('close', (code) => {
                 if (code !== 0) {
                     event.sender.send('sendUIMessage',
-                        `<!--modal-context:none:-->\n<strong>Error...</strong><br>Emscripten ${target} build failed (exit code ${code}).`
+                        `<!--modal-context:none:-->\n<strong>${t('msg.error')}</strong><br>${t('emscripten.buildFailed', { target, code })}`
                         + '<div id="fullConsoleOutput" class="not-hidden"><br><textarea class="selectable">' + stderr + '</textarea></div>'
                     );
                     event.sender.send('buildEmscriptenDone');
@@ -1778,7 +1834,7 @@ ipcMain.on('buildEmscripten', (event, { projectName, projectPath, configuration,
                 const htmlFile = fs.existsSync(path.join(emOutputDir, 'index.html')) ? 'index.html' : null;
 
                 if (!htmlFile) {
-                    event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>Error...</strong><br>Build succeeded but no .html output was found in <span class="monospace">${emOutputDir}</span>`);
+                    event.sender.send('sendUIMessage', `<!--modal-context:none:-->\n<strong>${t('msg.error')}</strong><br>${t('emscripten.noHtmlOutput', { path: `<span class="monospace">${emOutputDir}</span>` })}`);
                     event.sender.send('buildEmscriptenDone');
                     return;
                 }
