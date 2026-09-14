@@ -228,6 +228,19 @@
 						</div>
 						<div id="test"></div>
 					</div>
+					<div class="field" id="msys2EnvField" style="display: none">
+						<label>MSYS2 environment:</label>
+						<div class="ui selection dropdown" id="msys2EnvDropdown">
+							<input type="hidden" id="msys2EnvValue" value="ucrt64">
+							<i class="dropdown icon"></i>
+							<div class="text">UCRT64</div>
+							<div class="menu">
+								<div class="item" data-value="ucrt64">UCRT64 (default)</div>
+								<div class="item" data-value="mingw64">MINGW64 (legacy)</div>
+								<div class="item" data-value="clang64">CLANG64</div>
+							</div>
+						</div>
+					</div>
 					<div id="templateSection" class="field">
 						<label>Template:</label>
 						<div class="ui multiple search selection dropdown" id="templatesDropdown">

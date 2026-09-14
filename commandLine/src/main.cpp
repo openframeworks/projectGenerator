@@ -31,7 +31,8 @@ enum optionIndex { UNKNOWN,
 	COMMAND,
 	BACKUP_PROJECT_FILES,
 	FRAMEWORKS,
-	CLEANNAME_DISABLE
+	CLEANNAME_DISABLE,
+	MSYS2ENV
 };
 
 constexpr option::Descriptor usage[] = {
@@ -57,6 +58,8 @@ constexpr option::Descriptor usage[] = {
 	{ FRAMEWORKS, 0, "f", "frameworks", option::Arg::Optional, "  --frameworks, -f  \tframeworks list (such as Vision,ARKit)" },
 	
 	{ CLEANNAME_DISABLE, 0, "n", "cleanname", option::Arg::Optional, "  --cleanname, -f  \tcleanname" },
+
+	{ MSYS2ENV, 0, "k", "msys2env", option::Arg::Optional, "  --msys2env, -k  \tMSYS2 environment for the VSCode target: ucrt64 (default) | mingw64 | clang64" },
 
 	{ 0, 0, 0, 0, 0, 0 }
 };
@@ -86,6 +89,7 @@ vector<string> targets;
 vector<string> frameworks;
 string ofPathEnv;
 string templateName;
+string msys2Env = "ucrt64";
 
 bool busingEnvVar;
 bool bVerbose;
@@ -253,6 +257,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 
 	if (!bDryRun) {
 		auto project = getTargetProject(target);
+		project->setMsys2Environment(msys2Env);
 		project->create(path, templateName);
 
 		if (bConsiderParameterAddons && bAddonsPassedIn) {
@@ -546,6 +551,11 @@ int main(int argc, char ** argv) {
 		addPlatforms("vscode");
 	}
 
+	if (options[MSYS2ENV].count() > 0 && options[MSYS2ENV].arg != NULL) {
+		msys2Env = options[MSYS2ENV].arg;
+		ofLogNotice() << "{ \"msys2Env\": \"" << msys2Env << "\" }";
+	}
+
 	if (options[ADDONS].count() > 0) {
 		bAddonsPassedIn = true; // could be empty
 		if (options[ADDONS].arg != NULL) {
@@ -722,6 +732,7 @@ int main(int argc, char ** argv) {
 					if (!bDryRun) {
 						ofLogNotice() << "project path is: [" << projectPath << "]";
 						auto project = getTargetProject(t);
+						project->setMsys2Environment(msys2Env);
 						project->create(projectPath, templateName);
 						if(bAddonsPassedIn){
 							for (auto & addon : addons) {
