@@ -98,6 +98,11 @@ public:
 
 	virtual void addFramework(const fs::path & path, const fs::path & folder, bool isRelativeToSDK = false){};
 
+	// public entry point for project-level preprocessor defines (e.g. -D/--defines on the
+	// CLI, or a GUI-driven renderer choice) - addDefine() itself stays protected since it's
+	// also invoked internally by addAddonDefines() for addon-provided defines
+	void addProjectDefine(const std::string & define, LibType libType = RELEASE_LIB) { addDefine(define, libType); }
+
 
 #ifdef OFADDON_OUTPUT_JSON_DEBUG
     void saveAddonsToJson(){

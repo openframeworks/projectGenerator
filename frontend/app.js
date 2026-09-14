@@ -958,6 +958,9 @@ function setup() {
             ipcRenderer.send('setLanguage', lang);
         });
 
+        $('#rendererDropdown').dropdown();
+        $('#rendererDropdown').dropdown('set exactly', 'default');
+
         // reflesh template dropdown list depends on selected platforms
         $("#platformsDropdown").on('change', () => {
             const selectedPlatforms = $("#platformsDropdown input").val();
@@ -969,6 +972,15 @@ function setup() {
             }
             console.log(arg);
             ipcRenderer.send('refreshTemplateList', arg);
+
+            // renderer choice (OF_USE_ANGLE / OF_USE_DAWN) only applies to the Xcode-based
+            // osx/ios/macos (mega iOS/tvOS/macOS) targets
+            const rendererPlatforms = ['osx', 'ios', 'macos'];
+            if (selectedPlatformArray.some((p) => rendererPlatforms.includes(p))) {
+                $('#rendererField').show();
+            } else {
+                $('#rendererField').hide();
+            }
         })
         $("#platformsDropdownMulti").on('change', () => {
             const selectedPlatforms = $("#platformsDropdownMulti input").val();
@@ -1151,6 +1163,18 @@ function generate() {
 
     const lengthOfPlatforms = platformValueArray.length;
 
+    // renderer choice adds its OF_USE_* define on top of whatever the user typed manually
+    const rendererDefines = {
+        angle: 'OF_USE_ANGLE=1',
+        dawn: 'OF_USE_DAWN=1'
+    };
+    const rendererChoice = $('#rendererDropdown').dropdown('get value');
+    const customDefinesText = $('#customDefines').val().trim();
+    const definesArr = customDefinesText ? customDefinesText.split(',').map((s) => s.trim()).filter(Boolean) : [];
+    if (rendererDefines[rendererChoice]) {
+        definesArr.push(rendererDefines[rendererChoice]);
+    }
+
     const gen = {
         projectName: $("#projectName").val(),
         projectPath: $("#projectPath").val(),
@@ -1159,7 +1183,8 @@ function generate() {
         templateList: templateValueArray,
         addonList: addonValueArray,  //$("#addonsDropdown").val();
         ofPath: $("#ofPath").val(),
-        verbose: bVerbose
+        verbose: bVerbose,
+        defines: definesArr.join(',')
     };
 
     // console.log(gen);

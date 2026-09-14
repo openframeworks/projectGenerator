@@ -31,7 +31,8 @@ enum optionIndex { UNKNOWN,
 	COMMAND,
 	BACKUP_PROJECT_FILES,
 	FRAMEWORKS,
-	CLEANNAME_DISABLE
+	CLEANNAME_DISABLE,
+	DEFINES
 };
 
 constexpr option::Descriptor usage[] = {
@@ -57,6 +58,8 @@ constexpr option::Descriptor usage[] = {
 	{ FRAMEWORKS, 0, "f", "frameworks", option::Arg::Optional, "  --frameworks, -f  \tframeworks list (such as Vision,ARKit)" },
 	
 	{ CLEANNAME_DISABLE, 0, "n", "cleanname", option::Arg::Optional, "  --cleanname, -f  \tcleanname" },
+
+	{ DEFINES, 0, "D", "defines", option::Arg::Optional, "  --defines, -D  \tpreprocessor defines list (such as OF_USE_ANGLE=1,MY_FLAG)" },
 
 	{ 0, 0, 0, 0, 0, 0 }
 };
@@ -84,6 +87,7 @@ vector<string> addons;
 vector<fs::path> srcPaths;
 vector<string> targets;
 vector<string> frameworks;
+vector<string> defines;
 string ofPathEnv;
 string templateName;
 
@@ -265,6 +269,14 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 		}
 		for (auto & f : frameworks) {
 			project->addFramework(f, "Frameworks", true);
+		}
+
+		// matches addAddonDefines()'s existing convention (single call, default RELEASE_LIB) -
+		// xcodeProject::addDefine ignores libType and applies to all build configs anyway,
+		// but visualStudioProject::addDefine doesn't, so a define here is Release-only for VS,
+		// consistent with how addon-provided defines already behave there
+		for (auto & d : defines) {
+			project->addProjectDefine(d);
 		}
 
 		for (auto & srcPath : srcPaths) {
@@ -583,6 +595,10 @@ int main(int argc, char ** argv) {
 		}
 	}
 
+	if (options[DEFINES].count() > 0 && options[DEFINES].arg != NULL) {
+		defines = ofSplitString(options[DEFINES].arg, ",", true, true);
+	}
+
 
 	if (parse.nonOptionsCount() > 0) {
 		projectName = parse.nonOption(0);
@@ -732,6 +748,10 @@ int main(int argc, char ** argv) {
 						}
 						for (auto & f : frameworks) {
 							project->addFramework(f, "Frameworks", true);
+						}
+
+						for (auto & d : defines) {
+							project->addProjectDefine(d);
 						}
 
 						for (auto & s : srcPaths) {
