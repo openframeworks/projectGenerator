@@ -116,8 +116,8 @@ package_app(){
     echo "cd to ${PG_DIR}"
     cd ${PG_DIR}
 
-    TEAM_ID="HC25N2E7UT"
-    APPLE_ID="theo@theowatson.com"
+    TEAM_ID="${CERTIFCATE_TEAM_ID}"
+    APPLE_ID="${GA_APPLE_USERNAME}"
     # echo "--identity=3rd Party Mac Developer Application: ${APPLE_ID} (${TEAM_ID})"
     if [[ ("${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" || "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/bleeding") && "$TRAVIS_PULL_REQUEST" == "false" ]] ||
         [[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
@@ -169,7 +169,7 @@ sign_and_upload(){
             # need to upload zip of just app to apple for notarizing
             zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator.app.zip projectGenerator-$PLATFORM/projectGenerator.app
             # xcrun altool --notarize-app --primary-bundle-id "com.electron.projectgenerator" --username "${GA_APPLE_USERNAME}" -p "${GA_APPLE_PASS}" --asc-provider "${GA_NOTARIZE_PROVIDER}" --file projectGenerator-$PLATFORM/projectGenerator.app.zip
-            TEAM_ID="HC25N2E7UT"
+            TEAM_ID="${CERTIFCATE_TEAM_ID}"
             xcrun notarytool submit "projectGenerator-${PLATFORM}/projectGenerator-${PLATFORM}.app.zip" --apple-id "${GA_APPLE_USERNAME}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
 
             # Upload to OF CI server
