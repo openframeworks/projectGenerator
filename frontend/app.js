@@ -534,7 +534,8 @@ function setup() {
     
             if(isSierra) {
                 try {
-                    const runningOnVar = (ofpath.length >= 8 && ofpath.substring(0,8) === '/private');
+                    // matches Gatekeeper's real AppTranslocation path, not just any /private path
+                    const runningOnVar = /^\/private\/var\/folders\/.*\/AppTranslocation\//.test(ofpath);
                     isFirstTimeSierra = runningOnVar;
                 } catch(e) {
                     isFirstTimeSierra = false;

@@ -389,12 +389,14 @@
     		
 
 
-                                        <div class="ui negative message" id="ofPathSierraMessage" style="position: absolute; top:-10px; left:0px; width:100%; height:400px; display:none;">
+                                        <div class="ui negative message" id="ofPathSierraMessage" style="position: absolute; top:-10px; left:0px; width:100%; display:none;">
                                             <div class="header">
-                                                ACTION NEEDED: Running on macOS for the first time?
+                                                ACTION NEEDED: macOS quarantine warning
                                             </div>
 
-                                            <p><br/>Please close the ProjectGenerator.app, move it up a level (or anywhere on HD) and then back into the projectGenerator/ folder. <br/> <br/> If the OF path is not the root of the unzipped OF folder please set the OF path to this folder (ie, the folder which has "addons", "libs", in it)</p>
+                                            <p>macOS is running this app from a temporary, randomized location because it still has a "downloaded from the internet" flag. This can confuse auto-detection of your openFrameworks path.</p>
+                                            <p><strong>Easiest fix:</strong> just set the OF path below to the folder containing "addons" and "libs".</p>
+                                            <p><strong>Permanent fix:</strong> close this app, move ProjectGenerator.app anywhere via Finder (e.g. to your Desktop) and back, then relaunch.</p>
                                         </div>
 
 				</div>
