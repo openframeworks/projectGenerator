@@ -111,6 +111,10 @@ jobs:
           GA_CI_SECRET: ${{ secrets.CI_SECRET }}
           CERTIFICATE_OSX_APPLICATION: ${{ secrets.CERTIFICATE_OSX_APPLICATION }}
           CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+          CERTIFCATE_TEAM_ID: ${{ secrets.CERTIFCATE_TEAM_ID }}
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
           GA_APPLE_USERNAME: ${{ secrets.GA_APPLE_USERNAME }}
           GA_APPLE_PASS: ${{ secrets.GA_APPLE_PASS }}
           GA_NOTARIZE_PROVIDER: ${{ secrets.GA_NOTARIZE_PROVIDER }}

@@ -116,9 +116,6 @@ package_app(){
     echo "cd to ${PG_DIR}"
     cd ${PG_DIR}
 
-    TEAM_ID="HC25N2E7UT"
-    APPLE_ID="theo@theowatson.com"
-    # echo "--identity=3rd Party Mac Developer Application: ${APPLE_ID} (${TEAM_ID})"
     if [[ ("${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" || "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/bleeding") && "$TRAVIS_PULL_REQUEST" == "false" ]] ||
         [[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
         electron-osx-sign projectGenerator-$PLATFORM/projectGenerator.app --platform=darwin --type=distribution --no-gatekeeper-assess --hardened-runtime --entitlements=scripts/osx/PG.entitlements --entitlements-inherit=scripts/osx/PG.entitlements
@@ -129,7 +126,10 @@ package_app(){
     zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip projectGenerator-$PLATFORM/projectGenerator.app
     if [[ ("${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/master" || "${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}" == "openframeworks/projectGenerator/bleeding") && "$TRAVIS_PULL_REQUEST" == "false" ]] ||
         [[ ("${GITHUB_REF##*/}" == "master" || "${GITHUB_REF##*/}" == "bleeding") && -z "${GITHUB_HEAD_REF}" ]] ; then
-        xcrun notarytool submit "projectGenerator-${PLATFORM}/projectGenerator-${PLATFORM}.zip" --apple-id "${APPLE_ID}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
+        # App Store Connect API key auth (--key/--key-id/--issuer) instead of
+        # --apple-id/--team-id/--password - not tied to a personal Apple ID's
+        # password, and revocable independently (see setup_notarization_key)
+        xcrun notarytool submit "projectGenerator-${PLATFORM}/projectGenerator-${PLATFORM}.zip" --key "${APPLE_API_KEY_PATH}" --key-id "${APPLE_API_KEY_ID}" --issuer "${APPLE_API_ISSUER_ID}"
     fi
 
     mv projectGenerator-$PLATFORM/projectGenerator-$PLATFORM.zip ${PG_DIR}/../../../projectGenerator/projectGenerator-$PLATFORM.zip
@@ -169,8 +169,7 @@ sign_and_upload(){
             # need to upload zip of just app to apple for notarizing
             zip --symlinks -r -q projectGenerator-$PLATFORM/projectGenerator.app.zip projectGenerator-$PLATFORM/projectGenerator.app
             # xcrun altool --notarize-app --primary-bundle-id "com.electron.projectgenerator" --username "${GA_APPLE_USERNAME}" -p "${GA_APPLE_PASS}" --asc-provider "${GA_NOTARIZE_PROVIDER}" --file projectGenerator-$PLATFORM/projectGenerator.app.zip
-            TEAM_ID="HC25N2E7UT"
-            xcrun notarytool submit "projectGenerator-${PLATFORM}/projectGenerator-${PLATFORM}.app.zip" --apple-id "${GA_APPLE_USERNAME}" --team-id "${TEAM_ID}" --password "${GA_APPLE_PASS}"
+            xcrun notarytool submit "projectGenerator-${PLATFORM}/projectGenerator-${PLATFORM}.app.zip" --key "${APPLE_API_KEY_PATH}" --key-id "${APPLE_API_KEY_ID}" --issuer "${APPLE_API_ISSUER_ID}"
 
             # Upload to OF CI server
             echo "Uploading $PLATFORM PG to CI servers"
@@ -190,6 +189,22 @@ sign_and_upload(){
             scp -i scripts/id_rsa projectGenerator-$PLATFORM.zip tests@198.61.170.130:projectGenerator_builds/projectGenerator-$PLATFORM_new.zip
             ssh -i scripts/id_rsa tests@198.61.170.130 "mv projectGenerator_builds/projectGenerator-$PLATFORM_new.zip projectGenerator_builds/projectGenerator-$PLATFORM.zip"
         fi
+    fi
+}
+
+setup_notarization_key(){
+    echo "  setup_notarization_key"
+
+    # APPLE_API_KEY_P8 holds the raw .p8 contents (the -----BEGIN PRIVATE KEY-----
+    # block) directly - GitHub secrets preserve multi-line values as-is, so no
+    # base64 round-trip is needed. notarytool still requires a file path (no
+    # inline-content option), so it's written out here for the CLI call to use.
+    if [[ -n "${APPLE_API_KEY_P8}" ]]; then
+        echo "Writing App Store Connect API key"
+        APPLE_API_KEY_PATH="${PG_DIR}/AuthKey_${APPLE_API_KEY_ID}.p8"
+        printf '%s\n' "${APPLE_API_KEY_P8}" > "${APPLE_API_KEY_PATH}"
+        chmod 600 "${APPLE_API_KEY_PATH}"
+        export APPLE_API_KEY_PATH
     fi
 }
 
@@ -242,6 +257,10 @@ echo "##[endgroup]"
 echo "##[group]import_certificate"
 import_certificate
 # Generate electron app
+echo "##[endgroup]"
+
+echo "##[group]setup_notarization_key"
+setup_notarization_key
 echo "##[endgroup]"
 
 echo "##[group]build_frontend"
