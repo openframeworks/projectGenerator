@@ -973,14 +973,7 @@ function setup() {
             console.log(arg);
             ipcRenderer.send('refreshTemplateList', arg);
 
-            // renderer choice (OF_USE_ANGLE / OF_USE_DAWN) only applies to the Xcode-based
-            // osx/ios/macos (mega iOS/tvOS/macOS) targets
-            const rendererPlatforms = ['osx', 'ios', 'macos'];
-            if (selectedPlatformArray.some((p) => rendererPlatforms.includes(p))) {
-                $('#rendererField').show();
-            } else {
-                $('#rendererField').hide();
-            }
+            updateRendererFieldVisibility();
         })
         $("#platformsDropdownMulti").on('change', () => {
             const selectedPlatforms = $("#platformsDropdownMulti input").val();
@@ -1314,6 +1307,7 @@ function enableAdvancedMode(isAdvanced) {
         $('#templateSectionMulti').show();
         $('#ofPathButton').show();
         $('#emsdkField').show();
+        $('#customDefinesField').show();
         if (!defaultSettings['detachConsole']) {
             $('body').addClass('showConsole');
         }
@@ -1331,12 +1325,26 @@ function enableAdvancedMode(isAdvanced) {
 
         $('#ofPathButton').hide();
         $('#emsdkField').hide();
+        $('#customDefinesField').hide();
         $("body").removeClass('advanced');
         $('a.updateMultiMenuOption').hide();
     }
     defaultSettings.advancedMode = isAdvanced;
     saveDefaultSettings();
+    updateRendererFieldVisibility();
     //$("#advancedToggle").prop('checked', defaultSettings['advancedMode'] );
+}
+
+// renderer choice (OF_USE_ANGLE / OF_USE_DAWN) only applies to the Xcode-based
+// osx/ios/macos (mega iOS/tvOS/macOS) targets, and is an advanced-only option
+function updateRendererFieldVisibility() {
+    const rendererPlatforms = ['osx', 'ios', 'macos'];
+    const selectedPlatforms = ($("#platformsDropdown input").val() || '').trim().split(',');
+    if (defaultSettings.advancedMode && selectedPlatforms.some((p) => rendererPlatforms.includes(p))) {
+        $('#rendererField').show();
+    } else {
+        $('#rendererField').hide();
+    }
 }
 
 //----------------------------------------
