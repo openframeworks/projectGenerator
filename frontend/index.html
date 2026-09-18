@@ -233,15 +233,18 @@
 						<div class="ui selection dropdown" id="rendererDropdown">
 							<input type="hidden" id="rendererValue" value="default">
 							<i class="dropdown icon"></i>
-							<div class="text">Default (OpenGL)</div>
+							<div class="text">Default (OpenGL / OpenGL ES)</div>
+							<!-- labels assume the Metal backend since this field is currently only
+							     shown for osx/ios/macos - update if/when Linux/Windows ANGLE-Vulkan
+							     or Dawn-Vulkan packages are actually available to build against -->
 							<div class="menu">
-								<div class="item" data-value="default">Default (OpenGL)</div>
-								<div class="item" data-value="angle">ANGLE (OF_USE_ANGLE)</div>
-								<div class="item" data-value="dawn">Dawn / WebGPU (OF_USE_DAWN)</div>
+								<div class="item" data-value="default">Default (OpenGL / OpenGL ES)</div>
+								<div class="item" data-value="angle">ANGLE - Auto OpenGL to Metal</div>
+								<div class="item" data-value="dawn">Dawn - Auto OpenGL to WebGPU/Metal</div>
 							</div>
 						</div>
 					</div>
-					<div class="field">
+					<div class="field advanced" id="customDefinesField" style="display: none">
 						<label>Custom defines: &nbsp;
 							<a class="ui icon tooltip" href="#" data-content="Comma-separated preprocessor defines, e.g. MY_FLAG,OTHER_FLAG=1" data-position="right center">
 								<i class="help circle icon"></i>
