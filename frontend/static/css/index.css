@@ -76,8 +76,9 @@ body.showConsole #hideConsole {
   display: inline;
 }
 
-body.showConsole {
-  padding-bottom: 100px; /* same height as console */
+/* --console-height is set from app.js; body doesn't grow, so pad the container */
+body.showConsole .main.ui.container {
+  padding-bottom: calc(var(--console-height, 100px) + 50px) !important;
 }
 body.showConsole #consoleContainer {
   margin-bottom: 0;

@@ -126,7 +126,7 @@ const hostplatform = getCurrentPlatform();
  */
 function getDefaultTemplateForPlatform(platformId) {
     const defaultTemplates = {
-        "osx": "OS X (Xcode)",
+        "osx": "macOS (OSX) (Xcode)",
         "vs": "Windows (Visual Studio)",
         "msys2": "Windows (msys2/mingw)",
         "ios": "iOS (Xcode)",
@@ -287,7 +287,7 @@ const addonsToSkip = [
 ];
 
 const platforms = {
-    "osx": "OS X (Xcode)",
+    "osx": "macOS (OSX) (Xcode)",
     "vs": "Windows (Visual Studio)",
     "msys2": "Windows (msys2/mingw)",
     "ios": "iOS (Xcode)",
@@ -1228,6 +1228,292 @@ ipcMain.on('runOfMenu', (event, { command, ofPath }) => {
         }
         event.sender.send('ofMenuDone', { command });
     });
+});
+
+//--------------------------------------------------------- library downloads
+const APOTHECARY_REPO = 'openframeworks/apothecary';
+
+// libs installed into an addon, same as scripts/dev/download_libs.sh
+const ADDON_LIBS = {
+    poco: 'ofxPoco',
+    opencv: 'ofxOpenCv',
+    ippicv: 'ofxOpenCv',
+    libusb: 'ofxKinect',
+    assimp: 'ofxAssimpModelLoader',
+    libxml2: 'ofxSvg',
+    svgtiny: 'ofxSvg',
+};
+
+const HOST_LIB_PLATFORM = {
+    osx: 'osx',
+    windows: 'vs',
+    linux: 'linux',
+    linux64: 'linux64',
+    linuxaarch64: 'linuxaarch64',
+    linuxarmv6l: 'linuxarmv6l',
+};
+
+// default modular package target (oF_<lib>_<target>.tar.bz2) for this host
+const HOST_MODULAR_TARGET = {
+    osx: 'osx_64',
+    windows: 'vs_64',
+    linux64: 'linux_64_gcc14',
+    linuxaarch64: 'linux_arm64_gcc14',
+    linuxarmv6l: 'linux_armv6l_gcc10',
+};
+
+let apothecaryReleases = null;
+
+function githubJSON(url) {
+    return fetch(url, {
+        headers: { 'User-Agent': 'openFrameworks-projectGenerator', 'Accept': 'application/vnd.github+json' },
+    }).then((res) => {
+        if (!res.ok) throw new Error(`GitHub API ${res.status} ${res.statusText} (${url})`);
+        return res.json();
+    });
+}
+
+function fetchApothecaryReleases(refresh) {
+    if (apothecaryReleases && !refresh) return Promise.resolve(apothecaryReleases);
+    return githubJSON(`https://api.github.com/repos/${APOTHECARY_REPO}/releases?per_page=50`).then((releases) => {
+        apothecaryReleases = releases.map((r) => ({
+            tag: r.tag_name,
+            name: r.name || r.tag_name,
+            prerelease: r.prerelease,
+            published: r.published_at,
+            assets: r.assets.map((a) => ({
+                name: a.name,
+                size: a.size,
+                url: a.browser_download_url,
+                digest: a.digest || null,
+            })),
+        }));
+        return apothecaryReleases;
+    });
+}
+
+function modularLibDest(ofPath, lib) {
+    const addon = ADDON_LIBS[lib];
+    return addon ? path.join(ofPath, 'addons', addon, 'libs') : path.join(ofPath, 'libs');
+}
+
+const LIB_DIR_PLATFORMS = {
+    osx: 'macOS',
+    ios: 'iOS',
+    tvos: 'tvOS',
+    xros: 'visionOS',
+    emscripten: 'Emscripten',
+    linux: 'Linux',
+    linux64: 'Linux',
+    linuxaarch64: 'Linux arm64',
+    linuxarmv6l: 'Linux armv6l',
+    linuxarmv7l: 'Linux armv7l',
+    vs: 'Windows',
+    msys2: 'MSYS2',
+    android: 'Android',
+};
+
+const XCFRAMEWORK_SLICE_PLATFORMS = { macos: 'macOS', ios: 'iOS', tvos: 'tvOS', xros: 'visionOS' };
+
+function nonEmptyDir(dir) {
+    try {
+        return fs.statSync(dir).isDirectory() && fs.readdirSync(dir).some((f) => !f.startsWith('.'));
+    } catch (e) {
+        return false;
+    }
+}
+
+// lib/macos is read per xcframework slice so iOS/tvOS show separately
+function installedPlatforms(libDir) {
+    const found = new Set();
+    if (!nonEmptyDir(libDir)) return [];
+    for (const dir of fs.readdirSync(libDir)) {
+        const full = path.join(libDir, dir);
+        if (!nonEmptyDir(full)) continue;
+        if (dir === 'macos') {
+            const xcframeworks = fs.readdirSync(full).filter((f) => f.endsWith('.xcframework'));
+            for (const xc of xcframeworks) {
+                for (const slice of fs.readdirSync(path.join(full, xc))) {
+                    if (slice.includes('simulator') || !nonEmptyDir(path.join(full, xc, slice))) continue;
+                    const name = XCFRAMEWORK_SLICE_PLATFORMS[slice.split('-')[0]];
+                    if (name) found.add(name);
+                }
+            }
+            if (!xcframeworks.length) found.add('macOS');
+        } else {
+            found.add(LIB_DIR_PLATFORMS[dir.toLowerCase()] || dir);
+        }
+    }
+    return [...found].sort();
+}
+
+// oF_<lib>_<target>.(tar.bz2|zip) assets of a release, plus where each would install
+function modularLibsFor(release, ofPath) {
+    const libs = [];
+    const platformsByLib = {};
+    for (const asset of release.assets) {
+        const m = /^oF_([^_]+)_(.+)\.(tar\.bz2|zip)$/.exec(asset.name);
+        if (!m) continue;
+        const [, lib, target] = m;
+        const destParent = ofPath ? modularLibDest(ofPath, lib) : '';
+        libs.push({
+            lib,
+            target,
+            asset,
+            installTo: path.join(ADDON_LIBS[lib] ? `addons/${ADDON_LIBS[lib]}/libs` : 'libs', lib),
+            platforms: ofPath ? (platformsByLib[lib] ||= installedPlatforms(path.join(destParent, lib, 'lib'))) : [],
+        });
+    }
+    return libs;
+}
+
+function corePlatformsFor(ofPath) {
+    const scriptsDir = path.join(ofPath || '', 'scripts');
+    if (!ofPath || !fs.existsSync(scriptsDir)) return [];
+    return fs.readdirSync(scriptsDir).filter((dir) => dir !== 'dev' && fs.existsSync(path.join(scriptsDir, dir, 'download_libs.sh')));
+}
+
+ipcMain.on('getLibReleases', (event, { ofPath, refresh }) => {
+    fetchApothecaryReleases(refresh).then((releases) => {
+        event.sender.send('libReleases', {
+            releases: releases.map((r) => ({
+                tag: r.tag,
+                name: r.name,
+                prerelease: r.prerelease,
+                published: r.published,
+                hasCore: r.assets.some((a) => a.name.startsWith('openFrameworksLibs_')),
+                modular: modularLibsFor(r, ofPath).map(({ asset, ...lib }) => ({ ...lib, asset: asset.name, size: asset.size, verifiable: !!asset.digest })),
+            })),
+            corePlatforms: corePlatformsFor(ofPath),
+            hostPlatform: HOST_LIB_PLATFORM[hostplatform] || '',
+            hostModularTarget: HOST_MODULAR_TARGET[hostplatform] || '',
+        });
+    }).catch((error) => {
+        event.sender.send('libReleases', { error: error.message });
+    });
+});
+
+// drop curl/wget progress-bar redraws (bare \r)
+function stripProgressRedraws(text) {
+    return text.replace(/[^\n]*\r(?!\n)/g, '');
+}
+
+ipcMain.on('downloadCoreLibs', (event, { ofPath, tag, platform }) => {
+    const send = (msg) => { if (!event.sender.isDestroyed()) event.sender.send('consoleMessage', msg); };
+    const done = (ok) => { if (!event.sender.isDestroyed()) event.sender.send('downloadCoreLibsDone', { ok }); };
+
+    const script = path.join(ofPath || '', 'scripts', platform || '', 'download_libs.sh');
+    if (!ofPath || !platform || !fs.existsSync(script)) {
+        send(`<br><strong>${t('msg.error')}</strong> ${t('downloads.scriptMissing', { script })}<br>`);
+        done(false);
+        return;
+    }
+
+    const args = [script];
+    if (tag && tag !== 'latest') args.push('-t', tag);
+    send(`<br><em>${t('downloads.coreStarting', { tag: tag || 'latest', platform })}</em><br>`);
+
+    let child;
+    try {
+        child = spawn('bash', args, { cwd: path.dirname(script), windowsHide: true });
+    } catch (error) {
+        send(`<strong>${t('msg.error')}</strong> ${error.message}<br>`);
+        done(false);
+        return;
+    }
+    child.stdout.on('data', (chunk) => send(stripProgressRedraws(chunk.toString())));
+    child.stderr.on('data', (chunk) => send(stripProgressRedraws(chunk.toString())));
+    child.on('error', (error) => {
+        send(`<strong>${t('msg.error')}</strong> ${t('downloads.bashMissing')} (${error.message})<br>`);
+        done(false);
+    });
+    child.on('close', (code) => {
+        send(`<br><em>(command used: bash ${args.join(' ')})</em><br>`);
+        if (code !== 0) {
+            event.sender.send('sendUIMessage',
+                `<!--modal-context:none:-->\n<strong>${t('msg.error')}</strong><br>${t('downloads.coreFailed', { code })}`);
+        }
+        done(code === 0);
+    });
+});
+
+function runTool(cmd, args, options) {
+    return new Promise((resolve, reject) => {
+        execFile(cmd, args, { windowsHide: true, maxBuffer: 16 * 1024 * 1024, ...options }, (error, stdout, stderr) => {
+            if (error) reject(new Error(`${cmd} ${args.join(' ')}: ${stderr || error.message}`));
+            else resolve(stdout);
+        });
+    });
+}
+
+async function installModularLib(ofPath, lib, asset, send) {
+    const downloadDir = path.join(ofPath, 'libs', 'download');
+    fs.mkdirSync(downloadDir, { recursive: true });
+    const archive = path.join(downloadDir, asset.name);
+
+    send(`<em>${t('downloads.fetching', { name: asset.name })}</em><br>`);
+    const res = await fetch(asset.url, { headers: { 'User-Agent': 'openFrameworks-projectGenerator' } });
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText} - ${asset.url}`);
+    const data = Buffer.from(await res.arrayBuffer());
+
+    if (asset.digest && asset.digest.startsWith('sha256:')) {
+        const actual = require('crypto').createHash('sha256').update(data).digest('hex');
+        if (actual !== asset.digest.slice('sha256:'.length)) {
+            throw new Error(t('downloads.shaMismatch', { name: asset.name }));
+        }
+        send(`&nbsp;&nbsp;SHA-256 ✓<br>`);
+    } else {
+        send(`&nbsp;&nbsp;${t('downloads.noDigest')}<br>`);
+    }
+    fs.writeFileSync(archive, data);
+
+    const destParent = modularLibDest(ofPath, lib);
+    fs.mkdirSync(destParent, { recursive: true });
+
+    // keep existing Info.plist so ios/tvos slices stay linked, as download_libs.sh does
+    const plist = path.join(destParent, lib, 'lib', 'macos', `${lib}.xcframework`, 'Info.plist');
+    const plistBackup = fs.existsSync(plist) ? fs.readFileSync(plist) : null;
+
+    if (asset.name.endsWith('.zip') && process.platform !== 'win32') {
+        await runTool('unzip', ['-qo', archive, '-d', destParent]);
+    } else {
+        await runTool('tar', ['-xf', archive, '-C', destParent]);
+    }
+
+    if (plistBackup) fs.writeFileSync(plist, plistBackup);
+    send(`&nbsp;&nbsp;${t('downloads.installedTo', { path: path.join(destParent, lib) })}<br>`);
+}
+
+ipcMain.on('downloadModularLibs', async (event, { ofPath, tag, names }) => {
+    const send = (msg) => { if (!event.sender.isDestroyed()) event.sender.send('consoleMessage', msg); };
+    const failed = [];
+    try {
+        // latest-modular is re-uploaded in place, so re-read digests
+        const release = (await fetchApothecaryReleases(true)).find((r) => r.tag === tag);
+        if (!release) throw new Error(t('downloads.releaseMissing', { tag }));
+        send(`<br><em>${t('downloads.modularStarting', { count: names.length, tag })}</em><br>`);
+        for (const name of names) {
+            const asset = release.assets.find((a) => a.name === name);
+            const m = /^oF_([^_]+)_/.exec(name);
+            try {
+                if (!asset || !m) throw new Error(t('downloads.assetMissing', { name, tag }));
+                await installModularLib(ofPath, m[1], asset, send);
+            } catch (error) {
+                failed.push(name);
+                send(`<strong>${t('msg.error')}</strong> ${error.message}<br>`);
+            }
+        }
+    } catch (error) {
+        failed.push(...names);
+        send(`<strong>${t('msg.error')}</strong> ${error.message}<br>`);
+    }
+    if (failed.length) {
+        event.sender.send('sendUIMessage',
+            `<!--modal-context:none:-->\n<strong>${t('msg.error')}</strong><br>${t('downloads.modularFailed', { names: failed.join(', ') })}`);
+    } else {
+        send(`<strong>${t('msg.success')}</strong> ${t('downloads.modularDone', { count: names.length })}<br>`);
+    }
+    if (!event.sender.isDestroyed()) event.sender.send('downloadModularLibsDone', { failed });
 });
 
 /** @typedef {{
