@@ -134,5 +134,13 @@
   "downloads.modularDone": "모듈형 패키지 {{count}}개를 설치했습니다.",
   "button.downloadCoreLibs": "코어 라이브러리 다운로드",
   "button.downloadSelected": "선택 항목 다운로드 ({{count}})",
-  "button.refresh": "새로 고침"
+  "button.refresh": "새로 고침",
+  "downloads.source": "소스:",
+  "downloads.sourceApothecary": "Apothecary (권장)",
+  "downloads.sourceOfLibs": "ofLibs (실험적)",
+  "downloads.sourceArchive": "아카이브 (libs.danoli3.com)",
+  "downloads.sourceNote.apothecary": "openframeworks/apothecary 미리 빌드된 패키지 - 표준 openFrameworks 구조입니다.",
+  "downloads.sourceNote.oflibs": "ofWorks/ofLibs 라이브러리별 zip을 libs/<lib>에 설치합니다. ofWorks 중심이라 일부 라이브러리는 경로 조정이 필요할 수 있습니다.",
+  "downloads.sourceNote.archive": "libs.danoli3.com의 이전 openFrameworks 릴리스 - 해당 릴리스의 libs/를 이 체크아웃에 병합합니다.",
+  "downloads.archiveConfirm": "아카이브 {{tag}}은(는) libs/ 폴더 전체(libs/openFrameworks 포함)를 해당 릴리스의 것으로 교체합니다. 계속할까요?"
 }

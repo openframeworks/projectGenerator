@@ -670,6 +670,7 @@ function setup() {
         });
 
         $('#coreReleaseDropdown, #corePlatformDropdown').dropdown();
+        $('#coreSourceDropdown').dropdown({ onChange: () => fillCoreSource(false) });
         $('#modularReleaseDropdown').dropdown({ onChange: () => fillModularTargets() });
         $('#modularTargetDropdown').dropdown({ onChange: () => renderModularLibs() });
         $('#modularSelectAll').on('change', function () {
@@ -1696,19 +1697,41 @@ ipcRenderer.on('libReleases', (event, data) => {
 
     const byTag = {};
     for (const r of data.releases) byTag[r.tag] = r;
-    const coreTags = data.releases.filter((r) => r.hasCore).map((r) => r.tag);
     const modularTags = data.releases.filter((r) => r.modular.length).map((r) => r.tag);
     const keep = (sel, fallback, list) => {
         const cur = previous ? $(sel).dropdown('get value') : '';
         return list.includes(cur) ? cur : fallback;
     };
 
-    fillDropdown('#coreReleaseDropdown', coreTags, keep('#coreReleaseDropdown', 'latest', coreTags), (tag) => releaseLabel(byTag[tag]));
-    const corePlatforms = sortCorePlatforms(data.corePlatforms);
-    fillDropdown('#corePlatformDropdown', corePlatforms, keep('#corePlatformDropdown', data.hostPlatform, corePlatforms), corePlatformLabel);
+    data.sources.apothecary = { releases: data.releases.filter((r) => r.hasCore), platforms: data.corePlatforms };
+    fillCoreSource(previous);
     fillDropdown('#modularReleaseDropdown', modularTags, keep('#modularReleaseDropdown', 'latest-modular', modularTags), (tag) => releaseLabel(byTag[tag]));
     fillModularTargets();
 });
+
+function coreSource() {
+    return $('#coreSourceDropdown').dropdown('get value') || 'apothecary';
+}
+
+function fillCoreSource(keepSelection) {
+    if (!libReleases) return;
+    const source = coreSource();
+    const { releases, platforms, error } = libReleases.sources[source];
+    const tags = releases.map((r) => r.tag);
+    const byTag = {};
+    for (const r of releases) byTag[r.tag] = r;
+    const sorted = sortCorePlatforms(platforms);
+    const pick = (sel, fallback, list) => {
+        const cur = keepSelection ? $(sel).dropdown('get value') : '';
+        return list.includes(cur) ? cur : (list.includes(fallback) ? fallback : list[0]);
+    };
+    $('#coreReleaseDropdown').dropdown('clear');
+    fillDropdown('#coreReleaseDropdown', tags, pick('#coreReleaseDropdown', 'latest', tags), (tag) => releaseLabel(byTag[tag]));
+    $('#corePlatformDropdown').dropdown('clear');
+    fillDropdown('#corePlatformDropdown', sorted, pick('#corePlatformDropdown', libReleases.hostPlatform, sorted), corePlatformLabel);
+    const note = error ? t('downloads.releasesError', { error }) : t('downloads.sourceNote.' + source);
+    $('#coreSourceNote').text(note);
+}
 
 function currentModularRelease() {
     const tag = $('#modularReleaseDropdown').dropdown('get value');
@@ -1826,12 +1849,14 @@ function updateModularButton() {
 }
 
 function downloadCoreLibs() {
+    const source = coreSource();
     const tag = $('#coreReleaseDropdown').dropdown('get value');
     const platform = $('#corePlatformDropdown').dropdown('get value');
     if (!tag || !platform) return;
+    if (source === 'archive' && !confirm(t('downloads.archiveConfirm', { tag }))) return;
     $('#downloadCoreLibsButton').addClass('loading disabled');
     openConsoleForOperation();
-    ipcRenderer.send('downloadCoreLibs', { ofPath: $("#ofPath").val(), tag, platform });
+    ipcRenderer.send('downloadCoreLibs', { ofPath: $("#ofPath").val(), source, tag, platform });
 }
 
 ipcRenderer.on('downloadCoreLibsDone', () => {

@@ -134,5 +134,13 @@
   "downloads.modularDone": "已安装 {{count}} 个模块化包。",
   "button.downloadCoreLibs": "下载核心库",
   "button.downloadSelected": "下载所选 ({{count}})",
-  "button.refresh": "刷新"
+  "button.refresh": "刷新",
+  "downloads.source": "来源：",
+  "downloads.sourceApothecary": "Apothecary（推荐）",
+  "downloads.sourceOfLibs": "ofLibs（实验性）",
+  "downloads.sourceArchive": "归档（libs.danoli3.com）",
+  "downloads.sourceNote.apothecary": "openframeworks/apothecary 预编译包 - 标准的 openFrameworks 目录结构。",
+  "downloads.sourceNote.oflibs": "ofWorks/ofLibs 单库 zip，安装到 libs/<lib>。面向 ofWorks，部分库可能需要调整路径。",
+  "downloads.sourceNote.archive": "来自 libs.danoli3.com 的历史 openFrameworks 版本 - 将该版本的 libs/ 合并到当前目录。",
+  "downloads.archiveConfirm": "归档 {{tag}} 会用该版本的内容整体替换 libs/ 下的文件夹（包括 libs/openFrameworks）。是否继续？"
 }

@@ -1373,9 +1373,57 @@ function corePlatformsFor(ofPath) {
     return fs.readdirSync(scriptsDir).filter((dir) => dir !== 'dev' && fs.existsSync(path.join(scriptsDir, dir, 'download_libs.sh')));
 }
 
-ipcMain.on('getLibReleases', (event, { ofPath, refresh }) => {
+const OFLIBS_REPO = 'ofWorks/ofLibs';
+const ARCHIVE_BASE = 'https://libs.danoli3.com';
+
+// platforms lib_sources.sh can map for each non-apothecary source (ofLibsPlatform / archivePlatformToken)
+const SOURCE_PLATFORMS = {
+    oflibs: ['osx', 'macos', 'linux', 'linux64', 'linuxaarch64', 'vs', 'msys2', 'emscripten'],
+    archive: ['osx', 'macos', 'ios', 'android', 'vs', 'msys2', 'linux'],
+};
+
+let ofLibsReleases = null;
+let archiveVersions = null;
+
+function fetchOfLibsReleases(refresh) {
+    if (ofLibsReleases && !refresh) return Promise.resolve(ofLibsReleases);
+    return githubJSON(`https://api.github.com/repos/${OFLIBS_REPO}/releases?per_page=30`).then((releases) => {
+        ofLibsReleases = releases.map((r) => ({ tag: r.tag_name, prerelease: r.prerelease, published: r.published_at }));
+        return ofLibsReleases;
+    });
+}
+
+// same directory-listing scrape as listArchiveVersions in lib_sources.sh, newest first
+function fetchArchiveVersions(refresh) {
+    if (archiveVersions && !refresh) return Promise.resolve(archiveVersions);
+    return fetch(`${ARCHIVE_BASE}/?dir=versions`, { headers: { 'User-Agent': 'openFrameworks-projectGenerator' } }).then((res) => {
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText} (${ARCHIVE_BASE})`);
+        return res.text();
+    }).then((html) => {
+        const versions = [...new Set([...html.matchAll(/versions\/(v\d+\.\d+(?:\.\d+)?)/g)].map((m) => m[1]))];
+        const key = (v) => v.slice(1).split('.').map(Number);
+        versions.sort((a, b) => {
+            const [x, y] = [key(a), key(b)];
+            for (let i = 0; i < 3; i++) if ((y[i] || 0) !== (x[i] || 0)) return (y[i] || 0) - (x[i] || 0);
+            return 0;
+        });
+        archiveVersions = versions.map((tag) => ({ tag, prerelease: false, published: null }));
+        return archiveVersions;
+    });
+}
+
+const settle = (promise) => promise.then((value) => ({ value }), (error) => ({ value: [], error: error.message }));
+
+ipcMain.on('getLibReleases', async (event, { ofPath, refresh }) => {
+    const [oflibs, archive] = await Promise.all([settle(fetchOfLibsReleases(refresh)), settle(fetchArchiveVersions(refresh))]);
+    const corePlatforms = corePlatformsFor(ofPath);
+    const sources = {
+        oflibs: { releases: oflibs.value, platforms: corePlatforms.filter((p) => SOURCE_PLATFORMS.oflibs.includes(p)), error: oflibs.error },
+        archive: { releases: archive.value, platforms: corePlatforms.filter((p) => SOURCE_PLATFORMS.archive.includes(p)), error: archive.error },
+    };
     fetchApothecaryReleases(refresh).then((releases) => {
         event.sender.send('libReleases', {
+            sources,
             releases: releases.map((r) => ({
                 tag: r.tag,
                 name: r.name,
@@ -1398,20 +1446,29 @@ function stripProgressRedraws(text) {
     return text.replace(/[^\n]*\r(?!\n)/g, '');
 }
 
-ipcMain.on('downloadCoreLibs', (event, { ofPath, tag, platform }) => {
+ipcMain.on('downloadCoreLibs', (event, { ofPath, source, tag, platform }) => {
     const send = (msg) => { if (!event.sender.isDestroyed()) event.sender.send('consoleMessage', msg); };
     const done = (ok) => { if (!event.sender.isDestroyed()) event.sender.send('downloadCoreLibsDone', { ok }); };
 
-    const script = path.join(ofPath || '', 'scripts', platform || '', 'download_libs.sh');
-    if (!ofPath || !platform || !fs.existsSync(script)) {
+    const script = source === 'oflibs' || source === 'archive'
+        ? path.join(ofPath || '', 'scripts', 'dev', 'lib_sources.sh')
+        : path.join(ofPath || '', 'scripts', platform || '', 'download_libs.sh');
+    if (!ofPath || !platform || !tag || !fs.existsSync(script)) {
         send(`<br><strong>${t('msg.error')}</strong> ${t('downloads.scriptMissing', { script })}<br>`);
         done(false);
         return;
     }
 
-    const args = [script];
-    if (tag && tag !== 'latest') args.push('-t', tag);
-    send(`<br><em>${t('downloads.coreStarting', { tag: tag || 'latest', platform })}</em><br>`);
+    let args;
+    if (source === 'oflibs') {
+        args = ['-c', 'source "$1" && downloadOfLibs "$2" "$3" "$4" core', 'bash', script, ofPath, tag, platform];
+    } else if (source === 'archive') {
+        args = ['-c', 'source "$1" && downloadArchiveRelease "$2" "$3" "$4" "" libs', 'bash', script, ofPath, tag, platform];
+    } else {
+        args = [script];
+        if (tag !== 'latest') args.push('-t', tag);
+    }
+    send(`<br><em>${t('downloads.coreStarting', { tag: `${source || 'apothecary'} ${tag}`, platform })}</em><br>`);
 
     let child;
     try {

@@ -134,5 +134,13 @@
   "downloads.modularDone": "{{count}} pacote(s) modular(es) instalado(s).",
   "button.downloadCoreLibs": "Baixar bibliotecas principais",
   "button.downloadSelected": "Baixar selecionadas ({{count}})",
-  "button.refresh": "Atualizar"
+  "button.refresh": "Atualizar",
+  "downloads.source": "Origem:",
+  "downloads.sourceApothecary": "Apothecary (recomendado)",
+  "downloads.sourceOfLibs": "ofLibs (experimental)",
+  "downloads.sourceArchive": "Arquivo (libs.danoli3.com)",
+  "downloads.sourceNote.apothecary": "Pacotes pré-compilados do openframeworks/apothecary - a estrutura padrão do openFrameworks.",
+  "downloads.sourceNote.oflibs": "Zips por biblioteca do ofWorks/ofLibs, instalados em libs/<lib>. Voltado ao ofWorks, algumas bibliotecas podem precisar de ajustes de caminho.",
+  "downloads.sourceNote.archive": "Versões históricas do openFrameworks em libs.danoli3.com - mescla o libs/ dessa versão neste checkout.",
+  "downloads.archiveConfirm": "O arquivo {{tag}} substitui pastas inteiras de libs/ (incluindo libs/openFrameworks) pelas dessa versão. Continuar?"
 }

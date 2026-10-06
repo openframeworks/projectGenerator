@@ -336,7 +336,20 @@
 				<div class="ui form">
 					<h4 class="ui dividing header" data-i18n="downloads.coreHeader">Core libraries</h4>
 					<p data-i18n="downloads.coreDescription">Downloads the prebuilt openFrameworks libraries from apothecary. Pick latest, or a tagged release to match an older openFrameworks.</p>
-					<div class="two fields">
+					<div class="three fields">
+						<div class="field">
+							<label data-i18n="downloads.source">Source:</label>
+							<div class="ui selection dropdown" id="coreSourceDropdown">
+								<input type="hidden" value="apothecary">
+								<i class="dropdown icon"></i>
+								<div class="text">Apothecary</div>
+								<div class="menu">
+									<div class="item" data-value="apothecary" data-i18n="downloads.sourceApothecary">Apothecary (recommended)</div>
+									<div class="item" data-value="oflibs" data-i18n="downloads.sourceOfLibs">ofLibs (experimental)</div>
+									<div class="item" data-value="archive" data-i18n="downloads.sourceArchive">Archive (libs.danoli3.com)</div>
+								</div>
+							</div>
+						</div>
 						<div class="field">
 							<label data-i18n="downloads.release">Release:</label>
 							<div class="ui selection dropdown" id="coreReleaseDropdown">
@@ -356,6 +369,7 @@
 							</div>
 						</div>
 					</div>
+					<p class="ui small grey text" id="coreSourceNote"></p>
 					<div class="field">
 						<div class="ui orange button" id="downloadCoreLibsButton" data-i18n="button.downloadCoreLibs" onclick="downloadCoreLibs()">Download core libraries</div>
 						<div class="ui olive button" id="ofMenuStatusButton" data-i18n="button.checkStatus" onclick="runOfMenuCommand('status')">Check Status</div>
