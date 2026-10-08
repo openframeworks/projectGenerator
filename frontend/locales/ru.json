@@ -146,5 +146,7 @@
   "field.webglVersion": "Версия WebGL:",
   "option.webglDefault": "По умолчанию (WebGL 2)",
   "field.glesVersion": "Версия OpenGL ES (iOS / tvOS):",
-  "option.glesDefault": "По умолчанию (OpenGL ES 2.0)"
+  "option.glesDefault": "По умолчанию (OpenGL ES 2.0)",
+  "field.glVersion": "Версия OpenGL (десктоп):",
+  "option.glDefault": "По умолчанию (OpenGL 2.1)"
 }

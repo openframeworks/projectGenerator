@@ -146,5 +146,7 @@
   "field.webglVersion": "WebGL 버전:",
   "option.webglDefault": "기본값 (WebGL 2)",
   "field.glesVersion": "OpenGL ES 버전 (iOS / tvOS):",
-  "option.glesDefault": "기본값 (OpenGL ES 2.0)"
+  "option.glesDefault": "기본값 (OpenGL ES 2.0)",
+  "field.glVersion": "OpenGL 버전 (데스크톱):",
+  "option.glDefault": "기본값 (OpenGL 2.1)"
 }

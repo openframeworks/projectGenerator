@@ -18,6 +18,12 @@ public:
 	void addCFLAG(const std::string& cflag, LibType libType = RELEASE_LIB) override ; // C
 	void addCPPFLAG(const std::string& cppflag, LibType libType = RELEASE_LIB) override ; // C++
 	void addDefine(const std::string& define, LibType libType = RELEASE_LIB) override ;
+	// project defines go to Debug and Release, same as addon defines
+	void addProjectDefine(const std::string & define, LibType libType = RELEASE_LIB) override {
+		addDefine(define, RELEASE_LIB);
+		addDefine(define, DEBUG_LIB);
+		projectDefines.emplace_back(define);
+	}
     
     void addLDFLAG(const std::string& ldflag, LibType libType = RELEASE_LIB) override {}
     void addAfterRule(const std::string& script) override {}

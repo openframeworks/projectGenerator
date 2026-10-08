@@ -146,5 +146,7 @@
   "field.webglVersion": "WebGL バージョン:",
   "option.webglDefault": "デフォルト (WebGL 2)",
   "field.glesVersion": "OpenGL ES バージョン (iOS / tvOS):",
-  "option.glesDefault": "デフォルト (OpenGL ES 2.0)"
+  "option.glesDefault": "デフォルト (OpenGL ES 2.0)",
+  "field.glVersion": "OpenGL バージョン (デスクトップ):",
+  "option.glDefault": "デフォルト (OpenGL 2.1)"
 }

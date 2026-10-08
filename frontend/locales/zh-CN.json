@@ -146,5 +146,7 @@
   "field.webglVersion": "WebGL 版本：",
   "option.webglDefault": "默认（WebGL 2）",
   "field.glesVersion": "OpenGL ES 版本（iOS / tvOS）：",
-  "option.glesDefault": "默认（OpenGL ES 2.0）"
+  "option.glesDefault": "默认（OpenGL ES 2.0）",
+  "field.glVersion": "OpenGL 版本（桌面）：",
+  "option.glDefault": "默认（OpenGL 2.1）"
 }

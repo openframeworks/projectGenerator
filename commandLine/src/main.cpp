@@ -271,10 +271,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 			project->addFramework(f, "Frameworks", true);
 		}
 
-		// matches addAddonDefines()'s existing convention (single call, default RELEASE_LIB) -
-		// xcodeProject::addDefine ignores libType and applies to all build configs anyway,
-		// but visualStudioProject::addDefine doesn't, so a define here is Release-only for VS,
-		// consistent with how addon-provided defines already behave there
+		// all build configs (visualStudioProject overrides addProjectDefine for Debug + Release)
 		for (auto & d : defines) {
 			project->addProjectDefine(d);
 		}
