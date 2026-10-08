@@ -105,8 +105,8 @@
 				<a class="item updateMultiMenuOption menuItem" data-tab="updateMulti" style="display: none" id="updateMenuButton">
 					<div style="padding:6px;" data-i18n="nav.updateMultiple">update multiple</div>
 				</a>
-				<a class="item updateMultiMenuOption menuItem" data-tab="ofMenu" style="display: none" id="ofMenuButton">
-					<div style="padding:6px;" data-i18n="nav.ofMenu">oF Menu</div>
+				<a class="item menuItem" data-tab="ofMenu" id="ofMenuButton">
+					<div style="padding:6px;" data-i18n="nav.ofMenu">downloads</div>
 				</a>
 				<a class="item right floated menuItem" data-tab="settings" id="settingsMenuButton">
 					<div style="-webkit-app-region: no-drag !important; padding:6px;"><i class="setting link icon"></i>
@@ -333,15 +333,86 @@
 			</div>
 			<!------------------------------- oF Menu -------------------------------->
 			<div class="ui tab" data-tab="ofMenu">
-				<div class="ui message">
-					<p id="ofMenuDescription">Runs <span class="monospace">scripts/of.sh</span> against the configured openFrameworks path. Output streams to the console below.</p>
-				</div>
 				<div class="ui form">
+					<h4 class="ui dividing header" data-i18n="downloads.coreHeader">Core libraries</h4>
+					<p data-i18n="downloads.coreDescription">Downloads the prebuilt openFrameworks libraries from apothecary. Pick latest, or a tagged release to match an older openFrameworks.</p>
+					<div class="three fields">
+						<div class="field">
+							<label data-i18n="downloads.source">Source:</label>
+							<div class="ui selection dropdown" id="coreSourceDropdown">
+								<input type="hidden" value="apothecary">
+								<i class="dropdown icon"></i>
+								<div class="text">Apothecary</div>
+								<div class="menu">
+									<div class="item" data-value="apothecary" data-i18n="downloads.sourceApothecary">Apothecary (recommended)</div>
+									<div class="item" data-value="oflibs" data-i18n="downloads.sourceOfLibs">ofLibs (experimental)</div>
+									<div class="item" data-value="archive" data-i18n="downloads.sourceArchive">Archive (libs.danoli3.com)</div>
+								</div>
+							</div>
+						</div>
+						<div class="field">
+							<label data-i18n="downloads.release">Release:</label>
+							<div class="ui selection dropdown" id="coreReleaseDropdown">
+								<input type="hidden">
+								<i class="dropdown icon"></i>
+								<div class="default text" data-i18n="downloads.loading">Loading releases...</div>
+								<div class="menu"></div>
+							</div>
+						</div>
+						<div class="field">
+							<label data-i18n="field.platform">Platform:</label>
+							<div class="ui selection dropdown" id="corePlatformDropdown">
+								<input type="hidden">
+								<i class="dropdown icon"></i>
+								<div class="default text" data-i18n="placeholder.platform">Platform...</div>
+								<div class="menu"></div>
+							</div>
+						</div>
+					</div>
+					<p class="ui small grey text" id="coreSourceNote"></p>
 					<div class="field">
+						<div class="ui orange button" id="downloadCoreLibsButton" data-i18n="button.downloadCoreLibs" onclick="downloadCoreLibs()">Download core libraries</div>
 						<div class="ui olive button" id="ofMenuStatusButton" data-i18n="button.checkStatus" onclick="runOfMenuCommand('status')">Check Status</div>
 					</div>
+
+					<h4 class="ui dividing header" data-i18n="downloads.modularHeader">Modular libraries</h4>
+					<p data-i18n="downloads.modularDescription">Optional single-library packages (Poco, OpenCV, Dawn, ...). Each installs into libs/ or the addon that uses it, without touching the rest.</p>
+					<div class="ui negative message" id="libReleasesError" style="display: none"></div>
+					<div class="two fields">
+						<div class="field">
+							<label data-i18n="downloads.release">Release:</label>
+							<div class="ui selection dropdown" id="modularReleaseDropdown">
+								<input type="hidden">
+								<i class="dropdown icon"></i>
+								<div class="default text" data-i18n="downloads.loading">Loading releases...</div>
+								<div class="menu"></div>
+							</div>
+						</div>
+						<div class="field">
+							<label data-i18n="downloads.target">Target:</label>
+							<div class="ui selection dropdown" id="modularTargetDropdown">
+								<input type="hidden">
+								<i class="dropdown icon"></i>
+								<div class="default text" data-i18n="downloads.target">Target:</div>
+								<div class="menu"></div>
+							</div>
+						</div>
+					</div>
+					<table class="ui compact celled unstackable table" id="modularLibTable">
+						<thead>
+							<tr>
+								<th class="collapsing"><div class="ui fitted checkbox"><input type="checkbox" id="modularSelectAll"><label></label></div></th>
+								<th data-i18n="downloads.library">Library</th>
+								<th data-i18n="downloads.installsTo">Installs to</th>
+								<th class="collapsing" data-i18n="downloads.size">Size</th>
+								<th class="collapsing" data-i18n="downloads.status">Status</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
 					<div class="field">
-						<div class="ui orange button" id="ofMenuUpdateLibsButton" data-i18n="button.downloadUpdateLibraries" onclick="runOfMenuCommand('update-libs')">Download / Update Libraries</div>
+						<div class="ui orange button disabled" id="downloadModularLibsButton" onclick="downloadModularLibs()">Download selected</div>
+						<div class="ui basic button" id="refreshLibReleasesButton" data-i18n="button.refresh" onclick="loadLibReleases(true)">Refresh</div>
 					</div>
 				</div>
 			</div>

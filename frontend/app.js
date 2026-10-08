@@ -10,7 +10,7 @@ let templates;
 let lastGeneratedProject = null;
 
 // var platforms = {
-//     "osx": "OS X (Xcode)",
+//     "osx": "macOS (OSX) (Xcode)",
 //     "vs": "Windows (Visual Studio)",
 //     "ios": "iOS (Xcode)",
 //     "linux": "Linux 32-bit (Code::Blocks)",
@@ -68,7 +68,7 @@ function applyTranslations() {
     const rescanLink = '<a href="#rescanAddons" onclick="rescanAddons()">' + t('msgBox.missingAddons.linkText') + '</a>';
     $('#missingAddonBody2').html(t('msgBox.missingAddons.body2Suffix', { link: rescanLink }));
 
-    $('#ofMenuDescription').html(t('ofMenu.description', { script: '<span class="monospace">scripts/of.sh</span>' }));
+    if (libReleases) renderModularLibs();
 
     $('#ofPathSierraEasyFix').html(`<strong>${t('msgBox.sierra.easyFixLabel')}</strong> ${t('msgBox.sierra.easyFix')}`);
     $('#ofPathSierraPermanentFix').html(`<strong>${t('msgBox.sierra.permanentFixLabel')}</strong> ${t('msgBox.sierra.permanentFix')}`);
@@ -669,6 +669,32 @@ function setup() {
             }
         });
 
+        $('#coreReleaseDropdown, #corePlatformDropdown').dropdown();
+        $('#coreSourceDropdown').dropdown({ onChange: () => fillCoreSource(false) });
+        $('#modularReleaseDropdown').dropdown({ onChange: () => fillModularTargets() });
+        $('#modularTargetDropdown').dropdown({ onChange: () => renderModularLibs() });
+        $('#modularSelectAll').on('change', function () {
+            const release = currentModularRelease();
+            const target = $('#modularTargetDropdown').dropdown('get value');
+            modularSelection = new Set(this.checked && release ? release.modular.filter((l) => l.target === target).map((l) => l.asset) : []);
+            renderModularLibs();
+        });
+
+        $("#ofMenuButton").tab({
+            'onVisible': () => {
+                if (isOfPathGood !== true) {
+                    $('#settingsMenuButton').click();
+                    $('#ofPathError').modal({
+                        onHide: () => {
+                            $('#settingsMenuButton').click();
+                        }
+                    }).modal("show");
+                    return;
+                }
+                loadLibReleases(false);
+            }
+        });
+
         $("#settingsMenuButton").tab({
             'onVisible': () => {
                 console.log("settings!! ");
@@ -856,6 +882,11 @@ function setup() {
         });
 
         // the console dock is always present as a collapsed peek strip - only
+        // keep the page scrollable past the console at any height
+        new ResizeObserver(([entry]) => {
+            document.documentElement.style.setProperty('--console-height', entry.target.offsetHeight + 'px');
+        }).observe(document.getElementById('consoleContainer'));
+
         // whether it's expanded (showConsole) is a persisted preference
         if (defaultSettings['showConsole']) { $("body").addClass('showConsole'); }
         $("#showConsole").on('click', function(){
@@ -1613,18 +1644,238 @@ ipcRenderer.on('buildEmscriptenDone', () => {
     $("#EmscriptenPreviewButton").removeClass('loading disabled').text(t('button.buildPreview'));
 });
 
-function ofMenuButtonFor(command) {
-    return command === 'status' ? $('#ofMenuStatusButton') : $('#ofMenuUpdateLibsButton');
-}
-
 function runOfMenuCommand(command) {
-    ofMenuButtonFor(command).addClass('loading disabled');
+    $('#ofMenuStatusButton').addClass('loading disabled');
     openConsoleForOperation();
     ipcRenderer.send('runOfMenu', { command, ofPath: $("#ofPath").val() });
 }
 
-ipcRenderer.on('ofMenuDone', (event, { command }) => {
-    ofMenuButtonFor(command).removeClass('loading disabled');
+ipcRenderer.on('ofMenuDone', () => {
+    $('#ofMenuStatusButton').removeClass('loading disabled');
+});
+
+//----------------------------------------
+// downloads tab
+let libReleases = null;
+let modularSelection = new Set();
+
+function loadLibReleases(refresh) {
+    $('#refreshLibReleasesButton').addClass('loading disabled');
+    $('#libReleasesError').hide();
+    ipcRenderer.send('getLibReleases', { ofPath: $("#ofPath").val(), refresh: !!refresh });
+}
+
+function formatSize(bytes) {
+    return bytes >= 1048576 ? (bytes / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(bytes / 1024)) + ' KB';
+}
+
+function releaseLabel(r) {
+    const date = r.published ? ' (' + r.published.slice(0, 10) + ')' : '';
+    return r.tag + date + (r.prerelease ? ' - ' + t('downloads.prerelease') : '');
+}
+
+function fillDropdown(selector, values, selected, labelFor) {
+    const menu = $(selector + ' .menu');
+    menu.empty();
+    for (const v of values) {
+        menu.append($('<div class="item">').attr('data-value', v).text(labelFor ? labelFor(v) : v));
+    }
+    $(selector).dropdown('refresh');
+    if (selected != null && values.includes(selected)) {
+        $(selector).dropdown('set selected', selected);
+    }
+}
+
+ipcRenderer.on('libReleases', (event, data) => {
+    $('#refreshLibReleasesButton').removeClass('loading disabled');
+    if (data.error) {
+        $('#libReleasesError').text(t('downloads.releasesError', { error: data.error })).show();
+        return;
+    }
+    const previous = libReleases;
+    libReleases = data;
+
+    const byTag = {};
+    for (const r of data.releases) byTag[r.tag] = r;
+    const modularTags = data.releases.filter((r) => r.modular.length).map((r) => r.tag);
+    const keep = (sel, fallback, list) => {
+        const cur = previous ? $(sel).dropdown('get value') : '';
+        return list.includes(cur) ? cur : fallback;
+    };
+
+    data.sources.apothecary = { releases: data.releases.filter((r) => r.hasCore), platforms: data.corePlatforms };
+    fillCoreSource(previous);
+    fillDropdown('#modularReleaseDropdown', modularTags, keep('#modularReleaseDropdown', 'latest-modular', modularTags), (tag) => releaseLabel(byTag[tag]));
+    fillModularTargets();
+});
+
+function coreSource() {
+    return $('#coreSourceDropdown').dropdown('get value') || 'apothecary';
+}
+
+function fillCoreSource(keepSelection) {
+    if (!libReleases) return;
+    const source = coreSource();
+    const { releases, platforms, error } = libReleases.sources[source];
+    const tags = releases.map((r) => r.tag);
+    const byTag = {};
+    for (const r of releases) byTag[r.tag] = r;
+    const sorted = sortCorePlatforms(platforms);
+    const pick = (sel, fallback, list) => {
+        const cur = keepSelection ? $(sel).dropdown('get value') : '';
+        return list.includes(cur) ? cur : (list.includes(fallback) ? fallback : list[0]);
+    };
+    $('#coreReleaseDropdown').dropdown('clear');
+    fillDropdown('#coreReleaseDropdown', tags, pick('#coreReleaseDropdown', 'latest', tags), (tag) => releaseLabel(byTag[tag]));
+    $('#corePlatformDropdown').dropdown('clear');
+    fillDropdown('#corePlatformDropdown', sorted, pick('#corePlatformDropdown', libReleases.hostPlatform, sorted), corePlatformLabel);
+    const note = error ? t('downloads.releasesError', { error }) : t('downloads.sourceNote.' + source);
+    $('#coreSourceNote').text(note);
+}
+
+function currentModularRelease() {
+    const tag = $('#modularReleaseDropdown').dropdown('get value');
+    return libReleases && libReleases.releases.find((r) => r.tag === tag);
+}
+
+// scripts/<platform>/download_libs.sh folder -> readable name, in dropdown order
+const CORE_PLATFORM_LABELS = {
+    osx: 'macOS (OSX only)',
+    macos: 'macOS (including iOS, tvOS, catOS)',
+    ios: 'iOS',
+    tvos: 'tvOS',
+    vs: 'Windows (Visual Studio)',
+    msys2: 'Windows (MSYS2)',
+    linux: 'Linux',
+    linux64: 'Linux (x86_64)',
+    linuxaarch64: 'Linux (arm64)',
+    linuxarmv6l: 'Linux (armv6l)',
+    linuxarmv7l: 'Linux (armv7l)',
+    android: 'Android',
+    emscripten: 'Emscripten (Web)',
+};
+
+function corePlatformLabel(platform) {
+    return CORE_PLATFORM_LABELS[platform] || platform;
+}
+
+function sortCorePlatforms(platforms) {
+    const order = Object.keys(CORE_PLATFORM_LABELS);
+    const rank = (p) => (order.includes(p) ? order.indexOf(p) : order.length);
+    return [...platforms].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+}
+
+// osx_64 is one universal xcframework, so both archs share an entry
+function modularTargetLabel(target) {
+    const named = {
+        osx_64: 'macOS (OSX) (x86_64 / arm64)',
+        ios_64: 'iOS (arm64)',
+        vs_64: 'Windows (x64)',
+        vs_arm64: 'Windows (arm64)',
+        vs_arm64ec: 'Windows (arm64ec)',
+        emscripten_64: 'Emscripten (wasm64)',
+        emscripten_32: 'Emscripten (wasm32)',
+    };
+    if (named[target]) return named[target];
+    const linux = /^linux_([^_]+)(?:_(gcc\d+))?$/.exec(target);
+    if (linux) {
+        const arch = { '64': 'x86_64', aarch64: 'arm64', arm64: 'arm64' }[linux[1]] || linux[1];
+        return 'Linux (' + arch + ')' + (linux[2] ? ' ' + linux[2] : '');
+    }
+    return target;
+}
+
+// which installedPlatforms() name a package target fills - matches LIB_DIR_PLATFORMS in index.js
+function modularTargetPlatform(target) {
+    if (target.startsWith('osx')) return 'macOS';
+    if (target.startsWith('ios')) return 'iOS';
+    if (target.startsWith('tvos')) return 'tvOS';
+    if (target.startsWith('emscripten')) return 'Emscripten';
+    if (target.startsWith('vs')) return 'Windows';
+    const linux = /^linux_([^_]+)/.exec(target);
+    if (linux) return { '64': 'Linux', aarch64: 'Linux arm64', arm64: 'Linux arm64' }[linux[1]] || 'Linux ' + linux[1];
+    return target;
+}
+
+function fillModularTargets() {
+    const release = currentModularRelease();
+    const targets = release ? [...new Set(release.modular.map((l) => l.target))].sort() : [];
+    const current = $('#modularTargetDropdown').dropdown('get value');
+    const host = libReleases ? libReleases.hostModularTarget : '';
+    const selected = targets.includes(current) ? current : (targets.includes(host) ? host : targets[0]);
+    fillDropdown('#modularTargetDropdown', targets, selected, modularTargetLabel);
+    renderModularLibs();
+}
+
+function renderModularLibs() {
+    const release = currentModularRelease();
+    const target = $('#modularTargetDropdown').dropdown('get value');
+    const libs = release ? release.modular.filter((l) => l.target === target) : [];
+    libs.sort((a, b) => a.lib.toLowerCase().localeCompare(b.lib.toLowerCase()));
+
+    const names = new Set(libs.map((l) => l.asset));
+    modularSelection = new Set([...modularSelection].filter((n) => names.has(n)));
+
+    const body = $('#modularLibTable tbody');
+    body.empty();
+    if (!libs.length) {
+        body.append($('<tr>').append($('<td colspan="5">').text(release ? t('downloads.noneForTarget') : t('downloads.loading'))));
+    }
+    for (const l of libs) {
+        const checkbox = $('<input type="checkbox">').prop('checked', modularSelection.has(l.asset)).on('change', function () {
+            if (this.checked) modularSelection.add(l.asset); else modularSelection.delete(l.asset);
+            updateModularButton();
+        });
+        const current = modularTargetPlatform(target);
+        const status = l.platforms.length
+            ? l.platforms.map((p) => $('<span class="ui tiny label">').toggleClass('green', p === current).text(p))
+            : $('<span class="ui tiny basic label">').text(t('downloads.notInstalled'));
+        body.append($('<tr>').append(
+            $('<td>').append($('<div class="ui fitted checkbox">').append(checkbox, $('<label>'))),
+            $('<td>').append($('<strong>').text(l.lib)),
+            $('<td class="monospace">').text(l.installTo),
+            $('<td style="white-space: nowrap">').text(formatSize(l.size) + (l.verifiable ? ' ✓' : '')).attr('title', l.verifiable ? 'SHA-256' : ''),
+            $('<td>').append(status),
+        ));
+    }
+    $('#modularSelectAll').prop('checked', libs.length > 0 && modularSelection.size === libs.length);
+    updateModularButton();
+}
+
+function updateModularButton() {
+    $('#downloadModularLibsButton')
+        .text(t('button.downloadSelected', { count: modularSelection.size }))
+        .toggleClass('disabled', modularSelection.size === 0);
+}
+
+function downloadCoreLibs() {
+    const source = coreSource();
+    const tag = $('#coreReleaseDropdown').dropdown('get value');
+    const platform = $('#corePlatformDropdown').dropdown('get value');
+    if (!tag || !platform) return;
+    if (source === 'archive' && !confirm(t('downloads.archiveConfirm', { tag }))) return;
+    $('#downloadCoreLibsButton').addClass('loading disabled');
+    openConsoleForOperation();
+    ipcRenderer.send('downloadCoreLibs', { ofPath: $("#ofPath").val(), source, tag, platform });
+}
+
+ipcRenderer.on('downloadCoreLibsDone', () => {
+    $('#downloadCoreLibsButton').removeClass('loading disabled');
+    loadLibReleases(false);
+});
+
+function downloadModularLibs() {
+    const release = currentModularRelease();
+    if (!release || modularSelection.size === 0) return;
+    $('#downloadModularLibsButton').addClass('loading disabled');
+    openConsoleForOperation();
+    ipcRenderer.send('downloadModularLibs', { ofPath: $("#ofPath").val(), tag: release.tag, names: [...modularSelection] });
+}
+
+ipcRenderer.on('downloadModularLibsDone', () => {
+    $('#downloadModularLibsButton').removeClass('loading');
+    modularSelection.clear();
+    loadLibReleases(false);
 });
 
 function getOFVersion() {
