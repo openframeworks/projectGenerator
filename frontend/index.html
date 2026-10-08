@@ -302,6 +302,10 @@
 							<input type="text" placeholder="MY_FLAG,OTHER_FLAG=1..." id="customDefines">
 						</div>
 					</div>
+					<div class="field advanced" id="postBuildField" style="display: none">
+						<label data-i18n="field.postBuild">Post-build script:</label>
+						<textarea rows="2" id="postBuildScript" data-i18n-placeholder="placeholder.postBuild" placeholder="Runs after the project compiles - Xcode run script / VS post-build event"></textarea>
+					</div>
 					<div id="templateSection" class="field">
 						<label data-i18n="field.template">Template:</label>
 						<div class="ui multiple search selection dropdown" id="templatesDropdown">

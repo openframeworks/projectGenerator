@@ -531,15 +531,8 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 	}
 
 	else if (variable == ADDON_AFTER_COMPILE_SCRIPT) {
-		appendString(afterCompileScript, value, "; ", addToValue);
-	}
-}
-
-void ofAddon::appendString(std::string & variable, const std::string & value, const std::string & delimiter, bool addToVariable) {
-	if (!addToVariable || variable.empty()) {
-		variable = value;
-	} else {
-		variable += delimiter + value;
+		if (!addToValue) afterCompileScript.clear();
+		if (!value.empty()) afterCompileScript.emplace_back(value);
 	}
 }
 

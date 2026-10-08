@@ -148,5 +148,7 @@
   "field.glesVersion": "OpenGL ES version (iOS / tvOS):",
   "option.glesDefault": "Default (OpenGL ES 2.0)",
   "field.glVersion": "OpenGL version (desktop):",
-  "option.glDefault": "Default (OpenGL 2.1)"
+  "option.glDefault": "Default (OpenGL 2.1)",
+  "field.postBuild": "Post-build script:",
+  "placeholder.postBuild": "Runs after the project compiles - Xcode run script / VS post-build event"
 }

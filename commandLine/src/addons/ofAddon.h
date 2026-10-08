@@ -178,7 +178,7 @@ public:
 	vector < string > xcframeworks;		// osx only
 	vector < string > data;
 	vector < string > defines;
-	string afterCompileScript;
+	vector < string > afterCompileScript; // one entry per line, run after the build
 
 	vector < string > definesCMAKE;
 
@@ -214,7 +214,6 @@ private:
 	void parseVariableValue(const string & variable, const string & value, bool addToValue, const string & line, int lineNum);
 
 	void addReplaceString(std::string &variable, const std::string &value, bool addToVariable);
-	void appendString(std::string & variable, const std::string & value, const std::string & delimiter, bool addToVariable);
 //	void addReplaceStringPath(fs::path &variable, const std::string & value, bool addToVariable);
 	void addReplaceStringVector(std::vector<std::string> &variable, const std::string &value, const std::string &prefix, bool addToVariable);
 //	void addReplaceStringVectorPre(std::vector<std::string> &variable, const std::string &value, fs::path &prefix, bool addToVariable);

@@ -593,6 +593,22 @@ void visualStudioProject::addCPPFLAG(const string& cppflag, LibType libType){
 }
 
 
+void visualStudioProject::addAfterRule(const string & script) {
+	pugi::xpath_node_set commands = doc.select_nodes("//ItemDefinitionGroup/PostBuildEvent/Command");
+	if (commands.empty()) {
+		for (auto & event : doc.select_nodes("//ItemDefinitionGroup/PostBuildEvent")) {
+			event.node().append_child("Command").append_child(pugi::node_pcdata);
+		}
+		commands = doc.select_nodes("//ItemDefinitionGroup/PostBuildEvent/Command");
+	}
+	for (auto & command : commands) {
+		pugi::xml_node text = command.node().first_child();
+		if (!text) text = command.node().append_child(pugi::node_pcdata);
+		string value = ofTrim(text.value());
+		text.set_value((value.empty() ? script : value + "\n" + script).c_str());
+	}
+}
+
 void visualStudioProject::addDefine(const string& define, LibType libType) {
 	addCompileOption("PreprocessorDefinitions", define, ";", libType);
 	// pugi::xpath_node_set items = doc.select_nodes("//ItemDefinitionGroup");

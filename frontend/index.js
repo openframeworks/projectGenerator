@@ -1583,6 +1583,7 @@ ipcMain.on('downloadModularLibs', async (event, { ofPath, tag, names }) => {
  *     ofPath: string,
  *     verbose: boolean,
  *     defines: string,
+ *     postBuild: string,
  * }} GenerateArgument */
 
 /**
@@ -1600,6 +1601,7 @@ function generateFunction(event, generate) {
         projectPath,
         projectName,
         defines,
+        postBuild,
     } = generate;
 
     const args = [];
@@ -1632,6 +1634,10 @@ function generateFunction(event, generate) {
 
     if (defines != null && defines.length > 0) {
         args.push(`-D${defines}`);
+    }
+
+    if (postBuild != null && postBuild.length > 0) {
+        args.push(`-P${postBuild}`);
     }
 
     if (projectName != null && projectPath != null) {

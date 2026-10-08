@@ -1223,7 +1223,8 @@ function generate() {
         addonList: addonValueArray,  //$("#addonsDropdown").val();
         ofPath: $("#ofPath").val(),
         verbose: bVerbose,
-        defines: definesArr.join(',')
+        defines: definesArr.join(','),
+        postBuild: $('#postBuildScript').val().trim()
     };
 
     // console.log(gen);
@@ -1354,6 +1355,7 @@ function enableAdvancedMode(isAdvanced) {
         $('#ofPathButton').show();
         $('#emsdkField').show();
         $('#customDefinesField').show();
+        $('#postBuildField').show();
         if (!defaultSettings['detachConsole']) {
             $('body').addClass('showConsole');
         }
@@ -1372,6 +1374,7 @@ function enableAdvancedMode(isAdvanced) {
         $('#ofPathButton').hide();
         $('#emsdkField').hide();
         $('#customDefinesField').hide();
+        $('#postBuildField').hide();
         $("body").removeClass('advanced');
         $('a.updateMultiMenuOption').hide();
     }
