@@ -327,7 +327,8 @@ ipcRenderer.on('setTemplates', (event, arg) => {
             allowAdditions: false,
             fullTextSearch: 'exact',
             match: "text",
-            maxSelections: 1
+            maxSelections: 1,
+            onChange: () => updateRendererFieldVisibility()
         });
 
     // // set the template to default
@@ -990,6 +991,7 @@ function setup() {
         });
 
         $('#rendererDropdown').dropdown();
+        $('#webglDropdown, #glesDropdown').dropdown();
         $('#rendererDropdown').dropdown('set exactly', 'default');
 
         // reflesh template dropdown list depends on selected platforms
@@ -1198,6 +1200,14 @@ function generate() {
     if (rendererDefines[rendererChoice]) {
         definesArr.push(rendererDefines[rendererChoice]);
     }
+    const webgl = $('#webglDropdown').dropdown('get value');
+    if ($('#webglField').css('display') !== 'none' && webgl !== 'default') {
+        definesArr.push('OF_WEBGL_VERSION=' + webgl);
+    }
+    const gles = $('#glesDropdown').dropdown('get value');
+    if ($('#glesField').css('display') !== 'none' && gles !== 'default') {
+        definesArr.push('OF_GLES_VERSION=' + gles);
+    }
 
     const gen = {
         projectName: $("#projectName").val(),
@@ -1376,6 +1386,9 @@ function updateRendererFieldVisibility() {
     } else {
         $('#rendererField').hide();
     }
+    const selectedTemplates = ($("#templatesDropdown input").val() || '').trim().split(',');
+    $('#webglField').toggle(!!defaultSettings.advancedMode && selectedTemplates.includes('emscripten'));
+    $('#glesField').toggle(!!defaultSettings.advancedMode && selectedPlatforms.some((p) => ['ios', 'macos'].includes(p)));
 }
 
 //----------------------------------------

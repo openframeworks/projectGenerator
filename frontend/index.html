@@ -244,6 +244,33 @@
 							</div>
 						</div>
 					</div>
+					<div class="field" id="webglField" style="display: none">
+						<label data-i18n="field.webglVersion">WebGL version:</label>
+						<div class="ui selection dropdown" id="webglDropdown">
+							<input type="hidden" value="default">
+							<i class="dropdown icon"></i>
+							<div class="text" data-i18n="option.webglDefault">Default (WebGL 2)</div>
+							<div class="menu">
+								<div class="item" data-value="default" data-i18n="option.webglDefault">Default (WebGL 2)</div>
+								<div class="item" data-value="1">WebGL 1 (OpenGL ES 2.0)</div>
+								<div class="item" data-value="2">WebGL 2 (OpenGL ES 3.0)</div>
+							</div>
+						</div>
+					</div>
+					<div class="field" id="glesField" style="display: none">
+						<label data-i18n="field.glesVersion">OpenGL ES version (iOS / tvOS):</label>
+						<div class="ui selection dropdown" id="glesDropdown">
+							<input type="hidden" value="default">
+							<i class="dropdown icon"></i>
+							<div class="text" data-i18n="option.glesDefault">Default (OpenGL ES 2.0)</div>
+							<div class="menu">
+								<div class="item" data-value="default" data-i18n="option.glesDefault">Default (OpenGL ES 2.0)</div>
+								<div class="item" data-value="1">OpenGL ES 1.1</div>
+								<div class="item" data-value="2">OpenGL ES 2.0</div>
+								<div class="item" data-value="3">OpenGL ES 3.0</div>
+							</div>
+						</div>
+					</div>
 					<div class="field advanced" id="customDefinesField" style="display: none">
 						<label>Custom defines: &nbsp;
 							<a class="ui icon tooltip" href="#" data-content="Comma-separated preprocessor defines, e.g. MY_FLAG,OTHER_FLAG=1" data-position="right center">

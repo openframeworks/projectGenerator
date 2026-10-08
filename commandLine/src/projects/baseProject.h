@@ -101,7 +101,10 @@ public:
 	// public entry point for project-level preprocessor defines (e.g. -D/--defines on the
 	// CLI, or a GUI-driven renderer choice) - addDefine() itself stays protected since it's
 	// also invoked internally by addAddonDefines() for addon-provided defines
-	void addProjectDefine(const std::string & define, LibType libType = RELEASE_LIB) { addDefine(define, libType); }
+	void addProjectDefine(const std::string & define, LibType libType = RELEASE_LIB) {
+		addDefine(define, libType);
+		projectDefines.emplace_back(define);
+	}
 
 
 #ifdef OFADDON_OUTPUT_JSON_DEBUG
@@ -172,6 +175,7 @@ protected:
 
 	std::vector<ofAddon> addons;
 	std::vector<fs::path> extSrcPaths;
+	std::vector<std::string> projectDefines; // also written to config.make PROJECT_DEFINES for make builds
 	
 	//cached addons - if an addon is requested more than once, avoid loading from disk as it's quite slow
 	std::map<std::string,std::map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]
