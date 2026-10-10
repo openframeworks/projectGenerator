@@ -112,6 +112,7 @@ ofAddon::ofAddon(const ofAddon& other):
 	xcframeworks(other.xcframeworks),
 	data(other.data),
 	defines(other.defines),
+	afterCompileScript(other.afterCompileScript),
 	definesCMAKE(other.definesCMAKE),
 	name(other.name),
 	addonPath(other.addonPath),
@@ -527,6 +528,11 @@ void ofAddon::parseVariableValue(const string & variable, const string & value, 
 
 	else if (variable == ADDON_DEFINES) {
 		addReplaceStringVector(defines, value, emptyString, addToValue);
+	}
+
+	else if (variable == ADDON_AFTER_COMPILE_SCRIPT) {
+		if (!addToValue) afterCompileScript.clear();
+		if (!value.empty()) afterCompileScript.emplace_back(value);
 	}
 }
 

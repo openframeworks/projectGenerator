@@ -598,24 +598,20 @@ void xcodeProject::addCPPFLAG(const string & cppflag, LibType libType) {
 }
 
 void xcodeProject::addAfterRule(const string & rule) {
-	// return;
-	//	cout << ">>>>>> addAfterRule " << rule << endl;
-	addCommand("Add :objects:" + afterPhaseUUID + ":buildActionMask string 2147483647");
-	// addCommand("Add :objects:"+afterPhaseUUID+":files array");
-	// addCommand("Add :objects:"+afterPhaseUUID+":inputPaths array");
-	addCommand("Add :objects:" + afterPhaseUUID + ":isa string PBXShellScriptBuildPhase");
-	// addCommand("Add :objects:"+afterPhaseUUID+":outputPaths array");
-	addCommand("Add :objects:" + afterPhaseUUID + ":runOnlyForDeploymentPostprocessing string 0");
-	addCommand("Add :objects:" + afterPhaseUUID + ":shellPath string /bin/sh");
-	addCommand("Add :objects:" + afterPhaseUUID + ":showEnvVarsInLog string 0");
-
-	// ofStringReplace(rule, "\"", "\\\"");
-	// addCommand("Add :objects:"+afterPhaseUUID+":shellScript string \"" + rule + "\"");
-	addCommand("Add :objects:" + afterPhaseUUID + ":shellScript string " + rule);
-
-	// adding this phase to build phases array
-	// TODO: Check if nit needs another buildConfigurationListUUID for debug.
-	addCommand("Add :objects:" + buildConfigurationListUUID + ":buildPhases: string " + afterPhaseUUID);
+	// own phase per script, so several addons don't overwrite each other
+	string phaseUUID { generateUUID("afterCompile-" + rule) };
+	addCommand("Add :objects:" + phaseUUID + ":buildActionMask string 2147483647");
+	addCommand("Add :objects:" + phaseUUID + ":files array");
+	addCommand("Add :objects:" + phaseUUID + ":inputPaths array");
+	addCommand("Add :objects:" + phaseUUID + ":outputPaths array");
+	addCommand("Add :objects:" + phaseUUID + ":isa string PBXShellScriptBuildPhase");
+	addCommand("Add :objects:" + phaseUUID + ":name string Run Script - After Compile");
+	addCommand("Add :objects:" + phaseUUID + ":runOnlyForDeploymentPostprocessing string 0");
+	addCommand("Add :objects:" + phaseUUID + ":shellPath string /bin/sh");
+	addCommand("Add :objects:" + phaseUUID + ":showEnvVarsInLog string 0");
+	addCommand("Add :objects:" + phaseUUID + ":shellScript string " + rule);
+	// buildConfigurationListUUID is the app's PBXNativeTarget
+	addCommand("Add :objects:" + buildConfigurationListUUID + ":buildPhases: string " + phaseUUID);
 }
 
 void xcodeProject::addAddonLibs(const ofAddon & addon) {

@@ -85,6 +85,7 @@ const string ADDON_PKG_CONFIG_LIBRARIES = "ADDON_PKG_CONFIG_LIBRARIES";
 const string ADDON_FRAMEWORKS = "ADDON_FRAMEWORKS";
 const string ADDON_XCFRAMEWORKS = "ADDON_XCFRAMEWORKS";
 const string ADDON_DLLS_TO_COPY = "ADDON_DLLS_TO_COPY";
+const string ADDON_AFTER_COMPILE_SCRIPT = "ADDON_AFTER_COMPILE_SCRIPT";
 
 // About Metadata
 const string ADDON_NAME = "ADDON_NAME";
@@ -129,6 +130,7 @@ const vector<string> AddonProjectVariables = {
 	ADDON_FRAMEWORKS,
 	ADDON_DLLS_TO_COPY,
 	ADDON_ADDITIONAL_LIBS,
+	ADDON_AFTER_COMPILE_SCRIPT,
 };
 
 class ofAddon {
@@ -176,6 +178,7 @@ public:
 	vector < string > xcframeworks;		// osx only
 	vector < string > data;
 	vector < string > defines;
+	vector < string > afterCompileScript; // one entry per line, run after the build
 
 	vector < string > definesCMAKE;
 

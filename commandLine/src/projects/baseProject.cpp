@@ -586,6 +586,10 @@ void baseProject::addAddon(ofAddon & addon){
 
 	addAddonDefines(addon);
 	addAddonFrameworks(addon);
+	if (!addon.afterCompileScript.empty()) {
+		ofLogVerbose() << "adding addon after compile script: " << addon.name;
+		addAfterRule(ofJoinString(addon.afterCompileScript, "\n"));
+	}
     copyAddonData(addon);
     addAddonProps(addon);
 }
@@ -793,14 +797,12 @@ void baseProject::parseConfigMake(){
 		auto config = ofTrim(line);
 		if(config[0] == '#') continue;
 		if(config == "") continue;
-		if(config.find("=")!=string::npos){
-			auto varValue = ofSplitString(config,"=",true,true);
-			if(varValue.size()>1){
-				auto var = ofTrim(varValue[0]);
-				auto value = ofTrim(varValue[1]);
-				if (var=="PROJECT_AFTER_OSX" && target=="osx"){
-					addAfterRule(value);
-				}
+		auto eq = config.find("=");
+		if(eq!=string::npos){
+			auto var = ofTrim(config.substr(0, eq));
+			auto value = ofTrim(config.substr(eq + 1));
+			if (var=="PROJECT_AFTER_OSX" && target=="osx" && !value.empty()){
+				addAfterRule(value);
 			}
 		}
 	}

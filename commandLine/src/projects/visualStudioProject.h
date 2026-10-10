@@ -26,7 +26,7 @@ public:
 	}
     
     void addLDFLAG(const std::string& ldflag, LibType libType = RELEASE_LIB) override {}
-    void addAfterRule(const std::string& script) override {}
+    void addAfterRule(const std::string& script) override;
     
     
 

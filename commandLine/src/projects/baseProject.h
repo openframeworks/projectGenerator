@@ -105,6 +105,8 @@ public:
 		addDefine(define, libType);
 		projectDefines.emplace_back(define);
 	}
+	// project-level post-build script (-P/--postbuild)
+	void addProjectAfterRule(const std::string & script) { addAfterRule(script); }
 
 
 #ifdef OFADDON_OUTPUT_JSON_DEBUG

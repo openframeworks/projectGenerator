@@ -148,5 +148,7 @@
   "field.glesVersion": "OpenGL ES バージョン (iOS / tvOS):",
   "option.glesDefault": "デフォルト (OpenGL ES 2.0)",
   "field.glVersion": "OpenGL バージョン (デスクトップ):",
-  "option.glDefault": "デフォルト (OpenGL 2.1)"
+  "option.glDefault": "デフォルト (OpenGL 2.1)",
+  "field.postBuild": "ビルド後スクリプト:",
+  "placeholder.postBuild": "プロジェクトのコンパイル後に実行 - Xcode の Run Script / VS のビルド後イベント"
 }
