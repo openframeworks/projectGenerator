@@ -327,7 +327,8 @@ ipcRenderer.on('setTemplates', (event, arg) => {
             allowAdditions: false,
             fullTextSearch: 'exact',
             match: "text",
-            maxSelections: 1
+            maxSelections: 1,
+            onChange: () => updateRendererFieldVisibility()
         });
 
     // // set the template to default
@@ -990,6 +991,7 @@ function setup() {
         });
 
         $('#rendererDropdown').dropdown();
+        $('#glDropdown, #webglDropdown, #glesDropdown').dropdown();
         $('#rendererDropdown').dropdown('set exactly', 'default');
 
         // reflesh template dropdown list depends on selected platforms
@@ -1198,6 +1200,19 @@ function generate() {
     if (rendererDefines[rendererChoice]) {
         definesArr.push(rendererDefines[rendererChoice]);
     }
+    const gl = $('#glDropdown').dropdown('get value');
+    if ($('#glField').css('display') !== 'none' && gl !== 'default') {
+        const [major, minor] = gl.split('.');
+        definesArr.push('OF_GL_VERSION_MAJOR=' + major, 'OF_GL_VERSION_MINOR=' + minor);
+    }
+    const webgl = $('#webglDropdown').dropdown('get value');
+    if ($('#webglField').css('display') !== 'none' && webgl !== 'default') {
+        definesArr.push('OF_WEBGL_VERSION=' + webgl);
+    }
+    const gles = $('#glesDropdown').dropdown('get value');
+    if ($('#glesField').css('display') !== 'none' && gles !== 'default') {
+        definesArr.push('OF_GLES_VERSION=' + gles);
+    }
 
     const gen = {
         projectName: $("#projectName").val(),
@@ -1376,6 +1391,20 @@ function updateRendererFieldVisibility() {
     } else {
         $('#rendererField').hide();
     }
+    const selectedTemplates = ($("#templatesDropdown input").val() || '').trim().split(',');
+    $('#webglField').toggle(!!defaultSettings.advancedMode && selectedTemplates.includes('emscripten'));
+    $('#glesField').toggle(!!defaultSettings.advancedMode && selectedPlatforms.some((p) => ['ios', 'macos'].includes(p)));
+
+    const glPlatforms = ['osx', 'vs', 'msys2', 'linux', 'linux64', 'linuxarmv6l', 'linuxaarch64', 'vscode'];
+    $('#glField').toggle(!!defaultSettings.advancedMode && selectedPlatforms.some((p) => glPlatforms.includes(p)));
+    // Apple's OpenGL stops at 4.1
+    const maxGL = selectedPlatforms.includes('osx') ? 4.1 : 4.6;
+    $('#glDropdown .item').each(function () {
+        const v = $(this).attr('data-value');
+        $(this).toggle(v === 'default' || parseFloat(v) <= maxGL);
+    });
+    const gl = $('#glDropdown').dropdown('get value');
+    if (gl !== 'default' && parseFloat(gl) > maxGL) $('#glDropdown').dropdown('set selected', 'default');
 }
 
 //----------------------------------------

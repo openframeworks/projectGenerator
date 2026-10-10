@@ -142,5 +142,11 @@
   "downloads.sourceNote.apothecary": "Vorkompilierte Pakete von openframeworks/apothecary - das Standard-Layout von openFrameworks.",
   "downloads.sourceNote.oflibs": "ofWorks/ofLibs-Zips pro Bibliothek, installiert nach libs/<lib>. Auf ofWorks ausgerichtet, manche Bibliotheken brauchen evtl. Pfadanpassungen.",
   "downloads.sourceNote.archive": "Historische openFrameworks-Releases von libs.danoli3.com - führt das libs/ dieses Releases in diesen Checkout zusammen.",
-  "downloads.archiveConfirm": "Archiv {{tag}} ersetzt ganze libs/-Ordner (einschließlich libs/openFrameworks) durch die aus diesem Release. Fortfahren?"
+  "downloads.archiveConfirm": "Archiv {{tag}} ersetzt ganze libs/-Ordner (einschließlich libs/openFrameworks) durch die aus diesem Release. Fortfahren?",
+  "field.webglVersion": "WebGL-Version:",
+  "option.webglDefault": "Standard (WebGL 2)",
+  "field.glesVersion": "OpenGL-ES-Version (iOS / tvOS):",
+  "option.glesDefault": "Standard (OpenGL ES 2.0)",
+  "field.glVersion": "OpenGL-Version (Desktop):",
+  "option.glDefault": "Standard (OpenGL 2.1)"
 }

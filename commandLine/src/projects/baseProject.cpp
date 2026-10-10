@@ -265,6 +265,7 @@ bool baseProject::save(){
 
 	vector <string> lines = fileToStrings(projectDir / "config.make");
 	std::ofstream saveConfig(projectDir / "config.make");
+	bool bWroteDefines = false;
 
 	for (auto & str : lines) {
 		//add the of root path
@@ -282,9 +283,19 @@ bool baseProject::save(){
 				ofLog(OF_LOG_VERBOSE) << " adding PROJECT_EXTERNAL_SOURCE_PATHS to config" << extSrcPaths[d].generic_string() << std::endl;
 				saveConfig << "PROJECT_EXTERNAL_SOURCE_PATHS" << (d == 0 ? " = " : " += ") << extSrcPaths[d].generic_string() << std::endl;
 			}
+		}
+		// make builds (emscripten, linux, msys2) only see defines through config.make
+		else if( projectDefines.size() && (str.rfind("# PROJECT_DEFINES =", 0) == 0 || str.rfind("PROJECT_DEFINES =", 0) == 0) ){
+			if (!bWroteDefines) {
+				saveConfig << "PROJECT_DEFINES = " << ofJoinString(projectDefines, " ") << std::endl;
+				bWroteDefines = true;
+			}
 		} else {
 		   saveConfig << str << std::endl;
 		}
+	}
+	if (projectDefines.size() && !bWroteDefines && lines.size()) {
+		saveConfig << "PROJECT_DEFINES = " << ofJoinString(projectDefines, " ") << std::endl;
 	}
 #ifdef OFADDON_OUTPUT_JSON_DEBUG
     saveAddonsToJson();

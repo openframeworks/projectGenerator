@@ -142,5 +142,11 @@
   "downloads.sourceNote.apothecary": "openframeworks/apothecary 预编译包 - 标准的 openFrameworks 目录结构。",
   "downloads.sourceNote.oflibs": "ofWorks/ofLibs 单库 zip，安装到 libs/<lib>。面向 ofWorks，部分库可能需要调整路径。",
   "downloads.sourceNote.archive": "来自 libs.danoli3.com 的历史 openFrameworks 版本 - 将该版本的 libs/ 合并到当前目录。",
-  "downloads.archiveConfirm": "归档 {{tag}} 会用该版本的内容整体替换 libs/ 下的文件夹（包括 libs/openFrameworks）。是否继续？"
+  "downloads.archiveConfirm": "归档 {{tag}} 会用该版本的内容整体替换 libs/ 下的文件夹（包括 libs/openFrameworks）。是否继续？",
+  "field.webglVersion": "WebGL 版本：",
+  "option.webglDefault": "默认（WebGL 2）",
+  "field.glesVersion": "OpenGL ES 版本（iOS / tvOS）：",
+  "option.glesDefault": "默认（OpenGL ES 2.0）",
+  "field.glVersion": "OpenGL 版本（桌面）：",
+  "option.glDefault": "默认（OpenGL 2.1）"
 }

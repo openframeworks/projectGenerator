@@ -142,5 +142,11 @@
   "downloads.sourceNote.apothecary": "openframeworks/apothecary 미리 빌드된 패키지 - 표준 openFrameworks 구조입니다.",
   "downloads.sourceNote.oflibs": "ofWorks/ofLibs 라이브러리별 zip을 libs/<lib>에 설치합니다. ofWorks 중심이라 일부 라이브러리는 경로 조정이 필요할 수 있습니다.",
   "downloads.sourceNote.archive": "libs.danoli3.com의 이전 openFrameworks 릴리스 - 해당 릴리스의 libs/를 이 체크아웃에 병합합니다.",
-  "downloads.archiveConfirm": "아카이브 {{tag}}은(는) libs/ 폴더 전체(libs/openFrameworks 포함)를 해당 릴리스의 것으로 교체합니다. 계속할까요?"
+  "downloads.archiveConfirm": "아카이브 {{tag}}은(는) libs/ 폴더 전체(libs/openFrameworks 포함)를 해당 릴리스의 것으로 교체합니다. 계속할까요?",
+  "field.webglVersion": "WebGL 버전:",
+  "option.webglDefault": "기본값 (WebGL 2)",
+  "field.glesVersion": "OpenGL ES 버전 (iOS / tvOS):",
+  "option.glesDefault": "기본값 (OpenGL ES 2.0)",
+  "field.glVersion": "OpenGL 버전 (데스크톱):",
+  "option.glDefault": "기본값 (OpenGL 2.1)"
 }
