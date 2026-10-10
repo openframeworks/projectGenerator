@@ -51,6 +51,7 @@ jobs:
             echo "PRERELEASE=false" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
             echo "RELEASE=nightly" >> $GITHUB_ENV
+            echo "DATED_RELEASE=nightly-$(TZ=UTC git log -1 --format=%cd --date=format-local:%Y%m%d)-${GITHUB_SHA::7}" >> $GITHUB_ENV
             echo "PRERELEASE=false" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
             echo "RELEASE=bleeding" >> $GITHUB_ENV
@@ -103,10 +104,28 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
           files: ../openFrameworks/apps/projectGenerator/commandLine/bin/projectGenerator-vs.zip
+      - name: Dated Nightly Release CMD
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2.0.8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ env.DATED_RELEASE }}
+          target_commitish: ${{ github.sha }}
+          make_latest: false
+          files: ../openFrameworks/apps/projectGenerator/commandLine/bin/projectGenerator-vs.zip
       - name: Update Release GUI
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
         uses: softprops/action-gh-release@v2.0.8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
+          files: ../openFrameworks/apps/projectGenerator/frontend/dist/projectGenerator-vs-gui.zip
+      - name: Dated Nightly Release GUI
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2.0.8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ env.DATED_RELEASE }}
+          target_commitish: ${{ github.sha }}
+          make_latest: false
           files: ../openFrameworks/apps/projectGenerator/frontend/dist/projectGenerator-vs-gui.zip

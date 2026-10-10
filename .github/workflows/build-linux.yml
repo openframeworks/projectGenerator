@@ -46,6 +46,7 @@ jobs:
             echo "PRERELEASE=false" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
             echo "RELEASE=nightly" >> $GITHUB_ENV
+            echo "DATED_RELEASE=nightly-$(TZ=UTC git log -1 --format=%cd --date=format-local:%Y%m%d)-${GITHUB_SHA::7}" >> $GITHUB_ENV
             echo "PRERELEASE=false" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
             echo "RELEASE=bleeding" >> $GITHUB_ENV
@@ -113,6 +114,15 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
           files: projectGenerator-linux.tar.bz2
+      - name: Dated Nightly Release Linux
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2.0.8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ env.DATED_RELEASE }}
+          target_commitish: ${{ github.sha }}
+          make_latest: false
+          files: projectGenerator-linux.tar.bz2
 
       - name: Update Release Linux gui
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
@@ -120,6 +130,15 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
+          files: projectGenerator-linux-gui.gz
+      - name: Dated Nightly Release Linux gui
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2.0.8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ env.DATED_RELEASE }}
+          target_commitish: ${{ github.sha }}
+          make_latest: false
           files: projectGenerator-linux-gui.gz
 
       - name: Update Latest Tag - DateTime
@@ -149,6 +168,7 @@ jobs:
             echo "RELEASE=${{ github.ref_name }}" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
             echo "RELEASE=nightly" >> $GITHUB_ENV
+            echo "DATED_RELEASE=nightly-$(TZ=UTC git log -1 --format=%cd --date=format-local:%Y%m%d)-${GITHUB_SHA::7}" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
             echo "RELEASE=bleeding" >> $GITHUB_ENV
           else
@@ -195,6 +215,15 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
           files: projectGenerator-linux-ubuntu22.tar.bz2
+      - name: Dated Nightly Release Linux ubuntu22
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2.0.8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ env.DATED_RELEASE }}
+          target_commitish: ${{ github.sha }}
+          make_latest: false
+          files: projectGenerator-linux-ubuntu22.tar.bz2
 
       - name: Update Release Linux gui ubuntu22
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
@@ -202,6 +231,15 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
+          files: projectGenerator-linux-ubuntu22-gui.gz
+      - name: Dated Nightly Release Linux gui ubuntu22
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2.0.8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ env.DATED_RELEASE }}
+          target_commitish: ${{ github.sha }}
+          make_latest: false
           files: projectGenerator-linux-ubuntu22-gui.gz
 
   # Native arm64 build for Raspberry Pi (64-bit Raspberry Pi OS / Ubuntu on Pi 3+).
@@ -225,6 +263,7 @@ jobs:
             echo "RELEASE=${{ github.ref_name }}" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
             echo "RELEASE=nightly" >> $GITHUB_ENV
+            echo "DATED_RELEASE=nightly-$(TZ=UTC git log -1 --format=%cd --date=format-local:%Y%m%d)-${GITHUB_SHA::7}" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
             echo "RELEASE=bleeding" >> $GITHUB_ENV
           else
@@ -271,6 +310,15 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
           files: projectGenerator-linux-arm64.tar.bz2
+      - name: Dated Nightly Release Linux arm64
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2.0.8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ env.DATED_RELEASE }}
+          target_commitish: ${{ github.sha }}
+          make_latest: false
+          files: projectGenerator-linux-arm64.tar.bz2
 
       - name: Update Release Linux gui arm64
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
@@ -278,4 +326,13 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
+          files: projectGenerator-linux-arm64-gui.gz
+      - name: Dated Nightly Release Linux gui arm64
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2.0.8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ env.DATED_RELEASE }}
+          target_commitish: ${{ github.sha }}
+          make_latest: false
           files: projectGenerator-linux-arm64-gui.gz
