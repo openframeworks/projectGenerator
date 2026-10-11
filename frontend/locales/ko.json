@@ -150,5 +150,8 @@
   "field.glVersion": "OpenGL 버전 (데스크톱):",
   "option.glDefault": "기본값 (OpenGL 2.1)",
   "field.postBuild": "빌드 후 스크립트:",
-  "placeholder.postBuild": "프로젝트 컴파일 후 실행 - Xcode Run Script / VS 빌드 후 이벤트"
+  "placeholder.postBuild": "프로젝트 컴파일 후 실행 - Xcode Run Script / VS 빌드 후 이벤트",
+  "field.msys2Env": "MSYS2 환경 (VS Code):",
+  "option.msys2Ucrt64": "UCRT64 (기본값)",
+  "option.msys2Mingw64": "MINGW64 (레거시)"
 }

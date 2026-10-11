@@ -306,6 +306,19 @@
 						<label data-i18n="field.postBuild">Post-build script:</label>
 						<textarea rows="2" id="postBuildScript" data-i18n-placeholder="placeholder.postBuild" placeholder="Runs after the project compiles - Xcode run script / VS post-build event"></textarea>
 					</div>
+					<div class="field" id="msys2EnvField" style="display: none">
+						<label data-i18n="field.msys2Env">MSYS2 environment (VS Code):</label>
+						<div class="ui selection dropdown" id="msys2EnvDropdown">
+							<input type="hidden" id="msys2EnvValue" value="ucrt64">
+							<i class="dropdown icon"></i>
+							<div class="text">UCRT64</div>
+							<div class="menu">
+								<div class="item" data-value="ucrt64" data-i18n="option.msys2Ucrt64">UCRT64 (default)</div>
+								<div class="item" data-value="mingw64" data-i18n="option.msys2Mingw64">MINGW64 (legacy)</div>
+								<div class="item" data-value="clang64">CLANG64</div>
+							</div>
+						</div>
+					</div>
 					<div id="templateSection" class="field">
 						<label data-i18n="field.template">Template:</label>
 						<div class="ui multiple search selection dropdown" id="templatesDropdown">

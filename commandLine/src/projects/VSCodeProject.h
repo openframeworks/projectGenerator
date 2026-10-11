@@ -26,12 +26,15 @@ public:
     void addCPPFLAG(const std::string& cppflag, LibType libType = RELEASE_LIB) override {}
     void addAfterRule(const std::string& script) override {}
     void addDefine(const std::string& define, LibType libType = RELEASE_LIB) override {}
-    
+
+    void setMsys2Environment(const std::string & env) override { msys2Environment = env; }
 
     void addAddonBegin(const ofAddon& addon) override;
 
 	static std::string LOG_NAME;
 
 private:
+
+	std::string msys2Environment = "ucrt64";
 
 };

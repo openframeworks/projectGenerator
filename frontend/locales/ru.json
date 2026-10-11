@@ -150,5 +150,8 @@
   "field.glVersion": "Версия OpenGL (десктоп):",
   "option.glDefault": "По умолчанию (OpenGL 2.1)",
   "field.postBuild": "Скрипт после сборки:",
-  "placeholder.postBuild": "Запускается после компиляции проекта - Run Script в Xcode / событие после сборки в VS"
+  "placeholder.postBuild": "Запускается после компиляции проекта - Run Script в Xcode / событие после сборки в VS",
+  "field.msys2Env": "Среда MSYS2 (VS Code):",
+  "option.msys2Ucrt64": "UCRT64 (по умолчанию)",
+  "option.msys2Mingw64": "MINGW64 (устаревшая)"
 }
