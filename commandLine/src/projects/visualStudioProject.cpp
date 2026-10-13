@@ -330,16 +330,9 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 void visualStudioProject::addClCompileAsC(const string & srcFileString, const string & folderString){
 	pugi::xml_node node = appendValue(doc, "ClCompile", "Include", srcFileString);
 
+	// overrides openFrameworksCommon.props CompileAsCpp for every configuration/platform
 	if(!node.child("CompileAs")){
-		static const std::vector<string> configurations { "Debug", "Release" };
-		static const std::vector<string> platforms { "x64", "ARM64", "ARM64EC" };
-		for(const auto & configuration : configurations){
-			for(const auto & platformName : platforms){
-				pugi::xml_node compileAs = node.append_child("CompileAs");
-				compileAs.append_attribute("Condition").set_value(("'$(Configuration)|$(Platform)'=='" + configuration + "|" + platformName + "'").c_str());
-				compileAs.set_value("CompileAsC");
-			}
-		}
+		node.append_child("CompileAs").text().set("CompileAsC");
 	}
 
 	pugi::xml_node nodeFilters = filterXmlDoc.select_node("//ItemGroup[ClCompile]").node();
