@@ -1273,6 +1273,15 @@ function githubJSON(url) {
     });
 }
 
+// rolling tags (latest, latest-modular) get assets re-uploaded without re-publishing the release,
+// so date them by the newest osx core asset, else the newest asset
+function releaseBuildDate(r) {
+    const files = r.assets.filter((a) => !/\.(sha256|manifest\.json)$/.test(a.name));
+    const osx = files.filter((a) => /^openFrameworksLibs_.*_osx/.test(a.name));
+    const dates = (osx.length ? osx : files).map((a) => a.updated_at).filter(Boolean).sort();
+    return dates.length ? dates[dates.length - 1] : r.published_at;
+}
+
 function fetchApothecaryReleases(refresh) {
     if (apothecaryReleases && !refresh) return Promise.resolve(apothecaryReleases);
     return githubJSON(`https://api.github.com/repos/${APOTHECARY_REPO}/releases?per_page=50`).then((releases) => {
@@ -1281,6 +1290,7 @@ function fetchApothecaryReleases(refresh) {
             name: r.name || r.tag_name,
             prerelease: r.prerelease,
             published: r.published_at,
+            built: releaseBuildDate(r),
             assets: r.assets.map((a) => ({
                 name: a.name,
                 size: a.size,
@@ -1388,7 +1398,7 @@ let archiveVersions = null;
 function fetchOfLibsReleases(refresh) {
     if (ofLibsReleases && !refresh) return Promise.resolve(ofLibsReleases);
     return githubJSON(`https://api.github.com/repos/${OFLIBS_REPO}/releases?per_page=30`).then((releases) => {
-        ofLibsReleases = releases.map((r) => ({ tag: r.tag_name, prerelease: r.prerelease, published: r.published_at }));
+        ofLibsReleases = releases.map((r) => ({ tag: r.tag_name, prerelease: r.prerelease, published: r.published_at, built: releaseBuildDate(r) }));
         return ofLibsReleases;
     });
 }

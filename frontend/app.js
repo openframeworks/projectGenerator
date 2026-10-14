@@ -1702,7 +1702,8 @@ function formatSize(bytes) {
 }
 
 function releaseLabel(r) {
-    const date = r.published ? ' (' + r.published.slice(0, 10) + ')' : '';
+    const when = r.built || r.published;
+    const date = when ? ' (' + when.slice(0, 10) + ')' : '';
     return r.tag + date + (r.prerelease ? ' - ' + t('downloads.prerelease') : '');
 }
 
