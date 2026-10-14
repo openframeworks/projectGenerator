@@ -63,7 +63,7 @@ constexpr option::Descriptor usage[] = {
 
 	{ DEFINES, 0, "D", "defines", option::Arg::Optional, "  --defines, -D  \tpreprocessor defines list (such as OF_USE_ANGLE=1,MY_FLAG)" },
 	{ POSTBUILD, 0, "P", "postbuild", option::Arg::Optional, "  --postbuild, -P  \tscript to run after the project compiles (Xcode run script / VS post-build event)" },
-	{ MSYS2ENV, 0, "k", "msys2env", option::Arg::Optional, "  --msys2env, -k  \tMSYS2 environment for the VSCode target: ucrt64 (default) | mingw64 | clang64" },
+	{ MSYS2ENV, 0, "k", "msys2env", option::Arg::Optional, "  --msys2env, -k  \tMSYS2 environment for the msys2 / VSCode targets: ucrt64 (default) | mingw64 | clang64" },
 
 	{ 0, 0, 0, 0, 0, 0 }
 };

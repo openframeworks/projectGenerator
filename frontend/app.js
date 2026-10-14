@@ -1412,7 +1412,7 @@ function updateRendererFieldVisibility() {
     const gl = $('#glDropdown').dropdown('get value');
     if (gl !== 'default' && parseFloat(gl) > maxGL) $('#glDropdown').dropdown('set selected', 'default');
 
-    $('#msys2EnvField').toggle(selectedPlatforms.includes('vscode'));
+    $('#msys2EnvField').toggle(selectedPlatforms.some((p) => ['vscode', 'msys2'].includes(p)));
 }
 
 //----------------------------------------
