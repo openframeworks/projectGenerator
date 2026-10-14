@@ -858,6 +858,7 @@ ipcMain.on('isOFProjectFolder', (event, project) => {
                 
                 //read the valid lines
                 let extraSrcPathsCount = 0;
+                let emscriptenWasm = '32';
                 
                 projectExtra.forEach((el, i) => {
                     //remove spaces
@@ -885,13 +886,18 @@ ipcMain.on('isOFProjectFolder', (event, project) => {
 
                         console.log("Reading config pair. Macro: " + macro + " Value: " + value);
                         
+                        if (macro === 'PROJECT_EMSCRIPTEN_WASM') {
+                            emscriptenWasm = value;
+                        } else if (macro === 'EMSCRIPTEN_MEMORY64' && value === '1') {
+                            emscriptenWasm = '64';
+                        }
                         if(macro.startsWith('PROJECT_EXTERNAL_SOURCE_PATHS')) {
                             event.sender.send('setSourceExtraPath', [value, extraSrcPathsCount]);
                             extraSrcPathsCount++;
                         }
                     }
                 });
-                
+                event.sender.send('setEmscriptenWasm', emscriptenWasm);
             }
             
         } else {
@@ -1602,6 +1608,7 @@ ipcMain.on('downloadModularLibs', async (event, { ofPath, tag, names }) => {
  *     defines: string,
  *     postBuild: string,
  *     msys2Env: string,
+ *     emscriptenWasm: string,
  * }} GenerateArgument */
 
 /**
@@ -1621,6 +1628,7 @@ function generateFunction(event, generate) {
         defines,
         postBuild,
         msys2Env,
+        emscriptenWasm,
     } = generate;
 
     const args = [];
@@ -1661,6 +1669,10 @@ function generateFunction(event, generate) {
 
     if (msys2Env != null && msys2Env.length > 0) {
         args.push(`-k${msys2Env}`);
+    }
+
+    if (emscriptenWasm === '32' || emscriptenWasm === '64') {
+        args.push(`-W${emscriptenWasm}`);
     }
 
     if (projectName != null && projectPath != null) {

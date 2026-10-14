@@ -209,6 +209,12 @@ ipcRenderer.on('setGenerateMode', (event, arg) => {
 });
 
 //-------------------------------------------
+// existing project's PROJECT_EMSCRIPTEN_WASM, so updating keeps it
+ipcRenderer.on('setEmscriptenWasm', (event, bits) => {
+    $('#wasmDropdown').dropdown('set selected', bits === '64' ? '64' : '32');
+    $('#wasmNote').toggle(bits === '64');
+});
+
 ipcRenderer.on('importProjectSettings', (event, settings) => {
     $("#projectPath").val(settings.projectPath);
     $("#projectName").val(settings.projectName).trigger('change'); // change triggers addon scanning
@@ -992,6 +998,7 @@ function setup() {
 
         $('#rendererDropdown').dropdown();
         $('#glDropdown, #webglDropdown, #glesDropdown').dropdown();
+        $('#wasmDropdown').dropdown({ onChange: (value) => $('#wasmNote').toggle(value === '64') });
         $('#rendererDropdown').dropdown('set exactly', 'default');
         $('#msys2EnvDropdown').dropdown();
         $('#msys2EnvDropdown').dropdown('set exactly', 'ucrt64');
@@ -1227,7 +1234,8 @@ function generate() {
         verbose: bVerbose,
         defines: definesArr.join(','),
         postBuild: $('#postBuildScript').val().trim(),
-        msys2Env: $('#msys2EnvField').css('display') !== 'none' ? $('#msys2EnvDropdown').dropdown('get value') : ''
+        msys2Env: $('#msys2EnvField').css('display') !== 'none' ? $('#msys2EnvDropdown').dropdown('get value') : '',
+        emscriptenWasm: $('#wasmField').css('display') !== 'none' ? $('#wasmDropdown').dropdown('get value') : ''
     };
 
     // console.log(gen);
@@ -1399,6 +1407,7 @@ function updateRendererFieldVisibility() {
     }
     const selectedTemplates = ($("#templatesDropdown input").val() || '').trim().split(',');
     $('#webglField').toggle(!!defaultSettings.advancedMode && selectedTemplates.includes('emscripten'));
+    $('#wasmField').toggle(!!defaultSettings.advancedMode && selectedTemplates.includes('emscripten'));
     $('#glesField').toggle(!!defaultSettings.advancedMode && selectedPlatforms.some((p) => ['ios', 'macos'].includes(p)));
 
     const glPlatforms = ['osx', 'vs', 'msys2', 'linux', 'linux64', 'linuxarmv6l', 'linuxaarch64', 'vscode'];

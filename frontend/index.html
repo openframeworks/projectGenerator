@@ -278,6 +278,19 @@
 							</div>
 						</div>
 					</div>
+					<div class="field" id="wasmField" style="display: none">
+						<label data-i18n="field.emscriptenWasm">WebAssembly (Emscripten):</label>
+						<div class="ui selection dropdown" id="wasmDropdown">
+							<input type="hidden" value="32">
+							<i class="dropdown icon"></i>
+							<div class="text" data-i18n="option.wasm32">32-bit (default)</div>
+							<div class="menu">
+								<div class="item" data-value="32" data-i18n="option.wasm32">32-bit (default)</div>
+								<div class="item" data-value="64" data-i18n="option.wasm64">64-bit (wasm64, MEMORY64)</div>
+							</div>
+						</div>
+						<p class="ui small grey text" id="wasmNote" style="display: none" data-i18n="note.wasm64">Needs wasm64 libraries: run BITS=64 scripts/emscripten/download_libs.sh (replaces the installed lib/emscripten libraries).</p>
+					</div>
 					<div class="field" id="glesField" style="display: none">
 						<label data-i18n="field.glesVersion">OpenGL ES version (iOS / tvOS):</label>
 						<div class="ui selection dropdown" id="glesDropdown">

@@ -110,6 +110,23 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(string target)
 	return templates;
 }
 
+// PROJECT_EMSCRIPTEN_WASM from config.make; the old EMSCRIPTEN_MEMORY64=1 also means 64
+static std::string readEmscriptenWasm(const fs::path & configMake) {
+	std::string bits;
+	if (!fs::exists(configMake)) return bits;
+	for (auto & line : fileToStrings(configMake)) {
+		auto config = ofTrim(line);
+		if (config.empty() || config[0] == '#') continue;
+		auto eq = config.find('=');
+		if (eq == std::string::npos) continue;
+		auto var = ofTrim(config.substr(0, eq));
+		auto value = ofTrim(config.substr(eq + 1));
+		if (var == "PROJECT_EMSCRIPTEN_WASM") bits = value;
+		else if (var == "EMSCRIPTEN_MEMORY64" && value == "1" && bits.empty()) bits = "64";
+	}
+	return bits;
+}
+
 bool baseProject::create(const fs::path & _path, string templateName){
 //	alert("baseProject::create " + path.string() + " : " + templateName, 35);
 	auto path = _path; // just because it is const
@@ -152,6 +169,27 @@ bool baseProject::create(const fs::path & _path, string templateName){
 	projectPath = normalizePath(projectPath);
 	ofLogNotice() << "projectPath: [" << projectPath << "]";
 	projectName = projectPath.filename().string();
+
+	// read before template copies can replace config.make
+	emscriptenWasm = emscriptenWasmOption.empty() ? readEmscriptenWasm(projectDir / "config.make") : emscriptenWasmOption;
+	if (!emscriptenWasm.empty()) {
+		ofLogNotice() << "{ \"emscriptenWasm\": \"" << emscriptenWasm << "\" }";
+	}
+	if (emscriptenWasm == "64") {
+		bool bHasWasm64Libs = false;
+		if (fs::exists(getOFRoot() / "libs")) {
+			for (auto & lib : fs::directory_iterator(getOFRoot() / "libs")) {
+				if (fs::exists(lib.path() / "lib" / "emscripten" / "WASM64")) {
+					bHasWasm64Libs = true;
+					break;
+				}
+			}
+		}
+		if (!bHasWasm64Libs) {
+			ofLogWarning() << "wasm64: no libs/*/lib/emscripten/WASM64 found. Run BITS=64 scripts/emscripten/download_libs.sh (replaces the installed lib/emscripten libs)";
+		}
+	}
+
 	bool bDoesSrcDirExist = false;
 	fs::path projectSrc { projectDir / "src" };
 	if (fs::exists(projectSrc) && fs::is_directory(projectSrc)) {
@@ -266,6 +304,7 @@ bool baseProject::save(){
 	vector <string> lines = fileToStrings(projectDir / "config.make");
 	std::ofstream saveConfig(projectDir / "config.make");
 	bool bWroteDefines = false;
+	bool bWroteWasm = false;
 
 	for (auto & str : lines) {
 		//add the of root path
@@ -290,12 +329,26 @@ bool baseProject::save(){
 				saveConfig << "PROJECT_DEFINES = " << ofJoinString(projectDefines, " ") << std::endl;
 				bWroteDefines = true;
 			}
+		}
+		// emscripten wasm32 / wasm64: 32 is the makefile default, so it leaves the line commented
+		else if( !emscriptenWasm.empty() && (str.rfind("# PROJECT_EMSCRIPTEN_WASM =", 0) == 0 || str.rfind("PROJECT_EMSCRIPTEN_WASM =", 0) == 0) ){
+			if (!bWroteWasm) {
+				saveConfig << (emscriptenWasm == "64" ? "PROJECT_EMSCRIPTEN_WASM = 64" : "# PROJECT_EMSCRIPTEN_WASM = 64") << std::endl;
+				bWroteWasm = true;
+			}
+		}
+		else if( emscriptenWasm == "32" && str.rfind("EMSCRIPTEN_MEMORY64", 0) == 0 ){
+			saveConfig << "# " << str << std::endl;
 		} else {
 		   saveConfig << str << std::endl;
 		}
 	}
 	if (projectDefines.size() && !bWroteDefines && lines.size()) {
 		saveConfig << "PROJECT_DEFINES = " << ofJoinString(projectDefines, " ") << std::endl;
+	}
+	if (emscriptenWasm == "64" && !bWroteWasm && lines.size()) {
+		saveConfig << "# emscripten: 32 (default) or 64 (wasm64, MEMORY64)" << std::endl;
+		saveConfig << "PROJECT_EMSCRIPTEN_WASM = 64" << std::endl;
 	}
 #ifdef OFADDON_OUTPUT_JSON_DEBUG
     saveAddonsToJson();
