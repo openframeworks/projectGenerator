@@ -69,6 +69,11 @@ jobs:
       - name: Test cmdline
         run: ./../openFrameworks/apps/projectGenerator/scripts/linux/test_cmdline.sh
 
+      - name: Build emptyExample and allAddonsExample
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        shell: bash
+        run: ../openFrameworks/apps/projectGenerator/scripts/ci_build_examples.sh linux64
+
       - name: List output directory
         run: ls -lah ./../openFrameworks/apps/projectGenerator/commandLine/bin
 

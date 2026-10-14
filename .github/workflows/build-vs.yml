@@ -81,6 +81,11 @@ jobs:
         run: 
           ../openFrameworks/apps/projectGenerator/scripts/vs/test_cmdline.sh
 
+      - name: Build emptyExample and allAddonsExample
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        shell: bash
+        run: ../openFrameworks/apps/projectGenerator/scripts/ci_build_examples.sh vs
+
       - name: Build and Package projectGenerator VS GUI
         shell: bash
         run: |
