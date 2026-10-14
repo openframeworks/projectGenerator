@@ -1439,6 +1439,7 @@ ipcMain.on('getLibReleases', async (event, { ofPath, refresh }) => {
                 name: r.name,
                 prerelease: r.prerelease,
                 published: r.published,
+                built: r.built,
                 hasCore: r.assets.some((a) => a.name.startsWith('openFrameworksLibs_')),
                 modular: modularLibsFor(r, ofPath).map(({ asset, ...lib }) => ({ ...lib, asset: asset.name, size: asset.size, verifiable: !!asset.digest })),
             })),
