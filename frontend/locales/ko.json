@@ -47,7 +47,7 @@
   "field.platform": "플랫폼:",
   "field.cmdLineVersion": "commandLine PG 버전:",
   "field.guiVersion": "GUI 버전:",
-  "field.language": "언어:",
+  "field.language": "언어 (Language):",
   "msgBox.ofPathWrong.header": "openFrameworks 경로가 잘못되었습니다",
   "msgBox.ofPathWrong.body": "OF 경로를 openFrameworks의 루트(\"addons\", \"libs\" 등이 있는 폴더)로 설정하세요",
   "checkbox.verboseOutput": "상세 출력",

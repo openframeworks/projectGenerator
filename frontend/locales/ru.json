@@ -47,7 +47,7 @@
   "field.platform": "Платформа:",
   "field.cmdLineVersion": "Версия PG (commandLine):",
   "field.guiVersion": "Версия интерфейса:",
-  "field.language": "Язык:",
+  "field.language": "Язык (Language):",
   "msgBox.ofPathWrong.header": "Путь к openFrameworks указан неверно",
   "msgBox.ofPathWrong.body": "Укажите путь OF на корень openFrameworks (папку, содержащую \"addons\", \"libs\" и т. д.)",
   "checkbox.verboseOutput": "Подробный вывод",

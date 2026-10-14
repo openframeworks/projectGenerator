@@ -47,7 +47,7 @@
   "field.platform": "プラットフォーム:",
   "field.cmdLineVersion": "commandLine PGバージョン:",
   "field.guiVersion": "GUIバージョン:",
-  "field.language": "言語:",
+  "field.language": "言語 (Language):",
   "msgBox.ofPathWrong.header": "openFrameworksのパスが正しくありません",
   "msgBox.ofPathWrong.body": "OFパスをopenFrameworksのルート（\"addons\"や\"libs\"などが入っているフォルダ）に設定してください",
   "checkbox.verboseOutput": "詳細な出力",

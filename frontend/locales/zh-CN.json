@@ -47,7 +47,7 @@
   "field.platform": "平台：",
   "field.cmdLineVersion": "commandLine PG 版本：",
   "field.guiVersion": "GUI 版本：",
-  "field.language": "语言：",
+  "field.language": "语言（Language）：",
   "msgBox.ofPathWrong.header": "openFrameworks 路径不正确",
   "msgBox.ofPathWrong.body": "请将 OF 路径设置为 openFrameworks 的根目录（即包含 \"addons\"、\"libs\" 等的文件夹）",
   "checkbox.verboseOutput": "详细输出",

@@ -47,7 +47,7 @@
   "field.platform": "Plataforma:",
   "field.cmdLineVersion": "Versão do PG (commandLine):",
   "field.guiVersion": "Versão da interface:",
-  "field.language": "Idioma:",
+  "field.language": "Idioma (Language):",
   "msgBox.ofPathWrong.header": "O caminho do openFrameworks está incorreto",
   "msgBox.ofPathWrong.body": "Defina o caminho do OF para a raiz do openFrameworks (a pasta que contém \"addons\", \"libs\", etc.)",
   "checkbox.verboseOutput": "Saída detalhada",

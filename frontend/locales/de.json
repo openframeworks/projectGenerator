@@ -47,7 +47,7 @@
   "field.platform": "Plattform:",
   "field.cmdLineVersion": "commandLine PG-Version:",
   "field.guiVersion": "GUI-Version:",
-  "field.language": "Sprache:",
+  "field.language": "Sprache (Language):",
   "msgBox.ofPathWrong.header": "openFrameworks-Pfad ist falsch",
   "msgBox.ofPathWrong.body": "Lege den OF-Pfad auf das Stammverzeichnis von openFrameworks fest (den Ordner, der \"addons\", \"libs\" usw. enthält)",
   "checkbox.verboseOutput": "Ausführliche Ausgabe",
