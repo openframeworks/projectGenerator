@@ -97,6 +97,8 @@ bool VSCodeProject::createProjectFile(){
 		return false;
 	}
 
+	ofLogNotice() << "{ \"msys2Env\": \"" << msys2Environment << "\" }";
+
 	// point the template's msys2_shell flag and msys64/<env> paths at the chosen MSYS2 environment
 	static const std::regex shellFlag(R"re("-(mingw64|ucrt64|clangarm64|clang64)")re");
 	static const std::regex envPath(R"re(msys64([/\\]+)(mingw64|ucrt64|clangarm64|clang64)([/\\]))re");
