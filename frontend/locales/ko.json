@@ -158,6 +158,6 @@
   "option.msys2Clangarm64": "CLANGARM64 (ARM용 Windows)",
   "field.emscriptenWasm": "WebAssembly (Emscripten):",
   "option.wasm32": "32비트 (기본값) (MEMORY32)",
-  "option.wasm64": "64비트 (wasm64, MEMORY64)",
+  "option.wasm64": "64비트 (WASM64) (MEMORY64)",
   "note.wasm64": "wasm64 라이브러리가 필요합니다: BITS=64 scripts/emscripten/download_libs.sh 를 실행하세요 (설치된 lib/emscripten 라이브러리를 교체합니다)."
 }

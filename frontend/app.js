@@ -1406,8 +1406,9 @@ function updateRendererFieldVisibility() {
         $('#rendererField').hide();
     }
     const selectedTemplates = ($("#templatesDropdown input").val() || '').trim().split(',');
-    $('#webglField').toggle(!!defaultSettings.advancedMode && selectedTemplates.includes('emscripten'));
-    $('#wasmField').toggle(!!defaultSettings.advancedMode && selectedTemplates.includes('emscripten'));
+    const emscripten = selectedTemplates.includes('emscripten') || selectedPlatforms.includes('emscripten');
+    $('#webglField').toggle(!!defaultSettings.advancedMode && emscripten);
+    $('#wasmField').toggle(!!defaultSettings.advancedMode && emscripten);
     $('#glesField').toggle(!!defaultSettings.advancedMode && selectedPlatforms.some((p) => ['ios', 'macos'].includes(p)));
 
     const glPlatforms = ['osx', 'vs', 'msys2', 'linux', 'linux64', 'linuxarmv6l', 'linuxaarch64', 'vscode'];

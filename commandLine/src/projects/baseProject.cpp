@@ -31,6 +31,7 @@ fs::path baseProject::getPlatformTemplateDir() {
 		|| target == "linuxarmv6l"
 		|| target == "linuxarmv7l"
 		|| target == "linuxaarch64"
+		|| target == "emscripten" // vscode base, emscripten template overlaid in create()
 	) {
 		folder = "vscode";
 	}
@@ -211,6 +212,11 @@ bool baseProject::create(const fs::path & _path, string templateName){
 	if (!ret) {
 		ofLogError() << "{ \"errorMessage\": \"" << "baseProject::create createProjectFile failed" << "\", \"status:\" \"EXIT_FAILURE\" }";
 		return false;
+	}
+	// emscripten platform: emscripten template (Makefile, config.make, emmake.sh) over the vscode base
+	if (target == "emscripten") {
+		recursiveTemplateCopy(getOFRoot() / templatesFolder / "emscripten", projectDir);
+		if (templateName == "emscripten") templateName = "";
 	}
 	if (templateName != "" && !empty(templateName)) {
 		fs::path templateDir = getOFRoot() / templatesFolder / templateName;

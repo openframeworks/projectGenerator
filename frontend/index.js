@@ -136,6 +136,7 @@ function getDefaultTemplateForPlatform(platformId) {
         "linuxarmv6l": "Arm 32 (VS Code/Make)",
         "linuxaarch64": "Arm 64 (VS Code/Make)",
         "vscode": "VS Code",
+        "emscripten": "Emscripten (Web) (Make)",
         "vs2019": "Windows (Visual Studio 2019)",
     };
 
@@ -296,7 +297,8 @@ const platforms = {
     "linux64": "Linux 64 (VS Code/Make)",
     "linuxarmv6l": "Arm 32 (VS Code/Make)",
     "linuxaarch64": "Arm 64 (VS Code/Make)",
-    "vscode": "VS Code"
+    "vscode": "VS Code",
+    "emscripten": "Emscripten (Web) (Make)"
 };
 
 const bUseMoniker = settings["useDictionaryNameGenerator"];
@@ -681,6 +683,8 @@ function refreshPlatformList(event, ofPathValue) {
                 // this folder is for platform
                 console.log("Found platform, key " + key + " has value " + platforms[key]);
                 platformsWeHave[key] = platforms[key];
+                // emscripten is also a template overlay for osx / linux
+                if (key === 'emscripten') templatesWeHave[key] = templates[key];
             } else {
                 // this folder is for template
                 if(templates[key]){

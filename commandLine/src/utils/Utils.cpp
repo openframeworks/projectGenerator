@@ -455,7 +455,8 @@ unique_ptr<baseProject> getTargetProject(const string & targ) {
 			   targ == "linux64" ||
 			   targ == "linuxarmv6l" ||
 			   targ == "linuxarmv7l" ||
-			   targ == "linuxaarch64"
+			   targ == "linuxaarch64" ||
+			   targ == "emscripten"
 			   ) {
 		return unique_ptr<VSCodeProject>(new VSCodeProject(targ));
 	}

@@ -158,6 +158,6 @@
   "option.msys2Clangarm64": "CLANGARM64 (Windows no ARM)",
   "field.emscriptenWasm": "WebAssembly (Emscripten):",
   "option.wasm32": "32 bits (padrão) (MEMORY32)",
-  "option.wasm64": "64 bits (wasm64, MEMORY64)",
+  "option.wasm64": "64 bits (WASM64) (MEMORY64)",
   "note.wasm64": "Requer bibliotecas wasm64: execute BITS=64 scripts/emscripten/download_libs.sh (substitui as bibliotecas lib/emscripten instaladas)."
 }
