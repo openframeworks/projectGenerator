@@ -1380,7 +1380,10 @@ function modularLibsFor(release, ofPath) {
 function corePlatformsFor(ofPath) {
     const scriptsDir = path.join(ofPath || '', 'scripts');
     if (!ofPath || !fs.existsSync(scriptsDir)) return [];
-    return fs.readdirSync(scriptsDir).filter((dir) => dir !== 'dev' && fs.existsSync(path.join(scriptsDir, dir, 'download_libs.sh')));
+    const platforms = fs.readdirSync(scriptsDir).filter((dir) => dir !== 'dev' && fs.existsSync(path.join(scriptsDir, dir, 'download_libs.sh')));
+    // no scripts/tvos wrapper, but dev/download_libs.sh takes -p tvos
+    if (platforms.includes('ios') && fs.existsSync(path.join(scriptsDir, 'dev', 'download_libs.sh'))) platforms.push('tvos');
+    return platforms;
 }
 
 const OFLIBS_REPO = 'ofWorks/ofLibs';
@@ -1463,7 +1466,7 @@ ipcMain.on('downloadCoreLibs', (event, { ofPath, source, tag, platform }) => {
 
     const script = source === 'oflibs' || source === 'archive'
         ? path.join(ofPath || '', 'scripts', 'dev', 'lib_sources.sh')
-        : path.join(ofPath || '', 'scripts', platform || '', 'download_libs.sh');
+        : path.join(ofPath || '', 'scripts', platform === 'tvos' ? 'dev' : platform || '', 'download_libs.sh');
     if (!ofPath || !platform || !tag || !fs.existsSync(script)) {
         send(`<br><strong>${t('msg.error')}</strong> ${t('downloads.scriptMissing', { script })}<br>`);
         done(false);
@@ -1476,7 +1479,7 @@ ipcMain.on('downloadCoreLibs', (event, { ofPath, source, tag, platform }) => {
     } else if (source === 'archive') {
         args = ['-c', 'source "$1" && downloadArchiveRelease "$2" "$3" "$4" "" libs', 'bash', script, ofPath, tag, platform];
     } else {
-        args = [script];
+        args = platform === 'tvos' ? [script, '-p', 'tvos', '-b'] : [script];
         if (tag !== 'latest') args.push('-t', tag);
     }
     send(`<br><em>${t('downloads.coreStarting', { tag: `${source || 'apothecary'} ${tag}`, platform })}</em><br>`);
