@@ -1254,7 +1254,7 @@ function generate() {
         // the template pick is cleared in the #projectName change handler instead,
         // as soon as the user points at a different project - not here, so a plain
         // single generate doesn't wipe the pick you just used
-        lastGeneratedProject = { projectName: gen.projectName, projectPath: gen.projectPath, templateList: gen.templateList };
+        lastGeneratedProject = { projectName: gen.projectName, projectPath: gen.projectPath, templateList: gen.templateList, platformList: gen.platformList };
         openConsoleForOperation();
         ipcRenderer.send('generate', gen);
     }
@@ -1473,7 +1473,9 @@ function displayModal(message) {
             ipcRenderer.send('openExternal', $(e.currentTarget).prop("href") );
         });
 
-    const isEmscripten = lastGeneratedProject != null && lastGeneratedProject.templateList.includes('emscripten');
+    // emscripten template on osx/linux, or the emscripten platform
+    const isEmscripten = lastGeneratedProject != null
+        && (lastGeneratedProject.templateList.includes('emscripten') || (lastGeneratedProject.platformList || []).includes('emscripten'));
 
     $("#IDEButton").hide();
     $("#FolderButton").hide();
@@ -1650,7 +1652,7 @@ function launchInIDE(){
     for (let i = 0; i < templatePicked.length; i++){
         templateValueArray.push($(templatePicked[i]).attr("data-value"));
     }
-    if (templateValueArray.includes('emscripten')) {
+    if (templateValueArray.includes('emscripten') || getPlatformList().includes('emscripten')) {
         displayModal(`<!--modal-context:none:-->\n<strong>Emscripten</strong><br>${t('modal.emscriptenNoIde')}`);
         return;
     }
