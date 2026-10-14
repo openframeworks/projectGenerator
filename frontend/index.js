@@ -1383,6 +1383,8 @@ function corePlatformsFor(ofPath) {
     const platforms = fs.readdirSync(scriptsDir).filter((dir) => dir !== 'dev' && fs.existsSync(path.join(scriptsDir, dir, 'download_libs.sh')));
     // no scripts/tvos wrapper, but dev/download_libs.sh takes -p tvos
     if (platforms.includes('ios') && fs.existsSync(path.join(scriptsDir, 'dev', 'download_libs.sh'))) platforms.push('tvos');
+    // wasm64 libs: same script with BITS=64
+    if (platforms.includes('emscripten')) platforms.push('emscripten64');
     return platforms;
 }
 
@@ -1466,7 +1468,7 @@ ipcMain.on('downloadCoreLibs', (event, { ofPath, source, tag, platform }) => {
 
     const script = source === 'oflibs' || source === 'archive'
         ? path.join(ofPath || '', 'scripts', 'dev', 'lib_sources.sh')
-        : path.join(ofPath || '', 'scripts', platform === 'tvos' ? 'dev' : platform || '', 'download_libs.sh');
+        : path.join(ofPath || '', 'scripts', platform === 'tvos' ? 'dev' : platform === 'emscripten64' ? 'emscripten' : platform || '', 'download_libs.sh');
     if (!ofPath || !platform || !tag || !fs.existsSync(script)) {
         send(`<br><strong>${t('msg.error')}</strong> ${t('downloads.scriptMissing', { script })}<br>`);
         done(false);
@@ -1486,7 +1488,8 @@ ipcMain.on('downloadCoreLibs', (event, { ofPath, source, tag, platform }) => {
 
     let child;
     try {
-        child = spawn('bash', args, { cwd: path.dirname(script), windowsHide: true });
+        const env = platform === 'emscripten64' ? { ...process.env, BITS: '64' } : process.env;
+        child = spawn('bash', args, { cwd: path.dirname(script), env, windowsHide: true });
     } catch (error) {
         send(`<strong>${t('msg.error')}</strong> ${error.message}<br>`);
         done(false);

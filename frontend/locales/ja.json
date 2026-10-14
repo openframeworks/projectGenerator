@@ -150,5 +150,6 @@
   "field.glVersion": "OpenGL バージョン (デスクトップ):",
   "option.glDefault": "デフォルト (OpenGL 2.1)",
   "field.postBuild": "ビルド後スクリプト:",
-  "placeholder.postBuild": "プロジェクトのコンパイル後に実行 - Xcode の Run Script / VS のビルド後イベント"
+  "placeholder.postBuild": "プロジェクトのコンパイル後に実行 - Xcode の Run Script / VS のビルド後イベント",
+  "downloads.wasm64Confirm": "WASM64 ライブラリはインストール済みの lib/emscripten ライブラリを置き換えます (32 ビット版は削除されます)。続行しますか?"
 }

@@ -150,5 +150,6 @@
   "field.glVersion": "Версия OpenGL (десктоп):",
   "option.glDefault": "По умолчанию (OpenGL 2.1)",
   "field.postBuild": "Скрипт после сборки:",
-  "placeholder.postBuild": "Запускается после компиляции проекта - Run Script в Xcode / событие после сборки в VS"
+  "placeholder.postBuild": "Запускается после компиляции проекта - Run Script в Xcode / событие после сборки в VS",
+  "downloads.wasm64Confirm": "Библиотеки WASM64 заменят установленные библиотеки lib/emscripten (32-битные будут удалены). Продолжить?"
 }

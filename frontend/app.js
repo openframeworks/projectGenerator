@@ -1785,7 +1785,8 @@ const CORE_PLATFORM_LABELS = {
     linuxarmv6l: 'Linux (armv6l)',
     linuxarmv7l: 'Linux (armv7l)',
     android: 'Android',
-    emscripten: 'Emscripten (Web)',
+    emscripten: 'Emscripten (Web) (default 32)',
+    emscripten64: 'Emscripten (Web) (WASM64)',
 };
 
 function corePlatformLabel(platform) {
@@ -1888,6 +1889,7 @@ function downloadCoreLibs() {
     const platform = $('#corePlatformDropdown').dropdown('get value');
     if (!tag || !platform) return;
     if (source === 'archive' && !confirm(t('downloads.archiveConfirm', { tag }))) return;
+    if (platform === 'emscripten64' && !confirm(t('downloads.wasm64Confirm'))) return;
     $('#downloadCoreLibsButton').addClass('loading disabled');
     openConsoleForOperation();
     ipcRenderer.send('downloadCoreLibs', { ofPath: $("#ofPath").val(), source, tag, platform });

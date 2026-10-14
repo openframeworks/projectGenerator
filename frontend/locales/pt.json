@@ -150,5 +150,6 @@
   "field.glVersion": "Versão do OpenGL (desktop):",
   "option.glDefault": "Padrão (OpenGL 2.1)",
   "field.postBuild": "Script pós-compilação:",
-  "placeholder.postBuild": "Executa após compilar o projeto - run script do Xcode / evento pós-build do VS"
+  "placeholder.postBuild": "Executa após compilar o projeto - run script do Xcode / evento pós-build do VS",
+  "downloads.wasm64Confirm": "As bibliotecas WASM64 substituem as bibliotecas lib/emscripten instaladas (as de 32 bits são removidas). Continuar?"
 }

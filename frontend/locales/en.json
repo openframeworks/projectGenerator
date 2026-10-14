@@ -150,5 +150,6 @@
   "field.glVersion": "OpenGL version (desktop):",
   "option.glDefault": "Default (OpenGL 2.1)",
   "field.postBuild": "Post-build script:",
-  "placeholder.postBuild": "Runs after the project compiles - Xcode run script / VS post-build event"
+  "placeholder.postBuild": "Runs after the project compiles - Xcode run script / VS post-build event",
+  "downloads.wasm64Confirm": "WASM64 libraries replace the installed lib/emscripten libraries (the 32-bit ones are removed). Continue?"
 }
