@@ -7,6 +7,7 @@
 //
 
 #include "baseProject.h"
+#include <regex>
 #include "ofLog.h"
 #include "Utils.h"
 #include "ofConstants.h"
@@ -128,6 +129,19 @@ static std::string readEmscriptenWasm(const fs::path & configMake) {
 	return bits;
 }
 
+static const std::string OF_CMAKE_INCLUDE { "libs/openFrameworksCompiled/project/CMake/openFrameworks.cmake" };
+
+// set(PROJECT_EMSCRIPTEN_WASM 64) written by PG into an openFrameworks CMakeLists.txt (openFrameworks#8586)
+static std::string readCMakeEmscriptenWasm(const fs::path & cmakeLists) {
+	static const std::regex wasmSet(R"re(^\s*set\(\s*PROJECT_EMSCRIPTEN_WASM\s+(32|64)\b)re");
+	std::smatch m;
+	if (!fs::exists(cmakeLists)) return "";
+	for (auto & line : fileToStrings(cmakeLists)) {
+		if (std::regex_search(line, m, wasmSet)) return m[1];
+	}
+	return "";
+}
+
 bool baseProject::create(const fs::path & _path, string templateName){
 //	alert("baseProject::create " + path.string() + " : " + templateName, 35);
 	auto path = _path; // just because it is const
@@ -172,7 +186,9 @@ bool baseProject::create(const fs::path & _path, string templateName){
 	projectName = projectPath.filename().string();
 
 	// read before template copies can replace config.make
-	emscriptenWasm = emscriptenWasmOption.empty() ? readEmscriptenWasm(projectDir / "config.make") : emscriptenWasmOption;
+	emscriptenWasm = emscriptenWasmOption;
+	if (emscriptenWasm.empty()) emscriptenWasm = readEmscriptenWasm(projectDir / "config.make");
+	if (emscriptenWasm.empty()) emscriptenWasm = readCMakeEmscriptenWasm(projectDir / "CMakeLists.txt");
 	if (!emscriptenWasm.empty()) {
 		ofLogNotice() << "{ \"emscriptenWasm\": \"" << emscriptenWasm << "\" }";
 	}
@@ -213,6 +229,17 @@ bool baseProject::create(const fs::path & _path, string templateName){
 		ofLogError() << "{ \"errorMessage\": \"" << "baseProject::create createProjectFile failed" << "\", \"status:\" \"EXIT_FAILURE\" }";
 		return false;
 	}
+	// cmake template (openFrameworks#8586) is a single CMakeLists.txt with no template.config; keep an existing one
+	if (templateName == "cmake") {
+		fs::path cmakeTemplate { getOFRoot() / templatesFolder / "cmake" / "CMakeLists.txt" };
+		if (!fs::exists(cmakeTemplate)) {
+			ofLogWarning() << "no scripts/templates/cmake/CMakeLists.txt in this openFrameworks (CMake support is openFrameworks#8586)";
+		} else if (!fs::exists(projectDir / "CMakeLists.txt")) {
+			fs::copy_file(cmakeTemplate, projectDir / "CMakeLists.txt");
+		}
+		templateName = "";
+	}
+
 	// emscripten platform: emscripten template (Makefile, config.make, emmake.sh) over the vscode base
 	if (target == "emscripten") {
 		recursiveTemplateCopy(getOFRoot() / templatesFolder / "emscripten", projectDir);
@@ -356,6 +383,8 @@ bool baseProject::save(){
 		saveConfig << "# emscripten: 32 (default) or 64 (wasm64, MEMORY64)" << std::endl;
 		saveConfig << "PROJECT_EMSCRIPTEN_WASM = 64" << std::endl;
 	}
+	saveCMakeLists();
+
 #ifdef OFADDON_OUTPUT_JSON_DEBUG
     saveAddonsToJson();
 #endif
@@ -949,4 +978,32 @@ bool baseProject::copyTemplateFile::run() {
 		return false;
 	}
 	return true;
+}
+
+// OF_ROOT and PROJECT_EMSCRIPTEN_WASM in an openFrameworks app CMakeLists.txt, like config.make
+void baseProject::saveCMakeLists() {
+	fs::path cmakeLists { projectDir / "CMakeLists.txt" };
+	if (!fs::exists(cmakeLists)) return;
+	auto lines = fileToStrings(cmakeLists);
+	bool bOFApp = std::any_of(lines.begin(), lines.end(), [](const std::string & l) { return l.find(OF_CMAKE_INCLUDE) != std::string::npos; });
+	if (!bOFApp) return;
+
+	fs::path root = getOFRoot();
+	string ofRoot = root.generic_string();
+	if (projectDir.string().rfind(root.string(), 0) == 0) {
+		ofRoot = "${CMAKE_CURRENT_SOURCE_DIR}/" + fs::relative(root, projectDir).generic_string();
+	}
+	static const std::regex ofRootSet(R"re(^(\s*)set\(OF_ROOT\s+"[^"]*"\))re");
+	static const std::regex wasmSet(R"re(^\s*set\(\s*PROJECT_EMSCRIPTEN_WASM\b)re");
+
+	std::ofstream out(cmakeLists);
+	for (auto & line : lines) {
+		if (!emscriptenWasm.empty() && std::regex_search(line, wasmSet)) continue;
+		if (line.find(OF_CMAKE_INCLUDE) != std::string::npos && emscriptenWasm == "64") {
+			out << "# emscripten: 32 (default) or 64 (wasm64, MEMORY64)" << std::endl;
+			out << "set(PROJECT_EMSCRIPTEN_WASM 64)" << std::endl;
+		}
+		if (line.find("# emscripten: 32 (default) or 64") != std::string::npos && !emscriptenWasm.empty()) continue;
+		out << std::regex_replace(line, ofRootSet, "$1set(OF_ROOT \"" + ofRoot + "\")") << std::endl;
+	}
 }

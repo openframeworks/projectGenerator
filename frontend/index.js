@@ -305,6 +305,7 @@ const bUseMoniker = settings["useDictionaryNameGenerator"];
 
 const templates = {
     "emscripten": "Emscripten",
+    "cmake": "CMake (CMakeLists.txt)",
     "gitignore": "Git Ignore",
     "gl3.1": "Open GL 3.1",
     "gl3.2": "Open GL 3.2",
@@ -902,6 +903,11 @@ ipcMain.on('isOFProjectFolder', (event, project) => {
                     }
                 });
                 event.sender.send('setEmscriptenWasm', emscriptenWasm);
+            }
+            // CMake projects (openFrameworks#8586) keep it in CMakeLists.txt
+            const cmakeLists = path.resolve(folder, 'CMakeLists.txt');
+            if (fs.existsSync(cmakeLists) && /^\s*set\(\s*PROJECT_EMSCRIPTEN_WASM\s+64\b/m.test(fs.readFileSync(cmakeLists, 'utf8'))) {
+                event.sender.send('setEmscriptenWasm', '64');
             }
             
         } else {

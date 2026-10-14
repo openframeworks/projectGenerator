@@ -185,6 +185,7 @@ protected:
 	std::vector<std::string> projectDefines; // also written to config.make PROJECT_DEFINES for make builds
 	std::string emscriptenWasmOption; // from the CLI, empty = keep
 	std::string emscriptenWasm; // value for this project: "", "32" or "64"
+	void saveCMakeLists();
 	
 	//cached addons - if an addon is requested more than once, avoid loading from disk as it's quite slow
 	std::map<std::string,std::map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]
