@@ -157,7 +157,7 @@
   "option.msys2Mingw64": "MINGW64 (旧版)",
   "option.msys2Clangarm64": "CLANGARM64 (ARM 版 Windows)",
   "field.emscriptenWasm": "WebAssembly (Emscripten)：",
-  "option.wasm32": "32 位（默认）",
+  "option.wasm32": "32 位（默认）（MEMORY32）",
   "option.wasm64": "64 位（wasm64, MEMORY64）",
   "note.wasm64": "需要 wasm64 库：运行 BITS=64 scripts/emscripten/download_libs.sh（会替换已安装的 lib/emscripten 库）。"
 }
