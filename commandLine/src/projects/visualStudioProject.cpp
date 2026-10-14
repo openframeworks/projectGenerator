@@ -284,7 +284,8 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 		} else if (ext == ".c") {
 			addClCompileAsC(srcFileString, folderString);
 		} else{
-			appendValue(doc, "ClCompile", "Include", srcFileString);
+			// appendValue copies the last ClCompile, drop a CompileAsC inherited from a .c file
+			appendValue(doc, "ClCompile", "Include", srcFileString).remove_child("CompileAs");
 
 			pugi::xml_node nodeFilters = filterXmlDoc.select_node("//ItemGroup[ClCompile]").node();
 			pugi::xml_node nodeAdded = nodeFilters.append_child("ClCompile");
@@ -294,7 +295,8 @@ void visualStudioProject::addSrc(const fs::path & srcFile, const fs::path & fold
 	}else{
 		switch(type){
 		case CPP:{
-			appendValue(doc, "ClCompile", "Include", srcFileString);
+			// appendValue copies the last ClCompile, drop a CompileAsC inherited from a .c file
+			appendValue(doc, "ClCompile", "Include", srcFileString).remove_child("CompileAs");
 
 			pugi::xml_node nodeFilters = filterXmlDoc.select_node("//ItemGroup[ClCompile]").node();
 			pugi::xml_node nodeAdded = nodeFilters.append_child("ClCompile");
