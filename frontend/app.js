@@ -206,6 +206,11 @@ ipcRenderer.on('setSourceExtraPath', (event, [arg, index]) => { // TODO:
 //-------------------------------------------
 ipcRenderer.on('setGenerateMode', (event, arg) => {
     switchGenerateMode(arg);
+    // new projects start at wasm32; an existing project sends its own value via setEmscriptenWasm
+    if (arg === 'createMode') {
+        $('#wasmDropdown').dropdown('set selected', '32');
+        $('#wasmNote').hide();
+    }
 });
 
 //-------------------------------------------
