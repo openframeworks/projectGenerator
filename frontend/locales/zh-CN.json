@@ -47,7 +47,7 @@
   "field.platform": "平台：",
   "field.cmdLineVersion": "commandLine PG 版本：",
   "field.guiVersion": "GUI 版本：",
-  "field.language": "语言：",
+  "field.language": "语言（Language）：",
   "msgBox.ofPathWrong.header": "openFrameworks 路径不正确",
   "msgBox.ofPathWrong.body": "请将 OF 路径设置为 openFrameworks 的根目录（即包含 \"addons\"、\"libs\" 等的文件夹）",
   "checkbox.verboseOutput": "详细输出",
@@ -136,8 +136,8 @@
   "button.downloadSelected": "下载所选 ({{count}})",
   "button.refresh": "刷新",
   "downloads.source": "来源：",
-  "downloads.sourceApothecary": "Apothecary（推荐）",
-  "downloads.sourceOfLibs": "ofLibs（实验性）",
+  "downloads.sourceApothecary": "Apothecary（GitHub）（推荐）",
+  "downloads.sourceOfLibs": "ofLibs（GitHub）（实验性）",
   "downloads.sourceArchive": "归档（libs.danoli3.com）",
   "downloads.sourceNote.apothecary": "openframeworks/apothecary 预编译包 - 标准的 openFrameworks 目录结构。",
   "downloads.sourceNote.oflibs": "ofWorks/ofLibs 单库 zip，安装到 libs/<lib>。面向 ofWorks，部分库可能需要调整路径。",
@@ -150,5 +150,6 @@
   "field.glVersion": "OpenGL 版本（桌面）：",
   "option.glDefault": "默认（OpenGL 2.1）",
   "field.postBuild": "编译后脚本：",
-  "placeholder.postBuild": "项目编译后运行 - Xcode Run Script / VS 生成后事件"
+  "placeholder.postBuild": "项目编译后运行 - Xcode Run Script / VS 生成后事件",
+  "downloads.wasm64Confirm": "WASM64 库会替换已安装的 lib/emscripten 库（32 位库将被删除）。是否继续？"
 }

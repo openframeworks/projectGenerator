@@ -1702,7 +1702,8 @@ function formatSize(bytes) {
 }
 
 function releaseLabel(r) {
-    const date = r.published ? ' (' + r.published.slice(0, 10) + ')' : '';
+    const when = r.built || r.published;
+    const date = when ? ' (' + when.slice(0, 10) + ')' : '';
     return r.tag + date + (r.prerelease ? ' - ' + t('downloads.prerelease') : '');
 }
 
@@ -1774,8 +1775,8 @@ function currentModularRelease() {
 const CORE_PLATFORM_LABELS = {
     osx: 'macOS (OSX only)',
     macos: 'macOS (including iOS, tvOS, catOS)',
-    ios: 'iOS',
-    tvos: 'tvOS',
+    ios: 'iOS (Apple)',
+    tvos: 'tvOS (Apple)',
     vs: 'Windows (Visual Studio)',
     msys2: 'Windows (MSYS2)',
     linux: 'Linux',
@@ -1784,7 +1785,8 @@ const CORE_PLATFORM_LABELS = {
     linuxarmv6l: 'Linux (armv6l)',
     linuxarmv7l: 'Linux (armv7l)',
     android: 'Android',
-    emscripten: 'Emscripten (Web)',
+    emscripten: 'Emscripten (Web) (default 32)',
+    emscripten64: 'Emscripten (Web) (WASM64)',
 };
 
 function corePlatformLabel(platform) {
@@ -1801,7 +1803,8 @@ function sortCorePlatforms(platforms) {
 function modularTargetLabel(target) {
     const named = {
         osx_64: 'macOS (OSX) (x86_64 / arm64)',
-        ios_64: 'iOS (arm64)',
+        ios_64: 'iOS (arm64) (Apple)',
+        tvos_64: 'tvOS (Apple)',
         vs_64: 'Windows (x64)',
         vs_arm64: 'Windows (arm64)',
         vs_arm64ec: 'Windows (arm64ec)',
@@ -1886,6 +1889,7 @@ function downloadCoreLibs() {
     const platform = $('#corePlatformDropdown').dropdown('get value');
     if (!tag || !platform) return;
     if (source === 'archive' && !confirm(t('downloads.archiveConfirm', { tag }))) return;
+    if (platform === 'emscripten64' && !confirm(t('downloads.wasm64Confirm'))) return;
     $('#downloadCoreLibsButton').addClass('loading disabled');
     openConsoleForOperation();
     ipcRenderer.send('downloadCoreLibs', { ofPath: $("#ofPath").val(), source, tag, platform });

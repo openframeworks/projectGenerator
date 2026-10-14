@@ -136,8 +136,8 @@
   "button.downloadSelected": "Download selected ({{count}})",
   "button.refresh": "Refresh",
   "downloads.source": "Source:",
-  "downloads.sourceApothecary": "Apothecary (recommended)",
-  "downloads.sourceOfLibs": "ofLibs (experimental)",
+  "downloads.sourceApothecary": "Apothecary (GitHub) (Recommended)",
+  "downloads.sourceOfLibs": "ofLibs (GitHub) (experimental)",
   "downloads.sourceArchive": "Archive (libs.danoli3.com)",
   "downloads.sourceNote.apothecary": "openframeworks/apothecary prebuilt packages - the standard openFrameworks layout.",
   "downloads.sourceNote.oflibs": "ofWorks/ofLibs per-library zips, installed into libs/<lib>. ofWorks-oriented, some libs may need path tweaks.",
@@ -150,5 +150,6 @@
   "field.glVersion": "OpenGL version (desktop):",
   "option.glDefault": "Default (OpenGL 2.1)",
   "field.postBuild": "Post-build script:",
-  "placeholder.postBuild": "Runs after the project compiles - Xcode run script / VS post-build event"
+  "placeholder.postBuild": "Runs after the project compiles - Xcode run script / VS post-build event",
+  "downloads.wasm64Confirm": "WASM64 libraries replace the installed lib/emscripten libraries (the 32-bit ones are removed). Continue?"
 }

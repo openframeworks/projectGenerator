@@ -47,7 +47,7 @@
   "field.platform": "플랫폼:",
   "field.cmdLineVersion": "commandLine PG 버전:",
   "field.guiVersion": "GUI 버전:",
-  "field.language": "언어:",
+  "field.language": "언어 (Language):",
   "msgBox.ofPathWrong.header": "openFrameworks 경로가 잘못되었습니다",
   "msgBox.ofPathWrong.body": "OF 경로를 openFrameworks의 루트(\"addons\", \"libs\" 등이 있는 폴더)로 설정하세요",
   "checkbox.verboseOutput": "상세 출력",
@@ -136,8 +136,8 @@
   "button.downloadSelected": "선택 항목 다운로드 ({{count}})",
   "button.refresh": "새로 고침",
   "downloads.source": "소스:",
-  "downloads.sourceApothecary": "Apothecary (권장)",
-  "downloads.sourceOfLibs": "ofLibs (실험적)",
+  "downloads.sourceApothecary": "Apothecary (GitHub) (권장)",
+  "downloads.sourceOfLibs": "ofLibs (GitHub) (실험적)",
   "downloads.sourceArchive": "아카이브 (libs.danoli3.com)",
   "downloads.sourceNote.apothecary": "openframeworks/apothecary 미리 빌드된 패키지 - 표준 openFrameworks 구조입니다.",
   "downloads.sourceNote.oflibs": "ofWorks/ofLibs 라이브러리별 zip을 libs/<lib>에 설치합니다. ofWorks 중심이라 일부 라이브러리는 경로 조정이 필요할 수 있습니다.",
@@ -150,5 +150,6 @@
   "field.glVersion": "OpenGL 버전 (데스크톱):",
   "option.glDefault": "기본값 (OpenGL 2.1)",
   "field.postBuild": "빌드 후 스크립트:",
-  "placeholder.postBuild": "프로젝트 컴파일 후 실행 - Xcode Run Script / VS 빌드 후 이벤트"
+  "placeholder.postBuild": "프로젝트 컴파일 후 실행 - Xcode Run Script / VS 빌드 후 이벤트",
+  "downloads.wasm64Confirm": "WASM64 라이브러리가 설치된 lib/emscripten 라이브러리를 대체합니다 (32비트 라이브러리는 삭제됩니다). 계속하시겠습니까?"
 }

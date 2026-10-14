@@ -47,7 +47,7 @@
   "field.platform": "プラットフォーム:",
   "field.cmdLineVersion": "commandLine PGバージョン:",
   "field.guiVersion": "GUIバージョン:",
-  "field.language": "言語:",
+  "field.language": "言語 (Language):",
   "msgBox.ofPathWrong.header": "openFrameworksのパスが正しくありません",
   "msgBox.ofPathWrong.body": "OFパスをopenFrameworksのルート（\"addons\"や\"libs\"などが入っているフォルダ）に設定してください",
   "checkbox.verboseOutput": "詳細な出力",
@@ -136,8 +136,8 @@
   "button.downloadSelected": "選択項目をダウンロード ({{count}})",
   "button.refresh": "更新",
   "downloads.source": "ソース:",
-  "downloads.sourceApothecary": "Apothecary (推奨)",
-  "downloads.sourceOfLibs": "ofLibs (実験的)",
+  "downloads.sourceApothecary": "Apothecary (GitHub) (推奨)",
+  "downloads.sourceOfLibs": "ofLibs (GitHub) (実験的)",
   "downloads.sourceArchive": "アーカイブ (libs.danoli3.com)",
   "downloads.sourceNote.apothecary": "openframeworks/apothecary のビルド済みパッケージ - 標準の openFrameworks 構成です。",
   "downloads.sourceNote.oflibs": "ofWorks/ofLibs のライブラリ単位の zip を libs/<lib> にインストールします。ofWorks 向けのため、一部のライブラリはパス調整が必要な場合があります。",
@@ -150,5 +150,6 @@
   "field.glVersion": "OpenGL バージョン (デスクトップ):",
   "option.glDefault": "デフォルト (OpenGL 2.1)",
   "field.postBuild": "ビルド後スクリプト:",
-  "placeholder.postBuild": "プロジェクトのコンパイル後に実行 - Xcode の Run Script / VS のビルド後イベント"
+  "placeholder.postBuild": "プロジェクトのコンパイル後に実行 - Xcode の Run Script / VS のビルド後イベント",
+  "downloads.wasm64Confirm": "WASM64 ライブラリはインストール済みの lib/emscripten ライブラリを置き換えます (32 ビット版は削除されます)。続行しますか?"
 }

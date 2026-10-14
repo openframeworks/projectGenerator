@@ -1273,6 +1273,15 @@ function githubJSON(url) {
     });
 }
 
+// rolling tags (latest, latest-modular) get assets re-uploaded without re-publishing the release,
+// so date them by the newest osx core asset, else the newest asset
+function releaseBuildDate(r) {
+    const files = r.assets.filter((a) => !/\.(sha256|manifest\.json)$/.test(a.name));
+    const osx = files.filter((a) => /^openFrameworksLibs_.*_osx/.test(a.name));
+    const dates = (osx.length ? osx : files).map((a) => a.updated_at).filter(Boolean).sort();
+    return dates.length ? dates[dates.length - 1] : r.published_at;
+}
+
 function fetchApothecaryReleases(refresh) {
     if (apothecaryReleases && !refresh) return Promise.resolve(apothecaryReleases);
     return githubJSON(`https://api.github.com/repos/${APOTHECARY_REPO}/releases?per_page=50`).then((releases) => {
@@ -1281,6 +1290,7 @@ function fetchApothecaryReleases(refresh) {
             name: r.name || r.tag_name,
             prerelease: r.prerelease,
             published: r.published_at,
+            built: releaseBuildDate(r),
             assets: r.assets.map((a) => ({
                 name: a.name,
                 size: a.size,
@@ -1370,7 +1380,12 @@ function modularLibsFor(release, ofPath) {
 function corePlatformsFor(ofPath) {
     const scriptsDir = path.join(ofPath || '', 'scripts');
     if (!ofPath || !fs.existsSync(scriptsDir)) return [];
-    return fs.readdirSync(scriptsDir).filter((dir) => dir !== 'dev' && fs.existsSync(path.join(scriptsDir, dir, 'download_libs.sh')));
+    const platforms = fs.readdirSync(scriptsDir).filter((dir) => dir !== 'dev' && fs.existsSync(path.join(scriptsDir, dir, 'download_libs.sh')));
+    // no scripts/tvos wrapper, but dev/download_libs.sh takes -p tvos
+    if (platforms.includes('ios') && fs.existsSync(path.join(scriptsDir, 'dev', 'download_libs.sh'))) platforms.push('tvos');
+    // wasm64 libs: same script with BITS=64
+    if (platforms.includes('emscripten')) platforms.push('emscripten64');
+    return platforms;
 }
 
 const OFLIBS_REPO = 'ofWorks/ofLibs';
@@ -1388,7 +1403,7 @@ let archiveVersions = null;
 function fetchOfLibsReleases(refresh) {
     if (ofLibsReleases && !refresh) return Promise.resolve(ofLibsReleases);
     return githubJSON(`https://api.github.com/repos/${OFLIBS_REPO}/releases?per_page=30`).then((releases) => {
-        ofLibsReleases = releases.map((r) => ({ tag: r.tag_name, prerelease: r.prerelease, published: r.published_at }));
+        ofLibsReleases = releases.map((r) => ({ tag: r.tag_name, prerelease: r.prerelease, published: r.published_at, built: releaseBuildDate(r) }));
         return ofLibsReleases;
     });
 }
@@ -1429,6 +1444,7 @@ ipcMain.on('getLibReleases', async (event, { ofPath, refresh }) => {
                 name: r.name,
                 prerelease: r.prerelease,
                 published: r.published,
+                built: r.built,
                 hasCore: r.assets.some((a) => a.name.startsWith('openFrameworksLibs_')),
                 modular: modularLibsFor(r, ofPath).map(({ asset, ...lib }) => ({ ...lib, asset: asset.name, size: asset.size, verifiable: !!asset.digest })),
             })),
@@ -1452,7 +1468,7 @@ ipcMain.on('downloadCoreLibs', (event, { ofPath, source, tag, platform }) => {
 
     const script = source === 'oflibs' || source === 'archive'
         ? path.join(ofPath || '', 'scripts', 'dev', 'lib_sources.sh')
-        : path.join(ofPath || '', 'scripts', platform || '', 'download_libs.sh');
+        : path.join(ofPath || '', 'scripts', platform === 'tvos' ? 'dev' : platform === 'emscripten64' ? 'emscripten' : platform || '', 'download_libs.sh');
     if (!ofPath || !platform || !tag || !fs.existsSync(script)) {
         send(`<br><strong>${t('msg.error')}</strong> ${t('downloads.scriptMissing', { script })}<br>`);
         done(false);
@@ -1465,14 +1481,15 @@ ipcMain.on('downloadCoreLibs', (event, { ofPath, source, tag, platform }) => {
     } else if (source === 'archive') {
         args = ['-c', 'source "$1" && downloadArchiveRelease "$2" "$3" "$4" "" libs', 'bash', script, ofPath, tag, platform];
     } else {
-        args = [script];
+        args = platform === 'tvos' ? [script, '-p', 'tvos', '-b'] : [script];
         if (tag !== 'latest') args.push('-t', tag);
     }
     send(`<br><em>${t('downloads.coreStarting', { tag: `${source || 'apothecary'} ${tag}`, platform })}</em><br>`);
 
     let child;
     try {
-        child = spawn('bash', args, { cwd: path.dirname(script), windowsHide: true });
+        const env = platform === 'emscripten64' ? { ...process.env, BITS: '64' } : process.env;
+        child = spawn('bash', args, { cwd: path.dirname(script), env, windowsHide: true });
     } catch (error) {
         send(`<strong>${t('msg.error')}</strong> ${error.message}<br>`);
         done(false);

@@ -47,7 +47,7 @@
   "field.platform": "Plataforma:",
   "field.cmdLineVersion": "Versión de PG (commandLine):",
   "field.guiVersion": "Versión de la interfaz:",
-  "field.language": "Idioma:",
+  "field.language": "Idioma (Language):",
   "msgBox.ofPathWrong.header": "La ruta de openFrameworks es incorrecta",
   "msgBox.ofPathWrong.body": "Configura la ruta de OF en la raíz de openFrameworks (es decir, la carpeta que contiene \"addons\", \"libs\", etc.)",
   "checkbox.verboseOutput": "Salida detallada",
@@ -136,8 +136,8 @@
   "button.downloadSelected": "Descargar seleccionadas ({{count}})",
   "button.refresh": "Actualizar",
   "downloads.source": "Origen:",
-  "downloads.sourceApothecary": "Apothecary (recomendado)",
-  "downloads.sourceOfLibs": "ofLibs (experimental)",
+  "downloads.sourceApothecary": "Apothecary (GitHub) (recomendado)",
+  "downloads.sourceOfLibs": "ofLibs (GitHub) (experimental)",
   "downloads.sourceArchive": "Archivo (libs.danoli3.com)",
   "downloads.sourceNote.apothecary": "Paquetes precompilados de openframeworks/apothecary - la estructura estándar de openFrameworks.",
   "downloads.sourceNote.oflibs": "Zips por biblioteca de ofWorks/ofLibs, instalados en libs/<lib>. Orientado a ofWorks, algunas bibliotecas pueden necesitar ajustes de rutas.",
@@ -150,5 +150,6 @@
   "field.glVersion": "Versión de OpenGL (escritorio):",
   "option.glDefault": "Predeterminado (OpenGL 2.1)",
   "field.postBuild": "Script posterior a la compilación:",
-  "placeholder.postBuild": "Se ejecuta después de compilar el proyecto - run script de Xcode / evento posterior a la compilación de VS"
+  "placeholder.postBuild": "Se ejecuta después de compilar el proyecto - run script de Xcode / evento posterior a la compilación de VS",
+  "downloads.wasm64Confirm": "Las bibliotecas WASM64 reemplazan las bibliotecas lib/emscripten instaladas (se eliminan las de 32 bits). ¿Continuar?"
 }
