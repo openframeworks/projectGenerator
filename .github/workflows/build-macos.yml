@@ -147,6 +147,10 @@ jobs:
       - name: Test cmdline
         run: ../openFrameworks/apps/projectGenerator/scripts/osx/test_cmdline.sh
 
+      - name: Build emptyExample and allAddonsExample
+        shell: bash
+        run: ../openFrameworks/apps/projectGenerator/scripts/ci_build_examples.sh osx
+
       - name: Update Release macOS-arm64
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
         uses: softprops/action-gh-release@v2.0.8
