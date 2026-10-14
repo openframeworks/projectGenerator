@@ -152,7 +152,6 @@
   "field.postBuild": "Post-Build-Skript:",
   "placeholder.postBuild": "Läuft nach dem Kompilieren des Projekts - Xcode Run Script / VS-Postbuildereignis",
   "downloads.wasm64Confirm": "WASM64-Bibliotheken ersetzen die installierten lib/emscripten-Bibliotheken (die 32-Bit-Versionen werden entfernt). Fortfahren?",
-  "field.msys2Env": "MSYS2-Umgebung (VS Code):",
   "field.msys2Env": "MSYS2-Umgebung (msys2 / VS Code):",
   "option.msys2Ucrt64": "UCRT64 (Standard)",
   "option.msys2Mingw64": "MINGW64 (veraltet)",
