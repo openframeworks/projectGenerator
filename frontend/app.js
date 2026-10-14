@@ -1775,8 +1775,8 @@ function currentModularRelease() {
 const CORE_PLATFORM_LABELS = {
     osx: 'macOS (OSX only)',
     macos: 'macOS (including iOS, tvOS, catOS)',
-    ios: 'iOS',
-    tvos: 'tvOS',
+    ios: 'iOS (Apple)',
+    tvos: 'tvOS (Apple)',
     vs: 'Windows (Visual Studio)',
     msys2: 'Windows (MSYS2)',
     linux: 'Linux',
