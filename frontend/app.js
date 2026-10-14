@@ -1802,7 +1802,8 @@ function sortCorePlatforms(platforms) {
 function modularTargetLabel(target) {
     const named = {
         osx_64: 'macOS (OSX) (x86_64 / arm64)',
-        ios_64: 'iOS (arm64)',
+        ios_64: 'iOS (arm64) (Apple)',
+        tvos_64: 'tvOS (Apple)',
         vs_64: 'Windows (x64)',
         vs_arm64: 'Windows (arm64)',
         vs_arm64ec: 'Windows (arm64ec)',
