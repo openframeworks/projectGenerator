@@ -45,7 +45,7 @@ jobs:
             echo "RELEASE=${{ github.ref_name }}" >> $GITHUB_ENV
             echo "PRERELEASE=false" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
-            echo "RELEASE=nightly" >> $GITHUB_ENV
+            echo "RELEASE=latest" >> $GITHUB_ENV
             echo "PRERELEASE=false" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
             echo "RELEASE=bleeding" >> $GITHUB_ENV
@@ -117,6 +117,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
+          make_latest: ${{ env.RELEASE == 'latest' && 'false' || 'legacy' }}
           files: projectGenerator-linux.tar.bz2
 
       - name: Update Release Linux gui
@@ -125,14 +126,15 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
+          make_latest: ${{ env.RELEASE == 'latest' && 'false' || 'legacy' }}
           files: projectGenerator-linux-gui.gz
 
       - name: Update Latest Tag - DateTime
         uses: EndBug/latest-tag@latest
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
         with:
-          ref: nightly
-          description: Latest Always Nightly Builds
+          ref: latest
+          description: Latest master build (copied to nightly every night)
           force-branch: true
 
   # Ubuntu 22.04 build - older glibc baseline, covers users/distros that can't
@@ -153,7 +155,7 @@ jobs:
           if [[ "${{ github.ref }}" == refs/tags/* ]]; then
             echo "RELEASE=${{ github.ref_name }}" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
-            echo "RELEASE=nightly" >> $GITHUB_ENV
+            echo "RELEASE=latest" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
             echo "RELEASE=bleeding" >> $GITHUB_ENV
           else
@@ -199,6 +201,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
+          make_latest: ${{ env.RELEASE == 'latest' && 'false' || 'legacy' }}
           files: projectGenerator-linux-ubuntu22.tar.bz2
 
       - name: Update Release Linux gui ubuntu22
@@ -207,6 +210,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
+          make_latest: ${{ env.RELEASE == 'latest' && 'false' || 'legacy' }}
           files: projectGenerator-linux-ubuntu22-gui.gz
 
   # Native arm64 build for Raspberry Pi (64-bit Raspberry Pi OS / Ubuntu on Pi 3+).
@@ -229,7 +233,7 @@ jobs:
           if [[ "${{ github.ref }}" == refs/tags/* ]]; then
             echo "RELEASE=${{ github.ref_name }}" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
-            echo "RELEASE=nightly" >> $GITHUB_ENV
+            echo "RELEASE=latest" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/bleeding" ]]; then
             echo "RELEASE=bleeding" >> $GITHUB_ENV
           else
@@ -275,6 +279,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
+          make_latest: ${{ env.RELEASE == 'latest' && 'false' || 'legacy' }}
           files: projectGenerator-linux-arm64.tar.bz2
 
       - name: Update Release Linux gui arm64
@@ -283,4 +288,5 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
+          make_latest: ${{ env.RELEASE == 'latest' && 'false' || 'legacy' }}
           files: projectGenerator-linux-arm64-gui.gz
