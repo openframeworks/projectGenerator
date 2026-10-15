@@ -110,6 +110,8 @@ public:
 	// MSYS2 environment (ucrt64 | mingw64 | clang64) - only meaningful for VSCodeProject,
 	// a no-op everywhere else so callers don't need to know which target this applies to
 	virtual void setMsys2Environment(const std::string & env) {}
+	// emscripten wasm32 / wasm64 (-W/--emscripten-wasm), written to config.make PROJECT_EMSCRIPTEN_WASM; empty keeps the project's value
+	void setEmscriptenWasm(const std::string & bits) { emscriptenWasmOption = bits; }
 
 
 #ifdef OFADDON_OUTPUT_JSON_DEBUG
@@ -181,6 +183,9 @@ protected:
 	std::vector<ofAddon> addons;
 	std::vector<fs::path> extSrcPaths;
 	std::vector<std::string> projectDefines; // also written to config.make PROJECT_DEFINES for make builds
+	std::string emscriptenWasmOption; // from the CLI, empty = keep
+	std::string emscriptenWasm; // value for this project: "", "32" or "64"
+	void saveCMakeLists();
 	
 	//cached addons - if an addon is requested more than once, avoid loading from disk as it's quite slow
 	std::map<std::string,std::map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]

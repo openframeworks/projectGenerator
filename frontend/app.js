@@ -206,9 +206,20 @@ ipcRenderer.on('setSourceExtraPath', (event, [arg, index]) => { // TODO:
 //-------------------------------------------
 ipcRenderer.on('setGenerateMode', (event, arg) => {
     switchGenerateMode(arg);
+    // new projects start at wasm32; an existing project sends its own value via setEmscriptenWasm
+    if (arg === 'createMode') {
+        $('#wasmDropdown').dropdown('set selected', '32');
+        $('#wasmNote').hide();
+    }
 });
 
 //-------------------------------------------
+// existing project's PROJECT_EMSCRIPTEN_WASM, so updating keeps it
+ipcRenderer.on('setEmscriptenWasm', (event, bits) => {
+    $('#wasmDropdown').dropdown('set selected', bits === '64' ? '64' : '32');
+    $('#wasmNote').toggle(bits === '64');
+});
+
 ipcRenderer.on('importProjectSettings', (event, settings) => {
     $("#projectPath").val(settings.projectPath);
     $("#projectName").val(settings.projectName).trigger('change'); // change triggers addon scanning
@@ -992,6 +1003,7 @@ function setup() {
 
         $('#rendererDropdown').dropdown();
         $('#glDropdown, #webglDropdown, #glesDropdown').dropdown();
+        $('#wasmDropdown').dropdown({ onChange: (value) => $('#wasmNote').toggle(value === '64') });
         $('#rendererDropdown').dropdown('set exactly', 'default');
         $('#msys2EnvDropdown').dropdown();
         $('#msys2EnvDropdown').dropdown('set exactly', 'ucrt64');
@@ -1227,7 +1239,8 @@ function generate() {
         verbose: bVerbose,
         defines: definesArr.join(','),
         postBuild: $('#postBuildScript').val().trim(),
-        msys2Env: $('#msys2EnvField').css('display') !== 'none' ? $('#msys2EnvDropdown').dropdown('get value') : ''
+        msys2Env: $('#msys2EnvField').css('display') !== 'none' ? $('#msys2EnvDropdown').dropdown('get value') : '',
+        emscriptenWasm: $('#wasmField').css('display') !== 'none' ? $('#wasmDropdown').dropdown('get value') : ''
     };
 
     // console.log(gen);
@@ -1241,7 +1254,7 @@ function generate() {
         // the template pick is cleared in the #projectName change handler instead,
         // as soon as the user points at a different project - not here, so a plain
         // single generate doesn't wipe the pick you just used
-        lastGeneratedProject = { projectName: gen.projectName, projectPath: gen.projectPath, templateList: gen.templateList };
+        lastGeneratedProject = { projectName: gen.projectName, projectPath: gen.projectPath, templateList: gen.templateList, platformList: gen.platformList };
         openConsoleForOperation();
         ipcRenderer.send('generate', gen);
     }
@@ -1398,7 +1411,9 @@ function updateRendererFieldVisibility() {
         $('#rendererField').hide();
     }
     const selectedTemplates = ($("#templatesDropdown input").val() || '').trim().split(',');
-    $('#webglField').toggle(!!defaultSettings.advancedMode && selectedTemplates.includes('emscripten'));
+    const emscripten = selectedTemplates.includes('emscripten') || selectedPlatforms.includes('emscripten');
+    $('#webglField').toggle(!!defaultSettings.advancedMode && emscripten);
+    $('#wasmField').toggle(!!defaultSettings.advancedMode && emscripten);
     $('#glesField').toggle(!!defaultSettings.advancedMode && selectedPlatforms.some((p) => ['ios', 'macos'].includes(p)));
 
     const glPlatforms = ['osx', 'vs', 'msys2', 'linux', 'linux64', 'linuxarmv6l', 'linuxaarch64', 'vscode'];
@@ -1458,7 +1473,9 @@ function displayModal(message) {
             ipcRenderer.send('openExternal', $(e.currentTarget).prop("href") );
         });
 
-    const isEmscripten = lastGeneratedProject != null && lastGeneratedProject.templateList.includes('emscripten');
+    // emscripten template on osx/linux, or the emscripten platform
+    const isEmscripten = lastGeneratedProject != null
+        && (lastGeneratedProject.templateList.includes('emscripten') || (lastGeneratedProject.platformList || []).includes('emscripten'));
 
     $("#IDEButton").hide();
     $("#FolderButton").hide();
@@ -1635,7 +1652,7 @@ function launchInIDE(){
     for (let i = 0; i < templatePicked.length; i++){
         templateValueArray.push($(templatePicked[i]).attr("data-value"));
     }
-    if (templateValueArray.includes('emscripten')) {
+    if (templateValueArray.includes('emscripten') || getPlatformList().includes('emscripten')) {
         displayModal(`<!--modal-context:none:-->\n<strong>Emscripten</strong><br>${t('modal.emscriptenNoIde')}`);
         return;
     }

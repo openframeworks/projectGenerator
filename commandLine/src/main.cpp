@@ -34,7 +34,8 @@ enum optionIndex { UNKNOWN,
 	CLEANNAME_DISABLE,
 	DEFINES,
 	POSTBUILD,
-	MSYS2ENV
+	MSYS2ENV,
+	EMSCRIPTEN_WASM
 };
 
 constexpr option::Descriptor usage[] = {
@@ -64,6 +65,7 @@ constexpr option::Descriptor usage[] = {
 	{ DEFINES, 0, "D", "defines", option::Arg::Optional, "  --defines, -D  \tpreprocessor defines list (such as OF_USE_ANGLE=1,MY_FLAG)" },
 	{ POSTBUILD, 0, "P", "postbuild", option::Arg::Optional, "  --postbuild, -P  \tscript to run after the project compiles (Xcode run script / VS post-build event)" },
 	{ MSYS2ENV, 0, "k", "msys2env", option::Arg::Optional, "  --msys2env, -k  \tMSYS2 environment for the msys2 / VSCode targets: ucrt64 (default) | mingw64 | clang64 | clangarm64" },
+	{ EMSCRIPTEN_WASM, 0, "W", "emscripten-wasm", option::Arg::Optional, "  --emscripten-wasm, -W  \temscripten WebAssembly: 32 (default) | 64 (wasm64, MEMORY64), written to config.make PROJECT_EMSCRIPTEN_WASM" },
 
 	{ 0, 0, 0, 0, 0, 0 }
 };
@@ -93,6 +95,7 @@ vector<string> targets;
 vector<string> frameworks;
 vector<string> defines;
 string postBuildScript;
+string emscriptenWasm; // empty keeps the project's config.make value
 string ofPathEnv;
 string templateName;
 string msys2Env = "ucrt64";
@@ -264,6 +267,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 	if (!bDryRun) {
 		auto project = getTargetProject(target);
 		project->setMsys2Environment(msys2Env);
+		project->setEmscriptenWasm(emscriptenWasm);
 		project->create(path, templateName);
 
 		if (bConsiderParameterAddons && bAddonsPassedIn) {
@@ -615,6 +619,15 @@ int main(int argc, char ** argv) {
 		defines = ofSplitString(options[DEFINES].arg, ",", true, true);
 	}
 
+	if (options[EMSCRIPTEN_WASM].count() > 0 && options[EMSCRIPTEN_WASM].arg != NULL) {
+		std::string bits = ofTrim(options[EMSCRIPTEN_WASM].arg);
+		if (bits == "32" || bits == "64") {
+			emscriptenWasm = bits;
+		} else {
+			ofLogWarning() << "unknown emscripten wasm " << bits << ", expected 32 or 64 - keeping the project's setting";
+		}
+	}
+
 	if (options[POSTBUILD].count() > 0 && options[POSTBUILD].arg != NULL) {
 		postBuildScript = ofTrim(options[POSTBUILD].arg);
 	}
@@ -759,6 +772,7 @@ int main(int argc, char ** argv) {
 						ofLogNotice() << "project path is: [" << projectPath << "]";
 						auto project = getTargetProject(t);
 						project->setMsys2Environment(msys2Env);
+						project->setEmscriptenWasm(emscriptenWasm);
 						project->create(projectPath, templateName);
 						if(bAddonsPassedIn){
 							for (auto & addon : addons) {

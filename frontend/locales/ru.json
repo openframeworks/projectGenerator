@@ -155,5 +155,9 @@
   "field.msys2Env": "Среда MSYS2 (msys2 / VS Code):",
   "option.msys2Ucrt64": "UCRT64 (по умолчанию)",
   "option.msys2Mingw64": "MINGW64 (устаревшая)",
-  "option.msys2Clangarm64": "CLANGARM64 (Windows на ARM)"
+  "option.msys2Clangarm64": "CLANGARM64 (Windows на ARM)",
+  "field.emscriptenWasm": "WebAssembly (Emscripten):",
+  "option.wasm32": "32-бит (по умолчанию) (MEMORY32)",
+  "option.wasm64": "64-бит (WASM64) (MEMORY64)",
+  "note.wasm64": "Нужны библиотеки wasm64: запустите BITS=64 scripts/emscripten/download_libs.sh (заменяет установленные библиотеки lib/emscripten)."
 }

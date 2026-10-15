@@ -155,5 +155,9 @@
   "field.msys2Env": "Ambiente MSYS2 (msys2 / VS Code):",
   "option.msys2Ucrt64": "UCRT64 (padrão)",
   "option.msys2Mingw64": "MINGW64 (legado)",
-  "option.msys2Clangarm64": "CLANGARM64 (Windows no ARM)"
+  "option.msys2Clangarm64": "CLANGARM64 (Windows no ARM)",
+  "field.emscriptenWasm": "WebAssembly (Emscripten):",
+  "option.wasm32": "32 bits (padrão) (MEMORY32)",
+  "option.wasm64": "64 bits (WASM64) (MEMORY64)",
+  "note.wasm64": "Requer bibliotecas wasm64: execute BITS=64 scripts/emscripten/download_libs.sh (substitui as bibliotecas lib/emscripten instaladas)."
 }
