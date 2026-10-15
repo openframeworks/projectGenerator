@@ -198,7 +198,8 @@ void getFilesRecursively(const fs::path & path, std::vector < string > & fileNam
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
 
 	for (const auto & f : dirList(path)) {
-		if (fs::is_regular_file(f)) {
+		std::error_code ec;
+		if (fs::is_regular_file(f, ec)) {
 			fileNames.emplace_back(f.string());
 		}
 	}
@@ -209,7 +210,8 @@ void getFilesRecursively(const fs::path & path, std::vector < fs::path > & fileN
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
 
 	for (const auto & f : dirList(path)) {
-		if (fs::is_regular_file(f)) {
+		std::error_code ec;
+		if (fs::is_regular_file(f, ec)) {
 			fileNames.emplace_back(f.string());
 		}
 	}
@@ -275,16 +277,19 @@ void getFoldersRecursively(const fs::path & path, std::vector < fs::path > & fol
 
 	// TODO: disable recursion pending... it is not recursive yet.
 	if ((path.extension() != ".framework") || (path.extension() != ".xcframework")) {
-		for (const auto & entry : fs::directory_iterator(path)) {
+		std::error_code ec;
+		for (const auto & entry : fs::directory_iterator(path, fs::directory_options::skip_permission_denied, ec)) {
 			auto f = entry.path();
 			if (f.filename().c_str()[0] == '.') continue; // avoid hidden files .DS_Store .vscode .git etc
+			std::error_code dirEc;
+			bool isDir = entry.is_directory(dirEc) && !dirEc;
             bool shouldCheckPlatform = true;
-            if (fs::is_directory(f) && countSubdirectories(f) > 2 && f.string().find("src") != std::string::npos) {
+            if (isDir && countSubdirectories(f) > 2 && f.string().find("src") != std::string::npos) {
                 shouldCheckPlatform = false;
 //                cout << "getFoldersRecursively shouldCheckPlatform = false : " << f.filename().string() << endl;
             }
             
-            if (fs::is_directory(f) && (!shouldCheckPlatform || !isFolderNotCurrentPlatform(f.filename().string(), platform))) {
+            if (isDir && (!shouldCheckPlatform || !isFolderNotCurrentPlatform(f.filename().string(), platform))) {
                 getFoldersRecursively(f, folderNames, platform);
             }
 		}
@@ -298,7 +303,8 @@ void getPropsRecursively(const fs::path & path, std::vector < fs::path > & props
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
 
 	for (const auto & f : dirList(path)) {
-		if (fs::is_regular_file(f)) {
+		std::error_code ec;
+		if (fs::is_regular_file(f, ec)) {
 			if (f.extension() == ".props") {
 				props.emplace_back(f);
 			}
@@ -316,7 +322,8 @@ void getDllsRecursively(const fs::path & path, std::vector<fs::path> & dlls, str
 
 
 	for (const auto & f : dirList(path)) {
-		if (fs::is_regular_file(f) && (f.extension() == ".dll" || f.extension() == ".so")) {
+		std::error_code ec;
+		if (fs::is_regular_file(f, ec) && (f.extension() == ".dll" || f.extension() == ".so")) {
 			dlls.emplace_back(f.string());
 		}
 	}
@@ -334,10 +341,11 @@ void getLibsRecursively(const fs::path & path, std::vector < fs::path > & libFil
 		return;
 	}
 
-	fs::recursive_directory_iterator it { path };
+	std::error_code itEc;
+	fs::recursive_directory_iterator it { path, fs::directory_options::skip_permission_denied, itEc };
 	fs::recursive_directory_iterator last {  };
 
-	for(; it != last; ++it) {
+	for(; it != last; it.increment(itEc)) {
 		auto f = it->path();
 //		alert ("file: "+f.string(), 33);
 
@@ -490,10 +498,11 @@ vector <fs::path> dirList(const fs::path & path) {
 
 	if (dirListMap.find(keyPath) == dirListMap.end()) {
 //		alert ("will list dir " + path.string(), 35);
-		fs::recursive_directory_iterator it { path };
+		std::error_code itEc;
+		fs::recursive_directory_iterator it { path, fs::directory_options::skip_permission_denied, itEc };
 		fs::recursive_directory_iterator last {  };
 
-		for(; it != last; ++it) {
+		for(; it != last; it.increment(itEc)) {
 			// this wont' allow hidden directories files like .git to be added, and stop recursivity at this folder level.
 			if (it->path().filename().c_str()[0] == '.') {
 //				alert ("will disable recursion pending " + it->path().filename().string(), 34);
@@ -514,17 +523,19 @@ vector <fs::path> folderList(const fs::path & path) {
 	static std::map<fs::path, vector <fs::path >> folderListMap;
 
 	if (folderListMap.find(path) == folderListMap.end()) {
-		fs::recursive_directory_iterator it { path };
+		std::error_code itEc;
+		fs::recursive_directory_iterator it { path, fs::directory_options::skip_permission_denied, itEc };
 		fs::recursive_directory_iterator last {  };
 
-		for(; it != last; ++it) {
+		for(; it != last; it.increment(itEc)) {
 			// this wont' allow hidden directories files like .git to be added, and stop recursivity at this folder level.
 			if (it->path().filename().c_str()[0] == '.' || it->path().extension().string() == ".framework") {
 				it.disable_recursion_pending();
 				continue;
 			}
 
-			if (fs::is_directory(it->path())) {
+			std::error_code dirEc;
+			if (it->is_directory(dirEc) && !dirEc) {
 				folderListMap[path].emplace_back(it->path());
 			}
 		}
@@ -705,8 +716,10 @@ bool containsSourceFiles(const fs::path& dir) {
 		return false;
 	}
 
-	for (const auto& entry : fs::recursive_directory_iterator(normal)) {
-		if (fs::is_regular_file(entry)) {
+	std::error_code itEc;
+	for (const auto& entry : fs::recursive_directory_iterator(normal, fs::directory_options::skip_permission_denied, itEc)) {
+		std::error_code fileEc;
+		if (entry.is_regular_file(fileEc)) {
 			if (std::find(extensions.begin(), extensions.end(), entry.path().extension().string()) != extensions.end()) {
 				ofLogVerbose() << "Found source file: [" << entry.path().string() << "]";
 				return true;
