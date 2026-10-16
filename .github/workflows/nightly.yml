@@ -1,0 +1,59 @@
+name: nightly
+
+# master builds upload to the "latest" release; once a night its files are copied into a
+# freshly created "nightly" release so the release date (and tag) is the date it was published
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+jobs:
+  nightly:
+    if: github.repository == 'openframeworks/projectGenerator'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      LATEST: latest
+      NIGHTLY: nightly
+    steps:
+      - name: Copy latest into a new nightly release
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if ! gh release view "$LATEST" --repo "$REPO" > /dev/null 2>&1; then
+            echo "no latest release yet (made by master builds) - keeping the current nightly"
+            exit 0
+          fi
+
+          mkdir assets
+          gh release download "$LATEST" --repo "$REPO" --dir assets
+          ls -la assets
+          if [ -z "$(ls assets)" ]; then
+            echo "latest has no files - keeping the current nightly"
+            exit 0
+          fi
+
+          sha=$(gh api "repos/$REPO/commits/$LATEST" --jq .sha)
+          date=$(date -u +%Y-%m-%d)
+          echo "$LATEST is at $sha"
+
+          # upload into a draft first so nightly is only missing for the moment it takes to swap
+          gh release delete "$NIGHTLY-staging" --repo "$REPO" --yes 2> /dev/null || true
+          gh release create "$NIGHTLY-staging" assets/* --repo "$REPO" --draft --target "$sha" \
+            --title "$NIGHTLY $date" \
+            --notes "Nightly projectGenerator build from ${sha:0:7} ($date), copied from the latest release."
+
+          gh release delete "$NIGHTLY" --repo "$REPO" --cleanup-tag --yes 2> /dev/null || true
+          id=$(gh api "repos/$REPO/releases" --jq ".[] | select(.draft and .tag_name == \"$NIGHTLY-staging\") | .id" | head -1)
+          gh api -X PATCH "repos/$REPO/releases/$id" \
+            -f tag_name="$NIGHTLY" -f target_commitish="$sha" -F draft=false -f make_latest=true > /dev/null
+          gh release view "$NIGHTLY" --repo "$REPO" --json tagName,publishedAt,assets --jq '"\(.tagName) published \(.publishedAt) with \(.assets | length) files"'
