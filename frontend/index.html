@@ -291,6 +291,17 @@
 						</div>
 						<p class="ui small grey text" id="wasmNote" style="display: none" data-i18n="note.wasm64">Needs wasm64 libraries: run BITS=64 scripts/emscripten/download_libs.sh (replaces the installed lib/emscripten libraries).</p>
 					</div>
+					<div class="two fields" id="appVersionField">
+						<div class="field">
+							<label data-i18n="field.appVersion">Version:</label>
+							<input type="text" id="appVersion" placeholder="1.0" inputmode="decimal" autocomplete="off">
+						</div>
+						<div class="field">
+							<label data-i18n="field.appBuild">Build:</label>
+							<input type="text" id="appBuild" placeholder="1" inputmode="numeric" autocomplete="off">
+						</div>
+					</div>
+					<p class="ui small grey text" id="appVersionNote" style="display: none"></p>
 					<div class="field" id="glesField" style="display: none">
 						<label data-i18n="field.glesVersion">OpenGL ES version (iOS / tvOS):</label>
 						<div class="ui selection dropdown" id="glesDropdown">

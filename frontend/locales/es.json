@@ -159,5 +159,10 @@
   "field.emscriptenWasm": "WebAssembly (Emscripten):",
   "option.wasm32": "32 bits (predeterminado) (MEMORY32)",
   "option.wasm64": "64 bits (WASM64) (MEMORY64)",
-  "note.wasm64": "Requiere bibliotecas wasm64: ejecuta BITS=64 scripts/emscripten/download_libs.sh (reemplaza las bibliotecas lib/emscripten instaladas)."
+  "note.wasm64": "Requiere bibliotecas wasm64: ejecuta BITS=64 scripts/emscripten/download_libs.sh (reemplaza las bibliotecas lib/emscripten instaladas).",
+  "field.appVersion": "Versión:",
+  "field.appBuild": "Compilación:",
+  "tooltip.appVersionInvalid": "La versión debe contener solo dígitos y puntos, p. ej. 1, 1.2 o 1.2.3.",
+  "tooltip.appBuildInvalid": "La compilación debe ser un número entero positivo, p. ej. 42.",
+  "note.appVersionDiffers": "{{file}} tiene otra versión: {{value}} - se usa la de config.make."
 }

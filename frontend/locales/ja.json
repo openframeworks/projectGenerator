@@ -159,5 +159,10 @@
   "field.emscriptenWasm": "WebAssembly (Emscripten):",
   "option.wasm32": "32ビット (デフォルト) (MEMORY32)",
   "option.wasm64": "64ビット (WASM64) (MEMORY64)",
-  "note.wasm64": "wasm64 ライブラリが必要です: BITS=64 scripts/emscripten/download_libs.sh を実行してください (インストール済みの lib/emscripten ライブラリを置き換えます)。"
+  "note.wasm64": "wasm64 ライブラリが必要です: BITS=64 scripts/emscripten/download_libs.sh を実行してください (インストール済みの lib/emscripten ライブラリを置き換えます)。",
+  "field.appVersion": "バージョン:",
+  "field.appBuild": "ビルド:",
+  "tooltip.appVersionInvalid": "バージョンは数字とドットのみで指定してください (例: 1、1.2、1.2.3)。",
+  "tooltip.appBuildInvalid": "ビルドは正の整数で指定してください (例: 42)。",
+  "note.appVersionDiffers": "{{file}} のバージョンが異なります: {{value}} - config.make の値を使用します。"
 }

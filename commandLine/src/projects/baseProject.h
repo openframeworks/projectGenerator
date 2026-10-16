@@ -112,6 +112,7 @@ public:
 	virtual void setMsys2Environment(const std::string & env) {}
 	// emscripten wasm32 / wasm64 (-W/--emscripten-wasm), written to config.make PROJECT_EMSCRIPTEN_WASM; empty keeps the project's value
 	void setEmscriptenWasm(const std::string & bits) { emscriptenWasmOption = bits; }
+	void setAppVersion(const std::string & version, const std::string & build) { appVersionOption = version; appBuildOption = build; }
 
 
 #ifdef OFADDON_OUTPUT_JSON_DEBUG
@@ -186,6 +187,10 @@ protected:
 	std::string emscriptenWasmOption; // from the CLI, empty = keep
 	std::string emscriptenWasm; // value for this project: "", "32" or "64"
 	void saveCMakeLists();
+	void saveAppVersionFiles();
+	std::string appVersionOption, appBuildOption; // from the CLI, empty = keep
+	std::string appVersion { "1.0" }, appBuild { "1" }; // value for this project
+	bool isDefaultAppVersion() const { return appVersion == "1.0" && appBuild == "1"; }
 	
 	//cached addons - if an addon is requested more than once, avoid loading from disk as it's quite slow
 	std::map<std::string,std::map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]

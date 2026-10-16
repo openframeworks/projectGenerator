@@ -142,6 +142,65 @@ static std::string readCMakeEmscriptenWasm(const fs::path & cmakeLists) {
 	return "";
 }
 
+// APP_VERSION / APP_BUILD in config.make (openFrameworks#8592)
+static std::pair<std::string, std::string> readMakeAppVersion(const fs::path & configMake) {
+	std::string version, build;
+	if (!fs::exists(configMake)) return { version, build };
+	for (auto & line : fileToStrings(configMake)) {
+		auto config = ofTrim(line);
+		if (config.empty() || config[0] == '#') continue;
+		auto eq = config.find('=');
+		if (eq == std::string::npos) continue;
+		auto var = ofTrim(config.substr(0, eq));
+		if (!var.empty() && (var.back() == '?' || var.back() == '+' || var.back() == ':')) var = ofTrim(var.substr(0, var.size() - 1));
+		if (var == "APP_VERSION") version = ofTrim(config.substr(eq + 1));
+		if (var == "APP_BUILD") build = ofTrim(config.substr(eq + 1));
+	}
+	return { version, build };
+}
+
+// set(APP_VERSION ...) / set(APP_BUILD ...) in an openFrameworks CMakeLists.txt (openFrameworks#8586)
+static std::pair<std::string, std::string> readCMakeAppVersion(const fs::path & cmakeLists) {
+	static const std::regex versionSet(R"re(^\s*set\(\s*APP_VERSION\s+"?([0-9.]+)"?\s*\))re");
+	static const std::regex buildSet(R"re(^\s*set\(\s*APP_BUILD\s+"?([0-9]+)"?\s*\))re");
+	std::string version, build;
+	std::smatch m;
+	if (!fs::exists(cmakeLists)) return { version, build };
+	for (auto & line : fileToStrings(cmakeLists)) {
+		if (std::regex_search(line, m, versionSet)) version = m[1];
+		if (std::regex_search(line, m, buildSet)) build = m[1];
+	}
+	return { version, build };
+}
+
+// MARKETING_VERSION / CURRENT_PROJECT_VERSION in the .xcodeproj target settings
+static std::pair<std::string, std::string> readXcodeAppVersion(const fs::path & pbxproj) {
+	static const std::regex versionSet(R"re("?MARKETING_VERSION"?\s*[:=]\s*"?([0-9.]+)"?)re");
+	static const std::regex buildSet(R"re("?CURRENT_PROJECT_VERSION"?\s*[:=]\s*"?([0-9]+)"?)re");
+	std::string version, build;
+	std::smatch m;
+	if (!fs::exists(pbxproj)) return { version, build };
+	for (auto & line : fileToStrings(pbxproj)) {
+		if (version.empty() && std::regex_search(line, m, versionSet)) version = m[1];
+		if (build.empty() && std::regex_search(line, m, buildSet)) build = m[1];
+	}
+	return { version, build };
+}
+
+// versionName / versionCode in the android ofApp/build.gradle
+static std::pair<std::string, std::string> readGradleAppVersion(const fs::path & gradle) {
+	static const std::regex versionSet(R"re(^\s*versionName\s+['"]([0-9.]+)['"])re");
+	static const std::regex buildSet(R"re(^\s*versionCode\s+([0-9]+))re");
+	std::string version, build;
+	std::smatch m;
+	if (!fs::exists(gradle)) return { version, build };
+	for (auto & line : fileToStrings(gradle)) {
+		if (std::regex_search(line, m, versionSet)) version = m[1];
+		if (std::regex_search(line, m, buildSet)) build = m[1];
+	}
+	return { version, build };
+}
+
 bool baseProject::create(const fs::path & _path, string templateName){
 //	alert("baseProject::create " + path.string() + " : " + templateName, 35);
 	auto path = _path; // just because it is const
@@ -191,6 +250,32 @@ bool baseProject::create(const fs::path & _path, string templateName){
 	if (emscriptenWasm.empty()) emscriptenWasm = readCMakeEmscriptenWasm(projectDir / "CMakeLists.txt");
 	if (!emscriptenWasm.empty()) {
 		ofLogNotice() << "{ \"emscriptenWasm\": \"" << emscriptenWasm << "\" }";
+	}
+
+	// app version / build: config.make first, then CMakeLists, Xcode, Android; the CLI value wins
+	{
+		std::vector<std::pair<std::string, std::pair<std::string, std::string>>> found {
+			{ "config.make", readMakeAppVersion(projectDir / "config.make") },
+			{ "CMakeLists.txt", readCMakeAppVersion(projectDir / "CMakeLists.txt") },
+			{ "xcodeproj", readXcodeAppVersion(projectDir / (projectName + ".xcodeproj") / "project.pbxproj") },
+			{ "build.gradle", readGradleAppVersion(projectDir / "ofApp" / "build.gradle") },
+		};
+		std::string version, build, versionFrom, buildFrom;
+		for (auto & f : found) {
+			if (version.empty() && !f.second.first.empty()) { version = f.second.first; versionFrom = f.first; }
+			if (build.empty() && !f.second.second.empty()) { build = f.second.second; buildFrom = f.first; }
+		}
+		for (auto & f : found) {
+			if (!f.second.first.empty() && f.second.first != version) {
+				ofLogWarning() << "app version " << f.second.first << " in " << f.first << " differs from " << version << " in " << versionFrom << " - using " << versionFrom;
+			}
+			if (!f.second.second.empty() && f.second.second != build) {
+				ofLogWarning() << "app build " << f.second.second << " in " << f.first << " differs from " << build << " in " << buildFrom << " - using " << buildFrom;
+			}
+		}
+		appVersion = !appVersionOption.empty() ? appVersionOption : (!version.empty() ? version : "1.0");
+		appBuild = !appBuildOption.empty() ? appBuildOption : (!build.empty() ? build : "1");
+		ofLogNotice() << "{ \"appVersion\": \"" << appVersion << "\", \"appBuild\": \"" << appBuild << "\" }";
 	}
 	if (emscriptenWasm == "64") {
 		bool bHasWasm64Libs = false;
@@ -338,6 +423,8 @@ bool baseProject::save(){
 	std::ofstream saveConfig(projectDir / "config.make");
 	bool bWroteDefines = false;
 	bool bWroteWasm = false;
+	bool bWroteAppVersion = false;
+	bool bWroteAppBuild = false;
 
 	for (auto & str : lines) {
 		//add the of root path
@@ -370,6 +457,19 @@ bool baseProject::save(){
 				bWroteWasm = true;
 			}
 		}
+		// app version / build (openFrameworks#8592): the defaults leave the section commented
+		else if( str.rfind("# APP_VERSION =", 0) == 0 || str.rfind("APP_VERSION =", 0) == 0 ){
+			if (!bWroteAppVersion) {
+				saveConfig << (isDefaultAppVersion() ? "# " : "") << "APP_VERSION = " << appVersion << std::endl;
+				bWroteAppVersion = true;
+			}
+		}
+		else if( str.rfind("# APP_BUILD =", 0) == 0 || str.rfind("APP_BUILD =", 0) == 0 ){
+			if (!bWroteAppBuild) {
+				saveConfig << (isDefaultAppVersion() ? "# " : "") << "APP_BUILD = " << appBuild << std::endl;
+				bWroteAppBuild = true;
+			}
+		}
 		else if( emscriptenWasm == "32" && str.rfind("EMSCRIPTEN_MEMORY64", 0) == 0 ){
 			saveConfig << "# " << str << std::endl;
 		} else {
@@ -383,7 +483,14 @@ bool baseProject::save(){
 		saveConfig << "# emscripten: 32 (default) or 64 (wasm64, MEMORY64)" << std::endl;
 		saveConfig << "PROJECT_EMSCRIPTEN_WASM = 64" << std::endl;
 	}
+	if (!isDefaultAppVersion() && lines.size() && (!bWroteAppVersion || !bWroteAppBuild)) {
+		saveConfig << std::endl << "# app version and build number" << std::endl;
+		if (!bWroteAppVersion) saveConfig << "APP_VERSION = " << appVersion << std::endl;
+		if (!bWroteAppBuild) saveConfig << "APP_BUILD = " << appBuild << std::endl;
+	}
+	saveConfig.close();
 	saveCMakeLists();
+	saveAppVersionFiles();
 
 #ifdef OFADDON_OUTPUT_JSON_DEBUG
     saveAddonsToJson();
@@ -980,6 +1087,34 @@ bool baseProject::copyTemplateFile::run() {
 	return true;
 }
 
+// app version / build in Project.xcconfig (Xcode) and ofApp/build.gradle (Android)
+static void replaceLines(const fs::path & file, const std::vector<std::pair<std::regex, std::string>> & replacements) {
+	if (!fs::exists(file)) return;
+	auto lines = fileToStrings(file);
+	std::ofstream out(file);
+	for (auto & line : lines) {
+		// regex group 1 is kept, the rest of the match becomes the value ("$1" + "42" would read as group 14)
+		for (auto & r : replacements) {
+			std::smatch m;
+			if (std::regex_search(line, m, r.first)) {
+				line = m.prefix().str() + m[1].str() + r.second + m.suffix().str();
+			}
+		}
+		out << line << std::endl;
+	}
+}
+
+void baseProject::saveAppVersionFiles() {
+	replaceLines(projectDir / "Project.xcconfig", {
+		{ std::regex(R"re(^(\s*MARKETING_VERSION\s*=\s*)[^\s/]+)re"), appVersion },
+		{ std::regex(R"re(^(\s*CURRENT_PROJECT_VERSION\s*=\s*)[^\s/]+)re"), appBuild },
+	});
+	replaceLines(projectDir / "ofApp" / "build.gradle", {
+		{ std::regex(R"re(^(\s*versionCode\s+)[0-9]+)re"), appBuild },
+		{ std::regex(R"re(^(\s*versionName\s+)['"][^'"]*['"])re"), "'" + appVersion + "'" },
+	});
+}
+
 // OF_ROOT and PROJECT_EMSCRIPTEN_WASM in an openFrameworks app CMakeLists.txt, like config.make
 void baseProject::saveCMakeLists() {
 	fs::path cmakeLists { projectDir / "CMakeLists.txt" };
@@ -995,9 +1130,27 @@ void baseProject::saveCMakeLists() {
 	}
 	static const std::regex ofRootSet(R"re(^(\s*)set\(OF_ROOT\s+"[^"]*"\))re");
 	static const std::regex wasmSet(R"re(^\s*set\(\s*PROJECT_EMSCRIPTEN_WASM\b)re");
+	static const std::regex appVersionSet(R"re(^\s*#?\s*set\(\s*APP_(VERSION|BUILD)\b)re");
+	static const std::regex addApp(R"re(^\s*of_add_app\s*\()re");
+	string comment = isDefaultAppVersion() ? "# " : "";
+	bool bWroteAppVersion = false;
+	auto writeAppVersion = [&](std::ofstream & o) {
+		if (bWroteAppVersion) return;
+		o << comment << "set(APP_VERSION " << appVersion << ")" << std::endl;
+		o << comment << "set(APP_BUILD " << appBuild << ")" << std::endl;
+		bWroteAppVersion = true;
+	};
 
 	std::ofstream out(cmakeLists);
 	for (auto & line : lines) {
+		if (std::regex_search(line, appVersionSet)) {
+			writeAppVersion(out);
+			continue;
+		}
+		if (std::regex_search(line, addApp) && !bWroteAppVersion) {
+			if (!isDefaultAppVersion()) writeAppVersion(out);
+			bWroteAppVersion = true;
+		}
 		if (!emscriptenWasm.empty() && std::regex_search(line, wasmSet)) continue;
 		if (line.find(OF_CMAKE_INCLUDE) != std::string::npos && emscriptenWasm == "64") {
 			out << "# emscripten: 32 (default) or 64 (wasm64, MEMORY64)" << std::endl;

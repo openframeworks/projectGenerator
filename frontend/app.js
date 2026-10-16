@@ -210,7 +210,19 @@ ipcRenderer.on('setGenerateMode', (event, arg) => {
     if (arg === 'createMode') {
         $('#wasmDropdown').dropdown('set selected', '32');
         $('#wasmNote').hide();
+        $('#appVersion').val('');
+        $('#appBuild').val('');
+        $('#appVersionNote').hide();
     }
+});
+
+//-------------------------------------------
+// existing project's app version / build, so updating keeps them
+ipcRenderer.on('setAppVersion', (event, { version, build, differs }) => {
+    $('#appVersion').val(version || '');
+    $('#appBuild').val(build || '');
+    const note = (differs || []).map((d) => t('note.appVersionDiffers', { file: d.file, value: d.value })).join(' ');
+    $('#appVersionNote').text(note).toggle(note.length > 0);
 });
 
 //-------------------------------------------
@@ -1240,7 +1252,9 @@ function generate() {
         defines: definesArr.join(','),
         postBuild: $('#postBuildScript').val().trim(),
         msys2Env: $('#msys2EnvField').css('display') !== 'none' ? $('#msys2EnvDropdown').dropdown('get value') : '',
-        emscriptenWasm: $('#wasmField').css('display') !== 'none' ? $('#wasmDropdown').dropdown('get value') : ''
+        emscriptenWasm: $('#wasmField').css('display') !== 'none' ? $('#wasmDropdown').dropdown('get value') : '',
+        appVersion: $('#appVersion').val().trim(),
+        appBuild: $('#appBuild').val().trim()
     };
 
     // console.log(gen);
@@ -1250,6 +1264,10 @@ function generate() {
         $("#projectPath").oneTimeTooltip(t('tooltip.projectPathEmpty'));
     } else if (gen.platformList == null || lengthOfPlatforms == 0) {
         $("#platformsDropdown").oneTimeTooltip(t('tooltip.selectPlatformFirst'));
+    } else if (gen.appVersion !== '' && !/^\d+(\.\d+)*$/.test(gen.appVersion)) {
+        $("#appVersion").oneTimeTooltip(t('tooltip.appVersionInvalid'));
+    } else if (gen.appBuild !== '' && !/^[1-9]\d*$/.test(gen.appBuild)) {
+        $("#appBuild").oneTimeTooltip(t('tooltip.appBuildInvalid'));
     } else {
         // the template pick is cleared in the #projectName change handler instead,
         // as soon as the user points at a different project - not here, so a plain

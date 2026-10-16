@@ -3,6 +3,7 @@
 
 #include "Utils.h"
 #include "defines.h"
+#include <regex>
 #include "ofUtils.h"
 #include "ofFileUtils.h"
 #include "ofSystemUtils.h"
@@ -35,7 +36,9 @@ enum optionIndex { UNKNOWN,
 	DEFINES,
 	POSTBUILD,
 	MSYS2ENV,
-	EMSCRIPTEN_WASM
+	EMSCRIPTEN_WASM,
+	APP_VERSION,
+	APP_BUILD
 };
 
 constexpr option::Descriptor usage[] = {
@@ -67,6 +70,8 @@ constexpr option::Descriptor usage[] = {
 	{ MSYS2ENV, 0, "k", "msys2env", option::Arg::Optional, "  --msys2env, -k  \tMSYS2 environment for the msys2 / VSCode targets: ucrt64 (default) | mingw64 | clang64 | clangarm64" },
 	{ EMSCRIPTEN_WASM, 0, "W", "emscripten-wasm", option::Arg::Optional, "  --emscripten-wasm, -W  \temscripten WebAssembly: 32 (default) | 64 (wasm64, MEMORY64), written to config.make PROJECT_EMSCRIPTEN_WASM" },
 
+	{ APP_VERSION, 0, "", "app-version", option::Arg::Optional, "  --app-version  \tapp version, eg 1.2.3 (default 1.0): config.make / CMake APP_VERSION, Xcode MARKETING_VERSION, Android versionName" },
+	{ APP_BUILD, 0, "", "app-build", option::Arg::Optional, "  --app-build  \tbuild number, eg 42 (default 1): config.make / CMake APP_BUILD, Xcode CURRENT_PROJECT_VERSION, Android versionCode" },
 	{ 0, 0, 0, 0, 0, 0 }
 };
 
@@ -96,6 +101,8 @@ vector<string> frameworks;
 vector<string> defines;
 string postBuildScript;
 string emscriptenWasm; // empty keeps the project's config.make value
+string appVersion; // empty keeps the project's value
+string appBuild;
 string ofPathEnv;
 string templateName;
 string msys2Env = "ucrt64";
@@ -268,6 +275,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 		auto project = getTargetProject(target);
 		project->setMsys2Environment(msys2Env);
 		project->setEmscriptenWasm(emscriptenWasm);
+		project->setAppVersion(appVersion, appBuild);
 		project->create(path, templateName);
 
 		if (bConsiderParameterAddons && bAddonsPassedIn) {
@@ -628,6 +636,23 @@ int pgMain(int argc, char ** argv) {
 		}
 	}
 
+	if (options[APP_VERSION].count() > 0 && options[APP_VERSION].arg != NULL) {
+		std::string v = ofTrim(options[APP_VERSION].arg);
+		if (std::regex_match(v, std::regex(R"(\d+(\.\d+)*)"))) {
+			appVersion = v;
+		} else {
+			ofLogWarning() << "app version " << v << " should be digits and dots (eg 1.2.3) - keeping the project's version";
+		}
+	}
+	if (options[APP_BUILD].count() > 0 && options[APP_BUILD].arg != NULL) {
+		std::string b = ofTrim(options[APP_BUILD].arg);
+		if (std::regex_match(b, std::regex(R"([1-9]\d*)"))) {
+			appBuild = b;
+		} else {
+			ofLogWarning() << "app build " << b << " should be a positive integer - keeping the project's build";
+		}
+	}
+
 	if (options[POSTBUILD].count() > 0 && options[POSTBUILD].arg != NULL) {
 		postBuildScript = ofTrim(options[POSTBUILD].arg);
 	}
@@ -773,6 +798,7 @@ int pgMain(int argc, char ** argv) {
 						auto project = getTargetProject(t);
 						project->setMsys2Environment(msys2Env);
 						project->setEmscriptenWasm(emscriptenWasm);
+						project->setAppVersion(appVersion, appBuild);
 						project->create(projectPath, templateName);
 						if(bAddonsPassedIn){
 							for (auto & addon : addons) {
