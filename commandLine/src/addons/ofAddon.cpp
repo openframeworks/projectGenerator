@@ -18,7 +18,8 @@ void ofAddon::getFrameworksRecursively(const fs::path & path, string platform, s
 	if (!fs::exists(path) || !fs::is_directory(path)) return;
 
 	for (const auto & f : dirList(path)) {
-		if (fs::is_directory(f)) {
+		std::error_code ec;
+		if (fs::is_directory(f, ec)) {
 			if (f.extension() == ".framework" || f.extension() == ".xcframework") {
 //				alert ("found XCF " + f.string(), 31);
 				bool platformFound = false;

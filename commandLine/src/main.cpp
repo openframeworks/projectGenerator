@@ -435,7 +435,7 @@ void printHelp() {
 	consoleSpace();
 }
 
-int main(int argc, char ** argv) {
+int pgMain(int argc, char ** argv) {
 	messageReturn("openFrameworks projectGenerator", getPGVersion());
 	bAddonsPassedIn = false;
 	bDryRun = false;
@@ -817,4 +817,16 @@ int main(int argc, char ** argv) {
 	messageReturn("status", "EXIT_OK");
 
 	return EXIT_OK;
+}
+
+int main(int argc, char ** argv) {
+	// an uncaught exception ends in abort(), which MSVC reports as 0xC0000409 with no message (#8545)
+	try {
+		return pgMain(argc, argv);
+	} catch (const fs::filesystem_error & ex) {
+		messageError(string("filesystem error: ") + ex.what() + " path1: [" + ex.path1().string() + "] path2: [" + ex.path2().string() + "]");
+	} catch (const std::exception & ex) {
+		messageError(string("exception: ") + ex.what());
+	}
+	return EXIT_FAILURE;
 }
