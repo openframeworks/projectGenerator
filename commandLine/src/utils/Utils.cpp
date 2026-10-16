@@ -672,9 +672,13 @@ void createBackup(const fs::path & path, const fs::path & backupPath) {
    }
 }
 
+// absolute + lexically normal, without resolving symlinks (symlinked addons / libs keep their path, #641)
 std::string normalizePath(const std::string& path) {
 	try {
-		auto value = fs::weakly_canonical(path);
+		auto value = fs::absolute(path).lexically_normal();
+		if (!value.has_filename() && value.has_relative_path()) {
+			value = value.parent_path(); // drop trailing separator like weakly_canonical did
+		}
 //#ifdef TARGET_WIN32
 //		fixSlashOrderPath(value);
 //#endif
@@ -688,7 +692,10 @@ std::string normalizePath(const std::string& path) {
 
 fs::path normalizePath(const fs::path& path) {
 	try {
-		auto value = fs::weakly_canonical(path);
+		auto value = fs::absolute(path).lexically_normal();
+		if (!value.has_filename() && value.has_relative_path()) {
+			value = value.parent_path(); // drop trailing separator like weakly_canonical did
+		}
 //#ifdef TARGET_WIN32
 //		fixSlashOrderPath(value);
 //#endif
@@ -700,12 +707,45 @@ fs::path normalizePath(const fs::path& path) {
 	}
 }
 
-fs::path makeRelative(const fs::path& from, const fs::path& to) {
-	fs::path relative = fs::relative(to, from);
-//#ifdef TARGET_WIN32
-//		fixSlashOrderPath(relative);
-//#endif
+// relative path without resolving symlinks, so symlinked addons / libs (worktrees, versioned dylibs) keep their path (#641)
+fs::path lexicalRelative(const fs::path& from, const fs::path& to) {
+	fs::path fromAbs = fs::absolute(from).lexically_normal();
+	fs::path toAbs = fs::absolute(to).lexically_normal();
+	fs::path relative = toAbs.lexically_relative(fromAbs);
+	if (relative.empty()) {
+		return toAbs;
+	}
+	// one side spelled through a symlink (eg /tmp vs /private/tmp): fall back to the resolved relative path
+	std::error_code ec;
+	if (fs::exists(toAbs, ec) && !fs::equivalent(fromAbs / relative, toAbs, ec)) {
+		fs::path resolved = fs::relative(to, from, ec);
+		if (!ec && !resolved.empty()) {
+			return resolved;
+		}
+	}
 	return relative;
+}
+
+// absolute paths outside the OF root (eg Homebrew /opt/homebrew/include) stay absolute (#641)
+bool isAbsoluteOutsideOF(const fs::path& path) {
+	if (!path.is_absolute()) {
+		return false;
+	}
+	fs::path root = fs::absolute(getOFRoot()).lexically_normal();
+	fs::path lexical = path.lexically_normal().lexically_relative(root);
+	if (lexical.empty() || *lexical.begin() != "..") {
+		return false;
+	}
+	std::error_code ec;
+	fs::path resolved = fs::relative(path, root, ec);
+	return ec || resolved.empty() || *resolved.begin() == "..";
+}
+
+fs::path makeRelative(const fs::path& from, const fs::path& to) {
+	if (isAbsoluteOutsideOF(to)) {
+		return to;
+	}
+	return lexicalRelative(from, to);
 }
 
 bool containsSourceFiles(const fs::path& dir) {
