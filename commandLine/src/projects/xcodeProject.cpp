@@ -563,7 +563,7 @@ void xcodeProject::addInclude(const fs::path & includeName) {
 
 void xcodeProject::addLibrary(const LibraryBinary & lib) {
 	for (auto & c : buildConfigs) {
-		addCommand("Add :objects:" + c + ":buildSettings:OTHER_LDFLAGS: string " + ofPathToString(fs::relative(lib.path)));
+		addCommand("Add :objects:" + c + ":buildSettings:OTHER_LDFLAGS: string " + ofPathToString(makeRelative(fs::current_path(), lib.path)));
 	}
 }
 
@@ -677,7 +677,9 @@ void xcodeProject::addAddonFrameworks(const ofAddon & addon) {
 		if (found == string::npos) {
 			isRelativeToSDK = true;
 		}
-		fs::path folder = isRelativeToSDK ? "Frameworks" : addon.filesToFolders.at(f);
+		// absolute frameworks outside the addon (eg /Library/Frameworks) aren't in filesToFolders (#641)
+		auto folderIt = addon.filesToFolders.find(f);
+		fs::path folder = (isRelativeToSDK || folderIt == addon.filesToFolders.end()) ? fs::path { "Frameworks" } : folderIt->second;
 		addFramework(path, folder, isRelativeToSDK);
 	}
 }

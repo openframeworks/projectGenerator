@@ -15,6 +15,7 @@
 
 
 namespace fs = of::filesystem;
+fs::path lexicalRelative(const fs::path& from, const fs::path& to); // Utils.h
 using std::string;
 using std::vector;
 
@@ -247,7 +248,7 @@ private:
 	fs::path normalizePath(const fs::path& path) {
 		try {
 //			auto value = fs::weakly_canonical(path);
-			auto value = fs::relative(path);
+			auto value = lexicalRelative(fs::current_path(), path);
 			return value;
 		} catch (const std::exception& ex) {
 			std::cout << "Canonical path for [" << path << "] threw exception:\n"

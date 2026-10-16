@@ -775,9 +775,11 @@ void ofAddon::addToFolder(const fs::path& path, const fs::path & parentFolder){
 
 	fs::path folder;
 	if (isLocalAddon) {
-		folder = fs::path { "local_addons" } / fs::relative(path.parent_path(), parentFolder);
+		folder = fs::path { "local_addons" } / lexicalRelative(parentFolder, path.parent_path());
+	} else if (isAbsoluteOutsideOF(path)) {
+		folder = "external";
 	} else {
-		folder = fs::relative(path.parent_path(), getOFRoot());
+		folder = lexicalRelative(getOFRoot(), path.parent_path());
 	}
 	filesToFolders[path] = folder;
 }
@@ -1084,8 +1086,8 @@ fs::path ofAddon::fixPath(const fs::path & path) {
 	 which is not good for macos dylibs, like ofxHapPlayer, so I had to replace with the original filename back
 	 */
 	if(isLocalAddon){
-		return normalizePath(( pathToProject / fs::relative(path, pathToProject) ).parent_path() / path.filename());
+		return normalizePath(( pathToProject / lexicalRelative(pathToProject, path) ).parent_path() / path.filename());
 	}else{
-		return normalizePath(( pathToOF / fs::relative(path, getOFRoot()) ).parent_path() / path.filename());
+		return normalizePath(( pathToOF / lexicalRelative(getOFRoot(), path) ).parent_path() / path.filename());
 	}
 }

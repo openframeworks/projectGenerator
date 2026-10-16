@@ -152,6 +152,8 @@ EmscriptenSDK resolveEmscriptenSDK();
 
 int runOfMenu(const std::string & subcommand);
 
+fs::path lexicalRelative(const fs::path& from, const fs::path& to);
+bool isAbsoluteOutsideOF(const fs::path& path);
 fs::path makeRelative(const fs::path& from, const fs::path& to);
 
 bool ofIsPathInPath(const fs::path & path, const fs::path & base);
