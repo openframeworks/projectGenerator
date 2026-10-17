@@ -89,6 +89,57 @@ function findOFPathUpwards(startPath) {
 }
 
 /**
+ * Picks the Apple platform matching the libraries this OF package was bundled with (#607):
+ * xcframeworks with iOS / tvOS slices = Mega macOS, only macOS libs = osx, only iOS / tvOS libs = ios.
+ * @param {string} ofPath - The openFrameworks root.
+ * @returns {string|null} "macos", "osx", "ios" or null when no Apple libs are found.
+ */
+function detectApplePlatformFromLibs(ofPath) {
+    const libsDir = path.join(ofPath || '', 'libs');
+    let hasMacOS = false;
+    let hasMega = false;
+    let hasIOS = false;
+    const hasFiles = (dir) => {
+        try {
+            return fs.readdirSync(dir).some((f) => !f.startsWith('.'));
+        } catch (e) {
+            return false;
+        }
+    };
+    let libs = [];
+    try {
+        libs = fs.readdirSync(libsDir).filter((l) => l !== 'openFrameworksCompiled' && !l.startsWith('.'));
+    } catch (e) {
+        return null;
+    }
+    for (const lib of libs) {
+        const libDir = path.join(libsDir, lib, 'lib');
+        if (hasFiles(path.join(libDir, 'osx'))) hasMacOS = true;
+        if (hasFiles(path.join(libDir, 'ios')) || hasFiles(path.join(libDir, 'tvos'))) hasIOS = true;
+        let xcframeworks = [];
+        try {
+            xcframeworks = fs.readdirSync(path.join(libDir, 'macos')).filter((f) => f.endsWith('.xcframework'));
+        } catch (e) {
+            continue;
+        }
+        for (const xcf of xcframeworks) {
+            let slices = [];
+            try {
+                slices = fs.readdirSync(path.join(libDir, 'macos', xcf));
+            } catch (e) {
+                continue;
+            }
+            if (slices.some((d) => d.startsWith('macos-'))) hasMacOS = true;
+            if (slices.some((d) => d.startsWith('ios-') || d.startsWith('tvos-'))) hasMega = true;
+        }
+    }
+    if (hasMega) return 'macos';
+    if (hasMacOS) return 'osx';
+    if (hasIOS) return 'ios';
+    return null;
+}
+
+/**
  * Determines the current platform based on process information.
  * @returns {string} The platform identifier.
  */
@@ -155,8 +206,9 @@ try {
     settings = JSON.parse(settingsJsonString);
     console.log(settings);
 
-    if (!settings.defaultPlatform) {
-        settings.defaultPlatform = getDefaultTemplateForPlatform(getCurrentPlatform());
+    // older settings stored the template label (has spaces) instead of the platform id
+    if (!settings.defaultPlatform || settings.defaultPlatform.includes(' ')) {
+        settings.defaultPlatform = getCurrentPlatform() === 'windows' ? 'vs' : getCurrentPlatform();
     }
 
 } catch (e) {
@@ -351,6 +403,15 @@ if (!path.isAbsolute(defaultOfPath)) {
     }
 
     settings["defaultOfPath"] = defaultOfPath || "";
+}
+
+// on macOS default to the Apple platform the bundled libs are for (iOS-only package = ios, all Apple platforms = macos)
+if (hostplatform === 'osx' && ['osx', 'ios', 'macos'].includes(settings.defaultPlatform)) {
+    const bundledPlatform = detectApplePlatformFromLibs(defaultOfPath);
+    if (bundledPlatform) {
+        console.log(`default platform from bundled libs: ${bundledPlatform}`);
+        settings.defaultPlatform = bundledPlatform;
+    }
 }
 
 // now, let's look for a folder called mySketch, and keep counting until we find one that doesn't exist
