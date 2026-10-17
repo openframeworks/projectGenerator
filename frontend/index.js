@@ -191,12 +191,11 @@ function getCurrentPlatform() {
     } else if (process.platform === "linux") {
         if (process.arch === 'ia32') {
             platform = 'linux';
+        } else if (process.arch === 'arm64') {
+            platform = 'linuxaarch64';
         } else if (process.arch === 'arm') {
-            if (os.cpus()[0].model.indexOf('ARMv6') === 0) {
-                platform = 'linuxarmv6l';
-            } else {
-                platform = 'linuxaarch64';
-            }
+            // 32-bit: ARMv6 (Pi 1 / Zero) or ARMv7 (Pi 2+, or a 32-bit OS on a newer Pi)
+            platform = os.cpus()[0].model.indexOf('ARMv6') === 0 ? 'linuxarmv6l' : 'linuxarmv7l';
         } else if (process.arch === 'x64') {
             platform = 'linux64';
         } else {
@@ -222,8 +221,9 @@ function getDefaultTemplateForPlatform(platformId) {
         "macos": "macOS (including iOS, tvOS, catOS, macOS) (Xcode) (Apple)",
         "android": "Android (Android Studio)",
         "linux64": "Linux 64 (VS Code/Make)",
-        "linuxarmv6l": "Arm 32 (VS Code/Make)",
-        "linuxaarch64": "Arm 64 (VS Code/Make)",
+        "linuxarmv6l": "Linux armv6l (VS Code/Make)",
+        "linuxarmv7l": "Linux armv7l (VS Code/Make)",
+        "linuxaarch64": "Linux arm64 (VS Code/Make)",
         "vscode": "VS Code",
         "emscripten": "Emscripten (Web) (Make)",
         "vs2019": "Windows (Visual Studio 2019)",
@@ -262,12 +262,10 @@ try {
         myPlatform = 'linux';
         if (process.arch === 'ia32') {
             myPlatform = 'linux';
+        } else if (process.arch === 'arm64') {
+            myPlatform = 'linuxaarch64';
         } else if (process.arch === 'arm') {
-            if (os.cpus()[0].model.indexOf('ARMv6') == 0) {
-                myPlatform = 'linuxarmv6l';
-            } else {
-                myPlatform = 'linuxaarch64';
-            }
+            myPlatform = os.cpus()[0].model.indexOf('ARMv6') === 0 ? 'linuxarmv6l' : 'linuxarmv7l';
         } else if (process.arch === 'x64') {
             myPlatform = 'linux64';
         }
@@ -385,8 +383,9 @@ const platforms = {
     "macos": "macOS (including iOS, tvOS, catOS, macOS) (Xcode) (Apple)",
     "android": "Android (Android Studio)",
     "linux64": "Linux 64 (VS Code/Make)",
-    "linuxarmv6l": "Arm 32 (VS Code/Make)",
-    "linuxaarch64": "Arm 64 (VS Code/Make)",
+    "linuxarmv6l": "Linux armv6l (VS Code/Make)",
+    "linuxarmv7l": "Linux armv7l (VS Code/Make)",
+    "linuxaarch64": "Linux arm64 (VS Code/Make)",
     "vscode": "VS Code",
     "emscripten": "Emscripten (Web) (Make)"
 };
@@ -1367,6 +1366,7 @@ const HOST_LIB_PLATFORM = {
     linux64: 'linux64',
     linuxaarch64: 'linuxaarch64',
     linuxarmv6l: 'linuxarmv6l',
+    linuxarmv7l: 'linuxarmv7l',
 };
 
 // default modular package target (oF_<lib>_<target>.tar.bz2) for this host
@@ -1376,6 +1376,7 @@ const HOST_MODULAR_TARGET = {
     linux64: 'linux_64_gcc14',
     linuxaarch64: 'linux_arm64_gcc14',
     linuxarmv6l: 'linux_armv6l_gcc10',
+    linuxarmv7l: 'linux_armv7l_gcc10',
 };
 
 let apothecaryReleases = null;

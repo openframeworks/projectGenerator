@@ -1437,7 +1437,7 @@ function updateRendererFieldVisibility() {
     $('#appVersionField').css('display', defaultSettings.advancedMode ? 'flex' : 'none');
     $('#appVersionNote').toggle(!!defaultSettings.advancedMode && $('#appVersionNote').text().length > 0);
 
-    const glPlatforms = ['osx', 'vs', 'msys2', 'linux', 'linux64', 'linuxarmv6l', 'linuxaarch64', 'vscode'];
+    const glPlatforms = ['osx', 'vs', 'msys2', 'linux', 'linux64', 'linuxarmv6l', 'linuxarmv7l', 'linuxaarch64', 'vscode'];
     $('#glField').toggle(!!defaultSettings.advancedMode && selectedPlatforms.some((p) => glPlatforms.includes(p)));
     // Apple's OpenGL stops at 4.1
     const maxGL = selectedPlatforms.includes('osx') ? 4.1 : 4.6;
