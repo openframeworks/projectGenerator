@@ -45,6 +45,7 @@
   "field.ofPath": "openFrameworks path:",
   "placeholder.ofPath": "openFrameworks path...",
   "field.platform": "Platform:",
+  "field.hostPlatform": "Host Platform:",
   "field.cmdLineVersion": "commandLine PG Version:",
   "field.guiVersion": "GUI Version:",
   "field.language": "Language:",
@@ -159,5 +160,10 @@
   "field.emscriptenWasm": "WebAssembly (Emscripten):",
   "option.wasm32": "32-bit (default) (MEMORY32)",
   "option.wasm64": "64-bit (WASM64) (MEMORY64)",
-  "note.wasm64": "Needs wasm64 libraries: run BITS=64 scripts/emscripten/download_libs.sh (replaces the installed lib/emscripten libraries)."
+  "note.wasm64": "Needs wasm64 libraries: run BITS=64 scripts/emscripten/download_libs.sh (replaces the installed lib/emscripten libraries).",
+  "field.appVersion": "Version:",
+  "field.appBuild": "Build:",
+  "tooltip.appVersionInvalid": "Version should be digits and dots, e.g. 1, 1.2 or 1.2.3.",
+  "tooltip.appBuildInvalid": "Build should be a positive whole number, e.g. 42.",
+  "note.appVersionDiffers": "{{file}} has a different version: {{value}} - config.make's is used."
 }

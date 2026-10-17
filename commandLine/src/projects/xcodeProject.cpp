@@ -988,6 +988,23 @@ bool xcodeProject::saveProjectFile() {
 			}
 		}
 
+		// app version / build on every target configuration (target settings override Project.xcconfig)
+		try {
+			auto & objects = j["objects"];
+			for (auto & target : objects) {
+				if (!target.is_object() || target.value("isa", "") != "PBXNativeTarget" || !target.contains("buildConfigurationList")) continue;
+				auto & configList = objects[target["buildConfigurationList"].get<string>()];
+				if (!configList.contains("buildConfigurations")) continue;
+				for (auto & configUUID : configList["buildConfigurations"]) {
+					auto & config = objects[configUUID.get<string>()];
+					config["buildSettings"]["MARKETING_VERSION"] = appVersion;
+					config["buildSettings"]["CURRENT_PROJECT_VERSION"] = appBuild;
+				}
+			}
+		} catch (std::exception & e) {
+			ofLogError(xcodeProject::LOG_NAME) << "app version: " << e.what();
+		}
+
 		std::ofstream jsonFile(fileName);
 
 		// This is not pretty but address some differences in nlohmann json 3.11.2 to 3.11.3

@@ -45,6 +45,7 @@
   "field.ofPath": "openFrameworks 路径：",
   "placeholder.ofPath": "openFrameworks 路径...",
   "field.platform": "平台：",
+  "field.hostPlatform": "主机平台：",
   "field.cmdLineVersion": "commandLine PG 版本：",
   "field.guiVersion": "GUI 版本：",
   "field.language": "语言（Language）：",
@@ -159,5 +160,10 @@
   "field.emscriptenWasm": "WebAssembly (Emscripten)：",
   "option.wasm32": "32 位（默认）（MEMORY32）",
   "option.wasm64": "64 位（WASM64）（MEMORY64）",
-  "note.wasm64": "需要 wasm64 库：运行 BITS=64 scripts/emscripten/download_libs.sh（会替换已安装的 lib/emscripten 库）。"
+  "note.wasm64": "需要 wasm64 库：运行 BITS=64 scripts/emscripten/download_libs.sh（会替换已安装的 lib/emscripten 库）。",
+  "field.appVersion": "版本:",
+  "field.appBuild": "构建号:",
+  "tooltip.appVersionInvalid": "版本只能包含数字和点，例如 1、1.2 或 1.2.3。",
+  "tooltip.appBuildInvalid": "构建号必须是正整数，例如 42。",
+  "note.appVersionDiffers": "{{file}} 中的版本不同: {{value}} - 使用 config.make 中的值。"
 }

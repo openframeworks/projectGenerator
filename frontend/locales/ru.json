@@ -45,6 +45,7 @@
   "field.ofPath": "Путь к openFrameworks:",
   "placeholder.ofPath": "Путь к openFrameworks...",
   "field.platform": "Платформа:",
+  "field.hostPlatform": "Платформа хоста:",
   "field.cmdLineVersion": "Версия PG (commandLine):",
   "field.guiVersion": "Версия интерфейса:",
   "field.language": "Язык (Language):",
@@ -159,5 +160,10 @@
   "field.emscriptenWasm": "WebAssembly (Emscripten):",
   "option.wasm32": "32-бит (по умолчанию) (MEMORY32)",
   "option.wasm64": "64-бит (WASM64) (MEMORY64)",
-  "note.wasm64": "Нужны библиотеки wasm64: запустите BITS=64 scripts/emscripten/download_libs.sh (заменяет установленные библиотеки lib/emscripten)."
+  "note.wasm64": "Нужны библиотеки wasm64: запустите BITS=64 scripts/emscripten/download_libs.sh (заменяет установленные библиотеки lib/emscripten).",
+  "field.appVersion": "Версия:",
+  "field.appBuild": "Сборка:",
+  "tooltip.appVersionInvalid": "Версия должна состоять из цифр и точек, например 1, 1.2 или 1.2.3.",
+  "tooltip.appBuildInvalid": "Номер сборки должен быть целым положительным числом, например 42.",
+  "note.appVersionDiffers": "В {{file}} другая версия: {{value}} - используется значение из config.make."
 }

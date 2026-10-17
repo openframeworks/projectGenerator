@@ -64,6 +64,44 @@ const templateSettings = {
 
 
 
+/**
+ * App version / build of an existing project, read like the commandLine does:
+ * config.make, then CMakeLists.txt, then the .xcodeproj, then the android ofApp/build.gradle.
+ * @param {string} folder - The project folder.
+ * @returns {{version: string, build: string, differs: Array<{file: string, value: string}>}}
+ */
+function readProjectAppVersion(folder) {
+    const read = (file) => {
+        try {
+            return fs.readFileSync(path.join(folder, file), 'utf8');
+        } catch (e) {
+            return '';
+        }
+    };
+    const last = (text, re) => {
+        let value = '';
+        for (const m of text.matchAll(re)) value = m[1];
+        return value;
+    };
+    const name = path.basename(folder);
+    const pbxproj = read(path.join(`${name}.xcodeproj`, 'project.pbxproj'));
+    const sources = [
+        { file: 'config.make', text: read('config.make'), version: /^[ \t]*APP_VERSION[ \t]*[?:+]?=[ \t]*([0-9.]+)/gm, build: /^[ \t]*APP_BUILD[ \t]*[?:+]?=[ \t]*([0-9]+)/gm },
+        { file: 'CMakeLists.txt', text: read('CMakeLists.txt'), version: /^[ \t]*set\([ \t]*APP_VERSION[ \t]+"?([0-9.]+)/gm, build: /^[ \t]*set\([ \t]*APP_BUILD[ \t]+"?([0-9]+)/gm },
+        { file: `${name}.xcodeproj`, text: pbxproj, version: /"?MARKETING_VERSION"?\s*[:=]\s*"?([0-9.]+)/g, build: /"?CURRENT_PROJECT_VERSION"?\s*[:=]\s*"?([0-9]+)/g },
+        { file: 'ofApp/build.gradle', text: read(path.join('ofApp', 'build.gradle')), version: /^\s*versionName\s+['"]([0-9.]+)['"]/gm, build: /^\s*versionCode\s+([0-9]+)/gm },
+    ].map((s) => ({ file: s.file, version: s.text ? last(s.text, s.version) : '', build: s.text ? last(s.text, s.build) : '' }));
+    const version = (sources.find((s) => s.version) || {}).version || '';
+    const build = (sources.find((s) => s.build) || {}).build || '';
+    const differs = [];
+    for (const s of sources) {
+        if ((s.version && s.version !== version) || (s.build && s.build !== build)) {
+            differs.push({ file: s.file, value: `${s.version || version} (${s.build || build})` });
+        }
+    }
+    return { version, build, differs };
+}
+
 // mirrors isGoodOFPath() in commandLine/src/main.cpp
 function isGoodOFPath(p) {
     try {
@@ -90,7 +128,7 @@ function findOFPathUpwards(startPath) {
 
 /**
  * Picks the Apple platform matching the libraries this OF package was bundled with (#607):
- * xcframeworks with iOS / tvOS slices = Mega macOS, only macOS libs = osx, only iOS / tvOS libs = ios.
+ * xcframeworks with iOS / tvOS slices = macos (all Apple platforms), only macOS libs = osx, only iOS / tvOS libs = ios.
  * @param {string} ofPath - The openFrameworks root.
  * @returns {string|null} "macos", "osx", "ios" or null when no Apple libs are found.
  */
@@ -153,12 +191,11 @@ function getCurrentPlatform() {
     } else if (process.platform === "linux") {
         if (process.arch === 'ia32') {
             platform = 'linux';
+        } else if (process.arch === 'arm64') {
+            platform = 'linuxaarch64';
         } else if (process.arch === 'arm') {
-            if (os.cpus()[0].model.indexOf('ARMv6') === 0) {
-                platform = 'linuxarmv6l';
-            } else {
-                platform = 'linuxaarch64';
-            }
+            // 32-bit: ARMv6 (Pi 1 / Zero) or ARMv7 (Pi 2+, or a 32-bit OS on a newer Pi)
+            platform = os.cpus()[0].model.indexOf('ARMv6') === 0 ? 'linuxarmv6l' : 'linuxarmv7l';
         } else if (process.arch === 'x64') {
             platform = 'linux64';
         } else {
@@ -181,11 +218,12 @@ function getDefaultTemplateForPlatform(platformId) {
         "vs": "Windows (Visual Studio)",
         "msys2": "Windows (msys2/mingw)",
         "ios": "iOS (Xcode) (Apple)",
-        "macos": "Mega macOS (including iOS, tvOS, catOS, macOS) (Xcode) (Apple)",
-        "android": "Android (Android Studio)",
+        "macos": "macOS (including iOS, tvOS, catOS, macOS) (Xcode) (Apple)",
+        "android": "Android (Android Studio) (CMake)",
         "linux64": "Linux 64 (VS Code/Make)",
-        "linuxarmv6l": "Arm 32 (VS Code/Make)",
-        "linuxaarch64": "Arm 64 (VS Code/Make)",
+        "linuxarmv6l": "Linux armv6l (VS Code/Make)",
+        "linuxarmv7l": "Linux armv7l (VS Code/Make)",
+        "linuxaarch64": "Linux arm64 (VS Code/Make)",
         "vscode": "VS Code",
         "emscripten": "Emscripten (Web) (Make)",
         "vs2019": "Windows (Visual Studio 2019)",
@@ -224,12 +262,10 @@ try {
         myPlatform = 'linux';
         if (process.arch === 'ia32') {
             myPlatform = 'linux';
+        } else if (process.arch === 'arm64') {
+            myPlatform = 'linuxaarch64';
         } else if (process.arch === 'arm') {
-            if (os.cpus()[0].model.indexOf('ARMv6') == 0) {
-                myPlatform = 'linuxarmv6l';
-            } else {
-                myPlatform = 'linuxaarch64';
-            }
+            myPlatform = os.cpus()[0].model.indexOf('ARMv6') === 0 ? 'linuxarmv6l' : 'linuxarmv7l';
         } else if (process.arch === 'x64') {
             myPlatform = 'linux64';
         }
@@ -344,11 +380,12 @@ const platforms = {
     "vs": "Windows (Visual Studio)",
     "msys2": "Windows (msys2/mingw)",
     "ios": "iOS (Xcode) (Apple)",
-    "macos": "Mega macOS (including iOS, tvOS, catOS, macOS) (Xcode) (Apple)",
-    "android": "Android (Android Studio)",
+    "macos": "macOS (including iOS, tvOS, catOS, macOS) (Xcode) (Apple)",
+    "android": "Android (Android Studio) (CMake)",
     "linux64": "Linux 64 (VS Code/Make)",
-    "linuxarmv6l": "Arm 32 (VS Code/Make)",
-    "linuxaarch64": "Arm 64 (VS Code/Make)",
+    "linuxarmv6l": "Linux armv6l (VS Code/Make)",
+    "linuxarmv7l": "Linux armv7l (VS Code/Make)",
+    "linuxaarch64": "Linux arm64 (VS Code/Make)",
     "vscode": "VS Code",
     "emscripten": "Emscripten (Web) (Make)"
 };
@@ -970,6 +1007,7 @@ ipcMain.on('isOFProjectFolder', (event, project) => {
             if (fs.existsSync(cmakeLists) && /^\s*set\(\s*PROJECT_EMSCRIPTEN_WASM\s+64\b/m.test(fs.readFileSync(cmakeLists, 'utf8'))) {
                 event.sender.send('setEmscriptenWasm', '64');
             }
+            event.sender.send('setAppVersion', readProjectAppVersion(folder));
             
         } else {
             event.sender.send('setGenerateMode', 'createMode');
@@ -1328,6 +1366,7 @@ const HOST_LIB_PLATFORM = {
     linux64: 'linux64',
     linuxaarch64: 'linuxaarch64',
     linuxarmv6l: 'linuxarmv6l',
+    linuxarmv7l: 'linuxarmv7l',
 };
 
 // default modular package target (oF_<lib>_<target>.tar.bz2) for this host
@@ -1337,6 +1376,7 @@ const HOST_MODULAR_TARGET = {
     linux64: 'linux_64_gcc14',
     linuxaarch64: 'linux_arm64_gcc14',
     linuxarmv6l: 'linux_armv6l_gcc10',
+    linuxarmv7l: 'linux_armv7l_gcc10',
 };
 
 let apothecaryReleases = null;
@@ -1680,6 +1720,8 @@ ipcMain.on('downloadModularLibs', async (event, { ofPath, tag, names }) => {
  *     postBuild: string,
  *     msys2Env: string,
  *     emscriptenWasm: string,
+ *     appVersion: string,
+ *     appBuild: string,
  * }} GenerateArgument */
 
 /**
@@ -1700,6 +1742,8 @@ function generateFunction(event, generate) {
         postBuild,
         msys2Env,
         emscriptenWasm,
+        appVersion,
+        appBuild,
     } = generate;
 
     const args = [];
@@ -1744,6 +1788,14 @@ function generateFunction(event, generate) {
 
     if (emscriptenWasm === '32' || emscriptenWasm === '64') {
         args.push(`-W${emscriptenWasm}`);
+    }
+
+    // empty keeps the project's version / build (new projects get 1.0 / 1)
+    if (appVersion && /^\d+(\.\d+)*$/.test(appVersion)) {
+        args.push(`--app-version=${appVersion}`);
+    }
+    if (appBuild && /^[1-9]\d*$/.test(appBuild)) {
+        args.push(`--app-build=${appBuild}`);
     }
 
     if (projectName != null && projectPath != null) {
@@ -2396,6 +2448,20 @@ ipcMain.on('getOFPath', (event) => {
     });
 });
 
+/**
+ * Settings label for the host platform the commandLine reports, eg osx -> "macOS (Apple) (arm64)".
+ * @param {string} hostPlatform - The commandLine's ofHostPlatform.
+ * @returns {string} The label to show.
+ */
+function hostPlatformLabel(hostPlatform) {
+    if (hostPlatform === 'osx') {
+        // Apple silicon even when this app runs under Rosetta
+        const arm = process.arch === 'arm64' || (os.cpus()[0] && /Apple/.test(os.cpus()[0].model));
+        return `macOS (Apple) (${arm ? 'arm64' : 'x86_64'})`;
+    }
+    return hostPlatform;
+}
+
 ipcMain.on('getHostType', (event) => {
     execPG(['-i'], (error, stdout, stderr) => {
         if (error) {
@@ -2413,7 +2479,7 @@ ipcMain.on('getHostType', (event) => {
                     console.log(data);
                     event.sender.send('ofPlatformResult', {
                         success: true,
-                        message: data.ofHostPlatform
+                        message: hostPlatformLabel(data.ofHostPlatform)
                     });
                 } else {
                     throw new Error('No JSON output found');
