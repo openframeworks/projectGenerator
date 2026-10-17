@@ -128,7 +128,7 @@ function findOFPathUpwards(startPath) {
 
 /**
  * Picks the Apple platform matching the libraries this OF package was bundled with (#607):
- * xcframeworks with iOS / tvOS slices = Mega macOS, only macOS libs = osx, only iOS / tvOS libs = ios.
+ * xcframeworks with iOS / tvOS slices = macos (all Apple platforms), only macOS libs = osx, only iOS / tvOS libs = ios.
  * @param {string} ofPath - The openFrameworks root.
  * @returns {string|null} "macos", "osx", "ios" or null when no Apple libs are found.
  */
@@ -219,7 +219,7 @@ function getDefaultTemplateForPlatform(platformId) {
         "vs": "Windows (Visual Studio)",
         "msys2": "Windows (msys2/mingw)",
         "ios": "iOS (Xcode) (Apple)",
-        "macos": "Mega macOS (including iOS, tvOS, catOS, macOS) (Xcode) (Apple)",
+        "macos": "macOS (including iOS, tvOS, catOS, macOS) (Xcode) (Apple)",
         "android": "Android (Android Studio)",
         "linux64": "Linux 64 (VS Code/Make)",
         "linuxarmv6l": "Arm 32 (VS Code/Make)",
@@ -382,7 +382,7 @@ const platforms = {
     "vs": "Windows (Visual Studio)",
     "msys2": "Windows (msys2/mingw)",
     "ios": "iOS (Xcode) (Apple)",
-    "macos": "Mega macOS (including iOS, tvOS, catOS, macOS) (Xcode) (Apple)",
+    "macos": "macOS (including iOS, tvOS, catOS, macOS) (Xcode) (Apple)",
     "android": "Android (Android Studio)",
     "linux64": "Linux 64 (VS Code/Make)",
     "linuxarmv6l": "Arm 32 (VS Code/Make)",
