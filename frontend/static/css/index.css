@@ -164,3 +164,16 @@ body.showConsole #consoleContainer {
 .incomingFile #dropZoneOverlay {
   display: block;
 }
+
+/* Version / Build: always one row, half width each (Semantic stacks .fields on narrow windows) */
+.ui.form #appVersionField.fields {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	margin: 0 -0.5em 1em;
+}
+.ui.form #appVersionField.fields > .field {
+	width: 50% !important;
+	padding: 0 0.5em !important;
+	margin: 0 !important;
+}

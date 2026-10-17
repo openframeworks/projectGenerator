@@ -222,7 +222,7 @@ ipcRenderer.on('setAppVersion', (event, { version, build, differs }) => {
     $('#appVersion').val(version || '');
     $('#appBuild').val(build || '');
     const note = (differs || []).map((d) => t('note.appVersionDiffers', { file: d.file, value: d.value })).join(' ');
-    $('#appVersionNote').text(note).toggle(note.length > 0);
+    $('#appVersionNote').text(note).toggle(!!defaultSettings.advancedMode && note.length > 0);
 });
 
 //-------------------------------------------
@@ -1433,6 +1433,9 @@ function updateRendererFieldVisibility() {
     $('#webglField').toggle(!!defaultSettings.advancedMode && emscripten);
     $('#wasmField').toggle(!!defaultSettings.advancedMode && emscripten);
     $('#glesField').toggle(!!defaultSettings.advancedMode && selectedPlatforms.some((p) => ['ios', 'macos'].includes(p)));
+    // advanced only; hidden fields keep the project's values, so updating still keeps them
+    $('#appVersionField').css('display', defaultSettings.advancedMode ? 'flex' : 'none');
+    $('#appVersionNote').toggle(!!defaultSettings.advancedMode && $('#appVersionNote').text().length > 0);
 
     const glPlatforms = ['osx', 'vs', 'msys2', 'linux', 'linux64', 'linuxarmv6l', 'linuxaarch64', 'vscode'];
     $('#glField').toggle(!!defaultSettings.advancedMode && selectedPlatforms.some((p) => glPlatforms.includes(p)));
