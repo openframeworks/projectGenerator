@@ -45,6 +45,7 @@
   "field.ofPath": "openFrameworks 경로:",
   "placeholder.ofPath": "openFrameworks 경로...",
   "field.platform": "플랫폼:",
+  "field.hostPlatform": "호스트 플랫폼:",
   "field.cmdLineVersion": "commandLine PG 버전:",
   "field.guiVersion": "GUI 버전:",
   "field.language": "언어 (Language):",

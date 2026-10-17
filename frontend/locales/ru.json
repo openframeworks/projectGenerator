@@ -45,6 +45,7 @@
   "field.ofPath": "Путь к openFrameworks:",
   "placeholder.ofPath": "Путь к openFrameworks...",
   "field.platform": "Платформа:",
+  "field.hostPlatform": "Платформа хоста:",
   "field.cmdLineVersion": "Версия PG (commandLine):",
   "field.guiVersion": "Версия интерфейса:",
   "field.language": "Язык (Language):",

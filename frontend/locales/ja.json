@@ -45,6 +45,7 @@
   "field.ofPath": "openFrameworksパス:",
   "placeholder.ofPath": "openFrameworksパス...",
   "field.platform": "プラットフォーム:",
+  "field.hostPlatform": "ホストプラットフォーム:",
   "field.cmdLineVersion": "commandLine PGバージョン:",
   "field.guiVersion": "GUIバージョン:",
   "field.language": "言語 (Language):",

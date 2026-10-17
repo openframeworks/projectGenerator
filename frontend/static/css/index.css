@@ -177,3 +177,18 @@ body.showConsole #consoleContainer {
 	padding: 0 0.5em !important;
 	margin: 0 !important;
 }
+
+/* platform pickers: less room reserved for the dropdown arrow, and the empty search box takes no
+   space until it's focused, so a long label like "macOS (including iOS, tvOS, catOS, macOS) (Xcode) (Apple)"
+   stays on one line instead of the search box wrapping onto a second */
+.ui.form #platformsDropdown.ui.multiple.dropdown,
+.ui.form #platformsDropdownMulti.ui.multiple.dropdown {
+	padding-right: 28px;
+}
+.ui.form #platformsDropdown.ui.multiple.search.dropdown > input.search:not(:focus),
+.ui.form #platformsDropdownMulti.ui.multiple.search.dropdown > input.search:not(:focus) {
+	position: absolute;
+	width: 1px !important;
+	margin: 0;
+	padding: 0;
+}

@@ -2448,6 +2448,20 @@ ipcMain.on('getOFPath', (event) => {
     });
 });
 
+/**
+ * Settings label for the host platform the commandLine reports, eg osx -> "macOS (Apple) (arm64)".
+ * @param {string} hostPlatform - The commandLine's ofHostPlatform.
+ * @returns {string} The label to show.
+ */
+function hostPlatformLabel(hostPlatform) {
+    if (hostPlatform === 'osx') {
+        // Apple silicon even when this app runs under Rosetta
+        const arm = process.arch === 'arm64' || (os.cpus()[0] && /Apple/.test(os.cpus()[0].model));
+        return `macOS (Apple) (${arm ? 'arm64' : 'x86_64'})`;
+    }
+    return hostPlatform;
+}
+
 ipcMain.on('getHostType', (event) => {
     execPG(['-i'], (error, stdout, stderr) => {
         if (error) {
@@ -2465,7 +2479,7 @@ ipcMain.on('getHostType', (event) => {
                     console.log(data);
                     event.sender.send('ofPlatformResult', {
                         success: true,
-                        message: data.ofHostPlatform
+                        message: hostPlatformLabel(data.ofHostPlatform)
                     });
                 } else {
                     throw new Error('No JSON output found');

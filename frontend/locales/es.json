@@ -45,6 +45,7 @@
   "field.ofPath": "Ruta de openFrameworks:",
   "placeholder.ofPath": "Ruta de openFrameworks...",
   "field.platform": "Plataforma:",
+  "field.hostPlatform": "Plataforma anfitriona:",
   "field.cmdLineVersion": "Versión de PG (commandLine):",
   "field.guiVersion": "Versión de la interfaz:",
   "field.language": "Idioma (Language):",
