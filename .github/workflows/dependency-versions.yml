@@ -1,0 +1,41 @@
+name: Dependency version check
+
+# weekly report of out of date dependencies (Electron and the other frontend npm packages,
+# GitHub Actions, CI Node, vendored jQuery / Semantic UI), kept in one tracking issue
+on:
+  schedule:
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/check-dependency-versions.sh'
+      - '.github/workflows/dependency-versions.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dependency-versions-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare dependency versions
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          # only the scheduled / manual run on the main repo maintains the tracking issue
+          if [[ "${{ github.event_name }}" != pull_request && "${{ github.repository }}" == openframeworks/projectGenerator ]]; then
+            bash scripts/check-dependency-versions.sh --file-issue
+          else
+            bash scripts/check-dependency-versions.sh
+          fi
