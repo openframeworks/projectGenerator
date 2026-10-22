@@ -89,10 +89,24 @@ protected:
 		"E4B69B4F0A3A1720003C02F2", //macOS Release SDKROOT macosx
 	};
 
-	string buildConfigs[2] = {
+	// build configurations of every app target (both targets of the macos template)
+	std::vector<string> buildConfigs = {
 		"E4B69B610A3A1757003C02F2", //Release
 		"E4B69B600A3A1757003C02F2", //Debug
 	};
+
+	// build phases of an app target, the first one is the hard coded osx / ios one
+	struct appTarget {
+		string uuid;
+		string sources;
+		string frameworks;
+		string copyFrameworks;
+		string resources;
+	};
+	std::vector<appTarget> appTargets;
+	string copyFrameworksUUID { "E4C2427710CC5ABF004149E2" };
+	bool renameTarget = true;
+	void readTemplateUUIDs();
 
 //	std::unordered_map <string, string> folderUUID ;
 	std::map <fs::path, string> folderUUID ;
