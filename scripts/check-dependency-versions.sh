@@ -47,6 +47,23 @@ latest_github() {
 	printf '%s\n' "$tag"
 }
 
+# dependencies held back on a major: prints "<major> <note>" (Semantic UI 2.x uses $.isArray etc, removed in jQuery 4)
+hold() {
+	case $1 in
+		jQuery) echo '3 held at 3.x for Semantic UI 2.x' ;;
+		@types/jquery) echo '3 held at 3.x with jQuery' ;;
+	esac
+}
+
+# newest X.y.z tag of a GitHub repo within one major
+latest_github_major() {
+	local repo=$1 major=$2 tag
+	tag=$(curl_json "https://api.github.com/repos/$repo/tags?per_page=100" |
+		jq -r --arg m "$major" '.[].name | select(test("^v?" + $m + "(\\.[0-9]+)+$"))' | sort -V | tail -n 1)
+	[[ -n $tag ]] || return 1
+	printf '%s\n' "$tag"
+}
+
 ROWS=()
 ERRORS=()
 UPDATES=0
@@ -68,13 +85,20 @@ failed() {
 }
 
 check_npm() {
-	local package_json="$ROOT/frontend/package.json" name range latest electron_latest major note
+	local package_json="$ROOT/frontend/package.json" name range uri held latest electron_latest major note
 	while IFS=$'\t' read -r name range; do
-		if ! latest=$(curl_json "https://registry.npmjs.org/$(jq -rn --arg n "$name" '$n | @uri')/latest" | jq -r '.version // empty') || [[ -z $latest ]]; then
+		uri=$(jq -rn --arg n "$name" '$n | @uri')
+		read -r held note <<< "$(hold "$name")"
+		if [[ -n $held ]]; then
+			latest=$(curl_json "https://registry.npmjs.org/$uri" | jq -r --arg m "$held" \
+				'.versions | keys[] | select(test("^" + $m + "\\.[0-9]+\\.[0-9]+$"))' | sort -V | tail -n 1) || latest=''
+		else
+			latest=$(curl_json "https://registry.npmjs.org/$uri/latest" | jq -r '.version // empty') || latest=''
+		fi
+		if [[ -z $latest ]]; then
 			failed "npm $name" 'registry lookup failed'
 			continue
 		fi
-		note=''
 		# Electron supports only the latest three major releases
 		if [[ $name == electron ]]; then
 			electron_latest=${latest%%.*}
@@ -119,17 +143,23 @@ check_node() {
 
 # vendored copy in frontend/static: version read from the file header
 check_vendored() {
-	local name=$1 file=$2 header_regex=$3 repo=$4 current latest
+	local name=$1 file=$2 header_regex=$3 repo=$4 current held note latest
 	current=$(head -c 2000 "$ROOT/$file" 2>/dev/null | grep -oE "$header_regex" | head -n 1 | grep -oE '[0-9]+(\.[0-9]+)+' || true)
 	if [[ -z $current ]]; then
 		failed "$name" "no version found in $file"
 		return
 	fi
-	if ! latest=$(latest_github "$repo"); then
+	read -r held note <<< "$(hold "$name")"
+	if [[ -n $held ]]; then
+		latest=$(latest_github_major "$repo" "$held") || latest=''
+	else
+		latest=$(latest_github "$repo") || latest=''
+	fi
+	if [[ -z $latest ]]; then
 		failed "$name" "no release or tag found for $repo"
 		return
 	fi
-	row vendored "$name ($file)" "$current" "$latest"
+	row vendored "$name ($file)" "$current" "$latest" "$note"
 }
 
 publish() {
