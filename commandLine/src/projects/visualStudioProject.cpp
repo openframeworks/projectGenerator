@@ -656,7 +656,7 @@ void visualStudioProject::addPropertyDefine(const string & define) {
 		}
 		if (found.empty()) {
 			ofLogError(LOG_NAME) << "no GLon12 files found in " << bin.string()
-				<< " - download the glon12 library (projectGenerator Libraries, or apothecary: TYPE=vs ./apothecary update glon12)";
+				<< " - download glon12 in projectGenerator: downloads > Modular libraries > glon12 > Download selected (or apothecary: TYPE=vs ./apothecary update glon12)";
 		} else {
 			ofLogVerbose(LOG_NAME) << "GLon12 files found for " << ofJoinString(found, ", ");
 		}
