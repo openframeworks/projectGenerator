@@ -103,7 +103,7 @@ jobs:
 
       - name: Update Release CMD
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
-        uses: softprops/action-gh-release@v3.0.3
+        uses: danoli3/action-gh-release@ec40b04e78c39008f73c4ca3fdf9b51df604c4ed # temporary patch: softprops/action-gh-release#852
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}
@@ -111,7 +111,7 @@ jobs:
           files: ../openFrameworks/apps/projectGenerator/commandLine/bin/projectGenerator-vs.zip
       - name: Update Release GUI
         if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
-        uses: softprops/action-gh-release@v3.0.3
+        uses: danoli3/action-gh-release@ec40b04e78c39008f73c4ca3fdf9b51df604c4ed # temporary patch: softprops/action-gh-release#852
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.RELEASE }}

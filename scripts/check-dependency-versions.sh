@@ -2,6 +2,7 @@
 # Report out of date projectGenerator dependencies: frontend npm packages (Electron etc.),
 # GitHub Actions used by the workflows, CI Node versions and the vendored jQuery / Semantic UI.
 # Maintains a tracking issue only with --file-issue (like apothecary's check-upstream-versions.sh).
+# --update rewrites out of date action refs and CI node-version in the workflows (npm / vendored are report only).
 set -euo pipefail
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 MARKER='<!-- projectGenerator-dependency-versions -->'
@@ -64,9 +65,23 @@ latest_github_major() {
 	printf '%s\n' "$tag"
 }
 
+# latest in the same form as current: v7 + v8.0.1 -> v8, v1.2.24 + v1.2.25 -> v1.2.25
+same_form() {
+	local prefix=${1%%[0-9]*} fields
+	IFS=. read -ra fields <<< "$1"
+	printf '%s%s\n' "$prefix" "$(version_of "$2" | cut -d. -f1-"${#fields[@]}")"
+}
+
+# replace old with new in every workflow (old must end at whitespace, # or end of line)
+rewrite_workflows() {
+	OLD=$1 NEW=$2 perl -pi -e 's/\Q$ENV{OLD}\E(?=[\s#]|$)/$ENV{NEW}/g' "$ROOT"/.github/workflows/*.yml
+	printf 'updated  %s -> %s\n' "$1" "$2" >&2
+}
+
 ROWS=()
 ERRORS=()
 UPDATES=0
+UPDATE=0
 
 # kind name current latest [note]
 row() {
@@ -124,8 +139,32 @@ check_actions() {
 			continue
 		fi
 		row action "$repo" "$ref" "$latest"
+		if ((UPDATE)) && is_newer "$(version_of "$ref")" "$(version_of "$latest")"; then
+			rewrite_workflows "$action" "${action%@*}@$(same_form "$ref" "$latest")"
+		fi
 	done < <(grep -hoE 'uses:[[:space:]]*[A-Za-z0-9_.-]+/[A-Za-z0-9_./-]+@[^[:space:]#]+' $workflows |
 		sed -E 's/^uses:[[:space:]]*//' | sort -u)
+}
+
+# fork pins marked "# temporary patch: owner/repo#123" can go back upstream once that PR is merged
+check_patches() {
+	local pin pr state workflows
+	workflows=$(find "$ROOT/.github/workflows" -name '*.yml' -o -name '*.yaml')
+	# shellcheck disable=SC2086
+	while read -r pin pr; do
+		if ! state=$(curl_json "https://api.github.com/repos/${pr%#*}/pulls/${pr#*#}" | jq -r 'if .merged then "merged" else .state end'); then
+			failed "patch $pr" 'GitHub lookup failed'
+			continue
+		fi
+		if [[ $state == merged ]]; then
+			ROWS+=("| patch | $pin | \`$pr\` | merged | **update** | switch back to ${pr%#*} |")
+			UPDATES=$((UPDATES + 1))
+		else
+			ROWS+=("| patch | $pin | \`$pr\` | $state | ok | |")
+		fi
+		printf '%-8s %-32s %-14s %s\n' patch "$pin" "$pr" "$state" >&2
+	done < <(grep -hoE 'uses:[[:space:]]*[^[:space:]]+@[0-9a-f]{40}[[:space:]]*# temporary patch: [A-Za-z0-9_./-]+#[0-9]+' $workflows |
+		sed -E 's/^uses:[[:space:]]*([^@]+)@.*# temporary patch: /\1 /' | sort -u)
 }
 
 check_node() {
@@ -138,6 +177,9 @@ check_node() {
 	# shellcheck disable=SC2086
 	while read -r version; do
 		row node "node-version (CI)" "$version" "${lts#v}" 'latest LTS'
+		if ((UPDATE)) && is_newer "$version" "${lts#v}"; then
+			rewrite_workflows "node-version: $version" "node-version: $(same_form "$version" "${lts#v}")"
+		fi
 	done < <(grep -hoE "node-version:[[:space:]]*['\"]?[0-9][0-9.x]*" $workflows | grep -oE '[0-9][0-9.x]*$' | sed 's/\.x$//' | sort -u)
 }
 
@@ -185,8 +227,9 @@ main() {
 	while [[ $# -gt 0 ]]; do
 		case $1 in
 			--file-issue) file_issue=1; shift ;;
+			--update) UPDATE=1; shift ;;
 			--repository) repository=${2:?Missing repository}; shift 2 ;;
-			--help|-h) echo 'Usage: check-dependency-versions.sh [--file-issue [--repository OWNER/REPO]]'; return ;;
+			--help|-h) echo 'Usage: check-dependency-versions.sh [--update] [--file-issue [--repository OWNER/REPO]]'; return ;;
 			*) echo "Unknown argument: $1" >&2; return 1 ;;
 		esac
 	done
@@ -194,6 +237,7 @@ main() {
 
 	check_npm
 	check_actions
+	check_patches
 	check_node
 	check_vendored 'jQuery' 'frontend/static/js/jquery.min.js' 'jQuery v[0-9.]+' 'jquery/jquery'
 	check_vendored 'Semantic UI' 'frontend/static/css/semantic.css' 'Semantic UI[ -]*[0-9.]+' 'Semantic-Org/Semantic-UI'

@@ -1,7 +1,8 @@
 name: Dependency version check
 
 # weekly report of out of date dependencies (Electron and the other frontend npm packages,
-# GitHub Actions, CI Node, vendored jQuery / Semantic UI), kept in one tracking issue
+# GitHub Actions, CI Node, vendored jQuery / Semantic UI), kept in one tracking issue;
+# out of date actions / node-version also get a PR (update job)
 on:
   schedule:
     - cron: '0 8 * * 1'
@@ -34,4 +35,46 @@ jobs:
             bash scripts/check-dependency-versions.sh --file-issue
           else
             bash scripts/check-dependency-versions.sh
+          fi
+
+  # rewrites out of date action refs / node-version and keeps one PR open for them.
+  # pushing workflow changes needs a PAT with the workflow scope (PAT_TOKEN), GITHUB_TOKEN can't
+  update:
+    if: github.repository == 'openframeworks/projectGenerator'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+      BRANCH: dependency-versions-update
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+      - name: Update action refs and node-version
+        shell: bash
+        run: bash scripts/check-dependency-versions.sh --update > /dev/null
+      - name: Open / update PR
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "Actions and node-version are up to date"
+            exit 0
+          fi
+          git diff --stat
+          if [[ -z $GH_TOKEN ]]; then
+            echo "::warning::PAT_TOKEN secret not set, can't push workflow updates"
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -C "$BRANCH"
+          git commit -qam 'CI: update GitHub Actions and node-version to latest'
+          git push -f origin "$BRANCH"
+          if [[ -z $(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number') ]]; then
+            gh pr create --base master --head "$BRANCH" \
+              --title 'CI: update GitHub Actions and node-version to latest' \
+              --body "Automated by the dependency version check (\`scripts/check-dependency-versions.sh --update\`)."
           fi
