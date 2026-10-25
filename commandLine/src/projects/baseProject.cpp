@@ -588,7 +588,7 @@ void baseProject::addAddon(const std::string & _addonName){
             addonsCache[target][addonName] = addon;
         }else{
             // keep it in addons.make so the project still says it needs it (#258)
-            ofLogError("baseProject::addAddon") << "addon not found: " << _addonName << " - kept in addons.make, install it or fix the name";
+            ofLogError("baseProject::addAddon") << "addon not found: " << ofTrim(ofSplitString(_addonName, "#")[0]) << " - kept in addons.make, install it or fix the name";
             if (std::find(missingAddons.begin(), missingAddons.end(), _addonName) == missingAddons.end()) {
                 missingAddons.emplace_back(_addonName);
             }
