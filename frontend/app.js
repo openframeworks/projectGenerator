@@ -1219,7 +1219,8 @@ function generate() {
     const rendererDefines = {
         angle: 'OF_USE_ANGLE=1',
         dawn: 'OF_USE_DAWN=1',
-        glon12: 'OF_USE_GLON12=1'
+        glon12: 'OF_USE_GLON12=1',
+        glon12warp: 'OF_USE_GLON12=1,OF_USE_GLON12_WARP=1'
     };
     const rendererChoice = $('#rendererDropdown').dropdown('get value');
     const customDefinesText = $('#customDefines').val().trim();
@@ -1426,9 +1427,9 @@ function updateRendererFieldVisibility() {
     const apple = selectedPlatforms.some((p) => ['osx', 'ios', 'macos'].includes(p));
     const vs = selectedPlatforms.includes('vs');
     $('#rendererDropdown .item[data-value="angle"], #rendererDropdown .item[data-value="dawn"]').toggle(apple);
-    $('#rendererDropdown .item[data-value="glon12"]').toggle(vs);
+    $('#rendererDropdown .item[data-value="glon12"], #rendererDropdown .item[data-value="glon12warp"]').toggle(vs);
     const renderer = $('#rendererDropdown').dropdown('get value');
-    if ((['angle', 'dawn'].includes(renderer) && !apple) || (renderer === 'glon12' && !vs)) {
+    if ((['angle', 'dawn'].includes(renderer) && !apple) || (['glon12', 'glon12warp'].includes(renderer) && !vs)) {
         $('#rendererDropdown').dropdown('set exactly', 'default');
     }
     if (defaultSettings.advancedMode && (apple || vs)) {
