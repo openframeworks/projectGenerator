@@ -404,16 +404,14 @@ bool baseProject::create(const fs::path & _path, string templateName){
 }
 
 bool baseProject::save(){
-	ofLog(OF_LOG_NOTICE) << "saving addons.make";
-
-	std::ofstream addonsMake(projectDir / "addons.make");
-	for (auto & a : addons) {
-        addonsMake << a.addonMakeName << std::endl;
-//		if (a.isLocalAddon) {
-//			addonsMake << fs::path(a.addonPath).generic_string() << std::endl;
-//		} else {
-//			addonsMake << a.name << std::endl;
-//		}
+	// no addons and no addons.make yet: don't create an empty one (#297).
+	// an existing one is still rewritten, so removing every addon clears it
+	if (addons.size() || fs::exists(projectDir / "addons.make")) {
+		ofLog(OF_LOG_NOTICE) << "saving addons.make";
+		std::ofstream addonsMake(projectDir / "addons.make");
+		for (auto & a : addons) {
+			addonsMake << a.addonMakeName << std::endl;
+		}
 	}
 
 	//save out params which the PG knows about to config.make
