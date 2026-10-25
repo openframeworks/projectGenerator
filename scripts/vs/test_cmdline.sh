@@ -85,4 +85,15 @@ if [[ $errorcode -ne 0 ]]; then
     exit $errorcode
 fi
 
+echo "Test -DOF_USE_GLON12=1 sets the MSBuild property"
+./"${EXE_FILE}" -o"../openFrameworks" -p"vs" -D"OF_USE_GLON12=1" "../openFrameworks/apps/myApps/testingGLon12"
+errorcode=$?
+if [[ $errorcode -ne 0 ]]; then
+    exit $errorcode
+fi
+if ! grep -q "<OF_USE_GLON12>1</OF_USE_GLON12>" "../openFrameworks/apps/myApps/testingGLon12/testingGLon12.vcxproj"; then
+    echo "OF_USE_GLON12 property missing from testingGLon12.vcxproj"
+    exit 1
+fi
+
 echo "Successful projectGenerator tests for [vs]"

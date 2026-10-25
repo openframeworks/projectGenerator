@@ -234,13 +234,15 @@
 							<input type="hidden" id="rendererValue" value="default">
 							<i class="dropdown icon"></i>
 							<div class="text">Default (OpenGL / OpenGL ES)</div>
-							<!-- labels assume the Metal backend since this field is currently only
-							     shown for osx/ios/macos - update if/when Linux/Windows ANGLE-Vulkan
+							<!-- angle / dawn labels assume the Metal backend (only shown for osx/ios/macos),
+							     glon12 is only shown for vs - update if/when Linux/Windows ANGLE-Vulkan
 							     or Dawn-Vulkan packages are actually available to build against -->
 							<div class="menu">
 								<div class="item" data-value="default">Default (OpenGL / OpenGL ES)</div>
 								<div class="item" data-value="angle">ANGLE - Auto OpenGL to Metal</div>
 								<div class="item" data-value="dawn">Dawn - Auto OpenGL to WebGPU/Metal</div>
+								<div class="item" data-value="glon12">GLon12 - OpenGL to Direct3D 12 (Mesa)</div>
+								<div class="item" data-value="glon12warp">GLon12 - WARP software (no GPU driver)</div>
 							</div>
 						</div>
 					</div>

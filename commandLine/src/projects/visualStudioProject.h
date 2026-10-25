@@ -23,6 +23,7 @@ public:
 		addDefine(define, RELEASE_LIB);
 		addDefine(define, DEBUG_LIB);
 		projectDefines.emplace_back(define);
+		addPropertyDefine(define);
 	}
     
     void addLDFLAG(const std::string& ldflag, LibType libType = RELEASE_LIB) override {}
@@ -58,4 +59,6 @@ protected:
 	void addCompileOption(const string& nodeName, const string& value, const string& delimiter, LibType libType = RELEASE_LIB);
 
 	void addClCompileAsC(const string & srcFileString, const string & folderString);
+	// defines openFrameworksCommon.props also reads as MSBuild properties (OF_USE_GLON12 copies the GLon12 DLLs, OF_USE_GLON12_WARP selects WARP)
+	void addPropertyDefine(const string & define);
 };

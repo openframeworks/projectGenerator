@@ -629,6 +629,40 @@ void visualStudioProject::addDefine(const string& define, LibType libType) {
 	// }
 }
 
+// OF_USE_GLON12[=1] / OF_USE_GLON12_WARP[=1] -> <OF_USE_GLON12>1</OF_USE_GLON12> etc in the Globals PropertyGroup
+void visualStudioProject::addPropertyDefine(const string & define) {
+	static const std::set<string> properties { "OF_USE_GLON12", "OF_USE_GLON12_WARP" };
+	auto eq = define.find('=');
+	string name = ofTrim(define.substr(0, eq));
+	if (!properties.count(name)) return;
+	string value = eq == string::npos ? "1" : ofTrim(define.substr(eq + 1));
+
+	pugi::xml_node globals = doc.select_node("//PropertyGroup[@Label='Globals']").node();
+	if (!globals) {
+		ofLogWarning(LOG_NAME) << "no Globals PropertyGroup, not setting " << name;
+		return;
+	}
+	pugi::xml_node node = globals.child(name.c_str());
+	if (!node) node = globals.append_child(name.c_str());
+	node.text().set(value.c_str());
+	ofLogVerbose(LOG_NAME) << "MSBuild property " << name << " = " << value;
+
+	// the build fails without them too (openFrameworksCommon.props), say so now
+	if (name == "OF_USE_GLON12" && value == "1") {
+		fs::path bin { getOFRoot() / "libs" / "glon12" / "bin" / "vs" };
+		std::vector<string> found;
+		for (const auto & arch : { "x64", "ARM64", "ARM64EC" }) {
+			if (fs::exists(bin / arch / "opengl32.dll")) found.emplace_back(arch);
+		}
+		if (found.empty()) {
+			ofLogError(LOG_NAME) << "no GLon12 files found in " << bin.string()
+				<< " - download glon12 in projectGenerator: downloads > Modular libraries > glon12 > Download selected (or apothecary: TYPE=vs ./apothecary update glon12)";
+		} else {
+			ofLogVerbose(LOG_NAME) << "GLon12 files found for " << ofJoinString(found, ", ");
+		}
+	}
+}
+
 void visualStudioProject::ensureDllDirectoriesExist() {
 	std::vector<fs::path> dirs { { "dll/x64" }, { "dll/ARM64" }, { "dll/ARM64EC" } };
 	for (const auto & dir : dirs) {
