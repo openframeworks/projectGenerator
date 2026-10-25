@@ -6,6 +6,7 @@
 	#include <cstdlib> // std::system
 //	#include <regex>
 #endif
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 
@@ -16,7 +17,8 @@ string xcodeProject::LOG_NAME = "xcodeProjectFile";
 xcodeProject::xcodeProject(const string & target)
 	: baseProject(target) {
 	// TODO: remove unused variables
-	if (target == "osx") {
+	// macos is the osx template plus a multiplatform target (see readTemplateUUIDs)
+	if (target == "osx" || target == "macos") {
 		folderUUID = {
 			{ "src", "E4B69E1C0A3A1BDC003C02F2" },
 			{ "addons", "BB4B014C10F69532006C3DED" },
@@ -191,12 +193,129 @@ void xcodeProject::saveMakefile() {
 	copyTemplateFiles.push_back({ templatePath / "config.make", projectDir / "config.make" });
 }
 
+// The UUIDs set in the constructor are the osx and ios templates' ones. The macos template has a
+// second (multiplatform) app target and tvOS has its own UUIDs, so anything missing is read from
+// the template's app targets; otherwise addon files and build settings end up in orphan objects.
+void xcodeProject::readTemplateUUIDs() {
+	appTarget first { buildConfigurationListUUID, buildActionMaskUUID, uuidMap["linkBinaryWithLibraries"], copyFrameworksUUID, copyBundleResourcesUUID };
+	appTargets = { first };
+
+	fs::path fileName { projectDir / (projectName + ".xcodeproj/project.pbxproj") };
+	json j;
+	try {
+		std::ifstream contents(fileName);
+		j = json::parse(contents);
+	} catch (std::exception & e) {
+		ofLogError(xcodeProject::LOG_NAME) << "readTemplateUUIDs: " << fileName << " " << e.what();
+		return;
+	}
+	if (!j.contains("objects") || !j.contains("rootObject")) return;
+	auto & objects = j["objects"];
+	auto exists = [&](const string & uuid) { return !uuid.empty() && objects.contains(uuid); };
+	auto & root = objects[j["rootObject"].get<string>()];
+
+	std::vector<appTarget> found;
+	std::vector<std::vector<string>> foundConfigs;
+	for (auto & t : root.value("targets", json::array())) {
+		string uuid = t.get<string>();
+		auto & target = objects[uuid];
+		if (target.value("productType", "") != "com.apple.product-type.application") continue;
+		appTarget a { uuid };
+		for (auto & p : target.value("buildPhases", json::array())) {
+			auto & phase = objects[p.get<string>()];
+			string isa = phase.value("isa", "");
+			if (isa == "PBXSourcesBuildPhase") a.sources = p;
+			else if (isa == "PBXFrameworksBuildPhase") a.frameworks = p;
+			else if (isa == "PBXResourcesBuildPhase") a.resources = p;
+			else if (isa == "PBXCopyFilesBuildPhase" && phase.value("dstSubfolderSpec", "") == "10") a.copyFrameworks = p;
+		}
+		std::vector<string> configs;
+		string list = target.value("buildConfigurationList", "");
+		if (exists(list)) {
+			for (auto & c : objects[list].value("buildConfigurations", json::array())) configs.push_back(c);
+		}
+		// the hard coded target stays first
+		if (uuid == buildConfigurationListUUID) {
+			found.insert(found.begin(), a);
+			foundConfigs.insert(foundConfigs.begin(), configs);
+		} else {
+			found.push_back(a);
+			foundConfigs.push_back(configs);
+		}
+	}
+	if (found.empty()) return;
+	// several app targets (macos) already have their own names
+	if (found.size() > 1) renameTarget = false;
+
+	// first target: keep each hard coded UUID that is in the template, so osx / ios generate as before
+	auto & a = appTargets[0];
+	if (!exists(a.uuid)) {
+		a.uuid = found[0].uuid;
+		renameTarget = false;
+	}
+	if (!exists(a.sources)) a.sources = found[0].sources;
+	if (!exists(a.frameworks)) a.frameworks = found[0].frameworks;
+	if (!exists(a.copyFrameworks)) a.copyFrameworks = found[0].copyFrameworks;
+	if (!exists(a.resources)) a.resources = found[0].resources;
+	buildConfigurationListUUID = a.uuid;
+	buildActionMaskUUID = a.sources;
+	uuidMap["linkBinaryWithLibraries"] = a.frameworks;
+	copyFrameworksUUID = a.copyFrameworks;
+	copyBundleResourcesUUID = a.resources;
+
+	std::vector<string> configs;
+	for (auto & c : buildConfigs) {
+		if (exists(c)) configs.push_back(c);
+	}
+	if (configs.empty()) configs = foundConfigs[0];
+	for (std::size_t i = 1; i < found.size(); i++) {
+		appTargets.push_back(found[i]);
+		configs.insert(configs.end(), foundConfigs[i].begin(), foundConfigs[i].end());
+	}
+	buildConfigs = configs;
+
+	// groups
+	string mainGroup = root.value("mainGroup", "");
+	if (!exists(projRootUUID) && exists(mainGroup)) projRootUUID = mainGroup;
+	for (auto name : { "src", "addons", "openFrameworks" }) {
+		folderUUID.try_emplace(name, "");
+	}
+	for (auto it = folderUUID.begin(); it != folderUUID.end();) {
+		if (exists(it->second)) {
+			++it;
+			continue;
+		}
+		string name = ofPathToString(it->first);
+		string match = name.empty() ? projRootUUID : "";
+		if (match.empty() && exists(mainGroup)) {
+			for (auto & c : objects[mainGroup].value("children", json::array())) {
+				auto & child = objects[c.get<string>()];
+				if (child.value("name", "") == name || child.value("path", "") == name) {
+					match = c;
+					break;
+				}
+			}
+		}
+		// not in the template: getFolderUUID creates the group
+		if (match.empty()) {
+			it = folderUUID.erase(it);
+		} else {
+			it->second = match;
+			++it;
+		}
+	}
+}
+
 bool xcodeProject::loadProjectFile() { //base
+	readTemplateUUIDs();
+
 	addCommand("# ---- PG VERSION " + getPGVersion());
 	addCommand("Add :_OFProjectGeneratorVersion string " + getPGVersion());
 
-	// Rename Project
-	addCommand("Set :objects:" + buildConfigurationListUUID + ":name string " + projectName);
+	// Rename Project (only the hard coded osx / ios target, a template's other targets keep their names)
+	if (renameTarget) {
+		addCommand("Set :objects:" + buildConfigurationListUUID + ":name string " + projectName);
+	}
 
 	// Just OSX here, debug app naming.
 	if (target == "osx") {
@@ -210,10 +329,16 @@ bool xcodeProject::loadProjectFile() { //base
 	
 	bool updateOFPath = false;
 	fs::path of = getOFRoot();
+	// openFrameworks / addons groups, if the template has them
+	auto group = [&](const string & name) {
+		auto it = folderUUID.find(name);
+		return it == folderUUID.end() ? string {} : it->second;
+	};
 	if (!ofIsPathInPath(fs::current_path(), getOFRoot())) {
 		updateOFPath = true;
-		addCommand("Set :objects:" + folderUUID["openFrameworks"] + ":sourceTree string <absolute>");
-		addCommand("Set :objects:" + folderUUID["addons"] + ":sourceTree string <absolute>");
+		for (auto name : { "openFrameworks", "addons" }) {
+			if (!group(name).empty()) addCommand("Set :objects:" + group(name) + ":sourceTree string <absolute>");
+		}
 	} else {
 		// inside OF Root but not in usual depth
 		if (!fs::equivalent(getOFRoot(), "../../..")) {
@@ -222,8 +347,8 @@ bool xcodeProject::loadProjectFile() { //base
 		}
 	}
 	if (updateOFPath) {
-		addCommand("Set :objects:" + folderUUID["openFrameworks"] + ":path string " + of.string() + "/libs/openFrameworks");
-		addCommand("Set :objects:" + folderUUID["addons"] + ":path string " + of.string() + "/addons");
+		if (!group("openFrameworks").empty()) addCommand("Set :objects:" + group("openFrameworks") + ":path string " + of.string() + "/libs/openFrameworks");
+		if (!group("addons").empty()) addCommand("Set :objects:" + group("addons") + ":path string " + of.string() + "/addons");
 	}
 
 	return true;
@@ -577,14 +702,14 @@ void xcodeProject::addLDFLAG(const string & ldflag, LibType libType) {
 void xcodeProject::addCFLAG(const string & cflag, LibType libType) {
 	ofLogVerbose("xcodeProject::addCFLAG") << cflag;
 	for (auto & c : buildConfigs) {
-		// FIXME: add array here if it doesnt exist
+		// like ADDON_CFLAGS in the makefiles, C++ too (the template's OTHER_CPLUSPLUSFLAGS doesn't inherit OTHER_CFLAGS)
 		addCommand("Add :objects:" + c + ":buildSettings:OTHER_CFLAGS: string " + cflag);
+		addCommand("Add :objects:" + c + ":buildSettings:OTHER_CPLUSPLUSFLAGS: string " + cflag);
 	}
 }
 
 void xcodeProject::addDefine(const string & define, LibType libType) {
 	for (auto & c : buildConfigs) {
-		// FIXME: add array here if it doesnt exist
 		addCommand("Add :objects:" + c + ":buildSettings:GCC_PREPROCESSOR_DEFINITIONS: string " + define);
 	}
 }
@@ -592,7 +717,6 @@ void xcodeProject::addDefine(const string & define, LibType libType) {
 // FIXME: libtype is unused here
 void xcodeProject::addCPPFLAG(const string & cppflag, LibType libType) {
 	for (auto & c : buildConfigs) {
-		// FIXME: add array here if it doesnt exist
 		addCommand("Add :objects:" + c + ":buildSettings:OTHER_CPLUSPLUSFLAGS: string " + cppflag);
 	}
 }
@@ -772,76 +896,69 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 		addCommand("# ---- addFileToFolder UUID : " + ofPathToString(folder));
 		addCommand("Add :objects:" + folderUUID + ":children: string " + UUID);
 
-		string buildUUID { generateUUID(ofPathToString(path) + "-build") };
-		// If any other option is true, add buildUUID entries.
-		if (
-			fp.addToBuildPhase || fp.codeSignOnCopy || fp.copyFilesBuildPhase || fp.addToBuildResource || fp.addToResources || fp.copyBundleResources
-		) {
-			addCommand("# ---- addFileToBuildUUID " + buildUUID);
-			addCommand("Add :objects:" + buildUUID + ":isa string PBXBuildFile");
-			addCommand("Add :objects:" + buildUUID + ":fileRef string " + UUID);
-		}
+		// one PBXBuildFile per app target and phase (the first target keeps the original UUIDs)
+		for (std::size_t i = 0; i < appTargets.size(); i++) {
+			auto & t = appTargets[i];
+			string suffix { i == 0 ? "" : "-" + t.uuid };
 
-		if (fp.addToBuildPhase) { // Compile Sources
-			// Not sure if it applies to everything, applies to srcFile.
-			addCommand("# ---- addToBuildPhase");
-			addCommand("Add :objects:" + buildActionMaskUUID + ":files: string " + buildUUID);
-		}
+			string buildUUID { generateUUID(ofPathToString(path) + "-build" + suffix) };
+			// If any other option is true, add buildUUID entries.
+			if (
+				fp.addToBuildPhase || fp.codeSignOnCopy || fp.copyFilesBuildPhase || fp.addToBuildResource || fp.addToResources || fp.copyBundleResources
+			) {
+				addCommand("# ---- addFileToBuildUUID " + buildUUID);
+				addCommand("Add :objects:" + buildUUID + ":isa string PBXBuildFile");
+				addCommand("Add :objects:" + buildUUID + ":fileRef string " + UUID);
+			}
 
-		if (fp.copyBundleResources) {
-			addCommand("# ---- copyBundleResources");
-			addCommand("Add :objects:" + copyBundleResourcesUUID + ":files: string " + buildUUID);
-		}
+			if (fp.addToBuildPhase && !t.sources.empty()) { // Compile Sources
+				// Not sure if it applies to everything, applies to srcFile.
+				addCommand("# ---- addToBuildPhase");
+				addCommand("Add :objects:" + t.sources + ":files: string " + buildUUID);
+			}
 
-		if (fp.copyFilesBuildPhase) {
-			//			// If we are going to add xcframeworks to copy files -> destination frameworks, we should include here
-			if (path.extension() == ".framework") {
-				addCommand("# ---- copyPhase Frameworks " + buildUUID);
-				addCommand("Add :objects:E4C2427710CC5ABF004149E2:files: string " + buildUUID);
+			if (fp.copyBundleResources && !t.resources.empty()) {
+				addCommand("# ---- copyBundleResources");
+				addCommand("Add :objects:" + t.resources + ":files: string " + buildUUID);
+			}
+
+			if (fp.copyFilesBuildPhase && !t.copyFrameworks.empty()) {
+				//			// If we are going to add xcframeworks to copy files -> destination frameworks, we should include here
+				if (path.extension() == ".framework") {
+					addCommand("# ---- copyPhase Frameworks " + buildUUID);
+					addCommand("Add :objects:" + t.copyFrameworks + ":files: string " + buildUUID);
+				}
+			}
+
+			if (fp.codeSignOnCopy) {
+				addCommand("# ---- codeSignOnCopy " + buildUUID);
+				addCommand("Add :objects:" + buildUUID + ":settings:ATTRIBUTES array");
+				addCommand("Add :objects:" + buildUUID + ":settings:ATTRIBUTES: string CodeSignOnCopy");
+			}
+
+			if (i == 0 && fp.addToBuildResource) {
+				string mediaAssetsUUID { "9936F60E1BFA4DEE00891288" };
+				addCommand("# ---- addToBuildResource");
+				addCommand("Add :objects:" + mediaAssetsUUID + ":files: string " + UUID);
+			}
+
+			if (i == 0 && fp.addToResources) {
+				// FIXME: test if it is working on iOS
+				if (resourcesUUID != "") {
+					addCommand("# ---- addToResources (IOS only) ?" + buildUUID);
+					addCommand("Add :objects:" + resourcesUUID + ": string " + buildUUID);
+				}
+			}
+
+			if (fp.linkBinaryWithLibraries && !t.frameworks.empty()) { // Link Binary With Libraries
+				auto tempUUID = generateUUID(ofPathToString(path) + "-InFrameworks" + suffix);
+				addCommand("Add :objects:" + tempUUID + ":fileRef string " + UUID);
+				addCommand("Add :objects:" + tempUUID + ":isa string PBXBuildFile");
+				addCommand("# --- linkBinaryWithLibraries PBXFrameworksBuildPhase");
+				addCommand("Add :objects:" + t.frameworks + ":files: string " + tempUUID);
+				alert (commands.back(), 96);
 			}
 		}
-//			//			if (path.extension() == ".framework" || path.extension() == ".xcframework") {
-//			// This now includes both .framework and .xcframework
-//			if (fileType == "wrapper.framework" || fileType == ".xcframework") {
-//				// copy to frameworks
-//				addCommand("# ---- copyPhase Frameworks " + buildUUID);
-//				addCommand("Add :objects:E4C2427710CC5ABF004149E2:files: string " + buildUUID);
-//			} else {
-//				// copy to executables
-//				addCommand("# ---- copyPhase Executables " + buildUUID);
-//				addCommand("Add :objects:E4A5B60F29BAAAE400C2D356:files: string " + buildUUID);
-//			}
-//		}
-
-		if (fp.codeSignOnCopy) {
-			addCommand("# ---- codeSignOnCopy " + buildUUID);
-			addCommand("Add :objects:" + buildUUID + ":settings:ATTRIBUTES array");
-			addCommand("Add :objects:" + buildUUID + ":settings:ATTRIBUTES: string CodeSignOnCopy");
-		}
-
-		if (fp.addToBuildResource) {
-			string mediaAssetsUUID { "9936F60E1BFA4DEE00891288" };
-			addCommand("# ---- addToBuildResource");
-			addCommand("Add :objects:" + mediaAssetsUUID + ":files: string " + UUID);
-		}
-
-		if (fp.addToResources) {
-			// FIXME: test if it is working on iOS
-			if (resourcesUUID != "") {
-				addCommand("# ---- addToResources (IOS only) ?" + buildUUID);
-				addCommand("Add :objects:" + resourcesUUID + ": string " + buildUUID);
-			}
-		}
-
-		 if (fp.linkBinaryWithLibraries) { // Link Binary With Libraries
-			auto tempUUID = generateUUID(ofPathToString(path) + "-InFrameworks");
-			addCommand("Add :objects:" + tempUUID + ":fileRef string " + UUID);
-			addCommand("Add :objects:" + tempUUID + ":isa string PBXBuildFile");
-			addCommand("# --- linkBinaryWithLibraries PBXFrameworksBuildPhase");
-			//			 uuidMap["linkBinaryWithLibraries"] = "E4B69B590A3A1756003C02F2";
-			addCommand("Add :objects:" + uuidMap["linkBinaryWithLibraries"] + ":files: string " + tempUUID);
-			alert (commands.back(), 96);
-		 }
 	}
 	return UUID;
 }
@@ -953,6 +1070,8 @@ bool xcodeProject::saveProjectFile() {
 					thispath = thispath.substr(0, thispath.length() - 1);
 //					alert (thispath, 95);
 					json::json_pointer p = json::json_pointer(thispath);
+					string key { p.back() };
+					bool bFlags { key == "GCC_PREPROCESSOR_DEFINITIONS" || key == "OTHER_CFLAGS" || key == "OTHER_CPLUSPLUSFLAGS" || key == "OTHER_LDFLAGS" };
 					try {
 						// Fixing XCode one item array issue
 						if (!j[p].is_array()) {
@@ -968,6 +1087,10 @@ bool xcodeProject::saveProjectFile() {
 							// leading [null] element (e.g. GCC_PREPROCESSOR_DEFINITIONS via addDefine)
 							auto v = j[p];
 							j[p] = json::array();
+							// flags set by addons keep the xcconfig ones (CoreOF.xcconfig / Project.xcconfig)
+							if (bFlags && v != "$(inherited)") {
+								j[p].emplace_back("$(inherited)");
+							}
 							if (!v.is_null()) {
 								//								cout << "thispath " << thispath << endl;
 								j[p].emplace_back(v);
@@ -975,7 +1098,13 @@ bool xcodeProject::saveProjectFile() {
 						}
 						//						alert (c, 31);
 						//						alert ("emplace back " + cols[3] , 32);
-						j[p].emplace_back(cols[3]);
+						// the same define / -D -U -I flag from an addon parsed twice is added once
+						// (not other flags: "-framework A -framework B" are separate values)
+						string value { cols[3] };
+						bool bUnique { key == "GCC_PREPROCESSOR_DEFINITIONS" || (bFlags && key != "OTHER_LDFLAGS" && value.size() > 2 && value[0] == '-' && (value[1] == 'D' || value[1] == 'U' || value[1] == 'I')) };
+						if (!bUnique || std::find(j[p].begin(), j[p].end(), value) == j[p].end()) {
+							j[p].emplace_back(value);
+						}
 
 					} catch (std::exception & e) {
 						ofLogError(xcodeProject::LOG_NAME) << "json error ";

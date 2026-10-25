@@ -148,7 +148,7 @@ jobs:
         run: ../openFrameworks/apps/projectGenerator/scripts/osx/test_cmdline.sh
 
       - name: Build emptyExample and allAddonsExample
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master'
         shell: bash
         run: ../openFrameworks/apps/projectGenerator/scripts/ci_build_examples.sh osx
 

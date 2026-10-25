@@ -39,6 +39,10 @@ echo "Test 2: all examples - defined core openFrameworks path ../../"
 ./projectGenerator --recursive -posx -o../../ ../../examples/ ./projectGenerator
 echo "Test 2: all examples - success"
 
+echo "Test 3: addon defines / cflags / sources in every Xcode app target (osx, macos, ios, tvos)"
+"${CURRENT_DIR}/test_xcode_addon_flags.sh" ./projectGenerator "${PG_DIR}/../.." || exit 1
+echo "Test 3: addon defines / cflags / sources - success"
+
 # echo "test out of folder -o [vs]";
 # rm -rf ../../../../../pg2
 # mkdir -p  ../../../../../pg2
