@@ -406,11 +406,15 @@ bool baseProject::create(const fs::path & _path, string templateName){
 bool baseProject::save(){
 	// no addons and no addons.make yet: don't create an empty one (#297).
 	// an existing one is still rewritten, so removing every addon clears it
-	if (addons.size() || fs::exists(projectDir / "addons.make")) {
+	if (addons.size() || missingAddons.size() || fs::exists(projectDir / "addons.make")) {
 		ofLog(OF_LOG_NOTICE) << "saving addons.make";
 		std::ofstream addonsMake(projectDir / "addons.make");
 		for (auto & a : addons) {
 			addonsMake << a.addonMakeName << std::endl;
+		}
+		// not found, kept so the project still says it needs them (#258)
+		for (auto & m : missingAddons) {
+			addonsMake << m << std::endl;
 		}
 	}
 
@@ -583,7 +587,11 @@ void baseProject::addAddon(const std::string & _addonName){
         if(addon.load(_addonName, projectDir, target)){
             addonsCache[target][addonName] = addon;
         }else{
-            ofLogVerbose("baseProject::addAddon") << "Ignoring addon that doesn't seem to exist: " << _addonName;
+            // keep it in addons.make so the project still says it needs it (#258)
+            ofLogError("baseProject::addAddon") << "addon not found: " << _addonName << " - kept in addons.make, install it or fix the name";
+            if (std::find(missingAddons.begin(), missingAddons.end(), _addonName) == missingAddons.end()) {
+                missingAddons.emplace_back(_addonName);
+            }
             return; //if addon does not exist, stop early
         }
     }

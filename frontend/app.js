@@ -25,6 +25,9 @@ let isOfPathGood = false;
 let isFirstTimeSierra = false;
 let bVerbose = false;
 let localAddons = [];
+// addons.make lines whose addon isn't installed: kept on generate / update, shown under the addons (#258)
+let missingAddons = [];
+let missingAddonCloning = false;
 
 let numAddedSrcPaths = 1;
 
@@ -416,11 +419,14 @@ ipcRenderer.on('selectAddons', (event, arg) => {
 
     const neededAddons = [];
     localAddons = [];
+    missingAddons = [];
 
     //haystack.indexOf(needle) >= 0
 
     for (let i = 0; i < arg.length; i++) {
-        arg[i] = arg[i].trim();
+        // addons.make line, optionally "name #url"
+        const line = arg[i].trim();
+        arg[i] = line.split('#')[0].trim();
         // first, check if it's already picked, then do nothing
         if (addonsAlreadyPicked.indexOf(arg[i]) >= 0){
             console.log("already picked"); // alread picked
@@ -437,6 +443,8 @@ ipcRenderer.on('selectAddons', (event, arg) => {
                     localAddons.push(arg[i]);
                 } else {
                     neededAddons.push(arg[i]);
+                    const url = ((line.split('#')[1] || '').match(/(https?:\/\/|git@)\S+/) || [''])[0];
+                    missingAddons.push({ name: arg[i], line, url });
                 }
             }
         }
@@ -455,6 +463,7 @@ ipcRenderer.on('selectAddons', (event, arg) => {
 
         // $("#generate-mode-section").removeClass("has-missing-addons");
     }
+    renderMissingAddons();
 
     if (localAddons.length > 0){
         // $("#generate-mode-section").addClass("has-missing-addons");
@@ -1209,6 +1218,10 @@ function generate() {
     for(let i = 0; i < localAddons.length; i++) {
         addonValueArray.push(localAddons[i]);
     }
+    // and the missing ones, so they stay in addons.make (with their #url comment)
+    for (const m of missingAddons) {
+        addonValueArray.push(m.line.includes(',') ? m.name : m.line);
+    }
 
     // extra source locations
     const srcExtraArr = [];
@@ -1349,6 +1362,8 @@ function switchGenerateMode(mode) {
         $("#folderButton").show();
         $("#missingAddonMessage").hide();
         $("#localAddonMessage").hide();
+        missingAddons = [];
+        renderMissingAddons();
         $("#nameRandomiser").hide();
         $("#revealProjectFiles").show();
         $("#extraContainer").hide();
@@ -1373,6 +1388,8 @@ function switchGenerateMode(mode) {
         $("#folderButton").show();
         $("#missingAddonMessage").hide();
         $("#localAddonMessage").hide();
+        missingAddons = [];
+        renderMissingAddons();
         $("#nameRandomiser").show();
         $("#revealProjectFiles").hide();
         $("#extraContainer").hide();
@@ -1653,6 +1670,34 @@ function rescanAddons() {
     ipcRenderer.send('isOFProjectFolder', projectInfo);     // <- this forces addon reload
 }
 
+// one line per missing addon under the addons dropdown: clone it from its addons.make #url, or search for it
+function renderMissingAddons() {
+    const $list = $('#missingAddonsField').empty();
+    for (const m of missingAddons) {
+        const $row = $('<div class="missing-addon">').append(
+            $('<i class="red exclamation triangle icon">'),
+            $('<span class="monospace">').text(m.name),
+            ' ', $('<span>').text(t('addon.missing')), ' ');
+        if (m.url) {
+            $row.append($('<a href="#">').text(t('addon.missingDownload')).attr('title', m.url).on('click', (e) => {
+                e.preventDefault();
+                missingAddonCloning = true;
+                openConsoleForOperation();
+                // package manager style url@commit (an @ before the first / is git@host)
+                const at = m.url.lastIndexOf('@');
+                const [url, ref] = at > m.url.indexOf('/') && m.url.includes('/') ? [m.url.slice(0, at), m.url.slice(at + 1)] : [m.url, ''];
+                ipcRenderer.send('cloneAddon', { ofPath: $("#ofPath").val(), url, ref });
+            }), ' · ');
+        }
+        $row.append($('<a href="#">').text(t('addon.missingFind')).on('click', (e) => {
+            e.preventDefault();
+            ipcRenderer.send('openExternal', 'https://github.com/search?type=repositories&q=' + encodeURIComponent(m.name));
+        }));
+        $list.append($row);
+    }
+    $list.toggle(missingAddons.length > 0);
+}
+
 function cloneAddonFromGit(){
     const raw = $("#addonGitUrl").val().trim();
     if (raw === '') return;
@@ -1665,6 +1710,11 @@ function cloneAddonFromGit(){
 
 ipcRenderer.on('cloneAddonDone', () => {
     $("#addonGitUrl").prop('disabled', false).attr('placeholder', 'git URL, optionally url#branch-or-commit...');
+    // re-import the project so a downloaded missing addon gets picked
+    if (missingAddonCloning) {
+        missingAddonCloning = false;
+        rescanAddons();
+    }
 });
 
 function getRandomSketchName(){

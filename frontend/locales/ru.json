@@ -22,7 +22,7 @@
   "msgBox.missingAddons.body1": "Вы пытаетесь обновить проект, в котором отсутствуют следующие аддоны:",
   "msgBox.missingAddons.linkText": "пересканировать",
   "msgBox.missingAddons.body2Suffix": "Скачайте недостающие аддоны и поместите их в папку addons, затем {{link}}.",
-  "msgBox.missingAddons.body3": "Если вы обновите этот проект без этих аддонов, его настройки могут быть перезаписаны.",
+  "msgBox.missingAddons.body3": "Они остаются в addons.make; проект не соберётся, пока они не установлены.",
   "msgBox.localAddons.header": "Локальные аддоны",
   "msgBox.localAddons.body1": "Вы пытаетесь обновить проект, использующий следующие локальные аддоны:",
   "msgBox.localAddons.body2": "Чтобы изменить эти локальные аддоны, отредактируйте файл addons.make внутри проекта и импортируйте заново",
@@ -165,5 +165,8 @@
   "field.appBuild": "Сборка:",
   "tooltip.appVersionInvalid": "Версия должна состоять из цифр и точек, например 1, 1.2 или 1.2.3.",
   "tooltip.appBuildInvalid": "Номер сборки должен быть целым положительным числом, например 42.",
-  "note.appVersionDiffers": "В {{file}} другая версия: {{value}} - используется значение из config.make."
+  "note.appVersionDiffers": "В {{file}} другая версия: {{value}} - используется значение из config.make.",
+  "addon.missing": "не установлен - остаётся в addons.make, проект не соберётся, пока его нет",
+  "addon.missingDownload": "Скачать",
+  "addon.missingFind": "Найти на GitHub"
 }

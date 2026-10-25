@@ -22,7 +22,7 @@
   "msgBox.missingAddons.body1": "다음 애드온이 없는 프로젝트를 업데이트하려고 합니다:",
   "msgBox.missingAddons.linkText": "다시 스캔",
   "msgBox.missingAddons.body2Suffix": "누락된 애드온을 다운로드하여 addons 폴더에 넣은 다음 {{link}}하세요.",
-  "msgBox.missingAddons.body3": "이 애드온 없이 프로젝트를 업데이트하면 설정이 덮어써질 수 있습니다.",
+  "msgBox.missingAddons.body3": "addons.make에는 유지됩니다. 설치할 때까지 프로젝트를 빌드할 수 없습니다.",
   "msgBox.localAddons.header": "로컬 애드온",
   "msgBox.localAddons.body1": "다음 로컬 애드온을 사용하는 프로젝트를 업데이트하려고 합니다:",
   "msgBox.localAddons.body2": "이 로컬 애드온을 변경하려면 이 프로젝트 안의 addons.make 파일을 수정한 후 다시 가져오세요",
@@ -165,5 +165,8 @@
   "field.appBuild": "빌드:",
   "tooltip.appVersionInvalid": "버전은 숫자와 점만 사용할 수 있습니다 (예: 1, 1.2, 1.2.3).",
   "tooltip.appBuildInvalid": "빌드는 양의 정수여야 합니다 (예: 42).",
-  "note.appVersionDiffers": "{{file}}의 버전이 다릅니다: {{value}} - config.make의 값을 사용합니다."
+  "note.appVersionDiffers": "{{file}}의 버전이 다릅니다: {{value}} - config.make의 값을 사용합니다.",
+  "addon.missing": "설치되지 않음 - addons.make에 유지되며, 설치할 때까지 프로젝트를 빌드할 수 없습니다",
+  "addon.missingDownload": "다운로드",
+  "addon.missingFind": "GitHub에서 찾기"
 }
