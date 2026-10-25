@@ -22,7 +22,7 @@
   "msgBox.missingAddons.body1": "次のアドオンが不足しているプロジェクトを更新しようとしています:",
   "msgBox.missingAddons.linkText": "再スキャン",
   "msgBox.missingAddons.body2Suffix": "不足しているアドオンをダウンロードしてaddonsフォルダに置き、その後{{link}}してください。",
-  "msgBox.missingAddons.body3": "これらのアドオンなしでこのプロジェクトを更新すると、設定が上書きされる場合があります。",
+  "msgBox.missingAddons.body3": "addons.make には残ります。インストールするまでプロジェクトはビルドできません。",
   "msgBox.localAddons.header": "ローカルアドオン",
   "msgBox.localAddons.body1": "次のローカルアドオンを使用しているプロジェクトを更新しようとしています:",
   "msgBox.localAddons.body2": "これらのローカルアドオンを変更するには、このプロジェクト内のaddons.makeを編集してから再インポートしてください",
@@ -165,5 +165,8 @@
   "field.appBuild": "ビルド:",
   "tooltip.appVersionInvalid": "バージョンは数字とドットのみで指定してください (例: 1、1.2、1.2.3)。",
   "tooltip.appBuildInvalid": "ビルドは正の整数で指定してください (例: 42)。",
-  "note.appVersionDiffers": "{{file}} のバージョンが異なります: {{value}} - config.make の値を使用します。"
+  "note.appVersionDiffers": "{{file}} のバージョンが異なります: {{value}} - config.make の値を使用します。",
+  "addon.missing": "未インストール - addons.make に残ります。インストールするまでプロジェクトはビルドできません",
+  "addon.missingDownload": "ダウンロード",
+  "addon.missingFind": "GitHubで検索"
 }

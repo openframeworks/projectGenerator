@@ -22,7 +22,7 @@
   "msgBox.missingAddons.body1": "Você está tentando atualizar um projeto ao qual faltam os seguintes addons:",
   "msgBox.missingAddons.linkText": "reescanear",
   "msgBox.missingAddons.body2Suffix": "Baixe os addons ausentes e coloque-os na sua pasta de addons, depois {{link}}.",
-  "msgBox.missingAddons.body3": "Se você optar por atualizar este projeto sem esses addons, poderá sobrescrever as configurações do projeto.",
+  "msgBox.missingAddons.body3": "Eles continuam no addons.make; o projeto não compila até que sejam instalados.",
   "msgBox.localAddons.header": "Addons locais",
   "msgBox.localAddons.body1": "Você está tentando atualizar um projeto que usa os seguintes addons locais:",
   "msgBox.localAddons.body2": "Para alterar esses addons locais, edite o arquivo addons.make dentro deste projeto e reimporte",
@@ -165,5 +165,8 @@
   "field.appBuild": "Build:",
   "tooltip.appVersionInvalid": "A versão deve conter apenas dígitos e pontos, ex.: 1, 1.2 ou 1.2.3.",
   "tooltip.appBuildInvalid": "O build deve ser um número inteiro positivo, ex.: 42.",
-  "note.appVersionDiffers": "{{file}} tem outra versão: {{value}} - é usada a do config.make."
+  "note.appVersionDiffers": "{{file}} tem outra versão: {{value}} - é usada a do config.make.",
+  "addon.missing": "não instalado - mantido no addons.make, o projeto não compila até ser instalado",
+  "addon.missingDownload": "Baixar",
+  "addon.missingFind": "Procurar no GitHub"
 }

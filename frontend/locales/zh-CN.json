@@ -22,7 +22,7 @@
   "msgBox.missingAddons.body1": "你正在尝试更新一个缺少以下插件的项目：",
   "msgBox.missingAddons.linkText": "重新扫描",
   "msgBox.missingAddons.body2Suffix": "请下载缺失的插件并放入你的插件文件夹，然后{{link}}。",
-  "msgBox.missingAddons.body3": "如果你选择在没有这些插件的情况下更新此项目，可能会覆盖其设置。",
+  "msgBox.missingAddons.body3": "它们会保留在 addons.make 中；安装之前项目无法编译。",
   "msgBox.localAddons.header": "本地插件",
   "msgBox.localAddons.body1": "你正在尝试更新一个使用以下本地插件的项目：",
   "msgBox.localAddons.body2": "要修改这些本地插件，请编辑此项目中的 addons.make 文件，然后重新导入",
@@ -165,5 +165,8 @@
   "field.appBuild": "构建号:",
   "tooltip.appVersionInvalid": "版本只能包含数字和点，例如 1、1.2 或 1.2.3。",
   "tooltip.appBuildInvalid": "构建号必须是正整数，例如 42。",
-  "note.appVersionDiffers": "{{file}} 中的版本不同: {{value}} - 使用 config.make 中的值。"
+  "note.appVersionDiffers": "{{file}} 中的版本不同: {{value}} - 使用 config.make 中的值。",
+  "addon.missing": "未安装 - 保留在 addons.make 中，安装前项目无法编译",
+  "addon.missingDownload": "下载",
+  "addon.missingFind": "在 GitHub 上查找"
 }

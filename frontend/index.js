@@ -34,6 +34,7 @@ crashReporter.start({
 /**
  * @typedef {{ 
  *   defaultOfPath: string, 
+ *   ofPathManual: boolean,
  *   advancedMode: boolean, 
  *   defaultPlatform: string,
  *   showConsole: boolean,
@@ -51,6 +52,7 @@ let settings = {};
 /** @type Settings */
 const templateSettings = {
     defaultOfPath: "",
+    ofPathManual: false,
     emsdkPath: "",
     advancedMode: false,
     defaultPlatform: '',
@@ -321,7 +323,7 @@ function sendTranslations(webContents) {
     const lang = translations[settings.language] ? settings.language : 'en';
     webContents.send('setTranslations', {
         lang,
-        strings: translations[lang],
+        strings: { ...translations.en, ...translations[lang] },
         available: AVAILABLE_LANGUAGES.map((code) => ({ code, name: translations[code]['language.name'] })),
     });
 }
@@ -937,8 +939,8 @@ ipcMain.on('isOFProjectFolder', (event, project) => {
                     }
                 });
 
-                // remove comments
-                projectAddons = projectAddons.map((element) => element.split('#')[0]);
+                // whole lines: a missing addon's "#url" comment lets the GUI clone it (#258)
+                projectAddons = projectAddons.map((element) => element.trim()).filter((el) => el !== '' && el[0] !== '#');
 
                 // console.log('addons', projectAddons);
 

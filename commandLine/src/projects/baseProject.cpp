@@ -404,16 +404,18 @@ bool baseProject::create(const fs::path & _path, string templateName){
 }
 
 bool baseProject::save(){
-	ofLog(OF_LOG_NOTICE) << "saving addons.make";
-
-	std::ofstream addonsMake(projectDir / "addons.make");
-	for (auto & a : addons) {
-        addonsMake << a.addonMakeName << std::endl;
-//		if (a.isLocalAddon) {
-//			addonsMake << fs::path(a.addonPath).generic_string() << std::endl;
-//		} else {
-//			addonsMake << a.name << std::endl;
-//		}
+	// no addons and no addons.make yet: don't create an empty one (#297).
+	// an existing one is still rewritten, so removing every addon clears it
+	if (addons.size() || missingAddons.size() || fs::exists(projectDir / "addons.make")) {
+		ofLog(OF_LOG_NOTICE) << "saving addons.make";
+		std::ofstream addonsMake(projectDir / "addons.make");
+		for (auto & a : addons) {
+			addonsMake << a.addonMakeName << std::endl;
+		}
+		// not found, kept so the project still says it needs them (#258)
+		for (auto & m : missingAddons) {
+			addonsMake << m << std::endl;
+		}
 	}
 
 	//save out params which the PG knows about to config.make
@@ -585,7 +587,11 @@ void baseProject::addAddon(const std::string & _addonName){
         if(addon.load(_addonName, projectDir, target)){
             addonsCache[target][addonName] = addon;
         }else{
-            ofLogVerbose("baseProject::addAddon") << "Ignoring addon that doesn't seem to exist: " << _addonName;
+            // keep it in addons.make so the project still says it needs it (#258)
+            ofLogError("baseProject::addAddon") << "addon not found: " << ofTrim(ofSplitString(_addonName, "#")[0]) << " - kept in addons.make, install it or fix the name";
+            if (std::find(missingAddons.begin(), missingAddons.end(), _addonName) == missingAddons.end()) {
+                missingAddons.emplace_back(_addonName);
+            }
             return; //if addon does not exist, stop early
         }
     }
@@ -646,6 +652,15 @@ void baseProject::copyAddonData(ofAddon& addon){
 
 			if(fs::exists(from)){
 				fs::path to { dest / d };
+				// bin/data (and any folders in ADDON_DATA) may not exist yet (#619)
+				fs::path toDir { fs::is_directory(from) ? to : to.parent_path() };
+				if (!fs::exists(toDir)) {
+					try {
+						fs::create_directories(toDir);
+					} catch (const std::exception& e) {
+						ofLogWarning() << "Can not create addon data folder: " << toDir.string() << " :: " << e.what();
+					}
+				}
 				if (fs::is_regular_file(from)){
 					try {
 						fs::copy_file(from, to, fs::copy_options::overwrite_existing); // this is addon files
@@ -655,14 +670,6 @@ void baseProject::copyAddonData(ofAddon& addon){
 					}
 
 				} else if (fs::is_directory(from)) {
-					if (!fs::exists(to)) {
-						try {
-						   fs::create_directory(to);
-						} catch (const std::exception& e) {
-						   std::cerr << "Error creating directories: " << e.what() << std::endl;
-						}
-					}
-
 					try {
 						fs::copy(from, to, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
 						ofLogVerbose() << "adding addon data file: " << d << endl;

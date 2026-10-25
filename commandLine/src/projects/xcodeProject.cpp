@@ -1100,7 +1100,12 @@ bool xcodeProject::saveProjectFile() {
 						//						alert ("emplace back " + cols[3] , 32);
 						// the same define / -D -U -I flag from an addon parsed twice is added once
 						// (not other flags: "-framework A -framework B" are separate values)
-						string value { cols[3] };
+						// the whole value, not just its first word: "src/sub folder" (#303)
+						string value { c.substr(cols[0].size() + cols[1].size() + cols[2].size() + 3) };
+						// Xcode splits build settings on spaces, quote like Xcode does for paths with spaces
+						if (value.find(' ') != string::npos && value.front() != '"') {
+							value = "\"" + value + "\"";
+						}
 						bool bUnique { key == "GCC_PREPROCESSOR_DEFINITIONS" || (bFlags && key != "OTHER_LDFLAGS" && value.size() > 2 && value[0] == '-' && (value[1] == 'D' || value[1] == 'U' || value[1] == 'I')) };
 						if (!bUnique || std::find(j[p].begin(), j[p].end(), value) == j[p].end()) {
 							j[p].emplace_back(value);
