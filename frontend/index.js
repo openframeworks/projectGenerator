@@ -1579,6 +1579,36 @@ function stripProgressRedraws(text) {
     return text.replace(/[^\n]*\r(?!\n)/g, '');
 }
 
+// Git for Windows only puts Git\cmd on PATH, so a GUI launch can't find bash.
+// Never System32 / WindowsApps bash.exe (WSL): it can't run the Windows paths we pass.
+function findBash() {
+    if (process.platform !== 'win32') return { cmd: 'bash', env: {} };
+    const gitBash = (root) => root && path.join(root, 'Git', 'bin', 'bash.exe');
+    const candidates = [];
+    for (const dir of (process.env.PATH || '').split(path.delimiter)) {
+        if (!dir) continue;
+        candidates.push(path.join(dir, 'bash.exe'));
+        // ...\Git\cmd on PATH -> ...\Git\bin\bash.exe
+        if (path.basename(dir).toLowerCase() === 'cmd') candidates.push(path.join(dir, '..', 'bin', 'bash.exe'));
+    }
+    candidates.push(
+        gitBash(process.env.ProgramW6432),
+        gitBash(process.env.ProgramFiles),
+        gitBash(process.env['ProgramFiles(x86)']),
+        process.env.LOCALAPPDATA && path.join(process.env.LOCALAPPDATA, 'Programs', 'Git', 'bin', 'bash.exe'),
+    );
+    const system32 = path.join(process.env.SystemRoot || 'C:\\Windows', 'System32').toLowerCase();
+    const isWsl = (c) => { const d = path.dirname(c).toLowerCase(); return d.startsWith(system32) || d.endsWith('\\windowsapps'); };
+    const found = candidates.find((c) => c && !isWsl(c) && fs.existsSync(c));
+    if (found) return { cmd: found, env: {} };
+    // MSYS2 bash needs a login shell for /usr/bin on PATH; CHERE_INVOKING keeps the cwd
+    for (const root of [process.env.MSYS2_ROOT, 'C:\\msys64', 'C:\\msys2']) {
+        const msys = root && path.join(root, 'usr', 'bin', 'bash.exe');
+        if (msys && fs.existsSync(msys)) return { cmd: msys, args: ['-l'], env: { CHERE_INVOKING: '1', MSYSTEM: 'MINGW64' } };
+    }
+    return null;
+}
+
 ipcMain.on('downloadCoreLibs', (event, { ofPath, source, tag, platform }) => {
     const send = (msg) => { if (!event.sender.isDestroyed()) event.sender.send('consoleMessage', msg); };
     const done = (ok) => { if (!event.sender.isDestroyed()) event.sender.send('downloadCoreLibsDone', { ok }); };
@@ -1603,10 +1633,17 @@ ipcMain.on('downloadCoreLibs', (event, { ofPath, source, tag, platform }) => {
     }
     send(`<br><em>${t('downloads.coreStarting', { tag: `${source || 'apothecary'} ${tag}`, platform })}</em><br>`);
 
+    const bash = findBash();
+    if (!bash) {
+        send(`<strong>${t('msg.error')}</strong> ${t('downloads.bashMissing')}<br>`);
+        done(false);
+        return;
+    }
+    args = [...(bash.args || []), ...args];
     let child;
     try {
-        const env = platform === 'emscripten64' ? { ...process.env, BITS: '64' } : process.env;
-        child = spawn('bash', args, { cwd: path.dirname(script), env, windowsHide: true });
+        const env = { ...process.env, ...bash.env, ...(platform === 'emscripten64' ? { BITS: '64' } : {}) };
+        child = spawn(bash.cmd, args, { cwd: path.dirname(script), env, windowsHide: true });
     } catch (error) {
         send(`<strong>${t('msg.error')}</strong> ${error.message}<br>`);
         done(false);
@@ -1619,7 +1656,7 @@ ipcMain.on('downloadCoreLibs', (event, { ofPath, source, tag, platform }) => {
         done(false);
     });
     child.on('close', (code) => {
-        send(`<br><em>(command used: bash ${args.join(' ')})</em><br>`);
+        send(`<br><em>(command used: ${bash.cmd} ${args.join(' ')})</em><br>`);
         if (code !== 0) {
             event.sender.send('sendUIMessage',
                 `<!--modal-context:none:-->\n<strong>${t('msg.error')}</strong><br>${t('downloads.coreFailed', { code })}`);
