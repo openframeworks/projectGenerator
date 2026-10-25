@@ -646,6 +646,15 @@ void baseProject::copyAddonData(ofAddon& addon){
 
 			if(fs::exists(from)){
 				fs::path to { dest / d };
+				// bin/data (and any folders in ADDON_DATA) may not exist yet (#619)
+				fs::path toDir { fs::is_directory(from) ? to : to.parent_path() };
+				if (!fs::exists(toDir)) {
+					try {
+						fs::create_directories(toDir);
+					} catch (const std::exception& e) {
+						ofLogWarning() << "Can not create addon data folder: " << toDir.string() << " :: " << e.what();
+					}
+				}
 				if (fs::is_regular_file(from)){
 					try {
 						fs::copy_file(from, to, fs::copy_options::overwrite_existing); // this is addon files
@@ -655,14 +664,6 @@ void baseProject::copyAddonData(ofAddon& addon){
 					}
 
 				} else if (fs::is_directory(from)) {
-					if (!fs::exists(to)) {
-						try {
-						   fs::create_directory(to);
-						} catch (const std::exception& e) {
-						   std::cerr << "Error creating directories: " << e.what() << std::endl;
-						}
-					}
-
 					try {
 						fs::copy(from, to, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
 						ofLogVerbose() << "adding addon data file: " << d << endl;
