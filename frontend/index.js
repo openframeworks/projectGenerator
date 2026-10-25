@@ -34,6 +34,7 @@ crashReporter.start({
 /**
  * @typedef {{ 
  *   defaultOfPath: string, 
+ *   ofPathManual: boolean,
  *   advancedMode: boolean, 
  *   defaultPlatform: string,
  *   showConsole: boolean,
@@ -51,6 +52,7 @@ let settings = {};
 /** @type Settings */
 const templateSettings = {
     defaultOfPath: "",
+    ofPathManual: false,
     emsdkPath: "",
     advancedMode: false,
     defaultPlatform: '',

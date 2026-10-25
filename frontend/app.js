@@ -98,6 +98,8 @@ ipcRenderer.on('setTranslations', (event, data) => {
 
 //-------------------------------------------
 ipcRenderer.on('setOfPath', (event, arg) => {
+    // picked with the folder dialog: keep it over the detected path from now on (#602)
+    defaultSettings.ofPathManual = true;
     setOFPath(arg);
 });
 
@@ -658,7 +660,7 @@ function setup() {
        
         $('#ofPathButton').click(() => {
             disableButtonTemporarily($("#ofPathButton"));
-            getOFPath();
+            getOFPath(true);
         });
 
         console.log("App is translocated: " + isFirstTimeSierra);
@@ -845,6 +847,11 @@ function setup() {
                  bVerbose = false;
                  saveDefaultSettings();
             }
+        });
+
+        // typed by the user (setOFPath only triggers change)
+        $("#ofPath").on("input", () => {
+            defaultSettings.ofPathManual = true;
         });
 
         $("#ofPath").on("change", () => {
@@ -1985,14 +1992,35 @@ function getOFPlatform() {
     ipcRenderer.send('getHostType');
 }
 
-function getOFPath() {
+// the ofPath button re-detects even over a manually set path
+let ofPathDetectForced = false;
+
+function getOFPath(force = false) {
     console.log('getOFPath:sending');
+    ofPathDetectForced = force;
     ipcRenderer.send('getOFPath');
 }
 
+// absolute folder with libs/openFrameworks and addons ("../../.." = the cmdline didn't find one)
+function isOFPath(p) {
+    return !!p && path.isAbsolute(p)
+        && fs.existsSync(path.join(p, 'libs', 'openFrameworks')) && fs.existsSync(path.join(p, 'addons'));
+}
 
 ipcRenderer.on('ofPathResult', (event, result) => {
+    const forced = ofPathDetectForced;
+    ofPathDetectForced = false;
+    // a path the user set (dialog / typed) wins over detection on launch and the settings tab (#602)
+    if (!forced && defaultSettings.ofPathManual && isOFPath($('#ofPath').val())) {
+        console.log('ofPath: keeping manually set path', $('#ofPath').val());
+        return;
+    }
+    if (result.success && !forced && !isOFPath(result.message) && isOFPath($('#ofPath').val())) {
+        console.log('ofPath: detected path is not an openFrameworks folder, keeping', $('#ofPath').val());
+        return;
+    }
     if (result.success) {
+        if (forced) defaultSettings.ofPathManual = false;
         console.log('ofPath:', result.message);
         document.getElementById('ofPath').textContent = result.message;
         setOFPath(result.message);
