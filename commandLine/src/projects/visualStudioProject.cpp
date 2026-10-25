@@ -629,9 +629,9 @@ void visualStudioProject::addDefine(const string& define, LibType libType) {
 	// }
 }
 
-// OF_USE_GLON12[=1] -> <OF_USE_GLON12>1</OF_USE_GLON12> in the Globals PropertyGroup
+// OF_USE_GLON12[=1] / OF_USE_GLON12_WARP[=1] -> <OF_USE_GLON12>1</OF_USE_GLON12> etc in the Globals PropertyGroup
 void visualStudioProject::addPropertyDefine(const string & define) {
-	static const std::set<string> properties { "OF_USE_GLON12" };
+	static const std::set<string> properties { "OF_USE_GLON12", "OF_USE_GLON12_WARP" };
 	auto eq = define.find('=');
 	string name = ofTrim(define.substr(0, eq));
 	if (!properties.count(name)) return;
