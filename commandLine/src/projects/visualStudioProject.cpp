@@ -646,6 +646,21 @@ void visualStudioProject::addPropertyDefine(const string & define) {
 	if (!node) node = globals.append_child(name.c_str());
 	node.text().set(value.c_str());
 	ofLogVerbose(LOG_NAME) << "MSBuild property " << name << " = " << value;
+
+	// the build fails without them too (openFrameworksCommon.props), say so now
+	if (name == "OF_USE_GLON12" && value == "1") {
+		fs::path bin { getOFRoot() / "libs" / "glon12" / "bin" / "vs" };
+		std::vector<string> found;
+		for (const auto & arch : { "x64", "ARM64", "ARM64EC" }) {
+			if (fs::exists(bin / arch / "opengl32.dll")) found.emplace_back(arch);
+		}
+		if (found.empty()) {
+			ofLogError(LOG_NAME) << "no GLon12 files found in " << bin.string()
+				<< " - download the glon12 library (projectGenerator Libraries, or apothecary: TYPE=vs ./apothecary update glon12)";
+		} else {
+			ofLogVerbose(LOG_NAME) << "GLon12 files found for " << ofJoinString(found, ", ");
+		}
+	}
 }
 
 void visualStudioProject::ensureDllDirectoriesExist() {
