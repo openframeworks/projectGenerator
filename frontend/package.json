@@ -1,7 +1,7 @@
 {
   "name": "projectGenerator",
   "productName": "projectGenerator",
-  "version": "0.105.0",
+  "version": "0.106.0",
   "description": "Build electron GUI openFrameworks projectGenerator",
   "license": "MIT",
   "main": "index.js",
@@ -25,7 +25,7 @@
     "dist:linux": "electron-builder --linux --publish never",
     "dist:linux64": "electron-builder --linux --x64 --publish never",
     "dist:linux:arm64": "electron-builder --linux --arm64 --publish never",
-    "build:linux64": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=44.9.3 --platform=linux --arch=x64"
+    "build:linux64": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=45.0.0 --platform=linux --arch=x64"
   },
   "build": {
     "appId": "cc.openframeworks.projectGenerator",
@@ -92,8 +92,8 @@
     "n-readlines": "^3.4.1"
   },
   "devDependencies": {
-    "electron": "^44.9.3",
-    "electron-builder": "^26.15.3",
+    "electron": "^45.0.0",
+    "electron-builder": "^26.18.0",
     "@electron/packager": "^20.3.0"
   }
 }
