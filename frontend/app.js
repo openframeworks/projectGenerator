@@ -1218,7 +1218,8 @@ function generate() {
     // renderer choice adds its OF_USE_* define on top of whatever the user typed manually
     const rendererDefines = {
         angle: 'OF_USE_ANGLE=1',
-        dawn: 'OF_USE_DAWN=1'
+        dawn: 'OF_USE_DAWN=1',
+        glon12: 'OF_USE_GLON12=1'
     };
     const rendererChoice = $('#rendererDropdown').dropdown('get value');
     const customDefinesText = $('#customDefines').val().trim();
@@ -1418,12 +1419,19 @@ function enableAdvancedMode(isAdvanced) {
     //$("#advancedToggle").prop('checked', defaultSettings['advancedMode'] );
 }
 
-// renderer choice (OF_USE_ANGLE / OF_USE_DAWN) only applies to the Xcode-based
-// osx/ios/macos (mega iOS/tvOS/macOS) targets, and is an advanced-only option
+// renderer choice is advanced-only: OF_USE_ANGLE / OF_USE_DAWN for the Xcode-based
+// osx/ios/macos (mega iOS/tvOS/macOS) targets, OF_USE_GLON12 for vs
 function updateRendererFieldVisibility() {
-    const rendererPlatforms = ['osx', 'ios', 'macos'];
     const selectedPlatforms = ($("#platformsDropdown input").val() || '').trim().split(',');
-    if (defaultSettings.advancedMode && selectedPlatforms.some((p) => rendererPlatforms.includes(p))) {
+    const apple = selectedPlatforms.some((p) => ['osx', 'ios', 'macos'].includes(p));
+    const vs = selectedPlatforms.includes('vs');
+    $('#rendererDropdown .item[data-value="angle"], #rendererDropdown .item[data-value="dawn"]').toggle(apple);
+    $('#rendererDropdown .item[data-value="glon12"]').toggle(vs);
+    const renderer = $('#rendererDropdown').dropdown('get value');
+    if ((['angle', 'dawn'].includes(renderer) && !apple) || (renderer === 'glon12' && !vs)) {
+        $('#rendererDropdown').dropdown('set exactly', 'default');
+    }
+    if (defaultSettings.advancedMode && (apple || vs)) {
         $('#rendererField').show();
     } else {
         $('#rendererField').hide();
