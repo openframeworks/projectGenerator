@@ -23,7 +23,7 @@ jobs:
       contents: read
       issues: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Compare dependency versions
         shell: bash
         env:
@@ -50,7 +50,7 @@ jobs:
       GH_TOKEN: ${{ secrets.PAT_TOKEN }}
       BRANCH: dependency-versions-update
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
       - name: Update action refs and node-version
