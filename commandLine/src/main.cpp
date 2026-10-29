@@ -572,9 +572,17 @@ int pgMain(int argc, char ** argv) {
 	}
 
 	//fix as we want to treat vscode as a platform not a template
-	if (templateName == "vscode") {
-		templateName = "";
-		addPlatforms("vscode");
+	// added to the -p platforms, not replacing them (addPlatforms clears), so -posx -tvscode still makes the xcodeproj (#476)
+	{
+		vector<string> templateNames = ofSplitString(templateName, ",", true, true);
+		auto vscode = std::find(templateNames.begin(), templateNames.end(), "vscode");
+		if (vscode != templateNames.end()) {
+			templateNames.erase(vscode);
+			templateName = ofJoinString(templateNames, ",");
+			if (std::find(targets.begin(), targets.end(), "vscode") == targets.end()) {
+				targets.emplace_back("vscode");
+			}
+		}
 	}
 
 	if (options[MSYS2ENV].count() > 0 && options[MSYS2ENV].arg != NULL) {
