@@ -1,0 +1,33 @@
+name: latest-release
+
+# a master push starts the builds, which upload to the "latest" release; recreate it first so
+# its date and tag are this commit's (the builds take minutes before they upload)
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**/README.md'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: latest-release
+  cancel-in-progress: false
+
+jobs:
+  latest-release:
+    if: github.repository == 'openframeworks/projectGenerator'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Recreate the latest release at this commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release delete latest --repo "$REPO" --cleanup-tag --yes || echo "no latest release yet"
+          gh release create latest --repo "$REPO" --target "$GITHUB_SHA" --title latest --latest=false \
+            --notes "Latest master build from ${GITHUB_SHA:0:7} (copied to nightly every night). Files are added as each platform finishes building."
