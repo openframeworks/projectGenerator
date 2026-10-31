@@ -448,8 +448,9 @@ if (!path.isAbsolute(defaultOfPath)) {
 if (hostplatform === 'osx' && ['osx', 'ios', 'macos'].includes(settings.defaultPlatform)) {
     const bundledPlatform = detectApplePlatformFromLibs(defaultOfPath);
     if (bundledPlatform) {
-        console.log(`default platform from bundled libs: ${bundledPlatform}`);
-        settings.defaultPlatform = bundledPlatform;
+        // macos template is broken for now, default all Apple packages to osx
+        settings.defaultPlatform = bundledPlatform === 'macos' ? 'osx' : bundledPlatform;
+        console.log(`default platform from bundled libs: ${bundledPlatform} -> ${settings.defaultPlatform}`);
     }
 }
 
