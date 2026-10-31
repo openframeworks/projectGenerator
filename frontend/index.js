@@ -1526,6 +1526,15 @@ function corePlatformsFor(ofPath) {
     if (platforms.includes('ios') && fs.existsSync(path.join(scriptsDir, 'dev', 'download_libs.sh'))) platforms.push('tvos');
     // wasm64 libs: same script with BITS=64
     if (platforms.includes('emscripten')) platforms.push('emscripten64');
+    // Visual Studio 2026 / 2019 libs: scripts/vs/download_libs.sh --vs2026 / --legacy (vs is 2022)
+    if (platforms.includes('vs')) {
+        let dev = '';
+        try {
+            dev = fs.readFileSync(path.join(scriptsDir, 'dev', 'download_libs.sh'), 'utf8');
+        } catch (e) {}
+        if (dev.includes('--vs2026')) platforms.push('vs2026');
+        if (dev.includes('--legacy')) platforms.push('vs2019');
+    }
     return platforms;
 }
 
@@ -1587,6 +1596,9 @@ ipcMain.on('getLibReleases', async (event, { ofPath, refresh }) => {
                 published: r.published,
                 built: r.built,
                 hasCore: r.assets.some((a) => a.name.startsWith('openFrameworksLibs_')),
+                // releases without these packages don't offer them
+                vs2026: r.assets.some((a) => a.name.startsWith(`openFrameworksLibs_${r.tag}_vs_2026_`)),
+                vs2019: r.assets.some((a) => a.name.startsWith(`openFrameworksLibs_${r.tag}_vs_2019_`)),
                 modular: modularLibsFor(r, ofPath).map(({ asset, ...lib }) => ({ ...lib, asset: asset.name, size: asset.size, verifiable: !!asset.digest })),
             })),
             corePlatforms: corePlatformsFor(ofPath),
@@ -1633,13 +1645,16 @@ function findBash() {
     return null;
 }
 
+// openFrameworksLibs_<tag>_vs_2026_* / vs_2019_* packages (vs is 2022)
+const VS_LIB_FLAGS = { vs2026: '--vs2026', vs2019: '--legacy' };
+
 ipcMain.on('downloadCoreLibs', (event, { ofPath, source, tag, platform }) => {
     const send = (msg) => { if (!event.sender.isDestroyed()) event.sender.send('consoleMessage', msg); };
     const done = (ok) => { if (!event.sender.isDestroyed()) event.sender.send('downloadCoreLibsDone', { ok }); };
 
     const script = source === 'oflibs' || source === 'archive'
         ? path.join(ofPath || '', 'scripts', 'dev', 'lib_sources.sh')
-        : path.join(ofPath || '', 'scripts', platform === 'tvos' ? 'dev' : platform === 'emscripten64' ? 'emscripten' : platform || '', 'download_libs.sh');
+        : path.join(ofPath || '', 'scripts', platform === 'tvos' ? 'dev' : platform === 'emscripten64' ? 'emscripten' : VS_LIB_FLAGS[platform] ? 'vs' : platform || '', 'download_libs.sh');
     if (!ofPath || !platform || !tag || !fs.existsSync(script)) {
         send(`<br><strong>${t('msg.error')}</strong> ${t('downloads.scriptMissing', { script })}<br>`);
         done(false);
@@ -1653,6 +1668,7 @@ ipcMain.on('downloadCoreLibs', (event, { ofPath, source, tag, platform }) => {
         args = ['-c', 'source "$1" && downloadArchiveRelease "$2" "$3" "$4" "" libs', 'bash', script, ofPath, tag, platform];
     } else {
         args = platform === 'tvos' ? [script, '-p', 'tvos', '-b'] : [script];
+        if (VS_LIB_FLAGS[platform]) args.push(VS_LIB_FLAGS[platform]);
         if (tag !== 'latest') args.push('-t', tag);
     }
     send(`<br><em>${t('downloads.coreStarting', { tag: `${source || 'apothecary'} ${tag}`, platform })}</em><br>`);
