@@ -557,7 +557,7 @@
 				<p>The PG targets this computer's platform (on macOS: <b>osx</b>). With <b>Advanced options</b> on in settings, pick one or more platforms (Xcode, Visual Studio, make, VS Code, Android, Emscripten ...) and templates, which add to them, e.g. <b>VS Code</b> on top of osx or vs.</p>
 
 				<h4 class="ui dividing header">System frameworks and libraries (macOS / iOS / tvOS)</h4>
-				<p>When an Apple platform is selected, add SDK frameworks and libraries the project links to, comma-separated:</p>
+				<p>With <b>Advanced options</b> on and an Apple platform selected, add SDK frameworks and libraries the project links to, comma-separated:</p>
 				<ul>
 					<li><b>System frameworks</b>: <code>Security,CoreBluetooth</code> - Security.framework, CoreBluetooth.framework</li>
 					<li><b>System libraries</b>: <code>sqlite3,z</code> - libsqlite3.tbd, libz.tbd (<code>libsqlite3</code>, <code>libsqlite3.tbd</code> and <code>-lsqlite3</code> also work)</li>
@@ -568,7 +568,7 @@ PROJECT_SYSTEM_LIBS = sqlite3 z</pre>
 				<p>Xcode gets them in <i>Link Binary With Libraries</i>; make and CMake builds read the same lines (<code>-framework Security</code>, <code>-lsqlite3</code>). Clear a field and update to remove them.</p>
 
 				<h4 class="ui dividing header">Advanced options</h4>
-				<p>Turn on <b>Advanced options</b> in settings for: custom defines, renderer (ANGLE / Dawn / GLon12), OpenGL / GLES / WebGL version, app version and build, post-build script, MSYS2 environment, Emscripten wasm32 / wasm64.</p>
+				<p>Turn on <b>Advanced options</b> in settings for: system frameworks and libraries, custom defines, renderer (ANGLE / Dawn / GLon12), OpenGL / GLES / WebGL version, app version and build, post-build script, MSYS2 environment, Emscripten wasm32 / wasm64.</p>
 
 				<h4 class="ui dividing header">Downloads</h4>
 				<p>Download or update the prebuilt openFrameworks libraries, or single (modular) libraries, for your OF path.</p>

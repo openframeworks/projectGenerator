@@ -79,7 +79,7 @@ Link SDK frameworks and libraries (sqlite3 = `libsqlite3.tbd`) to a project:
 
 and read back on every update, so a plain `./projectGenerator -o"pathToOF" pathToProject` keeps them. The Xcode project gets them in Link Binary With Libraries; the makefiles and CMake read the same lines (`-framework Security` on Apple only, `-lsqlite3` everywhere). Edit `config.make` and update the project, or pass an empty `-f` / `--system-libs=` to remove them.
 
-The GUI shows them as System frameworks / System libraries when an Apple platform is selected (see the help tab).
+The GUI shows them as System frameworks / System libraries with Advanced options on and an Apple platform selected (see the help tab).
 
 
 

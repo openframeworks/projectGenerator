@@ -1481,7 +1481,7 @@ function updateRendererFieldVisibility() {
     // advanced only; hidden fields keep the project's values, so updating still keeps them
     $('#appVersionField').css('display', defaultSettings.advancedMode ? 'flex' : 'none');
     $('#appVersionNote').toggle(!!defaultSettings.advancedMode && $('#appVersionNote').text().length > 0);
-    $('#systemFrameworksField').css('display', selectedPlatforms.some((p) => ['osx', 'ios', 'macos', 'tvos'].includes(p)) ? 'flex' : 'none');
+    $('#systemFrameworksField').css('display', defaultSettings.advancedMode && selectedPlatforms.some((p) => ['osx', 'ios', 'macos', 'tvos'].includes(p)) ? 'flex' : 'none');
 
     const glPlatforms = ['osx', 'vs', 'msys2', 'linux', 'linux64', 'linuxarmv6l', 'linuxarmv7l', 'linuxaarch64', 'vscode'];
     $('#glField').toggle(!!defaultSettings.advancedMode && selectedPlatforms.some((p) => glPlatforms.includes(p)));
