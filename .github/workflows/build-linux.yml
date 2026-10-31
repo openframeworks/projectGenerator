@@ -129,14 +129,6 @@ jobs:
           make_latest: ${{ env.RELEASE == 'latest' && 'false' || 'legacy' }}
           files: projectGenerator-linux-gui.gz
 
-      - name: Update Latest Tag - DateTime
-        uses: EndBug/latest-tag@latest
-        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/bleeding')
-        with:
-          ref: latest
-          description: Latest master build (copied to nightly every night)
-          force-branch: true
-
   # Ubuntu 22.04 build - older glibc baseline, covers users/distros that can't
   # run binaries linked against 24.04's newer glibc.
   build-linux-ubuntu22:
