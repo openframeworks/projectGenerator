@@ -666,6 +666,17 @@ void xcodeProject::addFramework(const fs::path & path, const fs::path & folder, 
 	}
 }
 
+void xcodeProject::addSystemLibrary(const std::string & name) {
+	ofLogVerbose() << "Adding system library " << name;
+	addCommand("# ----- addSystemLibrary " + name);
+
+	fileProperties fp;
+	fp.absolute = false;
+	fp.isRelativeToSDK = true;
+	fp.linkBinaryWithLibraries = true;
+	addFile(fs::path { "usr/lib/lib" + name + ".tbd" }, "Frameworks", fp);
+}
+
 void xcodeProject::addDylib(const fs::path & path, const fs::path & folder) {
 	//	alert( "xcodeProject::addDylib " + ofPathToString(path) , 33);
 

@@ -97,6 +97,12 @@ public:
 	bool bOverwrite = true;
 
 	virtual void addFramework(const fs::path & path, const fs::path & folder, bool isRelativeToSDK = false){};
+	// SDK library like sqlite3 = usr/lib/libsqlite3.tbd (Xcode only)
+	virtual void addSystemLibrary(const std::string & name){};
+
+	// system frameworks / libraries (-f / --system-libs), kept in config.make PROJECT_FRAMEWORKS / PROJECT_SYSTEM_LIBS
+	void setSystemFrameworks(const std::vector<std::string> & frameworks, bool frameworksPassed, const std::vector<std::string> & libs, bool libsPassed);
+	void addSystemFrameworks();
 
 	// public entry point for project-level preprocessor defines (e.g. -D/--defines on the
 	// CLI, or a GUI-driven renderer choice) - addDefine() itself stays protected since it's
@@ -185,6 +191,9 @@ protected:
 	std::vector<fs::path> extSrcPaths;
 	std::vector<std::string> projectDefines; // also written to config.make PROJECT_DEFINES for make builds
 	std::vector<std::string> missingAddons; // not found, still written to addons.make (#258)
+	std::vector<std::string> systemFrameworks, systemLibs; // value for this project
+	std::vector<std::string> systemFrameworksOption, systemLibsOption; // from the CLI
+	bool systemFrameworksPassed = false, systemLibsPassed = false; // false = keep the project's
 	std::string emscriptenWasmOption; // from the CLI, empty = keep
 	std::string emscriptenWasm; // value for this project: "", "32" or "64"
 	void saveCMakeLists();

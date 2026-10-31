@@ -75,6 +75,16 @@
  			word-wrap: break-word;
 		}
 
+		#helpTab .helpCode {
+			background-color: #333;
+			color: #dfdfdf;
+			padding: 8px 10px;
+			border-radius: 4px;
+			font-size: 11px;
+			white-space: pre-wrap;
+			word-break: break-all;
+		}
+
 		</style>
 	</head>
 	<body>
@@ -107,6 +117,9 @@
 				</a>
 				<a class="item menuItem" data-tab="ofMenu" id="ofMenuButton">
 					<div style="padding:6px;" data-i18n="nav.ofMenu">downloads</div>
+				</a>
+				<a class="item menuItem" data-tab="help" id="helpMenuButton">
+					<div style="padding:6px;" data-i18n="nav.help">help</div>
 				</a>
 				<a class="item right floated menuItem" data-tab="settings" id="settingsMenuButton">
 					<div style="-webkit-app-region: no-drag !important; padding:6px;"><i class="setting link icon"></i>
@@ -305,6 +318,24 @@
 						</div>
 					</div>
 					<p class="ui small grey text" id="appVersionNote" style="display: none"></p>
+					<div class="two fields" id="systemFrameworksField" style="display: none">
+						<div class="field">
+							<label><span data-i18n="field.systemFrameworks">System frameworks:</span> &nbsp;
+								<a class="ui icon tooltip" href="#" data-i18n-content="tooltip.systemFrameworks" data-content="Apple SDK frameworks, comma-separated, e.g. Security,CoreBluetooth. Saved in config.make PROJECT_FRAMEWORKS." data-position="right center">
+									<i class="help circle icon"></i>
+								</a>
+							</label>
+							<input type="text" id="systemFrameworks" placeholder="Security,CoreBluetooth" autocomplete="off" spellcheck="false">
+						</div>
+						<div class="field">
+							<label><span data-i18n="field.systemLibs">System libraries:</span> &nbsp;
+								<a class="ui icon tooltip" href="#" data-i18n-content="tooltip.systemLibs" data-content="SDK libraries, comma-separated, e.g. sqlite3,z for libsqlite3.tbd and libz.tbd. Saved in config.make PROJECT_SYSTEM_LIBS." data-position="right center">
+									<i class="help circle icon"></i>
+								</a>
+							</label>
+							<input type="text" id="systemLibs" placeholder="sqlite3,z" autocomplete="off" spellcheck="false">
+						</div>
+					</div>
 					<div class="field" id="glesField" style="display: none">
 						<label data-i18n="field.glesVersion">OpenGL ES version (iOS / tvOS):</label>
 						<div class="ui selection dropdown" id="glesDropdown">
@@ -508,6 +539,47 @@
 						<div class="ui basic button" id="refreshLibReleasesButton" data-i18n="button.refresh" onclick="loadLibReleases(true)">Refresh</div>
 					</div>
 				</div>
+			</div>
+			<!------------------------------- help -------------------------------->
+			<div class="ui tab" data-tab="help" id="helpTab">
+				<h4 class="ui dividing header">Create a project</h4>
+				<p>Set the <b>project name</b> and <b>path</b>, pick the <b>addons</b> and <b>platforms</b>, then press <b>Generate</b>. New projects start from the template's <code>src/</code> (main.cpp, ofApp.h, ofApp.cpp).</p>
+
+				<h4 class="ui dividing header">Update a project</h4>
+				<p>Drag the project folder onto the window, or set its name and path. The PG switches to <b>Update</b> and reads the project's settings back:</p>
+				<ul>
+					<li><code>addons.make</code> - one addon per line. Addons that aren't installed are kept and shown so you can download or find them.</li>
+					<li><code>config.make</code> - OF path, extra source paths, defines, app version / build, system frameworks and libraries.</li>
+				</ul>
+				<p><b>Update multiple</b> (advanced options) updates every project in a folder, e.g. all of <code>examples/</code>.</p>
+
+				<h4 class="ui dividing header">Platforms and templates</h4>
+				<p>The PG targets this computer's platform (on macOS: <b>osx</b>). With <b>Advanced options</b> on in settings, pick one or more platforms (Xcode, Visual Studio, make, VS Code, Android, Emscripten ...) and templates, which add to them, e.g. <b>VS Code</b> on top of osx or vs.</p>
+
+				<h4 class="ui dividing header">System frameworks and libraries (macOS / iOS / tvOS)</h4>
+				<p>With <b>Advanced options</b> on and an Apple platform selected, add SDK frameworks and libraries the project links to, separated by commas or spaces:</p>
+				<ul>
+					<li><b>System frameworks</b>: <code>Security,CoreBluetooth</code> - Security.framework, CoreBluetooth.framework</li>
+					<li><b>System libraries</b>: <code>sqlite3,z</code> - libsqlite3.tbd, libz.tbd (<code>libsqlite3</code>, <code>libsqlite3.tbd</code> and <code>-lsqlite3</code> also work)</li>
+				</ul>
+				<p>They are saved with the project in <code>config.make</code>, so updating the project or opening it on another machine keeps them:</p>
+				<pre class="helpCode">PROJECT_FRAMEWORKS = Security CoreBluetooth
+PROJECT_SYSTEM_LIBS = sqlite3 z</pre>
+				<p>Xcode gets them in <i>Link Binary With Libraries</i>; make and CMake builds read the same lines (<code>-framework Security</code>, <code>-lsqlite3</code>). Clear a field and update to remove them.</p>
+
+				<h4 class="ui dividing header">Advanced options</h4>
+				<p>Turn on <b>Advanced options</b> in settings for: system frameworks and libraries, custom defines, renderer (ANGLE / Dawn / GLon12), OpenGL / GLES / WebGL version, app version and build, post-build script, MSYS2 environment, Emscripten wasm32 / wasm64.</p>
+
+				<h4 class="ui dividing header">Downloads</h4>
+				<p>Download or update the prebuilt openFrameworks libraries, or single (modular) libraries, for your OF path.</p>
+
+				<h4 class="ui dividing header">Command line</h4>
+				<p>The PG app runs the <code>projectGenerator</code> command line, which can be used on its own:</p>
+				<pre class="helpCode">projectGenerator -o"path/to/openFrameworks" -a"ofxGui,ofxOsc" -p"osx" "path/to/myApp"
+projectGenerator -o"path/to/openFrameworks" -p"ios" -f"Security,CoreBluetooth" --system-libs="sqlite3" "path/to/myApp"
+projectGenerator -o"path/to/openFrameworks" -r -p"osx" "path/to/examples"
+projectGenerator --help</pre>
+				<p>Run without <code>-a</code>, <code>-f</code> or <code>--system-libs</code> to keep what the project's <code>addons.make</code> / <code>config.make</code> already have. An empty <code>-f</code> / <code>--system-libs=</code> removes them.</p>
 			</div>
 			<!------------------------------- settings -------------------------------->
 			<div class="ui tab" data-tab="settings">
