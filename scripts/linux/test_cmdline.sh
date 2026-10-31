@@ -45,4 +45,7 @@ errorcode=$?
 if [[ $errorcode -ne 0 ]]; then
         exit $errorcode
 fi
+echo "Test command line arguments"
+"${CURRENT_DIR}/../test_cmdline_args.sh" ./projectGenerator ../../../../ linux64
+
 echo "Successful projectGenerator tests for [linux64]";
