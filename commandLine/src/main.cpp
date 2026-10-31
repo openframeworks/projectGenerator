@@ -65,7 +65,7 @@ constexpr option::Descriptor usage[] = {
 	{ FRAMEWORKS, 0, "f", "frameworks", option::Arg::Optional, "  --frameworks, -f  \tApple system frameworks (such as Security,CoreBluetooth), saved in config.make PROJECT_FRAMEWORKS. Empty removes them" },
 	{ SYSTEMLIBS, 0, "", "system-libs", option::Arg::Optional, "  --system-libs  \tApple system libraries (such as sqlite3,z = libsqlite3.tbd, libz.tbd), saved in config.make PROJECT_SYSTEM_LIBS. Empty removes them" },
 	
-	{ CLEANNAME_DISABLE, 0, "n", "cleanname", option::Arg::Optional, "  --cleanname, -f  \tcleanname" },
+	{ CLEANNAME_DISABLE, 0, "n", "cleanname", option::Arg::Optional, "  --cleanname, -n  \tcleanname" },
 
 	{ DEFINES, 0, "D", "defines", option::Arg::Optional, "  --defines, -D  \tpreprocessor defines list (such as OF_USE_ANGLE=1,MY_FLAG)" },
 	{ POSTBUILD, 0, "P", "postbuild", option::Arg::Optional, "  --postbuild, -P  \tscript to run after the project compiles (Xcode run script / VS post-build event)" },
@@ -472,6 +472,29 @@ int pgMain(int argc, char ** argv) {
 	// ------------------------------------------------------ parse args
 	argc -= (argc > 0);
 	argv += (argc > 0); // skip program name argv[0] if present
+
+	// optionparser only takes attached values (-posx, --platforms=osx); join -p osx / --platforms osx,
+	// but leave the last argument as the project path (-f <path> is an empty -f)
+	static const std::string valueShort { "paotsmfDPkW" };
+	static const std::vector<std::string> valueLong { "platforms", "addons", "ofPath", "template", "source", "ofmenu", "frameworks", "system-libs", "defines", "postbuild", "msys2env", "emscripten-wasm", "app-version", "app-build" };
+	std::vector<std::string> joinedArgs;
+	for (int i = 0; i < argc; i++) {
+		std::string a { argv[i] };
+		bool isValueOption = (a.size() == 2 && a[0] == '-' && valueShort.find(a[1]) != std::string::npos)
+			|| (a.rfind("--", 0) == 0 && std::find(valueLong.begin(), valueLong.end(), a.substr(2)) != valueLong.end());
+		bool keyword = a == "-m" || a == "--ofmenu"; // status / update-libs, no project path after it
+		if (isValueOption && i + 1 < argc && argv[i + 1][0] != '-' && (i + 2 < argc || keyword)) {
+			joinedArgs.emplace_back(a + (a.size() == 2 ? "" : "=") + argv[i + 1]);
+			i++;
+		} else {
+			joinedArgs.emplace_back(a);
+		}
+	}
+	std::vector<char *> joinedArgv;
+	for (auto & a : joinedArgs) joinedArgv.emplace_back(a.data());
+	argc = (int)joinedArgv.size();
+	argv = joinedArgv.data();
+
 	option::Stats stats(usage, argc, argv);
 	vector<option::Option> options(stats.options_max);
 	vector<option::Option> buffer(stats.buffer_max);
@@ -679,6 +702,13 @@ int pgMain(int argc, char ** argv) {
 	if (parse.nonOptionsCount() > 0) {
 		projectName = parse.nonOption(0);
 	}
+	// a value the parser didn't take (e.g. -n osx) would silently become the project path
+	if (parse.nonOptionsCount() > 1) {
+		std::string extra;
+		for (int i = 0; i < parse.nonOptionsCount(); i++) extra += std::string(i ? ", " : "") + parse.nonOption(i);
+		messageError("More than one project path: " + extra + " - give option values as -posx / --platforms=osx or -p osx");
+		return EXIT_USAGE;
+	}
 
 	// ------------------------------------------------------ post parse
 
@@ -737,6 +767,10 @@ int pgMain(int argc, char ** argv) {
 	if(projectPath.empty()) {
 		messageError( "Invalid project path: {" + projectPath.string() + "}");
 		return EXIT_FAILURE;
+	}
+	if (!getOFRoot().empty() && fs::weakly_canonical(projectPath) == fs::weakly_canonical(getOFRoot())) {
+		messageError("The project path is the openFrameworks folder: " + projectPath.string());
+		return EXIT_USAGE;
 	}
 	// make folder
 	if (!fs::exists(projectPath)) {
