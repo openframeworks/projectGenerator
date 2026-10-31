@@ -1287,8 +1287,8 @@ function generate() {
         appVersion: $('#appVersion').val().trim(),
         appBuild: $('#appBuild').val().trim(),
         // only for Apple targets; hidden = keep the project's config.make values
-        systemFrameworks: $('#systemFrameworksField').css('display') !== 'none' ? $('#systemFrameworks').val().split(',').map((s) => s.trim()).filter(Boolean) : null,
-        systemLibs: $('#systemFrameworksField').css('display') !== 'none' ? $('#systemLibs').val().split(',').map((s) => s.trim()).filter(Boolean) : null
+        systemFrameworks: $('#systemFrameworksField').css('display') !== 'none' ? $('#systemFrameworks').val().split(/[\s,]+/).filter(Boolean) : null,
+        systemLibs: $('#systemFrameworksField').css('display') !== 'none' ? $('#systemLibs').val().split(/[\s,]+/).filter(Boolean) : null
     };
 
     // console.log(gen);

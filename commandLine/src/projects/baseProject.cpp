@@ -1102,9 +1102,17 @@ void baseProject::parseConfigMake(){
 }
 
 void baseProject::setSystemFrameworks(const std::vector<std::string> & frameworks, bool frameworksPassed, const std::vector<std::string> & libs, bool libsPassed) {
-	systemFrameworksOption = frameworks;
+	// "Security CoreBluetooth" is two, names have no spaces
+	auto splitSpaces = [](const std::vector<std::string> & list) {
+		std::vector<std::string> out;
+		for (auto & l : list) {
+			for (auto & v : ofSplitString(l, " ", true, true)) out.emplace_back(v);
+		}
+		return out;
+	};
+	systemFrameworksOption = splitSpaces(frameworks);
 	systemFrameworksPassed = frameworksPassed;
-	systemLibsOption = libs;
+	systemLibsOption = splitSpaces(libs);
 	systemLibsPassed = libsPassed;
 }
 
