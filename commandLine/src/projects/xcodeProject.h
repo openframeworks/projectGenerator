@@ -19,6 +19,7 @@ private:
 	bool saveProjectFile() override;
 	void saveMakefile();
 	bool debugCommands = false;
+	bool bAddedDylibRunpath = false;
 
 	static std::string LOG_NAME;
 
