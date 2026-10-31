@@ -129,6 +129,51 @@ static std::string readEmscriptenWasm(const fs::path & configMake) {
 	return bits;
 }
 
+// space separated list from config.make, VAR = a b / VAR += c
+static std::vector<std::string> readMakeList(const fs::path & configMake, const std::string & name) {
+	std::vector<std::string> values;
+	if (!fs::exists(configMake)) return values;
+	for (auto & line : fileToStrings(configMake)) {
+		auto config = ofTrim(line);
+		if (config.empty() || config[0] == '#') continue;
+		auto eq = config.find('=');
+		if (eq == std::string::npos) continue;
+		auto var = ofTrim(config.substr(0, eq));
+		bool append = !var.empty() && var.back() == '+';
+		if (!var.empty() && (var.back() == '?' || var.back() == '+' || var.back() == ':')) var = ofTrim(var.substr(0, var.size() - 1));
+		if (var != name) continue;
+		if (!append) values.clear();
+		for (auto & v : ofSplitString(ofTrim(config.substr(eq + 1)), " ", true, true)) values.emplace_back(v);
+	}
+	return values;
+}
+
+// Security.framework -> Security
+static std::string cleanFrameworkName(std::string name) {
+	name = ofTrim(name);
+	if (name.size() > 10 && name.substr(name.size() - 10) == ".framework") name = name.substr(0, name.size() - 10);
+	return name;
+}
+
+// -lsqlite3 / libsqlite3 / libsqlite3.tbd / libsqlite3.dylib -> sqlite3
+static std::string cleanSystemLibName(std::string name) {
+	name = ofTrim(name);
+	if (name.rfind("-l", 0) == 0) name = name.substr(2);
+	for (std::string ext : { ".tbd", ".dylib" }) {
+		if (name.size() > ext.size() && name.substr(name.size() - ext.size()) == ext) name = name.substr(0, name.size() - ext.size());
+	}
+	if (name.rfind("lib", 0) == 0 && name.size() > 3) name = name.substr(3);
+	return name;
+}
+
+static bool isSystemLibName(const std::string & name) {
+	return name.rfind("-l", 0) == 0 || name.rfind("lib", 0) == 0 || ofIsStringInString(name, ".tbd") || ofIsStringInString(name, ".dylib");
+}
+
+static void addUnique(std::vector<std::string> & list, const std::string & value) {
+	if (!value.empty() && std::find(list.begin(), list.end(), value) == list.end()) list.emplace_back(value);
+}
+
 static const std::string OF_CMAKE_INCLUDE { "libs/openFrameworksCompiled/project/CMake/openFrameworks.cmake" };
 
 // set(PROJECT_EMSCRIPTEN_WASM 64) written by PG into an openFrameworks CMakeLists.txt (openFrameworks#8586)
@@ -251,6 +296,18 @@ bool baseProject::create(const fs::path & _path, string templateName){
 	if (!emscriptenWasm.empty()) {
 		ofLogNotice() << "{ \"emscriptenWasm\": \"" << emscriptenWasm << "\" }";
 	}
+
+	systemFrameworks.clear();
+	systemLibs.clear();
+	for (auto & f : systemFrameworksPassed ? systemFrameworksOption : readMakeList(projectDir / "config.make", "PROJECT_FRAMEWORKS")) {
+		if (isSystemLibName(f)) addUnique(systemLibs, cleanSystemLibName(f));
+		else addUnique(systemFrameworks, cleanFrameworkName(f));
+	}
+	for (auto & l : systemLibsPassed ? systemLibsOption : readMakeList(projectDir / "config.make", "PROJECT_SYSTEM_LIBS")) {
+		addUnique(systemLibs, cleanSystemLibName(l));
+	}
+	if (systemFrameworks.size()) ofLogNotice() << "{ \"systemFrameworks\": \"" << ofJoinString(systemFrameworks, " ") << "\" }";
+	if (systemLibs.size()) ofLogNotice() << "{ \"systemLibs\": \"" << ofJoinString(systemLibs, " ") << "\" }";
 
 	// app version / build: config.make first, then CMakeLists, Xcode, Android; the CLI value wins
 	{
@@ -427,6 +484,28 @@ bool baseProject::save(){
 	bool bWroteWasm = false;
 	bool bWroteAppVersion = false;
 	bool bWroteAppBuild = false;
+	bool bWroteFrameworks = false;
+	bool bWroteSystemLibs = false;
+	auto isMakeVar = [](const std::string & line, const std::string & name) {
+		auto config = ofTrim(line);
+		if (config.rfind("#", 0) == 0) config = ofTrim(config.substr(1));
+		if (config.rfind(name, 0) != 0) return false;
+		auto rest = ofTrim(config.substr(name.size()));
+		return rest.rfind("=", 0) == 0 || rest.rfind("+=", 0) == 0 || rest.rfind(":=", 0) == 0 || rest.rfind("?=", 0) == 0;
+	};
+	// the list on the first line, commented when empty, later += lines are folded in
+	auto writeMakeList = [&](const std::string & line, const std::string & name, const std::vector<std::string> & values, bool & bWrote) {
+		if (bWrote) {
+			if (ofTrim(line).rfind("#", 0) == 0) saveConfig << line << std::endl;
+			return;
+		}
+		if (values.empty()) {
+			saveConfig << (ofTrim(line).rfind("#", 0) == 0 ? line : "# " + name + " =") << std::endl;
+		} else {
+			saveConfig << name << " = " << ofJoinString(values, " ") << std::endl;
+		}
+		bWrote = true;
+	};
 
 	for (auto & str : lines) {
 		//add the of root path
@@ -472,6 +551,12 @@ bool baseProject::save(){
 				bWroteAppBuild = true;
 			}
 		}
+		else if( isMakeVar(str, "PROJECT_FRAMEWORKS") ){
+			writeMakeList(str, "PROJECT_FRAMEWORKS", systemFrameworks, bWroteFrameworks);
+		}
+		else if( isMakeVar(str, "PROJECT_SYSTEM_LIBS") ){
+			writeMakeList(str, "PROJECT_SYSTEM_LIBS", systemLibs, bWroteSystemLibs);
+		}
 		else if( emscriptenWasm == "32" && str.rfind("EMSCRIPTEN_MEMORY64", 0) == 0 ){
 			saveConfig << "# " << str << std::endl;
 		} else {
@@ -489,6 +574,12 @@ bool baseProject::save(){
 		saveConfig << std::endl << "# app version and build number" << std::endl;
 		if (!bWroteAppVersion) saveConfig << "APP_VERSION = " << appVersion << std::endl;
 		if (!bWroteAppBuild) saveConfig << "APP_BUILD = " << appBuild << std::endl;
+	}
+	if ((systemFrameworks.size() && !bWroteFrameworks) || (systemLibs.size() && !bWroteSystemLibs)) {
+		if (lines.size()) saveConfig << std::endl;
+		saveConfig << "# system frameworks (Security) and libraries (sqlite3 = libsqlite3.tbd / -lsqlite3)" << std::endl;
+		if (systemFrameworks.size() && !bWroteFrameworks) saveConfig << "PROJECT_FRAMEWORKS = " << ofJoinString(systemFrameworks, " ") << std::endl;
+		if (systemLibs.size() && !bWroteSystemLibs) saveConfig << "PROJECT_SYSTEM_LIBS = " << ofJoinString(systemLibs, " ") << std::endl;
 	}
 	saveConfig.close();
 	saveCMakeLists();
@@ -1007,6 +1098,22 @@ void baseProject::parseConfigMake(){
 				addAfterRule(value);
 			}
 		}
+	}
+}
+
+void baseProject::setSystemFrameworks(const std::vector<std::string> & frameworks, bool frameworksPassed, const std::vector<std::string> & libs, bool libsPassed) {
+	systemFrameworksOption = frameworks;
+	systemFrameworksPassed = frameworksPassed;
+	systemLibsOption = libs;
+	systemLibsPassed = libsPassed;
+}
+
+void baseProject::addSystemFrameworks() {
+	for (auto & f : systemFrameworks) {
+		addFramework(f, "Frameworks", true);
+	}
+	for (auto & l : systemLibs) {
+		addSystemLibrary(l);
 	}
 }
 

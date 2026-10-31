@@ -55,6 +55,7 @@ protected:
 
 	void addCompileFlagsForMMFile(const fs::path & srcFile);
 	void addFramework(const fs::path & path, const fs::path & folder, bool isRelativeToSDK = false) override;
+	void addSystemLibrary(const std::string & name) override;
 	void addXCFramework(const fs::path & path, const fs::path & folder);
 	void addDylib(const fs::path & path, const fs::path & folder);
 
@@ -125,6 +126,7 @@ protected:
 		{ ".framework" , "wrapper.framework" },
 		{ ".xcframework" , "wrapper.xcframework" },
 		{ ".dylib" , "compiled.mach-o.dylib" },
+		{ ".tbd" , "sourcecode.text-based-dylib-definition" },
 
 		{ ".cpp" , "sourcecode.cpp.cpp" },
 		{ ".c" , "sourcecode.cpp.c" },

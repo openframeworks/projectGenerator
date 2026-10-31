@@ -26,6 +26,12 @@ here's the extended options if you want to experiment.  please take are that opt
 	-v, --verbose                                        run verbose
 	-t"project_template", --template="project_template"  project template
 	-d, --dryrun                                         don't change files
+	-f"frameworks", --frameworks="frameworks"            Apple system frameworks
+	                                                     (Security,CoreBluetooth)
+	--system-libs="libraries"                            Apple system libraries
+	                                                     (sqlite3,z)
+
+	run with --help for every option.
 
 
 **note that on windows, command line flags are written with "/" not "-" and don't have abbreviations, so -r would be /recursive**
@@ -60,6 +66,20 @@ you can also specify platforms (default platform is inferred) such as:
     ./projectGenerator -o"pathToOF" -p"ios" pathOfNewIOSProject
 
 
+## System frameworks and libraries (macOS / iOS / tvOS)
+
+Link SDK frameworks and libraries (sqlite3 = `libsqlite3.tbd`) to a project:
+
+    ./projectGenerator -o"pathToOF" -p"osx" -f"Security,CoreBluetooth" --system-libs="sqlite3,z" pathToProject
+
+`libsqlite3`, `libsqlite3.tbd`, `-lsqlite3` and `Security.framework` work too. They are saved with the project in `config.make`:
+
+    PROJECT_FRAMEWORKS = Security CoreBluetooth
+    PROJECT_SYSTEM_LIBS = sqlite3 z
+
+and read back on every update, so a plain `./projectGenerator -o"pathToOF" pathToProject` keeps them. The Xcode project gets them in Link Binary With Libraries; the makefiles and CMake read the same lines (`-framework Security` on Apple only, `-lsqlite3` everywhere). Edit `config.make` and update the project, or pass an empty `-f` / `--system-libs=` to remove them.
+
+The GUI shows them as System frameworks / System libraries when an Apple platform is selected (see the help tab).
 
 
 

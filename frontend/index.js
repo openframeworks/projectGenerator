@@ -104,6 +104,26 @@ function readProjectAppVersion(folder) {
     return { version, build, differs };
 }
 
+/**
+ * PROJECT_FRAMEWORKS / PROJECT_SYSTEM_LIBS of an existing project's config.make, read like the commandLine does.
+ * @param {string} folder - The project folder.
+ * @returns {{frameworks: Array<string>, libs: Array<string>}}
+ */
+function readProjectSystemFrameworks(folder) {
+    const lists = { PROJECT_FRAMEWORKS: [], PROJECT_SYSTEM_LIBS: [] };
+    let text = '';
+    try {
+        text = fs.readFileSync(path.join(folder, 'config.make'), 'utf8');
+    } catch (e) {
+        return { frameworks: [], libs: [] };
+    }
+    for (const m of text.matchAll(/^[ \t]*(PROJECT_FRAMEWORKS|PROJECT_SYSTEM_LIBS)[ \t]*([?:+]?)=(.*)$/gm)) {
+        const values = m[3].trim().split(/\s+/).filter(Boolean);
+        lists[m[1]] = m[2] === '+' ? lists[m[1]].concat(values) : values;
+    }
+    return { frameworks: lists.PROJECT_FRAMEWORKS, libs: lists.PROJECT_SYSTEM_LIBS };
+}
+
 // mirrors isGoodOFPath() in commandLine/src/main.cpp
 function isGoodOFPath(p) {
     try {
@@ -1011,6 +1031,7 @@ ipcMain.on('isOFProjectFolder', (event, project) => {
                 event.sender.send('setEmscriptenWasm', '64');
             }
             event.sender.send('setAppVersion', readProjectAppVersion(folder));
+            event.sender.send('setSystemFrameworks', readProjectSystemFrameworks(folder));
             
         } else {
             event.sender.send('setGenerateMode', 'createMode');
@@ -1762,6 +1783,8 @@ ipcMain.on('downloadModularLibs', async (event, { ofPath, tag, names }) => {
  *     emscriptenWasm: string,
  *     appVersion: string,
  *     appBuild: string,
+ *     systemFrameworks: Array<string>|null,
+ *     systemLibs: Array<string>|null,
  * }} GenerateArgument */
 
 /**
@@ -1784,6 +1807,8 @@ function generateFunction(event, generate) {
         emscriptenWasm,
         appVersion,
         appBuild,
+        systemFrameworks,
+        systemLibs,
     } = generate;
 
     const args = [];
@@ -1836,6 +1861,14 @@ function generateFunction(event, generate) {
     }
     if (appBuild && /^[1-9]\d*$/.test(appBuild)) {
         args.push(`--app-build=${appBuild}`);
+    }
+
+    // null keeps the project's config.make PROJECT_FRAMEWORKS / PROJECT_SYSTEM_LIBS, empty removes them
+    if (Array.isArray(systemFrameworks)) {
+        args.push(`-f${systemFrameworks.join(',')}`);
+    }
+    if (Array.isArray(systemLibs)) {
+        args.push(`--system-libs=${systemLibs.join(',')}`);
     }
 
     if (projectName != null && projectPath != null) {

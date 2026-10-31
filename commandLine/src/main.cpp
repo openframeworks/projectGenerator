@@ -32,6 +32,7 @@ enum optionIndex { UNKNOWN,
 	COMMAND,
 	BACKUP_PROJECT_FILES,
 	FRAMEWORKS,
+	SYSTEMLIBS,
 	CLEANNAME_DISABLE,
 	DEFINES,
 	POSTBUILD,
@@ -61,7 +62,8 @@ constexpr option::Descriptor usage[] = {
 	{ COMMAND, 0, "c", "command", option::Arg::None, "  --command, -c \truns command" },
 	{ BACKUP_PROJECT_FILES, 0, "b", "backup", option::Arg::None, "  --backup, -b  \tbackup project files when replacing with template" },
 	
-	{ FRAMEWORKS, 0, "f", "frameworks", option::Arg::Optional, "  --frameworks, -f  \tframeworks list (such as Vision,ARKit)" },
+	{ FRAMEWORKS, 0, "f", "frameworks", option::Arg::Optional, "  --frameworks, -f  \tApple system frameworks (such as Security,CoreBluetooth), saved in config.make PROJECT_FRAMEWORKS. Empty removes them" },
+	{ SYSTEMLIBS, 0, "", "system-libs", option::Arg::Optional, "  --system-libs  \tApple system libraries (such as sqlite3,z = libsqlite3.tbd, libz.tbd), saved in config.make PROJECT_SYSTEM_LIBS. Empty removes them" },
 	
 	{ CLEANNAME_DISABLE, 0, "n", "cleanname", option::Arg::Optional, "  --cleanname, -f  \tcleanname" },
 
@@ -98,6 +100,9 @@ vector<string> addons;
 vector<fs::path> srcPaths;
 vector<string> targets;
 vector<string> frameworks;
+bool bFrameworksPassedIn = false;
+vector<string> systemLibs;
+bool bSystemLibsPassedIn = false;
 vector<string> defines;
 string postBuildScript;
 string emscriptenWasm; // empty keeps the project's config.make value
@@ -276,6 +281,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 		project->setMsys2Environment(msys2Env);
 		project->setEmscriptenWasm(emscriptenWasm);
 		project->setAppVersion(appVersion, appBuild);
+		project->setSystemFrameworks(frameworks, bFrameworksPassedIn, systemLibs, bSystemLibsPassedIn);
 		project->create(path, templateName);
 
 		if (bConsiderParameterAddons && bAddonsPassedIn) {
@@ -286,9 +292,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 			ofLogNotice() << "parsing addons.make";
 			project->parseAddons();
 		}
-		for (auto & f : frameworks) {
-			project->addFramework(f, "Frameworks", true);
-		}
+		project->addSystemFrameworks();
 
 		// all build configs (visualStudioProject overrides addProjectDefine for Debug + Release)
 		for (auto & d : defines) {
@@ -624,10 +628,16 @@ int pgMain(int argc, char ** argv) {
 #endif
 
 	if (options[FRAMEWORKS].count() > 0) {
-		bAddonsPassedIn = true; // could be empty
+		bFrameworksPassedIn = true; // could be empty
 		if (options[FRAMEWORKS].arg != NULL) {
 			frameworks = ofSplitString(options[FRAMEWORKS].arg, ",", true, true);
-//			cout << "frameworks " << options[FRAMEWORKS].arg << endl;
+		}
+	}
+
+	if (options[SYSTEMLIBS].count() > 0) {
+		bSystemLibsPassedIn = true; // could be empty
+		if (options[SYSTEMLIBS].arg != NULL) {
+			systemLibs = ofSplitString(options[SYSTEMLIBS].arg, ",", true, true);
 		}
 	}
 
@@ -807,6 +817,7 @@ int pgMain(int argc, char ** argv) {
 						project->setMsys2Environment(msys2Env);
 						project->setEmscriptenWasm(emscriptenWasm);
 						project->setAppVersion(appVersion, appBuild);
+						project->setSystemFrameworks(frameworks, bFrameworksPassedIn, systemLibs, bSystemLibsPassedIn);
 						project->create(projectPath, templateName);
 						if(bAddonsPassedIn){
 							for (auto & addon : addons) {
@@ -815,9 +826,7 @@ int pgMain(int argc, char ** argv) {
 						}else{
 							project->parseAddons();
 						}
-						for (auto & f : frameworks) {
-							project->addFramework(f, "Frameworks", true);
-						}
+						project->addSystemFrameworks();
 
 						for (auto & d : defines) {
 							project->addProjectDefine(d);

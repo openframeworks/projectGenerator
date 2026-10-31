@@ -218,6 +218,8 @@ ipcRenderer.on('setGenerateMode', (event, arg) => {
         $('#appVersion').val('');
         $('#appBuild').val('');
         $('#appVersionNote').hide();
+        $('#systemFrameworks').val('');
+        $('#systemLibs').val('');
     }
 });
 
@@ -228,6 +230,13 @@ ipcRenderer.on('setAppVersion', (event, { version, build, differs }) => {
     $('#appBuild').val(build || '');
     const note = (differs || []).map((d) => t('note.appVersionDiffers', { file: d.file, value: d.value })).join(' ');
     $('#appVersionNote').text(note).toggle(!!defaultSettings.advancedMode && note.length > 0);
+});
+
+//-------------------------------------------
+// existing project's config.make PROJECT_FRAMEWORKS / PROJECT_SYSTEM_LIBS, so updating keeps them
+ipcRenderer.on('setSystemFrameworks', (event, { frameworks, libs }) => {
+    $('#systemFrameworks').val((frameworks || []).join(','));
+    $('#systemLibs').val((libs || []).join(','));
 });
 
 //-------------------------------------------
@@ -1276,7 +1285,10 @@ function generate() {
         msys2Env: $('#msys2EnvField').css('display') !== 'none' ? $('#msys2EnvDropdown').dropdown('get value') : '',
         emscriptenWasm: $('#wasmField').css('display') !== 'none' ? $('#wasmDropdown').dropdown('get value') : '',
         appVersion: $('#appVersion').val().trim(),
-        appBuild: $('#appBuild').val().trim()
+        appBuild: $('#appBuild').val().trim(),
+        // only for Apple targets; hidden = keep the project's config.make values
+        systemFrameworks: $('#systemFrameworksField').css('display') !== 'none' ? $('#systemFrameworks').val().split(',').map((s) => s.trim()).filter(Boolean) : null,
+        systemLibs: $('#systemFrameworksField').css('display') !== 'none' ? $('#systemLibs').val().split(',').map((s) => s.trim()).filter(Boolean) : null
     };
 
     // console.log(gen);
@@ -1469,6 +1481,7 @@ function updateRendererFieldVisibility() {
     // advanced only; hidden fields keep the project's values, so updating still keeps them
     $('#appVersionField').css('display', defaultSettings.advancedMode ? 'flex' : 'none');
     $('#appVersionNote').toggle(!!defaultSettings.advancedMode && $('#appVersionNote').text().length > 0);
+    $('#systemFrameworksField').css('display', selectedPlatforms.some((p) => ['osx', 'ios', 'macos', 'tvos'].includes(p)) ? 'flex' : 'none');
 
     const glPlatforms = ['osx', 'vs', 'msys2', 'linux', 'linux64', 'linuxarmv6l', 'linuxarmv7l', 'linuxaarch64', 'vscode'];
     $('#glField').toggle(!!defaultSettings.advancedMode && selectedPlatforms.some((p) => glPlatforms.includes(p)));
