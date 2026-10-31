@@ -619,6 +619,14 @@ int pgMain(int argc, char ** argv) {
 		}
 	}
 
+	// getTargetProject has no project for these, which crashed (-p bogus, or no host platform)
+	for (auto & t : targets) {
+		if (!getTargetProject(t)) {
+			messageError("Unknown platform: \"" + t + "\" - see --help");
+			return EXIT_USAGE;
+		}
+	}
+
 	if (options[MSYS2ENV].count() > 0 && options[MSYS2ENV].arg != NULL) {
 		std::string env = ofToLower(ofTrim(options[MSYS2ENV].arg));
 		if (env == "ucrt64" || env == "mingw64" || env == "clang64" || env == "clangarm64") {

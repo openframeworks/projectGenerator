@@ -46,8 +46,14 @@ CASE=""
 OUT=""
 CODE=0
 
+# apps/myApps may not exist in a fresh checkout; made before the snapshot, removed at the end
+CREATED_MYAPPS=0
+[ -d "$RUN_DIR/myApps" ] || { mkdir -p "$RUN_DIR/myApps"; CREATED_MYAPPS=1; }
+
 listing() {
-	ls -a "$OF" "$RUN_DIR" "$RUN_DIR/myApps" 2>/dev/null | grep -v '^pgArgTests$'
+	for d in "$OF" "$RUN_DIR" "$RUN_DIR/myApps"; do
+		ls -A "$d" 2>/dev/null | grep -vx pgArgTests | sed "s|^|$d/|"
+	done
 }
 BEFORE="$(listing)"
 
@@ -119,18 +125,14 @@ expect_no_pbxproj() {
 	! grep -q "$1" "$APP_DIR/myApp.xcodeproj/project.pbxproj" 2>/dev/null || fail "project.pbxproj has $1"
 }
 
-# nothing new at the OF root, in apps/ or apps/myApps/ (a project named after an option value)
+# nothing new at the OF root, in apps/ or apps/myApps/ (a project named after an option value);
+# only reported (each once), never deleted
 expect_no_stray() {
 	local now
 	now="$(listing)"
 	if [ "$now" != "$BEFORE" ]; then
-		fail "stray files: $(diff <(echo "$BEFORE") <(echo "$now") | grep '^>' | tr '\n' ' ')"
-		# clean up so later cases start clean
-		for f in $(diff <(echo "$BEFORE") <(echo "$now") | grep '^>' | sed 's/^> //'); do
-			for d in "$OF" "$RUN_DIR" "$RUN_DIR/myApps"; do
-				if [ -e "$d/$f" ] && ! echo "$BEFORE" | grep -qx "$f"; then rm -rf "${d:?}/$f"; fi
-			done
-		done
+		fail "stray files: $(diff <(echo "$BEFORE") <(echo "$now") | grep '^>' | sed 's/^> //' | tr '\n' ' ')"
+		BEFORE="$now"
 	fi
 }
 
@@ -201,6 +203,10 @@ expect_exit 64; expect_output "More than one project path"; expect_not_updated; 
 start "the OF folder as the project"
 pg -o.. -p"$PLATFORM" ..
 expect_exit 64; expect_output "openFrameworks folder"; expect_no_stray
+
+start "unknown platform (was: crash)"
+pg -o.. -pbogus "$APP"
+expect_exit 64; expect_output "Unknown platform"; expect_not_updated; expect_no_stray
 
 start "unknown option"
 pg -o.. --bogus -p"$PLATFORM" "$APP"
@@ -298,6 +304,7 @@ fi
 
 rm -rf "$TEST_DIR"
 expect_no_stray
+[ "$CREATED_MYAPPS" = 1 ] && rmdir "$RUN_DIR/myApps" 2>/dev/null
 
 echo "$CASES cases, $FAILS failures"
 [ "$FAILS" = 0 ] || exit 1
