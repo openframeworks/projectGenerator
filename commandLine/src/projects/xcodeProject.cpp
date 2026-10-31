@@ -683,12 +683,21 @@ void xcodeProject::addDylib(const fs::path & path, const fs::path & folder) {
 	// path = the full path (w name) of this framework
 	// folder = the path in the addon (in case we want to add this to the file browser -- we don't do that for system libs);
 
+	// linked through OTHER_LDFLAGS (addLibrary), copied into the app's Frameworks folder (#320)
 	fileProperties fp;
-	fp.addToBuildPhase = true;
 	fp.codeSignOnCopy = true;
 	fp.copyFilesBuildPhase = true;
 
 	addFile(path, folder, fp);
+
+	// @rpath/lib.dylib install names load from there
+	if (!bAddedDylibRunpath) {
+		string runpath { (target == "osx" || target == "macos") ? "@executable_path/../Frameworks" : "@executable_path/Frameworks" };
+		for (auto & c : buildConfigs) {
+			addCommand("Add :objects:" + c + ":buildSettings:LD_RUNPATH_SEARCH_PATHS: string " + runpath);
+		}
+		bAddedDylibRunpath = true;
+	}
 }
 
 void xcodeProject::addInclude(const fs::path & includeName) {
@@ -935,7 +944,7 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 
 			if (fp.copyFilesBuildPhase && !t.copyFrameworks.empty()) {
 				//			// If we are going to add xcframeworks to copy files -> destination frameworks, we should include here
-				if (path.extension() == ".framework") {
+				if (path.extension() == ".framework" || path.extension() == ".dylib") {
 					addCommand("# ---- copyPhase Frameworks " + buildUUID);
 					addCommand("Add :objects:" + t.copyFrameworks + ":files: string " + buildUUID);
 				}
