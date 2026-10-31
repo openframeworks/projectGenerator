@@ -1,7 +1,7 @@
 {
   "name": "projectGenerator",
   "productName": "projectGenerator",
-  "version": "0.110.0",
+  "version": "0.111.0",
   "description": "Build electron GUI openFrameworks projectGenerator",
   "license": "MIT",
   "main": "index.js",
@@ -92,7 +92,7 @@
     "n-readlines": "^3.4.1"
   },
   "devDependencies": {
-    "electron": "^45.0.0",
+    "electron": "^45.2.0",
     "electron-builder": "^26.18.0",
     "@electron/packager": "^20.3.0"
   }
