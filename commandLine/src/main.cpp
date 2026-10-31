@@ -56,7 +56,7 @@ constexpr option::Descriptor usage[] = {
 	{ SRCEXTERNAL, 0, "s", "source", option::Arg::Optional, "  --source, -s  \trelative or absolute path to source or include folders external to the project (such as ../../../../common_utils/" },
 	{ VERSION, 0, "w", "version", option::Arg::None, "  --version, -w  \treturn the current version" },
 	{ GET_OFPATH, 0, "g", "getofpath", option::Arg::None, "  --getofpath, -g  \treturn the current ofPath" },
-	{ GET_HOST_PLATFORM, 0, "i", "platform", option::Arg::None, "  --getplatform, -i  \treturn the current host platform" },
+	{ GET_HOST_PLATFORM, 0, "i", "getplatform", option::Arg::None, "  --getplatform, -i  \treturn the current host platform" },
 	{ GET_EMSDK, 0, "e", "getemsdk", option::Arg::None, "  --getemsdk, -e  \tdetect the Emscripten SDK (EMSDK env var, PATH, or a Homebrew install) and return its location" },
 	{ OFMENU, 0, "m", "ofmenu", option::Arg::Optional, "  --ofmenu, -m  \trun an oF Menu (scripts/of.sh) command: status | update-libs" },
 	{ COMMAND, 0, "c", "command", option::Arg::None, "  --command, -c \truns command" },
@@ -482,8 +482,9 @@ int pgMain(int argc, char ** argv) {
 		std::string a { argv[i] };
 		bool isValueOption = (a.size() == 2 && a[0] == '-' && valueShort.find(a[1]) != std::string::npos)
 			|| (a.rfind("--", 0) == 0 && std::find(valueLong.begin(), valueLong.end(), a.substr(2)) != valueLong.end());
-		bool keyword = a == "-m" || a == "--ofmenu"; // status / update-libs, no project path after it
-		if (isValueOption && i + 1 < argc && argv[i + 1][0] != '-' && (i + 2 < argc || keyword)) {
+		// only -f / --frameworks / --system-libs mean something empty (remove), so -f <path> keeps the path
+		bool emptyMeansRemove = a == "-f" || a == "--frameworks" || a == "--system-libs";
+		if (isValueOption && i + 1 < argc && argv[i + 1][0] != '-' && (i + 2 < argc || !emptyMeansRemove)) {
 			joinedArgs.emplace_back(a + (a.size() == 2 ? "" : "=") + argv[i + 1]);
 			i++;
 		} else {
@@ -504,6 +505,12 @@ int pgMain(int argc, char ** argv) {
 	if (parse.error()) {
 		messageError("Parse error for arguments");
 		return 1;
+	}
+	if (options[UNKNOWN].count() > 0) {
+		std::string unknown;
+		for (option::Option * o = options[UNKNOWN]; o; o = o->next()) unknown += std::string(unknown.empty() ? "" : ", ") + o->name;
+		messageError("Unknown option: " + unknown + " - see --help");
+		return EXIT_USAGE;
 	}
 
 	if (options[VERBOSE].count() > 0) {
@@ -609,6 +616,14 @@ int pgMain(int argc, char ** argv) {
 			if (std::find(targets.begin(), targets.end(), "vscode") == targets.end()) {
 				targets.emplace_back("vscode");
 			}
+		}
+	}
+
+	// getTargetProject has no project for these, which crashed (-p bogus, or no host platform)
+	for (auto & t : targets) {
+		if (!getTargetProject(t)) {
+			messageError("Unknown platform: \"" + t + "\" - see --help");
+			return EXIT_USAGE;
 		}
 	}
 

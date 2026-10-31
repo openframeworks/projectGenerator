@@ -96,4 +96,7 @@ if ! grep -q "<OF_USE_GLON12>1</OF_USE_GLON12>" "../openFrameworks/apps/myApps/t
     exit 1
 fi
 
+echo "Test command line arguments"
+"${CURRENT_DIR}/../test_cmdline_args.sh" ./"${EXE_FILE}" ../openFrameworks vs || exit 1
+
 echo "Successful projectGenerator tests for [vs]"

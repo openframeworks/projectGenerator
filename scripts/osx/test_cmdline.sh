@@ -31,17 +31,20 @@ fi
 
 echo "Test: projectGenerator building"
 echo "Test 1: test examples templates - auto path to openFrameworks core"
-./projectGenerator --recursive -posx ../../examples/templates
+./projectGenerator --recursive -posx ../../examples/templates || exit 1
 echo "Test 1: test examples templates - success"
 
 echo "Test: projectGenerator building"
 echo "Test 2: all examples - defined core openFrameworks path ../../"
-./projectGenerator --recursive -posx -o../../ ../../examples/ ./projectGenerator
+./projectGenerator --recursive -posx -o../../ ../../examples/ || exit 1
 echo "Test 2: all examples - success"
 
 echo "Test 3: addon defines / cflags / sources in every Xcode app target (osx, macos, ios, tvos)"
 "${CURRENT_DIR}/test_xcode_addon_flags.sh" ./projectGenerator "${PG_DIR}/../.." || exit 1
 echo "Test 3: addon defines / cflags / sources - success"
+
+echo "Test 4: command line arguments"
+"${CURRENT_DIR}/../test_cmdline_args.sh" ./projectGenerator "${PG_DIR}/../.." osx || exit 1
 
 # echo "test out of folder -o [vs]";
 # rm -rf ../../../../../pg2

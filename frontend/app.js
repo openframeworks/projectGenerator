@@ -713,7 +713,8 @@ function setup() {
             }
         });
 
-        $('#coreReleaseDropdown, #corePlatformDropdown').dropdown();
+        $('#corePlatformDropdown').dropdown();
+        $('#coreReleaseDropdown').dropdown({ onChange: () => fillCorePlatforms(true) });
         $('#coreSourceDropdown').dropdown({ onChange: () => fillCoreSource(false) });
         $('#modularReleaseDropdown').dropdown({ onChange: () => fillModularTargets() });
         $('#modularTargetDropdown').dropdown({ onChange: () => renderModularLibs() });
@@ -1871,21 +1872,32 @@ function coreSource() {
 function fillCoreSource(keepSelection) {
     if (!libReleases) return;
     const source = coreSource();
-    const { releases, platforms, error } = libReleases.sources[source];
+    const { releases, error } = libReleases.sources[source];
     const tags = releases.map((r) => r.tag);
     const byTag = {};
     for (const r of releases) byTag[r.tag] = r;
-    const sorted = sortCorePlatforms(platforms);
     const pick = (sel, fallback, list) => {
         const cur = keepSelection ? $(sel).dropdown('get value') : '';
         return list.includes(cur) ? cur : (list.includes(fallback) ? fallback : list[0]);
     };
     $('#coreReleaseDropdown').dropdown('clear');
     fillDropdown('#coreReleaseDropdown', tags, pick('#coreReleaseDropdown', 'latest', tags), (tag) => releaseLabel(byTag[tag]));
-    $('#corePlatformDropdown').dropdown('clear');
-    fillDropdown('#corePlatformDropdown', sorted, pick('#corePlatformDropdown', libReleases.hostPlatform, sorted), corePlatformLabel);
+    fillCorePlatforms(keepSelection);
     const note = error ? t('downloads.releasesError', { error }) : t('downloads.sourceNote.' + source);
     $('#coreSourceNote').text(note);
+}
+
+// vs2026 / vs2019 only for apothecary releases that have those packages
+function fillCorePlatforms(keepSelection) {
+    if (!libReleases) return;
+    const source = coreSource();
+    const { releases, platforms } = libReleases.sources[source];
+    const release = releases.find((r) => r.tag === $('#coreReleaseDropdown').dropdown('get value'));
+    const sorted = sortCorePlatforms(platforms).filter((p) => !['vs2026', 'vs2019'].includes(p) || (release && release[p]));
+    const cur = keepSelection ? $('#corePlatformDropdown').dropdown('get value') : '';
+    const fallback = sorted.includes(libReleases.hostPlatform) ? libReleases.hostPlatform : sorted[0];
+    $('#corePlatformDropdown').dropdown('clear');
+    fillDropdown('#corePlatformDropdown', sorted, sorted.includes(cur) ? cur : fallback, corePlatformLabel);
 }
 
 function currentModularRelease() {
@@ -1899,7 +1911,9 @@ const CORE_PLATFORM_LABELS = {
     macos: 'macOS (including iOS, tvOS, catOS)',
     ios: 'iOS (Apple)',
     tvos: 'tvOS (Apple)',
-    vs: 'Windows (Visual Studio)',
+    vs: 'Windows (Visual Studio 2022)',
+    vs2026: 'Windows (Visual Studio 2026)',
+    vs2019: 'Windows (Visual Studio 2019) (x64)',
     msys2: 'Windows (MSYS2)',
     linux: 'Linux',
     linux64: 'Linux (x86_64)',

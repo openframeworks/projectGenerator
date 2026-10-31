@@ -82,7 +82,7 @@ std::string getPlatformString() {
 	else {
 		return "linux64";
 	}
-#elif defined(__WIN32__)
+#elif defined(_WIN32) || defined(__WIN32__)
 	#if defined(__MINGW32__) || defined(__MINGW64__)
 		return "msys2";
 	#else
