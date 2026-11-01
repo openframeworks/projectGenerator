@@ -37,6 +37,12 @@ jobs:
         with:
           key: ${{ matrix.cfg.target }}
 
+      - name: Recreate the latest release for this commit
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./scripts/ci_latest_release.sh
       - name: Determine Release
         id: vars
         shell: bash
@@ -141,6 +147,12 @@ jobs:
         with:
           key: ubuntu22-linux
 
+      - name: Recreate the latest release for this commit
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./scripts/ci_latest_release.sh
       - name: Determine Release
         shell: bash
         run: |
@@ -219,6 +231,12 @@ jobs:
         with:
           key: arm64-linux
 
+      - name: Recreate the latest release for this commit
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./scripts/ci_latest_release.sh
       - name: Determine Release
         shell: bash
         run: |

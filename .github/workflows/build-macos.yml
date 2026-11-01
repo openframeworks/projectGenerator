@@ -37,6 +37,12 @@ jobs:
           node-version: 26
       - name: Setup
         run: ./scripts/osx/setup_environment.sh
+      - name: Recreate the latest release for this commit
+        if: github.repository == 'openframeworks/projectGenerator' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./scripts/ci_latest_release.sh
       - name: Determine Release
         id: vars
         shell: bash
