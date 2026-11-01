@@ -478,20 +478,22 @@ int pgMain(int argc, char ** argv) {
 	argv += (argc > 0); // skip program name argv[0] if present
 
 	// optionparser only takes attached values (-posx, --platforms=osx); join -p osx / --platforms osx,
-	// but leave the last argument as the project path (-f <path> is an empty -f)
+	// but leave the last argument as the project path: -t"" <path> (scripts, the GUI) is an empty -t
 	static const std::string valueShort { "paotsmfDPkW" };
 	static const std::vector<std::string> valueLong { "platforms", "addons", "ofPath", "template", "source", "ofmenu", "frameworks", "system-libs", "defines", "postbuild", "msys2env", "emscripten-wasm", "app-version", "app-build", "bundle-id" };
 	std::vector<std::string> joinedArgs;
+	std::string platformBeforePath;
 	for (int i = 0; i < argc; i++) {
 		std::string a { argv[i] };
 		bool isValueOption = (a.size() == 2 && a[0] == '-' && valueShort.find(a[1]) != std::string::npos)
 			|| (a.rfind("--", 0) == 0 && std::find(valueLong.begin(), valueLong.end(), a.substr(2)) != valueLong.end());
-		// only -f / --frameworks / --system-libs mean something empty (remove), so -f <path> keeps the path
-		bool emptyMeansRemove = a == "-f" || a == "--frameworks" || a == "--system-libs";
-		if (isValueOption && i + 1 < argc && argv[i + 1][0] != '-' && (i + 2 < argc || !emptyMeansRemove)) {
+		bool keyword = a == "-m" || a == "--ofmenu"; // status / update-libs, no project path after it
+		if (isValueOption && i + 1 < argc && argv[i + 1][0] != '-' && (i + 2 < argc || keyword)) {
 			joinedArgs.emplace_back(a + (a.size() == 2 ? "" : "=") + argv[i + 1]);
 			i++;
 		} else {
+			// -p osx with no project path: osx would be taken as the project
+			if ((a == "-p" || a == "--platforms") && i + 2 == argc && argv[i + 1][0] != '-') platformBeforePath = argv[i + 1];
 			joinedArgs.emplace_back(a);
 		}
 	}
@@ -756,6 +758,12 @@ int pgMain(int argc, char ** argv) {
 		printHelp();
 		consoleSpace();
 		messageError("Missing project path");
+		return EXIT_USAGE;
+	}
+	if (!platformBeforePath.empty() && projectName == platformBeforePath && getTargetProject(platformBeforePath) && !fs::exists(fs::current_path() / projectName)) {
+		printHelp();
+		consoleSpace();
+		messageError("Missing project path (\"" + projectName + "\" after -p is the platform) - eg -p" + projectName + " path/to/myApp");
 		return EXIT_USAGE;
 	}
 

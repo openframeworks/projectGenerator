@@ -180,6 +180,18 @@ pg -o .. -p "$PLATFORM" -a ofxGui -D A=1 -P "echo done" -s myApps/pgArgTests/sha
 expect_exit 0; expect_updated; expect_no_stray
 grep -q ofxGui "$APP_DIR/addons.make" 2>/dev/null || fail "addons.make has no ofxGui"
 
+start "empty values before the path, as OF's CI scripts: -a\"\" -p\"$PLATFORM\" -t\"\" path (was: path taken as the template)"
+pg -o"$OF" -v -a"" -p"$PLATFORM" -t"" "$APP"
+expect_exit 0; expect_updated; expect_no_stray
+
+start "bare -t right before the path, as the GUI with no template (was: path taken as the template)"
+pg -o.. -a -p"$PLATFORM" -t "$APP"
+expect_exit 0; expect_updated; expect_no_stray
+
+start "empty separate values: -a \"\" -t \"\" path"
+pg -o.. -p"$PLATFORM" -a "" -t "" "$APP"
+expect_exit 0; expect_updated; expect_no_stray
+
 start "project path only (host platform, OF path from -o)"
 pg -o.. "$APP"
 expect_exit 0; expect_no_stray
