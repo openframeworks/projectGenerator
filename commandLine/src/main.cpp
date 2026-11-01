@@ -100,6 +100,7 @@ fs::path generatorPath;
 fs::path ofPath;
 vector<string> addons;
 vector<fs::path> srcPaths;
+bool bSrcPathsPassedIn = false; // false = keep the project's config.make PROJECT_EXTERNAL_SOURCE_PATHS
 vector<string> targets;
 vector<string> frameworks;
 bool bFrameworksPassedIn = false;
@@ -306,6 +307,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 			project->addProjectAfterRule(postBuildScript);
 		}
 
+		if (!bSrcPathsPassedIn) project->addSavedSrcPaths();
 		for (auto & srcPath : srcPaths) {
 			project->addSrcRecursively(srcPath);
 		}
@@ -652,6 +654,7 @@ int pgMain(int argc, char ** argv) {
 
 	// Additional Src Paths
 	if (options[SRCEXTERNAL].count() > 0) {
+		bSrcPathsPassedIn = true; // could be empty
 		if (options[SRCEXTERNAL].arg != NULL) {
 			string srcString(options[SRCEXTERNAL].arg);
 			// TODO: TEST
@@ -768,6 +771,12 @@ int pgMain(int argc, char ** argv) {
 	}
 
 	fs::path projectPath = normalizePath(fs::weakly_canonical(fs::current_path() / projectName));
+	// -s relative to here, unless it's relative to the project (config.make, the GUI)
+	for (auto & s : srcPaths) {
+		if (s.is_relative() && !fs::exists(projectPath / s) && fs::exists(fs::current_path() / s)) {
+			s = normalizePath(fs::weakly_canonical(fs::current_path() / s));
+		}
+	}
 	fs::path projectNamePath = projectPath.filename();
 	projectName = projectNamePath.string();
 
@@ -906,6 +915,7 @@ int pgMain(int argc, char ** argv) {
 							project->addProjectAfterRule(postBuildScript);
 						}
 
+						if (!bSrcPathsPassedIn) project->addSavedSrcPaths();
 						for (auto & s : srcPaths) {
 							project->addSrcRecursively(s);
 						}

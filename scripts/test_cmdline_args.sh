@@ -115,6 +115,31 @@ expect_output() {
 	echo "$OUT" | grep -qE "$1" || fail "output has no '$1'"
 }
 
+expect_file() {
+	[ -e "$1" ] || fail "${1#$OF/} missing"
+}
+
+expect_in_file() {
+	tr -d '\r' < "$1" 2>/dev/null | grep -qF -- "$2" || fail "${1#$OF/} has no '$2'"
+}
+
+# Xcode / Visual Studio list the sources; make projects read them from config.make
+project_sources_file() {
+	if [ "$XCODE" = 1 ]; then echo "$APP_DIR/myApp.xcodeproj/project.pbxproj"; elif [ "$PLATFORM" = vs ]; then echo "$APP_DIR/myApp.vcxproj"; fi
+}
+
+expect_src_in_project() {
+	local f
+	f="$(project_sources_file)"
+	[ -z "$f" ] || expect_in_file "$f" "$1"
+}
+
+expect_src_not_in_project() {
+	local f
+	f="$(project_sources_file)"
+	[ -z "$f" ] || ! tr -d '\r' < "$f" | grep -qF -- "$1" || fail "${f#$OF/} still has $1"
+}
+
 expect_pbxproj() {
 	[ "$XCODE" = 1 ] || return 0
 	grep -q "$1" "$APP_DIR/myApp.xcodeproj/project.pbxproj" 2>/dev/null || fail "project.pbxproj has no $1"
@@ -245,6 +270,136 @@ mkdir -p "$TEST_DIR/other/src" && cp "$APP_DIR/src/"* "$TEST_DIR/other/src/"
 pg -o.. -p"$PLATFORM" -r myApps/pgArgTests
 expect_exit 0; expect_updated; expect_no_stray
 [ -e "$TEST_DIR/other/${PROJECT_FILE/myApp/other}" ] || fail "other/${PROJECT_FILE/myApp/other} not written"
+
+# ---------------------------------------------------------------- how the GUI and openFrameworks' scripts call it
+
+# frontend/index.js generateFunction: -v -o -a -p -s -t [-D -P -k -W --app-*] [-f --system-libs] path
+start "GUI generate, no addons / template / source: -a<space> -s -t path"
+pg -v -o"$OF" "-a " -p"$PLATFORM" -s -t "$APP"
+expect_exit 0; expect_updated; expect_no_stray
+
+start "GUI generate with addons, defines, post-build, version"
+pg -v -o"$OF" -a"ofxGui,ofxOsc" -p"$PLATFORM" -s -t -D"A=1,B" -P"echo gui-postbuild" --app-version=2.0 --app-build=7 "$APP"
+expect_exit 0; expect_updated; expect_no_stray
+expect_in_file "$APP_DIR/addons.make" "ofxOsc"
+
+# frontend/index.js updateFunction (update multiple): -r -v -o -p [-t] folder
+start "GUI update multiple: -r -v -o -p folder"
+mkdir -p "$TEST_DIR/other/src" && cp "$APP_DIR/src/"* "$TEST_DIR/other/src/"
+pg -r -v -o"$OF" -p"$PLATFORM" myApps/pgArgTests
+expect_exit 0; expect_updated; expect_no_stray
+
+# scripts/dev/create_package.sh, scripts/osx/snapshotAllExamples.sh
+start "openFrameworks create_package: --recursive -p -o folder"
+mkdir -p "$TEST_DIR/other/src" && cp "$APP_DIR/src/"* "$TEST_DIR/other/src/"
+pg --recursive -p"$PLATFORM" -o"$OF" "$TEST_DIR"
+expect_exit 0; expect_updated; expect_no_stray
+
+# scripts/ci/cmake/build.sh
+if [ -f "$OF/scripts/templates/cmake/CMakeLists.txt" ]; then
+	start "openFrameworks cmake build.sh: -o -t\"cmake\" -p path"
+	pg -o"$OF" -t"cmake" -p"$PLATFORM" "$APP_DIR"
+	expect_exit 0; expect_file "$APP_DIR/CMakeLists.txt"; expect_no_stray
+fi
+
+# ---------------------------------------------------------------- project paths
+
+start "spaces in the project name"
+mkdir -p "$TEST_DIR/my App/src" && cp "$APP_DIR/src/"* "$TEST_DIR/my App/src/"
+pg -o.. -p"$PLATFORM" "myApps/pgArgTests/my App"
+expect_exit 0; expect_file "$TEST_DIR/my App/${PROJECT_FILE/myApp/my App}"; expect_no_stray
+
+start "trailing slash and ./ in the project path"
+pg -o.. -p"$PLATFORM" "./$APP/"
+expect_exit 0; expect_updated; expect_no_stray
+
+start "project path relative to apps/myApps (a name only)"
+mkdir -p "$TEST_DIR/../pgArgTestsByName/src" && cp "$APP_DIR/src/"* "$TEST_DIR/../pgArgTestsByName/src/"
+pg -o"$OF" -p"$PLATFORM" pgArgTestsByName
+[ -e "$RUN_DIR/myApps/pgArgTestsByName/${PROJECT_FILE/myApp/pgArgTestsByName}" ] || [ -e "$RUN_DIR/pgArgTestsByName/${PROJECT_FILE/myApp/pgArgTestsByName}" ] || fail "pgArgTestsByName not generated"
+rm -rf "$RUN_DIR/myApps/pgArgTestsByName" "$RUN_DIR/pgArgTestsByName"
+expect_no_stray
+
+# ---------------------------------------------------------------- addons
+
+start "missing addon is kept in addons.make"
+pg -o.. -p"$PLATFORM" -a"ofxGui,ofxDoesNotExist" "$APP"
+expect_exit 0; expect_updated; expect_output "addon not found: ofxDoesNotExist"
+expect_in_file "$APP_DIR/addons.make" "ofxDoesNotExist"
+
+start "addons with spaces and duplicates"
+pg -o.. -p"$PLATFORM" -a"ofxGui, ofxOsc,ofxGui" "$APP"
+expect_exit 0
+[ "$(tr -d '\r' < "$APP_DIR/addons.make" | grep -cx ofxGui)" = 1 ] || fail "addons.make should list ofxGui once"
+expect_in_file "$APP_DIR/addons.make" "ofxOsc"
+
+start "addons.make comments and #url of a missing addon are kept"
+printf 'ofxGui\nofxMissingOne#https://github.com/example/ofxMissingOne\n' > "$APP_DIR/addons.make"
+pg -o.. -p"$PLATFORM" "$APP"
+expect_exit 0; expect_in_file "$APP_DIR/addons.make" "ofxMissingOne#https://github.com/example/ofxMissingOne"
+
+start "no addons and no addons.make: none written"
+pg -o.. -p"$PLATFORM" "$APP"
+expect_exit 0; [ ! -e "$APP_DIR/addons.make" ] || fail "empty addons.make written"
+
+# ---------------------------------------------------------------- external sources (-s)
+
+mkshared() {
+	mkdir -p "$TEST_DIR/shared" && printf 'int sharedFn() { return 1; }\n' > "$TEST_DIR/shared/sharedSource.cpp"
+}
+
+start "-s relative to the current folder (was: silently nothing)"
+mkshared
+pg -o.. -p"$PLATFORM" -s myApps/pgArgTests/shared "$APP"
+expect_exit 0; expect_config PROJECT_EXTERNAL_SOURCE_PATHS "../shared"
+expect_src_in_project "sharedSource.cpp"
+
+start "-s relative to the project"
+mkshared
+pg -o.. -p"$PLATFORM" -s ../shared "$APP"
+expect_exit 0; expect_config PROJECT_EXTERNAL_SOURCE_PATHS "../shared"
+
+start "-s absolute, written relative to the project"
+mkshared
+pg -o.. -p"$PLATFORM" -s "$TEST_DIR/shared" "$APP"
+expect_exit 0; expect_config PROJECT_EXTERNAL_SOURCE_PATHS "../shared"
+
+start "external sources kept on update without -s, empty -s removes them (was: dropped / stale)"
+mkshared
+pg -o.. -p"$PLATFORM" -s ../shared "$APP"
+pg -o.. -p"$PLATFORM" "$APP"
+expect_exit 0; expect_config PROJECT_EXTERNAL_SOURCE_PATHS "../shared"
+expect_src_in_project "sharedSource.cpp"
+pg -o.. -p"$PLATFORM" -s -t "$APP"
+expect_exit 0; expect_no_config PROJECT_EXTERNAL_SOURCE_PATHS
+expect_src_not_in_project "sharedSource.cpp"
+
+# ---------------------------------------------------------------- other options
+
+start "-t vscode adds VS Code to the platform (#476)"
+pg -o.. -p"$PLATFORM" -tvscode "$APP"
+expect_exit 0; expect_updated; expect_file "$APP_DIR/.vscode"
+
+start "-P post-build script lands in the project"
+pg -o.. -p"$PLATFORM" -P "echo pg-postbuild-test" "$APP"
+expect_exit 0
+if [ "$XCODE" = 1 ]; then expect_pbxproj "pg-postbuild-test"; elif [ "$PLATFORM" = vs ]; then expect_in_file "$APP_DIR/myApp.vcxproj" "pg-postbuild-test"; fi
+
+start "-k bad MSYS2 environment warns"
+pg -o.. -pmsys2 -k bogus "$APP"
+expect_exit 0; expect_output "unknown msys2 environment bogus"
+
+start "-w / -i / --getofpath"
+pg -w
+expect_exit 0; expect_output "openFrameworks projectGenerator"
+pg -i
+expect_exit 0; expect_output "ofHostPlatform"
+pg -o.. --getofpath
+expect_exit 0; expect_output '"ofPath"'
+
+start "-l lists templates"
+pg -o.. -p"$PLATFORM" -l "$APP"
+expect_exit 0
 
 # ---------------------------------------------------------------- system frameworks / libraries
 
