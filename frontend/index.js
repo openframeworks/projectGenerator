@@ -124,6 +124,42 @@ function readProjectSystemFrameworks(folder) {
     return { frameworks: lists.PROJECT_FRAMEWORKS, libs: lists.PROJECT_SYSTEM_LIBS };
 }
 
+/**
+ * Bundle id of an existing project, read like the commandLine does: config.make APP_BUNDLE_ID, CMakeLists.txt,
+ * the .xcodeproj, Project.xcconfig, then the android applicationId; the templates' default ids don't count.
+ * @param {string} folder - The project folder.
+ * @returns {string} The bundle id, or '' for the template's cc.openFrameworks.<name>.
+ */
+function readProjectBundleId(folder) {
+    const read = (file) => {
+        try {
+            return fs.readFileSync(path.join(folder, file), 'utf8');
+        } catch (e) {
+            return '';
+        }
+    };
+    const name = path.basename(folder);
+    const isTemplate = (id) => {
+        if (!id || id.includes('$')) return true;
+        const m = /^(cc|com)\.openframeworks\.(.+)$/i.exec(id);
+        return !!m && ['emptyexample', 'androidassimpexample', name.toLowerCase(), name.toLowerCase() + 'debug'].includes(m[2].toLowerCase());
+    };
+    const lastMatch = (text, re) => {
+        let value = '';
+        for (const m of text.matchAll(re)) value = m[1];
+        return value;
+    };
+    const firstMatch = (text, re) => (re.exec(text) || [])[1] || '';
+    const found = [
+        lastMatch(read('config.make'), /^[ \t]*APP_BUNDLE_ID[ \t]*[?:+]?=[ \t]*(\S+)/gm),
+        lastMatch(read('CMakeLists.txt'), /^\s*set\(\s*APP_BUNDLE_ID\s+"?([^\s")]+)/gm),
+        firstMatch(read(path.join(`${name}.xcodeproj`, 'project.pbxproj')), /^\s*"?PRODUCT_BUNDLE_IDENTIFIER"?\s*[:=]\s*"?([^\s";]+)/m),
+        firstMatch(read('Project.xcconfig'), /^\s*PRODUCT_BUNDLE_IDENTIFIER\s*=\s*(\S+)/m),
+        firstMatch(read(path.join('ofApp', 'build.gradle')), /^\s*applicationId\s+['"]([^'"]+)['"]/m),
+    ];
+    return found.find((id) => !isTemplate(id)) || '';
+}
+
 // mirrors isGoodOFPath() in commandLine/src/main.cpp
 function isGoodOFPath(p) {
     try {
@@ -1030,7 +1066,7 @@ ipcMain.on('isOFProjectFolder', (event, project) => {
             if (fs.existsSync(cmakeLists) && /^\s*set\(\s*PROJECT_EMSCRIPTEN_WASM\s+64\b/m.test(fs.readFileSync(cmakeLists, 'utf8'))) {
                 event.sender.send('setEmscriptenWasm', '64');
             }
-            event.sender.send('setAppVersion', readProjectAppVersion(folder));
+            event.sender.send('setAppVersion', { ...readProjectAppVersion(folder), bundleId: readProjectBundleId(folder) });
             event.sender.send('setSystemFrameworks', readProjectSystemFrameworks(folder));
             
         } else {
@@ -1799,6 +1835,7 @@ ipcMain.on('downloadModularLibs', async (event, { ofPath, tag, names }) => {
  *     emscriptenWasm: string,
  *     appVersion: string,
  *     appBuild: string,
+ *     appBundleId: string,
  *     systemFrameworks: Array<string>|null,
  *     systemLibs: Array<string>|null,
  * }} GenerateArgument */
@@ -1823,6 +1860,7 @@ function generateFunction(event, generate) {
         emscriptenWasm,
         appVersion,
         appBuild,
+        appBundleId,
         systemFrameworks,
         systemLibs,
     } = generate;
@@ -1877,6 +1915,10 @@ function generateFunction(event, generate) {
     }
     if (appBuild && /^[1-9]\d*$/.test(appBuild)) {
         args.push(`--app-build=${appBuild}`);
+    }
+    // empty keeps the project's bundle id
+    if (appBundleId && /^[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$/.test(appBundleId)) {
+        args.push(`--bundle-id=${appBundleId}`);
     }
 
     // null keeps the project's config.make PROJECT_FRAMEWORKS / PROJECT_SYSTEM_LIBS, empty removes them

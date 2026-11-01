@@ -218,6 +218,7 @@ ipcRenderer.on('setGenerateMode', (event, arg) => {
         $('#appVersion').val('');
         $('#appBuild').val('');
         $('#appVersionNote').hide();
+        $('#bundleId').val('');
         $('#systemFrameworks').val('');
         $('#systemLibs').val('');
     }
@@ -225,9 +226,10 @@ ipcRenderer.on('setGenerateMode', (event, arg) => {
 
 //-------------------------------------------
 // existing project's app version / build, so updating keeps them
-ipcRenderer.on('setAppVersion', (event, { version, build, differs }) => {
+ipcRenderer.on('setAppVersion', (event, { version, build, differs, bundleId }) => {
     $('#appVersion').val(version || '');
     $('#appBuild').val(build || '');
+    $('#bundleId').val(bundleId || '');
     const note = (differs || []).map((d) => t('note.appVersionDiffers', { file: d.file, value: d.value })).join(' ');
     $('#appVersionNote').text(note).toggle(!!defaultSettings.advancedMode && note.length > 0);
 });
@@ -1207,6 +1209,9 @@ function saveDefaultSettings() {
 }
 
 //----------------------------------------
+// letters, digits, - and dots, at least two parts (same check as the commandLine)
+const BUNDLE_ID_RE = /^[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$/;
+
 function generate() {
     // let's get all the info:
     const platformValueArray = getPlatformList();
@@ -1287,6 +1292,7 @@ function generate() {
         emscriptenWasm: $('#wasmField').css('display') !== 'none' ? $('#wasmDropdown').dropdown('get value') : '',
         appVersion: $('#appVersion').val().trim(),
         appBuild: $('#appBuild').val().trim(),
+        appBundleId: $('#bundleId').val().trim(),
         // only for Apple targets; hidden = keep the project's config.make values
         systemFrameworks: $('#systemFrameworksField').css('display') !== 'none' ? $('#systemFrameworks').val().split(/[\s,]+/).filter(Boolean) : null,
         systemLibs: $('#systemFrameworksField').css('display') !== 'none' ? $('#systemLibs').val().split(/[\s,]+/).filter(Boolean) : null
@@ -1303,6 +1309,8 @@ function generate() {
         $("#appVersion").oneTimeTooltip(t('tooltip.appVersionInvalid'));
     } else if (gen.appBuild !== '' && !/^[1-9]\d*$/.test(gen.appBuild)) {
         $("#appBuild").oneTimeTooltip(t('tooltip.appBuildInvalid'));
+    } else if (gen.appBundleId !== '' && !BUNDLE_ID_RE.test(gen.appBundleId)) {
+        $("#bundleId").oneTimeTooltip(t('tooltip.bundleIdInvalid'));
     } else {
         // the template pick is cleared in the #projectName change handler instead,
         // as soon as the user points at a different project - not here, so a plain
@@ -1481,6 +1489,7 @@ function updateRendererFieldVisibility() {
     $('#glesField').toggle(!!defaultSettings.advancedMode && selectedPlatforms.some((p) => ['ios', 'macos'].includes(p)));
     // advanced only; hidden fields keep the project's values, so updating still keeps them
     $('#appVersionField').css('display', defaultSettings.advancedMode ? 'flex' : 'none');
+    $('#bundleIdField').toggle(!!defaultSettings.advancedMode);
     $('#appVersionNote').toggle(!!defaultSettings.advancedMode && $('#appVersionNote').text().length > 0);
     $('#systemFrameworksField').css('display', defaultSettings.advancedMode && selectedPlatforms.some((p) => ['osx', 'ios', 'macos', 'tvos'].includes(p)) ? 'flex' : 'none');
 

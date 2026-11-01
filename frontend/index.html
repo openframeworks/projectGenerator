@@ -318,6 +318,14 @@
 						</div>
 					</div>
 					<p class="ui small grey text" id="appVersionNote" style="display: none"></p>
+					<div class="field" id="bundleIdField" style="display: none">
+						<label><span data-i18n="field.bundleId">Bundle ID:</span> &nbsp;
+							<a class="ui icon tooltip" href="#" data-i18n-content="tooltip.bundleId" data-content="The app's bundle identifier (Xcode / Info.plist CFBundleIdentifier, Android applicationId), e.g. com.example.myApp. Saved in config.make APP_BUNDLE_ID. Empty keeps the project's (default cc.openFrameworks.<name>)." data-position="right center">
+								<i class="help circle icon"></i>
+							</a>
+						</label>
+						<input type="text" id="bundleId" placeholder="cc.openFrameworks.myApp" autocomplete="off" spellcheck="false">
+					</div>
 					<div class="two fields" id="systemFrameworksField" style="display: none">
 						<div class="field">
 							<label><span data-i18n="field.systemFrameworks">System frameworks:</span> &nbsp;
@@ -568,7 +576,7 @@ PROJECT_SYSTEM_LIBS = sqlite3 z</pre>
 				<p>Xcode gets them in <i>Link Binary With Libraries</i>; make and CMake builds read the same lines (<code>-framework Security</code>, <code>-lsqlite3</code>). Clear a field and update to remove them.</p>
 
 				<h4 class="ui dividing header">Advanced options</h4>
-				<p>Turn on <b>Advanced options</b> in settings for: system frameworks and libraries, custom defines, renderer (ANGLE / Dawn / GLon12), OpenGL / GLES / WebGL version, app version and build, post-build script, MSYS2 environment, Emscripten wasm32 / wasm64.</p>
+				<p>Turn on <b>Advanced options</b> in settings for: bundle ID (kept in <code>config.make</code> APP_BUNDLE_ID and set in Xcode / Android), system frameworks and libraries, custom defines, renderer (ANGLE / Dawn / GLon12), OpenGL / GLES / WebGL version, app version and build, post-build script, MSYS2 environment, Emscripten wasm32 / wasm64.</p>
 
 				<h4 class="ui dividing header">Downloads</h4>
 				<p>Download or update the prebuilt openFrameworks libraries, or single (modular) libraries, for your OF path.</p>

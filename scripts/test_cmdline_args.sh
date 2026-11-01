@@ -278,6 +278,32 @@ printf 'PROJECT_FRAMEWORKS = Security\nPROJECT_FRAMEWORKS += CoreBluetooth\n' > 
 pg -o.. -p"$PLATFORM" "$APP"
 expect_exit 0; expect_config PROJECT_FRAMEWORKS "Security CoreBluetooth"; expect_pbxproj "CoreBluetooth.framework"
 
+# ---------------------------------------------------------------- bundle id
+
+start "bundle id: none by default"
+pg -o.. -p"$PLATFORM" "$APP"
+expect_exit 0; expect_no_config APP_BUNDLE_ID; expect_no_pbxproj '"PRODUCT_BUNDLE_IDENTIFIER"'
+
+start "bundle id: --bundle-id com.example.my-app, kept on update"
+pg -o.. -p"$PLATFORM" --bundle-id com.example.my-app "$APP"
+expect_exit 0; expect_config APP_BUNDLE_ID "com.example.my-app"; expect_pbxproj '"PRODUCT_BUNDLE_IDENTIFIER": "com.example.my-app"'
+pg -o.. -p"$PLATFORM" "$APP"
+expect_exit 0; expect_config APP_BUNDLE_ID "com.example.my-app"; expect_pbxproj '"PRODUCT_BUNDLE_IDENTIFIER": "com.example.my-app"'
+
+start "bundle id: bad value warns and keeps the project's"
+pg -o.. -p"$PLATFORM" --bundle-id=com.example.good "$APP"
+pg -o.. -p"$PLATFORM" --bundle-id=nodots "$APP"
+expect_exit 0; expect_output "bundle id nodots should be"; expect_config APP_BUNDLE_ID "com.example.good"
+
+if [ "$XCODE" = 1 ]; then
+	start "bundle id: a custom Project.xcconfig PRODUCT_BUNDLE_IDENTIFIER is kept (was: reset to cc.openFrameworks.<name>)"
+	pg -o.. -p"$PLATFORM" "$APP"
+	sed -i.bak 's/^PRODUCT_BUNDLE_IDENTIFIER = .*/PRODUCT_BUNDLE_IDENTIFIER = com.example.fromxcconfig/' "$APP_DIR/Project.xcconfig"
+	pg -o.. -p"$PLATFORM" "$APP"
+	expect_exit 0; expect_config APP_BUNDLE_ID "com.example.fromxcconfig"; expect_pbxproj '"PRODUCT_BUNDLE_IDENTIFIER": "com.example.fromxcconfig"'
+	grep -q '^PRODUCT_BUNDLE_IDENTIFIER = com.example.fromxcconfig' "$APP_DIR/Project.xcconfig" || fail "Project.xcconfig was reset"
+fi
+
 # ---------------------------------------------------------------- defines / version / emscripten
 
 if [ "$HAS_CONFIG_TEMPLATE" = 1 ]; then

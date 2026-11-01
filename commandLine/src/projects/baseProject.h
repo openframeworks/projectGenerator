@@ -119,6 +119,8 @@ public:
 	// emscripten wasm32 / wasm64 (-W/--emscripten-wasm), written to config.make PROJECT_EMSCRIPTEN_WASM; empty keeps the project's value
 	void setEmscriptenWasm(const std::string & bits) { emscriptenWasmOption = bits; }
 	void setAppVersion(const std::string & version, const std::string & build) { appVersionOption = version; appBuildOption = build; }
+	// bundle id (--bundle-id), written to config.make APP_BUNDLE_ID; empty keeps the project's (default cc.openFrameworks.<name>)
+	void setAppBundleId(const std::string & bundleId) { appBundleIdOption = bundleId; }
 
 
 #ifdef OFADDON_OUTPUT_JSON_DEBUG
@@ -201,6 +203,9 @@ protected:
 	std::string appVersionOption, appBuildOption; // from the CLI, empty = keep
 	std::string appVersion { "1.0" }, appBuild { "1" }; // value for this project
 	bool isDefaultAppVersion() const { return appVersion == "1.0" && appBuild == "1"; }
+	std::string appBundleIdOption; // from the CLI, empty = keep
+	std::string appBundleId; // value for this project, empty = the template's cc.openFrameworks.<name>
+	void saveAppBundleIdFiles();
 	
 	//cached addons - if an addon is requested more than once, avoid loading from disk as it's quite slow
 	std::map<std::string,std::map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]

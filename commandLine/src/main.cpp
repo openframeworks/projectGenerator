@@ -39,7 +39,8 @@ enum optionIndex { UNKNOWN,
 	MSYS2ENV,
 	EMSCRIPTEN_WASM,
 	APP_VERSION,
-	APP_BUILD
+	APP_BUILD,
+	BUNDLE_ID
 };
 
 constexpr option::Descriptor usage[] = {
@@ -74,6 +75,7 @@ constexpr option::Descriptor usage[] = {
 
 	{ APP_VERSION, 0, "", "app-version", option::Arg::Optional, "  --app-version  \tapp version, eg 1.2.3 (default 1.0): config.make / CMake APP_VERSION, Xcode MARKETING_VERSION, Android versionName" },
 	{ APP_BUILD, 0, "", "app-build", option::Arg::Optional, "  --app-build  \tbuild number, eg 42 (default 1): config.make / CMake APP_BUILD, Xcode CURRENT_PROJECT_VERSION, Android versionCode" },
+	{ BUNDLE_ID, 0, "", "bundle-id", option::Arg::Optional, "  --bundle-id  \tbundle id, eg com.example.myApp (default cc.openFrameworks.<name>): config.make / CMake APP_BUNDLE_ID, Xcode PRODUCT_BUNDLE_IDENTIFIER, Android applicationId" },
 	{ 0, 0, 0, 0, 0, 0 }
 };
 
@@ -108,6 +110,7 @@ string postBuildScript;
 string emscriptenWasm; // empty keeps the project's config.make value
 string appVersion; // empty keeps the project's value
 string appBuild;
+string appBundleId; // empty keeps the project's value
 string ofPathEnv;
 string templateName;
 string msys2Env = "ucrt64";
@@ -281,6 +284,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 		project->setMsys2Environment(msys2Env);
 		project->setEmscriptenWasm(emscriptenWasm);
 		project->setAppVersion(appVersion, appBuild);
+		project->setAppBundleId(appBundleId);
 		project->setSystemFrameworks(frameworks, bFrameworksPassedIn, systemLibs, bSystemLibsPassedIn);
 		project->create(path, templateName);
 
@@ -476,7 +480,7 @@ int pgMain(int argc, char ** argv) {
 	// optionparser only takes attached values (-posx, --platforms=osx); join -p osx / --platforms osx,
 	// but leave the last argument as the project path (-f <path> is an empty -f)
 	static const std::string valueShort { "paotsmfDPkW" };
-	static const std::vector<std::string> valueLong { "platforms", "addons", "ofPath", "template", "source", "ofmenu", "frameworks", "system-libs", "defines", "postbuild", "msys2env", "emscripten-wasm", "app-version", "app-build" };
+	static const std::vector<std::string> valueLong { "platforms", "addons", "ofPath", "template", "source", "ofmenu", "frameworks", "system-libs", "defines", "postbuild", "msys2env", "emscripten-wasm", "app-version", "app-build", "bundle-id" };
 	std::vector<std::string> joinedArgs;
 	for (int i = 0; i < argc; i++) {
 		std::string a { argv[i] };
@@ -709,6 +713,15 @@ int pgMain(int argc, char ** argv) {
 		}
 	}
 
+	if (options[BUNDLE_ID].count() > 0 && options[BUNDLE_ID].arg != NULL) {
+		std::string id = ofTrim(options[BUNDLE_ID].arg);
+		if (std::regex_match(id, std::regex(R"([A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+)"))) {
+			appBundleId = id;
+		} else {
+			ofLogWarning() << "bundle id " << id << " should be letters, digits, - and dots (eg com.example.myApp) - keeping the project's bundle id";
+		}
+	}
+
 	if (options[POSTBUILD].count() > 0 && options[POSTBUILD].arg != NULL) {
 		postBuildScript = ofTrim(options[POSTBUILD].arg);
 	}
@@ -866,6 +879,7 @@ int pgMain(int argc, char ** argv) {
 						project->setMsys2Environment(msys2Env);
 						project->setEmscriptenWasm(emscriptenWasm);
 						project->setAppVersion(appVersion, appBuild);
+						project->setAppBundleId(appBundleId);
 						project->setSystemFrameworks(frameworks, bFrameworksPassedIn, systemLibs, bSystemLibsPassedIn);
 						project->create(projectPath, templateName);
 						if(bAddonsPassedIn){

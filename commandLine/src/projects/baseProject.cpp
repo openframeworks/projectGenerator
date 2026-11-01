@@ -246,6 +246,59 @@ static std::pair<std::string, std::string> readGradleAppVersion(const fs::path &
 	return { version, build };
 }
 
+// APP_BUNDLE_ID in config.make
+static std::string readMakeBundleId(const fs::path & configMake) {
+	auto values = readMakeList(configMake, "APP_BUNDLE_ID");
+	return values.empty() ? "" : values.back();
+}
+
+// set(APP_BUNDLE_ID ...) in an openFrameworks CMakeLists.txt
+static std::string readCMakeBundleId(const fs::path & cmakeLists) {
+	static const std::regex bundleIdSet(R"re(^\s*set\(\s*APP_BUNDLE_ID\s+"?([^\s")]+)"?\s*\))re");
+	std::string bundleId;
+	std::smatch m;
+	if (!fs::exists(cmakeLists)) return bundleId;
+	for (auto & line : fileToStrings(cmakeLists)) {
+		if (std::regex_search(line, m, bundleIdSet)) bundleId = m[1];
+	}
+	return bundleId;
+}
+
+// PRODUCT_BUNDLE_IDENTIFIER in the .xcodeproj target settings or Project.xcconfig (first one)
+static std::string readXcodeBundleId(const fs::path & file) {
+	static const std::regex bundleIdSet(R"re(^\s*"?PRODUCT_BUNDLE_IDENTIFIER"?\s*[:=]\s*"?([^\s";]+)"?)re");
+	std::smatch m;
+	if (!fs::exists(file)) return "";
+	for (auto & line : fileToStrings(file)) {
+		if (std::regex_search(line, m, bundleIdSet)) return m[1];
+	}
+	return "";
+}
+
+// applicationId in the android ofApp/build.gradle
+static std::string readGradleBundleId(const fs::path & gradle) {
+	static const std::regex bundleIdSet(R"re(^\s*applicationId\s+['"]([^'"]+)['"])re");
+	std::smatch m;
+	if (!fs::exists(gradle)) return "";
+	for (auto & line : fileToStrings(gradle)) {
+		if (std::regex_search(line, m, bundleIdSet)) return m[1];
+	}
+	return "";
+}
+
+// the templates' own ids: cc.openFrameworks.$(TARGET_NAME), com.openFrameworks.emptyExample, cc.openframeworks.<name>
+static bool isTemplateBundleId(const std::string & bundleId, const std::string & projectName) {
+	if (bundleId.empty() || bundleId.find('$') != std::string::npos) return true;
+	auto lower = ofToLower(bundleId);
+	auto name = ofToLower(projectName);
+	for (std::string prefix : { "cc.openframeworks.", "com.openframeworks." }) {
+		if (lower.rfind(prefix, 0) != 0) continue;
+		auto rest = lower.substr(prefix.size());
+		if (rest == "emptyexample" || rest == "androidassimpexample" || rest == name || rest == name + "debug") return true;
+	}
+	return false;
+}
+
 bool baseProject::create(const fs::path & _path, string templateName){
 //	alert("baseProject::create " + path.string() + " : " + templateName, 35);
 	auto path = _path; // just because it is const
@@ -333,6 +386,29 @@ bool baseProject::create(const fs::path & _path, string templateName){
 		appVersion = !appVersionOption.empty() ? appVersionOption : (!version.empty() ? version : "1.0");
 		appBuild = !appBuildOption.empty() ? appBuildOption : (!build.empty() ? build : "1");
 		ofLogNotice() << "{ \"appVersion\": \"" << appVersion << "\", \"appBuild\": \"" << appBuild << "\" }";
+	}
+
+	// bundle id: the CLI, then config.make, CMakeLists, Xcode target, Project.xcconfig, Android; the templates' default ids don't count
+	{
+		std::vector<std::pair<std::string, std::string>> found {
+			{ "config.make", readMakeBundleId(projectDir / "config.make") },
+			{ "CMakeLists.txt", readCMakeBundleId(projectDir / "CMakeLists.txt") },
+			{ "xcodeproj", readXcodeBundleId(projectDir / (projectName + ".xcodeproj") / "project.pbxproj") },
+			{ "Project.xcconfig", readXcodeBundleId(projectDir / "Project.xcconfig") },
+			{ "build.gradle", readGradleBundleId(projectDir / "ofApp" / "build.gradle") },
+		};
+		std::string bundleId, bundleIdFrom;
+		for (auto & f : found) {
+			if (isTemplateBundleId(f.second, projectName)) continue;
+			if (bundleId.empty()) {
+				bundleId = f.second;
+				bundleIdFrom = f.first;
+			} else if (f.second != bundleId && ofToLower(f.second) != ofToLower(ofJoinString(ofSplitString(bundleId, "-"), "_"))) {
+				ofLogWarning() << "bundle id " << f.second << " in " << f.first << " differs from " << bundleId << " in " << bundleIdFrom << " - using " << bundleIdFrom;
+			}
+		}
+		appBundleId = !appBundleIdOption.empty() ? appBundleIdOption : bundleId;
+		if (!appBundleId.empty()) ofLogNotice() << "{ \"appBundleId\": \"" << appBundleId << "\" }";
 	}
 	if (emscriptenWasm == "64") {
 		bool bHasWasm64Libs = false;
@@ -486,6 +562,7 @@ bool baseProject::save(){
 	bool bWroteAppBuild = false;
 	bool bWroteFrameworks = false;
 	bool bWroteSystemLibs = false;
+	bool bWroteBundleId = false;
 	auto isMakeVar = [](const std::string & line, const std::string & name) {
 		auto config = ofTrim(line);
 		if (config.rfind("#", 0) == 0) config = ofTrim(config.substr(1));
@@ -557,6 +634,9 @@ bool baseProject::save(){
 		else if( isMakeVar(str, "PROJECT_SYSTEM_LIBS") ){
 			writeMakeList(str, "PROJECT_SYSTEM_LIBS", systemLibs, bWroteSystemLibs);
 		}
+		else if( isMakeVar(str, "APP_BUNDLE_ID") ){
+			writeMakeList(str, "APP_BUNDLE_ID", appBundleId.empty() ? std::vector<std::string>{} : std::vector<std::string>{ appBundleId }, bWroteBundleId);
+		}
 		else if( emscriptenWasm == "32" && str.rfind("EMSCRIPTEN_MEMORY64", 0) == 0 ){
 			saveConfig << "# " << str << std::endl;
 		} else {
@@ -581,9 +661,15 @@ bool baseProject::save(){
 		if (systemFrameworks.size() && !bWroteFrameworks) saveConfig << "PROJECT_FRAMEWORKS = " << ofJoinString(systemFrameworks, " ") << std::endl;
 		if (systemLibs.size() && !bWroteSystemLibs) saveConfig << "PROJECT_SYSTEM_LIBS = " << ofJoinString(systemLibs, " ") << std::endl;
 	}
+	if (!appBundleId.empty() && !bWroteBundleId) {
+		if (lines.size()) saveConfig << std::endl;
+		saveConfig << "# bundle id (CFBundleIdentifier, Android applicationId)" << std::endl;
+		saveConfig << "APP_BUNDLE_ID = " << appBundleId << std::endl;
+	}
 	saveConfig.close();
 	saveCMakeLists();
 	saveAppVersionFiles();
+	saveAppBundleIdFiles();
 
 #ifdef OFADDON_OUTPUT_JSON_DEBUG
     saveAddonsToJson();
@@ -1237,6 +1323,31 @@ void baseProject::saveAppVersionFiles() {
 	});
 }
 
+void baseProject::saveAppBundleIdFiles() {
+	if (appBundleId.empty()) return;
+	// target settings override this, but a reader of Project.xcconfig sees the real id
+	replaceLines(projectDir / "Project.xcconfig", {
+		{ std::regex(R"re(^(\s*PRODUCT_BUNDLE_IDENTIFIER\s*=\s*)\S+)re"), appBundleId },
+	});
+	// Android application ids can't have '-'
+	replaceLines(projectDir / "ofApp" / "build.gradle", {
+		{ std::regex(R"re(^(\s*applicationId\s+)['"][^'"]*['"])re"), "\"" + ofJoinString(ofSplitString(appBundleId, "-"), "_") + "\"" },
+	});
+	// a custom Info.plist with a literal id instead of $(PRODUCT_BUNDLE_IDENTIFIER)
+	static const std::regex plistId(R"re((<key>CFBundleIdentifier</key>\s*<string>)([^<$]*)(</string>))re");
+	for (auto & name : { "openFrameworks-Info.plist", "ofxiOS-Info.plist", "ofxtvOS-Info.plist" }) {
+		fs::path plist { projectDir / name };
+		if (!fs::exists(plist)) continue;
+		std::ifstream in(plist);
+		std::string text((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+		in.close();
+		std::smatch m;
+		if (!std::regex_search(text, m, plistId) || m[2].str() == appBundleId) continue;
+		std::ofstream out(plist);
+		out << m.prefix().str() << m[1].str() << appBundleId << m[3].str() << m.suffix().str();
+	}
+}
+
 // OF_ROOT and PROJECT_EMSCRIPTEN_WASM in an openFrameworks app CMakeLists.txt, like config.make
 void baseProject::saveCMakeLists() {
 	fs::path cmakeLists { projectDir / "CMakeLists.txt" };
@@ -1253,6 +1364,8 @@ void baseProject::saveCMakeLists() {
 	static const std::regex ofRootSet(R"re(^(\s*)set\(OF_ROOT\s+"[^"]*"\))re");
 	static const std::regex wasmSet(R"re(^\s*set\(\s*PROJECT_EMSCRIPTEN_WASM\b)re");
 	static const std::regex appVersionSet(R"re(^\s*#?\s*set\(\s*APP_(VERSION|BUILD)\b)re");
+	static const std::regex bundleIdSet(R"re(^\s*#?\s*set\(\s*APP_BUNDLE_ID\b)re");
+	bool bWroteBundleId = appBundleId.empty();
 	static const std::regex addApp(R"re(^\s*of_add_app\s*\()re");
 	string comment = isDefaultAppVersion() ? "# " : "";
 	bool bWroteAppVersion = false;
@@ -1269,9 +1382,18 @@ void baseProject::saveCMakeLists() {
 			writeAppVersion(out);
 			continue;
 		}
+		if (!appBundleId.empty() && std::regex_search(line, bundleIdSet)) {
+			if (!bWroteBundleId) out << "set(APP_BUNDLE_ID " << appBundleId << ")" << std::endl;
+			bWroteBundleId = true;
+			continue;
+		}
 		if (std::regex_search(line, addApp) && !bWroteAppVersion) {
 			if (!isDefaultAppVersion()) writeAppVersion(out);
 			bWroteAppVersion = true;
+		}
+		if (std::regex_search(line, addApp) && !bWroteBundleId) {
+			out << "set(APP_BUNDLE_ID " << appBundleId << ")" << std::endl;
+			bWroteBundleId = true;
 		}
 		if (!emscriptenWasm.empty() && std::regex_search(line, wasmSet)) continue;
 		if (line.find(OF_CMAKE_INCLUDE) != std::string::npos && emscriptenWasm == "64") {
