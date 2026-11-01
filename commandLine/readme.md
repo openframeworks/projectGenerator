@@ -83,6 +83,13 @@ The GUI shows them as System frameworks / System libraries with Advanced options
 
 
 
+## Bundle ID
+
+    ./projectGenerator -o"pathToOF" --bundle-id=com.example.myApp pathToProject
+
+Saved in `config.make` as `APP_BUNDLE_ID = com.example.myApp` and set on every update in the Xcode targets (`PRODUCT_BUNDLE_IDENTIFIER`), `Project.xcconfig`, a literal `CFBundleIdentifier` in a custom Info.plist, CMake `set(APP_BUNDLE_ID ...)` and the Android `applicationId` (`-` becomes `_` there). Without `--bundle-id` the project's own is kept: `config.make`, then `CMakeLists.txt`, the Xcode target, `Project.xcconfig`, `build.gradle`. The template's `cc.openFrameworks.<name>` is the default.
+
+
 ## Environment variable
 
 If you want to skip using `-o` (for specifying the path to openframeworks) you can set an environment variable "PG_OF_PATH".  For example, on OSX, you can set this in your `~/.bash_profile`: 

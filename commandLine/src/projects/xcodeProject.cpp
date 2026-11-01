@@ -1142,7 +1142,7 @@ bool xcodeProject::saveProjectFile() {
 			}
 		}
 
-		// app version / build on every target configuration (target settings override Project.xcconfig)
+		// app version / build / bundle id on every target configuration (target settings override Project.xcconfig)
 		try {
 			auto & objects = j["objects"];
 			for (auto & target : objects) {
@@ -1153,6 +1153,7 @@ bool xcodeProject::saveProjectFile() {
 					auto & config = objects[configUUID.get<string>()];
 					config["buildSettings"]["MARKETING_VERSION"] = appVersion;
 					config["buildSettings"]["CURRENT_PROJECT_VERSION"] = appBuild;
+					if (!appBundleId.empty()) config["buildSettings"]["PRODUCT_BUNDLE_IDENTIFIER"] = appBundleId;
 				}
 			}
 		} catch (std::exception & e) {
