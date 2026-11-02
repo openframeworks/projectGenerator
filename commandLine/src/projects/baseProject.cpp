@@ -350,6 +350,7 @@ bool baseProject::create(const fs::path & _path, string templateName){
 		ofLogNotice() << "{ \"emscriptenWasm\": \"" << emscriptenWasm << "\" }";
 	}
 
+	savedExtSrcPaths = readMakeList(projectDir / "config.make", "PROJECT_EXTERNAL_SOURCE_PATHS");
 	systemFrameworks.clear();
 	systemLibs.clear();
 	for (auto & f : systemFrameworksPassed ? systemFrameworksOption : readMakeList(projectDir / "config.make", "PROJECT_FRAMEWORKS")) {
@@ -563,6 +564,7 @@ bool baseProject::save(){
 	bool bWroteFrameworks = false;
 	bool bWroteSystemLibs = false;
 	bool bWroteBundleId = false;
+	bool bWroteExtSrcPaths = false;
 	auto isMakeVar = [](const std::string & line, const std::string & name) {
 		auto config = ofTrim(line);
 		if (config.rfind("#", 0) == 0) config = ofTrim(config.substr(1));
@@ -594,12 +596,14 @@ bool baseProject::save(){
 			}
 			saveConfig << "OF_ROOT = " << path.generic_string() << std::endl;
 		}
-		// replace this section with our external paths
-		else if( extSrcPaths.size() && str.rfind("# PROJECT_EXTERNAL_SOURCE_PATHS =", 0) == 0 ){
-			for(std::size_t d = 0; d < extSrcPaths.size(); d++){
-				ofLog(OF_LOG_VERBOSE) << " adding PROJECT_EXTERNAL_SOURCE_PATHS to config" << extSrcPaths[d].generic_string() << std::endl;
-				saveConfig << "PROJECT_EXTERNAL_SOURCE_PATHS" << (d == 0 ? " = " : " += ") << extSrcPaths[d].generic_string() << std::endl;
+		// external source paths, relative to the project like the makefiles read them; replaces an old value too
+		else if( isMakeVar(str, "PROJECT_EXTERNAL_SOURCE_PATHS") ){
+			std::vector<std::string> paths;
+			for (auto & p : extSrcPaths) {
+				fs::path rel = p.is_absolute() ? fs::path(p).lexically_relative(fs::current_path()) : p;
+				paths.emplace_back((rel.empty() ? p : rel).generic_string());
 			}
+			writeMakeList(str, "PROJECT_EXTERNAL_SOURCE_PATHS", paths, bWroteExtSrcPaths);
 		}
 		// make builds (emscripten, linux, msys2) only see defines through config.make
 		else if( projectDefines.size() && (str.rfind("# PROJECT_DEFINES =", 0) == 0 || str.rfind("PROJECT_DEFINES =", 0) == 0) ){
@@ -654,6 +658,14 @@ bool baseProject::save(){
 		saveConfig << std::endl << "# app version and build number" << std::endl;
 		if (!bWroteAppVersion) saveConfig << "APP_VERSION = " << appVersion << std::endl;
 		if (!bWroteAppBuild) saveConfig << "APP_BUILD = " << appBuild << std::endl;
+	}
+	if (extSrcPaths.size() && !bWroteExtSrcPaths) {
+		if (lines.size()) saveConfig << std::endl;
+		saveConfig << "# external source folders, relative to the project" << std::endl;
+		for (std::size_t d = 0; d < extSrcPaths.size(); d++) {
+			fs::path rel = extSrcPaths[d].is_absolute() ? extSrcPaths[d].lexically_relative(fs::current_path()) : extSrcPaths[d];
+			saveConfig << "PROJECT_EXTERNAL_SOURCE_PATHS" << (d == 0 ? " = " : " += ") << (rel.empty() ? extSrcPaths[d] : rel).generic_string() << std::endl;
+		}
 	}
 	if ((systemFrameworks.size() && !bWroteFrameworks) || (systemLibs.size() && !bWroteSystemLibs)) {
 		if (lines.size()) saveConfig << std::endl;
@@ -1200,6 +1212,17 @@ void baseProject::setSystemFrameworks(const std::vector<std::string> & framework
 	systemFrameworksPassed = frameworksPassed;
 	systemLibsOption = splitSpaces(libs);
 	systemLibsPassed = libsPassed;
+}
+
+void baseProject::addSavedSrcPaths() {
+	// the project folder is the working directory here, like config.make's relative paths
+	for (auto & p : savedExtSrcPaths) {
+		if (fs::exists(p)) {
+			addSrcRecursively(p);
+		} else {
+			ofLogWarning() << "config.make PROJECT_EXTERNAL_SOURCE_PATHS " << p << " doesn't exist - skipped";
+		}
+	}
 }
 
 void baseProject::addSystemFrameworks() {

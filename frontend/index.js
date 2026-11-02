@@ -1885,9 +1885,8 @@ function generateFunction(event, generate) {
         args.push(`-p${platformList.join(",")}`);
     }
 
-    if (sourcePath != null && sourcePath.length > 0) {
-        args.push(`-s${sourcePath}`);
-    }
+    // always: an empty -s removes the project's external source folders (the field shows config.make's)
+    args.push(`-s${sourcePath || ''}`);
 
     if (templateList != null) {
         args.push(`-t${templateList.join(",")}`);
