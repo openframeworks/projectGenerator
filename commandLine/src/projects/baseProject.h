@@ -103,6 +103,8 @@ public:
 	// system frameworks / libraries (-f / --system-libs), kept in config.make PROJECT_FRAMEWORKS / PROJECT_SYSTEM_LIBS
 	void setSystemFrameworks(const std::vector<std::string> & frameworks, bool frameworksPassed, const std::vector<std::string> & libs, bool libsPassed);
 	void addSystemFrameworks();
+	// config.make PROJECT_EXTERNAL_SOURCE_PATHS, when no -s was given
+	void addSavedSrcPaths();
 
 	// public entry point for project-level preprocessor defines (e.g. -D/--defines on the
 	// CLI, or a GUI-driven renderer choice) - addDefine() itself stays protected since it's
@@ -191,6 +193,7 @@ protected:
 
 	std::vector<ofAddon> addons;
 	std::vector<fs::path> extSrcPaths;
+	std::vector<std::string> savedExtSrcPaths; // config.make PROJECT_EXTERNAL_SOURCE_PATHS, read before the template copies
 	std::vector<std::string> projectDefines; // also written to config.make PROJECT_DEFINES for make builds
 	std::vector<std::string> missingAddons; // not found, still written to addons.make (#258)
 	std::vector<std::string> systemFrameworks, systemLibs; // value for this project
