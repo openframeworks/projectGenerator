@@ -1,17 +1,14 @@
 name: build-vs
 
-# make the action not run on the local repo if the branch is also in a pull request to OF/OF
+# Keep path filters in sync with build-linux.yml and build-macos.yml: each
+# master build can recreate latest, so all platforms must run for the same changes.
 on:
   push:
-    if: github.event_name == 'push' && github.event.pull_request == null
     paths-ignore:
-    - '**/*.md'
-    - 'examples/**'
+      - '**/README.md'
   pull_request:
-    if: github.event_name == 'pull_request' && github.repository == 'openframeworks/openFrameworks'
     paths-ignore:
-      - '**/*.md'
-      - 'examples/**'
+      - '**/README.md'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
