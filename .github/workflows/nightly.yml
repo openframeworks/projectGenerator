@@ -42,6 +42,29 @@ jobs:
             exit 0
           fi
 
+          # latest is recreated before the platform builds finish. Never replace a
+          # working nightly with a partial release if a build is skipped or fails.
+          missing=0
+          for asset in \
+            projectGenerator-vs.zip \
+            projectGenerator-vs-gui.zip \
+            projectGenerator-osx.zip \
+            projectGenerator-mac-arm64.zip \
+            projectGenerator-linux.tar.bz2 \
+            projectGenerator-linux-gui.gz \
+            projectGenerator-linux-ubuntu22.tar.bz2 \
+            projectGenerator-linux-ubuntu22-gui.gz \
+            projectGenerator-linux-arm64.tar.bz2 \
+            projectGenerator-linux-arm64-gui.gz; do
+            if [ ! -s "assets/$asset" ]; then
+              echo "::warning::latest is missing $asset - keeping the current nightly"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            exit 0
+          fi
+
           sha=$(gh api "repos/$REPO/commits/$LATEST" --jq .sha)
           date=$(date -u +%Y-%m-%d)
           echo "$LATEST is at $sha"
