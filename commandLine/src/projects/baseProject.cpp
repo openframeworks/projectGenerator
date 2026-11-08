@@ -26,6 +26,14 @@ baseProject::baseProject(const string & _target) : target(_target) {
 fs::path baseProject::getPlatformTemplateDir() {
 	// always the platform's own base template - extra templates are overlaid later via recursiveTemplateCopy (#8479)
 	string folder { target };
+	// Visual Studio 2022 is templates/vs, the other versions have their own template (toolset and .sln version)
+	if (target == "vs" && (vsVersion == "2019" || vsVersion == "2026")) {
+		fs::path versioned { getOFRoot() / templatesFolder / ("vs" + vsVersion) };
+		if (fs::exists(versioned)) {
+			return fs::weakly_canonical(versioned);
+		}
+		ofLogWarning() << "no scripts/templates/vs" << vsVersion << " in this openFrameworks, using the Visual Studio 2022 template";
+	}
 	if ( target == "msys2"
 		|| target == "linux"
 		|| target == "linux64"
@@ -110,6 +118,22 @@ vector<baseProject::Template> baseProject::listAvailableTemplates(string target)
 		}
 	}
 	return templates;
+}
+
+// Visual Studio version of an existing project from its toolset. An update recopies the project files
+// from the template, so without this a 2026 project would silently go back to 2022
+static std::string readVsVersion(const fs::path & path) {
+	std::error_code ec;
+	auto folder = fs::weakly_canonical(fs::current_path() / path, ec);
+	if (ec) return {};
+	auto project = folder / (folder.filename().string() + ".vcxproj");
+	if (!fs::exists(project, ec)) return {};
+	for (auto & line : fileToStrings(project)) {
+		if (line.find("<PlatformToolset>v142") != std::string::npos) return "2019";
+		if (line.find("<PlatformToolset>v143") != std::string::npos) return "2022";
+		if (line.find("<PlatformToolset>v145") != std::string::npos) return "2026";
+	}
+	return {};
 }
 
 // PROJECT_EMSCRIPTEN_WASM from config.make; the old EMSCRIPTEN_MEMORY64=1 also means 64
@@ -324,6 +348,9 @@ bool baseProject::create(const fs::path & _path, string templateName){
 
 	addons.clear();
 	extSrcPaths.clear();
+	if (target == "vs" && vsVersion.empty()) {
+		vsVersion = readVsVersion(path);
+	}
 	auto pathTemplate = getPlatformTemplateDir();
 	if (fs::exists(pathTemplate)) {
 		templatePath = normalizePath(pathTemplate);

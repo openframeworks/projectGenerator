@@ -52,7 +52,7 @@ constexpr option::Descriptor usage[] = {
 	{ ADDONS, 0, "a", "addons", option::Arg::Optional, "  --addons, -a  \taddon list (such as ofxOpenCv, ofxGui, ofxXmlSettings)" },
 	{ OFPATH, 0, "o", "ofPath", option::Arg::Optional, "  --ofPath, -o  \tpath to openframeworks (relative or absolute). This *must* be set, or you can also alternatively use an environment variable PG_OF_PATH and if this isn't set, it will use that value instead" },
 	{ VERBOSE, 0, "v", "verbose", option::Arg::None, "  --verbose, -v  \trun verbose" },
-	{ TEMPLATE, 0, "t", "template", option::Arg::Optional, "  --template, -t  \tproject template" },
+	{ TEMPLATE, 0, "t", "template", option::Arg::Optional, "  --template, -t  \tproject template, or the Visual Studio version for -pvs: 2026 | 2022 (default) | 2019 (such as -pvs -t2026). An existing project keeps its version" },
 	{ DRYRUN, 0, "d", "dryrun", option::Arg::None, "  --dryrun, -d  \tdry run, don't change files" },
 	{ SRCEXTERNAL, 0, "s", "source", option::Arg::Optional, "  --source, -s  \trelative or absolute path to source or include folders external to the project (such as ../../../../common_utils/" },
 	{ VERSION, 0, "w", "version", option::Arg::None, "  --version, -w  \treturn the current version" },
@@ -115,6 +115,7 @@ string appBundleId; // empty keeps the project's value
 string ofPathEnv;
 string templateName;
 string msys2Env = "ucrt64";
+string vsVersion; // from -t2026 etc, empty keeps the project's
 
 bool busingEnvVar;
 bool bVerbose;
@@ -283,6 +284,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 	if (!bDryRun) {
 		auto project = getTargetProject(target);
 		project->setMsys2Environment(msys2Env);
+		project->setVsVersion(vsVersion);
 		project->setEmscriptenWasm(emscriptenWasm);
 		project->setAppVersion(appVersion, appBuild);
 		project->setAppBundleId(appBundleId);
@@ -627,6 +629,44 @@ int pgMain(int argc, char ** argv) {
 		}
 	}
 
+	// Visual Studio version: -pvs -t2026. The platform is always vs, only the base template changes.
+	// -tvs2026 and the old -pvs2026 / -pvs2019 mean the same
+	{
+		auto vsVersionFrom = [](string name) {
+			if (name.rfind("vs", 0) == 0) name = name.substr(2);
+			return (name == "2019" || name == "2022" || name == "2026") ? name : string();
+		};
+		vector<string> platformNames;
+		for (auto & t : targets) {
+			string platform = t;
+			if (t.rfind("vs", 0) == 0 && !vsVersionFrom(t).empty()) {
+				vsVersion = vsVersionFrom(t);
+				platform = "vs";
+			}
+			if (std::find(platformNames.begin(), platformNames.end(), platform) == platformNames.end()) {
+				platformNames.emplace_back(platform);
+			}
+		}
+		targets = platformNames;
+
+		vector<string> templateNames;
+		for (auto & name : ofSplitString(templateName, ",", true, true)) {
+			if (vsVersionFrom(name).empty()) {
+				templateNames.emplace_back(name);
+			} else {
+				vsVersion = vsVersionFrom(name); // -t wins over -p
+			}
+		}
+		templateName = ofJoinString(templateNames, ",");
+
+		if (!vsVersion.empty()) {
+			ofLogNotice() << "{ \"VisualStudioVersion\": \"" << vsVersion << "\" }";
+			if (std::find(targets.begin(), targets.end(), "vs") == targets.end()) {
+				ofLogWarning() << "Visual Studio version " << vsVersion << " has no effect without the vs platform";
+			}
+		}
+	}
+
 	// getTargetProject has no project for these, which crashed (-p bogus, or no host platform)
 	for (auto & t : targets) {
 		if (!getTargetProject(t)) {
@@ -894,6 +934,7 @@ int pgMain(int argc, char ** argv) {
 						ofLogNotice() << "project path is: [" << projectPath << "]";
 						auto project = getTargetProject(t);
 						project->setMsys2Environment(msys2Env);
+						project->setVsVersion(vsVersion);
 						project->setEmscriptenWasm(emscriptenWasm);
 						project->setAppVersion(appVersion, appBuild);
 						project->setAppBundleId(appBundleId);

@@ -171,6 +171,8 @@ ipcRenderer.on('setup', (event, arg) => {
 // this is called from main when defaults are loaded in:
 ipcRenderer.on('setDefaults', (event, arg) => {
     defaultSettings = arg;
+    $('#vsVersionDropdown').dropdown();
+    $('#vsVersionDropdown').dropdown('set exactly', arg.defaultVsVersion || '2022');
     setOFPath(defaultSettings.defaultOfPath);
     $("#emsdkPath").val(defaultSettings.emsdkPath || '');
     enableAdvancedMode(defaultSettings.advancedMode);
@@ -246,6 +248,11 @@ ipcRenderer.on('setSystemFrameworks', (event, { frameworks, libs }) => {
 ipcRenderer.on('setEmscriptenWasm', (event, bits) => {
     $('#wasmDropdown').dropdown('set selected', bits === '64' ? '64' : '32');
     $('#wasmNote').toggle(bits === '64');
+});
+
+// an existing project's Visual Studio version, it stays on that version unless another one is picked
+ipcRenderer.on('setVsVersion', (event, version) => {
+    $('#vsVersionDropdown').dropdown('set exactly', version);
 });
 
 ipcRenderer.on('importProjectSettings', (event, settings) => {
@@ -1282,7 +1289,8 @@ function generate() {
         projectPath: $("#projectPath").val(),
         sourcePath: srcExtraList,
         platformList: platformValueArray,
-        templateList: templateValueArray,
+        // -pvs -t2026: the Visual Studio version goes with the templates
+        templateList: $('#vsVersionField').css('display') !== 'none' ? [...templateValueArray, $('#vsVersionDropdown').dropdown('get value')] : templateValueArray,
         addonList: addonValueArray,  //$("#addonsDropdown").val();
         ofPath: $("#ofPath").val(),
         verbose: bVerbose,
@@ -1505,6 +1513,7 @@ function updateRendererFieldVisibility() {
     if (gl !== 'default' && parseFloat(gl) > maxGL) $('#glDropdown').dropdown('set selected', 'default');
 
     $('#msys2EnvField').toggle(selectedPlatforms.some((p) => ['vscode', 'msys2'].includes(p)));
+    $('#vsVersionField').toggle(vs);
 }
 
 //----------------------------------------
