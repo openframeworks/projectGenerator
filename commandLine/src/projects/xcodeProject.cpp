@@ -71,6 +71,25 @@ xcodeProject::xcodeProject(const string & target)
 };
 
 bool xcodeProject::createProjectFile() {
+	// PROJECT_DEFINES is a makefile setting. Xcode needs each value copied
+	// into GCC_PREPROCESSOR_DEFINITIONS when the project is generated.
+	for (const auto & line : fileToStrings(projectDir / "config.make")) {
+		auto config = ofTrim(line);
+		if (config.empty() || config[0] == '#') continue;
+		auto eq = config.find('=');
+		if (eq == string::npos) continue;
+		auto variable = ofTrim(config.substr(0, eq));
+		bool append = !variable.empty() && variable.back() == '+';
+		if (!variable.empty() && (variable.back() == '+' || variable.back() == '?' || variable.back() == ':')) {
+			variable = ofTrim(variable.substr(0, variable.size() - 1));
+		}
+		if (variable != "PROJECT_DEFINES") continue;
+		if (!append) projectDefines.clear();
+		for (const auto & define : ofSplitString(ofTrim(config.substr(eq + 1)), " ", true, true)) {
+			addDefine(define);
+		}
+	}
+
 	fs::path xcodeProject = projectDir / (projectName + ".xcodeproj");
 	try {
 		fs::create_directories(xcodeProject);
