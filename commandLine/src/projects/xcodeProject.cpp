@@ -792,6 +792,32 @@ void xcodeProject::addAddonSrcFiles(ofAddon & addon) {
 	}
 }
 
+// Files discovered under addon/libs are stored relative to OF, while Xcode
+// resolves local_addons file references from the project SOURCE_ROOT.
+void xcodeProject::addAddonCsrcFiles(ofAddon & addon) {
+	for (const auto & file : addon.csrcFiles) {
+		addSrc(makeRelative(projectDir, file), addon.filesToFolders.at(file), C);
+	}
+}
+
+void xcodeProject::addAddonCppsrcFiles(ofAddon & addon) {
+	for (const auto & file : addon.cppsrcFiles) {
+		addSrc(makeRelative(projectDir, file), addon.filesToFolders.at(file), CPP);
+	}
+}
+
+void xcodeProject::addAddonObjcsrcFiles(ofAddon & addon) {
+	for (const auto & file : addon.objcsrcFiles) {
+		addSrc(makeRelative(projectDir, file), addon.filesToFolders.at(file), OBJC);
+	}
+}
+
+void xcodeProject::addAddonHeadersrcFiles(ofAddon & addon) {
+	for (const auto & file : addon.headersrcFiles) {
+		addSrc(makeRelative(projectDir, file), addon.filesToFolders.at(file), HEADER);
+	}
+}
+
 //-----------------------------------------------------------------------------------------------
 void xcodeProject::addAddonFrameworks(const ofAddon & addon) {
 	ofLogVerbose("xcodeProject::addAddonFrameworks") << addon.name;

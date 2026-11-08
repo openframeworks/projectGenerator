@@ -44,6 +44,10 @@ protected:
 //    void addAddonXCFrameworks(const ofAddon& addon) override ;
 	void addAddonLibs(const ofAddon& addon) override;
 	void addAddonSrcFiles( ofAddon& addon) override;
+	void addAddonCsrcFiles(ofAddon& addon) override;
+	void addAddonCppsrcFiles(ofAddon& addon) override;
+	void addAddonObjcsrcFiles(ofAddon& addon) override;
+	void addAddonHeadersrcFiles(ofAddon& addon) override;
 
 	void addSrc(const fs::path & srcFile, const fs::path & folder, SrcType type=DEFAULT) override;
 	void addInclude(const fs::path & includeName) override;
