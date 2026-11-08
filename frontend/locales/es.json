@@ -154,6 +154,7 @@
   "field.postBuild": "Script posterior a la compilación:",
   "placeholder.postBuild": "Se ejecuta después de compilar el proyecto - run script de Xcode / evento posterior a la compilación de VS",
   "downloads.wasm64Confirm": "Las bibliotecas WASM64 reemplazan las bibliotecas lib/emscripten instaladas (se eliminan las de 32 bits). ¿Continuar?",
+  "field.vsVersion": "Versión de Visual Studio:",
   "field.msys2Env": "Entorno MSYS2 (msys2 / VS Code):",
   "option.msys2Ucrt64": "UCRT64 (predeterminado)",
   "option.msys2Mingw64": "MINGW64 (heredado)",

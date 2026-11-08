@@ -471,6 +471,55 @@ if [ "$XCODE" = 1 ]; then
 	grep -q '^PRODUCT_BUNDLE_IDENTIFIER = com.example.fromxcconfig' "$APP_DIR/Project.xcconfig" || fail "Project.xcconfig was reset"
 fi
 
+# ---------------------------------------------------------------- Visual Studio version
+
+if [ "$PLATFORM" = vs ]; then
+	expect_toolset() {
+		expect_in_file "$APP_DIR/myApp.vcxproj" "<PlatformToolset>$1<"
+	}
+
+	start "vs version: no -t is 2022"
+	pg -o.. -pvs "$APP"
+	expect_exit 0; expect_toolset v143
+
+	start "vs version: -t2022, and no stray project or template warning"
+	pg -o.. -pvs -t2022 "$APP"
+	expect_exit 0; expect_toolset v143; expect_no_stray
+	echo "$OUT" | grep -q "Cannot find 2022" && fail "2022 treated as a template"
+
+	for pair in 2026:v145 2019:v142; do
+		VS_VERSION="${pair%%:*}"
+		VS_TOOLSET="${pair##*:}"
+		[ -d "$OF/scripts/templates/vs$VS_VERSION" ] || continue
+
+		start "vs version: -pvs -t$VS_VERSION"
+		pg -o.. -pvs -t"$VS_VERSION" "$APP"
+		expect_exit 0; expect_toolset "$VS_TOOLSET"; expect_no_stray
+
+		start "vs version: an update without -t keeps $VS_VERSION, -t2022 changes it"
+		pg -o.. -pvs -t"$VS_VERSION" "$APP"
+		pg -o.. -pvs "$APP"
+		expect_exit 0; expect_toolset "$VS_TOOLSET"
+		pg -o.. -pvs -t2022 "$APP"
+		expect_exit 0; expect_toolset v143
+
+		start "vs version: the old -pvs$VS_VERSION is the vs platform with that version"
+		pg -o.. -pvs"$VS_VERSION" "$APP"
+		expect_exit 0; expect_toolset "$VS_TOOLSET"
+
+		start "vs version: goes with another template, -t$VS_VERSION,gitignore"
+		pg -o.. -pvs -t"$VS_VERSION",gitignore "$APP"
+		expect_exit 0; expect_toolset "$VS_TOOLSET"
+
+		# addon libs live in lib/vs for every version (lost when vs20xx was its own platform)
+		if [ -d "$OF/addons/ofxSvg/libs/libxml2/lib/vs" ]; then
+			start "vs version: -t$VS_VERSION keeps the addon's lib/vs libs"
+			pg -o.. -pvs -t"$VS_VERSION" -aofxSvg "$APP"
+			expect_exit 0; expect_in_file "$APP_DIR/myApp.vcxproj" 'libxml2\lib\vs'
+		fi
+	done
+fi
+
 # ---------------------------------------------------------------- defines / version / emscripten
 
 if [ "$HAS_CONFIG_TEMPLATE" = 1 ]; then
