@@ -56,6 +56,7 @@ const templateSettings = {
     emsdkPath: "",
     advancedMode: false,
     defaultPlatform: '',
+    defaultVsVersion: '',
     showConsole: false,
     detachConsole: false,
     showDeveloperTools: false,
@@ -284,7 +285,6 @@ function getDefaultTemplateForPlatform(platformId) {
         "linuxaarch64": "Linux arm64 (VS Code/Make)",
         "vscode": "VS Code",
         "emscripten": "Emscripten (Web) (Make)",
-        "vs2019": "Windows (Visual Studio 2019)",
     };
 
     return defaultTemplates[platformId] || "Unknown Template";
@@ -338,6 +338,13 @@ try {
         defaultRelativeProjectPath: "apps/myApps",
         useDictionaryNameGenerator: true,
     };
+}
+
+// vs2019 / vs2026 are not platforms: the platform is vs, the version is its own setting
+const savedVsPlatform = /^vs(\d{4})$/.exec(settings.defaultPlatform || '');
+if (savedVsPlatform) {
+    settings.defaultPlatform = 'vs';
+    settings.defaultVsVersion = savedVsPlatform[1];
 }
 
 for(const key in templateSettings) {
@@ -471,8 +478,6 @@ const templates = {
     "tvOS": "Apple tvOS template",
     "unittest": "Unit test no window application",
     "vscode": "Visual Studio Code",
-    "vs2019": "Visual Studio 2019",
-
 };
 
 let defaultOfPath = settings["defaultOfPath"];
@@ -622,9 +627,12 @@ function toLetters(num) {
 //-------------------------------------------------------- window
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', () => {
+app.on('ready', async () => {
     if (needsLanguageDetection) {
         settings.language = matchOSLocale(app.getLocale());
+    }
+    if (hostplatform === 'windows' && !settings.defaultVsVersion) {
+        settings.defaultVsVersion = await detectVsVersion();
     }
 
     // Create the browser window.
@@ -837,6 +845,8 @@ function refreshPlatformList(event, ofPathValue) {
         // check all folder name under /scripts/templates
         for (const id in folders) {
             const key = folders[id];
+            // vs2019 / vs2026: Visual Studio versions, picked in their own dropdown
+            if (/^vs\d{4}$/.test(key)) continue;
             if (platforms[key]) {
                 // this folder is for platform
                 console.log("Found platform, key " + key + " has value " + platforms[key]);
@@ -958,6 +968,11 @@ ipcMain.on('isOFProjectFolder', (event, project) => {
         projectName
     } = project;
     const folder = path.join(projectPath, projectName);
+
+    const projectVsVersion = readProjectVsVersion(folder, projectName);
+    if (projectVsVersion) {
+        event.sender.send('setVsVersion', projectVsVersion);
+    }
 
     try {
         const tmpFiles = fs.readdirSync(folder);
@@ -2125,10 +2140,41 @@ ipcMain.on('checkMultiUpdatePath', (event, arg) => {
     }
 });
 
+/**
+ * Visual Studio version of an existing project, from its toolset like the commandLine does.
+ * @param {string} folder - The project folder.
+ * @param {string} projectName
+ * @returns {string} 2026, 2022, 2019 or '' when it isn't a Visual Studio project.
+ */
+function readProjectVsVersion(folder, projectName) {
+    try {
+        const match = /<PlatformToolset>(v14[235])/.exec(fs.readFileSync(path.join(folder, projectName + '.vcxproj'), 'utf8'));
+        return match ? { v142: '2019', v143: '2022', v145: '2026' }[match[1]] : '';
+    } catch (e) {
+        return '';
+    }
+}
+
+/**
+ * The newest installed Visual Studio, for the version dropdown's default.
+ * @returns {Promise<string>} 2026, 2022 or 2019; 2022 when none is found.
+ */
+async function detectVsVersion() {
+    for (const [major, version] of [['18', '2026'], ['17', '2022'], ['16', '2019']]) {
+        try {
+            await getVisualStudioPath(major);
+            return version;
+        } catch (e) {
+            // not installed, try the next one
+        }
+    }
+    return '2022';
+}
+
 function getVisualStudioPath(version) {
     return new Promise((resolve, reject) => {
         const vswherePath = "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe";
-        execFile(vswherePath, ['-latest', '-prerelease', '-format', 'json'], (error, stdout, stderr) => {
+        execFile(vswherePath, ['-all', '-prerelease', '-format', 'json'], (error, stdout, stderr) => {
             if (error) {
                 reject("vswhere.exe not found. Ensure Visual Studio is installed.");
                 return;
@@ -2168,28 +2214,26 @@ async function openVisualStudio(windowsPath) {
         return;
     }
 
-    let isVS2019Project = false;
+    let vsMajor = "17";
     const solutionFile = path.resolve(windowsPath);
     console.log("VS Solution File Content: " + solutionFile);
     if (fs.existsSync(solutionFile)) {
         const fileContent = fs.readFileSync(solutionFile, 'utf8');
-        if (fileContent.match(/VisualStudioVersion = 16\.\d+/)) {
-            console.log("Detected VS2019!");
-            isVS2019Project = true;
-        } else {
-            console.log("VS2019 Not Detected.");
+        const solutionVersion = fileContent.match(/VisualStudioVersion = (16|17|18)\.\d+/);
+        if (solutionVersion) {
+            vsMajor = solutionVersion[1];
         }
+        console.log("Detected Visual Studio major version: " + vsMajor);
     } else {
         console.error("Error: Solution file does not exist: " + solutionFile);
     }
 
     try {
-        const vsVersion = isVS2019Project ? "16" : "17";
-        console.log(`Opening in VS${isVS2019Project ? "2019" : "2022"}...`);
-        const vsPath = await getVisualStudioPath(vsVersion);
+        console.log(`Opening in Visual Studio ${vsMajor}...`);
+        const vsPath = await getVisualStudioPath(vsMajor);
         execFile(vsPath, [windowsPath], (error) => {
             if (error) {
-                console.error(`Error opening in VS${isVS2019Project ? "2019" : "2022"}:`, error.message);
+                console.error(`Error opening in Visual Studio ${vsMajor}:`, error.message);
             }
         });
     } catch (error) {

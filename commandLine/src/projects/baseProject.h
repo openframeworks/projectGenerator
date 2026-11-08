@@ -118,6 +118,8 @@ public:
 	// MSYS2 environment (ucrt64 | mingw64 | clang64) - only meaningful for VSCodeProject,
 	// a no-op everywhere else so callers don't need to know which target this applies to
 	virtual void setMsys2Environment(const std::string & env) {}
+	// Visual Studio version (-t2026 / -t2022 / -t2019): the platform stays vs, only the base template changes; empty keeps the project's version
+	void setVsVersion(const std::string & version) { vsVersion = version; }
 	// emscripten wasm32 / wasm64 (-W/--emscripten-wasm), written to config.make PROJECT_EMSCRIPTEN_WASM; empty keeps the project's value
 	void setEmscriptenWasm(const std::string & bits) { emscriptenWasmOption = bits; }
 	void setAppVersion(const std::string & version, const std::string & build) { appVersionOption = version; appBuildOption = build; }
@@ -200,6 +202,7 @@ protected:
 	std::vector<std::string> systemFrameworksOption, systemLibsOption; // from the CLI
 	bool systemFrameworksPassed = false, systemLibsPassed = false; // false = keep the project's
 	std::string emscriptenWasmOption; // from the CLI, empty = keep
+	std::string vsVersion; // 2026 | 2022 | 2019, empty = the project's, or 2022 for a new project
 	std::string emscriptenWasm; // value for this project: "", "32" or "64"
 	void saveCMakeLists();
 	void saveAppVersionFiles();
