@@ -67,6 +67,16 @@ projectGenerator\scripts\osx\setup_environment.sh (first time)
 
 ## Contributing
 
+### Release version policy
+
+Every GUI version bump must also bump the command-line version, including releases
+that change only GUI code, packaging or dependencies. Update `frontend/package.json`,
+both root version fields in `frontend/npm-shrinkwrap.json`, and
+`commandLine/src/defines.h`. GUI and CLI versions are numbered independently;
+both must increase relative to the PR's base branch. A CLI-only release can keep
+the GUI version unchanged. Include both versions in the PR description.
+CI checks this policy with `python3 scripts/check_release_versions.py <base-ref>`.
+
 The project generator is available in two flavors:
 
 - A command line utility tool. This option is the most versatile and provides all features.

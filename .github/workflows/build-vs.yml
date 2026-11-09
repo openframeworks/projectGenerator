@@ -88,6 +88,10 @@ jobs:
         shell: pwsh
         run: node --test ../openFrameworks/apps/projectGenerator/scripts/test_gui_project_settings.cjs
 
+      - name: Test packaged executable paths and writable settings
+        shell: pwsh
+        run: node --test ../openFrameworks/apps/projectGenerator/scripts/test_packaged_paths.cjs
+
       - name: Build emptyExample and allAddonsExample
         if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master'
         shell: bash
@@ -100,6 +104,7 @@ jobs:
           npm install
           npm update
           npm run dist:win64
+          node ../scripts/test_asar_package.cjs dist/win-unpacked/resources
           cd dist
           pwd
           ls
