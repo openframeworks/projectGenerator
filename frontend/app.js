@@ -8,6 +8,7 @@ const webUtils = { getPathForFile: window.ipcWrapper.getPathForFile };
 let platforms;
 let templates;
 let lastGeneratedProject = null;
+let loadedProjectSettings = null;
 
 // var platforms = {
 //     "osx": "macOS (OSX) (Xcode)",
@@ -217,31 +218,36 @@ ipcRenderer.on('setGenerateMode', (event, arg) => {
     if (arg === 'createMode') {
         $('#wasmDropdown').dropdown('set selected', '32');
         $('#wasmNote').hide();
-        $('#appVersion').val('');
-        $('#appBuild').val('');
-        $('#appVersionNote').hide();
-        $('#bundleId').val('');
-        $('#systemFrameworks').val('');
-        $('#systemLibs').val('');
     }
 });
 
-//-------------------------------------------
-// existing project's app version / build, so updating keeps them
-ipcRenderer.on('setAppVersion', (event, { version, build, differs, bundleId }) => {
-    $('#appVersion').val(version || '');
-    $('#appBuild').val(build || '');
-    $('#bundleId').val(bundleId || '');
-    const note = (differs || []).map((d) => t('note.appVersionDiffers', { file: d.file, value: d.value })).join(' ');
-    $('#appVersionNote').text(note).toggle(!!defaultSettings.advancedMode && note.length > 0);
-});
+function clearProjectSettings() {
+    for (const id of ['appVersion', 'appBuild', 'bundleId', 'systemFrameworks', 'systemLibs', 'customDefines']) $('#' + id).val('');
+    $('#appVersionNote').text('').hide();
+    $('#rendererDropdown, #glDropdown, #webglDropdown, #glesDropdown').dropdown('set exactly', 'default');
+    loadedProjectSettings = null;
+}
 
 //-------------------------------------------
-// existing project's config.make PROJECT_FRAMEWORKS / PROJECT_SYSTEM_LIBS, so updating keeps them
-ipcRenderer.on('setSystemFrameworks', (event, { frameworks, libs }) => {
-    $('#systemFrameworks').val((frameworks || []).join(','));
-    $('#systemLibs').val((libs || []).join(','));
+// Populate from the selected project. Unedited fields are displayed without becoming CLI overrides.
+ipcRenderer.on('setProjectSettings', (event, values) => {
+    if (values.projectName !== $('#projectName').val() || values.projectPath !== $('#projectPath').val()) return;
+    const fields = { appVersion: values.version || '', appBuild: values.build || '', bundleId: values.bundleId || '',
+        systemFrameworks: (values.frameworks || []).join(','), systemLibs: (values.libs || []).join(','), customDefines: (values.defines || []).join(',') };
+    const keepEdits = values.preserveEdits && loadedProjectSettings?.projectName === values.projectName && loadedProjectSettings?.projectPath === values.projectPath;
+    for (const [id, value] of Object.entries(fields)) {
+        if (!keepEdits || $('#' + id).val().trim() === loadedProjectSettings[id]) $('#' + id).val(value);
+    }
+    $('#appVersionNote').text('').hide();
+    if (!keepEdits) $('#rendererDropdown, #glDropdown, #webglDropdown, #glesDropdown').dropdown('set exactly', 'default');
+    loadedProjectSettings = { projectName: values.projectName, projectPath: values.projectPath, ...fields };
 });
+
+function projectFieldValue(id) {
+    const value = $('#' + id).val().trim();
+    if (loadedProjectSettings && (loadedProjectSettings.projectName !== $('#projectName').val() || loadedProjectSettings.projectPath !== $('#projectPath').val())) return null;
+    return loadedProjectSettings && loadedProjectSettings[id] === value ? null : value;
+}
 
 //-------------------------------------------
 // existing project's PROJECT_EMSCRIPTEN_WASM, so updating keeps it
@@ -794,8 +800,11 @@ function setup() {
 
         	const project = {
                 projectName: $("#projectName").val(),
-                projectPath: $("#projectPath").val()
+                projectPath: $("#projectPath").val(),
+                platformList: getPlatformList(),
+                ofPath: $("#ofPath").val()
             };
+            if (loadedProjectSettings && (loadedProjectSettings.projectName !== project.projectName || loadedProjectSettings.projectPath !== project.projectPath)) clearProjectSettings();
 
             // a template pick belongs to the project it was made for - clear it as
             // soon as the user points at a different project (rather than right after
@@ -1068,6 +1077,8 @@ function setup() {
             ipcRenderer.send('refreshTemplateList', arg);
 
             updateRendererFieldVisibility();
+            ipcRenderer.send('readProjectSettings', { projectName: $('#projectName').val(), projectPath: $('#projectPath').val(),
+                platformList: selectedPlatformArray, ofPath: $('#ofPath').val(), preserveEdits: true });
         })
         $("#platformsDropdownMulti").on('change', () => {
             const selectedPlatforms = $("#platformsDropdownMulti input").val();
@@ -1266,21 +1277,26 @@ function generate() {
     };
     const rendererChoice = $('#rendererDropdown').dropdown('get value');
     const customDefinesText = $('#customDefines').val().trim();
-    const definesArr = customDefinesText ? customDefinesText.split(',').map((s) => s.trim()).filter(Boolean) : [];
+    let definesArr = customDefinesText ? customDefinesText.split(',').map((s) => s.trim()).filter(Boolean) : [];
     if (rendererDefines[rendererChoice]) {
-        definesArr.push(rendererDefines[rendererChoice]);
+        const rendererKeys = new Set(['OF_USE_ANGLE', 'OF_USE_DAWN', 'OF_USE_GLON12', 'OF_USE_GLON12_WARP']);
+        definesArr = definesArr.filter((define) => !rendererKeys.has(define.split('=')[0]));
+        definesArr.push(...rendererDefines[rendererChoice].split(','));
     }
     const gl = $('#glDropdown').dropdown('get value');
     if ($('#glField').css('display') !== 'none' && gl !== 'default') {
+        definesArr = definesArr.filter((define) => !/^OF_GL_VERSION_(MAJOR|MINOR)=/.test(define));
         const [major, minor] = gl.split('.');
         definesArr.push('OF_GL_VERSION_MAJOR=' + major, 'OF_GL_VERSION_MINOR=' + minor);
     }
     const webgl = $('#webglDropdown').dropdown('get value');
     if ($('#webglField').css('display') !== 'none' && webgl !== 'default') {
+        definesArr = definesArr.filter((define) => !define.startsWith('OF_WEBGL_VERSION='));
         definesArr.push('OF_WEBGL_VERSION=' + webgl);
     }
     const gles = $('#glesDropdown').dropdown('get value');
     if ($('#glesField').css('display') !== 'none' && gles !== 'default') {
+        definesArr = definesArr.filter((define) => !define.startsWith('OF_GLES_VERSION='));
         definesArr.push('OF_GLES_VERSION=' + gles);
     }
 
@@ -1294,16 +1310,16 @@ function generate() {
         addonList: addonValueArray,  //$("#addonsDropdown").val();
         ofPath: $("#ofPath").val(),
         verbose: bVerbose,
-        defines: definesArr.join(','),
+        defines: projectFieldValue('customDefines') === null && rendererChoice === 'default' && gl === 'default' && webgl === 'default' && gles === 'default' ? null : [...new Set(definesArr)].join(','),
         postBuild: $('#postBuildScript').val().trim(),
         msys2Env: $('#msys2EnvField').css('display') !== 'none' ? $('#msys2EnvDropdown').dropdown('get value') : '',
         emscriptenWasm: $('#wasmField').css('display') !== 'none' ? $('#wasmDropdown').dropdown('get value') : '',
-        appVersion: $('#appVersion').val().trim(),
-        appBuild: $('#appBuild').val().trim(),
-        appBundleId: $('#bundleId').val().trim(),
+        appVersion: projectFieldValue('appVersion') || '',
+        appBuild: projectFieldValue('appBuild') || '',
+        appBundleId: projectFieldValue('bundleId') || '',
         // only for Apple targets; hidden = keep the project's config.make values
-        systemFrameworks: $('#systemFrameworksField').css('display') !== 'none' ? $('#systemFrameworks').val().split(/[\s,]+/).filter(Boolean) : null,
-        systemLibs: $('#systemFrameworksField').css('display') !== 'none' ? $('#systemLibs').val().split(/[\s,]+/).filter(Boolean) : null
+        systemFrameworks: $('#systemFrameworksField').css('display') !== 'none' && projectFieldValue('systemFrameworks') !== null ? $('#systemFrameworks').val().split(/[\s,]+/).filter(Boolean) : null,
+        systemLibs: $('#systemFrameworksField').css('display') !== 'none' && projectFieldValue('systemLibs') !== null ? $('#systemLibs').val().split(/[\s,]+/).filter(Boolean) : null
     };
 
     // console.log(gen);
@@ -1404,6 +1420,7 @@ function switchGenerateMode(mode) {
     }
     // [default]: switch to createMode (generate new projects)
     else {
+        clearProjectSettings();
         // if previously in update mode, deselect Addons
         if( $("#updateButton").is(":visible") ){
             clearAddonSelection();

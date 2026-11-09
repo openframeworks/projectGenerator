@@ -48,4 +48,10 @@ fi
 echo "Test command line arguments"
 "${CURRENT_DIR}/../test_cmdline_args.sh" ./projectGenerator ../../../../ linux64
 
+echo "Test preserve Apple settings across project updates"
+python3 "${CURRENT_DIR}/../test_xcode_settings.py" ./projectGenerator ../../../../
+
+echo "Test existing-project GUI settings and update arguments"
+node --test "${CURRENT_DIR}/../test_gui_project_settings.cjs"
+
 echo "Successful projectGenerator tests for [linux64]";

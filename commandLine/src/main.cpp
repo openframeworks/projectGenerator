@@ -11,6 +11,7 @@
 #include <set>
 #include <string>
 #include <cstdlib>
+#include <stdexcept>
 
 enum optionIndex { UNKNOWN,
 	HELP,
@@ -68,7 +69,7 @@ constexpr option::Descriptor usage[] = {
 	
 	{ CLEANNAME_DISABLE, 0, "n", "cleanname", option::Arg::Optional, "  --cleanname, -n  \tcleanname" },
 
-	{ DEFINES, 0, "D", "defines", option::Arg::Optional, "  --defines, -D  \tpreprocessor defines list (such as OF_USE_ANGLE=1,MY_FLAG)" },
+	{ DEFINES, 0, "D", "defines", option::Arg::Optional, "  --defines, -D  \tpreprocessor defines list (such as OF_USE_ANGLE=1,MY_FLAG); --defines= clears saved project defines" },
 	{ POSTBUILD, 0, "P", "postbuild", option::Arg::Optional, "  --postbuild, -P  \tscript to run after the project compiles (Xcode run script / VS post-build event)" },
 	{ MSYS2ENV, 0, "k", "msys2env", option::Arg::Optional, "  --msys2env, -k  \tMSYS2 environment for the msys2 / VSCode targets: ucrt64 (default) | mingw64 | clang64 | clangarm64" },
 	{ EMSCRIPTEN_WASM, 0, "W", "emscripten-wasm", option::Arg::Optional, "  --emscripten-wasm, -W  \temscripten WebAssembly: 32 (default) | 64 (wasm64, MEMORY64), written to config.make PROJECT_EMSCRIPTEN_WASM" },
@@ -107,6 +108,7 @@ bool bFrameworksPassedIn = false;
 vector<string> systemLibs;
 bool bSystemLibsPassedIn = false;
 vector<string> defines;
+bool bDefinesPassedIn = false;
 string postBuildScript;
 string emscriptenWasm; // empty keeps the project's config.make value
 string appVersion; // empty keeps the project's value
@@ -288,8 +290,9 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 		project->setEmscriptenWasm(emscriptenWasm);
 		project->setAppVersion(appVersion, appBuild);
 		project->setAppBundleId(appBundleId);
+		project->setProjectDefinesPassed(bDefinesPassedIn);
 		project->setSystemFrameworks(frameworks, bFrameworksPassedIn, systemLibs, bSystemLibsPassedIn);
-		project->create(path, templateName);
+		if (!project->create(path, templateName)) throw std::runtime_error("could not update project: " + path.string());
 
 		if (bConsiderParameterAddons && bAddonsPassedIn) {
 			for (auto & addon : addons) {
@@ -313,7 +316,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 		for (auto & srcPath : srcPaths) {
 			project->addSrcRecursively(srcPath);
 		}
-		project->save();
+		if (!project->save()) throw std::runtime_error("could not save project: " + path.string());
 	}
 }
 
@@ -728,8 +731,13 @@ int pgMain(int argc, char ** argv) {
 		}
 	}
 
-	if (options[DEFINES].count() > 0 && options[DEFINES].arg != NULL) {
-		defines = ofSplitString(options[DEFINES].arg, ",", true, true);
+	if (options[DEFINES].count() > 0) {
+		if (options[DEFINES].arg != NULL) {
+			bDefinesPassedIn = true;
+			defines = ofSplitString(options[DEFINES].arg, ",", true, true);
+		} else {
+			ofLogWarning() << "missing defines value; keeping the project's defines (use --defines= to clear them)";
+		}
 	}
 
 	if (options[EMSCRIPTEN_WASM].count() > 0 && options[EMSCRIPTEN_WASM].arg != NULL) {
@@ -938,8 +946,9 @@ int pgMain(int argc, char ** argv) {
 						project->setEmscriptenWasm(emscriptenWasm);
 						project->setAppVersion(appVersion, appBuild);
 						project->setAppBundleId(appBundleId);
+						project->setProjectDefinesPassed(bDefinesPassedIn);
 						project->setSystemFrameworks(frameworks, bFrameworksPassedIn, systemLibs, bSystemLibsPassedIn);
-						project->create(projectPath, templateName);
+						if (!project->create(projectPath, templateName)) return EXIT_FAILURE;
 						if(bAddonsPassedIn){
 							for (auto & addon : addons) {
 								project->addAddon(addon);
@@ -960,7 +969,7 @@ int pgMain(int argc, char ** argv) {
 						for (auto & s : srcPaths) {
 							project->addSrcRecursively(s);
 						}
-						project->save();
+						if (!project->save()) return EXIT_FAILURE;
 					}
 					ofLogNotice() << "project created! ";
 					nProjectsCreated += 1;
