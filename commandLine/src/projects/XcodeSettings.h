@@ -208,7 +208,7 @@ inline std::vector<std::vector<std::string>> flagUnits(const std::string & key, 
 		}
 	} else if (value.is_string()) tokens = words(value.get<std::string>());
 	static const std::set<std::string> withArgument {
-		"-framework", "-weak_framework", "-force_load", "-I", "-F", "-L", "-D", "-U",
+		"-framework", "-weak_framework", "-force_load", "-I", "-F", "-L", "-l", "-D", "-U",
 		"-isystem", "-iquote", "-include", "-Xclang", "-Xlinker"
 	};
 	std::vector<std::vector<std::string>> result;

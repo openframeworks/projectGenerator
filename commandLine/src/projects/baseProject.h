@@ -113,6 +113,7 @@ public:
 		addDefine(define, libType);
 		projectDefines.emplace_back(define);
 	}
+	void setProjectDefinesPassed(bool passed) { projectDefinesPassed = passed; }
 	// project-level post-build script (-P/--postbuild)
 	void addProjectAfterRule(const std::string & script) { addAfterRule(script); }
 	// MSYS2 environment (ucrt64 | mingw64 | clang64) - only meaningful for VSCodeProject,
@@ -197,6 +198,7 @@ protected:
 	std::vector<fs::path> extSrcPaths;
 	std::vector<std::string> savedExtSrcPaths; // config.make PROJECT_EXTERNAL_SOURCE_PATHS, read before the template copies
 	std::vector<std::string> projectDefines; // also written to config.make PROJECT_DEFINES for make builds
+	bool projectDefinesPassed = false; // an explicitly empty --defines clears saved project defines
 	std::vector<std::string> missingAddons; // not found, still written to addons.make (#258)
 	std::vector<std::string> systemFrameworks, systemLibs; // value for this project
 	std::vector<std::string> systemFrameworksOption, systemLibsOption; // from the CLI

@@ -35,6 +35,21 @@ def configs(project):
     return {key: obj for key, obj in project["objects"].items() if obj.get("isa") == "XCBuildConfiguration"}
 
 
+def linked_sdk(project, target_id):
+    objects = project["objects"]
+    files = {}
+    for phase_id in objects[target_id]["buildPhases"]:
+        phase = objects[phase_id]
+        if phase.get("isa") != "PBXFrameworksBuildPhase":
+            continue
+        for build_id in phase.get("files", []):
+            build = objects[build_id]
+            ref = objects.get(build.get("fileRef"), {})
+            if ref.get("sourceTree") == "SDKROOT":
+                files[ref.get("path", ref.get("name", ""))] = build.get("settings", {})
+    return files
+
+
 def openstep(value):
     if isinstance(value, dict):
         return "{\n" + "\n".join(json.dumps(k) + " = " + openstep(v) + ";" for k, v in value.items()) + "\n}"
@@ -78,6 +93,11 @@ def exercise(pg, root, platform):
     config_path = project / "Project.xcconfig"
     state = project / ".ofprojectgenerator/apple-settings.json"
     assert state.is_file(), "new projects must record a baseline"
+    workspace = project / (project.name + ".xcodeproj/project.xcworkspace/contents.xcworkspacedata")
+    workspace.parent.mkdir(parents=True, exist_ok=True)
+    workspace.write_text('<Workspace version="1.0"><FileRef location="group:CustomPackage.xcodeproj"/></Workspace>\n')
+    template_workspace = template / "emptyExample.xcodeproj/project.xcworkspace/contents.xcworkspacedata"
+    template_workspace_before = template_workspace.read_bytes() if template_workspace.exists() else None
 
     settings = read_plist(plist_path)
     settings["NSHighResolutionCapable"] = True
@@ -101,6 +121,7 @@ def exercise(pg, root, platform):
     config_path.write_text(xcconfig)
     with config_path.open("a") as out:
         out.write("OTHER_CFLAGS += -DMY_XCCONFIG_FLAG\nOTHER_LDFLAGS += -framework MySettingsFramework\n")
+        out.write("OTHER_LDFLAGS += -lsqlite3 -framework CoreBluetooth\n")
     (project / "App.xcconfig").write_text("MY_APP_SETTING = stays\n")
     (project / "Custom.xcconfig").write_text("MY_CUSTOM_SETTING = stays\n")
     with (project / "config.make").open("a") as out:
@@ -119,6 +140,17 @@ def exercise(pg, root, platform):
         build["MACOSX_DEPLOYMENT_TARGET"] = "14.0" if obj["name"] == "Debug" else "10.9"
         build["IPHONEOS_DEPLOYMENT_TARGET"] = "17.0" if obj["name"] == "Debug" else "8.0"
     native_targets = [key for key, obj in existing["objects"].items() if obj.get("isa") == "PBXNativeTarget"]
+    sdk_target = native_targets[0]
+    sdk_phase = next(key for key in existing["objects"][sdk_target]["buildPhases"] if existing["objects"][key]["isa"] == "PBXFrameworksBuildPhase")
+    for config_id in existing["objects"][existing["objects"][sdk_target]["buildConfigurationList"]]["buildConfigurations"]:
+        existing["objects"][config_id]["buildSettings"]["OTHER_LDFLAGS"] += ["-lsqlite3", "-framework", "CoreBluetooth"]
+    for name in ("System/Library/Frameworks/CoreBluetooth.framework", "usr/lib/libsqlite3.tbd"):
+        file_id = uuid.uuid5(uuid.NAMESPACE_URL, name + "/file").hex.upper()[:24]
+        build_id = uuid.uuid5(uuid.NAMESPACE_URL, name + "/build").hex.upper()[:24]
+        existing["objects"][file_id] = {"isa": "PBXFileReference", "path": name, "sourceTree": "SDKROOT"}
+        existing["objects"][build_id] = {"isa": "PBXBuildFile", "fileRef": file_id, "settings": {"ATTRIBUTES": ["Weak"]}}
+        existing["objects"][build_id]["platformFilters"] = ["ios" if platform == "ios" else "macos"]
+        existing["objects"][sdk_phase]["files"].append(build_id)
     root_object = existing["objects"][existing["rootObject"]]
     attributes = root_object.setdefault("attributes", {}).setdefault("TargetAttributes", {})
     for key in native_targets:
@@ -159,6 +191,8 @@ def exercise(pg, root, platform):
     run(pg, root, platform, project, "-aofxPGSettingsTest")
 
     updated = read_plist(plist_path)
+    assert "CustomPackage.xcodeproj" in workspace.read_text()
+    assert template_workspace_before == (template_workspace.read_bytes() if template_workspace.exists() else None), "updates must never copy workspace settings back into OF templates"
     assert updated["NSHighResolutionCapable"] is True
     assert updated["NSCameraUsageDescription"] == settings["NSCameraUsageDescription"]
     assert updated["PGCustomTypes"] == settings["PGCustomTypes"]
@@ -200,6 +234,16 @@ def exercise(pg, root, platform):
             assert "PG_FROM_CONFIG_MAKE=1" in updated_project["objects"][config]["buildSettings"]["GCC_PREPROCESSOR_DEFINITIONS"]
     assert all("isa" in obj for obj in updated_project["objects"].values()), "settings must not create orphan configuration objects"
     assert "extra.cpp" in pbx_path.read_text()
+    assert linked_sdk(updated_project, sdk_target)["usr/lib/libsqlite3.tbd"] == {"ATTRIBUTES": ["Weak"]}
+    assert "System/Library/Frameworks/CoreBluetooth.framework" in linked_sdk(updated_project, sdk_target)
+    for phase_id in updated_project["objects"][sdk_target]["buildPhases"]:
+        for build_id in updated_project["objects"][phase_id].get("files", []):
+            build = updated_project["objects"][build_id]
+            ref = updated_project["objects"].get(build.get("fileRef"), {})
+            if ref.get("path") == "usr/lib/libsqlite3.tbd":
+                assert build.get("platformFilters") == ["ios" if platform == "ios" else "macos"]
+    for target_id in native_targets[1:]:
+        assert "usr/lib/libsqlite3.tbd" not in linked_sdk(updated_project, target_id), "per-target libraries must not leak to other targets"
     if (project / "of.entitlements").exists():
         assert read_plist(project / "of.entitlements")["com.apple.security.application-groups"] == ["group.my.installation"]
 
@@ -225,6 +269,21 @@ def exercise(pg, root, platform):
     run(pg, root, platform, project)
     assert read_plist(plist_path)["NSHighResolutionCapable"] is True
     assert "PG_USER_SETTING" in pbx_path.read_text() and state.exists()
+
+    run(pg, root, platform, project, "--defines")
+    assert "PG_FROM_CONFIG_MAKE=1" in pbx_path.read_text(), "a missing defines argument must not clear saved values"
+    run(pg, root, platform, project, "--defines=GUI_EDITED=1")
+    assert "GUI_EDITED=1" in pbx_path.read_text() and "PG_FROM_CONFIG_MAKE=1" not in pbx_path.read_text()
+    assert "-DPG_USER_FLAG=1" not in pbx_path.read_text()
+    assert "PG_ADDON_AFTER=1" in pbx_path.read_text(), "editing project defines must keep addon defines"
+    run(pg, root, platform, project, "--defines=", "--frameworks=", "--system-libs=")
+    assert "GUI_EDITED=1" not in pbx_path.read_text()
+    assert "PG_ADDON_AFTER=1" in pbx_path.read_text()
+    assert "usr/lib/libsqlite3.tbd" not in linked_sdk(read_json(pbx_path), sdk_target)
+    assert "System/Library/Frameworks/CoreBluetooth.framework" not in linked_sdk(read_json(pbx_path), sdk_target)
+    assert "-lsqlite3" not in pbx_path.read_text() and "CoreBluetooth" not in pbx_path.read_text()
+    assert "-lsqlite3" not in config_path.read_text() and "CoreBluetooth" not in config_path.read_text()
+    assert "MyCustomFramework" in pbx_path.read_text(), "SDK edits must keep unrelated third-party flags"
 
     run(pg, root, platform, project, "--app-version=3.2.1", "--app-build=42", "--bundle-id=com.example.test")
     for obj in configs(read_json(pbx_path)).values():

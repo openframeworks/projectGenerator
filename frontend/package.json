@@ -21,11 +21,11 @@
     "dist:mac:arm64": " electron-builder --macos --arm64 --publish never",
     "dist:mac:universal": " electron-builder --mac --universal --publish never",
     "dist:win64": "electron-builder --win --x64 --publish never",
-    "dist:win:arm64": "electron-builder --win --arm64 --publish never", 
+    "dist:win:arm64": "electron-builder --win --arm64 --publish never",
     "dist:linux": "electron-builder --linux --publish never",
     "dist:linux64": "electron-builder --linux --x64 --publish never",
     "dist:linux:arm64": "electron-builder --linux --arm64 --publish never",
-    "build:linux64": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=45.0.0 --platform=linux --arch=x64"
+    "build:linux64": "electron-packager . $npm_package_productName --icon=static/icon/of.icns --out=dist --ignore='dist' --ignore='readme.md' --prune --overwrite --electron-version=45.2.3 --platform=linux --arch=x64"
   },
   "build": {
     "appId": "cc.openframeworks.projectGenerator",
@@ -66,6 +66,7 @@
       "static/**/*",
       "index.js",
       "app.js",
+      "project-settings.js",
       "preload.js",
       "console-window.html",
       "app-console-window.js",
@@ -92,7 +93,7 @@
     "n-readlines": "^3.4.1"
   },
   "devDependencies": {
-    "electron": "^45.2.0",
+    "electron": "45.2.3",
     "electron-builder": "^26.18.0",
     "@electron/packager": "^20.3.0"
   }

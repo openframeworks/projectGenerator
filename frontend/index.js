@@ -5,6 +5,7 @@ const moniker = require('moniker');
 const process = require('process');
 const os = require("os");
 const { execFile, spawn } = require('child_process');
+const { readProjectSettings } = require('./project-settings');
 
 const {
     app,
@@ -66,100 +67,6 @@ const templateSettings = {
 };
 
 
-
-/**
- * App version / build of an existing project, read like the commandLine does:
- * config.make, then CMakeLists.txt, then the .xcodeproj, then the android ofApp/build.gradle.
- * @param {string} folder - The project folder.
- * @returns {{version: string, build: string, differs: Array<{file: string, value: string}>}}
- */
-function readProjectAppVersion(folder) {
-    const read = (file) => {
-        try {
-            return fs.readFileSync(path.join(folder, file), 'utf8');
-        } catch (e) {
-            return '';
-        }
-    };
-    const last = (text, re) => {
-        let value = '';
-        for (const m of text.matchAll(re)) value = m[1];
-        return value;
-    };
-    const name = path.basename(folder);
-    const pbxproj = read(path.join(`${name}.xcodeproj`, 'project.pbxproj'));
-    const sources = [
-        { file: 'config.make', text: read('config.make'), version: /^[ \t]*APP_VERSION[ \t]*[?:+]?=[ \t]*([0-9.]+)/gm, build: /^[ \t]*APP_BUILD[ \t]*[?:+]?=[ \t]*([0-9]+)/gm },
-        { file: 'CMakeLists.txt', text: read('CMakeLists.txt'), version: /^[ \t]*set\([ \t]*APP_VERSION[ \t]+"?([0-9.]+)/gm, build: /^[ \t]*set\([ \t]*APP_BUILD[ \t]+"?([0-9]+)/gm },
-        { file: `${name}.xcodeproj`, text: pbxproj, version: /"?MARKETING_VERSION"?\s*[:=]\s*"?([0-9.]+)/g, build: /"?CURRENT_PROJECT_VERSION"?\s*[:=]\s*"?([0-9]+)/g },
-        { file: 'ofApp/build.gradle', text: read(path.join('ofApp', 'build.gradle')), version: /^\s*versionName\s+['"]([0-9.]+)['"]/gm, build: /^\s*versionCode\s+([0-9]+)/gm },
-    ].map((s) => ({ file: s.file, version: s.text ? last(s.text, s.version) : '', build: s.text ? last(s.text, s.build) : '' }));
-    const version = (sources.find((s) => s.version) || {}).version || '';
-    const build = (sources.find((s) => s.build) || {}).build || '';
-    const differs = [];
-    for (const s of sources) {
-        if ((s.version && s.version !== version) || (s.build && s.build !== build)) {
-            differs.push({ file: s.file, value: `${s.version || version} (${s.build || build})` });
-        }
-    }
-    return { version, build, differs };
-}
-
-/**
- * PROJECT_FRAMEWORKS / PROJECT_SYSTEM_LIBS of an existing project's config.make, read like the commandLine does.
- * @param {string} folder - The project folder.
- * @returns {{frameworks: Array<string>, libs: Array<string>}}
- */
-function readProjectSystemFrameworks(folder) {
-    const lists = { PROJECT_FRAMEWORKS: [], PROJECT_SYSTEM_LIBS: [] };
-    let text = '';
-    try {
-        text = fs.readFileSync(path.join(folder, 'config.make'), 'utf8');
-    } catch (e) {
-        return { frameworks: [], libs: [] };
-    }
-    for (const m of text.matchAll(/^[ \t]*(PROJECT_FRAMEWORKS|PROJECT_SYSTEM_LIBS)[ \t]*([?:+]?)=(.*)$/gm)) {
-        const values = m[3].trim().split(/\s+/).filter(Boolean);
-        lists[m[1]] = m[2] === '+' ? lists[m[1]].concat(values) : values;
-    }
-    return { frameworks: lists.PROJECT_FRAMEWORKS, libs: lists.PROJECT_SYSTEM_LIBS };
-}
-
-/**
- * Bundle id of an existing project, read like the commandLine does: config.make APP_BUNDLE_ID, CMakeLists.txt,
- * the .xcodeproj, Project.xcconfig, then the android applicationId; the templates' default ids don't count.
- * @param {string} folder - The project folder.
- * @returns {string} The bundle id, or '' for the template's cc.openFrameworks.<name>.
- */
-function readProjectBundleId(folder) {
-    const read = (file) => {
-        try {
-            return fs.readFileSync(path.join(folder, file), 'utf8');
-        } catch (e) {
-            return '';
-        }
-    };
-    const name = path.basename(folder);
-    const isTemplate = (id) => {
-        if (!id || id.includes('$')) return true;
-        const m = /^(cc|com)\.openframeworks\.(.+)$/i.exec(id);
-        return !!m && ['emptyexample', 'androidassimpexample', name.toLowerCase(), name.toLowerCase() + 'debug'].includes(m[2].toLowerCase());
-    };
-    const lastMatch = (text, re) => {
-        let value = '';
-        for (const m of text.matchAll(re)) value = m[1];
-        return value;
-    };
-    const firstMatch = (text, re) => (re.exec(text) || [])[1] || '';
-    const found = [
-        lastMatch(read('config.make'), /^[ \t]*APP_BUNDLE_ID[ \t]*[?:+]?=[ \t]*(\S+)/gm),
-        lastMatch(read('CMakeLists.txt'), /^\s*set\(\s*APP_BUNDLE_ID\s+"?([^\s")]+)/gm),
-        firstMatch(read(path.join(`${name}.xcodeproj`, 'project.pbxproj')), /^\s*"?PRODUCT_BUNDLE_IDENTIFIER"?\s*[:=]\s*"?([^\s";]+)/m),
-        firstMatch(read('Project.xcconfig'), /^\s*PRODUCT_BUNDLE_IDENTIFIER\s*=\s*(\S+)/m),
-        firstMatch(read(path.join('ofApp', 'build.gradle')), /^\s*applicationId\s+['"]([^'"]+)['"]/m),
-    ];
-    return found.find((id) => !isTemplate(id)) || '';
-}
 
 // mirrors isGoodOFPath() in commandLine/src/main.cpp
 function isGoodOFPath(p) {
@@ -962,6 +869,19 @@ function getDirectories(srcpath, acceptedPrefix) {
 
 //----------------------------------------------------------- ipc
 
+function sendProjectSettings(event, project) {
+    const folder = path.join(project.projectPath, project.projectName);
+    try {
+        if (!fs.statSync(path.join(folder, 'src')).isDirectory()) return;
+    } catch { return; }
+    event.sender.send('setProjectSettings', {
+        projectPath: project.projectPath, projectName: project.projectName, preserveEdits: !!project.preserveEdits,
+        ...readProjectSettings(folder, { platforms: project.platformList || [], ofPath: project.ofPath || settings.defaultOfPath })
+    });
+}
+
+ipcMain.on('readProjectSettings', sendProjectSettings);
+
 ipcMain.on('isOFProjectFolder', (event, project) => {
     const {
         projectPath,
@@ -977,6 +897,7 @@ ipcMain.on('isOFProjectFolder', (event, project) => {
     try {
         const tmpFiles = fs.readdirSync(folder);
         if (!tmpFiles || tmpFiles.length <= 1) {
+            event.sender.send('setGenerateMode', 'createMode');
             return false;
         } // we need at least 2 files/folders within
 
@@ -1081,8 +1002,7 @@ ipcMain.on('isOFProjectFolder', (event, project) => {
             if (fs.existsSync(cmakeLists) && /^\s*set\(\s*PROJECT_EMSCRIPTEN_WASM\s+64\b/m.test(fs.readFileSync(cmakeLists, 'utf8'))) {
                 event.sender.send('setEmscriptenWasm', '64');
             }
-            event.sender.send('setAppVersion', { ...readProjectAppVersion(folder), bundleId: readProjectBundleId(folder) });
-            event.sender.send('setSystemFrameworks', readProjectSystemFrameworks(folder));
+            sendProjectSettings(event, project);
             
         } else {
             event.sender.send('setGenerateMode', 'createMode');
@@ -1844,7 +1764,7 @@ ipcMain.on('downloadModularLibs', async (event, { ofPath, tag, names }) => {
  *     addonList: Array<string>,
  *     ofPath: string,
  *     verbose: boolean,
- *     defines: string,
+ *     defines: string|null,
  *     postBuild: string,
  *     msys2Env: string,
  *     emscriptenWasm: string,
@@ -1907,8 +1827,9 @@ function generateFunction(event, generate) {
         args.push(`-t${templateList.join(",")}`);
     }
 
-    if (defines != null && defines.length > 0) {
-        args.push(`-D${defines}`);
+    if (typeof defines === 'string') {
+        // null keeps existing defines; an explicitly edited empty field clears them.
+        args.push(`--defines=${defines}`);
     }
 
     if (postBuild != null && postBuild.length > 0) {

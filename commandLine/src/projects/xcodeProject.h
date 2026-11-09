@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <regex>
+#include <set>
 #include <nlohmann/json.hpp>
 using std::string;
 
@@ -21,8 +22,10 @@ private:
 	void saveMakefile();
 	bool readAppleSettings();
 	void mergeAppleSettings(nlohmann::json & project);
+	void mergeSystemReferences(nlohmann::json & project);
 	void saveAppleSettings();
 	nlohmann::json appleProject, appleFiles, appleState, appleDefaults, nextAppleDefaults, appleMinimums;
+	std::set<string> appleSDKKeys;
 	std::vector<string> savedMakeDefines;
 	bool debugCommands = false;
 	bool bAddedDylibRunpath = false;

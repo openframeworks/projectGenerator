@@ -633,7 +633,7 @@ bool baseProject::save(){
 			writeMakeList(str, "PROJECT_EXTERNAL_SOURCE_PATHS", paths, bWroteExtSrcPaths);
 		}
 		// make builds (emscripten, linux, msys2) only see defines through config.make
-		else if( projectDefines.size() && (str.rfind("# PROJECT_DEFINES =", 0) == 0 || str.rfind("PROJECT_DEFINES =", 0) == 0) ){
+		else if( (projectDefines.size() || projectDefinesPassed) && isMakeVar(str, "PROJECT_DEFINES") ){
 			if (!bWroteDefines) {
 				saveConfig << "PROJECT_DEFINES = " << ofJoinString(projectDefines, " ") << std::endl;
 				bWroteDefines = true;
@@ -674,7 +674,7 @@ bool baseProject::save(){
 		   saveConfig << str << std::endl;
 		}
 	}
-	if (projectDefines.size() && !bWroteDefines && lines.size()) {
+	if ((projectDefines.size() || projectDefinesPassed) && !bWroteDefines && lines.size()) {
 		saveConfig << "PROJECT_DEFINES = " << ofJoinString(projectDefines, " ") << std::endl;
 	}
 	if (emscriptenWasm == "64" && !bWroteWasm && lines.size()) {
