@@ -51,6 +51,9 @@ echo "Test command line arguments"
 echo "Test preserve Apple settings across project updates"
 python3 "${CURRENT_DIR}/../test_xcode_settings.py" ./projectGenerator ../../../../
 
+echo "Test preserve custom Xcode resources and target membership"
+python3 "${CURRENT_DIR}/../test_xcode_resources.py" ./projectGenerator ../../../../
+
 echo "Test existing-project GUI settings and update arguments"
 node --test "${CURRENT_DIR}/../test_gui_project_settings.cjs"
 

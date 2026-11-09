@@ -342,11 +342,11 @@
 					<div class="two fields" id="systemFrameworksField" style="display: none">
 						<div class="field">
 							<label><span data-i18n="field.systemFrameworks">System frameworks:</span> &nbsp;
-								<a class="ui icon tooltip" href="#" data-i18n-content="tooltip.systemFrameworks" data-content="Apple SDK frameworks, comma-separated, e.g. Security,CoreBluetooth. Saved in config.make PROJECT_FRAMEWORKS." data-position="right center">
+								<a class="ui icon tooltip" href="#" data-i18n-content="tooltip.systemFrameworks" data-content="Apple SDK frameworks, comma-separated, e.g. Security, CoreBluetooth. Saved in config.make PROJECT_FRAMEWORKS." data-position="right center">
 									<i class="help circle icon"></i>
 								</a>
 							</label>
-							<input type="text" id="systemFrameworks" placeholder="Security,CoreBluetooth" autocomplete="off" spellcheck="false">
+							<input type="text" id="systemFrameworks" placeholder="Security, CoreBluetooth" autocomplete="off" spellcheck="false">
 						</div>
 						<div class="field">
 							<label><span data-i18n="field.systemLibs">System libraries:</span> &nbsp;
@@ -580,7 +580,7 @@
 				<h4 class="ui dividing header">System frameworks and libraries (macOS / iOS / tvOS)</h4>
 				<p>With <b>Advanced options</b> on and an Apple platform selected, add SDK frameworks and libraries the project links to, separated by commas or spaces:</p>
 				<ul>
-					<li><b>System frameworks</b>: <code>Security,CoreBluetooth</code> - Security.framework, CoreBluetooth.framework</li>
+					<li><b>System frameworks</b>: <code>Security, CoreBluetooth</code> - Security.framework, CoreBluetooth.framework</li>
 					<li><b>System libraries</b>: <code>sqlite3,z</code> - libsqlite3.tbd, libz.tbd (<code>libsqlite3</code>, <code>libsqlite3.tbd</code> and <code>-lsqlite3</code> also work)</li>
 				</ul>
 				<p>They are saved with the project in <code>config.make</code>, so updating the project or opening it on another machine keeps them:</p>
@@ -597,7 +597,7 @@ PROJECT_SYSTEM_LIBS = sqlite3 z</pre>
 				<h4 class="ui dividing header">Command line</h4>
 				<p>The PG app runs the <code>projectGenerator</code> command line, which can be used on its own:</p>
 				<pre class="helpCode">projectGenerator -o"path/to/openFrameworks" -a"ofxGui,ofxOsc" -p"osx" "path/to/myApp"
-projectGenerator -o"path/to/openFrameworks" -p"ios" -f"Security,CoreBluetooth" --system-libs="sqlite3" "path/to/myApp"
+projectGenerator -o"path/to/openFrameworks" -p"ios" -f"Security, CoreBluetooth" --system-libs="sqlite3" "path/to/myApp"
 projectGenerator -o"path/to/openFrameworks" -r -p"osx" "path/to/examples"
 projectGenerator --help</pre>
 				<p>Run without <code>-a</code>, <code>-f</code> or <code>--system-libs</code> to keep what the project's <code>addons.make</code> / <code>config.make</code> already have. An empty <code>-f</code> / <code>--system-libs=</code> removes them.</p>

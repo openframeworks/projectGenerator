@@ -233,7 +233,7 @@ function clearProjectSettings() {
 ipcRenderer.on('setProjectSettings', (event, values) => {
     if (values.projectName !== $('#projectName').val() || values.projectPath !== $('#projectPath').val()) return;
     const fields = { appVersion: values.version || '', appBuild: values.build || '', bundleId: values.bundleId || '',
-        systemFrameworks: (values.frameworks || []).join(','), systemLibs: (values.libs || []).join(','), customDefines: (values.defines || []).join(',') };
+        systemFrameworks: (values.frameworks || []).join(', '), systemLibs: (values.libs || []).join(','), customDefines: (values.defines || []).join(',') };
     const keepEdits = values.preserveEdits && loadedProjectSettings?.projectName === values.projectName && loadedProjectSettings?.projectPath === values.projectPath;
     for (const [id, value] of Object.entries(fields)) {
         if (!keepEdits || $('#' + id).val().trim() === loadedProjectSettings[id]) $('#' + id).val(value);
@@ -246,7 +246,8 @@ ipcRenderer.on('setProjectSettings', (event, values) => {
 function projectFieldValue(id) {
     const value = $('#' + id).val().trim();
     if (loadedProjectSettings && (loadedProjectSettings.projectName !== $('#projectName').val() || loadedProjectSettings.projectPath !== $('#projectPath').val())) return null;
-    return loadedProjectSettings && loadedProjectSettings[id] === value ? null : value;
+    const normalize = (text) => ['systemFrameworks', 'systemLibs'].includes(id) ? text.split(/[\s,]+/).filter(Boolean).join(',') : text;
+    return loadedProjectSettings && normalize(loadedProjectSettings[id]) === normalize(value) ? null : value;
 }
 
 //-------------------------------------------

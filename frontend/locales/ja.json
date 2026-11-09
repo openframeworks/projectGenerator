@@ -170,7 +170,7 @@
   "tooltip.bundleIdInvalid": "バンドルIDは英数字、- とドットのみ使用できます(例: com.example.myApp)。",
   "field.systemFrameworks": "システムフレームワーク:",
   "field.systemLibs": "システムライブラリ:",
-  "tooltip.systemFrameworks": "Apple SDK のフレームワーク(カンマ区切り、例: Security,CoreBluetooth)。config.make の PROJECT_FRAMEWORKS に保存されます。",
+  "tooltip.systemFrameworks": "Apple SDK のフレームワーク(カンマ区切り、例: Security, CoreBluetooth)。config.make の PROJECT_FRAMEWORKS に保存されます。",
   "tooltip.systemLibs": "SDK のライブラリ(カンマ区切り、例: sqlite3,z で libsqlite3.tbd と libz.tbd)。config.make の PROJECT_SYSTEM_LIBS に保存されます。",
   "tooltip.appVersionInvalid": "バージョンは数字とドットのみで指定してください (例: 1、1.2、1.2.3)。",
   "tooltip.appBuildInvalid": "ビルドは正の整数で指定してください (例: 42)。",

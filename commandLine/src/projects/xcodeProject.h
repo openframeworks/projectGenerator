@@ -157,6 +157,8 @@ protected:
 		{ ".plist" , "text.plist.xml" },
 
 		{ ".storyboard" , "wrapper.storyboard" },
+		{ ".icns" , "image.icns" },
+		{ ".xcassets" , "folder.assetcatalog" },
 	};
 
 	// other uuid strings can be ported to here.

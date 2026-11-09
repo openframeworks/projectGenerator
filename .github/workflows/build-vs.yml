@@ -92,6 +92,10 @@ jobs:
         shell: pwsh
         run: node --test ../openFrameworks/apps/projectGenerator/scripts/test_packaged_paths.cjs
 
+      - name: Test Xcode resource preservation
+        shell: pwsh
+        run: python ../openFrameworks/apps/projectGenerator/scripts/test_xcode_resources.py ../openFrameworks/apps/projectGenerator/commandLine/bin/projectGenerator.exe ../openFrameworks
+
       - name: Build emptyExample and allAddonsExample
         if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master'
         shell: bash

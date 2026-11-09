@@ -170,7 +170,7 @@
   "tooltip.bundleIdInvalid": "Bundle ID should be letters, digits, - and dots, e.g. com.example.myApp.",
   "field.systemFrameworks": "System frameworks:",
   "field.systemLibs": "System libraries:",
-  "tooltip.systemFrameworks": "Apple SDK frameworks, comma-separated, e.g. Security,CoreBluetooth. Saved in config.make PROJECT_FRAMEWORKS.",
+  "tooltip.systemFrameworks": "Apple SDK frameworks, comma-separated, e.g. Security, CoreBluetooth. Saved in config.make PROJECT_FRAMEWORKS.",
   "tooltip.systemLibs": "SDK libraries, comma-separated, e.g. sqlite3,z for libsqlite3.tbd and libz.tbd. Saved in config.make PROJECT_SYSTEM_LIBS.",
   "tooltip.appVersionInvalid": "Version should be digits and dots, e.g. 1, 1.2 or 1.2.3.",
   "tooltip.appBuildInvalid": "Build should be a positive whole number, e.g. 42.",
