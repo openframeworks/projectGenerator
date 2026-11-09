@@ -141,6 +141,18 @@ test('renderer populates fields, keeps unedited values implicit, and sends delib
     const first = sent.findLast((entry) => entry.channel === 'generate').data;
     assert.equal(first.appVersion, ''); assert.equal(first.appBuild, ''); assert.equal(first.appBundleId, '');
     assert.equal(first.defines, null); assert.equal(first.systemFrameworks, null); assert.equal(first.systemLibs, null);
+    const frameworks = ['Foundation', 'AppKit', 'AVFoundation', 'Security', 'UserNotifications', 'NotificationCenter'];
+    handlers.setProjectSettings(null, { projectName: 'demo', projectPath: '/tmp', version: '0.1', build: '2', bundleId: 'com.example.demo', defines: ['CUSTOM=1'], frameworks, libs: ['sqlite3'] });
+    assert.equal(element('#systemFrameworks').val(), frameworks.join(', '));
+    vm.runInContext('generate()', context);
+    assert.equal(sent.findLast((entry) => entry.channel === 'generate').data.systemFrameworks, null);
+    element('#systemFrameworks').val(frameworks.join(','));
+    vm.runInContext('generate()', context);
+    assert.equal(sent.findLast((entry) => entry.channel === 'generate').data.systemFrameworks, null, 'spacing-only edits must not override per-target libraries');
+    element('#systemFrameworks').val('Foundation, AppKit, AVFoundation, Security, UserNotifications, NotificationCenter,  CoreBluetooth');
+    vm.runInContext('generate()', context);
+    assert.deepEqual(Array.from(sent.findLast((entry) => entry.channel === 'generate').data.systemFrameworks), [...frameworks, 'CoreBluetooth']);
+    element('#systemFrameworks').val(frameworks.join(', '));
     element('#appVersion').val('0.2'); element('#customDefines').val(''); element('#systemLibs').val('z');
     vm.runInContext('generate()', context);
     const edited = sent.findLast((entry) => entry.channel === 'generate').data;

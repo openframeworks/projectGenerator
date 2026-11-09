@@ -170,7 +170,7 @@
   "tooltip.bundleIdInvalid": "Bundle ID может содержать буквы, цифры, - и точки, например com.example.myApp.",
   "field.systemFrameworks": "Системные фреймворки:",
   "field.systemLibs": "Системные библиотеки:",
-  "tooltip.systemFrameworks": "Фреймворки Apple SDK через запятую, например Security,CoreBluetooth. Сохраняются в config.make PROJECT_FRAMEWORKS.",
+  "tooltip.systemFrameworks": "Фреймворки Apple SDK через запятую, например Security, CoreBluetooth. Сохраняются в config.make PROJECT_FRAMEWORKS.",
   "tooltip.systemLibs": "Библиотеки SDK через запятую, например sqlite3,z для libsqlite3.tbd и libz.tbd. Сохраняются в config.make PROJECT_SYSTEM_LIBS.",
   "tooltip.appVersionInvalid": "Версия должна состоять из цифр и точек, например 1, 1.2 или 1.2.3.",
   "tooltip.appBuildInvalid": "Номер сборки должен быть целым положительным числом, например 42.",

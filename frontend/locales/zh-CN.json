@@ -170,7 +170,7 @@
   "tooltip.bundleIdInvalid": "Bundle ID 只能包含字母、数字、- 和点,例如 com.example.myApp。",
   "field.systemFrameworks": "系统框架:",
   "field.systemLibs": "系统库:",
-  "tooltip.systemFrameworks": "Apple SDK 框架,用逗号分隔,例如 Security,CoreBluetooth。保存在 config.make 的 PROJECT_FRAMEWORKS 中。",
+  "tooltip.systemFrameworks": "Apple SDK 框架,用逗号分隔,例如 Security, CoreBluetooth。保存在 config.make 的 PROJECT_FRAMEWORKS 中。",
   "tooltip.systemLibs": "SDK 库,用逗号分隔,例如 sqlite3,z 对应 libsqlite3.tbd 和 libz.tbd。保存在 config.make 的 PROJECT_SYSTEM_LIBS 中。",
   "tooltip.appVersionInvalid": "版本只能包含数字和点，例如 1、1.2 或 1.2.3。",
   "tooltip.appBuildInvalid": "构建号必须是正整数，例如 42。",

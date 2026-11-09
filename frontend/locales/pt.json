@@ -170,7 +170,7 @@
   "tooltip.bundleIdInvalid": "O ID do pacote deve ter letras, dígitos, - e pontos, ex. com.example.myApp.",
   "field.systemFrameworks": "Frameworks do sistema:",
   "field.systemLibs": "Bibliotecas do sistema:",
-  "tooltip.systemFrameworks": "Frameworks do SDK da Apple, separados por vírgulas, ex. Security,CoreBluetooth. Salvos em config.make PROJECT_FRAMEWORKS.",
+  "tooltip.systemFrameworks": "Frameworks do SDK da Apple, separados por vírgulas, ex. Security, CoreBluetooth. Salvos em config.make PROJECT_FRAMEWORKS.",
   "tooltip.systemLibs": "Bibliotecas do SDK, separadas por vírgulas, ex. sqlite3,z para libsqlite3.tbd e libz.tbd. Salvas em config.make PROJECT_SYSTEM_LIBS.",
   "tooltip.appVersionInvalid": "A versão deve conter apenas dígitos e pontos, ex.: 1, 1.2 ou 1.2.3.",
   "tooltip.appBuildInvalid": "O build deve ser um número inteiro positivo, ex.: 42.",

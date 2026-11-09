@@ -1,5 +1,6 @@
 #include "xcodeProject.h"
 #include "XcodeSettings.h"
+#include "XcodeResources.h"
 #include "Utils.h"
 #include "ofUtils.h"
 #include <nlohmann/json.hpp>
@@ -155,13 +156,17 @@ bool xcodeProject::readAppleSettings() {
 			for (auto & record : sdk) {
 				if (!record.at("scope").is_string() || !record.at("references").is_object()) throw std::runtime_error("invalid SDK reference baseline");
 			}
+			xcodeResources::validate(appleDefaults.value("resources", json::object()));
 		}
-		xcodeSettings::configurations(xcodeSettings::readProject(readSettingsFile(templatePath / "emptyExample.xcodeproj/project.pbxproj")));
+		auto templateProject = xcodeSettings::readProject(readSettingsFile(templatePath / "emptyExample.xcodeproj/project.pbxproj"));
+		xcodeSettings::configurations(templateProject);
+		xcodeResources::snapshot(templateProject);
 		auto projectFile = projectDir / (projectName + ".xcodeproj") / "project.pbxproj";
 		if (fs::exists(projectFile)) {
 			appleProject = xcodeSettings::readProject(readSettingsFile(projectFile));
 			xcodeSettings::configurations(appleProject);
 			targetAttributes(appleProject);
+			xcodeResources::snapshot(appleProject);
 		}
 		for (auto name : { "Project.xcconfig", "openFrameworks-Info.plist", "of.entitlements", "ofxiOS-Info.plist" }) {
 			if (!fs::exists(templatePath / name)) continue;
@@ -194,6 +199,8 @@ bool xcodeProject::readAppleSettings() {
 }
 
 void xcodeProject::mergeAppleSettings(json & project) {
+	nextAppleDefaults["resources"] = xcodeResources::merge(project, appleProject, appleDefaults.value("resources", json::object()),
+		projectDir, getOFRoot(), [] { return generateUUID(string("preserved-resource")); });
 	mergeSystemReferences(project);
 	appleSDKKeys.clear();
 	if (!appleProject.empty() && (systemFrameworksPassed || systemLibsPassed)) {
@@ -446,14 +453,20 @@ bool xcodeProject::createProjectFile() {
 	// FIXME: rootReplacements can be empty.
 	// if project is outside OF, rootReplacements is set to be used in XCode and make
 	if (!fs::equivalent(getOFRoot(), normalizePath(fs::path { "../../.." }))) {
-		string root { ofPathToString(getOFRoot()) };
+		string root { getOFRoot().generic_string() };
 		rootReplacements = { "../../..", root };
 	}
+	// Template substitutions occur inside JSON strings. Native Windows separators
+	// and quotes in names must be escaped before readTemplateUUIDs parses the copy.
+	auto jsonText = [](const string & text) {
+		auto quoted = json(text).dump();
+		return quoted.substr(1, quoted.size() - 2);
+	};
 
 	copyTemplateFiles.push_back({ normalizePath(templatePath / "emptyExample.xcodeproj" / "project.pbxproj"),
 		normalizePath(xcodeProject / "project.pbxproj"),
-		{ { "emptyExample", projectName },
-			rootReplacements } });
+		{ { "emptyExample", jsonText(projectName) },
+			{ rootReplacements.first, jsonText(rootReplacements.second) } } });
 
 	copyTemplateFiles.push_back({ normalizePath(templatePath / "Project.xcconfig"),
 		normalizePath(projectDir / "Project.xcconfig"),
@@ -628,7 +641,8 @@ void xcodeProject::readTemplateUUIDs() {
 	if (!exists(a.sources)) a.sources = found[0].sources;
 	if (!exists(a.frameworks)) a.frameworks = found[0].frameworks;
 	if (!exists(a.copyFrameworks)) a.copyFrameworks = found[0].copyFrameworks;
-	if (!exists(a.resources)) a.resources = found[0].resources;
+	// An unused template phase may still exist in objects without belonging to this target.
+	a.resources = found[0].resources;
 	buildConfigurationListUUID = a.uuid;
 	buildActionMaskUUID = a.sources;
 	uuidMap["linkBinaryWithLibraries"] = a.frameworks;
@@ -910,19 +924,20 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 			fp.addToBuildResource = true;
 			fp.addToResources = true;
 		} else if (ext == ".metal") {
-			fp.addToBuildResource = true;
-			fp.addToResources = true;
+			// Metal sources are compiled into the target's default.metallib.
 		} else if (ext == ".entitlements") {
+			fp.addToBuildPhase = false;
 			fp.addToBuildResource = true;
 			fp.addToResources = true;
 		} else if (ext == ".info") {
+			fp.addToBuildPhase = false;
 			fp.addToBuildResource = true;
 			fp.addToResources = true;
 		} else if (ext == ".storyboard") {
 			fp.addToBuildPhase = false;
 			fp.copyBundleResources = true;
 		} else if (ext == ".plist") {
-			fp.addToBuildPhase = true;
+			fp.addToBuildPhase = false;
 			fp.copyBundleResources = true;
 		} else if (ext == ".swift") {
 			fp.addToBuildPhase = true;
@@ -931,13 +946,18 @@ void xcodeProject::addSrc(const fs::path & srcFile, const fs::path & folder, Src
 				// mark all Swift files as C++ interop available :)
 			}
 		} else if (ext == ".xcassets") {
+			fp.addToBuildPhase = false;
 			fp.addToBuildResource = true;
 			fp.addToResources = true;
 		} else if (ext == ".modulemap") {
 			fp.addToBuildPhase = false;
 		} else if (ext == ".bundle") {
+			fp.addToBuildPhase = false;
 			fp.addToBuildResource = true;
 			fp.addToResources = true;
+		} else if (ext == ".icns") {
+			fp.addToBuildPhase = false;
+			fp.copyBundleResources = true;
 		} else if (ext == ".tbd") {
 			fp.linkBinaryWithLibraries = true;
 		}
@@ -1336,7 +1356,15 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 				addCommand("Add :objects:" + t.sources + ":files: string " + buildUUID);
 			}
 
-			if (fp.copyBundleResources && !t.resources.empty()) {
+			if (fp.copyBundleResources || fp.addToBuildResource || fp.addToResources) {
+				if (t.resources.empty()) {
+					t.resources = generateUUID("resources-" + t.uuid);
+					addCommand("Add :objects:" + t.resources + ":isa string PBXResourcesBuildPhase");
+					addCommand("Add :objects:" + t.resources + ":buildActionMask string 2147483647");
+					addCommand("Add :objects:" + t.resources + ":runOnlyForDeploymentPostprocessing string 0");
+					addCommand("Add :objects:" + t.resources + ":files array");
+					addCommand("Add :objects:" + t.uuid + ":buildPhases: string " + t.resources);
+				}
 				addCommand("# ---- copyBundleResources");
 				addCommand("Add :objects:" + t.resources + ":files: string " + buildUUID);
 			}
@@ -1353,20 +1381,6 @@ string xcodeProject::addFile(const fs::path & path, const fs::path & folder, con
 				addCommand("# ---- codeSignOnCopy " + buildUUID);
 				addCommand("Add :objects:" + buildUUID + ":settings:ATTRIBUTES array");
 				addCommand("Add :objects:" + buildUUID + ":settings:ATTRIBUTES: string CodeSignOnCopy");
-			}
-
-			if (i == 0 && fp.addToBuildResource) {
-				string mediaAssetsUUID { "9936F60E1BFA4DEE00891288" };
-				addCommand("# ---- addToBuildResource");
-				addCommand("Add :objects:" + mediaAssetsUUID + ":files: string " + UUID);
-			}
-
-			if (i == 0 && fp.addToResources) {
-				// FIXME: test if it is working on iOS
-				if (resourcesUUID != "") {
-					addCommand("# ---- addToResources (IOS only) ?" + buildUUID);
-					addCommand("Add :objects:" + resourcesUUID + ": string " + buildUUID);
-				}
 			}
 
 			if (fp.linkBinaryWithLibraries && !t.frameworks.empty()) { // Link Binary With Libraries
