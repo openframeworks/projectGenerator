@@ -71,6 +71,25 @@ xcodeProject::xcodeProject(const string & target)
 };
 
 bool xcodeProject::createProjectFile() {
+	// PROJECT_DEFINES is a makefile setting. Xcode needs each value copied
+	// into GCC_PREPROCESSOR_DEFINITIONS when the project is generated.
+	for (const auto & line : fileToStrings(projectDir / "config.make")) {
+		auto config = ofTrim(line);
+		if (config.empty() || config[0] == '#') continue;
+		auto eq = config.find('=');
+		if (eq == string::npos) continue;
+		auto variable = ofTrim(config.substr(0, eq));
+		bool append = !variable.empty() && variable.back() == '+';
+		if (!variable.empty() && (variable.back() == '+' || variable.back() == '?' || variable.back() == ':')) {
+			variable = ofTrim(variable.substr(0, variable.size() - 1));
+		}
+		if (variable != "PROJECT_DEFINES") continue;
+		if (!append) projectDefines.clear();
+		for (const auto & define : ofSplitString(ofTrim(config.substr(eq + 1)), " ", true, true)) {
+			addDefine(define);
+		}
+	}
+
 	fs::path xcodeProject = projectDir / (projectName + ".xcodeproj");
 	try {
 		fs::create_directories(xcodeProject);
@@ -789,6 +808,32 @@ void xcodeProject::addAddonSrcFiles(ofAddon & addon) {
 		} else {
 			addSrc(e, addon.filesToFolders.at(e));
 		}
+	}
+}
+
+// Files discovered under addon/libs are stored relative to OF, while Xcode
+// resolves local_addons file references from the project SOURCE_ROOT.
+void xcodeProject::addAddonCsrcFiles(ofAddon & addon) {
+	for (const auto & file : addon.csrcFiles) {
+		addSrc(makeRelative(projectDir, file), addon.filesToFolders.at(file), C);
+	}
+}
+
+void xcodeProject::addAddonCppsrcFiles(ofAddon & addon) {
+	for (const auto & file : addon.cppsrcFiles) {
+		addSrc(makeRelative(projectDir, file), addon.filesToFolders.at(file), CPP);
+	}
+}
+
+void xcodeProject::addAddonObjcsrcFiles(ofAddon & addon) {
+	for (const auto & file : addon.objcsrcFiles) {
+		addSrc(makeRelative(projectDir, file), addon.filesToFolders.at(file), OBJC);
+	}
+}
+
+void xcodeProject::addAddonHeadersrcFiles(ofAddon & addon) {
+	for (const auto & file : addon.headersrcFiles) {
+		addSrc(makeRelative(projectDir, file), addon.filesToFolders.at(file), HEADER);
 	}
 }
 
