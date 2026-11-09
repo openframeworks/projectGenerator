@@ -128,8 +128,8 @@ def exercise(pg, root, platform, legacy=False):
     # Actual addon resource generation must refresh when its config changes.
     addon = root / "addons/ofxPGResourceTest"
     (addon / "src").mkdir(parents=True, exist_ok=True)
-    (addon / "src/addon.xib").write_text('<document type="com.apple.InterfaceBuilder3.Cocoa.XIB"/>')
-    (addon / "addon_config.mk").write_text("meta:\n\tADDON_NAME = ofxPGResourceTest\ncommon:\n\tADDON_SOURCES = src/addon.xib\n")
+    (addon / "src/addon.xib").write_text('<document type="com.apple.InterfaceBuilder3.Cocoa.XIB"/>', encoding="utf-8")
+    (addon / "addon_config.mk").write_text("meta:\n\tADDON_NAME = ofxPGResourceTest\ncommon:\n\tADDON_SOURCES = src/addon.xib\n", encoding="utf-8")
     files = {"Artwork/macIcon.icns": b"custom icon bytes", "Artwork/preview.png": b"custom preview bytes",
              "src/sourceIcon.icns": b"custom source icon", "src/navigatorOnly.icns": b"not bundled",
              "Artwork/Assets.xcassets/Contents.json": b'{"info":{"version":1,"author":"xcode"}}',
@@ -145,7 +145,7 @@ def exercise(pg, root, platform, legacy=False):
         file.parent.mkdir(parents=True, exist_ok=True)
         file.write_bytes(contents)
     # Xcode's native save format must be preserved as input, not just PG's JSON.
-    pbx.write_text("// !$*UTF8*$!\n" + openstep(data) if sys.platform == "darwin" else json.dumps(data))
+    pbx.write_text("// !$*UTF8*$!\n" + openstep(data) if sys.platform == "darwin" else json.dumps(data), encoding="utf-8")
     if legacy:
         (project / ".ofprojectgenerator/apple-settings.json").unlink()
     # Start from the updated template, and force a UUID collision with a user's icon.
@@ -177,7 +177,7 @@ def exercise(pg, root, platform, legacy=False):
     upgraded = remap(upgraded)
     write_json(template, upgraded)
     run(pg, root, platform, project, "-aofxPGResourceTest")
-    assert "ofxPGResourceTest" in pbx.read_text() and "addon.xib" in pbx.read_text(), "fixture must include a generated addon resource"
+    assert "ofxPGResourceTest" in pbx.read_text(encoding="utf-8") and "addon.xib" in pbx.read_text(encoding="utf-8"), "fixture must include a generated addon resource"
 
     def check():
         updated = read_json(pbx)
@@ -241,7 +241,7 @@ def exercise(pg, root, platform, legacy=False):
     run(pg, root, platform, project, "-a")
     final = read_json(pbx)
     assert not any(node.get("path") == "macIcon.icns" for node in final["objects"].values()), "a user-removed icon must not return"
-    assert "ofxPGResourceTest" not in pbx.read_text(), "removed addon references must not be restored"
+    assert "ofxPGResourceTest" not in pbx.read_text(encoding="utf-8"), "removed addon references must not be restored"
     assert (project / "Artwork/macIcon.icns").read_bytes() == files["Artwork/macIcon.icns"]
     # Invalid resource baselines stop before template copies.
     state_file = project / ".ofprojectgenerator/apple-settings.json"
