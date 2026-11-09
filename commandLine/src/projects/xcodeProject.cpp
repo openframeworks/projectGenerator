@@ -1,4 +1,5 @@
 #include "xcodeProject.h"
+#include "XcodeSettings.h"
 #include "Utils.h"
 #include "ofUtils.h"
 #include <nlohmann/json.hpp>
@@ -13,6 +14,169 @@
 using nlohmann::json;
 
 string xcodeProject::LOG_NAME = "xcodeProjectFile";
+
+namespace {
+string readSettingsFile(const fs::path & path) {
+	std::ifstream in(path, std::ios::binary);
+	if (!in) throw std::runtime_error("cannot read " + path.string());
+	return string(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
+}
+
+void writeSettingsFile(const fs::path & path, const string & text) {
+	std::ofstream out(path, std::ios::binary);
+	if (!out || !(out << text)) throw std::runtime_error("cannot write " + path.string());
+}
+
+json targetAttributes(const json & project) {
+	json result = json::object();
+	const auto & objects = project.at("objects");
+	const auto & root = objects.at(project.at("rootObject").get<string>());
+	if (!root.contains("attributes") || !root["attributes"].contains("TargetAttributes")) return result;
+	for (auto it = root["attributes"]["TargetAttributes"].begin(); it != root["attributes"]["TargetAttributes"].end(); ++it) {
+		if (!objects.contains(it.key())) continue;
+		result[it.key()] = { { "scope", objects[it.key()].value("name", "") }, { "settings", *it } };
+	}
+	return result;
+}
+}
+
+bool xcodeProject::readAppleSettings() {
+	appleProject = json::object();
+	appleFiles = json::object();
+	appleDefaults = json::object();
+	nextAppleDefaults = json::object();
+	appleMinimums = json::object();
+	appleState = { { "format", 1 }, { "platforms", json::object() } };
+	try {
+		auto stateFile = projectDir / ".ofprojectgenerator" / "apple-settings.json";
+		if (fs::exists(stateFile.parent_path()) && !fs::is_directory(stateFile.parent_path())) {
+			throw std::runtime_error("settings baseline directory is a file: " + stateFile.parent_path().string());
+		}
+		if (fs::exists(stateFile)) {
+			appleState = json::parse(readSettingsFile(stateFile));
+			if (appleState.value("format", 0) != 1 || !appleState.at("platforms").is_object()) {
+				throw std::runtime_error("unsupported Apple settings baseline: " + stateFile.string());
+			}
+			appleDefaults = appleState["platforms"].value(target, json::object());
+			for (auto name : { "configurations", "targetAttributes" }) {
+				auto entries = appleDefaults.value(name, json::object());
+				if (!entries.is_object()) throw std::runtime_error("invalid Apple settings baseline");
+				for (auto & config : entries) {
+					if (!config.at("scope").is_string() || !config.at("settings").is_object()) throw std::runtime_error("invalid Apple settings baseline");
+				}
+			}
+			auto files = appleDefaults.value("files", json::object());
+			if (!files.is_object()) throw std::runtime_error("invalid Apple settings baseline files");
+			for (auto it = files.begin(); it != files.end(); ++it) {
+				if (it.key() != "Project.xcconfig") xcodeSettings::readPlist(it.value().get<string>());
+			}
+		}
+		xcodeSettings::configurations(xcodeSettings::readProject(readSettingsFile(templatePath / "emptyExample.xcodeproj/project.pbxproj")));
+		auto projectFile = projectDir / (projectName + ".xcodeproj") / "project.pbxproj";
+		if (fs::exists(projectFile)) {
+			appleProject = xcodeSettings::readProject(readSettingsFile(projectFile));
+			xcodeSettings::configurations(appleProject);
+			targetAttributes(appleProject);
+		}
+		for (auto name : { "Project.xcconfig", "openFrameworks-Info.plist", "of.entitlements", "ofxiOS-Info.plist" }) {
+			if (!fs::exists(templatePath / name)) continue;
+			if (string(name) != "Project.xcconfig") xcodeSettings::readPlist(readSettingsFile(templatePath / name));
+			if (!fs::exists(projectDir / name)) continue;
+			string text = readSettingsFile(projectDir / name);
+			// Validate before any template copy can replace a user's files.
+			if (string(name) != "Project.xcconfig") xcodeSettings::readPlist(text);
+			appleFiles[name] = text;
+		}
+		for (auto path : { getOFRoot() / "libs/openFrameworksCompiled/project" / target / "CoreOF.xcconfig", templatePath / "Project.xcconfig" }) {
+			if (!fs::exists(path)) continue;
+			for (auto & line : xcodeSettings::configLines(readSettingsFile(path))) {
+				if (!xcodeSettings::minimumSetting(line.key)) continue;
+				string name = xcodeSettings::settingName(line.key);
+				// Conditional SDK values are checked against their own template setting later.
+				if (name != line.key) continue;
+				appleMinimums[name] = appleMinimums.contains(name)
+					? xcodeSettings::requiredSetting(name, appleMinimums[name], line.value) : json(line.value);
+			}
+		}
+		if (!appleProject.empty() && appleDefaults.empty()) {
+			ofLogNotice() << "Apple settings: no previous template baseline; keeping existing values and adding new defaults";
+		}
+	} catch (const std::exception & e) {
+		ofLogError(LOG_NAME) << "Cannot preserve Apple settings; original settings kept: " << e.what();
+		return false;
+	}
+	return true;
+}
+
+void xcodeProject::mergeAppleSettings(json & project) {
+	auto fresh = xcodeSettings::configurations(project);
+	auto attributes = targetAttributes(project);
+	nextAppleDefaults["configurations"] = fresh;
+	nextAppleDefaults["targetAttributes"] = attributes;
+	if (appleProject.empty()) return;
+	auto previous = xcodeSettings::configurations(appleProject);
+	auto baseline = appleDefaults.value("configurations", json::object());
+	for (auto it = fresh.begin(); it != fresh.end(); ++it) {
+		auto user = xcodeSettings::matchingConfiguration(previous, it.key(), *it);
+		if (user.is_null()) continue;
+		auto base = xcodeSettings::matchingConfiguration(baseline, it.key(), *it);
+		if (base.is_null()) base = json::object();
+		auto merged = xcodeSettings::mergeBuildSettings(base, user, it->at("settings"), appleMinimums);
+		if (it->at("scope").get<string>().rfind("PBXNativeTarget/", 0) == 0) {
+			if (!appVersionOption.empty()) merged["MARKETING_VERSION"] = appVersion;
+			if (!appBuildOption.empty()) merged["CURRENT_PROJECT_VERSION"] = appBuild;
+			if (!appBundleIdOption.empty()) merged["PRODUCT_BUNDLE_IDENTIFIER"] = appBundleId;
+		}
+		project["objects"][it.key()]["buildSettings"] = merged;
+	}
+
+	auto userAttributes = targetAttributes(appleProject);
+	auto oldAttributes = appleDefaults.value("targetAttributes", json::object());
+	auto & root = project["objects"][project["rootObject"].get<string>()];
+	for (auto & targetId : root.value("targets", json::array())) {
+		string id = targetId;
+		json entry = { { "scope", project["objects"][id].value("name", "") } };
+		auto user = xcodeSettings::matchingConfiguration(userAttributes, id, entry);
+		if (user.is_null()) continue;
+		auto base = xcodeSettings::matchingConfiguration(oldAttributes, id, entry);
+		if (base.is_null()) base = json::object();
+		auto next = attributes.contains(id) ? attributes[id]["settings"] : json::object();
+		auto merged = xcodeSettings::merge(base, user, next);
+		for (auto key : { "CreatedOnToolsVersion", "LastSwiftMigration" }) {
+			if (next.contains(key)) merged[key] = next[key];
+			else merged.erase(key);
+		}
+		root["attributes"]["TargetAttributes"][id] = merged;
+	}
+}
+
+void xcodeProject::saveAppleSettings() {
+	json files = json::object();
+	std::map<fs::path, string> outputs;
+	for (auto name : { "Project.xcconfig", "openFrameworks-Info.plist", "of.entitlements", "ofxiOS-Info.plist" }) {
+		if (!fs::exists(templatePath / name) || !fs::exists(projectDir / name)) continue;
+		string fresh = readSettingsFile(projectDir / name);
+		// JSON stores a text baseline even when a template or user's plist is binary.
+		files[name] = string(name) == "Project.xcconfig" ? fresh : xcodeSettings::writePlist(xcodeSettings::readPlist(fresh));
+		if (!appleFiles.contains(name)) continue;
+		string user = appleFiles[name];
+		string base = appleDefaults.value("files", json::object()).value(name, "");
+		if (string(name) == "Project.xcconfig") outputs[projectDir / name] = xcodeSettings::mergeConfig(base, user, fresh, appleMinimums);
+		else {
+			auto previous = base.empty() ? json { { "type", "dict" }, { "value", json::object() } } : xcodeSettings::readPlist(base);
+			auto current = xcodeSettings::readPlist(user);
+			auto merged = xcodeSettings::mergePlist(previous, current, xcodeSettings::readPlist(fresh));
+			outputs[projectDir / name] = merged == current ? user : xcodeSettings::writePlist(merged);
+		}
+	}
+	nextAppleDefaults["files"] = files;
+	for (auto & output : outputs) writeSettingsFile(output.first, output.second);
+	if (!appVersionOption.empty() || !appBuildOption.empty()) saveAppVersionFiles();
+	if (!appBundleIdOption.empty()) saveAppBundleIdFiles();
+	appleState["platforms"][target] = nextAppleDefaults;
+	fs::create_directories(projectDir / ".ofprojectgenerator");
+	writeSettingsFile(projectDir / ".ofprojectgenerator" / "apple-settings.json", appleState.dump(1, '\t') + "\n");
+}
 
 xcodeProject::xcodeProject(const string & target)
 	: baseProject(target) {
@@ -71,8 +235,10 @@ xcodeProject::xcodeProject(const string & target)
 };
 
 bool xcodeProject::createProjectFile() {
+	if (!readAppleSettings()) return false;
 	// PROJECT_DEFINES is a makefile setting. Xcode needs each value copied
-	// into GCC_PREPROCESSOR_DEFINITIONS when the project is generated.
+	// into GCC_PREPROCESSOR_DEFINITIONS, after readTemplateUUIDs finds the current app targets.
+	savedMakeDefines.clear();
 	for (const auto & line : fileToStrings(projectDir / "config.make")) {
 		auto config = ofTrim(line);
 		if (config.empty() || config[0] == '#') continue;
@@ -84,9 +250,12 @@ bool xcodeProject::createProjectFile() {
 			variable = ofTrim(variable.substr(0, variable.size() - 1));
 		}
 		if (variable != "PROJECT_DEFINES") continue;
-		if (!append) projectDefines.clear();
+		if (!append) {
+			projectDefines.clear();
+			savedMakeDefines.clear();
+		}
 		for (const auto & define : ofSplitString(ofTrim(config.substr(eq + 1)), " ", true, true)) {
-			addDefine(define);
+			savedMakeDefines.push_back(define);
 		}
 	}
 
@@ -137,11 +306,13 @@ bool xcodeProject::createProjectFile() {
 	if (backupProjectFiles) {
 		createBackup({ xcodeProject / "project.pbxproj" }, projectDir);
 		createBackup({ projectDir / "openFrameworks-Info.plist" }, projectDir);
+		createBackup({ projectDir / "ofxiOS-Info.plist" }, projectDir);
 		createBackup({ projectDir / "Project.xcconfig" }, projectDir);
 		createBackup({ projectDir / "of.entitlements" }, projectDir);
 		createBackup({ projectDir / "addons.make" }, projectDir);
 		createBackup({ projectDir / "config.make" }, projectDir);
 		createBackup({ projectDir / "Makefile" }, projectDir);
+		createBackup({ projectDir / ".ofprojectgenerator" / "apple-settings.json" }, projectDir);
 	}
 
 	saveScheme();
@@ -153,7 +324,11 @@ bool xcodeProject::createProjectFile() {
 	// Execute all file copy and replacements, including ones in saveScheme, saveMakefile
 	for (auto & c : copyTemplateFiles) {
 		try {
-			c.run();
+			if (fs::exists(c.from) && (c.to.extension() == ".plist" || c.to.extension() == ".entitlements")) {
+				// update_existing can skip a newer user plist. Start from the actual template
+				// here; its validated original is in appleFiles and is merged back on save.
+				writeSettingsFile(c.to, readSettingsFile(c.from));
+			} else c.run();
 		} catch (const std::exception & e) {
 			std::cerr << "Error running copy template files: " << e.what() << std::endl;
 			return false;
@@ -327,6 +502,7 @@ void xcodeProject::readTemplateUUIDs() {
 
 bool xcodeProject::loadProjectFile() { //base
 	readTemplateUUIDs();
+	for (auto & define : savedMakeDefines) addDefine(define);
 
 	addCommand("# ---- PG VERSION " + getPGVersion());
 	addCommand("Add :_OFProjectGeneratorVersion string " + getPGVersion());
@@ -1205,6 +1381,12 @@ bool xcodeProject::saveProjectFile() {
 			ofLogError(xcodeProject::LOG_NAME) << "app version: " << e.what();
 		}
 
+		try {
+			mergeAppleSettings(j);
+		} catch (const std::exception & e) {
+			ofLogError(LOG_NAME) << "Cannot merge Apple settings: " << e.what();
+			return false;
+		}
 		std::ofstream jsonFile(fileName);
 
 		// This is not pretty but address some differences in nlohmann json 3.11.2 to 3.11.3
@@ -1223,6 +1405,12 @@ bool xcodeProject::saveProjectFile() {
 			return false;
 		}
 		jsonFile.close();
+		try {
+			saveAppleSettings();
+		} catch (const std::exception & e) {
+			ofLogError(LOG_NAME) << "Cannot save Apple settings: " << e.what();
+			return false;
+		}
 	}
 
 	//	for (auto & c : commands) cout << c << endl;

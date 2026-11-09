@@ -28,6 +28,36 @@ You can download packaged macOS and Windows builds here ( note Linux needs to be
 
 ---------------------------------------
 
+# Updating Apple projects
+
+Updating an `osx`, `macos` or `ios` project keeps user changes in `Project.xcconfig`,
+Info.plist, entitlements, and Xcode build settings, including Retina support, privacy
+descriptions, orientations, signing teams and capabilities. Nested plist dictionaries
+are merged; a changed array is retained as a whole.
+
+The generator records template defaults in `.ofprojectgenerator/apple-settings.json`.
+Keep this file with the project in version control: a later template upgrade can then
+refresh unchanged defaults while retaining your edits and deletions. The first update
+of a project without this file conservatively keeps existing values and adds missing
+defaults. It cannot distinguish an older template default from a user edit yet.
+
+OF paths, SDK/platform selection, generated addon flags and search paths still come
+from the current template and addon configuration. User additions to compile/link
+flags and search paths are carried across without retaining stale addon entries
+recorded in the previous baseline. Compiler language standards and
+deployment targets cannot be lowered below the current template/CoreOF minimums;
+higher user values remain. `config.make` and `App.xcconfig` also remain available
+for additional settings. Explicit `--app-version`, `--app-build` and `--bundle-id` options
+continue to override saved values.
+
+Custom schemes and additional targets are outside this settings merge; project
+structure and shared schemes are still regenerated. Invalid or unreadable settings
+stop the update before the template files are copied. OpenStep project files saved
+by Xcode and binary plists can be read on macOS; other hosts support JSON projects
+and XML plists and stop safely on unsupported formats.
+
+---------------------------------------
+
 # Build instructions with Bash Scripts 
 
 In the projectGenerator scripts folder run the scripts in order to setup environment and build

@@ -11,6 +11,7 @@
 #include <set>
 #include <string>
 #include <cstdlib>
+#include <stdexcept>
 
 enum optionIndex { UNKNOWN,
 	HELP,
@@ -289,7 +290,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 		project->setAppVersion(appVersion, appBuild);
 		project->setAppBundleId(appBundleId);
 		project->setSystemFrameworks(frameworks, bFrameworksPassedIn, systemLibs, bSystemLibsPassedIn);
-		project->create(path, templateName);
+		if (!project->create(path, templateName)) throw std::runtime_error("could not update project: " + path.string());
 
 		if (bConsiderParameterAddons && bAddonsPassedIn) {
 			for (auto & addon : addons) {
@@ -313,7 +314,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 		for (auto & srcPath : srcPaths) {
 			project->addSrcRecursively(srcPath);
 		}
-		project->save();
+		if (!project->save()) throw std::runtime_error("could not save project: " + path.string());
 	}
 }
 
@@ -939,7 +940,7 @@ int pgMain(int argc, char ** argv) {
 						project->setAppVersion(appVersion, appBuild);
 						project->setAppBundleId(appBundleId);
 						project->setSystemFrameworks(frameworks, bFrameworksPassedIn, systemLibs, bSystemLibsPassedIn);
-						project->create(projectPath, templateName);
+						if (!project->create(projectPath, templateName)) return EXIT_FAILURE;
 						if(bAddonsPassedIn){
 							for (auto & addon : addons) {
 								project->addAddon(addon);
@@ -960,7 +961,7 @@ int pgMain(int argc, char ** argv) {
 						for (auto & s : srcPaths) {
 							project->addSrcRecursively(s);
 						}
-						project->save();
+						if (!project->save()) return EXIT_FAILURE;
 					}
 					ofLogNotice() << "project created! ";
 					nProjectsCreated += 1;

@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <regex>
+#include <nlohmann/json.hpp>
 using std::string;
 
 class xcodeProject : public baseProject {
@@ -18,6 +19,11 @@ private:
 	bool loadProjectFile() override;
 	bool saveProjectFile() override;
 	void saveMakefile();
+	bool readAppleSettings();
+	void mergeAppleSettings(nlohmann::json & project);
+	void saveAppleSettings();
+	nlohmann::json appleProject, appleFiles, appleState, appleDefaults, nextAppleDefaults, appleMinimums;
+	std::vector<string> savedMakeDefines;
 	bool debugCommands = false;
 	bool bAddedDylibRunpath = false;
 
