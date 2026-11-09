@@ -1,0 +1,20 @@
+name: Release version policy
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  release-versions:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Check GUI and command-line versions
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: python3 scripts/check_release_versions.py "$BASE_SHA"
