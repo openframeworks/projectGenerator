@@ -29,8 +29,14 @@ jobs:
         run: |
           set -euo pipefail
 
-          if ! gh release view "$LATEST" --repo "$REPO" > /dev/null 2>&1; then
+          if ! asset_count=$(gh release view "$LATEST" --repo "$REPO" --json assets --jq '.assets | length'); then
             echo "no latest release yet (made by master builds) - keeping the current nightly"
+            exit 0
+          fi
+
+          # gh release download fails immediately when the release has no assets.
+          if [ "$asset_count" -eq 0 ]; then
+            echo "latest has no files - keeping the current nightly"
             exit 0
           fi
 
