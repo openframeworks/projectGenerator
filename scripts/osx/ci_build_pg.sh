@@ -62,7 +62,7 @@ package_app(){
     echo "-------------"
     echo "Copy cmdline PG from app contents (signed)"
     SOURCE_FILE="commandLine/bin/commandLine.app/Contents/MacOS/commandLine"
-    DEST_FILE="projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator"
+    DEST_FILE="projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app.asar.unpacked/app/projectGenerator"
 
     # Check if source file exists
     if [ ! -f "$SOURCE_FILE" ]; then
@@ -75,7 +75,7 @@ package_app(){
     # Check destination directory exists; if not, print error
     if [ ! -d "$(dirname "$DEST_FILE")" ]; then
         echo "Error: Destination directory does not exist: $(dirname "$DEST_FILE")"
-        ls -lah projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/
+        ls -lah projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app.asar.unpacked/app/
         exit 12
     fi
 
@@ -95,6 +95,8 @@ package_app(){
         echo "Error: File not found at destination: $DEST_FILE"
         exit 13
     fi
+
+    node "${PG_DIR}/scripts/test_asar_package.cjs" "${PG_DIR}/projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources"
 
     cd ${PG_DIR}
     echo "Current directory: (should be projectGenerator) $(pwd)"
@@ -146,7 +148,7 @@ sign_and_upload(){
     PLATFORM=$1
     # Copy commandLine into electron .app
     cd ${PG_DIR}
-    cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/app/projectGenerator 2> /dev/null
+    cp commandLine/bin/projectGenerator projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app.asar.unpacked/app/projectGenerator 2> /dev/null
 
     # sed -i -e "s/osx/$PLATFORM/g" projectGenerator-$PLATFORM/projectGenerator.app/Contents/Resources/app/settings.json
 

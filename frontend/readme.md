@@ -66,6 +66,7 @@ npm update
 
 ### Debugging
 You can open `settings.json` to enable some hidden settings, useful for debugging.  
+Packaged apps save it in Electron's user data directory: `~/Library/Application Support/projectGenerator` on macOS, `%APPDATA%/projectGenerator` on Windows, or `$XDG_CONFIG_HOME/projectGenerator` (usually `~/.config/projectGenerator`) on Linux. Development runs continue to use `frontend/settings.json`.
 Moreover, Electron uses Webkit so all the Webkit developper tools are available to you. ( `Cmd/Ctrl` + `Shift` + `i` from the Electron window.)  
 
  - Console messages from `index.js` show up in the terminal (where you did `npm start`).  

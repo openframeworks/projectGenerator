@@ -95,6 +95,7 @@ jobs:
           npm install
           npm update
           npm run dist:linux64
+          node ../scripts/test_asar_package.cjs dist/linux-unpacked/resources
           cd dist
           pwd
           ls
@@ -187,6 +188,7 @@ jobs:
           npm install
           npm update
           npm run dist:linux64
+          node ../scripts/test_asar_package.cjs dist/linux-unpacked/resources
 
       - name: Copy GUI tarball to root directory
         run: |
@@ -271,6 +273,7 @@ jobs:
           npm install
           npm update
           npm run dist:linux:arm64
+          node ../scripts/test_asar_package.cjs dist/linux-arm64-unpacked/resources
 
       - name: Copy GUI tarball to root directory
         run: |

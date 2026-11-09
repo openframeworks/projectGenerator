@@ -6,6 +6,7 @@ const process = require('process');
 const os = require("os");
 const { execFile, spawn } = require('child_process');
 const { readProjectSettings } = require('./project-settings');
+const { bundledGeneratorPath, settingsStore } = require('./packaged-paths');
 
 const {
     app,
@@ -204,9 +205,9 @@ console.log(`Detected platform: ${platformId}`);
 console.log(`Default template: ${defaultTemplate}`);
 
 
+const savedSettings = settingsStore(__dirname, app.getPath('userData'), app.isPackaged);
 try {
-    const settingsJsonString = fs.readFileSync(path.resolve(__dirname, 'settings.json'), 'utf-8');
-    settings = JSON.parse(settingsJsonString);
+    settings = savedSettings.read();
     console.log(settings);
 
     // older settings stored the template label (has spaces) instead of the platform id
@@ -1157,14 +1158,10 @@ ipcMain.on('getRandomSketchName', (event, projectPath) => {
 function getPgPath() {
     let pgApp = "";
     try {
-        if (hostplatform == "linux" || hostplatform == "linux64") { // ???: when appear there linux64?
+        if (!app.isPackaged && (hostplatform == "linux" || hostplatform == "linux64")) {
             pgApp = path.join(defaultOfPath, "apps/projectGenerator/commandLine/bin/projectGenerator");
         } else {
-            pgApp = path.normalize(path.join(__dirname, "app", "projectGenerator"));
-        }
-
-        if (hostplatform == "windows") {
-            pgApp += ".exe";
+            pgApp = bundledGeneratorPath(__dirname);
         }
     } catch (error) {
         console.error("Error determining project generator path:", error);
@@ -2465,7 +2462,7 @@ ipcMain.on('saveDefaultSettings', (event, defaultSettings) => {
     // fs.writeFile is async and would resolve after that, so a quit right after e.g.
     // picking a new OF path could race past the actual disk write and lose it (#602)
     try {
-        fs.writeFileSync(path.resolve(__dirname, 'settings.json'), defaultSettings);
+        savedSettings.write(defaultSettings);
         event.returnValue = "Updated default settings for the PG. (written to settings.json)";
     } catch (err) {
         event.returnValue = "Unable to save defaultSettings to settings.json... (Error=" + err.code + ")";
