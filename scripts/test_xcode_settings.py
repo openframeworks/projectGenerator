@@ -160,6 +160,8 @@ def exercise(pg, root, platform):
     if (project / "of.entitlements").exists():
         entitlements = read_plist(project / "of.entitlements")
         entitlements["com.apple.security.application-groups"] = ["group.my.installation"]
+        entitlements["com.apple.security.app-sandbox"] = False
+        entitlements["com.apple.security.network.client"] = True
         write_plist(project / "of.entitlements", entitlements)
 
     defaults["PGTemplateDefault"] = "after"
@@ -245,7 +247,10 @@ def exercise(pg, root, platform):
     for target_id in native_targets[1:]:
         assert "usr/lib/libsqlite3.tbd" not in linked_sdk(updated_project, target_id), "per-target libraries must not leak to other targets"
     if (project / "of.entitlements").exists():
-        assert read_plist(project / "of.entitlements")["com.apple.security.application-groups"] == ["group.my.installation"]
+        entitlements = read_plist(project / "of.entitlements")
+        assert entitlements["com.apple.security.application-groups"] == ["group.my.installation"]
+        assert entitlements["com.apple.security.app-sandbox"] is False
+        assert entitlements["com.apple.security.network.client"] is True
 
     addon_config.write_text(addon_config.read_text().replace("PG_ADDON_BEFORE", "PG_ADDON_AFTER"))
     run(pg, root, platform, project)

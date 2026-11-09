@@ -2,6 +2,7 @@
 """End-to-end Xcode resource updates, including user edits made by Xcode."""
 import json
 import pathlib
+import plistlib
 import shutil
 import sys
 import tempfile
@@ -102,6 +103,7 @@ def exercise(pg, root, platform, legacy=False):
     catalog = add_file(data, artwork, "Assets.xcassets", "folder.assetcatalog")
     navigator = add_file(data, virtual, "preview.png", "image.png")
     folder = add_file(data, artwork, "Presets", "folder")
+    add_file(data, artwork, "App.entitlements", "text.plist.entitlements")
     src_icon = add_file(data, artwork, "src/sourceIcon.icns", "image.icns", "SOURCE_ROOT")
     add_file(data, artwork, "src/navigatorOnly.icns", "image.icns", "SOURCE_ROOT")
     localized = uid()
@@ -111,6 +113,8 @@ def exercise(pg, root, platform, legacy=False):
     add_file(data, localized, "fr.lproj/Localizable.strings", "text.plist.strings")
     first = next(iter(targets(data)))
     target = objects[first]
+    for config_id in objects[target["buildConfigurationList"]]["buildConfigurations"]:
+        objects[config_id].setdefault("buildSettings", {})["CODE_SIGN_ENTITLEMENTS"] = "Artwork/App.entitlements"
     objects[template_variant]["children"].remove(template_english)
     del objects[template_english]
     add_file(data, template_variant, "fr.lproj/Template.strings", "text.plist.strings")
@@ -134,6 +138,8 @@ def exercise(pg, root, platform, legacy=False):
              "Artwork/en.lproj/Localizable.strings": b'"title" = "My app";',
              "Artwork/fr.lproj/Localizable.strings": b'"title" = "Mon app";'}
     files["fr.lproj/Template.strings"] = b'"title" = "Mon template";'
+    files["Artwork/App.entitlements"] = plistlib.dumps({"com.apple.security.app-sandbox": True,
+        "com.apple.security.network.client": True, "com.apple.security.application-groups": ["group.my.custom.app"]})
     for name, contents in files.items():
         file = project / name
         file.parent.mkdir(parents=True, exist_ok=True)
@@ -191,6 +197,9 @@ def exercise(pg, root, platform, legacy=False):
         assert extra[0][1]["platformFilters"] == ["ios", "macos"]
         refs = [node for node in updated["objects"].values() if node.get("isa") == "PBXFileReference"]
         assert any(node.get("path") == "preview.png" for node in refs), "navigator-only resources must remain"
+        assert any(node.get("path") == "App.entitlements" for node in refs), "custom entitlement file references must remain"
+        for config_id in updated["objects"][first_target["buildConfigurationList"]]["buildConfigurations"]:
+            assert updated["objects"][config_id]["buildSettings"]["CODE_SIGN_ENTITLEMENTS"] == "Artwork/App.entitlements"
         assert any(node.get("path") == "en.lproj/Localizable.strings" for node in refs)
         assert any(node.get("path") == "fr.lproj/Localizable.strings" for node in refs)
         assert any(node.get("path") == "fr.lproj/Template.strings" for node in refs)
@@ -285,6 +294,17 @@ def main():
             exercise(pg, root, platform)
             exercise(pg, root, platform, legacy=True)
             generated_resources(pg, root, platform)
+        if sys.platform != "win32":
+            # POSIX permits these literal characters, reproducing JSON escaping
+            # failures without needing a Windows host for the regression test.
+            escaped_root = pathlib.Path(directory) / 'OF "quoted" root\\resources'
+            for folder in ("apps", "addons", "libs/openFrameworks"):
+                (escaped_root / folder).mkdir(parents=True)
+            shutil.copytree(source / "scripts/templates", escaped_root / "scripts/templates")
+            shutil.copytree(source / "libs/openFrameworksCompiled/project", escaped_root / "libs/openFrameworksCompiled/project")
+            shutil.copytree(root / "addons/ofxPGResourceTest", escaped_root / "addons/ofxPGResourceTest")
+            generated_resources(pg, escaped_root, "osx")
+            print("ok JSON template substitutions with quotes, spaces and literal backslashes", flush=True)
     print("Xcode resource preservation tests passed")
 
 

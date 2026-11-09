@@ -453,14 +453,20 @@ bool xcodeProject::createProjectFile() {
 	// FIXME: rootReplacements can be empty.
 	// if project is outside OF, rootReplacements is set to be used in XCode and make
 	if (!fs::equivalent(getOFRoot(), normalizePath(fs::path { "../../.." }))) {
-		string root { ofPathToString(getOFRoot()) };
+		string root { getOFRoot().generic_string() };
 		rootReplacements = { "../../..", root };
 	}
+	// Template substitutions occur inside JSON strings. Native Windows separators
+	// and quotes in names must be escaped before readTemplateUUIDs parses the copy.
+	auto jsonText = [](const string & text) {
+		auto quoted = json(text).dump();
+		return quoted.substr(1, quoted.size() - 2);
+	};
 
 	copyTemplateFiles.push_back({ normalizePath(templatePath / "emptyExample.xcodeproj" / "project.pbxproj"),
 		normalizePath(xcodeProject / "project.pbxproj"),
-		{ { "emptyExample", projectName },
-			rootReplacements } });
+		{ { "emptyExample", jsonText(projectName) },
+			{ rootReplacements.first, jsonText(rootReplacements.second) } } });
 
 	copyTemplateFiles.push_back({ normalizePath(templatePath / "Project.xcconfig"),
 		normalizePath(projectDir / "Project.xcconfig"),
