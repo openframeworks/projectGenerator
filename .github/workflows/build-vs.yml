@@ -84,6 +84,10 @@ jobs:
         run: 
           ../openFrameworks/apps/projectGenerator/scripts/vs/test_cmdline.sh
 
+      - name: Test existing-project GUI settings and update arguments
+        shell: pwsh
+        run: node --test ../openFrameworks/apps/projectGenerator/scripts/test_gui_project_settings.cjs
+
       - name: Build emptyExample and allAddonsExample
         if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master'
         shell: bash

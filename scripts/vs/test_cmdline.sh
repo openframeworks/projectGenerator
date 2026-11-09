@@ -99,7 +99,4 @@ fi
 echo "Test command line arguments"
 "${CURRENT_DIR}/../test_cmdline_args.sh" ./"${EXE_FILE}" ../openFrameworks vs || exit 1
 
-echo "Test existing-project GUI settings and update arguments"
-node --test "${CURRENT_DIR}/../test_gui_project_settings.cjs" || exit 1
-
 echo "Successful projectGenerator tests for [vs]"
