@@ -20,11 +20,29 @@ private:
 	bool loadProjectFile() override;
 	bool saveProjectFile() override;
 	void saveMakefile();
+	// drop template PBXFileReference entries under src/ whose file is missing on disk
+	// (ofxMultiplatform / addon examples that put main/ofApp in a subfolder of src/)
+	void removeDeadSrcReferences(nlohmann::json & project);
+	// snapshot per-file PBXBuildFile.settings (COMPILER_FLAGS like -fno-objc-arc, ATTRIBUTES, ...) from
+	// the previous pbxproj so that regenerating the project does not wipe them.
+	void snapshotFileSettings();
+	// re-apply those per-file settings on the freshly generated PBXBuildFile entries.
+	void restoreFileSettings(nlohmann::json & project);
+	// snapshot user-added Run Script phases (PBXShellScriptBuildPhase) that aren't in the template —
+	// Xcode users attach these via Editor → Add Build Phase → New Run Script Phase and lose them
+	// when the template pbxproj is copied over on regen.
+	void snapshotShellScriptPhases();
+	// re-attach those phases to their original target (matched by name) in the fresh project.
+	void restoreShellScriptPhases(nlohmann::json & project);
 	bool readAppleSettings();
 	void mergeAppleSettings(nlohmann::json & project);
 	void mergeSystemReferences(nlohmann::json & project);
 	void saveAppleSettings();
 	nlohmann::json appleProject, appleFiles, appleState, appleDefaults, nextAppleDefaults, appleMinimums;
+	// per-file settings carried across regens (key: resolved relative path like "src/Apps/ofApp.cpp").
+	std::map<std::string, nlohmann::json> appleFileSettings;
+	// user-added Run Script phases carried across regens; each entry: { targetName, phase (raw PBXShellScriptBuildPhase json) }.
+	std::vector<nlohmann::json> appleShellScriptPhases;
 	std::set<string> appleSDKKeys;
 	std::vector<string> savedMakeDefines;
 	bool debugCommands = false;
