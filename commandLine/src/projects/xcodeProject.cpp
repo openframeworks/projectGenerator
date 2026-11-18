@@ -104,6 +104,47 @@ bool installedSDKItem(const string & key) {
 	return false;
 }
 
+// child-UUID -> parent-group-UUID over every PBXGroup in `objects`. Used by resolveRefPath to
+// turn a <group>-relative PBXFileReference back into a SOURCE_ROOT path.
+std::map<string, string> parentGroupMap(const json & objects) {
+	std::map<string, string> parentOf;
+	for (auto it = objects.begin(); it != objects.end(); ++it) {
+		if (!it.value().is_object()) continue;
+		if (it.value().value("isa", "") != "PBXGroup") continue;
+		if (!it.value().contains("children") || !it.value()["children"].is_array()) continue;
+		for (auto & c : it.value()["children"]) {
+			if (c.is_string()) parentOf[c.get<string>()] = it.key();
+		}
+	}
+	return parentOf;
+}
+
+// Resolve a PBXFileReference's path by walking <group> parents up to SOURCE_ROOT.
+// Returns an empty path for refs rooted at SDKROOT / DEVELOPER_DIR / BUILT_PRODUCTS_DIR / etc.
+fs::path resolveRefPath(const json & objects, const std::map<string, string> & parentOf, const string & refUUID) {
+	if (!objects.contains(refUUID)) return {};
+	const auto & ref = objects.at(refUUID);
+	fs::path accumulated = ref.value("path", "");
+	string sourceTree = ref.value("sourceTree", "<group>");
+	if (sourceTree == "SOURCE_ROOT") return accumulated;
+	if (sourceTree != "<group>") return {};
+	string cur = refUUID;
+	for (int depth = 0; depth < 32; ++depth) { // safety cap in case of a cycle
+		auto p = parentOf.find(cur);
+		if (p == parentOf.end()) break;
+		const string & parentUUID = p->second;
+		if (!objects.contains(parentUUID)) break;
+		const auto & g = objects.at(parentUUID);
+		string gPath = g.value("path", "");
+		string gTree = g.value("sourceTree", "<group>");
+		if (!gPath.empty()) accumulated = fs::path(gPath) / accumulated;
+		if (gTree == "SOURCE_ROOT") return accumulated;
+		if (gTree != "<group>") return {};
+		cur = parentUUID;
+	}
+	return accumulated;
+}
+
 json withoutSystemLinks(const json & value, bool frameworks, bool libs, const std::set<string> & known) {
 	json kept = json::array();
 	for (auto & unit : xcodeSettings::flagUnits("OTHER_LDFLAGS", value)) {
@@ -167,6 +208,8 @@ bool xcodeProject::readAppleSettings() {
 			xcodeSettings::configurations(appleProject);
 			targetAttributes(appleProject);
 			xcodeResources::snapshot(appleProject);
+			snapshotFileSettings();
+			snapshotShellScriptPhases();
 		}
 		for (auto name : { "Project.xcconfig", "openFrameworks-Info.plist", "of.entitlements", "ofxiOS-Info.plist" }) {
 			if (!fs::exists(templatePath / name)) continue;
@@ -1403,6 +1446,265 @@ void xcodeProject::addCommand(const string & command) {
 	commands.emplace_back(command);
 }
 
+void xcodeProject::removeDeadSrcReferences(json & project) {
+	if (!project.is_object() || !project.contains("objects")) return;
+	auto & objects = project["objects"];
+	if (!objects.is_object()) return;
+
+	auto parentOf = parentGroupMap(objects);
+
+	// Collect basenames of every file that actually exists under projectDir/src/ (any depth).
+	// We only remove a top-level template placeholder (src/<basename>) when the user's project
+	// has a replacement with the same basename in a subfolder — the ofxMultiplatform pattern
+	// (src/iOS/main.mm, src/Apps/ofApp.cpp). If nothing matches, the placeholder is kept so a
+	// project with no main / no ofApp still has a visible entry point in the sidebar.
+	std::set<string> srcBasenames;
+	fs::path srcRoot = projectDir / "src";
+	if (fs::exists(srcRoot) && fs::is_directory(srcRoot)) {
+		std::error_code ec;
+		for (auto it = fs::recursive_directory_iterator(srcRoot, fs::directory_options::skip_permission_denied, ec);
+			 it != fs::recursive_directory_iterator(); it.increment(ec)) {
+			if (ec) { ec.clear(); continue; }
+			if (!it->is_regular_file(ec)) continue;
+			srcBasenames.insert(it->path().filename().string());
+		}
+	}
+
+	std::set<string> deadRefUUIDs;
+	for (auto it = objects.begin(); it != objects.end(); ++it) {
+		if (!it.value().is_object()) continue;
+		if (it.value().value("isa", "") != "PBXFileReference") continue;
+		string sourceTree = it.value().value("sourceTree", "<group>");
+		if (sourceTree != "SOURCE_ROOT" && sourceTree != "<group>") continue;
+		fs::path resolved = resolveRefPath(objects, parentOf, it.key());
+		string resolvedStr = resolved.generic_string();
+		// only src/* files (not bin/*, not root-level plists) — baseProject enumerates src/ itself
+		if (resolvedStr.rfind("src/", 0) != 0) continue;
+		if (fs::exists(projectDir / resolved)) continue;
+
+		// Depth 1 (src/<basename>) is where the template places its main / ofApp placeholders.
+		// Keep that dead ref unless a same-named file was found elsewhere under src/ (the
+		// "sources were moved into a subfolder" case). Deeper dead refs (src/sub/.../file)
+		// are prior-regen leftovers from user additions that have since been deleted — drop
+		// those unconditionally, they can't be anything but orphans.
+		auto depth = std::distance(resolved.begin(), resolved.end());
+		if (depth == 2) { // "src" / "<basename>"
+			string basename = resolved.filename().string();
+			if (!srcBasenames.count(basename)) {
+				ofLogVerbose(LOG_NAME) << "keeping dead template placeholder " << resolvedStr
+					<< " — no replacement with that basename found under src/";
+				continue;
+			}
+		}
+		deadRefUUIDs.insert(it.key());
+	}
+
+	if (deadRefUUIDs.empty()) return;
+
+	std::set<string> deadBuildUUIDs;
+	for (auto it = objects.begin(); it != objects.end(); ++it) {
+		if (!it.value().is_object()) continue;
+		if (it.value().value("isa", "") != "PBXBuildFile") continue;
+		string refUUID = it.value().value("fileRef", "");
+		if (deadRefUUIDs.count(refUUID)) deadBuildUUIDs.insert(it.key());
+	}
+
+	auto scrubArray = [](json & arr, const std::set<string> & toRemove) {
+		if (!arr.is_array()) return;
+		json kept = json::array();
+		for (auto & e : arr) {
+			if (e.is_string() && toRemove.count(e.get<string>())) continue;
+			kept.push_back(e);
+		}
+		arr = std::move(kept);
+	};
+
+	for (auto it = objects.begin(); it != objects.end(); ++it) {
+		if (!it.value().is_object()) continue;
+		string isa = it.value().value("isa", "");
+		if (isa == "PBXGroup" && it.value().contains("children")) {
+			scrubArray(it.value()["children"], deadRefUUIDs);
+		} else if (isa.find("BuildPhase") != string::npos && it.value().contains("files")) {
+			scrubArray(it.value()["files"], deadBuildUUIDs);
+		}
+	}
+
+	for (auto & u : deadRefUUIDs) objects.erase(u);
+	for (auto & u : deadBuildUUIDs) objects.erase(u);
+
+	ofLogNotice(LOG_NAME) << "removed " << deadRefUUIDs.size()
+		<< " dead src/* template file reference(s) (sources live in a src/ subfolder)";
+}
+
+// Walk the pre-regen pbxproj (appleProject, populated by readAppleSettings) and remember any
+// PBXBuildFile.settings keyed by the resolved file path. These carry per-file compiler flags
+// like -fno-objc-arc (COMPILER_FLAGS), header visibility (ATTRIBUTES), etc. - anything the
+// user set in Xcode's File Inspector that would otherwise be wiped when the template pbxproj
+// is copied over.
+void xcodeProject::snapshotFileSettings() {
+	appleFileSettings.clear();
+	if (appleProject.empty() || !appleProject.is_object() || !appleProject.contains("objects")) return;
+	const auto & objects = appleProject.at("objects");
+	if (!objects.is_object()) return;
+	auto parentOf = parentGroupMap(objects);
+	for (auto it = objects.begin(); it != objects.end(); ++it) {
+		if (!it.value().is_object()) continue;
+		if (it.value().value("isa", "") != "PBXBuildFile") continue;
+		if (!it.value().contains("settings")) continue;
+		const auto & settings = it.value().at("settings");
+		if (!settings.is_object() || settings.empty()) continue;
+		string refUUID = it.value().value("fileRef", "");
+		if (refUUID.empty()) continue;
+		fs::path resolved = resolveRefPath(objects, parentOf, refUUID);
+		string key = resolved.generic_string();
+		if (key.empty()) continue;
+		// prefer the first non-empty snapshot for a given path (multi-target templates have
+		// one PBXBuildFile per target; the user usually sets flags once and it propagates).
+		if (!appleFileSettings.count(key)) appleFileSettings[key] = settings;
+	}
+	if (!appleFileSettings.empty()) {
+		ofLogVerbose(LOG_NAME) << "snapshot per-file settings for " << appleFileSettings.size() << " file(s)";
+	}
+}
+
+// Re-apply the snapshotted per-file settings on the freshly generated PBXBuildFile entries.
+// The new pbxproj has new UUIDs (generateUUID is random), so we match by resolved file path.
+void xcodeProject::restoreFileSettings(json & project) {
+	if (appleFileSettings.empty()) return;
+	if (!project.is_object() || !project.contains("objects")) return;
+	auto & objects = project["objects"];
+	if (!objects.is_object()) return;
+	auto parentOf = parentGroupMap(objects);
+	int restored = 0;
+	for (auto it = objects.begin(); it != objects.end(); ++it) {
+		if (!it.value().is_object()) continue;
+		if (it.value().value("isa", "") != "PBXBuildFile") continue;
+		string refUUID = it.value().value("fileRef", "");
+		if (refUUID.empty()) continue;
+		fs::path resolved = resolveRefPath(objects, parentOf, refUUID);
+		string key = resolved.generic_string();
+		if (key.empty()) continue;
+		auto found = appleFileSettings.find(key);
+		if (found == appleFileSettings.end()) continue;
+		// Merge: the generator may have set its own settings (e.g. ATTRIBUTES CodeSignOnCopy on
+		// framework copies). Preserve those and overlay the user's snapshot on top so a user's
+		// COMPILER_FLAGS wins against the fresh defaults.
+		json merged = it.value().value("settings", json::object());
+		if (!merged.is_object()) merged = json::object();
+		for (auto s = found->second.begin(); s != found->second.end(); ++s) {
+			merged[s.key()] = s.value();
+		}
+		it.value()["settings"] = merged;
+		++restored;
+	}
+	if (restored) {
+		ofLogNotice(LOG_NAME) << "restored per-file compiler settings on " << restored
+			<< " build file(s) (e.g. -fno-objc-arc via COMPILER_FLAGS)";
+	}
+}
+
+// Walk the pre-regen pbxproj and remember any PBXShellScriptBuildPhase that isn't shipped by the
+// template — this is the user's own Run Script (Editor → Add Build Phase → New Run Script Phase).
+// They'd otherwise disappear when createProjectFile overwrites the pbxproj with the template.
+// Addon-added scripts (addAfterRule) are filtered out at restore time by signature match.
+void xcodeProject::snapshotShellScriptPhases() {
+	appleShellScriptPhases.clear();
+	if (appleProject.empty() || !appleProject.is_object() || !appleProject.contains("objects")) return;
+
+	// (name, shellScript) pairs shipped by the current template — anything matching stays owned by
+	// the template, not the user.
+	std::set<string> templateSigs;
+	try {
+		auto tmpl = xcodeSettings::readProject(readSettingsFile(templatePath / "emptyExample.xcodeproj/project.pbxproj"));
+		if (tmpl.is_object() && tmpl.contains("objects") && tmpl.at("objects").is_object()) {
+			for (auto it = tmpl.at("objects").begin(); it != tmpl.at("objects").end(); ++it) {
+				if (!it.value().is_object()) continue;
+				if (it.value().value("isa", "") != "PBXShellScriptBuildPhase") continue;
+				templateSigs.insert(it.value().value("name", "") + '\x1f' + it.value().value("shellScript", ""));
+			}
+		}
+	} catch (const std::exception & e) {
+		ofLogVerbose(LOG_NAME) << "snapshotShellScriptPhases: cannot read template for filtering: " << e.what();
+	}
+
+	const auto & objects = appleProject.at("objects");
+	if (!appleProject.contains("rootObject")) return;
+	string rootId = appleProject.at("rootObject").get<string>();
+	if (!objects.contains(rootId)) return;
+	const auto & root = objects.at(rootId);
+
+	for (auto & targetId : root.value("targets", json::array())) {
+		if (!targetId.is_string() || !objects.contains(targetId.get<string>())) continue;
+		const auto & target = objects.at(targetId.get<string>());
+		if (!target.is_object() || target.value("isa", "") != "PBXNativeTarget") continue;
+		string targetName = target.value("name", "");
+		for (auto & phaseId : target.value("buildPhases", json::array())) {
+			if (!phaseId.is_string() || !objects.contains(phaseId.get<string>())) continue;
+			const auto & phase = objects.at(phaseId.get<string>());
+			if (!phase.is_object() || phase.value("isa", "") != "PBXShellScriptBuildPhase") continue;
+			string sig = phase.value("name", "") + '\x1f' + phase.value("shellScript", "");
+			if (templateSigs.count(sig)) continue; // shipped by template, not user-owned
+			appleShellScriptPhases.push_back({ { "targetName", targetName }, { "phase", phase } });
+		}
+	}
+	if (!appleShellScriptPhases.empty()) {
+		ofLogVerbose(LOG_NAME) << "snapshot " << appleShellScriptPhases.size() << " custom Run Script phase(s)";
+	}
+}
+
+// Re-attach snapshotted user Run Script phases to the matching target in the freshly generated
+// project. Phases already re-added by addon processing (same name + shellScript) are skipped.
+void xcodeProject::restoreShellScriptPhases(json & project) {
+	if (appleShellScriptPhases.empty()) return;
+	if (!project.is_object() || !project.contains("objects") || !project.contains("rootObject")) return;
+	auto & objects = project["objects"];
+	if (!objects.is_object()) return;
+	string rootId = project.at("rootObject").get<string>();
+	if (!objects.contains(rootId)) return;
+	const auto & root = objects.at(rootId);
+
+	// index current targets by name + build existing shell-script signatures to avoid dupes
+	std::map<string, string> targetUUIDByName;
+	std::map<string, std::set<string>> existingByTarget;
+	for (auto & targetId : root.value("targets", json::array())) {
+		if (!targetId.is_string() || !objects.contains(targetId.get<string>())) continue;
+		string tid = targetId.get<string>();
+		auto & target = objects[tid];
+		if (!target.is_object() || target.value("isa", "") != "PBXNativeTarget") continue;
+		string tname = target.value("name", "");
+		targetUUIDByName[tname] = tid;
+		for (auto & phaseId : target.value("buildPhases", json::array())) {
+			if (!phaseId.is_string() || !objects.contains(phaseId.get<string>())) continue;
+			const auto & phase = objects.at(phaseId.get<string>());
+			if (!phase.is_object() || phase.value("isa", "") != "PBXShellScriptBuildPhase") continue;
+			existingByTarget[tname].insert(phase.value("name", "") + '\x1f' + phase.value("shellScript", ""));
+		}
+	}
+
+	int restored = 0;
+	for (size_t i = 0; i < appleShellScriptPhases.size(); ++i) {
+		const auto & entry = appleShellScriptPhases[i];
+		string tname = entry.value("targetName", "");
+		const auto & phase = entry.at("phase");
+		string sig = phase.value("name", "") + '\x1f' + phase.value("shellScript", "");
+		if (existingByTarget[tname].count(sig)) continue; // addon script re-added, or template dup
+		auto tit = targetUUIDByName.find(tname);
+		if (tit == targetUUIDByName.end()) {
+			ofLogWarning(LOG_NAME) << "restoreShellScriptPhases: target '" << tname
+				<< "' no longer exists, dropping Run Script '" << phase.value("name", "") << "'";
+			continue;
+		}
+		string phaseUUID = generateUUID(string("preserved-shell-") + tname + "-" + std::to_string(i));
+		objects[phaseUUID] = phase;
+		objects[tit->second]["buildPhases"].push_back(phaseUUID);
+		existingByTarget[tname].insert(sig);
+		++restored;
+	}
+	if (restored) {
+		ofLogNotice(LOG_NAME) << "restored " << restored << " custom Run Script build phase(s)";
+	}
+}
+
 bool xcodeProject::saveProjectFile() {
 
 	//	debugCommands = true;
@@ -1456,6 +1758,12 @@ bool xcodeProject::saveProjectFile() {
 		}
 
 		contents.close();
+
+		try {
+			removeDeadSrcReferences(j);
+		} catch (const std::exception & e) {
+			ofLogWarning(LOG_NAME) << "removeDeadSrcReferences: " << e.what();
+		}
 
 		for (auto & c : commands) {
 			//			alert (c, 31);
@@ -1578,6 +1886,16 @@ bool xcodeProject::saveProjectFile() {
 		} catch (const std::exception & e) {
 			ofLogError(LOG_NAME) << "Cannot merge Apple settings: " << e.what();
 			return false;
+		}
+		try {
+			restoreFileSettings(j);
+		} catch (const std::exception & e) {
+			ofLogWarning(LOG_NAME) << "restoreFileSettings: " << e.what();
+		}
+		try {
+			restoreShellScriptPhases(j);
+		} catch (const std::exception & e) {
+			ofLogWarning(LOG_NAME) << "restoreShellScriptPhases: " << e.what();
 		}
 		std::ofstream jsonFile(fileName);
 
