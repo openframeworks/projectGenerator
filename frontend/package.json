@@ -1,7 +1,7 @@
 {
   "name": "projectGenerator",
   "productName": "projectGenerator",
-  "version": "0.122.0",
+  "version": "0.123.0",
   "description": "Build electron GUI openFrameworks projectGenerator",
   "license": "MIT",
   "main": "index.js",
@@ -58,7 +58,8 @@
     },
     "linux": {
       "icon": "static/icon",
-      "target": "tar.gz"
+      "target": "tar.gz",
+      "executableName": "projectGenerator"
     },
     "files": [
       "index.html",
