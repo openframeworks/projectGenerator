@@ -145,6 +145,89 @@ fs::path resolveRefPath(const json & objects, const std::map<string, string> & p
 	return accumulated;
 }
 
+// Folder-reference assets (Assets.xcassets, mediaAssets) ship in templates and get copied into new
+// projects. Once copied, users customize them — add their own icons, imagesets, media files — and
+// a naive copy on every regen would wipe that. We decide per-folder using a three-state rule:
+//   CopyFresh    destination is missing, copy it in.
+//   CopyRefresh  destination exists and is byte-identical to the template, refresh in place so a
+//                template bugfix (e.g. new default icon) reaches projects that never got touched.
+//   KeepCustom   destination differs from the template in any way (added/removed/edited file),
+//                leave it alone — all-or-nothing, never merge.
+// .DS_Store and other dot-files are ignored on both sides.
+enum class folderUpdateDecision { CopyFresh, CopyRefresh, KeepCustom };
+
+bool isIgnoredAssetEntry(const fs::path & p) {
+	const string name = p.filename().string();
+	return !name.empty() && name.front() == '.';
+}
+
+std::set<string> collectRelativeFiles(const fs::path & root) {
+	std::set<string> files;
+	if (!fs::exists(root) || !fs::is_directory(root)) return files;
+	for (auto it = fs::recursive_directory_iterator(root); it != fs::recursive_directory_iterator(); ++it) {
+		const auto & entry = *it;
+		if (isIgnoredAssetEntry(entry.path())) {
+			if (entry.is_directory()) it.disable_recursion_pending();
+			continue;
+		}
+		if (entry.is_regular_file()) {
+			files.insert(fs::relative(entry.path(), root).generic_string());
+		}
+	}
+	return files;
+}
+
+bool filesByteIdentical(const fs::path & a, const fs::path & b) {
+	std::error_code ec;
+	auto sa = fs::file_size(a, ec); if (ec) return false;
+	auto sb = fs::file_size(b, ec); if (ec) return false;
+	if (sa != sb) return false;
+	std::ifstream fa(a, std::ios::binary);
+	std::ifstream fb(b, std::ios::binary);
+	if (!fa || !fb) return false;
+	constexpr size_t BUF = 64 * 1024;
+	std::vector<char> ba(BUF), bb(BUF);
+	while (fa && fb) {
+		fa.read(ba.data(), BUF);
+		fb.read(bb.data(), BUF);
+		auto na = fa.gcount(); auto nb = fb.gcount();
+		if (na != nb) return false;
+		if (na == 0) break;
+		if (!std::equal(ba.begin(), ba.begin() + na, bb.begin())) return false;
+	}
+	return !fa.bad() && !fb.bad();
+}
+
+folderUpdateDecision decideFolderUpdate(const fs::path & from, const fs::path & to) {
+	if (!fs::exists(to)) return folderUpdateDecision::CopyFresh;
+	auto fromFiles = collectRelativeFiles(from);
+	auto toFiles = collectRelativeFiles(to);
+	if (fromFiles != toFiles) return folderUpdateDecision::KeepCustom;
+	for (const auto & rel : fromFiles) {
+		if (!filesByteIdentical(from / rel, to / rel)) return folderUpdateDecision::KeepCustom;
+	}
+	return folderUpdateDecision::CopyRefresh;
+}
+
+// Returns true iff anything was copied; false means destination was either kept as a user
+// customization or the source doesn't exist in this template.
+bool copyTemplateFolderIfUnchanged(const fs::path & from, const fs::path & to, const string & label) {
+	if (!fs::exists(from)) return false;
+	switch (decideFolderUpdate(from, to)) {
+		case folderUpdateDecision::CopyFresh:
+			fs::copy(from, to, fs::copy_options::recursive);
+			return true;
+		case folderUpdateDecision::CopyRefresh:
+			fs::remove_all(to);
+			fs::copy(from, to, fs::copy_options::recursive);
+			return true;
+		case folderUpdateDecision::KeepCustom:
+			std::cout << label << ": customized, keeping project version" << std::endl;
+			return false;
+	}
+	return false;
+}
+
 json withoutSystemLinks(const json & value, bool frameworks, bool libs, const std::set<string> & known) {
 	json kept = json::array();
 	for (auto & unit : xcodeSettings::flagUnits("OTHER_LDFLAGS", value)) {
@@ -519,19 +602,23 @@ bool xcodeProject::createProjectFile() {
 		for (auto & f : { "openFrameworks-Info.plist", "of.entitlements" }) {
 			copyTemplateFiles.push_back({ normalizePath(templatePath / f), normalizePath(projectDir / f) });
 		}
+		try {
+			copyTemplateFolderIfUnchanged(normalizePath(templatePath / "Assets.xcassets"),
+				normalizePath(projectDir / "Assets.xcassets"), "Assets.xcassets");
+		} catch (const std::exception & e) {
+			std::cerr << "Error copying Assets.xcassets: " << e.what() << std::endl;
+			return false;
+		}
 	} else if (target == "ios" || target == "tvos" || target == "visionos" || target == "catos" || target == "macos") {
 		for (auto & f : { "ofxiOS-Info.plist", "ofxiOS_Prefix.pch" }) {
 			copyTemplateFiles.push_back({ normalizePath(templatePath / f), normalizePath(projectDir / f) });
-			try {
-				fs::path from = normalizePath(templatePath / "mediaAssets");
-				fs::path to = normalizePath(projectDir / "mediaAssets");
-				if (!fs::exists(to)) {
-					fs::copy(from, to, fs::copy_options::recursive | fs::copy_options::update_existing);
-				}
-			} catch (const std::exception & e) {
-				std::cerr << "Error copying template files: " << e.what() << std::endl;
-				return false;
-			}
+		}
+		try {
+			copyTemplateFolderIfUnchanged(normalizePath(templatePath / "mediaAssets"),
+				normalizePath(projectDir / "mediaAssets"), "mediaAssets");
+		} catch (const std::exception & e) {
+			std::cerr << "Error copying mediaAssets: " << e.what() << std::endl;
+			return false;
 		}
 	}
 
