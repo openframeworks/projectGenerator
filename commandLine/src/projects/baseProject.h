@@ -126,6 +126,9 @@ public:
 	void setAppVersion(const std::string & version, const std::string & build) { appVersionOption = version; appBuildOption = build; }
 	// bundle id (--bundle-id), written to config.make APP_BUNDLE_ID; empty keeps the project's (default cc.openFrameworks.<name>)
 	void setAppBundleId(const std::string & bundleId) { appBundleIdOption = bundleId; }
+	// Bundle data folder (--bundle-data=0|1): toggle OF_BUNDLE_DATA_FOLDER in Project.xcconfig for osx / macos targets.
+	// Empty leaves the xcconfig unchanged; "1" uncomments the line so the macOS .app bundles bin/data/ on build; "0" re-comments it.
+	virtual void setBundleDataFolder(const std::string & value) { bundleDataFolderOption = value; }
 
 
 #ifdef OFADDON_OUTPUT_JSON_DEBUG
@@ -214,6 +217,7 @@ protected:
 	std::string appBundleIdOption; // from the CLI, empty = keep
 	std::string appBundleId; // value for this project, empty = the template's cc.openFrameworks.<name>
 	void saveAppBundleIdFiles();
+	std::string bundleDataFolderOption; // from --bundle-data, empty = leave Project.xcconfig alone, "1" / "0" = uncomment / comment OF_BUNDLE_DATA_FOLDER
 	
 	//cached addons - if an addon is requested more than once, avoid loading from disk as it's quite slow
 	std::map<std::string,std::map<std::string, ofAddon>> addonsCache; //indexed by [platform][supplied path]

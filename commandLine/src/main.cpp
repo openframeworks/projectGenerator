@@ -41,7 +41,8 @@ enum optionIndex { UNKNOWN,
 	EMSCRIPTEN_WASM,
 	APP_VERSION,
 	APP_BUILD,
-	BUNDLE_ID
+	BUNDLE_ID,
+	BUNDLE_DATA
 };
 
 constexpr option::Descriptor usage[] = {
@@ -77,6 +78,7 @@ constexpr option::Descriptor usage[] = {
 	{ APP_VERSION, 0, "", "app-version", option::Arg::Optional, "  --app-version  \tapp version, eg 1.2.3 (default 1.0): config.make / CMake APP_VERSION, Xcode MARKETING_VERSION, Android versionName" },
 	{ APP_BUILD, 0, "", "app-build", option::Arg::Optional, "  --app-build  \tbuild number, eg 42 (default 1): config.make / CMake APP_BUILD, Xcode CURRENT_PROJECT_VERSION, Android versionCode" },
 	{ BUNDLE_ID, 0, "", "bundle-id", option::Arg::Optional, "  --bundle-id  \tbundle id, eg com.example.myApp (default cc.openFrameworks.<name>): config.make / CMake APP_BUNDLE_ID, Xcode PRODUCT_BUNDLE_IDENTIFIER, Android applicationId" },
+	{ BUNDLE_DATA, 0, "", "bundle-data", option::Arg::Optional, "  --bundle-data  \tbundle the project's bin/data/ folder into the macOS .app on build: 1 (uncomment OF_BUNDLE_DATA_FOLDER in Project.xcconfig) | 0 (re-comment it). Only applied for osx / macos targets; empty leaves the xcconfig unchanged" },
 	{ 0, 0, 0, 0, 0, 0 }
 };
 
@@ -114,6 +116,7 @@ string emscriptenWasm; // empty keeps the project's config.make value
 string appVersion; // empty keeps the project's value
 string appBuild;
 string appBundleId; // empty keeps the project's value
+string bundleDataFolder; // empty = leave Project.xcconfig alone; "1" uncomments OF_BUNDLE_DATA_FOLDER, "0" re-comments it
 string ofPathEnv;
 string templateName;
 string msys2Env = "ucrt64";
@@ -290,6 +293,7 @@ void updateProject(const fs::path & path, const string & target, bool bConsiderP
 		project->setEmscriptenWasm(emscriptenWasm);
 		project->setAppVersion(appVersion, appBuild);
 		project->setAppBundleId(appBundleId);
+		project->setBundleDataFolder(bundleDataFolder);
 		project->setProjectDefinesPassed(bDefinesPassedIn);
 		project->setSystemFrameworks(frameworks, bFrameworksPassedIn, systemLibs, bSystemLibsPassedIn);
 		if (!project->create(path, templateName)) throw std::runtime_error("could not update project: " + path.string());
@@ -487,7 +491,7 @@ int pgMain(int argc, char ** argv) {
 	// optionparser only takes attached values (-posx, --platforms=osx); join -p osx / --platforms osx,
 	// but leave the last argument as the project path: -t"" <path> (scripts, the GUI) is an empty -t
 	static const std::string valueShort { "paotsmfDPkW" };
-	static const std::vector<std::string> valueLong { "platforms", "addons", "ofPath", "template", "source", "ofmenu", "frameworks", "system-libs", "defines", "postbuild", "msys2env", "emscripten-wasm", "app-version", "app-build", "bundle-id" };
+	static const std::vector<std::string> valueLong { "platforms", "addons", "ofPath", "template", "source", "ofmenu", "frameworks", "system-libs", "defines", "postbuild", "msys2env", "emscripten-wasm", "app-version", "app-build", "bundle-id", "bundle-data" };
 	std::vector<std::string> joinedArgs;
 	std::string platformBeforePath;
 	for (int i = 0; i < argc; i++) {
@@ -775,6 +779,15 @@ int pgMain(int argc, char ** argv) {
 		}
 	}
 
+	if (options[BUNDLE_DATA].count() > 0 && options[BUNDLE_DATA].arg != NULL) {
+		std::string v = ofTrim(options[BUNDLE_DATA].arg);
+		if (v == "0" || v == "1") {
+			bundleDataFolder = v;
+		} else {
+			ofLogWarning() << "bundle-data " << v << " should be 0 or 1 - keeping the project's Project.xcconfig";
+		}
+	}
+
 	if (options[POSTBUILD].count() > 0 && options[POSTBUILD].arg != NULL) {
 		postBuildScript = ofTrim(options[POSTBUILD].arg);
 	}
@@ -946,6 +959,7 @@ int pgMain(int argc, char ** argv) {
 						project->setEmscriptenWasm(emscriptenWasm);
 						project->setAppVersion(appVersion, appBuild);
 						project->setAppBundleId(appBundleId);
+						project->setBundleDataFolder(bundleDataFolder);
 						project->setProjectDefinesPassed(bDefinesPassedIn);
 						project->setSystemFrameworks(frameworks, bFrameworksPassedIn, systemLibs, bSystemLibsPassedIn);
 						if (!project->create(projectPath, templateName)) return EXIT_FAILURE;
