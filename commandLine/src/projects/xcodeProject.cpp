@@ -2008,6 +2008,41 @@ bool xcodeProject::saveProjectFile() {
 			ofLogError(LOG_NAME) << "Cannot save Apple settings: " << e.what();
 			return false;
 		}
+		// --bundle-data=1|0 (osx / macos only): toggle the APPSTORE line that bundles bin/data/
+		// into the .app. The templates ship it commented out; this is applied after
+		// saveAppleSettings' merge so the explicit flag is the final word, overriding both the
+		// template default and any previous project state the merge would otherwise carry over.
+		// If the merge left multiple OF_BUNDLE_DATA_FOLDER lines (template-commented + user-
+		// uncommented), the first matching line is rewritten and the rest are dropped.
+		if ((target == "osx" || target == "macos") && !bundleDataFolderOption.empty()) {
+			fs::path xcconfig = projectDir / "Project.xcconfig";
+			if (fs::exists(xcconfig)) {
+				try {
+					static const std::regex lineRe(R"(^[ \t]*(?://)?[ \t]*OF_BUNDLE_DATA_FOLDER[ \t]*=.*$)");
+					string replacement = bundleDataFolderOption == "1" ? "OF_BUNDLE_DATA_FOLDER = 1" : "//OF_BUNDLE_DATA_FOLDER = 1";
+					std::vector<string> lines = fileToStrings(xcconfig);
+					bool wrote = false;
+					bool changed = false;
+					string updated;
+					for (auto & l : lines) {
+						if (std::regex_match(l, lineRe)) {
+							if (!wrote) {
+								if (l != replacement) changed = true;
+								updated += replacement + "\n";
+								wrote = true;
+							} else {
+								changed = true; // collapsing a duplicate
+							}
+						} else {
+							updated += l + "\n";
+						}
+					}
+					if (changed) writeSettingsFile(xcconfig, updated);
+				} catch (const std::exception & e) {
+					ofLogWarning(LOG_NAME) << "Cannot toggle OF_BUNDLE_DATA_FOLDER in Project.xcconfig: " << e.what();
+				}
+			}
+		}
 	}
 
 	//	for (auto & c : commands) cout << c << endl;

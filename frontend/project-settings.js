@@ -220,7 +220,7 @@ function cflagDefines(value, settings) {
 
 function readProjectSettings(folder, { platforms = [], ofPath = '' } = {}) {
     const make = assignments(text(path.join(folder, 'config.make')));
-    const result = { version: '', build: '', bundleId: '', defines: words(make.PROJECT_DEFINES), frameworks: [], libs: [] };
+    const result = { version: '', build: '', bundleId: '', bundleDataFolder: false, defines: words(make.PROJECT_DEFINES), frameworks: [], libs: [] };
     for (const item of words(make.PROJECT_FRAMEWORKS)) {
         if (/^-l|^lib|\.(?:tbd|dylib)$/.test(item)) result.libs.push(cleanLibrary(item));
         else result.frameworks.push(cleanFramework(item));
@@ -304,6 +304,9 @@ function readProjectSettings(folder, { platforms = [], ofPath = '' } = {}) {
     result.version ||= unquote(make.APP_VERSION || last(cmake, /^\s*set\(\s*APP_VERSION\s+"?([0-9.]+)/gm) || appConfig.MARKETING_VERSION || last(gradle, /^\s*versionName\s+['"]([^'"]+)/gm));
     result.build ||= unquote(make.APP_BUILD || last(cmake, /^\s*set\(\s*APP_BUILD\s+"?([0-9]+)/gm) || appConfig.CURRENT_PROJECT_VERSION || last(gradle, /^\s*versionCode\s+([0-9]+)/gm));
     result.bundleId ||= unquote(make.APP_BUNDLE_ID || last(cmake, /^\s*set\(\s*APP_BUNDLE_ID\s+"?([^\s")]+)/gm) || appConfig.PRODUCT_BUNDLE_IDENTIFIER || last(gradle, /^\s*applicationId\s+['"]([^'"]+)/gm));
+    // OF_BUNDLE_DATA_FOLDER = 1 in Project.xcconfig (osx / macos): commented lines are stripped
+    // by assignments(), so a truthy value means it's actually uncommented and set to 1.
+    result.bundleDataFolder = scalar(xcconfig.OF_BUNDLE_DATA_FOLDER || appConfig.OF_BUNDLE_DATA_FOLDER || '').trim() === '1';
     for (const key of ['version', 'build', 'bundleId']) if (result[key].includes('$')) result[key] = '';
     result.defines = unique(result.defines.filter((define) => !define.includes('$')));
     result.frameworks = unique(result.frameworks); result.libs = unique(result.libs);

@@ -339,6 +339,16 @@
 						</label>
 						<input type="text" id="bundleId" placeholder="cc.openFrameworks.myApp" autocomplete="off" spellcheck="false">
 					</div>
+					<div class="field" id="bundleDataField" style="display: none">
+						<div class="ui checkbox">
+							<input type="checkbox" id="bundleData">
+							<label><span data-i18n="checkbox.bundleData">Bundle data folder into .app (macOS)</span> &nbsp;
+								<a class="ui icon tooltip" href="#" data-i18n-content="tooltip.bundleData" data-content="Uncomments OF_BUNDLE_DATA_FOLDER = 1 in Project.xcconfig so Xcode copies bin/data/ into the built .app. Needed for App Store builds; unchecked leaves data/ next to the .app in bin/." data-position="right center">
+									<i class="help circle icon"></i>
+								</a>
+							</label>
+						</div>
+					</div>
 					<div class="two fields" id="systemFrameworksField" style="display: none">
 						<div class="field">
 							<label><span data-i18n="field.systemFrameworks">System frameworks:</span> &nbsp;

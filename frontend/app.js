@@ -223,6 +223,8 @@ ipcRenderer.on('setGenerateMode', (event, arg) => {
 
 function clearProjectSettings() {
     for (const id of ['appVersion', 'appBuild', 'bundleId', 'systemFrameworks', 'systemLibs', 'customDefines']) $('#' + id).val('');
+    $('#bundleData').prop('checked', false);
+    $('#bundleData').closest('.ui.checkbox').removeClass('checked');
     $('#appVersionNote').text('').hide();
     $('#rendererDropdown, #glDropdown, #webglDropdown, #glesDropdown').dropdown('set exactly', 'default');
     loadedProjectSettings = null;
@@ -238,9 +240,14 @@ ipcRenderer.on('setProjectSettings', (event, values) => {
     for (const [id, value] of Object.entries(fields)) {
         if (!keepEdits || $('#' + id).val().trim() === loadedProjectSettings[id]) $('#' + id).val(value);
     }
+    const bundleDataChecked = !!values.bundleDataFolder;
+    if (!keepEdits || $('#bundleData').is(':checked') === !!loadedProjectSettings?.bundleDataFolder) {
+        $('#bundleData').prop('checked', bundleDataChecked);
+        $('#bundleData').closest('.ui.checkbox').toggleClass('checked', bundleDataChecked);
+    }
     $('#appVersionNote').text('').hide();
     if (!keepEdits) $('#rendererDropdown, #glDropdown, #webglDropdown, #glesDropdown').dropdown('set exactly', 'default');
-    loadedProjectSettings = { projectName: values.projectName, projectPath: values.projectPath, ...fields };
+    loadedProjectSettings = { projectName: values.projectName, projectPath: values.projectPath, ...fields, bundleDataFolder: bundleDataChecked };
 });
 
 function projectFieldValue(id) {
@@ -972,6 +979,9 @@ function setup() {
         $("#detachConsole").checkbox();
         $("#detachConsole").prop('checked', !!defaultSettings['detachConsole']);
         updateConsoleDockVisibility();
+
+        // bundle data folder (osx / macos): Semantic UI init; state is set by setProjectSettings
+        $("#bundleData").checkbox();
         $("#detachConsole").on('change', function(){
             const enabled = $(this).is(':checked');
             defaultSettings['detachConsole'] = enabled;
@@ -1318,6 +1328,9 @@ function generate() {
         appVersion: projectFieldValue('appVersion') || '',
         appBuild: projectFieldValue('appBuild') || '',
         appBundleId: projectFieldValue('bundleId') || '',
+        // osx / macos checkbox for OF_BUNDLE_DATA_FOLDER in Project.xcconfig; hidden = keep
+        // the project's current xcconfig (don't send the flag at all)
+        bundleDataFolder: $('#bundleDataField').css('display') !== 'none' ? ($('#bundleData').is(':checked') ? '1' : '0') : '',
         // only for Apple targets; hidden = keep the project's config.make values
         systemFrameworks: $('#systemFrameworksField').css('display') !== 'none' && projectFieldValue('systemFrameworks') !== null ? $('#systemFrameworks').val().split(/[\s,]+/).filter(Boolean) : null,
         systemLibs: $('#systemFrameworksField').css('display') !== 'none' && projectFieldValue('systemLibs') !== null ? $('#systemLibs').val().split(/[\s,]+/).filter(Boolean) : null
@@ -1516,6 +1529,8 @@ function updateRendererFieldVisibility() {
     // advanced only; hidden fields keep the project's values, so updating still keeps them
     $('#appVersionField').css('display', defaultSettings.advancedMode ? 'flex' : 'none');
     $('#bundleIdField').toggle(!!defaultSettings.advancedMode);
+    // bundle data folder checkbox is osx / macos only (the APPSTORE block it toggles only exists in those templates)
+    $('#bundleDataField').toggle(!!defaultSettings.advancedMode && selectedPlatforms.some((p) => ['osx', 'macos'].includes(p)));
     $('#appVersionNote').toggle(!!defaultSettings.advancedMode && $('#appVersionNote').text().length > 0);
     $('#systemFrameworksField').css('display', defaultSettings.advancedMode && selectedPlatforms.some((p) => ['osx', 'ios', 'macos', 'tvos'].includes(p)) ? 'flex' : 'none');
 

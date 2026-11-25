@@ -1768,6 +1768,7 @@ ipcMain.on('downloadModularLibs', async (event, { ofPath, tag, names }) => {
  *     appVersion: string,
  *     appBuild: string,
  *     appBundleId: string,
+ *     bundleDataFolder: string,
  *     systemFrameworks: Array<string>|null,
  *     systemLibs: Array<string>|null,
  * }} GenerateArgument */
@@ -1793,6 +1794,7 @@ function generateFunction(event, generate) {
         appVersion,
         appBuild,
         appBundleId,
+        bundleDataFolder,
         systemFrameworks,
         systemLibs,
     } = generate;
@@ -1851,6 +1853,10 @@ function generateFunction(event, generate) {
     // empty keeps the project's bundle id
     if (appBundleId && /^[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$/.test(appBundleId)) {
         args.push(`--bundle-id=${appBundleId}`);
+    }
+    // osx / macos bundle data folder checkbox; empty (hidden) keeps the project's Project.xcconfig
+    if (bundleDataFolder === '0' || bundleDataFolder === '1') {
+        args.push(`--bundle-data=${bundleDataFolder}`);
     }
 
     // null keeps the project's config.make PROJECT_FRAMEWORKS / PROJECT_SYSTEM_LIBS, empty removes them
